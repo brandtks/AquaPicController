@@ -1,0 +1,15 @@
+C:\Users\Skyler Brandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\bin\Debug\MyWidgetLibrary.dll
+C:\Users\Skyler Brandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\bin\Debug\MyWidgetLibrary.pdb
+C:\Users\Skyler Brandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\obj\Debug\MyWidgetLibrary.csprojResolveAssemblyReference.cache
+C:\Users\Skyler Brandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\obj\Debug\MyWidgetLibrary.dll
+C:\Users\Skyler Brandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\obj\Debug\MyWidgetLibrary.pdb
+C:\Users\sbrandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\bin\Debug\MyWidgetLibrary.dll
+C:\Users\sbrandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\bin\Debug\MyWidgetLibrary.pdb
+C:\Users\sbrandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\obj\Debug\MyWidgetLibrary.dll
+C:\Users\sbrandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\obj\Debug\MyWidgetLibrary.pdb
+C:\Users\sbrandt\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\obj\Debug\MyWidgetLibrary.csprojResolveAssemblyReference.cache
+C:\Users\Skyler\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\bin\Debug\MyWidgetLibrary.dll
+C:\Users\Skyler\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\bin\Debug\MyWidgetLibrary.pdb
+C:\Users\Skyler\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Skyler\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\obj\Debug\MyWidgetLibrary.dll
+C:\Users\Skyler\Dropbox\MonoDeveloper\AquaPic\MyWidgetLibrary\obj\Debug\MyWidgetLibrary.pdb

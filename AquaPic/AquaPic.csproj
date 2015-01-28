@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{5272A01C-4356-4F37-AF92-B53974F21B34}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>AquaPic</RootNamespace>
+    <AssemblyName>AquaPic</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="gtk-sharp, Version=2.4.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=2.4.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="glib-sharp, Version=2.4.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="glade-sharp, Version=2.4.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="pango-sharp, Version=2.4.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="atk-sharp, Version=2.4.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Mono.Posix, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
+    <Reference Include="Mono.Cairo, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="gtk-gui\gui.stetic">
+      <LogicalName>gui.stetic</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="gtk-gui\generated.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Screens\power.cs" />
+    <Compile Include="gtk-gui\AquaPic.powerWindow.cs" />
+    <Compile Include="Driver\Alarm\Alarm.cs" />
+    <Compile Include="Driver\Alarm\AlarmEvents.cs" />
+    <Compile Include="Driver\Alarm\AlarmType.cs" />
+    <Compile Include="Driver\Utilites\Time.cs" />
+    <Compile Include="Driver\Utilites\TimeDate.cs" />
+    <Compile Include="Driver\Lights\LightingChannel.cs" />
+    <Compile Include="Driver\Lights\LightingMain.cs" />
+    <Compile Include="Driver\Lights\RiseSetCalc.cs" />
+    <Compile Include="Driver\Power\PowerEvents.cs" />
+    <Compile Include="Driver\Power\PowerMain.cs" />
+    <Compile Include="Driver\Power\PowerPlug.cs" />
+    <Compile Include="Driver\Power\PowerStrip.cs" />
+    <Compile Include="Driver\Power\PowerStruct.cs" />
+    <Compile Include="Driver\Temperature\ColumnTemperature.cs" />
+    <Compile Include="Driver\Temperature\Heater.cs" />
+    <Compile Include="Driver\Temperature\TemperatureMain.cs" />
+    <Compile Include="Driver\AnalogInput\AnalogInputCard.cs" />
+    <Compile Include="Driver\AnalogInput\AnalogInputChannel.cs" />
+    <Compile Include="Driver\AnalogInput\AnalogInputMain.cs" />
+    <Compile Include="Driver\AnalogInput\AnalogInputStruct.cs" />
+    <Compile Include="gtk-gui\AquaPic.mainWindow.cs" />
+    <Compile Include="Screens\MainScreen.cs" />
+    <Compile Include="Screens\ScreenLayout.cs" />
+    <Compile Include="Driver\SerialBus\AquaPicBus.cs" />
+    <Compile Include="Driver\SerialBus\AquaPicBusMessage.cs" />
+    <Compile Include="Driver\SerialBus\AquaPicBusSlave.cs" />
+    <Compile Include="Driver\SerialBus\AquaPicDefines.cs" />
+    <Compile Include="Driver\Globals\GlobalEnums.cs" />
+    <Compile Include="Driver\Utilites\Utilites.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Screens\" />
+    <Folder Include="Driver\" />
+    <Folder Include="Driver\Alarm\" />
+    <Folder Include="Driver\AnalogInput\" />
+    <Folder Include="Driver\Lights\" />
+    <Folder Include="Driver\Power\" />
+    <Folder Include="Driver\SerialBus\" />
+    <Folder Include="Driver\Temperature\" />
+    <Folder Include="Driver\Globals\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MyWidgetLibrary\MyWidgetLibrary.csproj">
+      <Project>{E8EBC196-4BF6-4BED-B519-5BB37B67E414}</Project>
+      <Name>MyWidgetLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
