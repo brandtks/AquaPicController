@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.Power;
 
@@ -51,11 +52,11 @@ namespace AquaPic.Lighting
                     if (!lights [i].lightingOn) { // lighting is off check conditions to turn on
                         if ((lights [i].sunRise.compareTo (now) > 1) && (lights [i].sunSet.compareTo (now) < 1)) {
                             //time is after sun rise and before sun set
-                            lights [i].turnLightsOn ();
+                            //lights [i].turnLightsOn ();
                         }
                     } else {
                         if ((lights [i].sunRise.compareTo (now) < 1) && (lights [i].sunSet.compareTo (now) > 1)) {
-                            lights [i].turnLightsOff ();
+                            //lights [i].turnLightsOff ();
                         }
                     }
                 }

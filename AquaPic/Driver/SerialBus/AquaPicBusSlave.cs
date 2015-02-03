@@ -1,4 +1,5 @@
 ﻿using System;
+using Gtk; // for Application.Invoke
 
 namespace AquaPic.SerialBus
 {
@@ -24,6 +25,7 @@ namespace AquaPic.SerialBus
             public int responeTime {
                 get { return _responeTime; }
             }
+            public string name { get; set; }
 
             public Slave (AquaPicBus bus, byte address) {
                 if (!bus.IsAddressOk (address))
@@ -35,8 +37,13 @@ namespace AquaPic.SerialBus
                 this._timeQue = new int[10];
                 this._queIdx = 0;
                 this._status = AquaPicBusStatus.notOpen;
+                this.name = null;
 
                 this._bus.slaves.Add (this);
+            }
+
+            public Slave (AquaPicBus bus, byte address, string name ) : this(bus, address) {
+                this.name = name;
             }
 
             public unsafe void Read (byte func, int readSize, ResponseCallback callback) {
@@ -71,7 +78,9 @@ namespace AquaPic.SerialBus
                 _status = stat;
 
                 if (OnStatusUpdate != null)
-                    OnStatusUpdate (this);
+                    Gtk.Application.Invoke (delegate {
+                        OnStatusUpdate (this);
+                    });
             }
         }
     }

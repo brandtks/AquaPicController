@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using AquaPic.Alarm;
 using AquaPic.AnalogInput;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 using AquaPic.Power;
 
 namespace AquaPic.Temp
@@ -60,7 +60,7 @@ namespace AquaPic.Temp
             float setpoint = 78.0f, 
             float offset = 0.3f)
         {
-            power.addPlug (powerID, plugID, name, true);
+            //power.addPlug (powerID, plugID, name, true);
             heaters.Add (new Heater ((byte)powerID, (byte)plugID, controlTemp, setpoint, offset));
         }
 

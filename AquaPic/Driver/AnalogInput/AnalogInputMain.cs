@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.AnalogInput
 {
@@ -23,7 +23,7 @@ namespace AquaPic.AnalogInput
         }
 
         public static float getAnalog (analogInputCh ch) {
-            cards [ch.cardID].getValue (ch.channelID);
+            //cards [ch.cardID].getValue (ch.channelID);
             return cards [ch.cardID].channels [ch.channelID].value;
         }
     }

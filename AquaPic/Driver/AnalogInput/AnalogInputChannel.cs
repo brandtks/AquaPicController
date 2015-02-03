@@ -1,5 +1,5 @@
 ﻿using System;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.AnalogInput
 {

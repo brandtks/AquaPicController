@@ -1,4 +1,4 @@
-﻿<Properties StartupItem="AquaPic\AquaPic.csproj">
+﻿<Properties StartupItem="AquaPic\AquaPic.csproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
   <MonoDevelop.Ide.Workbench />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

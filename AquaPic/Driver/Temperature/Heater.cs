@@ -19,11 +19,11 @@ namespace AquaPic.Temp
         }
 
         public void turnHeaterOn (bool modeOverride = false) {
-            power.setPlug (plug, true, modeOverride);
+            //power.setPlug (plug, true, modeOverride);
         }
 
         public void turnHeaterOff (bool modeOverride = false) {
-            power.setPlug (plug, false, modeOverride);
+            // power.setPlug (plug, false, modeOverride);
         }
     }
 }

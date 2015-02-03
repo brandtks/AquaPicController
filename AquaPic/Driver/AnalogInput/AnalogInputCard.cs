@@ -1,5 +1,5 @@
 ﻿using System;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 using AquaPic.SerialBus;
 using AquaPic.Alarm;
 
@@ -11,7 +11,7 @@ namespace AquaPic.AnalogInput
         private byte _cardID;
         private int _alarmIdx;
         public analogInputChannel[] channels;
-        public APBstatus commsStatus;
+        //public APBstatus commsStatus;
 
         public analogInputCard (byte address, byte cardID, AnalogType[] types, string[] names) {
             this._address = address;
@@ -37,7 +37,7 @@ namespace AquaPic.AnalogInput
             channels [ch].type = type;
             channels [ch].name = name;
         }
-
+        /*
         public void getValues () {
             float[] values = new float[4];
             for (int i = 0; i < values.Length; ++i)
@@ -73,7 +73,7 @@ namespace AquaPic.AnalogInput
             }
 
             channels [ch].value = value;
-        }
+        }*/
     }
 }
 

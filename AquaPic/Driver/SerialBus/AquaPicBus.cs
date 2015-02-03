@@ -21,6 +21,7 @@ using System.Threading; // for Thread, AutoResetEvent
 using System.Diagnostics; // for Stopwatch
 using System.Collections; // for Queue
 using System.Collections.Generic; // for List
+using Gtk; // for Application.Invoke
 
 namespace AquaPic.SerialBus
 {
@@ -126,7 +127,9 @@ namespace AquaPic.SerialBus
 
                                     if (checkResponse (ref m.readBuffer)) {
                                         if (m.callback != null) {
-                                            m.callback (new CallbackArgs (m.readBuffer));
+                                            Gtk.Application.Invoke ( delegate {
+                                                m.callback (new CallbackArgs (m.readBuffer));
+                                            });
                                         }
                                         m.slave.updateStatus (AquaPicBusStatus.communicationSuccess, (int)stopwatch.ElapsedMilliseconds);
                                         break;

@@ -52,6 +52,7 @@
     </Reference>
     <Reference Include="Mono.Posix, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
     <Reference Include="Mono.Cairo, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
@@ -72,11 +73,8 @@
     <Compile Include="Driver\Lights\LightingChannel.cs" />
     <Compile Include="Driver\Lights\LightingMain.cs" />
     <Compile Include="Driver\Lights\RiseSetCalc.cs" />
-    <Compile Include="Driver\Power\PowerEvents.cs" />
-    <Compile Include="Driver\Power\PowerMain.cs" />
     <Compile Include="Driver\Power\PowerPlug.cs" />
     <Compile Include="Driver\Power\PowerStrip.cs" />
-    <Compile Include="Driver\Power\PowerStruct.cs" />
     <Compile Include="Driver\Temperature\ColumnTemperature.cs" />
     <Compile Include="Driver\Temperature\Heater.cs" />
     <Compile Include="Driver\Temperature\TemperatureMain.cs" />
@@ -93,6 +91,8 @@
     <Compile Include="Driver\SerialBus\AquaPicDefines.cs" />
     <Compile Include="Driver\Globals\GlobalEnums.cs" />
     <Compile Include="Driver\Utilites\Utilites.cs" />
+    <Compile Include="Driver\Power\Power.cs" />
+    <Compile Include="Driver\Power\PowerDefines.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

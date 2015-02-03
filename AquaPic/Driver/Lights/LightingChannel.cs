@@ -1,4 +1,5 @@
 ﻿using System;
+using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.Power;
 using AquaPic.SerialBus;
@@ -46,11 +47,11 @@ namespace AquaPic.Lighting
                 int alarmIdx = temperature.highTempAlarmIdx;
                 if (alarmIdx == -1)
                     return;
-                alarm.addPostHandler (alarmIdx, sender => turnLightsOff ());
-                alarm.addClearHandler (alarmIdx, sender => turnLightsOn ());
+                //alarm.addPostHandler (alarmIdx, sender => turnLightsOff ());
+                //alarm.addClearHandler (alarmIdx, sender => turnLightsOn ());
             }
 
-            power.addHandlerOnStateChange (this.plug, new stateChangeHandler (lightingPlugStateChange));
+            //power.addHandlerOnStateChange (this.plug, new stateChangeHandler (lightingPlugStateChange));
 		}
 
         public void setSunRiseSet (TimeDate rise, TimeDate sSet) {
@@ -90,7 +91,7 @@ namespace AquaPic.Lighting
 
             sunSet.addMinToDate (sunSetOffset);
         }
-
+        /*
         public bool turnLightsOn () {
             return power.setPlug (plug, true);
         }
@@ -98,7 +99,7 @@ namespace AquaPic.Lighting
         public bool turnLightsOff () {
             return power.setPlug (plug, false);
         }
-
+*/
         public void lightingPlugStateChange (object sender, stateChangeEventArgs args) {
             lightingOn = args.state;
         }
