@@ -27,7 +27,7 @@ namespace AquaPic.SerialBus
 {
     public partial class AquaPicBus
     {
-        static public AquaPicBus Bus1 = new AquaPicBus (2, 1000);
+        public static AquaPicBus Bus1 = new AquaPicBus (2, 1000);
 
         private SerialPort uart;
         private Queue messageBuffer;

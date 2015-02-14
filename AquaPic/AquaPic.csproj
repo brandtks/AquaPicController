@@ -71,17 +71,13 @@
     <Compile Include="Driver\Utilites\Time.cs" />
     <Compile Include="Driver\Utilites\TimeDate.cs" />
     <Compile Include="Driver\Lights\LightingChannel.cs" />
-    <Compile Include="Driver\Lights\LightingMain.cs" />
     <Compile Include="Driver\Lights\RiseSetCalc.cs" />
     <Compile Include="Driver\Power\PowerPlug.cs" />
     <Compile Include="Driver\Power\PowerStrip.cs" />
     <Compile Include="Driver\Temperature\ColumnTemperature.cs" />
     <Compile Include="Driver\Temperature\Heater.cs" />
-    <Compile Include="Driver\Temperature\TemperatureMain.cs" />
     <Compile Include="Driver\AnalogInput\AnalogInputCard.cs" />
     <Compile Include="Driver\AnalogInput\AnalogInputChannel.cs" />
-    <Compile Include="Driver\AnalogInput\AnalogInputMain.cs" />
-    <Compile Include="Driver\AnalogInput\AnalogInputStruct.cs" />
     <Compile Include="gtk-gui\AquaPic.mainWindow.cs" />
     <Compile Include="Screens\MainScreen.cs" />
     <Compile Include="Screens\ScreenLayout.cs" />
@@ -93,6 +89,10 @@
     <Compile Include="Driver\Utilites\Utilites.cs" />
     <Compile Include="Driver\Power\Power.cs" />
     <Compile Include="Driver\Power\PowerDefines.cs" />
+    <Compile Include="Driver\Lights\Lighting.cs" />
+    <Compile Include="Driver\Temperature\Temperature.cs" />
+    <Compile Include="Driver\AnalogInput\AnalogInput.cs" />
+    <Compile Include="Driver\AnalogInput\AnalogInputDefines.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

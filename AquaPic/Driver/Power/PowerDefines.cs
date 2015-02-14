@@ -1,7 +1,7 @@
 ﻿using System;
 using AquaPic.Globals;
 
-namespace AquaPic.Power
+namespace AquaPic.PowerDriver
 {
     public delegate void modeChangedHandler (object sender, modeChangeEventArgs args);
     public delegate void stateChangeHandler (object sender, stateChangeEventArgs args);

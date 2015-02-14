@@ -1,7 +1,7 @@
 ﻿using System;
 using AquaPic.Globals;
 
-namespace AquaPic.Power
+namespace AquaPic.PowerDriver
 {
     public partial class Power 
     {

@@ -4,7 +4,7 @@ using AquaPic.SerialBus;
 using AquaPic.Alarm;
 using AquaPic.Globals;
 
-namespace AquaPic.Power
+namespace AquaPic.PowerDriver
 {
     public partial class Power
     {
@@ -30,7 +30,7 @@ namespace AquaPic.Power
             public bool acPowerAvail { get; set; }
             public PlugData[] plugs { get; set; }
 
-            /* <Future Expansion>
+            /* <Future>
             public powerStrip (byte address, byte powerID, string[] names, byte rtnToRequestedMask) {
                 this._address = address;
                 this._powerID = powerID;

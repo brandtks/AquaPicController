@@ -1,7 +1,7 @@
 ﻿using System;
 using AquaPic.Utilites;
 
-namespace AquaPic.Lighting
+namespace AquaPic.LightingDriver
 {
 	public class riseSetCalc
     {

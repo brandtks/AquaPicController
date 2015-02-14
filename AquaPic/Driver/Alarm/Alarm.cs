@@ -42,6 +42,10 @@ namespace AquaPic.Alarm
             }
         }
 
+        public static bool checkAlarming (int index) {
+            return alarms [index].alarming;
+        }
+
         public static void addPostHandler (int index, alarmHandler handler) {
             alarms [index].onPost += handler;
         }

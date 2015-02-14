@@ -122,16 +122,19 @@ namespace AquaPic.Utilites
             day = (byte)now.Day;
         }
 
+        // returns 1 if after value, -1 if before value
         public int compareTo (TimeDate value) {
             DateTime val = toDateTime ();
             return val.CompareTo (value.toDateTime ());
         }
 
+        // returns 1 if after value, -1 if before value
         public int compareTo (DateTime value) {
             DateTime val = toDateTime ();
             return val.CompareTo (value);
         }
 
+        // returns 1 if after value, -1 if before value
         public int compareToTime (TimeDate value) {
             return TimeSpan.Compare (toTimeSpan (), value.toTimeSpan ());
         }

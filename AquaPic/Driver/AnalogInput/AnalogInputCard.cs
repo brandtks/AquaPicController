@@ -3,77 +3,91 @@ using AquaPic.Globals;
 using AquaPic.SerialBus;
 using AquaPic.Alarm;
 
-namespace AquaPic.AnalogInput
+namespace AquaPic.AnalogInputDriver
 {
-    public class analogInputCard
+    public partial class AnalogInput
     {
-        private byte _address;
-        private byte _cardID;
-        private int _alarmIdx;
-        public analogInputChannel[] channels;
-        //public APBstatus commsStatus;
+        public class analogInputCard
+        {
+            private AquaPicBus.Slave _apb;
+            private byte _cardID;
+            private int _alarmIdx;
+            public analogInputChannel[] channels;
 
-        public analogInputCard (byte address, byte cardID, AnalogType[] types, string[] names) {
-            this._address = address;
-            this._cardID = cardID;
-            this._alarmIdx = alarm.subscribe ("APB communication error", "Temperature channel at address " + this._address.ToString ());
-            this.channels = new analogInputChannel[4];
-            for (int i = 0; i < channels.Length; ++i) {
-                channels [i] = new analogInputChannel (types [i], names [i]); 
+            /* <FUTURE>
+            public analogInputCard (byte address, byte cardID, AnalogType[] types, string[] names) {
+                this._cardID = cardID;
+                this._alarmIdx = alarm.subscribe ("APB communication error", "Temperature channel at address " + this._address.ToString ());
+                this.channels = new analogInputChannel[4];
+                for (int i = 0; i < channels.Length; ++i) {
+                    channels [i] = new analogInputChannel (types [i], names [i]); 
+                }
             }
-        }
+            */
 
-        public analogInputCard (byte address, byte cardID) {
-            this._address = address;
-            this._cardID = cardID;
-            this._alarmIdx = alarm.subscribe ("APB communication error", "Temperature channel at address " + this._address.ToString ());
-            this.channels = new analogInputChannel[4];
-            for (int i = 0; i < channels.Length; ++i) {
-                channels [i] = new analogInputChannel (AnalogType.None, null); 
-            }
-        }
-
-        public void addChannel (int ch, AnalogType type, string name) {
-            channels [ch].type = type;
-            channels [ch].name = name;
-        }
-        /*
-        public void getValues () {
-            float[] values = new float[4];
-            for (int i = 0; i < values.Length; ++i)
-                values [i] = 0.0f;
-
-            unsafe {
-                fixed (float* ptr = values) {
-                    commsStatus = APB.read (_address, 1, ptr, sizeof(float) * 4);
+            public analogInputCard (byte address, byte cardID) {
+                try {
+                    this._apb = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
+                } catch (Exception ex) {
+                    Console.WriteLine (ex.ToString ());
+                    Console.WriteLine (ex.Message);
+                }
+                this._cardID = cardID;
+                this._alarmIdx = alarm.subscribe ("APB communication error", "Temperature channel at address " + this._apb.address.ToString ());
+                this.channels = new analogInputChannel[4];
+                for (int i = 0; i < channels.Length; ++i) {
+                    channels [i] = new analogInputChannel (AnalogType.None, null); 
                 }
             }
 
-            if (commsStatus != APBstatus.readSuccess) {
-                alarm.post (_alarmIdx, true);
-                return;
+            public void addChannel (int ch, AnalogType type, string name) {
+                channels [ch].type = type;
+                channels [ch].name = name;
             }
 
-            for (int i = 0; i < channels.Length; ++i) {
-                channels [i].value = values [i];
+            protected void OnSlaveStatusUpdate (object sender) {
+                if ((_apb.status != AquaPicBusStatus.communicationSuccess) || (_apb.status != AquaPicBusStatus.communicationStart))
+                    alarm.post (_alarmIdx, true);
+            }
+                
+            public void getValues () {
+                unsafe {
+                    _apb.Read (1, sizeof(float) * 4, getValuesCallback); 
+                }
+            }
+
+            protected void getValuesCallback (CallbackArgs args) {
+                float[] values = new float[4];
+
+                unsafe {
+                    fixed (float* ptr = values) {
+                        args.copyBuffer (ptr, sizeof(float) * 4);
+                    }
+                }
+
+                for (int i = 0; i < channels.Length; ++i) {
+                    channels [i].value = values [i];
+                }
+            }
+
+            public void getValue (byte ch) {
+                byte message = ch;
+
+                unsafe {
+                    _apb.ReadWrite (2, &message, sizeof(byte), sizeof(float), getValueCallback);
+                }
+            }
+
+            protected void getValueCallback (CallbackArgs args) {
+                channelValue ch;
+
+                unsafe {
+                    args.copyBuffer (ch, sizeof(channelValue));
+                }
+
+                channels [ch.channel].value = ch.value;
             }
         }
-
-        public void getValue (byte ch) {
-            byte message = ch;
-            float value = 0.0f;
-
-            unsafe {
-                commsStatus = APB.readWrite (_address, 2, &message, sizeof(byte), &value, sizeof(float));
-            }
-
-            if (commsStatus != APBstatus.readWriteSuccess) {
-                alarm.post (_alarmIdx, true);
-                return;
-            }
-
-            channels [ch].value = value;
-        }*/
     }
 }
 

@@ -1,29 +1,32 @@
 ﻿using System;
-using AquaPic.Power;
+using AquaPic.PowerDriver;
 
-namespace AquaPic.Temp
+namespace AquaPic.TemperatureDriver
 {
-    public class Heater
+    public partial class Temperature
     {
-        public pwrPlug plug;
-        public bool controlTemp { get; set; }
-        public float setpoint { get; set; }
-        public float offset { get; set; }
+        public class Heater
+        {
+            public pwrPlug plug;
+            public bool controlTemp { get; set; }
+            public float setpoint { get; set; }
+            public float offset { get; set; }
 
-        public Heater (byte powerID, byte plugID, bool controlTemp, float setpoint, float offset) {
-            this.plug.powerID = powerID;
-            this.plug.plugID = plugID;
-            this.controlTemp = controlTemp;
-            this.setpoint = setpoint;
-            this.offset = offset;
-        }
+            public Heater (byte powerID, byte plugID, bool controlTemp, float setpoint, float offset) {
+                this.plug.powerID = powerID;
+                this.plug.plugID = plugID;
+                this.controlTemp = controlTemp;
+                this.setpoint = setpoint;
+                this.offset = offset;
+            }
 
-        public void turnHeaterOn (bool modeOverride = false) {
-            //power.setPlug (plug, true, modeOverride);
-        }
+            public void turnHeaterOn (bool modeOverride = false) {
+                Power.Main.setPlug (plug, true, modeOverride);
+            }
 
-        public void turnHeaterOff (bool modeOverride = false) {
-            // power.setPlug (plug, false, modeOverride);
+            public void turnHeaterOff (bool modeOverride = false) {
+                Power.Main.setPlug (plug, false, modeOverride);
+            }
         }
     }
 }

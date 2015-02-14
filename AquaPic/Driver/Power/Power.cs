@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic; // for List
 
-namespace AquaPic.Power
+namespace AquaPic.PowerDriver
 {
     public partial class Power
     {
@@ -11,6 +11,12 @@ namespace AquaPic.Power
 
         public Power () {
             pwrStrips = new List<PowerStrip> ();
+        }
+
+        public void run () {
+            for (int i = 0; i < pwrStrips.Count; ++i) {
+                pwrStrips [i].getStatus ();
+            }
         }
 
         public int addPowerStrip (int address, string name) {
