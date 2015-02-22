@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.Alarm;
+using AquaPic.AlarmDriver;
 using AquaPic.AnalogInputDriver;
 using AquaPic.Globals;
 using AquaPic.PowerDriver;
@@ -9,41 +9,42 @@ namespace AquaPic.TemperatureDriver
 {
     public partial class Temperature
     {
-        public static Temperature Main = new Temperature ();
+        //public static Temperature Main = new Temperature ();
 
-        private int _highTempAlarmIdx;
-        private int _lowTempAlarmIdx;
-        public int highTempAlarmIdx {
+        private static int _highTempAlarmIdx;
+        private static int _lowTempAlarmIdx;
+        public static int highTempAlarmIdx {
             get { return _highTempAlarmIdx; }
         }
-        public int lowTempAlarmIdx {
+        public static int lowTempAlarmIdx {
             get { return _lowTempAlarmIdx; }
         }
-        public float highTempAlarmSetpoint;
-        public float lowTempAlarmSetpoint;
-        public List<Heater> heaters;
-        public columnTemperature columnTemp;
+        public static float highTempAlarmSetpoint;
+        public static float lowTempAlarmSetpoint;
+        public static List<Heater> heaters = new List<Heater> ();
+        public static ColumnTemperature columnTemp = new ColumnTemperature ();
 
-        private Temperature () {
-            _highTempAlarmIdx = -1;
-            _lowTempAlarmIdx = -1;
-            heaters = new List<Heater> ();
+        //private Temperature () {
+            //_highTempAlarmIdx = -1;
+            //_lowTempAlarmIdx = -1;
+            //heaters = new List<Heater> ();
+        //}
+
+        public static void Init () {
+            _highTempAlarmIdx = Alarm.Subscribe ("High temperature", "Water column temperature too high");
+            _lowTempAlarmIdx = Alarm.Subscribe ("Low temperature", "Water column temperature too low");
+            Alarm.AddPostHandler (_highTempAlarmIdx, HighTempHandler);
+            Alarm.AddPostHandler (_lowTempAlarmIdx, LowTempHandler);
         }
 
-        public void init (int columnTempCardID, int columnTempChannelID, string colummTempName) {
-            _highTempAlarmIdx = alarm.subscribe ("High temperature", "Water column temperature too high");
-            _lowTempAlarmIdx = alarm.subscribe ("Low temperature", "Water column temperature too low");
-            alarm.addPostHandler (_highTempAlarmIdx, highTempHandler);
-            alarm.addPostHandler (_lowTempAlarmIdx, lowTempHandler);
-            addColumnTemperatureChannel (columnTempCardID, columnTempChannelID, colummTempName);
+        public static void AddTemperatureProbe (int cardID, int channelID, string name, bool waterColumn = true) {
+            AnalogInput.AddChannel (cardID, channelID, AnalogType.Temperature, name);
+            if (waterColumn) {
+                columnTemp.AddColumnTemperature (cardID, channelID);
+            }
         }
 
-        public void addColumnTemperatureChannel (int cardID, int channelID, string name) {
-            AnalogInput.Main.addChannel (cardID, channelID, AnalogType.Temperature, name);
-            columnTemp.addChannel ((byte)cardID, (byte)channelID);
-        }
-
-        public void addHeater (
+        public static void AddHeater (
             int powerID, 
             int plugID,
             string name,
@@ -51,18 +52,17 @@ namespace AquaPic.TemperatureDriver
             float setpoint = 78.0f, 
             float offset = 0.3f)
         {
-            Power.Main.addPlug (powerID, plugID, name, true);
-            heaters.Add (new Heater ((byte)powerID, (byte)plugID, controlTemp, setpoint, offset));
+            heaters.Add (new Heater ((byte)powerID, (byte)plugID, controlTemp, setpoint, offset, name));
         }
 
-        public void run () {
-            columnTemp.getColumnTemperature ();
+        public static void Run () {
+            columnTemp.GetColumnTemperature ();
 
             if (columnTemp.temperature >= highTempAlarmSetpoint) 
-                alarm.post (_highTempAlarmIdx);
+                Alarm.Post (_highTempAlarmIdx);
 
             if (columnTemp.temperature <= lowTempAlarmSetpoint)
-                alarm.post (_lowTempAlarmIdx);
+                Alarm.Post (_lowTempAlarmIdx);
 
             for (int i = 0; i < heaters.Count; ++i) {
                 if (heaters [i].controlTemp) {
@@ -75,13 +75,13 @@ namespace AquaPic.TemperatureDriver
             }
         }
 
-        private void highTempHandler (object sender) {
+        private static void HighTempHandler (object sender) {
             for (int i = 0; i < heaters.Count; ++i) {
                 heaters [i].turnHeaterOff (true);
             }
         }
 
-        private void lowTempHandler (object sender) {
+        private static void LowTempHandler (object sender) {
             for (int i = 0; i < heaters.Count; ++i) {
                 heaters [i].turnHeaterOn (true);
             }

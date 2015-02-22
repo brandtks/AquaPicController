@@ -1,7 +1,7 @@
 ﻿using System;
 using AquaPic;
 using AquaPic.SerialBus;
-using AquaPic.Alarm;
+using AquaPic.AlarmDriver;
 using AquaPic.Globals;
 
 namespace AquaPic.PowerDriver
@@ -53,8 +53,8 @@ namespace AquaPic.PowerDriver
                     Console.WriteLine (ex.Message);
                 }
                 this._powerID = powerID;
-                this._commsAlarmIdx = alarm.subscribe ("APB communication error", "Power Strip at address " + this._apb.address.ToString ());
-                this._powerAvailAlarmIdx = alarm.subscribe ("Loss of power", "Mains power not available at address " + this._apb.address.ToString ());
+                this._commsAlarmIdx = Alarm.Subscribe ("APB communication error", "Power Strip at address " + this._apb.address.ToString ());
+                this._powerAvailAlarmIdx = Alarm.Subscribe ("Loss of power", "Mains power not available at address " + this._apb.address.ToString ());
                 this.name = name;
                 this.acPowerAvail = false;
                 this.plugs = new PlugData[8];
@@ -63,11 +63,11 @@ namespace AquaPic.PowerDriver
                 }
             }
 
-            public unsafe void getStatus () {
-                _apb.Read (1, sizeof(pwrComms), getStatusCallback);
+            public unsafe void GetStatus () {
+                _apb.Read (20, sizeof(pwrComms), GetStatusCallback);
             }
 
-            protected void getStatusCallback (CallbackArgs callArgs) {
+            protected void GetStatusCallback (CallbackArgs callArgs) {
                 pwrComms status;
 
                 if (_apb.status != AquaPicBusStatus.communicationSuccess)
@@ -82,28 +82,28 @@ namespace AquaPic.PowerDriver
                     if (s != plugs [i].currentState) {
                         plugs [i].currentState = s;
                         stateChangeEventArgs args = new stateChangeEventArgs (i, powerID, plugs [i].mode, plugs [i].currentState);
-                        plugs [i].onChangeState (args);
+                        plugs [i].OnChangeState (args);
                     }
 
                     bool m = mtob (status.modeMask, i); 
                     if (m && (plugs [i].mode == Mode.Manual)) { // m true is auto
                         plugs [i].mode = Mode.Auto; 
                         modeChangeEventArgs args = new modeChangeEventArgs (i, address, plugs [i].mode);
-                        plugs [i].onModeChangedAuto (args);
+                        plugs [i].OnModeChangedAuto (args);
                     } else if (!m && (plugs [i].mode == Mode.Auto)) { // m false is manual
                         plugs [i].mode = Mode.Manual;
                         modeChangeEventArgs args = new modeChangeEventArgs (i, address, plugs [i].mode);
-                        plugs [i].onModeChangedManual (args);
+                        plugs [i].OnModeChangedManual (args);
                     }
                 }
 
                 acPowerAvail = status.acPowerAvail;
                 if (!acPowerAvail) {
-                    alarm.post (_powerAvailAlarmIdx, true);
+                    Alarm.Post (_powerAvailAlarmIdx, true);
                 }
             }
 
-            public void setPlugState (byte plugID, bool state, bool modeOverride) {
+            public void SetPlugState (byte plugID, bool state, bool modeOverride) {
                 byte[] message = new byte[3];
 
                 message [0] = plugID;
@@ -123,12 +123,12 @@ namespace AquaPic.PowerDriver
 
                 unsafe {
                     fixed (byte* ptr = message) {
-                        _apb.ReadWrite (2, ptr, sizeof(byte) * 3, sizeof(plugComms), setPlugStateCallback);
+                        _apb.ReadWrite (11, ptr, sizeof(byte) * 3, sizeof(plugComms), SetPlugStateCallback);
                     }
                 }
             }
 
-            protected void setPlugStateCallback (CallbackArgs a) {
+            protected void SetPlugStateCallback (CallbackArgs a) {
                 plugComms status;
 
                 if (_apb.status != AquaPicBusStatus.communicationSuccess)
@@ -144,17 +144,18 @@ namespace AquaPic.PowerDriver
                 if (plugs [plugID].requestedState == status.state) { // the state changed
                     plugs [plugID].currentState = status.state;
                     stateChangeEventArgs args = new stateChangeEventArgs (plugID, powerID, plugs [plugID].mode, plugs [plugID].currentState);
-                    plugs [plugID].onChangeState (args);
+                    plugs [plugID].OnChangeState (args);
                 }
             }
 
-            /* <TODO> this need lots of work */
+            // <TODO> this need lots of work
+            // need to determine how to handle the callback
     //        public void setAllPlugsState (byte mask) {
     //            for (int i = 0; i < 8; ++i)
     //                plugs [i].requestedState = mtob (mask, i);
     //
     //            unsafe {
-    //                commsStatus = APB.write (_address, 2, &mask, sizeof(byte));
+    //                commsStatus = APB.write (_address, 10, &mask, sizeof(byte));
     //            }
     //
     //            if (commsStatus != APBstatus.writeSuccess) {
@@ -162,7 +163,7 @@ namespace AquaPic.PowerDriver
     //            }
     //        }
 
-            public void setPlugMode (byte plugID, Mode mode) {
+            public void SetPlugMode (byte plugID, Mode mode) {
                 byte[] message = new byte[2];
                 plugs [plugID].mode = mode;
 
@@ -171,30 +172,32 @@ namespace AquaPic.PowerDriver
 
                 unsafe {
                     fixed (byte* ptr = message) {
-                        _apb.Write (3, ptr, sizeof(byte) * 2);
+                        _apb.Write (31, ptr, sizeof(byte) * 2);
                     }
                 }
             }
 
-            public void setAllPlugsMode (Mode mode) {
-                byte message;
-
-                for (int i = 0; i < 8; ++i)
-                    plugs [i].mode = mode;
-
-                if (plugs [0].mode == Mode.Auto)
-                    message = 0xFF;
-                else
-                    message = 0x00;
-
-                unsafe {
-                    _apb.Write (4, &message, sizeof(byte));
-                }
-            }
+            // <TODO> cann't decide if I want to set all the modes the same
+            // or be able to only set certain ones 
+//            public void SetAllPlugsMode (Mode mode) {
+//                byte message;
+//
+//                for (int i = 0; i < 8; ++i)
+//                    plugs [i].mode = mode;
+//
+//                if (plugs [0].mode == Mode.Auto)
+//                    message = 0xFF;
+//                else
+//                    message = 0x00;
+//
+//                unsafe {
+//                    _apb.Write (30, &message, sizeof(byte));
+//                }
+//            }
 
             protected void OnSlaveStatusUpdate (object sender) {
                 if ((_apb.status != AquaPicBusStatus.communicationSuccess) || (_apb.status != AquaPicBusStatus.communicationStart))
-                    alarm.post (_commsAlarmIdx, true);
+                    Alarm.Post (_commsAlarmIdx, true);
             }
 
             private static bool mtob (byte mask, int shift) {

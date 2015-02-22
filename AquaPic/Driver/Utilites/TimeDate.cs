@@ -139,6 +139,12 @@ namespace AquaPic.Utilites
             return TimeSpan.Compare (toTimeSpan (), value.toTimeSpan ());
         }
 
+        public double DifferenceInTime(TimeDate value) {
+            DateTime val = value.toDateTime();
+            TimeSpan span = val.Subtract(this.toDateTime());
+            return span.TotalMinutes;
+        }
+
         public DateTime toDateTime () {
             DateTime val = new DateTime (year, month, day, hour, min, sec, millisec);
             return val;
@@ -161,17 +167,17 @@ namespace AquaPic.Utilites
 			return val.ToString ();
 		}
 
-		public string ToString (string format) {
+        public override string ToString (string format) {
 			DateTime val = toDateTime ();
 			return val.ToString (format);
 		}
 
-		public string ToString (IFormatProvider provider) {
+        public override string ToString (IFormatProvider provider) {
 			DateTime val = toDateTime ();
 			return val.ToString (provider);
 		}
 
-		public string ToString (string format, IFormatProvider provider) {
+        public override string ToString (string format, IFormatProvider provider) {
 			DateTime val = toDateTime ();
 			return val.ToString (format, provider);
 		}

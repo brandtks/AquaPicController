@@ -29,6 +29,26 @@ namespace AquaPic.Utilites
 
 			return en.ToString();
 		}
+
+        public static float CalcParabola(TimeDate start, TimeDate end, TimeDate now, float min, float max) {
+            double period = start.DifferenceInTime(end);
+            double phase = start.DifferenceInTime(now);
+            double delta = max - min;
+            double degrees = (180 * (phase / period)) / Math.PI;
+            return min + (float)(delta * Math.Sin(degrees));
+        }
+
+        public static int Map (this int value, int from1, int from2, int to1, int to2) {
+            return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+        }
+
+        public static float Map (this float value, float from1, float from2, float to1, float to2) {
+            return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+        }
+
+        public static double Map (this double value, double from1, double from2, double to1, double to2) {
+            return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+        }
 	}
 }
 

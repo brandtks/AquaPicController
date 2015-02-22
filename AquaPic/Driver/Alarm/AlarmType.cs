@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace AquaPic.Alarm
+namespace AquaPic.AlarmDriver
 {
-    public class alarmType
+    public class AlarmType
     {
         public string shortName;
         public string longName;
@@ -10,11 +10,11 @@ namespace AquaPic.Alarm
         public bool alarming;
         public bool acknowledged;
         public bool clearOnAck;
-        public event alarmHandler onPost;
-        public event alarmHandler onAcknowledge;
-        public event alarmHandler onClear;
+        public event AlarmHandler onPost;
+        public event AlarmHandler onAcknowledge;
+        public event AlarmHandler onClear;
 
-        public alarmType (string shortName, string longName, bool clearOnAck) {
+        public AlarmType (string shortName, string longName, bool clearOnAck) {
             this.shortName = shortName;
             this.longName = longName;
             this.count = 0;
@@ -23,17 +23,17 @@ namespace AquaPic.Alarm
             this.clearOnAck = clearOnAck;
         }
 
-        public void onAlarmPost () {
+        public void OnAlarmPost () {
             if (onPost != null)
                 onPost (this);
         }
 
-        public void onAlarmAcknowledge () {
+        public void OnAlarmAcknowledge () {
             if (onAcknowledge != null)
                 onAcknowledge (this);
         }
 
-        public void onAlarmClear () {
+        public void OnAlarmClear () {
             if (onClear != null)
                 onClear (this);
         }

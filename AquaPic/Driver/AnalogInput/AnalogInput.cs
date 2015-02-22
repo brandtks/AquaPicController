@@ -6,26 +6,37 @@ namespace AquaPic.AnalogInputDriver
 {
     public partial class AnalogInput
     {
-        public static AnalogInput Main = new AnalogInput ();
+        //public static AnalogInput Main = new AnalogInput ();
 
-        public List<analogInputCard> cards;
+        public static List<AnalogInputCard> cards = new List<AnalogInputCard> ();
 
-        public AnalogInput () {
-            cards = new List<analogInputCard> ();
-        }
+        //private AnalogInput () {
+            //cards = new List<AnalogInputCard> ();
+        //}
 
-        public int addCard (int address, string name) {
+        public static int AddCard (int address, string name) {
             int count = cards.Count;
-            cards.Add (new analogInputCard ((byte)address, (byte)count));
+            cards.Add (new AnalogInputCard ((byte)address, (byte)count));
             return count;
         }
 
-        public void addChannel (int card, int ch, AnalogType type, string name) {
-            cards [card].addChannel (ch, type, name);
+        public static void AddChannel (int cardID, int channelID, AnalogType type, string name) {
+            cards [cardID].AddChannel (channelID, type, name);
         }
 
-        public float getAnalog (analogInputCh ch) {
-            return cards [ch.cardID].channels [ch.channelID].value;
+        public static void Run () {
+            for (int i = 0; i < cards.Count; ++i) {
+                cards [i].GetValues ();
+            }
+        }
+
+        public static float GetAnalogValue (IndividualControl channel, bool realTimeUpdate = false) {
+            if (realTimeUpdate) {
+                cards [channel.Group].GetValue (channel.Individual);
+                while (cards [channel.Group].updating)
+                    continue;
+            }
+            return cards [channel.Group].channels [channel.Individual].value;
         }
     }
 }

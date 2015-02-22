@@ -9,17 +9,10 @@ namespace AquaPic.Utilites
         public byte sec { get; set; }
         public byte millisec { get; set; }
 
-		public static Time TZero {
+		public static Time TimeZero {
             get {
 				return new Time (TimeSpan.Zero);
             }
-        }
-
-        public Time (byte hours, byte mins, byte secs) {
-            this.hour = hours;
-            this.min = mins;
-            this.sec = secs;
-            this.millisec = 0;
         }
 
         public Time (byte hours, byte mins, byte secs, byte millisecs) {
@@ -29,11 +22,12 @@ namespace AquaPic.Utilites
             this.millisec = millisecs;
         }
 
-        public Time (TimeSpan value) {
-			this.hour = (byte)value.Hours;
-			this.min = (byte)value.Minutes;
-			this.sec = (byte)value.Seconds;
-			this.millisec = (byte)value.Milliseconds;
+        public Time (byte hours, byte mins, byte secs) 
+            : this (hours, mins, secs, 0) {
+        }
+
+        public Time (TimeSpan value) 
+            : this ((byte)value.Hours, (byte)value.Minutes, (byte)value.Seconds, (byte)value.Milliseconds) {
         }
 
         public Time () {
@@ -73,7 +67,7 @@ namespace AquaPic.Utilites
             setTime (val);
         }
 
-		public string toString () {
+		public string TimeToString () {
 			TimeSpan val = toTimeSpan ();
 			return val.ToString ();
 		}

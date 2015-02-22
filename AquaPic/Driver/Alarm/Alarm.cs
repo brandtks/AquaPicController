@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AquaPic.Alarm
+namespace AquaPic.AlarmDriver
 {
-    public static class alarm
+    public static class Alarm
     {
-        private static List<alarmType> alarms;
+        private static List<AlarmType> alarms;
 
-        static alarm () {
-            alarms = new List<alarmType> ();
+        static Alarm () {
+            alarms = new List<AlarmType> ();
         }
 
-        public static void run () {
+        public static void Run () {
 
         }
 
-        public static int subscribe (string shortName, string longName, bool clearOnAck = false) {
-            alarms.Add (new alarmType (shortName, longName, clearOnAck));
+        public static int Subscribe (string shortName, string longName, bool clearOnAck = false) {
+            alarms.Add (new AlarmType (shortName, longName, clearOnAck));
             return alarms.Count - 1;
         }
 
-        public static void post (int index, bool clearOnAck = false) {
+        public static void Post (int index, bool clearOnAck = false) {
             if (!alarms [index].alarming) {
                 alarms [index].alarming = true;
                 alarms [index].acknowledged = false;
@@ -29,32 +29,32 @@ namespace AquaPic.Alarm
                 ++alarms [index].count;
         }
 
-        public static void clear (int index) {
+        public static void Clear (int index) {
             alarms [index].alarming = false;
             alarms [index].count = 0;
         }
 
-        public static void acknowledge () {
+        public static void Acknowledge () {
             for (int i = 0; i < alarms.Count; ++i) {
                 alarms [i].acknowledged = true;
                 if (alarms [i].clearOnAck)
-                    clear (i);
+                    Clear (i);
             }
         }
 
-        public static bool checkAlarming (int index) {
+        public static bool CheckAlarming (int index) {
             return alarms [index].alarming;
         }
 
-        public static void addPostHandler (int index, alarmHandler handler) {
+        public static void AddPostHandler (int index, AlarmHandler handler) {
             alarms [index].onPost += handler;
         }
 
-        public static void addAcknowledgeHandler (int index, alarmHandler handler) {
+        public static void AddAcknowledgeHandler (int index, AlarmHandler handler) {
             alarms [index].onAcknowledge += handler;
         }
 
-        public static void addClearHandler (int index, alarmHandler handler) {
+        public static void AddClearHandler (int index, AlarmHandler handler) {
             alarms [index].onClear += handler;
         }
     }

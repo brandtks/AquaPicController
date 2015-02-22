@@ -3,9 +3,9 @@ using AquaPic.Utilites;
 
 namespace AquaPic.LightingDriver
 {
-	public class riseSetCalc
+	public class RiseSetCalc
     {
-        public static void getRiseSetTimes(out TimeDate rise, out TimeDate sSet) {
+        public static void GetRiseSetTimes(out TimeDate rise, out TimeDate sSet) {
 			double latitude = 41.181946;
 			double longitude = -85.063345;
 			int timeZoneOffset = -5 * 60;

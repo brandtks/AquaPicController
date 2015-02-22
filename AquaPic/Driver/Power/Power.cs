@@ -1,49 +1,50 @@
 ﻿using System;
 using System.Collections.Generic; // for List
+using AquaPic.Globals;
 
 namespace AquaPic.PowerDriver
 {
     public partial class Power
     {
-        public static Power Main = new Power ();
+        //public static Power Main = new Power ();
 
-        private List<PowerStrip> pwrStrips;
+        private static List<PowerStrip> pwrStrips = new List<PowerStrip> ();
 
-        public Power () {
-            pwrStrips = new List<PowerStrip> ();
-        }
+        //public Power () {
+            //pwrStrips = new List<PowerStrip> ();
+        //}
 
-        public void run () {
+        public static void Run () {
             for (int i = 0; i < pwrStrips.Count; ++i) {
-                pwrStrips [i].getStatus ();
+                pwrStrips [i].GetStatus ();
             }
         }
 
-        public int addPowerStrip (int address, string name) {
+        public static int AddPowerStrip (int address, string name) {
             int count = pwrStrips.Count;
             pwrStrips.Add (new PowerStrip ((byte)address, (byte)count, name));
             return count;
         }
 
-        public void addPlug (int powerID, int plugID, string name, bool rtnToRequested = false) {
+        public static void AddPlug (int powerID, int plugID, string name, bool rtnToRequested = false) {
             pwrStrips [powerID].plugs [plugID].name = name;
             pwrStrips [powerID].plugs [plugID].rtnToRequested = rtnToRequested;
         }
 
-        public void setPlug (pwrPlug plug, bool state, bool modeOverride = false) {
-            pwrStrips [plug.powerID].setPlugState (plug.plugID, state, modeOverride);
+        public static void SetPlug (IndividualControl plug, bool state, bool modeOverride = false) {
+            pwrStrips [plug.Group].SetPlugState (plug.Individual, state, modeOverride);
         }
 
-        public void addHandlerOnAuto (pwrPlug plug, modeChangedHandler handler) {
-            pwrStrips [plug.powerID].plugs [plug.plugID].onAuto += handler;
+        public static void AddHandlerOnAuto (IndividualControl plug, modeChangedHandler handler) {
+            pwrStrips [plug.Group].plugs [plug.Individual].onAuto += handler;
         }
 
-        public void addHandlerOnManual (pwrPlug plug, modeChangedHandler handler) {
-            pwrStrips [plug.powerID].plugs [plug.plugID].onManual += handler;
+        public static void AddHandlerOnManual (IndividualControl plug, modeChangedHandler handler) {
+            pwrStrips [plug.Group].plugs [plug.Individual].onManual += handler;
         }
 
-        public void addHandlerOnStateChange (pwrPlug plug, stateChangeHandler handler) {
-            pwrStrips [plug.powerID].plugs [plug.plugID].onStateChange += handler;
+        public static void AddHandlerOnStateChange (IndividualControl plug, stateChangeHandler handler) {
+            pwrStrips [plug.Group].plugs [plug.Individual].onStateChange += handler;
         }
     }
 }

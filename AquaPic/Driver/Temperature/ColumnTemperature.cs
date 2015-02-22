@@ -1,34 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using AquaPic.AnalogInputDriver;
+using AquaPic.Globals;
 
 namespace AquaPic.TemperatureDriver
 {
     public partial class Temperature
     {
-        public class columnTemperature
+        private class ColumnTemperature
         {
             private float _temperature;
-            private List<analogInputCh> channels; 
+            private List<IndividualControl> channels; 
             public float temperature {
                 get { return _temperature; }
             }
 
-            public columnTemperature () {
-                this.channels = new List<analogInputCh> ();
+            public ColumnTemperature () {
+                this.channels = new List<IndividualControl> ();
                 this._temperature = 0.0f;
             }
 
-            public void addChannel (byte cardID, byte channelID) {
-                analogInputCh ch = new analogInputCh ();
-                ch.cardID = cardID;
-                ch.channelID = channelID;
+            public void AddColumnTemperature (int cardID, int channelID) {
+                IndividualControl ch = new IndividualControl ();
+                ch.Group = (byte)cardID;
+                ch.Individual = (byte)channelID;
                 channels.Add (ch);
+                // the Analog Input Channel is already added by the main temperature class
             }
 
-            public float getColumnTemperature () {
+            public float GetColumnTemperature () {
                 for (int i = 0; i < channels.Count; ++i)
-                    _temperature += AnalogInput.Main.getAnalog (channels [i]);
+                    _temperature += AnalogInput.GetAnalogValue (channels [i]);
                 _temperature /= channels.Count;
                 return _temperature;
             }

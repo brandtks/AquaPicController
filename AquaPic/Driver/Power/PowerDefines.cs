@@ -47,11 +47,5 @@ namespace AquaPic.PowerDriver
         public byte modeMask;
         public bool acPowerAvail;
     }
-
-    // data passing
-    public struct pwrPlug {
-        public byte powerID;
-        public byte plugID;
-    }
 }
 

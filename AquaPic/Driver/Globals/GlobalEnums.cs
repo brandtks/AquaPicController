@@ -11,7 +11,10 @@ namespace AquaPic.Globals
     public enum AnalogType : byte {
         None = 1,
         Temperature,
-        Level
+        Level,
+        PWM,
+        ZeroTen,
+        ZeroFive
     }
 }
 

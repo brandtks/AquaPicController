@@ -33,24 +33,24 @@ namespace AquaPic.PowerDriver
                 this.rtnToRequested = false;
             }
 
-            public void onModeChangedAuto (modeChangeEventArgs args) {
+            public void OnModeChangedAuto (modeChangeEventArgs args) {
                 if (rtnToRequested) {
-                    pwrPlug p;
-                    p.powerID = args.powerID;
-                    p.plugID = args.plugID;
-                    //power.setPlug (p, requestedState);
+                    IndividualControl p;
+                    p.Group = args.powerID;
+                    p.Individual = args.plugID;
+                    SetPlug (p, requestedState);
                 }
 
                 if (onAuto != null)
                     onAuto (this, args);
             }
 
-            public void onModeChangedManual (modeChangeEventArgs args) {
+            public void OnModeChangedManual (modeChangeEventArgs args) {
                 if (onManual != null)
                     onManual (this, args);
             }
 
-            public void onChangeState (stateChangeEventArgs args) {
+            public void OnChangeState (stateChangeEventArgs args) {
                 if (onStateChange != null)
                     onStateChange (this, args);
             }
