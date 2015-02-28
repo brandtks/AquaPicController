@@ -98,7 +98,7 @@ namespace AquaPic.AnalogInputDriver
                 ValueGetterFloat vg;
 
                 unsafe {
-                    args.copyBuffer (vg, sizeof(ValueGetterFloat));
+                    args.copyBuffer (&vg, sizeof(ValueGetterFloat));
                 }
 
                 channels [vg.channel].value = vg.value;

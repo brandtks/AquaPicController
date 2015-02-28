@@ -3,12 +3,13 @@ using Gtk;
 using AquaPic.AlarmDriver;
 using AquaPic.AnalogInputDriver;
 using AquaPic.AnalogOutputDriver;
+using AquaPic.Globals;
 using AquaPic.LightingDriver;
 using AquaPic.PowerDriver;
 using AquaPic.SerialBus;
+using AquaPic.TaskManagerDriver;
 using AquaPic.TemperatureDriver;
 using AquaPic.Utilites;
-using AquaPic.Globals;
 
 namespace AquaPic
 {
@@ -23,23 +24,23 @@ namespace AquaPic
 		{
             Application.Init ();
 
-            powerStrip1 = Power.Main.AddPowerStrip (16, "Left Power Strip");
-            powerStrip2 = Power.Main.AddPowerStrip (17, "Right Power Strip");
+            powerStrip1 = Power.AddPowerStrip (16, "Left Power Strip");
+            powerStrip2 = Power.AddPowerStrip (17, "Right Power Strip");
 
             // Analog Input
-            analogInputCard1 = AnalogInput.Main.AddCard (20, "Analog Input 1");
+            analogInputCard1 = AnalogInput.AddCard (20, "Analog Input 1");
 
             // Analog Output
-            analogOutputCard1 = AnalogOutput.Main.AddCard (30, "Analog Output 1");
+            analogOutputCard1 = AnalogOutput.AddCard (30, "Analog Output 1");
 
             // Temperature
-            Temperature.Main.AddHeater (powerStrip1, 6, "Bottom Heater");
-            Temperature.Main.AddHeater (powerStrip1, 7, "Top Heater");
-            Temperature.Main.AddTemperatureProbe (analogInputCard1, 0, "Sump Temperature");
-            Temperature.Main.Init ();
+            Temperature.AddHeater (powerStrip1, 6, "Bottom Heater");
+            Temperature.AddHeater (powerStrip1, 7, "Top Heater");
+            Temperature.AddTemperatureProbe (analogInputCard1, 0, "Sump Temperature");
+            Temperature.Init ();
 
             // Lighting
-            Lighting.Main.AddLight (
+            Lighting.AddLight (
                 powerStrip1, 
                 0, 
                 analogOutputCard1,
@@ -53,7 +54,7 @@ namespace AquaPic
                 0.0f,
                 75.0f
             );
-            Lighting.Main.AddLight (
+            Lighting.AddLight (
                 powerStrip1, 
                 1, 
                 analogOutputCard1,
@@ -68,8 +69,10 @@ namespace AquaPic
                 75.0f
             );
 
-            mainWindow mainScreen = new mainWindow ();
-            mainScreen.Show ();
+            //TaskManager.Start ();
+
+            AquaPicGUI win = new AquaPicGUI ();
+            win.Show ();
 			Application.Run ();
 		}
 	}

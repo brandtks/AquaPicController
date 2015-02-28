@@ -24,7 +24,7 @@ namespace AquaPic.LightingDriver
             public bool highTempLockout { get; set; }
 
             private IndividualControl plug;
-            private bool requestedState;
+            private MyState requestedState;
 
             public LightingFixture (
                 byte powerID,
@@ -55,7 +55,7 @@ namespace AquaPic.LightingDriver
                         return;
                     Alarm.AddPostHandler (alarmIdx, sender => this.TurnLightsOff ());
                     Alarm.AddClearHandler (alarmIdx, sender => {
-                        if (this.requestedState)
+                        if (this.requestedState == MyState.On)
                             this.TurnLightsOn ();
                     });
                 }
@@ -115,18 +115,21 @@ namespace AquaPic.LightingDriver
             }
 
             public virtual void TurnLightsOn () {
-                requestedState = true;
+                requestedState = MyState.On;
                 if (highTempLockout && !Alarm.CheckAlarming (Temperature.highTempAlarmIdx))
-                    Power.SetPlug (plug, true);
+                    Power.SetPlugState (plug, MyState.On);
             }
 
             public virtual void TurnLightsOff () {
-                requestedState = false;
-                Power.SetPlug (plug, false);
+                requestedState = MyState.On;
+                Power.SetPlugState (plug, MyState.Off);
             }
 
-            public void LightingPlugStateChange (object sender, stateChangeEventArgs args) {
-                lightingOn = args.state;
+            public void LightingPlugStateChange (object sender, StateChangeEventArgs args) {
+                if (args.state == MyState.On)
+                    lightingOn = true;
+                else
+                    lightingOn = false;
             }
     	}
     }

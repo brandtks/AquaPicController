@@ -1,4 +1,5 @@
 ﻿using System;
+using AquaPic.Utilites;
 
 namespace AquaPic.Globals
 {
@@ -13,8 +14,15 @@ namespace AquaPic.Globals
         Temperature,
         Level,
         PWM,
+        [Description("0-10Vdc")]
         ZeroTen,
+        [Description("0-5Vdc")]
         ZeroFive
+    }
+
+    public enum MyState : byte {
+        Off = 0,
+        On = 1
     }
 }
 

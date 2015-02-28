@@ -47,7 +47,7 @@ namespace AquaPic.LightingDriver
                 else if (dimmingLevel < minDimmingOutput)
                     dimmingLevel = minDimmingOutput;
 
-                dimmingLevel.Map (0.0, 100.0, 0.0, 1024.0); // PIC16F1936 has 10bit PWM
+                dimmingLevel.Map (0.0f, 100.0f, 0.0f, 1024.0f); // PIC16F1936 has 10bit PWM
                 int level = (int)dimmingLevel;
                     
                 AnalogOutput.SetAnalogValue (dimCh, level);

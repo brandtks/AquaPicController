@@ -14,7 +14,7 @@ namespace AquaPic.TemperatureDriver
             public float offset { get; set; }
             public string name { get; set; }
 
-            public Heater (byte powerID, byte plugID, bool controlTemp, float setpoint, float offset) {
+            public Heater (byte powerID, byte plugID, bool controlTemp, float setpoint, float offset, string name) {
                 this.plug.Group = powerID;
                 this.plug.Individual = plugID;
                 this.controlTemp = controlTemp;
@@ -25,11 +25,11 @@ namespace AquaPic.TemperatureDriver
             }
 
             public void turnHeaterOn (bool modeOverride = false) {
-                Power.SetPlug (plug, true, modeOverride);
+                Power.SetPlugState (plug, MyState.On, modeOverride);
             }
 
             public void turnHeaterOff (bool modeOverride = false) {
-                Power.SetPlug (plug, false, modeOverride);
+                Power.SetPlugState (plug, MyState.Off, modeOverride);
             }
         }
     }

@@ -86,7 +86,7 @@ namespace AquaPic.AnalogOutputDriver
                 int[] values = new int[4];
 
                 unsafe {
-                    fixed (float* ptr = values) {
+                    fixed (int* ptr = values) {
                         args.copyBuffer (ptr, sizeof(float) * 4);
                     }
                 }
@@ -108,7 +108,7 @@ namespace AquaPic.AnalogOutputDriver
                 ValueGetterInt vg;
 
                 unsafe {
-                    args.copyBuffer (vg, sizeof(ValueGetterInt));
+                    args.copyBuffer (&vg, sizeof(ValueGetterInt));
                 }
 
                 channels [vg.channel].value = vg.value;

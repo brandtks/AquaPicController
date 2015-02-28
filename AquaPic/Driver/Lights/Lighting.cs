@@ -10,7 +10,7 @@ namespace AquaPic.LightingDriver
     {
         //public static Lighting Main = new Lighting ();
 
-        public static List<LightingFixture> fixtures = new List<LightingFixture> ();
+        private static List<LightingFixture> fixtures = new List<LightingFixture> ();
 
         //private Lighting () {
             //fixtures = new List<LightingFixture> ();

@@ -13,6 +13,7 @@ namespace AquaPic.PowerDriver
             private byte _powerID;
             private int _commsAlarmIdx;
             private int _powerAvailAlarmIdx;
+            private bool _acPowerAvailable;
 
             public byte address {
                 get { return _apb.address; }
@@ -26,9 +27,12 @@ namespace AquaPic.PowerDriver
             public int powerAvailAlarmIdx {
                 get { return _powerAvailAlarmIdx; }
             }
+            public bool acPowerAvailable { 
+                get { return _acPowerAvailable; }
+            }
+
             public string name;
-            public bool acPowerAvail { get; set; }
-            public PlugData[] plugs { get; set; }
+            public PlugData[] plugs;
 
             /* <Future>
             public powerStrip (byte address, byte powerID, string[] names, byte rtnToRequestedMask) {
@@ -56,7 +60,7 @@ namespace AquaPic.PowerDriver
                 this._commsAlarmIdx = Alarm.Subscribe ("APB communication error", "Power Strip at address " + this._apb.address.ToString ());
                 this._powerAvailAlarmIdx = Alarm.Subscribe ("Loss of power", "Mains power not available at address " + this._apb.address.ToString ());
                 this.name = name;
-                this.acPowerAvail = false;
+                this._acPowerAvailable = false;
                 this.plugs = new PlugData[8];
                 for (int i = 0; i < 8; ++i) {
                     this.plugs [i] = new PlugData ();
@@ -64,136 +68,87 @@ namespace AquaPic.PowerDriver
             }
 
             public unsafe void GetStatus () {
-                _apb.Read (20, sizeof(pwrComms), GetStatusCallback);
+                _apb.Read (20, sizeof(PowerComms), GetStatusCallback);
             }
 
             protected void GetStatusCallback (CallbackArgs callArgs) {
-                pwrComms status;
-
                 if (_apb.status != AquaPicBusStatus.communicationSuccess)
                     return;
 
+                PowerComms status = new PowerComms ();
+
                 unsafe {
-                    callArgs.copyBuffer (&status, sizeof(pwrComms));
+                    callArgs.copyBuffer (&status, sizeof(PowerComms));
                 }
 
-                for (int i = 0; i < 8; ++i) {
-                    bool s = mtob (status.stateMask, i);
-                    if (s != plugs [i].currentState) {
-                        plugs [i].currentState = s;
-                        stateChangeEventArgs args = new stateChangeEventArgs (i, powerID, plugs [i].mode, plugs [i].currentState);
-                        plugs [i].OnChangeState (args);
-                    }
-
-                    bool m = mtob (status.modeMask, i); 
-                    if (m && (plugs [i].mode == Mode.Manual)) { // m true is auto
-                        plugs [i].mode = Mode.Auto; 
-                        modeChangeEventArgs args = new modeChangeEventArgs (i, address, plugs [i].mode);
-                        plugs [i].OnModeChangedAuto (args);
-                    } else if (!m && (plugs [i].mode == Mode.Auto)) { // m false is manual
-                        plugs [i].mode = Mode.Manual;
-                        modeChangeEventArgs args = new modeChangeEventArgs (i, address, plugs [i].mode);
-                        plugs [i].OnModeChangedManual (args);
-                    }
-                }
-
-                acPowerAvail = status.acPowerAvail;
-                if (!acPowerAvail) {
+                _acPowerAvailable = status.acPowerAvailable;
+                if (!_acPowerAvailable)
                     Alarm.Post (_powerAvailAlarmIdx, true);
+
+                for (int i = 0; i < plugs.Length; ++i) {
+                    if (mtob (status.currentAvailableMask, i))
+                        ReadPlugCurrent ((byte)i);
                 }
             }
 
-            public void SetPlugState (byte plugID, bool state, bool modeOverride) {
-                byte[] message = new byte[3];
+            public void ReadPlugCurrent (byte plugID) {
+                unsafe {
+                    _apb.ReadWrite (12, &plugID, sizeof (byte), sizeof (AmpComms), ReadPlugCurrentCallback);
+                }
+            }
+
+            protected void ReadPlugCurrentCallback (CallbackArgs callArgs) {
+                if (_apb.status != AquaPicBusStatus.communicationSuccess)
+                    return;
+
+                AmpComms message;
+
+                unsafe {
+                    callArgs.copyBuffer (&message, sizeof(AmpComms));
+                }
+
+                plugs [message.plugID].SetCurrent (message.current);
+            }
+
+            public void SetPlugState (byte plugID, MyState state, bool modeOverride) {
+                if (plugs [plugID].currentMode == Mode.Manual) {
+                    plugs [plugID].requestedState = state;
+                    if (!modeOverride)
+                        return;
+                }
+
+                plugs [plugID].currentState = state;
+                plugs [plugID].OnChangeState (new StateChangeEventArgs (plugID, powerID, plugs [plugID].currentState, plugs [plugID].currentMode));
+
+                /*
+                byte[] message = new byte[2];
 
                 message [0] = plugID;
 
-                if (state) {
-                    plugs [plugID].requestedState = true;
+                if (state == MyState.On) {
+                    plugs [plugID].currentState = MyState.On;
                     message [1] = 0xFF;
                 } else {
-                    plugs [plugID].requestedState = false;
+                    plugs [plugID].currentState = MyState.Off;
                     message [1] = 0x00;
                 }
-
-                if (modeOverride)
-                    message [2] = 0xFF;
-                else
-                    message [2] = 0x00;
+                plugs [plugID].OnChangeState (new StateChangeEventArgs (plugID, powerID, plugs [plugID].currentState, plugs [plugID].currentMode));
 
                 unsafe {
                     fixed (byte* ptr = message) {
-                        _apb.ReadWrite (11, ptr, sizeof(byte) * 3, sizeof(plugComms), SetPlugStateCallback);
+                        _apb.Write (11, ptr, sizeof(byte) * 2);
                     }
                 }
+                */
             }
-
-            protected void SetPlugStateCallback (CallbackArgs a) {
-                plugComms status;
-
-                if (_apb.status != AquaPicBusStatus.communicationSuccess)
-                    return;
-
-                unsafe {
-                    a.copyBuffer (&status, sizeof(plugComms));
-                }
-
-                byte plugID = status.plug;
-                plugs [plugID].mode = (Mode)status.mode;
-
-                if (plugs [plugID].requestedState == status.state) { // the state changed
-                    plugs [plugID].currentState = status.state;
-                    stateChangeEventArgs args = new stateChangeEventArgs (plugID, powerID, plugs [plugID].mode, plugs [plugID].currentState);
-                    plugs [plugID].OnChangeState (args);
-                }
-            }
-
-            // <TODO> this need lots of work
-            // need to determine how to handle the callback
-    //        public void setAllPlugsState (byte mask) {
-    //            for (int i = 0; i < 8; ++i)
-    //                plugs [i].requestedState = mtob (mask, i);
-    //
-    //            unsafe {
-    //                commsStatus = APB.write (_address, 10, &mask, sizeof(byte));
-    //            }
-    //
-    //            if (commsStatus != APBstatus.writeSuccess) {
-    //                alarm.post (_alarmIdx, true);
-    //            }
-    //        }
 
             public void SetPlugMode (byte plugID, Mode mode) {
-                byte[] message = new byte[2];
-                plugs [plugID].mode = mode;
-
-                message [0] = plugID;
-                message [1] = (byte)plugs [plugID].mode;
-
-                unsafe {
-                    fixed (byte* ptr = message) {
-                        _apb.Write (31, ptr, sizeof(byte) * 2);
-                    }
-                }
+                plugs [plugID].SetMode (mode);
+                if (plugs [plugID].currentMode == Mode.Auto)
+                    plugs [plugID].OnModeChangedAuto (new ModeChangeEventArgs (plugID, _powerID, plugs [plugID].currentMode));
+                else
+                    plugs [plugID].OnModeChangedManual (new ModeChangeEventArgs (plugID, _powerID, plugs [plugID].currentMode));
             }
-
-            // <TODO> cann't decide if I want to set all the modes the same
-            // or be able to only set certain ones 
-//            public void SetAllPlugsMode (Mode mode) {
-//                byte message;
-//
-//                for (int i = 0; i < 8; ++i)
-//                    plugs [i].mode = mode;
-//
-//                if (plugs [0].mode == Mode.Auto)
-//                    message = 0xFF;
-//                else
-//                    message = 0x00;
-//
-//                unsafe {
-//                    _apb.Write (30, &message, sizeof(byte));
-//                }
-//            }
 
             protected void OnSlaveStatusUpdate (object sender) {
                 if ((_apb.status != AquaPicBusStatus.communicationSuccess) || (_apb.status != AquaPicBusStatus.communicationStart))
@@ -210,15 +165,146 @@ namespace AquaPic.PowerDriver
                     return false;
             }
 
-            private static void btom(ref byte mask, bool b, int shift) {
-                if (b)
-                    mask |= (byte)Math.Pow (2, shift);
-                else {
-                    int m = ~(int)Math.Pow (2, shift);
-                    mask &= (byte) m;
-                }
-            }
+            // Not Used
+//            private static void btom(ref byte mask, bool b, int shift) {
+//                if (b)
+//                    mask |= (byte)Math.Pow (2, shift);
+//                else {
+//                    int m = ~(int)Math.Pow (2, shift);
+//                    mask &= (byte) m;
+//                }
+//            }
     	}
     }
 }
 
+/* Old Stuff
+protected void GetStatusCallback (CallbackArgs callArgs) {
+    if (_apb.status != AquaPicBusStatus.communicationSuccess)
+        return;
+
+    PwrComms status;
+
+    unsafe {
+        callArgs.copyBuffer (&status, sizeof(PwrComms));
+    }
+
+    for (int i = 0; i < 8; ++i) {
+        bool s = mtob (status.stateMask, i);
+        if (s != plugs [i].currentState) {
+            plugs [i].currentState = s;
+            stateChangeEventArgs args = new stateChangeEventArgs (i, powerID, plugs [i].mode, plugs [i].currentState);
+            plugs [i].OnChangeState (args);
+        }
+
+        bool m = mtob (status.modeMask, i); 
+        if (m && (plugs [i].mode == Mode.Manual)) { // m true is auto
+            plugs [i].mode = Mode.Auto; 
+            modeChangeEventArgs args = new modeChangeEventArgs (i, address, plugs [i].mode);
+            plugs [i].OnModeChangedAuto (args);
+        } else if (!m && (plugs [i].mode == Mode.Auto)) { // m false is manual
+            plugs [i].mode = Mode.Manual;
+            modeChangeEventArgs args = new modeChangeEventArgs (i, address, plugs [i].mode);
+            plugs [i].OnModeChangedManual (args);
+        }
+    }
+
+    acPowerAvail = status.acPowerAvail;
+    if (!acPowerAvail) {
+        Alarm.Post (_powerAvailAlarmIdx, true);
+    }
+}
+
+public void SetPlugState (byte plugID, bool state, bool modeOverride) {
+    byte[] message = new byte[3];
+
+    message [0] = plugID;
+
+    if (state) {
+        plugs [plugID].requestedState = true;
+        message [1] = 0xFF;
+    } else {
+        plugs [plugID].requestedState = false;
+        message [1] = 0x00;
+    }
+
+    if (modeOverride)
+        message [2] = 0xFF;
+    else
+        message [2] = 0x00;
+
+    unsafe {
+        fixed (byte* ptr = message) {
+            _apb.ReadWrite (11, ptr, sizeof(byte) * 3, sizeof(PlugComms), SetPlugStateCallback);
+        }
+    }
+}
+
+protected void SetPlugStateCallback (CallbackArgs callArgs) {
+    if (_apb.status != AquaPicBusStatus.communicationSuccess)
+        return;
+
+    PlugComms status;
+
+    unsafe {
+        callArgs.copyBuffer (&status, sizeof(PlugComms));
+    }
+
+    byte plugID = status.plugID;
+    plugs [plugID].mode = (Mode)status.mode;
+
+    if (plugs [plugID].requestedState == status.state) { // the state changed
+        plugs [plugID].currentState = status.state;
+        stateChangeEventArgs args = new stateChangeEventArgs (plugID, powerID, plugs [plugID].mode, plugs [plugID].currentState);
+        plugs [plugID].OnChangeState (args);
+    }
+}
+
+// <TODO> cann't decide if I want to set all the modes the same
+// or be able to only set certain ones 
+public void SetAllPlugsMode (Mode mode) {
+    byte message;
+
+    for (int i = 0; i < 8; ++i)
+        plugs [i].mode = mode;
+
+    if (plugs [0].mode == Mode.Auto)
+        message = 0xFF;
+    else
+        message = 0x00;
+
+    unsafe {
+        _apb.Write (30, &message, sizeof(byte));
+    }
+}
+
+// <TODO> this need lots of work
+// need to determine how to handle the callback
+public void setAllPlugsState (byte mask) {
+    for (int i = 0; i < 8; ++i)
+        plugs [i].requestedState = mtob (mask, i);
+
+    unsafe {
+        commsStatus = APB.write (_address, 10, &mask, sizeof(byte));
+    }
+
+    if (commsStatus != APBstatus.writeSuccess) {
+        alarm.post (_alarmIdx, true);
+    }
+}
+
+public void SetPlugMode (byte plugID, Mode mode) {
+    byte[] message = new byte[2];
+    plugs [plugID].mode = mode;
+
+    message [0] = plugID;
+    message [1] = (byte)plugs [plugID].mode;
+
+    unsafe {
+        fixed (byte* ptr = message) {
+            _apb.Write (31, ptr, sizeof(byte) * 2);
+        }
+    }
+}
+
+*/

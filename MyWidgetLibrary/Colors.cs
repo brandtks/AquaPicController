@@ -28,52 +28,73 @@ namespace MyWidgetLibrary
             { "white", new float [3] { 1.0f, 1.0f, 1.0f} }
         };
 
-        public Colors (string color, bool transparent = false, float alphaLevel = 0.8f) {
+        public Colors (string color, double A = 1.0) {
             try {
-                this.R = colorLookup [color] [0];
-                this.G = colorLookup [color] [1];
-                this.B = colorLookup [color] [2];
+                string c = color.ToLower ();
+                this.R = colorLookup [c] [0];
+                this.G = colorLookup [c] [1];
+                this.B = colorLookup [c] [2];
             } catch {
                 this.R = 0.0f;
                 this.G = 0.0f;
                 this.B = 0.0f;
             }
-            if (transparent)
-                this.A = alphaLevel;
-            else
-                this.A = 1.0f;
+
+            this.A = (float)A;
         }
 
-        public void changeColor(string color, bool transparent = false, float alphaLevel = 0.8f) {
-            R = colorLookup [color] [0];
-            G = colorLookup [color] [1];
-            B = colorLookup [color] [2];
-            if (transparent)
-                A = alphaLevel;
-            else
-                A = 1.0f;
+        public Colors (double R, double G, double B, double A = 1.0) {
+            this.R = (float)R;
+            this.G = (float)G;
+            this.B = (float)B;
+            this.A = (float)A;
         }
 
-        public void setTemporaryNewAlpha (float a) {
-            storedA = A;
-            A = a;
-        }
-
-        public void restoreAlpha () {
-            A = storedA;
-        }
-
-        public void ModifyColor(float ratio) {
+        public void ChangeColor(string color, double a = 1.0) {
             storedR = R;
             storedG = G;
             storedB = B;
 
-            R *= ratio;
-            G *= ratio;
-            B *= ratio;
+            try {
+                string c = color.ToLower ();
+                R = colorLookup [c] [0];
+                G = colorLookup [c] [1];
+                B = colorLookup [c] [2];
+            } catch {
+                R = storedR;
+                G = storedG;
+                B = storedB;
+            }
+                
+            A = (float)a;
         }
 
-        public void restoreColor () {
+        public void SetTemporaryAlpha (double a) {
+            storedA = A;
+            A = (float)a;
+        }
+
+        public void RestoreAlpha () {
+            A = storedA;
+        }
+
+        public void ModifyColor(double ratio) {
+            storedR = R;
+            storedG = G;
+            storedB = B;
+
+            R *= (float)ratio;
+            if (R > 1.0f)
+                R = 1.0f;
+            G *= (float)ratio;
+            if (G > 1.0f)
+                G = 1.0f;
+            B *= (float)ratio;
+            if (B > 1.0f)
+                B = 1.0f;
+        }
+
+        public void RestoreColor () {
             R = storedR;
             G = storedG;
             B = storedB;

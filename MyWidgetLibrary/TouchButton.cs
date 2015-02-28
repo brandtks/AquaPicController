@@ -24,7 +24,7 @@ namespace MyWidgetLibrary
             this.Visible = true;
             this.VisibleWindow = false;
 
-            this.ButtonColor = new Colors ("red", true);
+            this.ButtonColor = new Colors ("red", 0.8);
             this.Text = "";
             this.TextColor = "black";
             this.HeightRequest = 115;
@@ -61,7 +61,7 @@ namespace MyWidgetLibrary
 
         protected void onTouchButtonPress (object o, ButtonPressEventArgs args) {
             if (clickAction == ButtonClickAction.NoTransparency)
-                ButtonColor.setTemporaryNewAlpha (1.0f);
+                ButtonColor.SetTemporaryAlpha (1.0f);
             else if (clickAction == ButtonClickAction.Brighten)
                 ButtonColor.ModifyColor (1.05f);
             else if (clickAction == ButtonClickAction.Darken)
@@ -72,9 +72,9 @@ namespace MyWidgetLibrary
 
         protected void onTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
             if (clickAction == ButtonClickAction.NoTransparency)
-                ButtonColor.restoreAlpha ();
+                ButtonColor.RestoreAlpha ();
             else if ((clickAction == ButtonClickAction.Brighten) || (clickAction == ButtonClickAction.Darken))
-                ButtonColor.restoreColor ();
+                ButtonColor.RestoreColor ();
 
             this.QueueDraw ();
 

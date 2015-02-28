@@ -8,23 +8,4 @@
     <widget-library name="../../MyWidgetLibrary/bin/Debug/MyWidgetLibrary.dll" />
     <widget-library name="../bin/Debug/AquaPic.exe" internal="true" />
   </import>
-  <widget class="Gtk.Window" id="AquaPic.powerWindow" design-size="789 551">
-    <property name="MemberName" />
-    <property name="Title" translatable="yes">power</property>
-    <property name="WindowPosition">CenterOnParent</property>
-    <property name="Resizable">False</property>
-    <property name="AllowGrow">False</property>
-    <signal name="DeleteEvent" handler="OnDeleteEvent" />
-    <child>
-      <placeholder />
-    </child>
-  </widget>
-  <widget class="Gtk.Window" id="AquaPic.mainWindow" design-size="400 300">
-    <property name="MemberName" />
-    <property name="Title" translatable="yes">main</property>
-    <property name="WindowPosition">CenterOnParent</property>
-    <child>
-      <placeholder />
-    </child>
-  </widget>
 </stetic-interface>

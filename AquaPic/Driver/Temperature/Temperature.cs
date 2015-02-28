@@ -11,6 +11,8 @@ namespace AquaPic.TemperatureDriver
     {
         //public static Temperature Main = new Temperature ();
 
+        public static float highTempAlarmSetpoint;
+        public static float lowTempAlarmSetpoint;
         private static int _highTempAlarmIdx;
         private static int _lowTempAlarmIdx;
         public static int highTempAlarmIdx {
@@ -19,10 +21,13 @@ namespace AquaPic.TemperatureDriver
         public static int lowTempAlarmIdx {
             get { return _lowTempAlarmIdx; }
         }
-        public static float highTempAlarmSetpoint;
-        public static float lowTempAlarmSetpoint;
-        public static List<Heater> heaters = new List<Heater> ();
-        public static ColumnTemperature columnTemp = new ColumnTemperature ();
+
+        private static List<Heater> heaters = new List<Heater> ();
+
+        private static ColumnTemperature columnTemp = new ColumnTemperature ();
+        public static float columnTemperature {
+            get { return columnTemp.temperature; }
+        }
 
         //private Temperature () {
             //_highTempAlarmIdx = -1;

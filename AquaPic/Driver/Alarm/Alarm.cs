@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace AquaPic.AlarmDriver
 {
-    public static class Alarm
+    public partial class Alarm
     {
-        private static List<AlarmType> alarms;
+        private static List<AlarmType> alarms = new List<AlarmType> ();
 
-        static Alarm () {
-            alarms = new List<AlarmType> ();
-        }
+        //static Alarm () {
+            //alarms = new List<AlarmType> ();
+        //}
 
         public static void Run () {
 

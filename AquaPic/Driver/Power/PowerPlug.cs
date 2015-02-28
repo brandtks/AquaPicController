@@ -5,54 +5,74 @@ namespace AquaPic.PowerDriver
 {
     public partial class Power 
     {
-        private class PlugData 
+        private class PlugData
         {
-            public string name { get; set; }
-            public bool currentState { get; set; }
-            public bool requestedState { get; set; }
-            public Mode mode { get; set; }
-            public bool rtnToRequested;
-            public event modeChangedHandler onAuto;
-            public event modeChangedHandler onManual;
-            public event stateChangeHandler onStateChange;
+            private float _power;
+            private float _current;
+            private Mode _currentMode;
 
-            /* <For Future Expansion>
-            public plugData (string name, bool rtnToRequested) {
-                this.name = name;
-                this.currentState = false;
-                this.requestedState = false;
-                this.mode = Mode.Auto;
-                this.rtnToRequested = rtnToRequested;
-            }*/
+            public float current {
+                get { return _current; }
+            }
+            public float power {
+                get { return _power; }
+            }
+            public Mode currentMode { 
+                get { return _currentMode; } 
+            }
+
+            public float powerFactor { get; set; }
+            public string name { get; set; }
+            public MyState currentState { get; set; }
+            public MyState requestedState { get; set; }
+            public bool returnToRequested { get; set; }
+
+
+            public event StateChangeHandler onStateChange;
+            public event ModeChangedHandler onAuto;
+            public event ModeChangedHandler onManual;
 
             public PlugData () {
                 this.name = null;
-                this.currentState = false;
-                this.requestedState = false;
-                this.mode = Mode.Auto;
-                this.rtnToRequested = false;
+                this.currentState = MyState.Off;
+                this.requestedState = MyState.Off;
+                this.returnToRequested = false;
+                this._currentMode = Mode.Manual;
+                this._current = 0.0f;
+                this._power = 0.0f;
+                this.powerFactor = 1.0f;
             }
 
-            public void OnModeChangedAuto (modeChangeEventArgs args) {
-                if (rtnToRequested) {
+            public void SetCurrent (float c) {
+                _current = c;
+                _power = _current * Voltage * powerFactor;
+            }
+
+            public void SetMode (Mode mode) {
+                if ((mode == Mode.Auto) || (mode == Mode.Manual))
+                    _currentMode = mode;
+            }
+
+            public void OnChangeState (StateChangeEventArgs args) {
+                if (onStateChange != null)
+                    onStateChange (this, args);
+            }
+
+            public void OnModeChangedAuto (ModeChangeEventArgs args) {
+                if (returnToRequested) {
                     IndividualControl p;
                     p.Group = args.powerID;
                     p.Individual = args.plugID;
-                    SetPlug (p, requestedState);
+                    SetPlugState (p, requestedState);
                 }
 
                 if (onAuto != null)
                     onAuto (this, args);
             }
 
-            public void OnModeChangedManual (modeChangeEventArgs args) {
+            public void OnModeChangedManual (ModeChangeEventArgs args) {
                 if (onManual != null)
                     onManual (this, args);
-            }
-
-            public void OnChangeState (stateChangeEventArgs args) {
-                if (onStateChange != null)
-                    onStateChange (this, args);
             }
         }
     }

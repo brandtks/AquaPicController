@@ -12,7 +12,7 @@ namespace MyWidgetLibrary
             this.Visible = true;
             this.SetSizeRequest (1280, 18);
 
-            this.updateTimer = GLib.Timeout.Add (1000, new GLib.TimeoutHandler (onTimer));
+            this.updateTimer = GLib.Timeout.Add (1000, onTimer);
 
             this.ExposeEvent += onExpose;
         }

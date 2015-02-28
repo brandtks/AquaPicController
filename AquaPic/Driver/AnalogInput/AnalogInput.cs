@@ -8,7 +8,7 @@ namespace AquaPic.AnalogInputDriver
     {
         //public static AnalogInput Main = new AnalogInput ();
 
-        public static List<AnalogInputCard> cards = new List<AnalogInputCard> ();
+        private static List<AnalogInputCard> cards = new List<AnalogInputCard> ();
 
         //private AnalogInput () {
             //cards = new List<AnalogInputCard> ();

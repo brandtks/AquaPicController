@@ -1,5 +1,4 @@
-﻿/*
-using System;
+﻿using System;
 using System.IO;
 using Gtk;
 using Cairo;
@@ -12,12 +11,12 @@ namespace MyWidgetLibrary
         private MyNotificationBar notification;
         private TouchButton[] buttons;
         private string[] screenNames;
-        private Window parent;
+        public string currentScreen;
 
-        public MyBackgroundWidget (Window parent) {
+        public MyBackgroundWidget (string currentScreen, ButtonReleaseEventHandler OnTouchButtenRelease) {
             this.SetSizeRequest (1280, 800);
+            this.currentScreen = currentScreen;
 
-            this.parent = parent;
             this.screenNames = new string[7] {
                 "Main",
                 "Power",
@@ -70,16 +69,17 @@ namespace MyWidgetLibrary
             for (int i = 0; i < buttons.Length; ++i) {
                 this.buttons [i] = new TouchButton ();
                 this.buttons [i].Text = screenNames [i];
-                if (string.Compare (screenNames [i], parent.Title, StringComparison.InvariantCultureIgnoreCase) == 0) {
-                    this.buttons [i].ButtonColor.changeColor ("yellow");
+                if (string.Compare (screenNames [i], currentScreen, StringComparison.InvariantCultureIgnoreCase) == 0) {
+                    this.buttons [i].ButtonColor.ChangeColor ("yellow");
                     this.buttons [i].TextColor = "black";
                 } else {
-                    this.buttons [i].ButtonColor.changeColor ("light gray");
+                    this.buttons [i].ButtonColor.ChangeColor ("light gray");
                     this.buttons [i].TextColor = "white";
                 }
                 this.buttons [i].clickAction = ButtonClickAction.Darken;
                 this.buttons [i].SetSizeRequest (150, 100);
-                this.Put (this.buttons [i], (i * 170) + 20, 690);
+                this.buttons [i].TouchButtonReleasedHandler += OnTouchButtenRelease;
+                this.Put (this.buttons [i], (i * 177) + 30, 690);
                 this.buttons [i].Show ();
             }
         }
@@ -92,13 +92,6 @@ namespace MyWidgetLibrary
                 cr.Fill ();
             }
         }
-
-        protected void onButtonTouch (object sender, ExposeEventArgs args) {
-            TouchButton b = sender as TouchButton;
-            switch (b.Text) {
-            case "Main":
-
-            }
-        }
     }
-}*/
+}
+
