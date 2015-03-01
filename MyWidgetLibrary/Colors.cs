@@ -50,7 +50,7 @@ namespace MyWidgetLibrary
             this.A = (float)A;
         }
 
-        public void ChangeColor(string color, double a = 1.0) {
+        public void ChangeColor (string color, double a = 1.0) {
             storedR = R;
             storedG = G;
             storedB = B;
@@ -67,6 +67,17 @@ namespace MyWidgetLibrary
             }
                 
             A = (float)a;
+        }
+
+        public void ChangeColor (double r, double g, double b, double a = 1.0) {
+            storedR = R;
+            storedG = G;
+            storedB = B;
+
+            this.R = (float)r;
+            this.G = (float)g;
+            this.B = (float)b;
+            this.A = (float)a;
         }
 
         public void SetTemporaryAlpha (double a) {

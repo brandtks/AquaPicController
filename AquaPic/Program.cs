@@ -49,8 +49,8 @@ namespace AquaPic
                 "White LED", 
                 0,
                 0, 
-                new Time (7, 30, 0), 
-                new Time (8, 30, 0),
+                new Time (7, 31, 0), 
+                new Time (20, 33, 0),
                 0.0f,
                 75.0f
             );
@@ -64,13 +64,15 @@ namespace AquaPic
                 -15, 
                 15, 
                 new Time (7, 30, 0), 
-                new Time (8, 30, 0),
+                new Time (20, 33, 0),
                 0.0f,
                 75.0f
             );
+            Lighting.AtMidnight ();
 
+            // calls the crap out of a bunch of none existance rs485 slaves
             //TaskManager.Start ();
-
+             
             AquaPicGUI win = new AquaPicGUI ();
             win.Show ();
 			Application.Run ();

@@ -9,29 +9,29 @@ namespace AquaPic.AnalogOutputDriver
     {
         private class AnalogOutputCard
         {
-            private AquaPicBus.Slave _apb;
-            private byte _cardID;
-            private int _alarmIdx;
+            public AquaPicBus.Slave slave;
+            public byte cardID;
+            public int communicationAlarmIndex;
             public AnalogOutputChannel[] channels;
 
             public AnalogOutputCard (byte address, byte cardID) {
                 try {
-                    this._apb = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
-                    this._apb.OnStatusUpdate += OnSlaveStatusUpdate;
+                    this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
+                    this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
                 } catch (Exception ex) {
                     Console.WriteLine (ex.ToString ());
                     Console.WriteLine (ex.Message);
                 }
-                this._cardID = cardID;
-                this._alarmIdx = Alarm.Subscribe("APB communication error", "Analog output card at address " + this._apb.address.ToString ());
+                this.cardID = cardID;
+                this.communicationAlarmIndex = Alarm.Subscribe("APB communication error", "Analog output card at address " + this.slave.address.ToString ());
                 this.channels = new AnalogOutputChannel[4];
                 for (int i = 0; i < this.channels.Length; ++i)
                     this.channels [i] = new AnalogOutputChannel ();
             }
 
             protected void OnSlaveStatusUpdate (object sender) {
-                if ((_apb.status != AquaPicBusStatus.communicationSuccess) || (_apb.status != AquaPicBusStatus.communicationStart))
-                    Alarm.Post (_alarmIdx, true);
+                if ((slave.status != AquaPicBusStatus.communicationSuccess) || (slave.status != AquaPicBusStatus.communicationStart))
+                    Alarm.Post (communicationAlarmIndex, true);
             }
 
             public void AddChannel (int ch, AnalogType type, string name) {
@@ -44,7 +44,7 @@ namespace AquaPic.AnalogOutputDriver
 
                 unsafe {
                     fixed (byte* ptr = &arr [0]) {
-                        _apb.Write (2, ptr, sizeof(byte) * 2);
+                        slave.Write (2, ptr, sizeof(byte) * 2);
                     }
                 }
             }
@@ -57,7 +57,7 @@ namespace AquaPic.AnalogOutputDriver
                 channels [vs.channelID].value = vs.value;
 
                 unsafe {
-                    _apb.Write (31, &vs, sizeof(ValueSetter));
+                    slave.Write (31, &vs, sizeof(ValueSetter));
                 }
             }
 
@@ -71,14 +71,14 @@ namespace AquaPic.AnalogOutputDriver
 
                 unsafe {
                     fixed (int* ptr = &values[0]) {
-                        _apb.Write (30, ptr, sizeof(int) * 4);
+                        slave.Write (30, ptr, sizeof(int) * 4);
                     }
                 }
             }
 
             public void GetValues () {
                 unsafe {
-                    _apb.Read (20, sizeof(float) * 4, GetValuesCallback); 
+                    slave.Read (20, sizeof(float) * 4, GetValuesCallback); 
                 }
             }
 
@@ -100,7 +100,7 @@ namespace AquaPic.AnalogOutputDriver
                 byte message = ch;
 
                 unsafe {
-                    _apb.ReadWrite (10, &message, sizeof(byte), sizeof(ValueGetterInt), GetValueCallback);
+                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(ValueGetterInt), GetValueCallback);
                 }
             }
 

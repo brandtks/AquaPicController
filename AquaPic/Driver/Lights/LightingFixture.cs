@@ -20,11 +20,10 @@ namespace AquaPic.LightingDriver
             public TimeDate sunRise;
             public TimeDate sunSet;
             public Mode mode { get; set; }
-            public bool lightingOn { get; set; }
+            public MyState lightingOn { get; set; }
             public bool highTempLockout { get; set; }
-
-            private IndividualControl plug;
-            private MyState requestedState;
+            public IndividualControl plug;
+            public MyState requestedLightingOn;
 
             public LightingFixture (
                 byte powerID,
@@ -46,8 +45,8 @@ namespace AquaPic.LightingDriver
                 this.maxSunSet = maxSunSet;
                 this.sunRise = TimeDate.Zero;
                 this.sunSet = TimeDate.Zero;
-                this.mode = Mode.Manual;
-                this.lightingOn = false;
+                this.mode = Mode.Auto;
+                this.lightingOn = MyState.Off;
                 this.highTempLockout = highTempLockout;
                 if (this.highTempLockout) {
                     int alarmIdx = Temperature.highTempAlarmIdx;
@@ -55,11 +54,13 @@ namespace AquaPic.LightingDriver
                         return;
                     Alarm.AddPostHandler (alarmIdx, sender => this.TurnLightsOff ());
                     Alarm.AddClearHandler (alarmIdx, sender => {
-                        if (this.requestedState == MyState.On)
+                        if (this.requestedLightingOn == MyState.On)
                             this.TurnLightsOn ();
                     });
                 }
                 Power.AddHandlerOnStateChange (this.plug, LightingPlugStateChange);
+                this.sunRise.setTimeDate (new TimeDate (this.minSunRise));
+                this.sunSet.setTimeDate (new TimeDate (this.maxSunSet));
     		}
 
             public void SetSunRiseSet (TimeDate rise, TimeDate sSet) {
@@ -115,21 +116,18 @@ namespace AquaPic.LightingDriver
             }
 
             public virtual void TurnLightsOn () {
-                requestedState = MyState.On;
+                requestedLightingOn = MyState.On;
                 if (highTempLockout && !Alarm.CheckAlarming (Temperature.highTempAlarmIdx))
                     Power.SetPlugState (plug, MyState.On);
             }
 
             public virtual void TurnLightsOff () {
-                requestedState = MyState.On;
+                requestedLightingOn = MyState.On;
                 Power.SetPlugState (plug, MyState.Off);
             }
 
             public void LightingPlugStateChange (object sender, StateChangeEventArgs args) {
-                if (args.state == MyState.On)
-                    lightingOn = true;
-                else
-                    lightingOn = false;
+                lightingOn = args.state;
             }
     	}
     }

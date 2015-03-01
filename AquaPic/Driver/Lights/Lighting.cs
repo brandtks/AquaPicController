@@ -76,25 +76,32 @@ namespace AquaPic.LightingDriver
                     maxDimmingOutput,
                     highTempLockout
                 ));
-            TimeDate rise, sSet;
-            RiseSetCalc.GetRiseSetTimes (out rise, out sSet);
-            fixtures [count].SetSunRiseSet (rise, sSet);
+            //TimeDate rise, sSet;
+            //RiseSetCalc.GetRiseSetTimes (out rise, out sSet);
+            //fixtures [count].SetSunRiseSet (rise, sSet);
             return count;
         }
-
 
         public static void Run () {
             TimeDate now = TimeDate.Now;
 
+            Console.WriteLine ("Now is " + now.ToString ());
+
             for (int i = 0; i < fixtures.Count; ++i) {
                 if ((fixtures [i].mode == Mode.Auto) || (fixtures [i].mode == Mode.AutoAuto)) {
-                    if (!fixtures [i].lightingOn) { // lighting is off check conditions to turn on
-                        if ((fixtures [i].sunRise.compareTo (now) > 1) && (fixtures [i].sunSet.compareTo (now) < 1)) {
+                    if (fixtures [i].lightingOn == MyState.Off) { // lighting is off check conditions to turn on
+                        Console.WriteLine ("Lights are off");
+                        Console.WriteLine ("Sun rise is " + fixtures [i].sunRise.ToString ());
+                        Console.WriteLine ("Sun set is " + fixtures [i].sunSet.ToString ());
+                        int afterSunRise = fixtures [i].sunRise.compareTo (now);
+                        int beforeSunSet = fixtures [i].sunSet.compareTo (now);
+                        if ((fixtures [i].sunRise.compareTo (now) > 0) && (fixtures [i].sunSet.compareTo (now) < 0)) {
                             //time is after sun rise and before sun set
+                            Console.WriteLine ("turing Lights on");
                             fixtures [i].TurnLightsOn ();
                         }
                     } else {
-                        if ((fixtures [i].sunRise.compareTo (now) < 1) && (fixtures [i].sunSet.compareTo (now) > 1)) {
+                        if ((fixtures [i].sunRise.compareTo (now) < 0) && (fixtures [i].sunSet.compareTo (now) > 0)) {
                             fixtures [i].TurnLightsOff ();
                         }
                     }
@@ -102,7 +109,7 @@ namespace AquaPic.LightingDriver
 
                 if (fixtures [i] is DimmingLightingFixture) {
                     DimmingLightingFixture obj = (DimmingLightingFixture)fixtures [i];
-                    if (obj.lightingOn && ((obj.mode == Mode.Auto) || (obj.mode == Mode.AutoAuto)))
+                    if ((obj.lightingOn == MyState.On) && ((obj.mode == Mode.Auto) || (obj.mode == Mode.AutoAuto)))
                         obj.SetDimmingLevel (
                             Utils.CalcParabola (
                                 obj.sunRise, 

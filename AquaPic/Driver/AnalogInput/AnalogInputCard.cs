@@ -9,9 +9,9 @@ namespace AquaPic.AnalogInputDriver
     {
         private class AnalogInputCard
         {
-            private AquaPicBus.Slave _apb;
-            private byte _cardID;
-            private int _alarmIdx;
+            public AquaPicBus.Slave slave;
+            public byte cardID;
+            public int communicationAlarmIndex;
             public AnalogInputChannel[] channels;
             public bool updating;
 
@@ -28,14 +28,14 @@ namespace AquaPic.AnalogInputDriver
 
             public AnalogInputCard (byte address, byte cardID) {
                 try {
-                    this._apb = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
-                    this._apb.OnStatusUpdate += OnSlaveStatusUpdate;
+                    this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
+                    this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
                 } catch (Exception ex) {
                     Console.WriteLine (ex.ToString ());
                     Console.WriteLine (ex.Message);
                 }
-                this._cardID = cardID;
-                this._alarmIdx = Alarm.Subscribe ("APB communication error", "Analog Input card at address " + this._apb.address.ToString ());
+                this.cardID = cardID;
+                this.communicationAlarmIndex = Alarm.Subscribe ("APB communication error", "Analog Input card at address " + this.slave.address.ToString ());
                 this.channels = new AnalogInputChannel[4];
                 for (int i = 0; i < this.channels.Length; ++i) {
                     this.channels [i] = new AnalogInputChannel (); 
@@ -53,20 +53,20 @@ namespace AquaPic.AnalogInputDriver
 
                 unsafe {
                     fixed (byte* ptr = &arr [0]) {
-                        _apb.Write (2, ptr, sizeof(byte) * 2);
+                        slave.Write (2, ptr, sizeof(byte) * 2);
                     }
                 }
             }
 
             protected void OnSlaveStatusUpdate (object sender) {
-                if ((_apb.status != AquaPicBusStatus.communicationSuccess) || (_apb.status != AquaPicBusStatus.communicationStart))
-                    Alarm.Post (_alarmIdx, true);
+                if ((slave.status != AquaPicBusStatus.communicationSuccess) || (slave.status != AquaPicBusStatus.communicationStart))
+                    Alarm.Post (communicationAlarmIndex, true);
             }
                 
             public void GetValues () {
                 updating = true;
                 unsafe {
-                    _apb.Read (20, sizeof(float) * 4, GetValuesCallback); 
+                    slave.Read (20, sizeof(float) * 4, GetValuesCallback); 
                 }
             }
 
@@ -90,7 +90,7 @@ namespace AquaPic.AnalogInputDriver
 
                 updating = true;
                 unsafe {
-                    _apb.ReadWrite (10, &message, sizeof(byte), sizeof(ValueGetterFloat), GetValueCallback);
+                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(ValueGetterFloat), GetValueCallback);
                 }
             }
 

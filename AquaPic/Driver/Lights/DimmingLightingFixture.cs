@@ -12,12 +12,8 @@ namespace AquaPic.LightingDriver
             public float currentDimmingLevel { get; set; }
             public float minDimmingOutput { get; set; }
             public float maxDimmingOutput { get; set; }
-            public AnalogType type {
-                get { return _type; }
-            }
-
-            private IndividualControl dimCh;
-            private AnalogType _type;
+            public IndividualControl dimCh;
+            public AnalogType type;
 
             public DimmingLightingFixture (
                 byte powerID,
@@ -37,8 +33,8 @@ namespace AquaPic.LightingDriver
             {
                 this.dimCh.Group = cardID;
                 this.dimCh.Individual = channelID;
-                this._type = type;
-                AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this._type, name);
+                this.type = type;
+                AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this.type, name);
             }
 
             public void SetDimmingLevel (float dimmingLevel) {

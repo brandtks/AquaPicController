@@ -4,8 +4,7 @@ using Cairo;
 
 namespace MyWidgetLibrary
 {
-    [System.ComponentModel.ToolboxItem (true)]
-    public partial class MyPlugWidget : Gtk.Bin
+    public partial class MyPlugWidget : EventBox //Gtk.Bin
     {
         public bool onOff { get; set; }
         public byte id { get; set; }
@@ -13,54 +12,57 @@ namespace MyWidgetLibrary
 
         public event ButtonPressEventHandler PlugClicked;
 
-        public MyPlugWidget (byte id) {
+        public MyPlugWidget (int id) {
+            this.Visible = true;
+            this.VisibleWindow = false;
+
             this.onOff = false;
-            this.id = id;
+            this.id = (byte)id;
             this.PlugName = null;
-            this.Build ();
+
+            this.WidthRequest = 90;
+            this.HeightRequest = 90;
+
+            this.ExposeEvent += OnAreaExposeEvent;
+            this.ButtonPressEvent += OnAreaButtonClickedEvent;
+
+            //this.Build ();
         }
 
         protected void OnAreaExposeEvent (object o, ExposeEventArgs args) {
-            DrawingArea area = (DrawingArea) o;
-            Context cr =  Gdk.CairoHelper.Create(area.GdkWindow);
+            //var area = o as EventBox;
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                int width = Allocation.Width;
+                int height = Allocation.Height;
+                int left = Allocation.Left;
+                int top = Allocation.Top;
 
-            int width, height, left, top;
+                if (onOff)
+                    cr.SetSourceRGB (0.0, 2.55, 2.55);
+                else
+                    cr.SetSourceRGB (0.0, 0.45, 0.45);
+                cr.Rectangle (left, top, width, height);
+                cr.FillPreserve ();
+                cr.LineWidth = 0.85;
+                cr.SetSourceRGB (0.0, 0.0, 0.0);
+                cr.Stroke ();
 
-            width = Allocation.Width;
-            height = Allocation.Height;
-            left = Allocation.Left;
-            top = Allocation.Top;
+                cr.SetSourceRGB (0.3, 0.3, 0.3);
+                cr.Rectangle (left + 10, top + 10, width - 20, height - 20);
+                cr.FillPreserve ();
+                cr.LineWidth = 0.5;
+                cr.SetSourceRGB (0.0, 0.0, 0.0);
+                cr.Stroke ();
 
-            if (onOff)
-                cr.SetSourceRGB (0.0, 2.55, 2.55);
-            else
-                cr.SetSourceRGB (0.0, 0.45, 0.45);
-            cr.Rectangle (0, 0, width, height);
-            cr.Fill ();
-
-            cr.SetSourceRGB (0.3, 0.3, 0.3);
-            cr.Rectangle (10, 10, width - 20, height - 20);
-            cr.Fill ();
-
-            /*
-            Pango.Layout l = new Pango.Layout (area.PangoContext);
-            l.Width = Pango.Units.FromPixels (width);
-            l.Wrap = Pango.WrapMode.Word;
-            l.Alignment = Pango.Alignment.Left;
-            //l.SetText (ButtonLabel);
-            l.SetMarkup ("<span color=" + (char)34 + "white" + (char)34 + ">" + PlugName + "</span>"); 
-            l.FontDescription = Pango.FontDescription.FromString ("Courier New 12");
-            GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), 1, 1, l);
-            l.Dispose ();
-            */
-
-            cr.SetSourceRGB (1.0, 1.0, 1.0);
-            cr.SelectFontFace ("Courier New 12", FontSlant.Normal, FontWeight.Normal);
-            cr.SetFontSize (12);
-            cr.MoveTo (5, 12);
-            cr.ShowText (PlugName);
-
-            cr.Dispose ();
+                Pango.Layout l = new Pango.Layout (PangoContext);
+                l.Width = Pango.Units.FromPixels (width - 10);
+                l.Wrap = Pango.WrapMode.WordChar;
+                l.Alignment = Pango.Alignment.Center;
+                l.SetMarkup ("<span color=" + (char)34 + "white" + (char)34 + ">" + PlugName + "</span>"); 
+                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 5, top + 10, l);
+                l.Dispose ();
+            }
         }
 
         protected void OnAreaButtonClickedEvent (object o, ButtonPressEventArgs args) { 

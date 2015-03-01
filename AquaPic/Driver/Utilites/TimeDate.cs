@@ -124,14 +124,13 @@ namespace AquaPic.Utilites
 
         // returns 1 if after value, -1 if before value
         public int compareTo (TimeDate value) {
-            DateTime val = toDateTime ();
-            return val.CompareTo (value.toDateTime ());
+            DateTime val = value.toDateTime ();
+            return val.CompareTo (toDateTime ());
         }
 
         // returns 1 if after value, -1 if before value
         public int compareTo (DateTime value) {
-            DateTime val = toDateTime ();
-            return val.CompareTo (value);
+            return value.CompareTo (toDateTime());
         }
 
         // returns 1 if after value, -1 if before value

@@ -7,14 +7,7 @@ namespace AquaPic.AnalogInputDriver
     {
         private class AnalogInputChannel
         {
-            private AnalogType _type;
-            public AnalogType type {
-                get { return _type; }
-                set {
-                    if ((type == AnalogType.Level) || (type == AnalogType.Temperature))
-                        _type = type;
-                }
-            }
+            public AnalogType type;
             public string name { get; set; }
             public float value { get; set; }
 
@@ -28,7 +21,7 @@ namespace AquaPic.AnalogInputDriver
             */
 
             public AnalogInputChannel () {
-                this._type = AnalogType.None;
+                this.type = AnalogType.None;
                 this.name = null;
                 this.value = 0.0f;
             }

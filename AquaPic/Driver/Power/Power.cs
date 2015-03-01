@@ -30,6 +30,13 @@ namespace AquaPic.PowerDriver
         public static void AddPlug (int powerID, int plugID, string name, bool rtnToRequested = false) {
             pwrStrips [powerID].plugs [plugID].name = name;
             pwrStrips [powerID].plugs [plugID].returnToRequested = rtnToRequested;
+            pwrStrips [powerID].plugs [plugID].mode = Mode.Auto;
+        }
+
+        public static void GuiSetPlugState (IndividualControl plug, MyState state) {
+            if (pwrStrips [plug.Group].plugs [plug.Individual].mode == Mode.Manual) {
+                pwrStrips [plug.Group].SetPlugState (plug.Individual, state, true);
+            }
         }
 
         public static void SetPlugState (IndividualControl plug, MyState state, bool modeOverride = false) {
@@ -52,13 +59,13 @@ namespace AquaPic.PowerDriver
         }
 
         public static Mode GetPlugMode (IndividualControl plug) {
-            return pwrStrips [plug.Group].plugs [plug.Individual].currentMode;
+            return pwrStrips [plug.Group].plugs [plug.Individual].mode;
         }
 
         public static Mode[] GetAllModes (int powerID) {
             Mode[] modes = new Mode[8];
             for (int i = 0; i < modes.Length; ++i)
-                modes [i] = pwrStrips [powerID].plugs [i].currentMode;
+                modes [i] = pwrStrips [powerID].plugs [i].mode;
             return modes;
         }
 
@@ -67,6 +74,22 @@ namespace AquaPic.PowerDriver
             for (int i = 0; i < names.Length; ++i)
                 names [i] = pwrStrips [powerID].plugs [i].name;
             return names;
+        }
+
+        public static string[] GetPowerStripNames () {
+            string[] names = new string[pwrStrips.Count];
+            for (int i = 0; i < pwrStrips.Count; ++i) {
+                names [i] = pwrStrips [i].name;
+            }
+            return names;
+        }
+
+        public static int GetPowerStripIndex (string name) {
+            for (int i = 0; i < pwrStrips.Count; ++i) {
+                if (string.Compare (pwrStrips [i].name, name, StringComparison.CurrentCultureIgnoreCase) == 0)
+                    return i;
+            }
+            return -1;
         }
 
         public static void AddHandlerOnAuto (IndividualControl plug, ModeChangedHandler handler) {

@@ -9,15 +9,12 @@ namespace AquaPic.TemperatureDriver
     {
         private class ColumnTemperature
         {
-            private float _temperature;
+            public float temperature;
             private List<IndividualControl> channels; 
-            public float temperature {
-                get { return _temperature; }
-            }
 
             public ColumnTemperature () {
                 this.channels = new List<IndividualControl> ();
-                this._temperature = 0.0f;
+                this.temperature = 0.0f;
             }
 
             public void AddColumnTemperature (int cardID, int channelID) {
@@ -30,9 +27,9 @@ namespace AquaPic.TemperatureDriver
 
             public float GetColumnTemperature () {
                 for (int i = 0; i < channels.Count; ++i)
-                    _temperature += AnalogInput.GetAnalogValue (channels [i]);
-                _temperature /= channels.Count;
-                return _temperature;
+                    temperature += AnalogInput.GetAnalogValue (channels [i]);
+                temperature /= channels.Count;
+                return temperature;
             }
         }
     }

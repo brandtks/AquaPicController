@@ -43,7 +43,8 @@ namespace MyWidgetLibrary
                 int top = Allocation.Top;
                 int left = Allocation.Left;
 
-                cr.Rectangle (left, top, width, height);
+                //cr.Rectangle (left, top, width, height);
+                WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
                 cr.SetSourceRGBA (ButtonColor.R, ButtonColor.G, ButtonColor.B, ButtonColor.A);
                 cr.Fill ();
 
@@ -54,7 +55,8 @@ namespace MyWidgetLibrary
                 //l.SetText (ButtonLabel);
                 l.SetMarkup ("<span color=" + (char)34 + TextColor + (char)34 + ">" + Text + "</span>"); 
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New 12");
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, (top + (height / 2)) - 6, l);
+                //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, (top + (height / 2)) - 6, l);
+                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
                 l.Dispose ();
             }
         }
