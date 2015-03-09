@@ -57,7 +57,7 @@ namespace AquaPic.LightingDriver
                 rs.CheckHandler += OnRequestedState;
 //                PlugControl.Conditions.Add (requestedState);
 
-                PlugControl.Conditions.Script = "AND " + rs.Name + " AND NOT loss of power";
+                PlugControl.Conditions.Script = rs.Name + " AND NOT loss of power";
 
 //                Condition c = ConditionLocker.GetCondition ("Loss of power");
 //                if (c != null)

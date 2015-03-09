@@ -31,7 +31,7 @@ namespace AquaPic.TemperatureDriver
 
                 //PlugControl.Conditions.Add (RequestedState);
                // PlugControl.Conditions.Add (ConditionLocker.GetCondition ("High temperature"));
-                PlugControl.Conditions.Script = "AND " + rs.Name + " AND NOT high temperature";
+                PlugControl.Conditions.Script = rs.Name + " AND NOT high temperature";
             }
 
             protected bool OnRequestedState () {
