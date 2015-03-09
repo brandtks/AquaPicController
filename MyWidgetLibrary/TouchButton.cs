@@ -13,7 +13,7 @@ namespace MyWidgetLibrary
 
     public class TouchButton : EventBox
     {
-        public Colors ButtonColor { get; set; }
+        public MyColor ButtonColor { get; set; }
         public string Text { get; set; }
         public string TextColor { get; set; }
         public ButtonClickAction clickAction { get; set; }
@@ -24,7 +24,7 @@ namespace MyWidgetLibrary
             this.Visible = true;
             this.VisibleWindow = false;
 
-            this.ButtonColor = new Colors ("red", 0.8);
+            this.ButtonColor = new MyColor ("red", 0.8);
             this.Text = "";
             this.TextColor = "black";
             this.HeightRequest = 115;

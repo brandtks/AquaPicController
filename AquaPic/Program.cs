@@ -24,8 +24,8 @@ namespace AquaPic
 		{
             Application.Init ();
 
-            powerStrip1 = Power.AddPowerStrip (16, "Left Power Strip");
-            powerStrip2 = Power.AddPowerStrip (17, "Right Power Strip");
+            powerStrip1 = Power.AddPowerStrip (16, "Left Power Strip", false);
+            powerStrip2 = Power.AddPowerStrip (17, "Right Power Strip", false);
 
             // Analog Input
             analogInputCard1 = AnalogInput.AddCard (20, "Analog Input 1");
@@ -34,10 +34,9 @@ namespace AquaPic
             analogOutputCard1 = AnalogOutput.AddCard (30, "Analog Output 1");
 
             // Temperature
+            Temperature.AddTemperatureProbe (analogInputCard1, 0, "Sump Temperature");
             Temperature.AddHeater (powerStrip1, 6, "Bottom Heater");
             Temperature.AddHeater (powerStrip1, 7, "Top Heater");
-            Temperature.AddTemperatureProbe (analogInputCard1, 0, "Sump Temperature");
-            Temperature.Init ();
 
             // Lighting
             Lighting.AddLight (
@@ -49,8 +48,8 @@ namespace AquaPic
                 "White LED", 
                 0,
                 0, 
-                new Time (7, 31, 0), 
-                new Time (20, 33, 0),
+                new Time (7, 00, 0), 
+                new Time (20, 00, 0),
                 0.0f,
                 75.0f
             );
@@ -63,19 +62,28 @@ namespace AquaPic
                 "Actinic LED", 
                 -15, 
                 15, 
-                new Time (7, 30, 0), 
-                new Time (20, 33, 0),
+                new Time (7, 00, 0), 
+                new Time (20, 00, 0),
                 0.0f,
                 75.0f
             );
             Lighting.AtMidnight ();
 
-            // calls the crap out of a bunch of none existance rs485 slaves
+            uint timer = GLib.Timeout.Add (250, test);
+
+            // @test calls the crap out of a bunch of none existance rs485 slaves
             //TaskManager.Start ();
              
             AquaPicGUI win = new AquaPicGUI ();
             win.Show ();
 			Application.Run ();
 		}
+
+        protected static bool test () {
+            Lighting.Run ();
+            Temperature.Run ();
+
+            return true;
+        }
 	}
 }

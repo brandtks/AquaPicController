@@ -9,6 +9,7 @@ namespace AquaPic
     {
         private PowerWindow powerScreen;
         private MainWindow mainScreen;
+        private LightingWindow lighingScreen;
         private string currentScreen;
 
         public AquaPicGUI () : base (Gtk.WindowType.Toplevel) {
@@ -25,6 +26,10 @@ namespace AquaPic
             this.currentScreen = "Main";
 
             this.Add (mainScreen);
+
+//            powerScreen = new PowerWindow (OnButtonTouch);
+//            currentScreen = "Power";
+//            Add (powerScreen);
 
             this.Show ();
         }
@@ -50,6 +55,12 @@ namespace AquaPic
                     powerScreen = new PowerWindow (OnButtonTouch);
                     currentScreen = "Power";
                     Add (powerScreen);
+                    break;
+                case "Lighting":
+                    ClearChildren ();
+                    lighingScreen = new LightingWindow (OnButtonTouch);
+                    currentScreen = "Lighting";
+                    Add (lighingScreen);
                     break;
                 default:
                     break;

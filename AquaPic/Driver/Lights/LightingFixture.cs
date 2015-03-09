@@ -5,6 +5,7 @@ using AquaPic.PowerDriver;
 using AquaPic.SerialBus;
 using AquaPic.AlarmDriver;
 using AquaPic.TemperatureDriver;
+using AquaPic.CoilCondition;
 
 namespace AquaPic.LightingDriver
 {
@@ -12,18 +13,19 @@ namespace AquaPic.LightingDriver
     {
         private class LightingFixture
     	{
-            public string name { get; set; }
-            public int sunRiseOffset { get; set; }
-            public int sunSetOffset { get; set; }
-            public Time minSunRise { get; set; }
-            public Time maxSunSet { get; set; }
+            public string name;
+            public int sunRiseOffset;
+            public int sunSetOffset;
+            public Time minSunRise;
+            public Time maxSunSet;
             public TimeDate sunRise;
             public TimeDate sunSet;
-            public Mode mode { get; set; }
-            public MyState lightingOn { get; set; }
-            public bool highTempLockout { get; set; }
+            public Mode mode;
+            public MyState lightingOn;
+            public bool highTempLockout;
             public IndividualControl plug;
-            public MyState requestedLightingOn;
+            public Coil PlugControl;
+            //public Condition requestedState;
 
             public LightingFixture (
                 byte powerID,
@@ -33,11 +35,13 @@ namespace AquaPic.LightingDriver
                 int sunSetOffset, 
                 Time minSunRise, 
                 Time maxSunSet,  
-                bool highTempLockout
-            ) {
+                bool highTempLockout) 
+            {
                 this.plug.Group = powerID;
                 this.plug.Individual = plugID;
-                Power.AddPlug (this.plug.Group, this.plug.Individual, name, true);
+                PlugControl = Power.AddPlug (this.plug, name, MyState.Off, true);
+                Power.AddHandlerOnStateChange (this.plug, LightingPlugStateChange);
+
                 this.name = name;
                 this.sunRiseOffset = sunRiseOffset;
                 this.sunSetOffset = sunSetOffset;
@@ -48,23 +52,35 @@ namespace AquaPic.LightingDriver
                 this.mode = Mode.Auto;
                 this.lightingOn = MyState.Off;
                 this.highTempLockout = highTempLockout;
+
+                Condition rs = new Condition (name + " requested state");
+                rs.CheckHandler += OnRequestedState;
+//                PlugControl.Conditions.Add (requestedState);
+
+                PlugControl.Conditions.Script = "AND " + rs.Name + " AND NOT loss of power";
+
+//                Condition c = ConditionLocker.GetCondition ("Loss of power");
+//                if (c != null)
+//                    PlugControl.Conditions.Add (c);
+
                 if (this.highTempLockout) {
-                    int alarmIdx = Temperature.highTempAlarmIdx;
+//                    PlugControl.Conditions.Add (ConditionLocker.GetCondition ("High Temperature"));
+
+                    PlugControl.Conditions.Script += " AND NOT high temperature";
+
+                    int alarmIdx = Temperature.HighTemperatureAlarmIndex;
                     if (alarmIdx == -1)
                         return;
-                    Alarm.AddPostHandler (alarmIdx, sender => this.TurnLightsOff ());
-                    Alarm.AddClearHandler (alarmIdx, sender => {
-                        if (this.requestedLightingOn == MyState.On)
-                            this.TurnLightsOn ();
-                    });
+                    Alarm.AddPostHandler (alarmIdx, sender => Power.AlarmShutdownPlug (plug));
                 }
-                Power.AddHandlerOnStateChange (this.plug, LightingPlugStateChange);
-                this.sunRise.setTimeDate (new TimeDate (this.minSunRise));
-                this.sunSet.setTimeDate (new TimeDate (this.maxSunSet));
+
+                // @test
+                this.sunRise.setTimeDate (this.minSunRise);
+                this.sunSet.setTimeDate (this.maxSunSet);
     		}
 
             public void SetSunRiseSet (TimeDate rise, TimeDate sSet) {
-                if (mode == Mode.Auto) {
+                if (mode == Mode.Manual) {
                     sunRise.updateDateToToday ();
                     sunSet.updateDateToToday ();
                     return;
@@ -85,8 +101,7 @@ namespace AquaPic.LightingDriver
             }
 
             public void SetSunRise (TimeDate rise) {
-                if (mode == Mode.Auto) {
-                    sunRise.updateDateToToday ();
+                if (mode == Mode.Manual) {
                     sunSet.updateDateToToday ();
                     return;
                 }
@@ -100,8 +115,7 @@ namespace AquaPic.LightingDriver
             }
 
             public void SetSunSet (TimeDate sSet) {
-                if (mode == Mode.Auto) {
-                    sunRise.updateDateToToday ();
+                if (mode == Mode.Manual) {
                     sunSet.updateDateToToday ();
                     return;
                 }
@@ -112,19 +126,31 @@ namespace AquaPic.LightingDriver
                     sunSet.setTimeDate (sSet);
 
                 sunSet.addMinToDate (sunSetOffset);
-
             }
 
-            public virtual void TurnLightsOn () {
-                requestedLightingOn = MyState.On;
-                if (highTempLockout && !Alarm.CheckAlarming (Temperature.highTempAlarmIdx))
-                    Power.SetPlugState (plug, MyState.On);
+            protected bool OnRequestedState () {
+                if ((mode == Mode.AutoAuto) || (mode == Mode.Auto)) {
+                    TimeDate now = TimeDate.Now;
+                    if ((sunRise.compareTo (now) > 0) && (sunSet.compareTo (now) < 0)) {
+                        //time is after sun rise and before sun set
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                return false;
             }
 
-            public virtual void TurnLightsOff () {
-                requestedLightingOn = MyState.On;
-                Power.SetPlugState (plug, MyState.Off);
-            }
+            // set to protected since I don't want direct control of setting plugs
+//            protected virtual void OnLightsOnOutput () {
+//                if (Power.GetPlugState (plug) == MyState.Off)
+//                    Power.SetPlugState (plug, MyState.On);
+//            }
+//
+//            protected virtual void OnLightsOffOutput () {
+//                if (Power.GetPlugState (plug) == MyState.On)
+//                    Power.SetPlugState (plug, MyState.Off);
+//            }
 
             public void LightingPlugStateChange (object sender, StateChangeEventArgs args) {
                 lightingOn = args.state;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AquaPic.CoilCondition;
 
 namespace AquaPic.AlarmDriver
 {
@@ -16,11 +17,17 @@ namespace AquaPic.AlarmDriver
         }
 
         public static int Subscribe (string shortName, string longName, bool clearOnAck = false) {
+            int index = alarms.Count;
             alarms.Add (new AlarmType (shortName, longName, clearOnAck));
-            return alarms.Count - 1;
+            Condition c = new Condition (shortName);
+            c.CheckHandler += delegate () {
+                return CheckAlarming (index);
+            };
+
+            return index;
         }
 
-        public static void Post (int index, bool clearOnAck = false) {
+        public static void Post (int index) {
             if (!alarms [index].alarming) {
                 alarms [index].alarming = true;
                 alarms [index].acknowledged = false;

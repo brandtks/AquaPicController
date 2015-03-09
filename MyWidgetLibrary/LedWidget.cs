@@ -10,12 +10,12 @@ namespace MyWidgetLibrary
     public partial class MyLedWidget : Gtk.Bin
     {
 
-        public Colors color { get; set; }
+        public MyColor color { get; set; }
         public bool onOff { get; set; }
 
         public MyLedWidget ()
         {
-            color = new Colors ("red");
+            color = new MyColor ("red");
             onOff = false;
 
             this.Build ();

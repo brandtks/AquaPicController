@@ -46,12 +46,12 @@ namespace MyWidgetLibrary
                 pat.Dispose ();
 
                 Pango.Layout l = new Pango.Layout (this.PangoContext);
-                l.Width = Pango.Units.FromPixels (100);
+                l.Width = Pango.Units.FromPixels (120);
                 l.Wrap = Pango.WrapMode.Word;
                 l.Alignment = Pango.Alignment.Right;
                 l.SetMarkup ("<span color=" + (char)34 + "white" + (char)34 + ">" + DateTime.Now.ToLongTimeString () + "</span>"); 
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New 12");
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), 1180, 0, l);
+                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), 1160, 0, l);
                 l.Dispose ();
             }
         }

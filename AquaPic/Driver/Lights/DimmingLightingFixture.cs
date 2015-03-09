@@ -49,10 +49,10 @@ namespace AquaPic.LightingDriver
                 AnalogOutput.SetAnalogValue (dimCh, level);
             }
 
-            public override void TurnLightsOn () {
-                SetDimmingLevel (minDimmingOutput);
-                base.TurnLightsOn ();
-            }
+//            protected override void OnLightsOnOutput () {
+//                SetDimmingLevel (minDimmingOutput);
+//                base.OnLightsOnOutput ();
+//            }
         }
     }
 }

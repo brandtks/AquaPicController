@@ -4,7 +4,7 @@ using Cairo;
 
 namespace MyWidgetLibrary
 {
-    public class Colors
+    public class MyColor
     {
         public float R { get; set; }
         public float G { get; set; }
@@ -22,13 +22,13 @@ namespace MyWidgetLibrary
             { "blue", new float [3] { 0.0f, 0.0f, 1.0f} },
             { "yellow", new float [3] { 1.0f, 1.0f, 0.0f} },
             { "grey", new float [3] { 0.5f, 0.5f, 0.5f} },
-            { "dark gray", new float [3] { 0.2f, 0.2f, 0.2f} },
-            { "light gray", new float [3] { 0.75f, 0.75f, 0.75f} },
+            { "dark grey", new float [3] { 0.2f, 0.2f, 0.2f} },
+            { "light grey", new float [3] { 0.75f, 0.75f, 0.75f} },
             { "black", new float [3] { 0.0f, 0.0f, 0.0f} },
             { "white", new float [3] { 1.0f, 1.0f, 1.0f} }
         };
 
-        public Colors (string color, double A = 1.0) {
+        public MyColor (string color, double A = 1.0) {
             try {
                 string c = color.ToLower ();
                 this.R = colorLookup [c] [0];
@@ -43,10 +43,17 @@ namespace MyWidgetLibrary
             this.A = (float)A;
         }
 
-        public Colors (double R, double G, double B, double A = 1.0) {
+        public MyColor (double R, double G, double B, double A = 1.0) {
             this.R = (float)R;
             this.G = (float)G;
             this.B = (float)B;
+            this.A = (float)A;
+        }
+
+        public MyColor (byte R, byte G, byte B, double A = 1.0) {
+            this.R = (float)(R/255);
+            this.G = (float)(G/255);
+            this.B = (float)(B/255);
             this.A = (float)A;
         }
 
@@ -109,6 +116,18 @@ namespace MyWidgetLibrary
             R = storedR;
             G = storedG;
             B = storedB;
+        }
+
+        public string ToHTML () {
+            byte red = (byte)(R * 255);
+            byte green = (byte)(G * 255);
+            byte blue = (byte)(B * 255);
+            string html = string.Format ("#{0:X2}{1:X2}{2:X2}", red, green, blue);
+            return html;
+        }
+
+        public void SetSource (Context cr) {
+            cr.SetSourceRGB (R, G, B);
         }
     }
 }

@@ -11,9 +11,12 @@ namespace AquaPic
     public partial class PowerWindow : MyBackgroundWidget
     {
         private MyPlugWidget[] plugs;
-        private SelectorSwitch[] selectors;
+        private TouchSelectorSwitch[] selectors;
         private int powerID;
-        private ComboBox combo;
+        private TouchComboBox combo;
+        private TouchTextBox statusText;
+        private TouchTextBox timeText;
+        private TouchTextBox addressText;
 
         public PowerWindow (ButtonReleaseEventHandler OnTouchButtonRelease) : base ("Power", OnTouchButtonRelease) {
             powerID = 0;
@@ -21,7 +24,7 @@ namespace AquaPic
             EventBox box = new EventBox ();
             box.Visible = true;
             box.VisibleWindow = false;
-            box.ExposeEvent += onBoxExpose;
+            box.ExposeEvent += OnBoxExpose;
             box.SetSizeRequest (600, 270);
             Put (box, 340, 265);
             box.Show ();
@@ -44,9 +47,9 @@ namespace AquaPic
                 plugs [i].Show ();
             }
 
-            selectors = new SelectorSwitch[8];
+            selectors = new TouchSelectorSwitch[8];
             for (int i = 0; i < selectors.Length; ++i) {
-                selectors [i] = new SelectorSwitch (i);
+                selectors [i] = new TouchSelectorSwitch (i);
                 selectors [i].AddSelectedColorOption (0, 0.50, 0.50, 0.50);
                 selectors [i].AddSelectedColorOption (1, 0.35, 0.45, 0.95);
                 selectors [i].AddSelectedNameOption (0, "Manual");
@@ -65,12 +68,48 @@ namespace AquaPic
                 selectors [i].Show ();
             }
 
-            string[] pwrNames = Power.GetPowerStripNames ();
-            combo = new ComboBox (pwrNames);
+            string[] pwrNames = Power.GetAllPowerStripNames ();
+            combo = new TouchComboBox (pwrNames);
             combo.Active = powerID;
             combo.Changed += OnComboChanged;
-            Put (combo, 50, 50);
+            Put (combo, 1040, 35);
             combo.Show ();
+
+            statusText = new TouchTextBox ();
+            statusText.WidthRequest = 250;
+            Put (statusText, 1015, 580);
+            statusText.Show ();
+
+            var label1 = new TouchLabel ();
+            label1.Text = "Status";
+            label1.Justification = Justify.Right;
+            label1.FontColor = new MyColor (255, 255, 255);
+            Put (label1, 1013, 585);
+            label1.Show ();
+
+            timeText = new TouchTextBox ();
+            Put (timeText, 1015, 620);
+            timeText.Show ();
+
+            var label2 = new TouchLabel ();
+            label2.Text = "Response Time";
+            label2.Justification = Justify.Right;
+            label2.FontColor = new MyColor (255, 255, 255);
+            Put (label2, 1013, 625);
+            label2.Show ();
+
+            addressText = new TouchTextBox ();
+            addressText.Justification = Justify.Right;
+            addressText.WidthRequest = 50;
+            Put (addressText, 1215, 620);
+            addressText.Show ();
+
+            var label3 = new TouchLabel ();
+            label3.Text = "Address";
+            label3.Justification = Justify.Right;
+            label3.FontColor = new MyColor (255, 255, 255);
+            Put (label3, 1213, 625);
+            label3.Show ();
 
             GetPowerData (powerID);
 
@@ -82,7 +121,7 @@ namespace AquaPic
             a.RetVal = true;
         }
 
-        protected void onBoxExpose (object sender, ExposeEventArgs args) {
+        protected void OnBoxExpose (object sender, ExposeEventArgs args) {
             var area = sender as EventBox;
             using (Context cr = Gdk.CairoHelper.Create (area.GdkWindow)) {;
                 cr.SetSourceRGB(0.15, 0.15, 0.15);
@@ -106,7 +145,7 @@ namespace AquaPic
             else
                 s = MyState.Off;
 
-            Power.GuiSetPlugState (ic, s);
+            Power.ManualSetPlugState (ic, s);
         }
 
         protected void PlugStateChange (object sender, StateChangeEventArgs args) {
@@ -119,7 +158,7 @@ namespace AquaPic
         }
 
         protected void OnSelectorChanged (object sender, SelectorChangedEventArgs args) {
-            var sel = sender as SelectorSwitch;
+            var sel = sender as TouchSelectorSwitch;
 
             IndividualControl ic;
             Mode m;
@@ -136,7 +175,10 @@ namespace AquaPic
         protected void GetPowerData (int powerID) {
             MyState[] states = Power.GetAllStates (powerID);
             Mode[] modes = Power.GetAllModes (powerID);
-            string[] names = Power.GetAllNames (powerID);
+            string[] names = Power.GetAllPlugNames (powerID);
+            string status = Power.GetApbStatus (powerID);
+            int time = Power.GetApbResponseTime (powerID);
+            int address = Power.GetApbAddress (powerID);
             IndividualControl ic;
             ic.Group = (byte)powerID;
 
@@ -159,27 +201,31 @@ namespace AquaPic
                 ic.Individual = (byte)i;
                 Power.AddHandlerOnStateChange (ic, PlugStateChange);
             }
+
+            statusText.Text = status;
+            timeText.Text = time.ToString ();
+            addressText.Text = address.ToString ();
         }
 
-        protected void OnComboChanged (object sender, EventArgs e) {
-            TreeIter iter;
-            string name = "";
-            int id;
-
-            if (combo.GetActiveIter (out iter)) {
-                name = (string)combo.Model.GetValue (iter, 0);
-                id = Power.GetPowerStripIndex (name);
-                if (id != -1) {
-                    powerID = id;
-                    GetPowerData (powerID);
-                    QueueDraw ();
-                    combo.QueueDraw ();
-                    for (int i = 0; i < 8; ++i) {
-                        plugs [i].QueueDraw ();
-                        selectors [i].QueueDraw ();
-                    }
+        protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            int id = Power.GetPowerStripIndex (e.ActiveText);
+            if (id != -1) {
+                powerID = id;
+                GetPowerData (powerID);
+                QueueDraw ();
+                combo.QueueDraw ();
+                for (int i = 0; i < 8; ++i) {
+                    plugs [i].QueueDraw ();
+                    selectors [i].QueueDraw ();
                 }
             }
+        }
+
+        protected void OnApbPowerStripStatusUpdate (object sender) {
+            string status = Power.GetApbStatus (powerID);
+            int time = Power.GetApbResponseTime (powerID);
+            statusText.Text = status;
+            timeText.Text = time.ToString ();
         }
     }
 }

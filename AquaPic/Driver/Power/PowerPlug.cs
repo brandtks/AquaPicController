@@ -7,14 +7,15 @@ namespace AquaPic.PowerDriver
     {
         private class PlugData
         {
-            public float powerWatts;
-            public float currentAmps;
+            public float wattPower;
+            public float ampCurrent;
             public Mode mode;
-            public float powerFactor { get; set; }
-            public string name { get; set; }
-            public MyState currentState { get; set; }
-            public MyState requestedState { get; set; }
-            public bool returnToRequested { get; set; }
+            public float powerFactor;
+            public string name;
+            public MyState currentState;
+            public MyState requestedState;
+            public MyState fallback;
+            public bool returnToRequested;
 
             public event StateChangeHandler onStateChange;
             public event ModeChangedHandler onAuto;
@@ -24,16 +25,17 @@ namespace AquaPic.PowerDriver
                 this.name = null;
                 this.currentState = MyState.Off;
                 this.requestedState = MyState.Off;
+                this.fallback = MyState.Off;
                 this.returnToRequested = false;
                 this.mode = Mode.Manual;
-                this.currentAmps = 0.0f;
-                this.powerWatts = 0.0f;
+                this.ampCurrent = 0.0f;
+                this.wattPower = 0.0f;
                 this.powerFactor = 1.0f;
             }
 
-            public void SetCurrent (float c) {
-                currentAmps = c;
-                powerWatts = currentAmps * Voltage * powerFactor;
+            public void SetAmpCurrent (float c) {
+                ampCurrent = c;
+                wattPower = ampCurrent * Voltage * powerFactor;
             }
 
             public void OnChangeState (StateChangeEventArgs args) {

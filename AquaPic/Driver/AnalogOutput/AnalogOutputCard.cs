@@ -23,7 +23,7 @@ namespace AquaPic.AnalogOutputDriver
                     Console.WriteLine (ex.Message);
                 }
                 this.cardID = cardID;
-                this.communicationAlarmIndex = Alarm.Subscribe("APB communication error", "Analog output card at address " + this.slave.address.ToString ());
+                this.communicationAlarmIndex = Alarm.Subscribe(address.ToString () + " communication fault", "Analog output card at address " + this.slave.address.ToString ());
                 this.channels = new AnalogOutputChannel[4];
                 for (int i = 0; i < this.channels.Length; ++i)
                     this.channels [i] = new AnalogOutputChannel ();
@@ -31,7 +31,7 @@ namespace AquaPic.AnalogOutputDriver
 
             protected void OnSlaveStatusUpdate (object sender) {
                 if ((slave.status != AquaPicBusStatus.communicationSuccess) || (slave.status != AquaPicBusStatus.communicationStart))
-                    Alarm.Post (communicationAlarmIndex, true);
+                    Alarm.Post (communicationAlarmIndex);
             }
 
             public void AddChannel (int ch, AnalogType type, string name) {

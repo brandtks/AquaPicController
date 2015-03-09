@@ -1,6 +1,7 @@
 ﻿using System;
 using AquaPic.PowerDriver;
 using AquaPic.Globals;
+using AquaPic.CoilCondition;
 
 namespace AquaPic.TemperatureDriver
 {
@@ -8,29 +9,51 @@ namespace AquaPic.TemperatureDriver
     {
         private class Heater 
         {
-            public IndividualControl plug;
-            public bool controlTemp { get; set; }
-            public float setpoint { get; set; }
-            public float offset { get; set; }
-            public string name { get; set; }
+            public IndividualControl Plug;
+            public bool ControlTemperature;
+            public float Setpoint;
+            public float BandWidth;
+            public string Name;
+            public Coil PlugControl;
+            //public Condition RequestedState;
 
-            public Heater (byte powerID, byte plugID, bool controlTemp, float setpoint, float offset, string name) {
-                this.plug.Group = powerID;
-                this.plug.Individual = plugID;
-                this.controlTemp = controlTemp;
-                this.setpoint = setpoint;
-                this.offset = offset;
-                this.name = name;
-                Power.AddPlug (this.plug.Group, this.plug.Individual, name, true);
+            public Heater (byte powerID, byte plugID, bool controlTemp, float setpoint, float bandwidth, string name) {
+                this.Plug.Group = powerID;
+                this.Plug.Individual = plugID;
+                this.ControlTemperature = controlTemp;
+                this.Setpoint = setpoint;
+                this.BandWidth = bandwidth / 2;
+                this.Name = name;
+                PlugControl = Power.AddPlug (this.Plug, name, MyState.On, true);
+
+                Condition rs = new Condition (name + " requested state");
+                rs.CheckHandler += OnRequestedState;
+
+                //PlugControl.Conditions.Add (RequestedState);
+               // PlugControl.Conditions.Add (ConditionLocker.GetCondition ("High temperature"));
+                PlugControl.Conditions.Script = "AND " + rs.Name + " AND NOT high temperature";
             }
 
-            public void turnHeaterOn (bool modeOverride = false) {
-                Power.SetPlugState (plug, MyState.On, modeOverride);
+            protected bool OnRequestedState () {
+                if (ControlTemperature) {
+                    if (WaterColumnTemperature >= (Setpoint + BandWidth))
+                        return false;
+
+                    if (WaterColumnTemperature <= (Setpoint - BandWidth))
+                        return true;
+                }
+                return true;
             }
 
-            public void turnHeaterOff (bool modeOverride = false) {
-                Power.SetPlugState (plug, MyState.Off, modeOverride);
-            }
+//            protected void OnHeaterOnOutput () {
+//                if (Power.GetPlugState (Plug) == MyState.Off)
+//                    Power.SetPlugState (Plug, MyState.On);
+//            }
+//
+//            protected void OnHeaterOffOutput () {
+//                if (Power.GetPlugState (Plug) == MyState.On)
+//                    Power.SetPlugState (Plug, MyState.Off);
+//            }
         }
     }
 }

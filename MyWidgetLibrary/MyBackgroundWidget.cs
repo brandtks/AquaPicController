@@ -81,7 +81,7 @@ namespace MyWidgetLibrary
                 if (string.Compare (screenNames [i], currentScreen, StringComparison.InvariantCultureIgnoreCase) == 0)
                     this.buttons [i].ButtonColor.ChangeColor ("yellow");
                 else
-                    this.buttons [i].ButtonColor.ChangeColor ("light gray");
+                    this.buttons [i].ButtonColor.ChangeColor ("light grey");
                 this.buttons [i].clickAction = ButtonClickAction.Darken;
                 this.buttons [i].SetSizeRequest (87, 87);
                 this.buttons [i].TouchButtonReleasedHandler += OnTouchButtenRelease;
@@ -96,16 +96,16 @@ namespace MyWidgetLibrary
                 //cr.Rectangle (0, 680, 1280, 120);
                 //cr.SetSourceRGBA (0.15, 0.15, 0.15, 0.65);
 
-                cr.MoveTo (50, 800);
+                cr.MoveTo (50, 796);
                 cr.LineTo (100, 735);
                 cr.LineTo (1180, 735);
-                cr.LineTo (1230, 800);
-                cr.LineTo (50, 800);
+                cr.LineTo (1230, 796);
+                cr.LineTo (50, 796);
                 cr.ClosePath ();
 
                 Gradient pat = new LinearGradient (640, 735, 640, 800);
                 pat.AddColorStop (0.0, new Color (0.45, 0.45, 0.45, 0.85));
-                pat.AddColorStop (1.0, new Color (0.05, 0.05, 0.05, 0.55));
+                pat.AddColorStop (1.0, new Color (0.35, 0.35, 0.35, 0.55));
                 cr.SetSource (pat);
                 cr.Fill ();
                 pat.Dispose ();

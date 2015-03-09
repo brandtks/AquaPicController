@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic; // for List
 using AquaPic.Globals;
+using AquaPic.Utilites;
+using AquaPic.SerialBus;
+using AquaPic.CoilCondition;
 
 namespace AquaPic.PowerDriver
 {
@@ -21,26 +24,59 @@ namespace AquaPic.PowerDriver
             }
         }
 
-        public static int AddPowerStrip (int address, string name) {
+        public static int AddPowerStrip (int address, string name, bool alarmOnLossOfPower) {
             int count = pwrStrips.Count;
-            pwrStrips.Add (new PowerStrip ((byte)address, (byte)count, name));
+            int pwrLossAlarmIdx = -1;
+
+            if (alarmOnLossOfPower) {
+                for (int i = 0; i < pwrStrips.Count; ++i) {
+                    if (pwrStrips [i].powerLossAlarmIndex != -1)
+                        pwrLossAlarmIdx = pwrStrips [i].powerLossAlarmIndex;
+                }
+            }
+
+            pwrStrips.Add (new PowerStrip ((byte)address, (byte)count, name, alarmOnLossOfPower, pwrLossAlarmIdx));
             return count;
         }
 
-        public static void AddPlug (int powerID, int plugID, string name, bool rtnToRequested = false) {
+        public static Coil AddPlug (IndividualControl plug, string name, MyState fallback, bool returnToRequested = false) {
+            pwrStrips [plug.Group].plugs [plug.Individual].name = name;
+            pwrStrips [plug.Group].plugs [plug.Individual].fallback = fallback;
+            pwrStrips [plug.Group].plugs [plug.Individual].returnToRequested = returnToRequested;
+            pwrStrips [plug.Group].plugs [plug.Individual].mode = Mode.Auto;
+            pwrStrips [plug.Group].SetupPlug (
+                plug.Individual,
+                pwrStrips [plug.Group].plugs [plug.Individual].fallback);
+
+            Coil c = new Coil (pwrStrips [plug.Group].plugs [plug.Individual].name);
+            c.OutputTrue += delegate() {
+                SetPlugState (plug, MyState.On);
+            };
+            c.OutputFalse += delegate() {
+                SetPlugState (plug, MyState.Off);
+            };
+
+            return c;
+        }
+
+        public static void AddPlug (int powerID, int plugID, string name, MyState fallback, bool rtnToRequested = false) {
             pwrStrips [powerID].plugs [plugID].name = name;
             pwrStrips [powerID].plugs [plugID].returnToRequested = rtnToRequested;
             pwrStrips [powerID].plugs [plugID].mode = Mode.Auto;
         }
 
-        public static void GuiSetPlugState (IndividualControl plug, MyState state) {
+        public static void ManualSetPlugState (IndividualControl plug, MyState state) {
             if (pwrStrips [plug.Group].plugs [plug.Individual].mode == Mode.Manual) {
                 pwrStrips [plug.Group].SetPlugState (plug.Individual, state, true);
             }
         }
 
-        public static void SetPlugState (IndividualControl plug, MyState state, bool modeOverride = false) {
-            pwrStrips [plug.Group].SetPlugState (plug.Individual, state, modeOverride);
+        public static void AlarmShutdownPlug (IndividualControl plug) {
+            pwrStrips [plug.Group].SetPlugState (plug.Individual, MyState.Off, true);
+        }
+
+        protected static void SetPlugState (IndividualControl plug, MyState state) {
+            pwrStrips [plug.Group].SetPlugState (plug.Individual, state, false);
         }
 
         public static void SetPlugMode (IndividualControl plug, Mode mode) {
@@ -69,14 +105,14 @@ namespace AquaPic.PowerDriver
             return modes;
         }
 
-        public static string[] GetAllNames (int powerID) {
+        public static string[] GetAllPlugNames (int powerID) {
             string[] names = new string[8];
             for (int i = 0; i < names.Length; ++i)
                 names [i] = pwrStrips [powerID].plugs [i].name;
             return names;
         }
 
-        public static string[] GetPowerStripNames () {
+        public static string[] GetAllPowerStripNames () {
             string[] names = new string[pwrStrips.Count];
             for (int i = 0; i < pwrStrips.Count; ++i) {
                 names [i] = pwrStrips [i].name;
@@ -90,6 +126,18 @@ namespace AquaPic.PowerDriver
                     return i;
             }
             return -1;
+        }
+
+        public static string GetApbStatus (int powerID) {
+            return Utils.GetDescription (pwrStrips [powerID].slave.status);
+        }
+
+        public static int GetApbResponseTime (int powerID) {
+            return pwrStrips [powerID].slave.responeTime;
+        }
+
+        public static int GetApbAddress (int powerID) {
+            return pwrStrips [powerID].slave.address;
         }
 
         public static void AddHandlerOnAuto (IndividualControl plug, ModeChangedHandler handler) {

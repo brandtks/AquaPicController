@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using AquaPic.AnalogInputDriver;
 using AquaPic.Globals;
+using AquaPic.AlarmDriver;
 
 namespace AquaPic.TemperatureDriver
 {
@@ -10,11 +11,17 @@ namespace AquaPic.TemperatureDriver
         private class ColumnTemperature
         {
             public float temperature;
-            private List<IndividualControl> channels; 
+            public List<IndividualControl> channels;
+            public int _highTempAlarmIdx;
+            public int _lowTempAlarmIdx;
 
-            public ColumnTemperature () {
+            public ColumnTemperature (AlarmHandler HighTempHandler) {
                 this.channels = new List<IndividualControl> ();
                 this.temperature = 0.0f;
+
+                _highTempAlarmIdx = Alarm.Subscribe ("High temperature", "Water column temperature too high");
+                _lowTempAlarmIdx = Alarm.Subscribe ("Low temperature", "Water column temperature too low");
+                Alarm.AddPostHandler (_highTempAlarmIdx, HighTempHandler);
             }
 
             public void AddColumnTemperature (int cardID, int channelID) {
@@ -26,9 +33,17 @@ namespace AquaPic.TemperatureDriver
             }
 
             public float GetColumnTemperature () {
+                /* @test
                 for (int i = 0; i < channels.Count; ++i)
                     temperature += AnalogInput.GetAnalogValue (channels [i]);
-                temperature /= channels.Count;
+                temperature /= channels.Count;*/
+
+                if (temperature >= highTempAlarmSetpoint) 
+                    Alarm.Post (_highTempAlarmIdx);
+
+                if (temperature <= lowTempAlarmSetpoint)
+                    Alarm.Post (_lowTempAlarmIdx);
+
                 return temperature;
             }
         }
