@@ -3,11 +3,11 @@ using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.PowerDriver;
 using AquaPic.SerialBus;
-using AquaPic.AlarmDriver;
-using AquaPic.TemperatureDriver;
+using AquaPic.AlarmRuntime;
+using AquaPic.TemperatureModule;
 using AquaPic.CoilCondition;
 
-namespace AquaPic.LightingDriver
+namespace AquaPic.LightingModule
 {
     public partial class Lighting 
     {
@@ -39,7 +39,7 @@ namespace AquaPic.LightingDriver
             {
                 this.plug.Group = powerID;
                 this.plug.Individual = plugID;
-                PlugControl = Power.AddPlug (this.plug, name, MyState.Off, true);
+                PlugControl = Power.AddPlug (this.plug, name, MyState.Off);
                 Power.AddHandlerOnStateChange (this.plug, LightingPlugStateChange);
 
                 this.name = name;
@@ -53,11 +53,11 @@ namespace AquaPic.LightingDriver
                 this.lightingOn = MyState.Off;
                 this.highTempLockout = highTempLockout;
 
-                Condition rs = new Condition (name + " requested state");
-                rs.CheckHandler += OnRequestedState;
+                Condition autoControl = new Condition (name + " auto control");
+                autoControl.CheckHandler += OnRequestedState;
 //                PlugControl.Conditions.Add (requestedState);
 
-                PlugControl.Conditions.Script = rs.Name + " AND NOT loss of power";
+                PlugControl.Conditions.Script += " OR " + autoControl.Name + " AND NOT loss of power";
 
 //                Condition c = ConditionLocker.GetCondition ("Loss of power");
 //                if (c != null)
@@ -129,7 +129,7 @@ namespace AquaPic.LightingDriver
             }
 
             protected bool OnRequestedState () {
-                if ((mode == Mode.AutoAuto) || (mode == Mode.Auto)) {
+                if (Power.GetPlugMode (plug) == Mode.Auto) {
                     TimeDate now = TimeDate.Now;
                     if ((sunRise.compareTo (now) > 0) && (sunSet.compareTo (now) < 0)) {
                         //time is after sun rise and before sun set

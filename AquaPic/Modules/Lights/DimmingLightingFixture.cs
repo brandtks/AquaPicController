@@ -3,7 +3,7 @@ using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.AnalogOutputDriver;
 
-namespace AquaPic.LightingDriver
+namespace AquaPic.LightingModule
 {
     public partial class Lighting 
     {

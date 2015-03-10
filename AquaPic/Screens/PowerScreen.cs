@@ -149,12 +149,14 @@ namespace AquaPic
         }
 
         protected void PlugStateChange (object sender, StateChangeEventArgs args) {
-            if (args.state == MyState.On)
-                plugs [args.plugID].onOff = true;
-            else
-                plugs [args.plugID].onOff = false;
+            if (args.powerID == powerID) {
+                if (args.state == MyState.On)
+                    plugs [args.plugID].onOff = true;
+                else
+                    plugs [args.plugID].onOff = false;
 
-            plugs [args.plugID].QueueDraw ();
+                plugs [args.plugID].QueueDraw ();
+            }
         }
 
         protected void OnSelectorChanged (object sender, SelectorChangedEventArgs args) {

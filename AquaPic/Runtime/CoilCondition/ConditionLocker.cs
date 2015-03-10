@@ -19,8 +19,17 @@ namespace AquaPic.CoilCondition
             } catch {
                 return null;
             }
+                
 
             return c;
+        }
+
+        public static void ChangeKey (string newKey, Condition c) {
+            string n = c.Name.ToLowerInvariant ();
+            AllConditions.Remove (n);
+
+            newKey = newKey.ToLowerInvariant ();
+            AllConditions.Add (newKey, c);
         }
     }
 }

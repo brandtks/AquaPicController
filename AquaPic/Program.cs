@@ -1,14 +1,14 @@
 ﻿using System;
 using Gtk;
-using AquaPic.AlarmDriver;
+using AquaPic.AlarmRuntime;
 using AquaPic.AnalogInputDriver;
 using AquaPic.AnalogOutputDriver;
 using AquaPic.Globals;
-using AquaPic.LightingDriver;
+using AquaPic.LightingModule;
 using AquaPic.PowerDriver;
 using AquaPic.SerialBus;
-using AquaPic.TaskManagerDriver;
-using AquaPic.TemperatureDriver;
+using AquaPic.TaskManagerRuntime;
+using AquaPic.TemperatureModule;
 using AquaPic.Utilites;
 
 namespace AquaPic
@@ -69,10 +69,9 @@ namespace AquaPic
             );
             Lighting.AtMidnight ();
 
-            uint timer = GLib.Timeout.Add (250, test);
+            //uint timer = GLib.Timeout.Add (250, test);
 
-            // @test calls the crap out of a bunch of none existance rs485 slaves
-            //TaskManager.Start ();
+            TaskManager.Start ();
              
             AquaPicGUI win = new AquaPicGUI ();
             win.Show ();

@@ -16,7 +16,7 @@ namespace AquaPic.AnalogInputDriver
 
         public static int AddCard (int address, string name) {
             int count = cards.Count;
-            cards.Add (new AnalogInputCard ((byte)address, (byte)count));
+            cards.Add (new AnalogInputCard ((byte)address, (byte)count, name));
             return count;
         }
 

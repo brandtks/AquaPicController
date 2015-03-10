@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AquaPic.AlarmDriver
+namespace AquaPic.AlarmRuntime
 {
     public delegate void AlarmHandler (object sender);
 }

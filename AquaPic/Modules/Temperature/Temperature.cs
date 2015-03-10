@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.AlarmDriver;
+using AquaPic.AlarmRuntime;
 using AquaPic.AnalogInputDriver;
 using AquaPic.Globals;
 using AquaPic.PowerDriver;
 
-namespace AquaPic.TemperatureDriver
+namespace AquaPic.TemperatureModule
 {
     public partial class Temperature
     {
@@ -61,10 +61,6 @@ namespace AquaPic.TemperatureDriver
 
         public static void Run () {
             columnTemp.GetColumnTemperature ();
-
-            for (int i = 0; i < heaters.Count; ++i) {
-                heaters [i].PlugControl.Execute ();
-            }
         }
 
         private static void HighTempHandler (object sender) {

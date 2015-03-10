@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using AquaPic.CoilCondition;
 
-namespace AquaPic.AlarmDriver
+namespace AquaPic.AlarmRuntime
 {
     public partial class Alarm
     {

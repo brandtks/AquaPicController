@@ -1,6 +1,6 @@
 ﻿using System;
 using AquaPic.SerialBus;
-using AquaPic.AlarmDriver;
+using AquaPic.AlarmRuntime;
 using AquaPic.Globals;
 
 namespace AquaPic.AnalogOutputDriver
@@ -50,14 +50,14 @@ namespace AquaPic.AnalogOutputDriver
             }
 
             public void SetAnalogValue (byte channelID, int value) {
-                ValueSetter vs = new ValueSetter ();
-                vs.channelID = channelID;
+                CommValueInt vs;
+                vs.channel = channelID;
                 vs.value = value;
 
-                channels [vs.channelID].value = vs.value;
+                channels [vs.channel].value = vs.value;
 
                 unsafe {
-                    slave.Write (31, &vs, sizeof(ValueSetter));
+                    slave.Write (31, &vs, sizeof(CommValueInt));
                 }
             }
 
@@ -100,15 +100,15 @@ namespace AquaPic.AnalogOutputDriver
                 byte message = ch;
 
                 unsafe {
-                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(ValueGetterInt), GetValueCallback);
+                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueInt), GetValueCallback);
                 }
             }
 
             protected void GetValueCallback (CallbackArgs args) {
-                ValueGetterInt vg;
+                CommValueInt vg;
 
                 unsafe {
-                    args.copyBuffer (&vg, sizeof(ValueGetterInt));
+                    args.copyBuffer (&vg, sizeof(CommValueInt));
                 }
 
                 channels [vg.channel].value = vg.value;

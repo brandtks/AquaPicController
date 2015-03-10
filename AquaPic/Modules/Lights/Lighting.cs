@@ -4,7 +4,7 @@ using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.PowerDriver;
 
-namespace AquaPic.LightingDriver
+namespace AquaPic.LightingModule
 {
     public partial class Lighting
     {
@@ -86,10 +86,9 @@ namespace AquaPic.LightingDriver
         public static void Run () {
             TimeDate now = TimeDate.Now;
 
-            for (int i = 0; i < fixtures.Count; ++i) {
-                fixtures [i].PlugControl.Execute ();
-                if (fixtures [i] is DimmingLightingFixture) {
-                    DimmingLightingFixture obj = (DimmingLightingFixture)fixtures [i];
+            foreach (var fixture in fixtures) {
+                if (fixture is DimmingLightingFixture) {
+                    DimmingLightingFixture obj = (DimmingLightingFixture)fixture;
                     if ((obj.lightingOn == MyState.On) && ((obj.mode == Mode.Auto) || (obj.mode == Mode.AutoAuto)))
                         obj.SetDimmingLevel (
                             Utils.CalcParabola (

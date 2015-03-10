@@ -1,12 +1,12 @@
 ﻿using System;
 using Gtk;
-using AquaPic.AlarmDriver;
+using AquaPic.AlarmRuntime;
 using AquaPic.AnalogInputDriver;
-using AquaPic.LightingDriver;
+using AquaPic.LightingModule;
 using AquaPic.PowerDriver;
-using AquaPic.TemperatureDriver;
+using AquaPic.TemperatureModule;
 
-namespace AquaPic.TaskManagerDriver
+namespace AquaPic.TaskManagerRuntime
 {
     public class TaskManager
     {

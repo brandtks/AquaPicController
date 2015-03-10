@@ -1,8 +1,10 @@
 ﻿using System;
 using AquaPic;
 using AquaPic.SerialBus;
-using AquaPic.AlarmDriver;
+using AquaPic.AlarmRuntime;
 using AquaPic.Globals;
+using AquaPic.Utilites;
+using AquaPic.CoilCondition;
 
 namespace AquaPic.PowerDriver
 {
@@ -17,19 +19,19 @@ namespace AquaPic.PowerDriver
             public string name;
             public PlugData[] plugs;
 
-            /* <Future>
-            public powerStrip (byte address, byte powerID, string[] names, byte rtnToRequestedMask) {
-                this._address = address;
-                this._powerID = powerID;
-                this._commsAlarmIdx = alarm.subscribe ("APB communication error", "Power Strip at address " + this.address.ToString ());
-                this._powerAvailAlarmIdx = alarm.subscribe ("Loss of power", "Mains power not available at address " + this.address.ToString ());
-                this.commsStatus = APBstatus.notOpen;
-                this.acPowerAvail = false;
-                this.plugs = new plugData[8];
-                for (int i = 0; i < 8; ++i) {
-                    this.plugs [i] = new plugData (names[i], mtob (rtnToRequestedMask, i));
-                }
-    		}*/ 
+            //<Future>
+//            public powerStrip (byte address, byte powerID, string[] names, byte rtnToRequestedMask) {
+//                this._address = address;
+//                this._powerID = powerID;
+//                this._commsAlarmIdx = alarm.subscribe ("APB communication error", "Power Strip at address " + this.address.ToString ());
+//                this._powerAvailAlarmIdx = alarm.subscribe ("Loss of power", "Mains power not available at address " + this.address.ToString ());
+//                this.commsStatus = APBstatus.notOpen;
+//                this.acPowerAvail = false;
+//                this.plugs = new plugData[8];
+//                for (int i = 0; i < 8; ++i) {
+//                    this.plugs [i] = new plugData (names[i], mtob (rtnToRequestedMask, i));
+//                }
+//    		}
 
             public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) {
                 try { // if address is already used this will throw an exception
@@ -42,12 +44,14 @@ namespace AquaPic.PowerDriver
 
                 this.powerID = powerID;
 
-                this.commsAlarmIdx = Alarm.Subscribe (address.ToString () + " communication fault", "Power Strip at address " + this.slave.address.ToString ());
+                this.commsAlarmIdx = Alarm.Subscribe (
+                    this.slave.address.ToString () + " communication fault", 
+                    this.name + "serial communications fault");
 
                 if (alarmOnLossOfPower && (powerLossAlarmIndex == -1))
                     this.powerLossAlarmIndex = Alarm.Subscribe (
                         "Loss of power", 
-                        "Mains power not available at address " + this.slave.address.ToString ());
+                        "Mains power not available at " + this.name);
                 else
                     this.powerLossAlarmIndex = powerLossAlarmIndex;
 
@@ -55,8 +59,31 @@ namespace AquaPic.PowerDriver
                 this.AcPowerAvailable = false;
 
                 this.plugs = new PlugData[8];
-                for (int i = 0; i < 8; ++i)
-                    this.plugs [i] = new PlugData ();
+                for (int i = 0; i < 8; ++i) {
+                    int plugID = i;
+                    string plugName = "plug " + plugID.ToString() + " on " + this.name;
+                    Condition c = new Condition (plugName + " manual control");
+
+                    c.CheckHandler += delegate() {
+                        if (plugs [plugID].mode == Mode.Manual) {
+                            if (plugs [plugID].manualState == MyState.On)
+                                return true;
+                            else
+                                return false;
+                        }
+                        return false;
+                    };
+                        
+                    this.plugs [plugID] = new PlugData (
+                        plugName,
+                        c,
+                        delegate() {
+                            SetPlugState ((byte)plugID, MyState.On, false);
+                        },
+                        delegate() {
+                            SetPlugState ((byte)plugID, MyState.Off, false);
+                        });
+                }
             }
 
             public unsafe void SetupPlug (byte plugID, MyState fallback) {
@@ -97,14 +124,14 @@ namespace AquaPic.PowerDriver
                     Alarm.Post (powerLossAlarmIndex);
 
                 for (int i = 0; i < plugs.Length; ++i) {
-                    if (mtob (status.currentAvailableMask, i))
+                    if (Utils.mtob (status.currentAvailableMask, i))
                         ReadPlugCurrent ((byte)i);
                 }
             }
 
             public void ReadPlugCurrent (byte plugID) {
                 unsafe {
-                    slave.ReadWrite (12, &plugID, sizeof (byte), sizeof (AmpComms), ReadPlugCurrentCallback);
+                    slave.ReadWrite (10, &plugID, sizeof (byte), sizeof (AmpComms), ReadPlugCurrentCallback);
                 }
             }
 
@@ -122,37 +149,43 @@ namespace AquaPic.PowerDriver
             }
 
             public void SetPlugState (byte plugID, MyState state, bool modeOverride) {
-                if (plugs [plugID].mode == Mode.Manual && !modeOverride) {
-                    plugs [plugID].requestedState = state;
-                    return;
-                }
+                const int messageLength = 2; 
 
-                if (plugs [plugID].mode == Mode.Auto)
-                    plugs [plugID].requestedState = state;
+//                if (plugs [plugID].mode == Mode.Manual && !modeOverride) {
+//                    plugs [plugID].requestedState = state;
+//                    return;
+//                }
+//
+//                if (plugs [plugID].mode == Mode.Auto)
+//                    plugs [plugID].requestedState = state;
 
-                plugs [plugID].currentState = state;
-                plugs [plugID].OnChangeState (new StateChangeEventArgs (plugID, powerID, plugs [plugID].currentState, plugs [plugID].mode));
+                // plugs [plugID].currentState = state;
+                plugs [plugID].manualState = state;
 
-                /* @test Commented out for test the below called serial comms
-                byte[] message = new byte[2];
+                byte[] message = new byte[messageLength];
 
                 message [0] = plugID;
 
-                if (state == MyState.On) {
-                    plugs [plugID].currentState = MyState.On;
+                if (state == MyState.On)
                     message [1] = 0xFF;
-                } else {
-                    plugs [plugID].currentState = MyState.Off;
+                else
                     message [1] = 0x00;
-                }
-                plugs [plugID].OnChangeState (new StateChangeEventArgs (plugID, powerID, plugs [plugID].currentState, plugs [plugID].currentMode));
 
                 unsafe {
                     fixed (byte* ptr = message) {
-                        _apb.Write (11, ptr, sizeof(byte) * 2);
+                        slave.ReadWrite (
+                            30, 
+                            ptr, 
+                            sizeof(byte) * messageLength, 
+                            0, 
+                            delegate(CallbackArgs args) {
+                                plugs [plugID].OnChangeState (new StateChangeEventArgs (plugID, powerID, state, plugs [plugID].mode));
+                            });
                     }
                 }
-                */
+
+                // @test
+                plugs [plugID].OnChangeState (new StateChangeEventArgs (plugID, powerID, state, plugs [plugID].mode));
             }
 
             public void SetPlugMode (byte plugID, Mode mode) {
@@ -167,26 +200,6 @@ namespace AquaPic.PowerDriver
                 if ((slave.status != AquaPicBusStatus.communicationSuccess) || (slave.status != AquaPicBusStatus.communicationStart))
                     Alarm.Post (commsAlarmIdx);
             }
-
-            private static bool mtob (byte mask, int shift) {
-                byte b = mask;
-                byte _shift = (byte)shift;
-                b >>= _shift;
-                if ((b & 0x01) == 1)
-                    return true;
-                else
-                    return false;
-            }
-
-            // Not Used
-//            private static void btom(ref byte mask, bool b, int shift) {
-//                if (b)
-//                    mask |= (byte)Math.Pow (2, shift);
-//                else {
-//                    int m = ~(int)Math.Pow (2, shift);
-//                    mask &= (byte) m;
-//                }
-//            }
     	}
     }
 }

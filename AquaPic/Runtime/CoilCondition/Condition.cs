@@ -22,6 +22,11 @@ namespace AquaPic.CoilCondition
 
             return State;
         }
+
+        public void ChangeName (string name) {
+            ConditionLocker.ChangeKey (Name, this); // needs old name to remove from Dictionary
+            Name = name;
+        }
     }
 }
 

@@ -21,6 +21,9 @@ namespace AquaPic.PowerDriver
         public static void Run () {
             for (int i = 0; i < pwrStrips.Count; ++i) {
                 pwrStrips [i].GetStatus ();
+                foreach (var plug in pwrStrips [i].plugs) {
+                    plug.plugControl.Execute ();
+                }
             }
         }
 
@@ -39,36 +42,33 @@ namespace AquaPic.PowerDriver
             return count;
         }
 
-        public static Coil AddPlug (IndividualControl plug, string name, MyState fallback, bool returnToRequested = false) {
+        public static Coil AddPlug (IndividualControl plug, string name, MyState fallback) {
             pwrStrips [plug.Group].plugs [plug.Individual].name = name;
             pwrStrips [plug.Group].plugs [plug.Individual].fallback = fallback;
-            pwrStrips [plug.Group].plugs [plug.Individual].returnToRequested = returnToRequested;
             pwrStrips [plug.Group].plugs [plug.Individual].mode = Mode.Auto;
             pwrStrips [plug.Group].SetupPlug (
                 plug.Individual,
                 pwrStrips [plug.Group].plugs [plug.Individual].fallback);
 
-            Coil c = new Coil (pwrStrips [plug.Group].plugs [plug.Individual].name);
-            c.OutputTrue += delegate() {
-                SetPlugState (plug, MyState.On);
-            };
-            c.OutputFalse += delegate() {
-                SetPlugState (plug, MyState.Off);
-            };
-
-            return c;
+           
+            pwrStrips [plug.Group].plugs [plug.Individual].plugControl.ChangeName (name);
+            return pwrStrips [plug.Group].plugs [plug.Individual].plugControl;
         }
 
-        public static void AddPlug (int powerID, int plugID, string name, MyState fallback, bool rtnToRequested = false) {
+        public static Coil AddPlug (int powerID, int plugID, string name, MyState fallback) {
             pwrStrips [powerID].plugs [plugID].name = name;
-            pwrStrips [powerID].plugs [plugID].returnToRequested = rtnToRequested;
+            pwrStrips [powerID].plugs [plugID].fallback = fallback;
             pwrStrips [powerID].plugs [plugID].mode = Mode.Auto;
+
+            pwrStrips [powerID].plugs [plugID].plugControl.ChangeName (name);
+            return pwrStrips [powerID].plugs [plugID].plugControl;
         }
 
         public static void ManualSetPlugState (IndividualControl plug, MyState state) {
-            if (pwrStrips [plug.Group].plugs [plug.Individual].mode == Mode.Manual) {
-                pwrStrips [plug.Group].SetPlugState (plug.Individual, state, true);
-            }
+//            if (pwrStrips [plug.Group].plugs [plug.Individual].mode == Mode.Manual) {
+//                pwrStrips [plug.Group].SetPlugState (plug.Individual, state, true);
+//            }
+            pwrStrips [plug.Group].plugs [plug.Individual].manualState = state;
         }
 
         public static void AlarmShutdownPlug (IndividualControl plug) {
