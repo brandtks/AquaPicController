@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+/*
 namespace AquaPic.CoilCondition
 {
     public class ConditionLocker {
@@ -37,4 +38,4 @@ namespace AquaPic.CoilCondition
         }
     }
 }
-
+*/

@@ -103,7 +103,7 @@ namespace AquaPic.LightingModule
             foreach (var fixture in fixtures) {
                 if (fixture is DimmingLightingFixture) {
                     DimmingLightingFixture obj = (DimmingLightingFixture)fixture;
-                    if ((obj.lightingOn == MyState.On) && ((obj.mode == Mode.Auto) || (obj.mode == Mode.AutoAuto)))
+                    if ((obj.lightingOn == MyState.On) && (obj.mode == Mode.Auto))
                         obj.SetDimmingLevel (
                             Utils.CalcParabola (
                                 obj.timeOn, 

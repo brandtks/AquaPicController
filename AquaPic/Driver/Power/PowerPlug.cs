@@ -1,6 +1,6 @@
 ﻿using System;
 using AquaPic.Globals;
-using AquaPic.CoilCondition;
+using AquaPic.CoilRuntime;
 
 namespace AquaPic.PowerDriver
 {
@@ -22,7 +22,7 @@ namespace AquaPic.PowerDriver
             public event ModeChangedHandler onAuto;
             public event ModeChangedHandler onManual;
 
-            public PlugData (string name, Condition manualControl, OutputHandler outputTrue, OutputHandler outputFalse) {
+            public PlugData (string name, ConditionCheckHandler manualControl, OutputHandler outputTrue, OutputHandler outputFalse) {
                 this.name = name;
                 this.currentState = MyState.Off;
                 this.manualState = MyState.Off;
@@ -31,8 +31,8 @@ namespace AquaPic.PowerDriver
                 this.ampCurrent = 0.0f;
                 this.wattPower = 0.0f;
                 this.powerFactor = 1.0f;
-                this.plugControl = new Coil (name);
-                this.plugControl.Conditions.Script = manualControl.Name;
+                this.plugControl = new Coil ();
+                this.plugControl.ConditionChecker = manualControl;
                 this.plugControl.OutputTrue += outputTrue;
                 this.plugControl.OutputFalse += outputFalse;
             }

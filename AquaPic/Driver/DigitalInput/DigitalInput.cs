@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.CoilCondition;
+using AquaPic.CoilRuntime;
 using AquaPic.Globals;
 
 namespace AquaPic.DigitalInputDriver
@@ -17,11 +17,11 @@ namespace AquaPic.DigitalInputDriver
             return count;
         }
 
-        public static Condition AddInput (int cardID, int inputID, string name) {
-            cards [cardID].inputs [inputID].name = name;
-            cards [cardID].inputs [inputID].stateCondition.ChangeName (cards [cardID].inputs [inputID].name);
-            return cards [cardID].inputs [inputID].stateCondition;
-        }
+//        public static Condition AddInput (int cardID, int inputID, string name) {
+//            cards [cardID].inputs [inputID].name = name;
+//            cards [cardID].inputs [inputID].stateCondition.ChangeName (cards [cardID].inputs [inputID].name);
+//            return cards [cardID].inputs [inputID].stateCondition;
+//        }
 
         public static void Run () {
             foreach (var card in cards) {

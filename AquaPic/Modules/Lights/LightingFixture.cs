@@ -5,7 +5,7 @@ using AquaPic.PowerDriver;
 using AquaPic.SerialBus;
 using AquaPic.AlarmRuntime;
 using AquaPic.TemperatureModule;
-using AquaPic.CoilCondition;
+using AquaPic.CoilRuntime;
 
 namespace AquaPic.LightingModule
 {
@@ -37,12 +37,10 @@ namespace AquaPic.LightingModule
                 // Power Plug Setup
                 this.plug.Group = powerID;
                 this.plug.Individual = plugID;
-                plugControl = Power.AddPlug (this.plug, name, MyState.Off, true);
-                Power.AddHandlerOnStateChange (this.plug, LightingPlugStateChange);
+                plugControl = Power.AddPlug (this.plug, name, MyState.Off);
+                plugControl.ConditionChecker = PlugControlHandler;
 
-                Condition plugControlCondition = new Condition (name + " plug control");
-                plugControlCondition.CheckHandler += PlugControlHandler;
-                plugControl.Conditions.Script = plugControlCondition.Name;
+                Power.AddHandlerOnStateChange (this.plug, LightingPlugStateChange);
 
                 this.name = name;
                 this.timeOnOffsetMinutes = timeOnOffsetMinutes;

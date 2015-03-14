@@ -161,6 +161,12 @@ namespace AquaPic.Utilites
             setTimeDate (val);
         }
 
+        public void addDayToDate (int value) {
+            DateTime val = toDateTime ();
+            val = val.AddDays (value);
+            setTimeDate (val);
+        }
+
 		public override string ToString () {
 			DateTime val = toDateTime ();
 			return val.ToString ();

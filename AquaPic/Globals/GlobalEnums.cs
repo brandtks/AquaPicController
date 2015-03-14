@@ -5,8 +5,7 @@ namespace AquaPic.Globals
 {
     public enum Mode : byte {
         Manual = 1,
-        Auto,
-        AutoAuto
+        Auto
     }
 
     public enum AnalogType : byte {

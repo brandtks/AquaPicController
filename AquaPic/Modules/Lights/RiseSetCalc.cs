@@ -45,29 +45,32 @@ namespace AquaPic.LightingModule
         }
 
         public static void GetRiseTimeTomorrowOut (out TimeDate riseTomorrow) {
-            DateTime tomorrow = DateTime.Today;
-            tomorrow.AddDays (1.0);
-            double julianDate = calcJD (tomorrow);
+            DateTime today = DateTime.Today;
+            double julianDate = calcJD (today.Year, today.Month, today.Day + 1);
             double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
+
             riseTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            riseTomorrow.addDayToDate (1);
         }
 
         public static void GetRiseTimeTomorrowRef (ref TimeDate riseTomorrow) {
             TimeDate newRiseTomorrow;
-            DateTime tomorrow = DateTime.Today;
-            tomorrow.AddDays (1.0);
-            double julianDate = calcJD (tomorrow);
+            DateTime today = DateTime.Today;
+            double julianDate = calcJD (today.Year, today.Month, today.Day + 1);
             double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
+
             newRiseTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            newRiseTomorrow.addDayToDate (1);
             riseTomorrow.setTimeDate (newRiseTomorrow);
         }
 
         public static void GetSetTimeYesterday (out TimeDate setYesterday) {
-            DateTime yesterday = DateTime.Today;
-            yesterday.AddDays (-1.0);
-            double julianDate = calcJD (yesterday);
+            DateTime today = DateTime.Today;
+            double julianDate = calcJD (today.Year, today.Month, today.Day - 1);
             double riseUTC = calcSunSetUTC (julianDate, latitude, longitude);
+
             setYesterday = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            setYesterday.addDayToDate (-1);
         }
 
 		//http://www.esrl.noaa.gov/gmd/grad/solcalc/

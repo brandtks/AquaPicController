@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.CoilCondition;
+using AquaPic.CoilRuntime;
 
 namespace AquaPic.AlarmRuntime
 {
@@ -19,11 +19,6 @@ namespace AquaPic.AlarmRuntime
         public static int Subscribe (string shortName, string longName, bool clearOnAck = false) {
             int index = alarms.Count;
             alarms.Add (new AlarmType (shortName, longName, clearOnAck));
-            Condition c = new Condition (shortName);
-            c.CheckHandler += delegate () {
-                return CheckAlarming (index);
-            };
-
             return index;
         }
 

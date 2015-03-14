@@ -1,6 +1,7 @@
 ﻿using System;
 using AquaPic.Globals;
 
+/*
 namespace AquaPic.CoilCondition
 {
     public class Condition
@@ -29,4 +30,4 @@ namespace AquaPic.CoilCondition
         }
     }
 }
-
+*/

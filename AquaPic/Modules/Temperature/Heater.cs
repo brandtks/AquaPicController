@@ -1,7 +1,7 @@
 ﻿using System;
 using AquaPic.PowerDriver;
 using AquaPic.Globals;
-using AquaPic.CoilCondition;
+using AquaPic.CoilRuntime;
 using AquaPic.AlarmRuntime;
 
 namespace AquaPic.TemperatureModule
@@ -25,16 +25,8 @@ namespace AquaPic.TemperatureModule
                 this.Setpoint = setpoint;
                 this.BandWidth = bandwidth / 2;
                 this.Name = name;
-                PlugControl = Power.AddPlug (this.Plug, name, MyState.On, true);
-
-                Condition plugControlCondition = new Condition (name + " plug control");
-                plugControlCondition.CheckHandler += OnPlugControl;
-
-                PlugControl.Conditions.Script = plugControlCondition.Name;
-
-                //PlugControl.Conditions.Add (RequestedState);
-               // PlugControl.Conditions.Add (ConditionLocker.GetCondition ("High temperature"));
-//                PlugControl.Conditions.Script += " OR START " + autoControl.Name + " AND NOT high temperature END";
+                PlugControl = Power.AddPlug (this.Plug, name, MyState.On);
+                PlugControl.ConditionChecker = OnPlugControl;
             }
 
             protected bool OnPlugControl () {

@@ -46,6 +46,12 @@ namespace AquaPic
             Put (sunSet, 300, 95);
             sunSet.Show ();
 
+            TouchTextBox sunT = new TouchTextBox ();
+            sunT.WidthRequest = 200;
+            sunT.Text = Lighting.SunRiseTomorrow.ToString ();
+            Put (sunT, 300, 140);
+            sunT.Show ();
+
             Show ();
         }
     }

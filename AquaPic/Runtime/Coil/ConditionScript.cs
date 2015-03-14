@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+/*
 namespace AquaPic.CoilCondition
 {
     public class ConditionScript
@@ -157,4 +158,4 @@ namespace AquaPic.CoilCondition
         }
     }
 }
-
+*/

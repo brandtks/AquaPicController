@@ -3,7 +3,7 @@ using System.Collections.Generic; // for List
 using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.SerialBus;
-using AquaPic.CoilCondition;
+using AquaPic.CoilRuntime;
 
 namespace AquaPic.PowerDriver
 {
@@ -42,10 +42,7 @@ namespace AquaPic.PowerDriver
             return count;
         }
 
-        public static Coil AddPlug (IndividualControl plug, string name, MyState fallback, bool removeManualControl = false) {
-            if (removeManualControl) { // need orginal name to remove manual plug control
-                ConditionLocker.RemoveCondition (pwrStrips [plug.Group].plugs [plug.Individual].name + " manual control");
-            }
+        public static Coil AddPlug (IndividualControl plug, string name, MyState fallback) {
 
             pwrStrips [plug.Group].plugs [plug.Individual].name = name;
             pwrStrips [plug.Group].plugs [plug.Individual].fallback = fallback;
@@ -54,7 +51,6 @@ namespace AquaPic.PowerDriver
                 plug.Individual,
                 pwrStrips [plug.Group].plugs [plug.Individual].fallback);
 
-            pwrStrips [plug.Group].plugs [plug.Individual].plugControl.ChangeName (name);
             return pwrStrips [plug.Group].plugs [plug.Individual].plugControl;
         }
 
@@ -63,7 +59,7 @@ namespace AquaPic.PowerDriver
             pwrStrips [powerID].plugs [plugID].fallback = fallback;
             pwrStrips [powerID].plugs [plugID].mode = Mode.Auto;
 
-            pwrStrips [powerID].plugs [plugID].plugControl.ChangeName (name);
+            //pwrStrips [powerID].plugs [plugID].plugControl.ChangeName (name);
             return pwrStrips [powerID].plugs [plugID].plugControl;
         }
 

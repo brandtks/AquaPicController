@@ -4,7 +4,7 @@ using AquaPic.SerialBus;
 using AquaPic.AlarmRuntime;
 using AquaPic.Globals;
 using AquaPic.Utilites;
-using AquaPic.CoilCondition;
+using AquaPic.CoilRuntime;
 
 namespace AquaPic.PowerDriver
 {
@@ -62,21 +62,18 @@ namespace AquaPic.PowerDriver
                 for (int i = 0; i < 8; ++i) {
                     int plugID = i;
                     string plugName = "plug " + plugID.ToString() + " on " + this.name;
-                    Condition c = new Condition (plugName + " manual control");
-
-                    c.CheckHandler += delegate() {
-                        if (plugs [plugID].mode == Mode.Manual) {
-                            if (plugs [plugID].manualState == MyState.On)
-                                return true;
-                            else
-                                return false;
-                        }
-                        return false;
-                    };
                         
                     this.plugs [plugID] = new PlugData (
                         plugName,
-                        c,
+                        delegate() {
+                            if (plugs [plugID].mode == Mode.Manual) {
+                                if (plugs [plugID].manualState == MyState.On)
+                                    return true;
+                                else
+                                    return false;
+                            }
+                            return false;
+                        },
                         delegate() {
                             SetPlugState ((byte)plugID, MyState.On, false);
                         },
