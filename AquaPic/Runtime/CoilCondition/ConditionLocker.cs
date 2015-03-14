@@ -11,6 +11,11 @@ namespace AquaPic.CoilCondition
             AllConditions.Add (n, c);
         }
 
+        public static void RemoveCondition (string key) {
+            key = key.ToLowerInvariant ();
+            AllConditions.Remove (key);
+        }
+
         public static Condition GetCondition (string key) {
             Condition c;
             key = key.ToLowerInvariant ();
@@ -19,7 +24,6 @@ namespace AquaPic.CoilCondition
             } catch {
                 return null;
             }
-                
 
             return c;
         }

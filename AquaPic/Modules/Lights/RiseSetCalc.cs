@@ -5,19 +5,71 @@ namespace AquaPic.LightingModule
 {
 	public class RiseSetCalc
     {
-        public static void GetRiseSetTimes(out TimeDate rise, out TimeDate sSet) {
-			double latitude = 41.181946;
-			double longitude = -85.063345;
-			int timeZoneOffset = -5 * 60;
+        public static double latitude = 41.181946;
+        public static double longitude = -85.063345;
+        public static int timeZone = -5;
 
+        public static void GetRiseSetTimesOut (out TimeDate rise, out TimeDate sSet) {
 			double julianDate = calcJD (DateTime.Today);
 			double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
 			double setUTC = calcSunSetUTC (julianDate, latitude, longitude);
 
-            rise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZoneOffset)));
-            sSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZoneOffset)));
+            rise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            sSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
 		}
+
+        public static void GetRiseSetTimesRef (ref TimeDate rise, ref TimeDate sSet) {
+            TimeDate newRise, newSet;
+
+            double julianDate = calcJD (DateTime.Today);
+            double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
+            double setUTC = calcSunSetUTC (julianDate, latitude, longitude);
+
+            newRise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            newSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
+
+            rise.setTimeDate (newRise);
+            sSet.setTimeDate (newSet);
+        }
 	    
+        public static void GetRiseTime (out TimeDate rise) {
+            double julianDate = calcJD (DateTime.Today);
+            double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
+            rise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+        }
+
+        public static void GetSetTime (out TimeDate sSet) {
+            double julianDate = calcJD (DateTime.Today);
+            double setUTC = calcSunSetUTC (julianDate, latitude, longitude);
+            sSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
+        }
+
+        public static void GetRiseTimeTomorrowOut (out TimeDate riseTomorrow) {
+            DateTime tomorrow = DateTime.Today;
+            tomorrow.AddDays (1.0);
+            double julianDate = calcJD (tomorrow);
+            double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
+            riseTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+        }
+
+        public static void GetRiseTimeTomorrowRef (ref TimeDate riseTomorrow) {
+            TimeDate newRiseTomorrow;
+            DateTime tomorrow = DateTime.Today;
+            tomorrow.AddDays (1.0);
+            double julianDate = calcJD (tomorrow);
+            double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
+            newRiseTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            riseTomorrow.setTimeDate (newRiseTomorrow);
+        }
+
+        public static void GetSetTimeYesterday (out TimeDate setYesterday) {
+            DateTime yesterday = DateTime.Today;
+            yesterday.AddDays (-1.0);
+            double julianDate = calcJD (yesterday);
+            double riseUTC = calcSunSetUTC (julianDate, latitude, longitude);
+            setYesterday = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+        }
+
 		//http://www.esrl.noaa.gov/gmd/grad/solcalc/
 
         // Convert radian angle to degrees

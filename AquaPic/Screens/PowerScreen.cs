@@ -145,7 +145,7 @@ namespace AquaPic
             else
                 s = MyState.Off;
 
-            Power.ManualSetPlugState (ic, s);
+            Power.SetManualPlugState (ic, s);
         }
 
         protected void PlugStateChange (object sender, StateChangeEventArgs args) {

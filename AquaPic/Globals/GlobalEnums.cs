@@ -24,5 +24,10 @@ namespace AquaPic.Globals
         Off = 0,
         On = 1
     }
+
+    public enum LightingTime : byte {
+        Daytime = 1,
+        Nighttime
+    }
 }
 

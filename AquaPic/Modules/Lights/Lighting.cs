@@ -10,20 +10,32 @@ namespace AquaPic.LightingModule
     {
         //public static Lighting Main = new Lighting ();
 
-        private static List<LightingFixture> fixtures = new List<LightingFixture> ();
+        private static List<LightingFixture> fixtures;
+        public static TimeDate SunRiseToday;
+        public static TimeDate SunSetToday;
+        public static TimeDate SunRiseTomorrow;
+        public static TimeDate SunSetYesterday;
 
-        //private Lighting () {
-            //fixtures = new List<LightingFixture> ();
-        //}
+        static Lighting () {
+            fixtures = new List<LightingFixture> ();
+            RiseSetCalc.GetRiseSetTimesOut (out SunRiseToday, out SunSetToday);
+            RiseSetCalc.GetRiseTimeTomorrowOut (out SunRiseTomorrow);
+            RiseSetCalc.GetSetTimeYesterday (out SunSetYesterday);
+        }
+
+//        public static void Init () {
+//            RiseSetCalc.GetRiseSetTimes (out SunRiseToday, out SunSetToday);
+//            RiseSetCalc.GetRiseTimeTomorrow (out SunRiseTomorrow);
+//            RiseSetCalc.GetSetTimeYesterday (out SunSetYesterday);
+//        }
 
         public static int AddLight (
+            string name,
             int powerID,
-            int plugID,
-            string name,               
-            int sunRiseOffset, 
-            int sunSetOffset, 
-            Time minSunRise, 
-            Time maxSunSet,  
+            int plugID,         
+            int onTimeOffsetMinutes, 
+            int ofTimeOffsetMinutes, 
+            LightingTime lightingTime = LightingTime.Daytime,
             bool highTempLockout = true
         ) {
             int count = fixtures.Count;
@@ -32,31 +44,32 @@ namespace AquaPic.LightingModule
                     (byte)powerID, 
                     (byte)plugID, 
                     name, 
-                    sunRiseOffset, 
-                    sunSetOffset, 
-                    minSunRise, 
-                    maxSunSet, 
+                    onTimeOffsetMinutes, 
+                    ofTimeOffsetMinutes, 
+                    lightingTime,
                     highTempLockout
                 ));
-            TimeDate rise, sSet;
-            RiseSetCalc.GetRiseSetTimes (out rise, out sSet);
-            fixtures [count].SetSunRiseSet (rise, sSet);
+
+            if (fixtures [count].lightingTime == LightingTime.Daytime)
+                fixtures [count].SetOnOffTime (SunRiseToday, SunSetToday);
+            else
+                fixtures [count].SetOnOffTime (SunSetToday, SunRiseTomorrow);
+
             return count;
         }
 
         public static int AddLight (
+            string name,  
             int powerID,
             int plugID,
+            int onTimeOffsetMinutes, 
+            int offTimeOffsetMinutes,
             int cardID,
             int channelID,
             AnalogType type,
-            string name,               
-            int sunRiseOffset, 
-            int sunSetOffset, 
-            Time minSunRise, 
-            Time maxSunSet,
             float minDimmingOutput,
             float maxDimmingOutput,
+            LightingTime lightingTime = LightingTime.Daytime,
             bool highTempLockout = true
         ) {
             int count = fixtures.Count;
@@ -68,18 +81,19 @@ namespace AquaPic.LightingModule
                     (byte)channelID,
                     type,
                     name, 
-                    sunRiseOffset, 
-                    sunSetOffset, 
-                    minSunRise, 
-                    maxSunSet,
+                    onTimeOffsetMinutes, 
+                    offTimeOffsetMinutes, 
                     minDimmingOutput,
                     maxDimmingOutput,
+                    lightingTime,
                     highTempLockout
                 ));
-            //Commented out for testing 
-            //TimeDate rise, sSet;
-            //RiseSetCalc.GetRiseSetTimes (out rise, out sSet);
-            //fixtures [count].SetSunRiseSet (rise, sSet);
+
+            if (fixtures [count].lightingTime == LightingTime.Daytime)
+                fixtures [count].SetOnOffTime (SunRiseToday, SunSetToday);
+            else
+                fixtures [count].SetOnOffTime (SunSetToday, SunRiseTomorrow);
+
             return count;
         }
 
@@ -92,8 +106,8 @@ namespace AquaPic.LightingModule
                     if ((obj.lightingOn == MyState.On) && ((obj.mode == Mode.Auto) || (obj.mode == Mode.AutoAuto)))
                         obj.SetDimmingLevel (
                             Utils.CalcParabola (
-                                obj.sunRise, 
-                                obj.sunSet, 
+                                obj.timeOn, 
+                                obj.timeOff, 
                                 now, 
                                 obj.minDimmingOutput, 
                                 obj.maxDimmingOutput
@@ -103,10 +117,21 @@ namespace AquaPic.LightingModule
         }
 
         public static void AtMidnight () {
-            TimeDate rise, sSet;
-            RiseSetCalc.GetRiseSetTimes (out rise, out sSet);
-            for (int i = 0; i < fixtures.Count; ++i)
-                fixtures [i].SetSunRiseSet (rise, sSet);
+            SunSetYesterday.setTimeDate (SunSetToday); // sun set yesterday is sun set today
+            RiseSetCalc.GetRiseSetTimesRef (ref SunRiseToday, ref SunSetToday);
+            RiseSetCalc.GetRiseTimeTomorrowRef (ref SunRiseTomorrow);
+
+            foreach (var fixture in fixtures) {
+                if (fixture.lightingTime == LightingTime.Daytime)
+                    fixture.SetOnOffTime (SunRiseToday, SunSetToday);
+            }
+        }
+
+        public static void AtNoon () {
+            foreach (var fixture in fixtures) {
+                if (fixture.lightingTime == LightingTime.Nighttime)
+                    fixture.SetOnOffTime (SunSetToday, SunRiseTomorrow);
+            }
         }
     }
 }

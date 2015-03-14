@@ -2,6 +2,7 @@
 using Gtk;
 using Cairo;
 using MyWidgetLibrary;
+using AquaPic.LightingModule;
 
 namespace AquaPic
 {
@@ -32,6 +33,18 @@ namespace AquaPic
             l3.FontColor = new MyColor (1.0, 1.0, 0.50);
             Put (l3, 75, 110);
             l3.Show ();
+
+            TouchTextBox sunRise = new TouchTextBox ();
+            sunRise.WidthRequest = 200;
+            sunRise.Text = Lighting.SunRiseToday.ToString ();
+            Put (sunRise, 300, 50);
+            sunRise.Show ();
+
+            TouchTextBox sunSet = new TouchTextBox ();
+            sunSet.WidthRequest = 200;
+            sunSet.Text = Lighting.SunSetToday.ToString ();
+            Put (sunSet, 300, 95);
+            sunSet.Show ();
 
             Show ();
         }

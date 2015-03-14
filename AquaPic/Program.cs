@@ -40,34 +40,37 @@ namespace AquaPic
 
             // Lighting
             Lighting.AddLight (
+                "White LED", 
                 powerStrip1, 
-                0, 
+                0,
+                0,
+                0,
                 analogOutputCard1,
                 0,
                 AnalogType.ZeroTen,
-                "White LED", 
-                0,
-                0, 
-                new Time (7, 00, 0), 
-                new Time (20, 00, 0),
                 0.0f,
                 75.0f
             );
             Lighting.AddLight (
+                "Actinic LED", 
                 powerStrip1, 
                 1, 
+                -15, 
+                15,
                 analogOutputCard1,
                 0,
                 AnalogType.ZeroTen,
-                "Actinic LED", 
-                -15, 
-                15, 
-                new Time (7, 00, 0), 
-                new Time (20, 00, 0),
                 0.0f,
                 75.0f
             );
-            Lighting.AtMidnight ();
+            Lighting.AddLight (
+                "Refugium",
+                powerStrip1,
+                2,
+                0,
+                0,
+                LightingTime.Nighttime
+            );
 
             //uint timer = GLib.Timeout.Add (250, test);
 

@@ -42,7 +42,11 @@ namespace AquaPic.PowerDriver
             return count;
         }
 
-        public static Coil AddPlug (IndividualControl plug, string name, MyState fallback) {
+        public static Coil AddPlug (IndividualControl plug, string name, MyState fallback, bool removeManualControl = false) {
+            if (removeManualControl) { // need orginal name to remove manual plug control
+                ConditionLocker.RemoveCondition (pwrStrips [plug.Group].plugs [plug.Individual].name + " manual control");
+            }
+
             pwrStrips [plug.Group].plugs [plug.Individual].name = name;
             pwrStrips [plug.Group].plugs [plug.Individual].fallback = fallback;
             pwrStrips [plug.Group].plugs [plug.Individual].mode = Mode.Auto;
@@ -50,7 +54,6 @@ namespace AquaPic.PowerDriver
                 plug.Individual,
                 pwrStrips [plug.Group].plugs [plug.Individual].fallback);
 
-           
             pwrStrips [plug.Group].plugs [plug.Individual].plugControl.ChangeName (name);
             return pwrStrips [plug.Group].plugs [plug.Individual].plugControl;
         }
@@ -64,11 +67,15 @@ namespace AquaPic.PowerDriver
             return pwrStrips [powerID].plugs [plugID].plugControl;
         }
 
-        public static void ManualSetPlugState (IndividualControl plug, MyState state) {
+        public static void SetManualPlugState (IndividualControl plug, MyState state) {
 //            if (pwrStrips [plug.Group].plugs [plug.Individual].mode == Mode.Manual) {
 //                pwrStrips [plug.Group].SetPlugState (plug.Individual, state, true);
 //            }
             pwrStrips [plug.Group].plugs [plug.Individual].manualState = state;
+        }
+
+        public static MyState GetManualPlugState (IndividualControl plug) {
+            return pwrStrips [plug.Group].plugs [plug.Individual].manualState;
         }
 
         public static void AlarmShutdownPlug (IndividualControl plug) {

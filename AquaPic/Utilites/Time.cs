@@ -45,13 +45,20 @@ namespace AquaPic.Utilites
 			millisec = (byte)value.Milliseconds;
         }
 
+        public void setTime (Time value) {
+            hour = value.hour;
+            min = value.min;
+            sec = value.sec;
+            millisec = value.millisec;
+        }
+
         public TimeSpan toTimeSpan () {
             TimeSpan val = new TimeSpan (0, hour, min, sec, millisec);
             return val;
         }
 
         public int compareToTime (Time value) {
-            return TimeSpan.Compare (toTimeSpan (), value.toTimeSpan ());
+            return TimeSpan.Compare (value.toTimeSpan (), toTimeSpan ());
         }
 
         public void addMinToTime (int value) {

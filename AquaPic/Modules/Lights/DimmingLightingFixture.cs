@@ -22,14 +22,13 @@ namespace AquaPic.LightingModule
                 byte channelID,
                 AnalogType type,
                 string name,               
-                int sunRiseOffset, 
-                int sunSetOffset, 
-                Time minSunRise, 
-                Time maxSunSet,
+                int timeOnOffsetMinutes,
+                int timeOffOffsetMinutes,
                 float minDimmingOutput,
                 float maxDimmingOutput,
+                LightingTime lightingTime,
                 bool highTempLockout) 
-                : base (powerID, plugID, name, sunRiseOffset, sunSetOffset, minSunRise, maxSunSet, highTempLockout)
+                : base (powerID, plugID, name, timeOnOffsetMinutes, timeOffOffsetMinutes, lightingTime, highTempLockout)
             {
                 this.dimCh.Group = cardID;
                 this.dimCh.Individual = channelID;
@@ -48,11 +47,6 @@ namespace AquaPic.LightingModule
                     
                 AnalogOutput.SetAnalogValue (dimCh, level);
             }
-
-//            protected override void OnLightsOnOutput () {
-//                SetDimmingLevel (minDimmingOutput);
-//                base.OnLightsOnOutput ();
-//            }
         }
     }
 }

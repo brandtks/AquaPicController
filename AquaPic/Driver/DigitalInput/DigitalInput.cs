@@ -7,7 +7,7 @@ namespace AquaPic.DigitalInputDriver
 {
     public partial class DigitalInput
     {
-        private static List<DigitalInputCard> cards;
+        private static List<DigitalInputCard> cards = new List<DigitalInputCard> ();
 
         //public DigitalInput () { }
 

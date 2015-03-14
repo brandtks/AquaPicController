@@ -2,6 +2,7 @@
 using AquaPic.PowerDriver;
 using AquaPic.Globals;
 using AquaPic.CoilCondition;
+using AquaPic.AlarmRuntime;
 
 namespace AquaPic.TemperatureModule
 {
@@ -24,18 +25,28 @@ namespace AquaPic.TemperatureModule
                 this.Setpoint = setpoint;
                 this.BandWidth = bandwidth / 2;
                 this.Name = name;
-                PlugControl = Power.AddPlug (this.Plug, name, MyState.On);
+                PlugControl = Power.AddPlug (this.Plug, name, MyState.On, true);
 
-                Condition autoControl = new Condition (name + " auto control");
-                autoControl.CheckHandler += OnRequestedState;
+                Condition plugControlCondition = new Condition (name + " plug control");
+                plugControlCondition.CheckHandler += OnPlugControl;
+
+                PlugControl.Conditions.Script = plugControlCondition.Name;
 
                 //PlugControl.Conditions.Add (RequestedState);
                // PlugControl.Conditions.Add (ConditionLocker.GetCondition ("High temperature"));
-                PlugControl.Conditions.Script += " OR START " + autoControl.Name + " AND NOT high temperature END";
+//                PlugControl.Conditions.Script += " OR START " + autoControl.Name + " AND NOT high temperature END";
             }
 
-            protected bool OnRequestedState () {
-                if (Power.GetPlugMode (Plug) == Mode.Auto) {
+            protected bool OnPlugControl () {
+                if (Power.GetPlugMode (Plug) == Mode.Manual) {
+                    if (Power.GetManualPlugState (Plug) == MyState.On)
+                        return true;
+                    else
+                        return false;
+                } else {
+                    if (Alarm.CheckAlarming (HighTemperatureAlarmIndex))
+                        return false;
+
                     if (ControlTemperature) {
                         if (WaterColumnTemperature >= (Setpoint + BandWidth))
                             return false;
@@ -45,7 +56,6 @@ namespace AquaPic.TemperatureModule
                     }
                     return true;
                 }
-                return false;
             }
 
 //            protected void OnHeaterOnOutput () {
