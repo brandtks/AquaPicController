@@ -3,11 +3,14 @@ using Gtk;
 using AquaPic.AlarmRuntime;
 using AquaPic.AnalogInputDriver;
 using AquaPic.AnalogOutputDriver;
+using AquaPic.DigitalInputDriver;
 using AquaPic.Globals;
 using AquaPic.LightingModule;
 using AquaPic.PowerDriver;
 using AquaPic.SerialBus;
 using AquaPic.TaskManagerRuntime;
+using AquaPic.CoilRuntime;
+using AquaPic.PluginRuntime;
 using AquaPic.TemperatureModule;
 using AquaPic.Utilites;
 
@@ -16,7 +19,7 @@ namespace AquaPic
 	class MainClass
 	{
         static int powerStrip1 = -1;
-        static int powerStrip2 = -1;
+        //static int powerStrip2 = -1;
         static int analogInputCard1 = -1;
         static int analogOutputCard1 = -1;
 
@@ -25,13 +28,16 @@ namespace AquaPic
             Application.Init ();
 
             powerStrip1 = Power.AddPowerStrip (16, "Left Power Strip", false);
-            powerStrip2 = Power.AddPowerStrip (17, "Right Power Strip", false);
+            //powerStrip2 = Power.AddPowerStrip (17, "Right Power Strip", false);
 
             // Analog Input
             analogInputCard1 = AnalogInput.AddCard (20, "Analog Input 1");
 
             // Analog Output
             analogOutputCard1 = AnalogOutput.AddCard (30, "Analog Output 1");
+
+            // Digital Input
+            DigitalInput.AddCard (40, "Digital Input 1");
 
             // Temperature
             Temperature.AddTemperatureProbe (analogInputCard1, 0, "Sump Temperature");
@@ -71,6 +77,12 @@ namespace AquaPic
                 0,
                 LightingTime.Nighttime
             );
+
+            Coil plugControl = Power.AddPlug (powerStrip1, 5, "Test", MyState.On);
+            Plugin p = new Plugin ("TestPlugControl", "ScriptTest.cs");
+            plugControl.ConditionChecker = delegate() {
+                return p.RunPluginCoil ();
+            };
 
             //uint timer = GLib.Timeout.Add (250, test);
 

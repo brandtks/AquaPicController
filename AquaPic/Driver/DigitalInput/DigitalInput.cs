@@ -17,11 +17,9 @@ namespace AquaPic.DigitalInputDriver
             return count;
         }
 
-//        public static Condition AddInput (int cardID, int inputID, string name) {
-//            cards [cardID].inputs [inputID].name = name;
-//            cards [cardID].inputs [inputID].stateCondition.ChangeName (cards [cardID].inputs [inputID].name);
-//            return cards [cardID].inputs [inputID].stateCondition;
-//        }
+        public static void AddInput (int cardID, int inputID, string name) {
+            cards [cardID].inputs [inputID].name = name;
+        }
 
         public static void Run () {
             foreach (var card in cards) {
@@ -37,6 +35,16 @@ namespace AquaPic.DigitalInputDriver
             }
 
             return cards [input.Group].inputs [input.Individual].state;
+        }
+
+        public static bool GetInputValue (int card, int channel, bool realTimeUpdate = false) {
+            if (realTimeUpdate) {
+                cards [card].GetInput ((byte)channel);
+                while (cards [card].updating)
+                    continue;
+            }
+
+            return cards [card].inputs [channel].state;
         }
     }
 }

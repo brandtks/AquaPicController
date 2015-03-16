@@ -131,6 +131,21 @@ namespace AquaPic.PowerDriver
             return -1;
         }
 
+        public static IndividualControl GetPlugIndividualControl (string name) {
+            IndividualControl plug = new IndividualControl ();
+            for (int i = 0; i < pwrStrips.Count; ++i) {
+                for (int j = 0; j < pwrStrips [i].plugs.Length; ++j) {
+                    if (string.Compare (pwrStrips [i].plugs [j].name, name, StringComparison.InvariantCultureIgnoreCase) == 0) {
+                        plug.Group = (byte)j;
+                        plug.Individual = (byte)i;
+                        return plug;
+                    }
+                }
+            }
+
+            return plug;
+        }
+
         public static string GetApbStatus (int powerID) {
             return Utils.GetDescription (pwrStrips [powerID].slave.status);
         }

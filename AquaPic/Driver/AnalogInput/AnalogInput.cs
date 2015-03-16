@@ -38,5 +38,15 @@ namespace AquaPic.AnalogInputDriver
             }
             return cards [channel.Group].channels [channel.Individual].value;
         }
+
+        public static float GetInputValue (int card, int channel, bool realTimeUpdate = false) {
+            if (realTimeUpdate) {
+                cards [card].GetValue ((byte)channel);
+                while (cards [card].updating)
+                    continue;
+            }
+
+            return cards [card].channels [channel].value;
+        }
     }
 }

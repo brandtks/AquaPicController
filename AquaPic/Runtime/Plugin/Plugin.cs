@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.IO;
 using System.CodeDom.Compiler;
 using Microsoft.CSharp;
 
@@ -9,60 +10,79 @@ namespace AquaPic.PluginRuntime
     {
         private Assembly pluginAssembly;
         private string name;
-        private string sourceCode;
+        private string sourceCodeFile;
+        private bool compiled;
 
         public string Name {
             get { return name; }
         }
 
-        public string SourceCode {
-            get { return sourceCode; }
+        public string SourceCodeFile {
+            get { return sourceCodeFile; }
             set {
-                sourceCode = value;
+                compiled = false;
+                sourceCodeFile = value;
             }
         }
 
-        public Plugin (string sourceCode, string name) {
-            this.sourceCode = sourceCode;
+        public bool DefaultReturn;
+
+        public Plugin ( string name, string sourceCodeFile) {
             this.name = name;
+            this.sourceCodeFile = sourceCodeFile;
+            this.DefaultReturn = false;
 
             try {
-                this.pluginAssembly = Assembly.LoadFrom (this.name);
+                if (Directory.Exists (this.name + ".dll")) {
+                    this.pluginAssembly = Assembly.LoadFrom (this.name + ".dll");
+                    compiled = true;
+                    Console.WriteLine ("Loaded from file");
+                } else {
+                    Console.WriteLine ("Compiling");
+                    compiled = CompileCode ();
+                }
             } catch {
-                this.pluginAssembly = CompileCode ();
+                Console.WriteLine ("failed compiling");
+                compiled = false;
             }
         }
 
         public bool RunPluginCoil () {
-            try {
-                Type type = pluginAssembly.GetType ("MyScript.ScriptCoil");
-                MethodInfo method = type.GetMethod ("CoilCondition");
-                object rtn = method.Invoke (null, null);
-                return Convert.ToBoolean (rtn);
-            } catch {
-                return false;
-            }
+            if (compiled) {
+                try {
+                    Type type = pluginAssembly.GetType ("MyScript.ScriptCoil");
+                    MethodInfo method = type.GetMethod ("CoilCondition");
+                    object rtn = method.Invoke (null, null);
+                    bool b = Convert.ToBoolean (rtn);
+                    return b;
+                } catch {
+                    return false;
+                }
+            } else
+                return DefaultReturn;
         }
 
-        public Assembly CompileCode () {
+        protected bool CompileCode () {
             CSharpCodeProvider provider = new CSharpCodeProvider ();
             CompilerParameters options = new CompilerParameters();
 
             options.GenerateExecutable = false; // create dll
-            options.OutputAssembly = name;
+            options.OutputAssembly = name + ".dll";
             options.GenerateInMemory = false;
-            options.ReferencedAssemblies.Add(Assembly.GetExecutingAssembly().Location);
+            options.ReferencedAssemblies.Add (Assembly.GetExecutingAssembly ().Location);
            
-            CompilerResults result = provider.CompileAssemblyFromSource(options, sourceCode);
+            CompilerResults result = provider.CompileAssemblyFromFile(options, sourceCodeFile);
 
             if (result.Errors.HasErrors) {
                 foreach (CompilerError error in result.Errors)
                     Console.WriteLine ("Error ({0}): {1}", error.ErrorNumber, error.ErrorText);
 
-                return null;
+                pluginAssembly =  null;
+                return false;
             }
 
-            return result.CompiledAssembly;
+            pluginAssembly = Assembly.LoadFrom (name + ".dll");
+            return true;
         }
     }
 }
