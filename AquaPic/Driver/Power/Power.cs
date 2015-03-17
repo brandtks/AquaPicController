@@ -20,7 +20,7 @@ namespace AquaPic.PowerDriver
 
         public static void Run () {
             for (int i = 0; i < pwrStrips.Count; ++i) {
-                pwrStrips [i].GetStatus ();
+                //pwrStrips [i].GetStatus ();
                 foreach (var plug in pwrStrips [i].plugs) {
                     plug.plugControl.Execute ();
                 }
@@ -50,6 +50,8 @@ namespace AquaPic.PowerDriver
             pwrStrips [plug.Group].SetupPlug (
                 plug.Individual,
                 pwrStrips [plug.Group].plugs [plug.Individual].fallback);
+
+            //pwrStrips [plug.Group].plugs [plug.Individual].NewStateRequested = true;
 
             return pwrStrips [plug.Group].plugs [plug.Individual].plugControl;
         }
@@ -131,31 +133,30 @@ namespace AquaPic.PowerDriver
             return -1;
         }
 
-        public static IndividualControl GetPlugIndividualControl (string name) {
-            IndividualControl plug = new IndividualControl ();
+        public static bool GetPlugIndividualControl (string name, ref IndividualControl plug) {
             for (int i = 0; i < pwrStrips.Count; ++i) {
                 for (int j = 0; j < pwrStrips [i].plugs.Length; ++j) {
                     if (string.Compare (pwrStrips [i].plugs [j].name, name, StringComparison.InvariantCultureIgnoreCase) == 0) {
-                        plug.Group = (byte)j;
-                        plug.Individual = (byte)i;
-                        return plug;
+                        plug.Group = (byte)i;
+                        plug.Individual = (byte)j;
+                        return true;
                     }
                 }
             }
 
-            return plug;
+            return false;
         }
 
         public static string GetApbStatus (int powerID) {
-            return Utils.GetDescription (pwrStrips [powerID].slave.status);
+            return Utils.GetDescription (pwrStrips [powerID].slave.Status);
         }
 
         public static int GetApbResponseTime (int powerID) {
-            return pwrStrips [powerID].slave.responeTime;
+            return pwrStrips [powerID].slave.ResponeTime;
         }
 
         public static int GetApbAddress (int powerID) {
-            return pwrStrips [powerID].slave.address;
+            return pwrStrips [powerID].slave.Address;
         }
 
         public static void AddHandlerOnAuto (IndividualControl plug, ModeChangedHandler handler) {

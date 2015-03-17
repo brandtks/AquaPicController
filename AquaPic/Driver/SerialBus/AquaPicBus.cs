@@ -23,13 +23,24 @@ using System.Collections; // for Queue
 using System.Collections.Generic; // for List
 using Gtk; // for Application.Invoke
 
+#if SIMULATION
+using System.IO;
+using System.Text;
+#endif
+
 namespace AquaPic.SerialBus
 {
     public partial class AquaPicBus
     {
+        #if SIMULATION
+        const string FILENAME = @"C:\Users\sbrandt\Dropbox\AquaPic\Simulation.txt";
+        #endif
+
         public static AquaPicBus Bus1 = new AquaPicBus (2, 1000);
 
+        #if !SIMULATION
         private SerialPort uart;
+        #endif
         private Queue messageBuffer;
         private Thread txRxThread;
         private Thread responseThread;
@@ -54,6 +65,12 @@ namespace AquaPic.SerialBus
             this.readTimeout = responseTimeout;
         }
 
+        #if SIMULATION
+        public void Start () {
+            File.WriteAllText (FILENAME, string.Empty);
+            txRxThread.Start ();
+        }
+        #else
         public void Open (string port, int baudRate) {
             try {
                 //<TODO> Determine port for Radxa Rock "/dev/ttyAMA0"
@@ -74,19 +91,27 @@ namespace AquaPic.SerialBus
                 Console.WriteLine (ex.ToString ());
                 Console.WriteLine (ex.Message);
             }
+            
         }
+        #endif
 
         private bool IsAddressOk (byte a) {
             for (int i = 0; i < slaves.Count; ++i) {
-                if (slaves [i].address == a)
+                if (slaves [i].Address == a)
                     return false;
             }
             return true;
         }
 
+        #if SIMULATION
+        private void queueMessage (Slave slave, int func, string[] writeMessage, int writeSize, int readSize, ResponseCallback callback) {
+            messageBuffer.Enqueue (new Message (slave, func, writeMessage, writeSize, readSize, callback));
+        }
+        #else
         private unsafe void queueMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
             messageBuffer.Enqueue (new Message (slave, func, writeData, writeSize, readSize, callback));
         }
+        #endif
 
         // background thread to dequeue any messages and send to slave
         // waits for response and calls callback if required
@@ -98,12 +123,73 @@ namespace AquaPic.SerialBus
                 }
 
                 if (count > 0) {
+                    #if SIMULATION
+                    Console.WriteLine ("Message queue count is {0}", count);
+                    #endif
+
                     Message m;
 
                     lock (messageBuffer.SyncRoot) {
                         m = (Message)messageBuffer.Dequeue ();
                     }
 
+                    #if SIMULATION
+                    bool fileOpen = false;
+                    do {
+                        try {
+                            using (FileStream fs = File.Open (FILENAME, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) {
+                                StringBuilder sb = new StringBuilder ();
+                                sb.AppendLine ("master");
+                                foreach (string line in m.writeData)
+                                    sb.AppendLine (line);
+
+                                fs.SetLength (0);
+                                byte[] wb = Encoding.UTF8.GetBytes (sb.ToString ());
+                                fs.Write (wb, 0, wb.Length);
+                            }
+                            fileOpen = true;
+                        } catch {
+                            Console.WriteLine ("An exception happened");
+                            Thread.Sleep (1000);
+                        }
+                    } while (!fileOpen);
+
+                    Thread.Sleep (500);
+
+                    fileOpen = false;
+                    do {
+                        try {
+                            using (FileStream fs = File.Open (FILENAME, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) {
+                                char[] splitChars = { '\n' };
+                                byte[] b = new byte[fs.Length];
+                                fs.Read (b, 0, (int)fs.Length);
+                                string stringMessage = Encoding.UTF8.GetString (b);
+                                string[] lines = stringMessage.Split (splitChars);
+                                if (lines[0].StartsWith ("slave", StringComparison.InvariantCultureIgnoreCase)) {
+                                    for (int i = 0; i < m.responseLength; ++i)
+                                        m.readData [i] = lines [1 + i];
+
+                                    if (m.callback != null) {
+                                        Gtk.Application.Invoke ( delegate {
+                                            m.callback (new CallbackArgs (m.readData));
+                                        });
+                                    }
+
+                                    fileOpen = true;
+                                }
+                                else {
+                                    Console.WriteLine ("the slave has not responded");
+                                }
+                            }
+
+                            if (!fileOpen)
+                                Thread.Sleep (1000);
+                        } catch {
+                            Console.WriteLine ("An exception happened");
+                            Thread.Sleep (1000);
+                        }
+                    } while (!fileOpen);
+                    #else
                     if (uart.IsOpen) {
                         m.slave.updateStatus (AquaPicBusStatus.communicationStart, 0);
                         uart.ReceivedBytesThreshold = m.responseLength;
@@ -147,6 +233,7 @@ namespace AquaPic.SerialBus
                     } else {
                         m.slave.updateStatus (AquaPicBusStatus.notOpen, 0);
                     }
+                    #endif
                 }
             }
         }
@@ -160,6 +247,7 @@ namespace AquaPic.SerialBus
             }
         }
 
+        #if !SIMULATION
         private void getResponse (ref byte[] response) {
             responseReceived = false;
             getInput.Set ();
@@ -171,6 +259,7 @@ namespace AquaPic.SerialBus
             } else
                 throw new TimeoutException("UART response timeout");
         }
+        #endif
 
         private void uartDataReceived (object sender, SerialDataReceivedEventArgs e) {
             responseReceived = true;

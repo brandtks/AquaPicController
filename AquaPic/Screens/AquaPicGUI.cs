@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Gtk;
 using Cairo;
 using MyWidgetLibrary;
@@ -12,7 +13,15 @@ namespace AquaPic
         private LightingWindow lighingScreen;
         private string currentScreen;
 
+        #if SIMULATION
+        private Process simulator;
+        #endif
+
+        #if SIMULATION
+        public AquaPicGUI (Process simulator) : base (Gtk.WindowType.Toplevel) {
+        #else
         public AquaPicGUI () : base (Gtk.WindowType.Toplevel) {
+        #endif
             this.Name = "AquaPic.GUI";
             this.Title = global::Mono.Unix.Catalog.GetString ("GUI");
             this.WindowPosition = ((global::Gtk.WindowPosition)(4));
@@ -21,6 +30,10 @@ namespace AquaPic
             this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
             this.Resizable = false;
             this.AllowGrow = false;
+
+            #if SIMULATION
+            this.simulator = simulator;
+            #endif
 
             this.mainScreen = new MainWindow (OnButtonTouch);
             this.currentScreen = "Main";
@@ -35,6 +48,11 @@ namespace AquaPic
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a) {
+            #if SIMULATION
+            simulator.CloseMainWindow ();
+            simulator.Close ();
+            #endif
+
             Application.Quit ();
             a.RetVal = true;
         }

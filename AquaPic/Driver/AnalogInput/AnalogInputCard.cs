@@ -33,7 +33,7 @@ namespace AquaPic.AnalogInputDriver
 
                 this.cardID = cardID;
                 this.name = name;
-                this.communicationAlarmIndex = Alarm.Subscribe (address.ToString () + " communication fault", "Analog Input card at address " + this.slave.address.ToString ());
+                this.communicationAlarmIndex = Alarm.Subscribe (address.ToString () + " communication fault", "Analog Input card at address " + this.slave.Address.ToString ());
                 this.channels = new AnalogInputChannel[4];
                 for (int i = 0; i < this.channels.Length; ++i) {
                     this.channels [i] = new AnalogInputChannel (); 
@@ -42,10 +42,16 @@ namespace AquaPic.AnalogInputDriver
             }
 
             protected void OnSlaveStatusUpdate (object sender) {
-                if ((slave.status != AquaPicBusStatus.communicationSuccess) || (slave.status != AquaPicBusStatus.communicationStart))
+                if ((slave.Status != AquaPicBusStatus.communicationSuccess) || (slave.Status != AquaPicBusStatus.communicationStart))
                     Alarm.Post (communicationAlarmIndex);
             }
 
+            #if SIMULATION
+            public void AddChannel (int ch, AnalogType type, string name) {
+                channels [ch].type = type;
+                channels [ch].name = name;
+            }
+            #else
             public void AddChannel (int ch, AnalogType type, string name) {
                 channels [ch].type = type;
                 channels [ch].name = name;
@@ -60,12 +66,28 @@ namespace AquaPic.AnalogInputDriver
                     }
                 }
             }
-                
+            #endif
+
+            #if SIMULATION
+            public void GetValues () {
+                updating = true;
+                slave.Read (20, 4, GetValuesCallback); 
+            }
+            #else
             public unsafe void GetValues () {
                 updating = true;
                 slave.Read (20, sizeof(float) * 4, GetValuesCallback); 
             }
+            #endif
 
+            #if SIMULATION
+            protected void GetValuesCallback (CallbackArgs args) {
+                for (int i = 0; i < channels.Length; ++i) {
+                    channels [i].value = Convert.ToSingle(args.readMessage[3 + i]);
+                }
+                updating = false;
+            }
+            #else
             protected void GetValuesCallback (CallbackArgs args) {
                 float[] values = new float[4];
 
@@ -80,13 +102,31 @@ namespace AquaPic.AnalogInputDriver
                 }
                 updating = false;
             }
+            #endif
 
+            #if SIMULATION
+            public unsafe void GetValue (byte ch) {
+                const int messageLength = 1;
+                string[] message = new string[messageLength];
+                message [0] = ch.ToString ();
+                updating = true;
+                slave.ReadWrite (10, message, messageLength, 2, GetValueCallback);
+            }
+            #else
             public unsafe void GetValue (byte ch) {
                 byte message = ch;
                 updating = true;
                 slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueFloat), GetValueCallback);
             }
+            #endif
 
+            #if SIMULATION
+            protected void GetValueCallback (CallbackArgs args) {
+                int ch = Convert.ToInt32 (args.readMessage [3]);
+                channels [ch].value = Convert.ToSingle (args.readMessage [4]);
+                updating = false;
+            }
+            #else
             protected void GetValueCallback (CallbackArgs args) {
                 CommValueFloat vg;
 
@@ -97,6 +137,7 @@ namespace AquaPic.AnalogInputDriver
                 channels [vg.channel].value = vg.value;
                 updating = false;
             }
+            #endif
         }
     }
 }

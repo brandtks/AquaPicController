@@ -49,15 +49,15 @@ namespace AquaPic.PluginRuntime
 
         public bool RunPluginCoil () {
             if (compiled) {
-                try {
+                //try {
                     Type type = pluginAssembly.GetType ("MyScript.ScriptCoil");
                     MethodInfo method = type.GetMethod ("CoilCondition");
                     object rtn = method.Invoke (null, null);
                     bool b = Convert.ToBoolean (rtn);
                     return b;
-                } catch {
-                    return false;
-                }
+                //} catch {
+                //    return false;
+                //}
             } else
                 return DefaultReturn;
         }

@@ -18,6 +18,10 @@ namespace AquaPic.PowerDriver
             public MyState fallback;
             public Coil plugControl;
 
+            #if SIMULATION
+            public bool Updated;
+            #endif
+
             public event StateChangeHandler onStateChange;
             public event ModeChangedHandler onAuto;
             public event ModeChangedHandler onManual;
@@ -35,6 +39,10 @@ namespace AquaPic.PowerDriver
                 this.plugControl.ConditionChecker = manualControl;
                 this.plugControl.OutputTrue += outputTrue;
                 this.plugControl.OutputFalse += outputFalse;
+
+                #if SIMULATION
+                this.Updated = true;
+                #endif
             }
 
             public void SetAmpCurrent (float c) {
@@ -44,6 +52,9 @@ namespace AquaPic.PowerDriver
 
             public void OnChangeState (StateChangeEventArgs args) {
                 currentState = args.state;
+                #if SIMULATION
+                this.Updated = true;
+                #endif
 
                 if (onStateChange != null)
                     onStateChange (this, args);

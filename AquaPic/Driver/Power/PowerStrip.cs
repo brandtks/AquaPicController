@@ -45,7 +45,7 @@ namespace AquaPic.PowerDriver
                 this.powerID = powerID;
 
                 this.commsAlarmIdx = Alarm.Subscribe (
-                    this.slave.address.ToString () + " communication fault", 
+                    this.slave.Address.ToString () + " communication fault", 
                     this.name + "serial communications fault");
 
                 if (alarmOnLossOfPower && (powerLossAlarmIndex == -1))
@@ -83,6 +83,19 @@ namespace AquaPic.PowerDriver
                 }
             }
 
+            #if SIMULATION
+            public void SetupPlug (byte plugID, MyState fallback) {
+                const int messageLength = 2;
+                string[] message = new string[messageLength];
+                message[0] = plugID.ToString ();
+                if (fallback == MyState.On)
+                    message[1] = "true";
+                else
+                    message[1] = "false";
+
+                slave.Write (2, message, messageLength);
+            }
+            #else
             public unsafe void SetupPlug (byte plugID, MyState fallback) {
                 const int messageLength = 2; 
 
@@ -101,13 +114,30 @@ namespace AquaPic.PowerDriver
                     }
                 }
             }
+            #endif
 
+            #if SIMULATION
+            public void GetStatus () {
+                slave.Read (20, 2, GetStatusCallback);
+            }
+            #else
             public unsafe void GetStatus () {
                 slave.Read (20, sizeof(PowerComms), GetStatusCallback);
             }
+            #endif
 
+            #if SIMULATION
             protected void GetStatusCallback (CallbackArgs callArgs) {
-                if (slave.status != AquaPicBusStatus.communicationSuccess)
+                AcPowerAvailable = Convert.ToBoolean(callArgs.readMessage[3]);
+                byte mask = Convert.ToByte(callArgs.readMessage[4]);
+                for (int i = 0; i < plugs.Length; ++i) {
+                    if (Utils.mtob (mask, i))
+                        ReadPlugCurrent (i);
+                }
+            }
+            #else
+            protected void GetStatusCallback (CallbackArgs callArgs) {
+                if (slave.Status != AquaPicBusStatus.communicationSuccess)
                     return;
 
                 PowerComms status = new PowerComms ();
@@ -125,15 +155,33 @@ namespace AquaPic.PowerDriver
                         ReadPlugCurrent ((byte)i);
                 }
             }
+            #endif
 
+            #if SIMULATION
+            public void ReadPlugCurrent (int i) {
+                const int messageLength = 1;
+                string[] m = new string[messageLength];
+                m [0] = i.ToString ();
+                slave.ReadWrite (10, m, messageLength, 2, ReadPlugCurrentCallback);
+            }
+            #else
             public void ReadPlugCurrent (byte plugID) {
                 unsafe {
                     slave.ReadWrite (10, &plugID, sizeof (byte), sizeof (AmpComms), ReadPlugCurrentCallback);
                 }
             }
+            #endif
 
+            #if SIMULATION
             protected void ReadPlugCurrentCallback (CallbackArgs callArgs) {
-                if (slave.status != AquaPicBusStatus.communicationSuccess)
+                int plug = Convert.ToInt32(callArgs.readMessage [3]);
+                float current = Convert.ToSingle(callArgs.readMessage [4]);
+                plugs [plug].SetAmpCurrent (current);
+
+            }
+            #else
+            protected void ReadPlugCurrentCallback (CallbackArgs callArgs) {
+                if (slave.Status != AquaPicBusStatus.communicationSuccess)
                     return;
 
                 AmpComms message;
@@ -143,10 +191,32 @@ namespace AquaPic.PowerDriver
                 }
 
                 plugs [message.plugID].SetAmpCurrent (message.current);
-            }
 
+            }
+            #endif
+
+            #if SIMULATION
             public void SetPlugState (byte plugID, MyState state, bool modeOverride) {
-                const int messageLength = 2; 
+                if ((state != plugs [plugID].currentState) && (plugs [plugID].Updated)) {
+                    plugs [plugID].Updated = false;
+
+                    const int messageLength = 2;
+                    string[] message = new string[messageLength];
+                    message [0] = plugID.ToString ();
+                    if (state == MyState.On)
+                        message [1] = "true";
+                    else
+                        message [1] = "false";
+
+                    slave.ReadWrite (30, message, messageLength, 0, 
+                        delegate (CallbackArgs args) {
+                            plugs [plugID].OnChangeState (new StateChangeEventArgs (plugID, powerID, state, plugs [plugID].mode));
+                        });
+                }
+            }
+            #else
+            public void SetPlugState (byte plugID, MyState state, bool modeOverride) {
+                const int messageLength = 2;
 
 //                if (plugs [plugID].mode == Mode.Manual && !modeOverride) {
 //                    plugs [plugID].requestedState = state;
@@ -184,6 +254,7 @@ namespace AquaPic.PowerDriver
                 // @test
                 plugs [plugID].OnChangeState (new StateChangeEventArgs (plugID, powerID, state, plugs [plugID].mode));
             }
+            #endif
 
             public void SetPlugMode (byte plugID, Mode mode) {
                 plugs [plugID].mode = mode;
@@ -194,7 +265,7 @@ namespace AquaPic.PowerDriver
             }
 
             protected void OnSlaveStatusUpdate (object sender) {
-                if ((slave.status != AquaPicBusStatus.communicationSuccess) || (slave.status != AquaPicBusStatus.communicationStart))
+                if ((slave.Status != AquaPicBusStatus.communicationSuccess) || (slave.Status != AquaPicBusStatus.communicationStart))
                     Alarm.Post (commsAlarmIdx);
             }
     	}

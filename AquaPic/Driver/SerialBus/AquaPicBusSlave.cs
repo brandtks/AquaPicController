@@ -9,73 +9,87 @@ namespace AquaPic.SerialBus
         {
             public event StatusUpdateHandler OnStatusUpdate;
 
-            private AquaPicBus _bus;
-            private byte _address;
-            private int _responeTime;
-            private int[] _timeQue;
-            private int _queIdx;
-            private AquaPicBusStatus _status;
+            private AquaPicBus bus;
+            private byte address;
+            private int responeTime;
+            private int[] timeQue;
+            private int queIdx;
+            private AquaPicBusStatus status;
 
-            public AquaPicBusStatus status { 
-                get { return _status; }
+            public AquaPicBusStatus Status { 
+                get { return status; }
             }
-            public byte address {
-                get { return _address; }
+            public byte Address {
+                get { return address; }
             }
-            public int responeTime {
-                get { return _responeTime; }
+            public int ResponeTime {
+                get { return responeTime; }
             }
-            public string name { get; set; }
+            public string Name { get; set; }
 
             public Slave (AquaPicBus bus, byte address) {
                 if (!bus.IsAddressOk (address))
                     throw new Exception ("Address already in use");
 
-                this._bus = bus;
-                this._address = address;
-                this._responeTime = 0;
-                this._timeQue = new int[10];
-                this._queIdx = 0;
-                this._status = AquaPicBusStatus.notOpen;
-                this.name = null;
+                this.bus = bus;
+                this.address = address;
+                this.responeTime = 0;
+                this.timeQue = new int[10];
+                this.queIdx = 0;
+                this.status = AquaPicBusStatus.notOpen;
+                this.Name = null;
 
-                this._bus.slaves.Add (this);
+                this.bus.slaves.Add (this);
             }
 
             public Slave (AquaPicBus bus, byte address, string name ) : this(bus, address) {
-                this.name = name;
+                this.Name = name;
             }
 
+            #if SIMULATION
+            public void Read (int func, int readSize, ResponseCallback callback) {
+                bus.queueMessage (this, func, null, 0, readSize, callback);
+            }
+
+            public void Write (int func, string[] writeMessage, int writeSize) {
+                bus.queueMessage (this, func, writeMessage, writeSize, 0, null);
+            }
+
+            public void ReadWrite (int func, string[] writeMessage, int writeSize, int readSize, ResponseCallback callback) {
+                bus.queueMessage (this, func, writeMessage, writeSize, readSize, callback);
+            }
+            #else
             public unsafe void Read (byte func, int readSize, ResponseCallback callback) {
-                _bus.queueMessage (this, func, null, 0, readSize, callback);
+                bus.queueMessage (this, func, null, 0, readSize, callback);
             }
 
             public unsafe void Write (byte func, void* writeData, int writeSize) {
-                _bus.queueMessage (this, func, writeData, writeSize, 0, null);
+                bus.queueMessage (this, func, writeData, writeSize, 0, null);
             }
 
             public unsafe void ReadWrite (byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
-                _bus.queueMessage (this, func, writeData, writeSize, readSize, callback);
+                bus.queueMessage (this, func, writeData, writeSize, readSize, callback);
             }
+            #endif
 
             public void updateStatus (AquaPicBusStatus stat, int time) {
                 if (time != 0) {
                     long sum = 0;
                     int sumCount = 0;
 
-                    _timeQue [_queIdx] = time;
-                    for (int i = 0; i < _timeQue.Length; ++i) {
-                        if (_timeQue [i] != 0) {
-                            sum += _timeQue [i];
+                    timeQue [queIdx] = time;
+                    for (int i = 0; i < timeQue.Length; ++i) {
+                        if (timeQue [i] != 0) {
+                            sum += timeQue [i];
                             ++sumCount;
                         }
                     }
 
-                    _responeTime = (int)(sum / sumCount);
-                    _queIdx = ++_queIdx % _timeQue.Length;
+                    responeTime = (int)(sum / sumCount);
+                    queIdx = ++queIdx % timeQue.Length;
                 }
 
-                _status = stat;
+                status = stat;
 
                 if (OnStatusUpdate != null)
                     Gtk.Application.Invoke (delegate {
