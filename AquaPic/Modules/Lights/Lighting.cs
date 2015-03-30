@@ -18,9 +18,12 @@ namespace AquaPic.LightingModule
 
         static Lighting () {
             fixtures = new List<LightingFixture> ();
-            RiseSetCalc.GetRiseSetTimesOut (out SunRiseToday, out SunSetToday);
-            RiseSetCalc.GetRiseTimeTomorrowOut (out SunRiseTomorrow);
-            RiseSetCalc.GetSetTimeYesterday (out SunSetYesterday);
+//            RiseSetCalc.GetRiseSetTimesOut (out SunRiseToday, out SunSetToday);
+//            RiseSetCalc.GetRiseTimeTomorrowOut (out SunRiseTomorrow);
+//            RiseSetCalc.GetSetTimeYesterday (out SunSetYesterday);
+            SunRiseToday = new TimeDate (2015, 3, 17, 6, 0, 0, 0);
+            SunSetToday = new TimeDate (2015, 3, 17, 21, 0, 0, 0);
+            SunRiseTomorrow = new TimeDate (2015, 3, 18, 21, 0, 0, 0);
         }
 
 //        public static void Init () {

@@ -6,8 +6,10 @@ namespace AquaPic.PowerDriver
 {
     public partial class Power 
     {
-        private class PlugData
+        private class OutletData
         {
+            public static float Voltage = 115;
+
             public float wattPower;
             public float ampCurrent;
             public Mode mode;
@@ -16,7 +18,7 @@ namespace AquaPic.PowerDriver
             public MyState currentState;
             public MyState manualState;
             public MyState fallback;
-            public Coil plugControl;
+            public Coil OutletControl;
 
             #if SIMULATION
             public bool Updated;
@@ -26,7 +28,7 @@ namespace AquaPic.PowerDriver
             public event ModeChangedHandler onAuto;
             public event ModeChangedHandler onManual;
 
-            public PlugData (string name, ConditionCheckHandler manualControl, OutputHandler outputTrue, OutputHandler outputFalse) {
+            public OutletData (string name, ConditionCheckHandler manualControl, OutputHandler outputTrue, OutputHandler outputFalse) {
                 this.name = name;
                 this.currentState = MyState.Off;
                 this.manualState = MyState.Off;
@@ -35,10 +37,10 @@ namespace AquaPic.PowerDriver
                 this.ampCurrent = 0.0f;
                 this.wattPower = 0.0f;
                 this.powerFactor = 1.0f;
-                this.plugControl = new Coil ();
-                this.plugControl.ConditionChecker = manualControl;
-                this.plugControl.OutputTrue += outputTrue;
-                this.plugControl.OutputFalse += outputFalse;
+                this.OutletControl = new Coil ();
+                this.OutletControl.ConditionChecker = manualControl;
+                this.OutletControl.OutputTrue += outputTrue;
+                this.OutletControl.OutputFalse += outputFalse;
 
                 #if SIMULATION
                 this.Updated = true;

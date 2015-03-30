@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AquaPic.AnalogInputDriver;
 using AquaPic.Globals;
 using AquaPic.AlarmRuntime;
+using AquaPic.Utilites;
 
 namespace AquaPic.TemperatureModule
 {
@@ -33,9 +34,12 @@ namespace AquaPic.TemperatureModule
             }
 
             public float GetColumnTemperature () {
+                temperature = 0.0f;
                 for (int i = 0; i < channels.Count; ++i)
                     temperature += AnalogInput.GetAnalogValue (channels [i]);
                 temperature /= channels.Count;
+
+                temperature = temperature.Map (0, 4096, 32.0f, 100.0f);
 
                 if (temperature >= highTempAlarmSetpoint) 
                     Alarm.Post (_highTempAlarmIdx);

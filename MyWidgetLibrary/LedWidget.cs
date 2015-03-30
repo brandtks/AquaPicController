@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 namespace MyWidgetLibrary
 {
-
     [System.ComponentModel.ToolboxItem (true)]
     public partial class MyLedWidget : Gtk.Bin
     {

@@ -37,7 +37,7 @@ namespace AquaPic.LightingModule
                 // Power Plug Setup
                 this.plug.Group = powerID;
                 this.plug.Individual = plugID;
-                plugControl = Power.AddPlug (this.plug, name, MyState.Off);
+                plugControl = Power.AddOutlet (this.plug, name, MyState.Off);
                 plugControl.ConditionChecker = PlugControlHandler;
 
                 Power.AddHandlerOnStateChange (this.plug, LightingPlugStateChange);
@@ -55,7 +55,7 @@ namespace AquaPic.LightingModule
 
                 if (this.highTempLockout) {
                     int alarmIdx = Temperature.HighTemperatureAlarmIndex;
-                    Alarm.AddPostHandler (alarmIdx, sender => Power.AlarmShutdownPlug (plug));
+                    Alarm.AddPostHandler (alarmIdx, sender => Power.AlarmShutdownOutlet (plug));
                 }
     		}
 
@@ -86,12 +86,12 @@ namespace AquaPic.LightingModule
             }
 
             protected bool PlugControlHandler () {
-                if (Power.GetPlugMode (plug) == Mode.Manual) {
-                    if (Power.GetManualPlugState (plug) == MyState.On)
-                        return true;
-                    else
-                        return false;
-                } else {
+//                if (Power.GetPlugMode (plug) == Mode.Manual) {
+//                    if (Power.GetManualPlugState (plug) == MyState.On)
+//                        return true;
+//                    else
+//                        return false;
+//                } else {
                     if (highTempLockout && Alarm.CheckAlarming (Temperature.HighTemperatureAlarmIndex))
                         return false;
 
@@ -102,7 +102,7 @@ namespace AquaPic.LightingModule
                     } else {
                         return false;
                     }
-                }
+//                }
             }
 
             public void LightingPlugStateChange (object sender, StateChangeEventArgs args) {

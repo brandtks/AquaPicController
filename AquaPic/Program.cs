@@ -23,7 +23,7 @@ namespace AquaPic
 	class MainClass
 	{
         static int powerStrip1 = -1;
-        //static int powerStrip2 = -1;
+        static int powerStrip2 = -1;
         static int analogInputCard1 = -1;
         static int analogOutputCard1 = -1;
 
@@ -33,22 +33,23 @@ namespace AquaPic
 
             #if SIMULATION
             AquaPicBus.Bus1.Start ();
-            const string SIMULATOR_EXE = @"C:\Users\sbrandt\Dropbox\VisualStudio\AquaPicSimulator\AquaPicSimulator\bin\Debug\AquaPicSimulator.exe";
-            Process simulator = Process.Start (SIMULATOR_EXE);
+            const string FILENAME = @"\VisualStudio\AquaPicSimulator\AquaPicSimulator\bin\Release\AquaPicSimulator.exe";
+            string path = string.Format ("{0}{1}", Environment.GetEnvironmentVariable ("AquaPic"), FILENAME);
+            Process simulator = Process.Start (path);
             Thread.Sleep (2000);
             #endif
 
-            powerStrip1 = Power.AddPowerStrip (16, "Left Power Strip", false);
-            //powerStrip2 = Power.AddPowerStrip (17, "Right Power Strip", false);
+            powerStrip1 = Power.AddPowerStrip (16, "PS1", false);
+            powerStrip2 = Power.AddPowerStrip (17, "PS2", false);
 
             // Analog Input
-            analogInputCard1 = AnalogInput.AddCard (20, "Analog Input 1");
+            analogInputCard1 = AnalogInput.AddCard (20, "AI1");
 
             // Analog Output
-            analogOutputCard1 = AnalogOutput.AddCard (30, "Analog Output 1");
+            analogOutputCard1 = AnalogOutput.AddCard (30, "AQ1");
 
             // Digital Input
-            DigitalInput.AddCard (40, "Digital Input 1");
+            DigitalInput.AddCard (40, "DI1");
 
             // Temperature
             Temperature.AddTemperatureProbe (analogInputCard1, 0, "Sump Temperature");
@@ -65,8 +66,8 @@ namespace AquaPic
                 analogOutputCard1,
                 0,
                 AnalogType.ZeroTen,
-                0.0f,
-                75.0f
+                10.0f,
+                100.0f
             );
             Lighting.AddLight (
                 "Actinic LED", 
@@ -75,10 +76,10 @@ namespace AquaPic
                 -15, 
                 15,
                 analogOutputCard1,
-                0,
+                1,
                 AnalogType.ZeroTen,
-                0.0f,
-                75.0f
+                10.0f,
+                100.0f
             );
             Lighting.AddLight (
                 "Refugium",
@@ -89,7 +90,7 @@ namespace AquaPic
                 LightingTime.Nighttime
             );
                 
-            Coil plugControl = Power.AddPlug (powerStrip1, 5, "Test", MyState.On);
+            Coil plugControl = Power.AddOutlet (powerStrip1, 5, "Test", MyState.On);
             Plugin p = new Plugin ("TestPlugControl", "ScriptTest.cs");
             plugControl.ConditionChecker = delegate() {
                 bool b = p.RunPluginCoil ();

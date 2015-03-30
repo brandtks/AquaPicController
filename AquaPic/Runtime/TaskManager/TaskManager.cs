@@ -20,7 +20,7 @@ namespace AquaPic.TaskManagerRuntime
         public static void Start () {
             #if SIMULATION
             timer250 = GLib.Timeout.Add (500, On250Tasks);
-            timer1000 = GLib.Timeout.Add (5000, On1000Tasks);
+            timer1000 = GLib.Timeout.Add (4000, On1000Tasks);
             #else
             timer250 = GLib.Timeout.Add (250, On250Tasks);
             timer1000 = GLib.Timeout.Add (1000, On1000Tasks);
@@ -33,11 +33,12 @@ namespace AquaPic.TaskManagerRuntime
         }
 
         protected static bool On1000Tasks () {
-            Alarm.Run ();
             AnalogInput.Run ();
             DigitalInput.Run ();
-            Lighting.Run ();
+
             Temperature.Run ();
+            Lighting.Run ();
+            Alarm.Run ();
             return true; // restarts timer
         }
     }

@@ -33,17 +33,22 @@ namespace AquaPic.LightingModule
                 this.dimCh.Group = cardID;
                 this.dimCh.Individual = channelID;
                 this.type = type;
+                this.minDimmingOutput = minDimmingOutput;
+                this.maxDimmingOutput = maxDimmingOutput;
                 AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this.type, name);
             }
 
             public void SetDimmingLevel (float dimmingLevel) {
-                if (dimmingLevel > maxDimmingOutput)
-                    dimmingLevel = maxDimmingOutput;
-                else if (dimmingLevel < minDimmingOutput)
-                    dimmingLevel = minDimmingOutput;
+                currentDimmingLevel = dimmingLevel;
 
-                dimmingLevel.Map (0.0f, 100.0f, 0.0f, 1024.0f); // PIC16F1936 has 10bit PWM
-                int level = (int)dimmingLevel;
+                if (currentDimmingLevel > maxDimmingOutput)
+                    currentDimmingLevel = maxDimmingOutput;
+
+                if (currentDimmingLevel < minDimmingOutput)
+                    currentDimmingLevel = minDimmingOutput;
+
+                currentDimmingLevel = currentDimmingLevel.Map (0.0f, 100.0f, 0, 1024); // PIC16F1936 has 10bit PWM
+                int level = Convert.ToInt32(currentDimmingLevel);
                     
                 AnalogOutput.SetAnalogValue (dimCh, level);
             }

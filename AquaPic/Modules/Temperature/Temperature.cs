@@ -65,7 +65,7 @@ namespace AquaPic.TemperatureModule
 
         private static void HighTempHandler (object sender) {
             for (int i = 0; i < heaters.Count; ++i)
-                Power.AlarmShutdownPlug (heaters [i].Plug);
+                Power.AlarmShutdownOutlet (heaters [i].Plug);
         }
     }
 }

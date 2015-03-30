@@ -54,7 +54,7 @@ namespace MyWidgetLibrary
                 l.Alignment = Pango.Alignment.Center;
                 //l.SetText (ButtonLabel);
                 l.SetMarkup ("<span color=" + (char)34 + TextColor + (char)34 + ">" + Text + "</span>"); 
-                l.FontDescription = Pango.FontDescription.FromString ("Courier New 12");
+                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
                 //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, (top + (height / 2)) - 6, l);
                 GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
                 l.Dispose ();

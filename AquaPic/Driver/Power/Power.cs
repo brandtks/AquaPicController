@@ -9,20 +9,20 @@ namespace AquaPic.PowerDriver
 {
     public partial class Power
     {
-        //public static Power Main = new Power ();
-
         private static List<PowerStrip> pwrStrips = new List<PowerStrip> ();
-        public static float Voltage = 115;
-
-        //public Power () {
-            //pwrStrips = new List<PowerStrip> ();
-        //}
 
         public static void Run () {
             for (int i = 0; i < pwrStrips.Count; ++i) {
-                //pwrStrips [i].GetStatus ();
-                foreach (var plug in pwrStrips [i].plugs) {
-                    plug.plugControl.Execute ();
+                #if !SIMULATION
+                pwrStrips [i].GetStatus ();
+                #endif
+
+                for (int j = 0; j < pwrStrips [i].Outlets.Length; ++j) {
+                    if (pwrStrips [i].Outlets [j].mode == Mode.Manual) {
+                        if (pwrStrips [i].Outlets [j].manualState != pwrStrips [i].Outlets [j].currentState)
+                            pwrStrips [i].SetOutletState ((byte)j, pwrStrips [i].Outlets [j].manualState, false);
+                    } else
+                        pwrStrips [i].Outlets [j].OutletControl.Execute ();
                 }
             }
         }
@@ -42,78 +42,67 @@ namespace AquaPic.PowerDriver
             return count;
         }
 
-        public static Coil AddPlug (IndividualControl plug, string name, MyState fallback) {
-
-            pwrStrips [plug.Group].plugs [plug.Individual].name = name;
-            pwrStrips [plug.Group].plugs [plug.Individual].fallback = fallback;
-            pwrStrips [plug.Group].plugs [plug.Individual].mode = Mode.Auto;
-            pwrStrips [plug.Group].SetupPlug (
-                plug.Individual,
-                pwrStrips [plug.Group].plugs [plug.Individual].fallback);
-
-            //pwrStrips [plug.Group].plugs [plug.Individual].NewStateRequested = true;
-
-            return pwrStrips [plug.Group].plugs [plug.Individual].plugControl;
+        public static Coil AddOutlet (IndividualControl outlet, string name, MyState fallback) {
+            return AddOutlet (outlet.Group, outlet.Individual, name, fallback);
         }
 
-        public static Coil AddPlug (int powerID, int plugID, string name, MyState fallback) {
-            pwrStrips [powerID].plugs [plugID].name = name;
-            pwrStrips [powerID].plugs [plugID].fallback = fallback;
-            pwrStrips [powerID].plugs [plugID].mode = Mode.Auto;
+        public static Coil AddOutlet (int powerID, int outletID, string name, MyState fallback) {
+            pwrStrips [powerID].Outlets [outletID].name = name;
+            pwrStrips [powerID].Outlets [outletID].fallback = fallback;
+            pwrStrips [powerID].Outlets [outletID].mode = Mode.Auto;
+            pwrStrips [powerID].SetupOutlet (
+                (byte)outletID,
+                pwrStrips [powerID].Outlets [outletID].fallback);
 
-            //pwrStrips [powerID].plugs [plugID].plugControl.ChangeName (name);
-            return pwrStrips [powerID].plugs [plugID].plugControl;
+            return pwrStrips [powerID].Outlets [outletID].OutletControl;
         }
 
-        public static void SetManualPlugState (IndividualControl plug, MyState state) {
-//            if (pwrStrips [plug.Group].plugs [plug.Individual].mode == Mode.Manual) {
-//                pwrStrips [plug.Group].SetPlugState (plug.Individual, state, true);
-//            }
-            pwrStrips [plug.Group].plugs [plug.Individual].manualState = state;
+        public static void SetManualOutletState (IndividualControl outlet, MyState state) {
+            pwrStrips [outlet.Group].Outlets [outlet.Individual].manualState = state;
         }
 
-        public static MyState GetManualPlugState (IndividualControl plug) {
-            return pwrStrips [plug.Group].plugs [plug.Individual].manualState;
+//        public static MyState GetManualPlugState (IndividualControl plug) {
+//            return pwrStrips [plug.Group].plugs [plug.Individual].manualState;
+//        }
+
+        public static void AlarmShutdownOutlet (IndividualControl outlet) {
+            pwrStrips [outlet.Group].SetOutletState (outlet.Individual, MyState.Off, true);
         }
 
-        public static void AlarmShutdownPlug (IndividualControl plug) {
-            pwrStrips [plug.Group].SetPlugState (plug.Individual, MyState.Off, true);
+//        protected static void SetPlugState (IndividualControl plug, MyState state) {
+//            pwrStrips [plug.Group].SetPlugState (plug.Individual, state, false);
+//        }
+
+        public static void SetOutletMode (IndividualControl outlet, Mode mode) {
+            pwrStrips [outlet.Group].SetPlugMode (outlet.Individual, mode);
         }
 
-        protected static void SetPlugState (IndividualControl plug, MyState state) {
-            pwrStrips [plug.Group].SetPlugState (plug.Individual, state, false);
-        }
-
-        public static void SetPlugMode (IndividualControl plug, Mode mode) {
-            pwrStrips [plug.Group].SetPlugMode (plug.Individual, mode);
-        }
-
-        public static MyState GetPlugState (IndividualControl plug) {
-            return pwrStrips [plug.Group].plugs [plug.Individual].currentState;
+        public static MyState GetOutletState (IndividualControl outlet) {
+            return pwrStrips [outlet.Group].Outlets [outlet.Individual].currentState;
         }
 
         public static MyState[] GetAllStates (int powerID) {
             MyState[] states = new MyState[8];
             for (int i = 0; i < states.Length; ++i)
-                states [i] = pwrStrips [powerID].plugs [i].currentState;
+                states [i] = pwrStrips [powerID].Outlets [i].currentState;
             return states;
         }
 
-        public static Mode GetPlugMode (IndividualControl plug) {
-            return pwrStrips [plug.Group].plugs [plug.Individual].mode;
+        public static Mode GetOutletMode (IndividualControl outlet) {
+            return pwrStrips [outlet.Group].Outlets [outlet.Individual].mode;
         }
 
         public static Mode[] GetAllModes (int powerID) {
             Mode[] modes = new Mode[8];
             for (int i = 0; i < modes.Length; ++i)
-                modes [i] = pwrStrips [powerID].plugs [i].mode;
+                modes [i] = pwrStrips [powerID].Outlets [i].mode;
             return modes;
         }
 
-        public static string[] GetAllPlugNames (int powerID) {
+        public static string[] GetAllOutletNames (int powerID) {
             string[] names = new string[8];
             for (int i = 0; i < names.Length; ++i)
-                names [i] = pwrStrips [powerID].plugs [i].name;
+                names [i] = pwrStrips [powerID].Outlets [i].name;
             return names;
         }
 
@@ -133,12 +122,12 @@ namespace AquaPic.PowerDriver
             return -1;
         }
 
-        public static bool GetPlugIndividualControl (string name, ref IndividualControl plug) {
+        public static bool GetOutletIndividualControl (string name, ref IndividualControl outlet) {
             for (int i = 0; i < pwrStrips.Count; ++i) {
-                for (int j = 0; j < pwrStrips [i].plugs.Length; ++j) {
-                    if (string.Compare (pwrStrips [i].plugs [j].name, name, StringComparison.InvariantCultureIgnoreCase) == 0) {
-                        plug.Group = (byte)i;
-                        plug.Individual = (byte)j;
+                for (int j = 0; j < pwrStrips [i].Outlets.Length; ++j) {
+                    if (string.Compare (pwrStrips [i].Outlets [j].name, name, StringComparison.InvariantCultureIgnoreCase) == 0) {
+                        outlet.Group = (byte)i;
+                        outlet.Individual = (byte)j;
                         return true;
                     }
                 }
@@ -159,16 +148,20 @@ namespace AquaPic.PowerDriver
             return pwrStrips [powerID].slave.Address;
         }
 
-        public static void AddHandlerOnAuto (IndividualControl plug, ModeChangedHandler handler) {
-            pwrStrips [plug.Group].plugs [plug.Individual].onAuto += handler;
+        public static void AddHandlerOnAuto (IndividualControl outlet, ModeChangedHandler handler) {
+            pwrStrips [outlet.Group].Outlets [outlet.Individual].onAuto += handler;
         }
 
-        public static void AddHandlerOnManual (IndividualControl plug, ModeChangedHandler handler) {
-            pwrStrips [plug.Group].plugs [plug.Individual].onManual += handler;
+        public static void AddHandlerOnManual (IndividualControl outlet, ModeChangedHandler handler) {
+            pwrStrips [outlet.Group].Outlets [outlet.Individual].onManual += handler;
         }
 
-        public static void AddHandlerOnStateChange (IndividualControl plug, StateChangeHandler handler) {
-            pwrStrips [plug.Group].plugs [plug.Individual].onStateChange += handler;
+        public static void AddHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
+            pwrStrips [outlet.Group].Outlets [outlet.Individual].onStateChange += handler;
+        }
+
+        public static void RemoveHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
+            pwrStrips [outlet.Group].Outlets [outlet.Individual].onStateChange -= handler;
         }
     }
 }

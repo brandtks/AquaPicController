@@ -7,25 +7,25 @@ namespace AquaPic.PowerDriver
     public delegate void StateChangeHandler (object sender, StateChangeEventArgs args);
 
     public class ModeChangeEventArgs : EventArgs {
-        public byte plugID;
+        public byte outletID;
         public byte powerID;
         public Mode mode;
 
         public ModeChangeEventArgs (int plugID, byte powerID, Mode mode) {
-            this.plugID = (byte)plugID;
+            this.outletID = (byte)plugID;
             this.powerID = powerID;
             this.mode = mode;
         }
     }
 
     public class StateChangeEventArgs : EventArgs {
-        public byte plugID;
+        public byte outletID;
         public byte powerID;
         public MyState state;
         public Mode mode;
 
         public StateChangeEventArgs (int plugID, byte powerID, MyState state, Mode mode) {
-            this.plugID = (byte)plugID;
+            this.outletID = (byte)plugID;
             this.powerID = powerID;
             this.state = state;
         }
@@ -33,7 +33,7 @@ namespace AquaPic.PowerDriver
 
     // AquaPicBus communication struct
     public struct PlugComms {
-        public byte plugID;
+        public byte outletID;
         public bool state;
     }
 
@@ -43,7 +43,7 @@ namespace AquaPic.PowerDriver
     }
 
     public struct AmpComms {
-        public byte plugID;
+        public byte outletID;
         public float current;
     }
 }

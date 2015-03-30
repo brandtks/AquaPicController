@@ -59,17 +59,17 @@ namespace AquaPic.TemperatureModule
                 this.Setpoint = setpoint;
                 this.BandWidth = bandwidth / 2;
                 this.Name = name;
-                PlugControl = Power.AddPlug (this.Plug, name, MyState.On);
+                PlugControl = Power.AddOutlet (this.Plug, name, MyState.On);
                 PlugControl.ConditionChecker = OnPlugControl;
             }
 
             protected bool OnPlugControl () {
-                if (Power.GetPlugMode (Plug) == Mode.Manual) {
-                    if (Power.GetManualPlugState (Plug) == MyState.On)
-                        return true;
-                    else
-                        return false;
-                } else {
+//                if (Power.GetPlugMode (Plug) == Mode.Manual) {
+//                    if (Power.GetManualPlugState (Plug) == MyState.On)
+//                        return true;
+//                    else
+//                        return false;
+//                } else {
                     if (Alarm.CheckAlarming (HighTemperatureAlarmIndex))
                         return false;
 
@@ -81,7 +81,7 @@ namespace AquaPic.TemperatureModule
                             return true;
                     }
                     return true;
-                }
+//                }
             }
 
 //            protected void OnHeaterOnOutput () {

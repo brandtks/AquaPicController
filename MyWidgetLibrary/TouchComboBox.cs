@@ -41,11 +41,11 @@ namespace MyWidgetLibrary
             this.listDropdown = false;
             this.timer = 0;
             this.highlighted = 0;
-            this.height = 30;
+            this.height = 25;
             this.secondClick = 0;
 
-            this.WidthRequest = 225;
-            this.HeightRequest = 30;
+            this.WidthRequest = 175;
+            this.HeightRequest = 25;
 
             this.ExposeEvent += OnExpose;
             this.ButtonPressEvent += OnComboBoxPressed;
@@ -66,9 +66,9 @@ namespace MyWidgetLibrary
                 if (listDropdown) {
                     int listHeight;
                     if (List.Count > 0)
-                        listHeight = List.Count * 30 + height;
+                        listHeight = List.Count * 25 + height;
                     else
-                        listHeight = 30 + height;
+                        listHeight = 25 + height;
 
                     this.HeightRequest = listHeight;
 
@@ -100,7 +100,7 @@ namespace MyWidgetLibrary
                     l.Alignment = Pango.Alignment.Left;
                     l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
                     for (int i = 0; i < List.Count; ++i) {
-                        int y = top + 35 + (30 * i);
+                        int y = top + height + 5 + (height * i);
                         l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + List [i] + "</span>"); 
                         GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, y, l);
                     }
@@ -134,7 +134,7 @@ namespace MyWidgetLibrary
                     l.Alignment = Pango.Alignment.Left;
                     l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
                     l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
-                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, top + 5, l);
+                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, top + 4, l);
                     l.Dispose ();
                 }
             }
@@ -217,8 +217,8 @@ namespace MyWidgetLibrary
                     int top = Allocation.Top + height;
 
                     for (int i = 0; i < List.Count; ++i) {
-                        int topWindow = i * height + 30;
-                        int bottomWindow = (i + 1) * height + 30;
+                        int topWindow = i * height + 25;
+                        int bottomWindow = (i + 1) * height + 25;
                         if ((y >= topWindow) && (y <= bottomWindow)) {
                             highlighted = i;
                             QueueDraw ();

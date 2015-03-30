@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Reflection;
-using System.IO;
 using System.CodeDom.Compiler;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using Microsoft.CSharp;
 
 namespace AquaPic.PluginRuntime
@@ -29,20 +30,18 @@ namespace AquaPic.PluginRuntime
 
         public Plugin ( string name, string sourceCodeFile) {
             this.name = name;
-            this.sourceCodeFile = sourceCodeFile;
+            StringBuilder sb = new StringBuilder ();
+            sb.Append (Environment.GetEnvironmentVariable ("AquaPic"));
+            sb.Append (@"\AquaPicRuntimeProject\");
+            sb.Append (sourceCodeFile);
+            this.sourceCodeFile = sb.ToString ();
             this.DefaultReturn = false;
 
             try {
-                if (Directory.Exists (this.name + ".dll")) {
-                    this.pluginAssembly = Assembly.LoadFrom (this.name + ".dll");
-                    compiled = true;
-                    Console.WriteLine ("Loaded from file");
-                } else {
-                    Console.WriteLine ("Compiling");
-                    compiled = CompileCode ();
-                }
+                Console.WriteLine ("Compiling" + this.name);
+                compiled = CompileCode ();
             } catch {
-                Console.WriteLine ("failed compiling");
+                Console.WriteLine ("failed compiling" + this.name);
                 compiled = false;
             }
         }
@@ -50,11 +49,11 @@ namespace AquaPic.PluginRuntime
         public bool RunPluginCoil () {
             if (compiled) {
                 //try {
-                    Type type = pluginAssembly.GetType ("MyScript.ScriptCoil");
-                    MethodInfo method = type.GetMethod ("CoilCondition");
-                    object rtn = method.Invoke (null, null);
-                    bool b = Convert.ToBoolean (rtn);
-                    return b;
+                Type type = pluginAssembly.GetType ("MyScript.OutletPlugin");
+                MethodInfo method = type.GetMethod ("OutletCondition");
+                object rtn = method.Invoke (null, null);
+                bool b = Convert.ToBoolean (rtn);
+                return b;
                 //} catch {
                 //    return false;
                 //}

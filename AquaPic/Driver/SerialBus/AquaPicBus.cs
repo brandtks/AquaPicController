@@ -33,7 +33,7 @@ namespace AquaPic.SerialBus
     public partial class AquaPicBus
     {
         #if SIMULATION
-        const string FILENAME = @"C:\Users\sbrandt\Dropbox\AquaPic\Simulation.txt";
+        public string textFilePath; 
         #endif
 
         public static AquaPicBus Bus1 = new AquaPicBus (2, 1000);
@@ -67,7 +67,10 @@ namespace AquaPic.SerialBus
 
         #if SIMULATION
         public void Start () {
-            File.WriteAllText (FILENAME, string.Empty);
+            const string FILENAME = @"\AquaPic\Simulation.txt";
+            string path = Environment.GetEnvironmentVariable ("AquaPic");
+            textFilePath = string.Format ("{0}{1}", path, FILENAME);
+            File.WriteAllText (textFilePath, string.Empty);
             txRxThread.Start ();
         }
         #else
@@ -123,9 +126,9 @@ namespace AquaPic.SerialBus
                 }
 
                 if (count > 0) {
-                    #if SIMULATION
-                    Console.WriteLine ("Message queue count is {0}", count);
-                    #endif
+                    if (count > 8) {
+                        Console.WriteLine ("Message queue count is {0}", count);
+                    }
 
                     Message m;
 
@@ -137,7 +140,7 @@ namespace AquaPic.SerialBus
                     bool fileOpen = false;
                     do {
                         try {
-                            using (FileStream fs = File.Open (FILENAME, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) {
+                            using (FileStream fs = File.Open (textFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) {
                                 StringBuilder sb = new StringBuilder ();
                                 sb.AppendLine ("master");
                                 foreach (string line in m.writeData)
@@ -148,8 +151,9 @@ namespace AquaPic.SerialBus
                                 fs.Write (wb, 0, wb.Length);
                             }
                             fileOpen = true;
-                        } catch {
+                        } catch (Exception ex) {
                             Console.WriteLine ("An exception happened");
+                            Console.WriteLine (ex.ToString ());
                             Thread.Sleep (1000);
                         }
                     } while (!fileOpen);
@@ -159,7 +163,7 @@ namespace AquaPic.SerialBus
                     fileOpen = false;
                     do {
                         try {
-                            using (FileStream fs = File.Open (FILENAME, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) {
+                            using (FileStream fs = File.Open (textFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) {
                                 char[] splitChars = { '\n' };
                                 byte[] b = new byte[fs.Length];
                                 fs.Read (b, 0, (int)fs.Length);
@@ -184,8 +188,9 @@ namespace AquaPic.SerialBus
 
                             if (!fileOpen)
                                 Thread.Sleep (1000);
-                        } catch {
+                        } catch (Exception ex) {
                             Console.WriteLine ("An exception happened");
+                            Console.WriteLine (ex.ToString ());
                             Thread.Sleep (1000);
                         }
                     } while (!fileOpen);

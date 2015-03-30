@@ -46,6 +46,10 @@ namespace AquaPic.DigitalInputDriver
 
             return cards [card].inputs [channel].state;
         }
+
+//        public static bool GetInputIndividualControl (string name, ref IndividualControl input) {
+//
+//        }
     }
 }
 

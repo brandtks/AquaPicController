@@ -2,12 +2,13 @@
 
 namespace ScriptingInterface
 {
-    public interface ScriptCoil
+    public interface OutletPlugin
     {
-        bool CoilCondition ();
+        void OutletInitialize ();
+        bool OutletCondition ();
     }
 
-    public interface ScriptValue
+    public interface ValuePlugin
     {
         double ValueCondition ();
     }
