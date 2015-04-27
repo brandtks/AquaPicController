@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -9,59 +10,48 @@ namespace AquaPic.PluginRuntime
 {
     public class Plugin
     {
-        private Assembly pluginAssembly;
-        private string name;
-        private string sourceCodeFile;
-        private bool compiled;
+        public static Dictionary<string, PluginType> AllPlugins = new Dictionary<string, PluginType> ();
 
-        public string Name {
-            get { return name; }
-        }
-
-        public string SourceCodeFile {
-            get { return sourceCodeFile; }
-            set {
-                compiled = false;
-                sourceCodeFile = value;
-            }
-        }
-
-        public bool DefaultReturn;
-
-        public Plugin ( string name, string sourceCodeFile) {
-            this.name = name;
+        public static void AddPlugins () {
             StringBuilder sb = new StringBuilder ();
             sb.Append (Environment.GetEnvironmentVariable ("AquaPic"));
             sb.Append (@"\AquaPicRuntimeProject\");
-            sb.Append (sourceCodeFile);
-            this.sourceCodeFile = sb.ToString ();
-            this.DefaultReturn = false;
+            var topPath = sb.ToString ();
+            var files = Directory.GetFiles (topPath, "*.cs");
 
-            try {
-                Console.WriteLine ("Compiling" + this.name);
-                compiled = CompileCode ();
-            } catch {
-                Console.WriteLine ("failed compiling" + this.name);
-                compiled = false;
+            foreach (var path in files) {
+                string name = string.Empty;
+                var idxBackslash = path.LastIndexOf ('\\') + 1;
+                var idxPeriod = path.LastIndexOf ('.');
+                if ((idxBackslash != -1) && (idxPeriod != -1))
+                    name = path.Substring (idxBackslash, (idxPeriod - idxBackslash));
+
+                //Console.WriteLine ("{0} at file path {1}", name, path);
+
+                foreach (var line in File.ReadLines (path)) {
+                    if (line.Contains ("OutletPluginScript")) {
+                        AllPlugins.Add (name, new OutletPlugin (name, path));
+                        AllPlugins [name].RunInitialize ("ScriptingInterface.OutletPluginScript");
+                        break;
+                    } else if (line.Contains ("PluginScript")) {
+                        AllPlugins.Add (name, new PluginType (name, path));
+                        AllPlugins [name].RunInitialize ("ScriptingInterface.PluginScript");
+                    }
+                }
             }
         }
 
-        public bool RunPluginCoil () {
-            if (compiled) {
-                //try {
-                Type type = pluginAssembly.GetType ("MyScript.OutletPlugin");
-                MethodInfo method = type.GetMethod ("OutletCondition");
-                object rtn = method.Invoke (null, null);
-                bool b = Convert.ToBoolean (rtn);
-                return b;
-                //} catch {
-                //    return false;
-                //}
-            } else
-                return DefaultReturn;
+        public static void Run () {
+            foreach (var p in AllPlugins.Values) {
+                if (p is OutletPlugin) {
+
+                } else {
+                    p.RunPlugin ();
+                }
+            }
         }
 
-        protected bool CompileCode () {
+        public static Assembly CompileCode (ref bool compiledOk, string name, string sourceFileLocation) {
             CSharpCodeProvider provider = new CSharpCodeProvider ();
             CompilerParameters options = new CompilerParameters();
 
@@ -69,19 +59,19 @@ namespace AquaPic.PluginRuntime
             options.OutputAssembly = name + ".dll";
             options.GenerateInMemory = false;
             options.ReferencedAssemblies.Add (Assembly.GetExecutingAssembly ().Location);
-           
-            CompilerResults result = provider.CompileAssemblyFromFile(options, sourceCodeFile);
+
+            CompilerResults result = provider.CompileAssemblyFromFile(options, sourceFileLocation);
 
             if (result.Errors.HasErrors) {
                 foreach (CompilerError error in result.Errors)
                     Console.WriteLine ("Error ({0}): {1}", error.ErrorNumber, error.ErrorText);
 
-                pluginAssembly =  null;
-                return false;
+                compiledOk = false;
+                return null;
             }
 
-            pluginAssembly = Assembly.LoadFrom (name + ".dll");
-            return true;
+            compiledOk = true;
+            return Assembly.LoadFrom (name + ".dll");
         }
     }
 }

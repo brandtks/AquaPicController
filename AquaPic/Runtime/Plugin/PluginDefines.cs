@@ -2,14 +2,15 @@
 
 namespace ScriptingInterface
 {
-    public interface OutletPlugin
+    public interface OutletPluginScript
     {
-        void OutletInitialize ();
+        void Initialize ();
         bool OutletCondition ();
     }
 
-    public interface ValuePlugin
+    public interface PluginScript
     {
-        double ValueCondition ();
+        void Initialize ();
+        void RuntimePlugin ();
     }
 }

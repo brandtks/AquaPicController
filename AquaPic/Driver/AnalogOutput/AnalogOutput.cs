@@ -20,6 +20,10 @@ namespace AquaPic.AnalogOutputDriver
             return count;
         }
 
+        public static void AddChannel (IndividualControl channel, AnalogType type, string name) {
+            cards [channel.Group].AddChannel (channel.Individual, type, name);
+        }
+
         public static void AddChannel (int cardID, int channelID, AnalogType type, string name) {
             cards [cardID].AddChannel (channelID, type, name);
         }

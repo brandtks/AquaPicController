@@ -4,6 +4,7 @@ using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.SerialBus;
 using AquaPic.CoilRuntime;
+using AquaPic.PluginRuntime;
 
 namespace AquaPic.PowerDriver
 {
@@ -55,6 +56,20 @@ namespace AquaPic.PowerDriver
                 pwrStrips [powerID].Outlets [outletID].fallback);
 
             return pwrStrips [powerID].Outlets [outletID].OutletControl;
+        }
+
+        public static void AddPluginOutlet (
+            string pluginName, 
+            int powerID, 
+            int outletID, 
+            string name, 
+            MyState fallback
+        ) {
+            Coil c = AddOutlet (powerID, outletID, name, fallback);
+            c.ConditionChecker = delegate() {
+                OutletPlugin p = Plugin.AllPlugins [pluginName] as OutletPlugin;
+                return p.RunOutletCondition ();
+            };
         }
 
         public static void SetManualOutletState (IndividualControl outlet, MyState state) {

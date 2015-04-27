@@ -88,7 +88,7 @@ namespace AquaPic.PowerDriver
             public void SetupOutlet (byte outletID, MyState fallback) {
                 const int messageLength = 2;
                 string[] message = new string[messageLength];
-                message[0] = plugID.ToString ();
+                message[0] = outletID.ToString ();
                 if (fallback == MyState.On)
                     message[1] = "true";
                 else
@@ -131,9 +131,9 @@ namespace AquaPic.PowerDriver
             protected void GetStatusCallback (CallbackArgs callArgs) {
                 AcPowerAvailable = Convert.ToBoolean(callArgs.readMessage[3]);
                 byte mask = Convert.ToByte(callArgs.readMessage[4]);
-                for (int i = 0; i < plugs.Length; ++i) {
+                for (int i = 0; i < Outlets.Length; ++i) {
                     if (Utils.mtob (mask, i))
-                        ReadPlugCurrent (i);
+                        ReadOutletCurrent (i);
                 }
             }
             #else
@@ -163,7 +163,7 @@ namespace AquaPic.PowerDriver
                 const int messageLength = 1;
                 string[] m = new string[messageLength];
                 m [0] = i.ToString ();
-                slave.ReadWrite (10, m, messageLength, 2, ReadPlugCurrentCallback);
+                slave.ReadWrite (10, m, messageLength, 2, ReadOutletCurrentCallback);
             }
             #else
             public void ReadOutletCurrent (byte outletID) {
@@ -177,7 +177,7 @@ namespace AquaPic.PowerDriver
             protected void ReadOutletCurrentCallback (CallbackArgs callArgs) {
                 int plug = Convert.ToInt32(callArgs.readMessage [3]);
                 float current = Convert.ToSingle(callArgs.readMessage [4]);
-                plugs [plug].SetAmpCurrent (current);
+                Outlets [plug].SetAmpCurrent (current);
 
             }
             #else
@@ -197,13 +197,13 @@ namespace AquaPic.PowerDriver
             #endif
 
             #if SIMULATION
-            public void SetOutletState (byte plugID, MyState state, bool modeOverride) {
-                if ((state != plugs [plugID].currentState) && (plugs [plugID].Updated)) {
-                    plugs [plugID].Updated = false;
+            public void SetOutletState (byte outletID, MyState state, bool modeOverride) {
+                if ((state != Outlets [outletID].currentState) && (Outlets [outletID].Updated)) {
+                    Outlets [outletID].Updated = false;
 
                     const int messageLength = 2;
                     string[] message = new string[messageLength];
-                    message [0] = plugID.ToString ();
+                    message [0] = outletID.ToString ();
                     if (state == MyState.On)
                         message [1] = "true";
                     else
@@ -211,7 +211,7 @@ namespace AquaPic.PowerDriver
 
                     slave.ReadWrite (30, message, messageLength, 0, 
                         delegate (CallbackArgs args) {
-                            plugs [plugID].OnChangeState (new StateChangeEventArgs (plugID, powerID, state, plugs [plugID].mode));
+                            Outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state, Outlets [outletID].mode));
                         });
                 }
             }

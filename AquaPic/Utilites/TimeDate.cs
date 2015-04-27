@@ -149,19 +149,19 @@ namespace AquaPic.Utilites
             return val;
         }
 
-        public void addMinToDate (int value) {
-            DateTime val = toDateTime ();
-            val.AddMinutes (value);
-            setTimeDate (val);
-        }
+//        public void addMinToDate (int value) {
+//            DateTime val = toDateTime ();
+//            val.AddMinutes (value);
+//            setTimeDate (val);
+//        }
+//
+//        public void addTimeToDate (Time value) {
+//            DateTime val = toDateTime ();
+//            val.Add (value.toTimeSpan ());
+//            setTimeDate (val);
+//        }
 
-        public void addTimeToDate (Time value) {
-            DateTime val = toDateTime ();
-            val.Add (value.toTimeSpan ());
-            setTimeDate (val);
-        }
-
-        public void addDayToDate (int value) {
+        public void AddDay (int value) {
             DateTime val = toDateTime ();
             val = val.AddDays (value);
             setTimeDate (val);

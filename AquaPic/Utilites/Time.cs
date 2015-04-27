@@ -61,7 +61,7 @@ namespace AquaPic.Utilites
             return TimeSpan.Compare (value.toTimeSpan (), toTimeSpan ());
         }
 
-        public void addMinToTime (int value) {
+        public void AddMinutes (int value) {
             TimeSpan val1 = toTimeSpan ();
             TimeSpan val2 = new TimeSpan (hour, min + value, sec);
             val1.Add (val2);

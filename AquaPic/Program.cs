@@ -89,13 +89,16 @@ namespace AquaPic
                 0,
                 LightingTime.Nighttime
             );
-                
+
+            /*
             Coil plugControl = Power.AddOutlet (powerStrip1, 5, "Test", MyState.On);
-            Plugin p = new Plugin ("TestPlugControl", "ScriptTest.cs");
+            OutletPlugin p = new OutletPlugin ("TestPlugControl", "ScriptTest.cs");
             plugControl.ConditionChecker = delegate() {
-                bool b = p.RunPluginCoil ();
+                bool b = p.RunOutletCondition ();
                 return b;
-            };
+            };*/
+
+            Plugin.AddPlugins ();
 
             //uint timer = GLib.Timeout.Add (250, test);
 

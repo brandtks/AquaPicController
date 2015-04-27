@@ -17,6 +17,10 @@ namespace AquaPic.DigitalInputDriver
             return count;
         }
 
+        public static void AddInput (IndividualControl input, string name) {
+            cards [input.Group].inputs [input.Individual].name = name;
+        }
+
         public static void AddInput (int cardID, int inputID, string name) {
             cards [cardID].inputs [inputID].name = name;
         }
@@ -28,13 +32,7 @@ namespace AquaPic.DigitalInputDriver
         }
 
         public static bool GetInputValue (IndividualControl input, bool realTimeUpdate = false) {
-            if (realTimeUpdate) {
-                cards [input.Group].GetInput (input.Individual);
-                while (cards [input.Group].updating)
-                    continue;
-            }
-
-            return cards [input.Group].inputs [input.Individual].state;
+            return GetInputValue (input.Group, input.Individual, realTimeUpdate);
         }
 
         public static bool GetInputValue (int card, int channel, bool realTimeUpdate = false) {

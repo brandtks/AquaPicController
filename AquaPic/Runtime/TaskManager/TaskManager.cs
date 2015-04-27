@@ -6,6 +6,7 @@ using AquaPic.LightingModule;
 using AquaPic.PowerDriver;
 using AquaPic.TemperatureModule;
 using AquaPic.DigitalInputDriver;
+using AquaPic.PluginRuntime;
 
 namespace AquaPic.TaskManagerRuntime
 {
@@ -39,6 +40,7 @@ namespace AquaPic.TaskManagerRuntime
             Temperature.Run ();
             Lighting.Run ();
             Alarm.Run ();
+            Plugin.Run ();
             return true; // restarts timer
         }
     }

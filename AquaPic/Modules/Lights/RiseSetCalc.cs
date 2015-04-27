@@ -3,13 +3,13 @@ using AquaPic.Utilites;
 
 namespace AquaPic.LightingModule
 {
-	public class RiseSetCalc
+	public static class RiseSetCalc
     {
         public static double latitude = 41.181946;
         public static double longitude = -85.063345;
-        public static int timeZone = -5;
+        public static int timeZone = -4;
 
-        public static void GetRiseSetTimesOut (out TimeDate rise, out TimeDate sSet) {
+        public static void GetRiseSetTimes (out TimeDate rise, out TimeDate sSet) {
 			double julianDate = calcJD (DateTime.Today);
 			double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
 			double setUTC = calcSunSetUTC (julianDate, latitude, longitude);
@@ -17,60 +17,37 @@ namespace AquaPic.LightingModule
             rise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
             sSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
 		}
-
-        public static void GetRiseSetTimesRef (ref TimeDate rise, ref TimeDate sSet) {
-            TimeDate newRise, newSet;
-
-            double julianDate = calcJD (DateTime.Today);
-            double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
-            double setUTC = calcSunSetUTC (julianDate, latitude, longitude);
-
-            newRise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
-            newSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
-
-            rise.setTimeDate (newRise);
-            sSet.setTimeDate (newSet);
-        }
 	    
-        public static void GetRiseTime (out TimeDate rise) {
+        public static TimeDate GetRiseTime () {
             double julianDate = calcJD (DateTime.Today);
             double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
-            rise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            return new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
         }
 
-        public static void GetSetTime (out TimeDate sSet) {
+        public static TimeDate GetSetTime () {
             double julianDate = calcJD (DateTime.Today);
             double setUTC = calcSunSetUTC (julianDate, latitude, longitude);
-            sSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
+            return new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
         }
 
-        public static void GetRiseTimeTomorrowOut (out TimeDate riseTomorrow) {
+        public static TimeDate GetRiseTimeTomorrow () {
             DateTime today = DateTime.Today;
             double julianDate = calcJD (today.Year, today.Month, today.Day + 1);
             double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
 
-            riseTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
-            riseTomorrow.addDayToDate (1);
+            TimeDate riseTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            riseTomorrow.AddDay (1);
+            return riseTomorrow;
         }
 
-        public static void GetRiseTimeTomorrowRef (ref TimeDate riseTomorrow) {
-            TimeDate newRiseTomorrow;
+        public static TimeDate GetSetTimeTomorrow () {
             DateTime today = DateTime.Today;
             double julianDate = calcJD (today.Year, today.Month, today.Day + 1);
-            double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
-
-            newRiseTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
-            newRiseTomorrow.addDayToDate (1);
-            riseTomorrow.setTimeDate (newRiseTomorrow);
-        }
-
-        public static void GetSetTimeYesterday (out TimeDate setYesterday) {
-            DateTime today = DateTime.Today;
-            double julianDate = calcJD (today.Year, today.Month, today.Day - 1);
             double riseUTC = calcSunSetUTC (julianDate, latitude, longitude);
 
-            setYesterday = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
-            setYesterday.addDayToDate (-1);
+            TimeDate setTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            setTomorrow.AddDay (1);
+            return setTomorrow;
         }
 
 		//http://www.esrl.noaa.gov/gmd/grad/solcalc/
@@ -487,7 +464,7 @@ namespace AquaPic.LightingModule
         //* time in minutes from zero Z	
         //***********************************************************************/
 
-		static private double calcSunriseUTC(double JD, double latitude, double longitude)
+        static private double calcSunriseUTC(double JD, double latitudeVar, double longitudeVar)
         {
             double t = calcTimeJulianCent(JD);
 
@@ -495,16 +472,16 @@ namespace AquaPic.LightingModule
             // that declination. This is better than start of the 
             // Julian day
 
-            double noonmin = calcSolNoonUTC(t, longitude);
+            double noonmin = calcSolNoonUTC(t, longitudeVar);
             double tnoon = calcTimeJulianCent(JD + noonmin / 1440.0);
 
             // *** First pass to approximate sunrise (using solar noon)
 
             double eqTime = calcEquationOfTime(tnoon);
             double solarDec = calcSunDeclination(tnoon);
-            double hourAngle = calcHourAngleSunrise(latitude, solarDec);
+            double hourAngle = calcHourAngleSunrise(latitudeVar, solarDec);
 
-            double delta = longitude - radToDeg(hourAngle);
+            double delta = longitudeVar - radToDeg(hourAngle);
             double timeDiff = 4 * delta;	// in minutes of time
             double timeUTC = 720 + timeDiff - eqTime;	// in minutes
 
@@ -515,8 +492,8 @@ namespace AquaPic.LightingModule
             double newt = calcTimeJulianCent(calcJDFromJulianCent(t) + timeUTC / 1440.0);
             eqTime = calcEquationOfTime(newt);
             solarDec = calcSunDeclination(newt);
-            hourAngle = calcHourAngleSunrise(latitude, solarDec);
-            delta = longitude - radToDeg(hourAngle);
+            hourAngle = calcHourAngleSunrise(latitudeVar, solarDec);
+            delta = longitudeVar - radToDeg(hourAngle);
             timeDiff = 4 * delta;
             timeUTC = 720 + timeDiff - eqTime; // in minutes
 
@@ -537,18 +514,18 @@ namespace AquaPic.LightingModule
         //* time in minutes from zero Z	
         //***********************************************************************/
 
-		static private double calcSolNoonUTC(double t, double longitude)
+        static private double calcSolNoonUTC(double t, double longitudeVar)
         {
             // First pass uses approximate solar noon to calculate eqtime
-            double tnoon = calcTimeJulianCent(calcJDFromJulianCent(t) + longitude / 360.0);
+            double tnoon = calcTimeJulianCent(calcJDFromJulianCent(t) + longitudeVar / 360.0);
             double eqTime = calcEquationOfTime(tnoon);
-            double solNoonUTC = 720 + (longitude * 4) - eqTime; // min
+            double solNoonUTC = 720 + (longitudeVar * 4) - eqTime; // min
 
             double newt = calcTimeJulianCent(calcJDFromJulianCent(t) - 0.5 + solNoonUTC / 1440.0);
 
             eqTime = calcEquationOfTime(newt);
             // double solarNoonDec = calcSunDeclination(newt);
-            solNoonUTC = 720 + (longitude * 4) - eqTime; // min
+            solNoonUTC = 720 + (longitudeVar * 4) - eqTime; // min
 
             return solNoonUTC;
         }
@@ -566,25 +543,25 @@ namespace AquaPic.LightingModule
         //* time in minutes from zero Z	
         //***********************************************************************/
 
-		static private double calcSunSetUTC(double JD, double latitude, double longitude)
+        static private double calcSunSetUTC(double JD, double latitudeVar, double longitudeVar)
         {
             var t = calcTimeJulianCent(JD);
             var eqTime = calcEquationOfTime(t);
             var solarDec = calcSunDeclination(t);
-            var hourAngle = calcHourAngleSunrise(latitude, solarDec);
+            var hourAngle = calcHourAngleSunrise(latitudeVar, solarDec);
             hourAngle = -hourAngle;
-            var delta = longitude + radToDeg(hourAngle);
+            var delta = longitudeVar + radToDeg(hourAngle);
             var timeUTC = 720 - (4.0 * delta) - eqTime;	// in minutes
             return timeUTC;
         }
 
-		static private double calcSunRiseUTC(double JD, double latitude, double longitude)
+        static private double calcSunRiseUTC(double JD, double latitudeVar, double longitudeVar)
         {
             var t = calcTimeJulianCent(JD);
             var eqTime = calcEquationOfTime(t);
             var solarDec = calcSunDeclination(t);
-            var hourAngle = calcHourAngleSunrise(latitude, solarDec);
-            var delta = longitude + radToDeg(hourAngle);
+            var hourAngle = calcHourAngleSunrise(latitudeVar, solarDec);
+            var delta = longitudeVar + radToDeg(hourAngle);
             var timeUTC = 720 - (4.0 * delta) - eqTime;	// in minutes
             return timeUTC;
         }
@@ -608,8 +585,7 @@ namespace AquaPic.LightingModule
 
         static private string getTimeString(double minutes)
         {
-
-            string output = "";
+            string output;
 
             if ((minutes >= 0) && (minutes < 1440))
             {

@@ -5,9 +5,9 @@ using AquaPic.AnalogOutputDriver;
 
 namespace AquaPic.LightingModule
 {
-    public partial class Lighting 
+    public partial class Lighting
     {
-        private class DimmingLightingFixture : LightingFixture
+        public class DimmingLightingFixture : LightingFixture
         {
             public float currentDimmingLevel { get; set; }
             public float minDimmingOutput { get; set; }
@@ -15,20 +15,33 @@ namespace AquaPic.LightingModule
             public IndividualControl dimCh;
             public AnalogType type;
 
-            public DimmingLightingFixture (
-                byte powerID,
-                byte plugID,
-                byte cardID,
-                byte channelID,
-                AnalogType type,
-                string name,               
-                int timeOnOffsetMinutes,
-                int timeOffOffsetMinutes,
-                float minDimmingOutput,
-                float maxDimmingOutput,
-                LightingTime lightingTime,
-                bool highTempLockout) 
-                : base (powerID, plugID, name, timeOnOffsetMinutes, timeOffOffsetMinutes, lightingTime, highTempLockout)
+            public DimmingLightingFixture (byte powerID,
+                                           byte plugID,
+                                           byte cardID,
+                                           byte channelID,
+                                           AnalogType type,
+                                           string name,               
+                                           int onTimeOffsetMinutes,
+                                           int offTimeOffsetMinutes,
+                                           Time minOnTime,
+                                           Time maxOnTime,
+                                           Time minOffTime,
+                                           Time maxOffTime,
+                                           float minDimmingOutput,
+                                           float maxDimmingOutput,
+                                           LightingTime lightingTime,
+                                           bool highTempLockout)
+            : base (powerID, 
+                    plugID, 
+                    name, 
+                    onTimeOffsetMinutes, 
+                    offTimeOffsetMinutes, 
+                    minOnTime,
+                    maxOnTime,
+                    minOffTime,
+                    maxOffTime,
+                    lightingTime, 
+                    highTempLockout) 
             {
                 this.dimCh.Group = cardID;
                 this.dimCh.Individual = channelID;
@@ -55,4 +68,3 @@ namespace AquaPic.LightingModule
         }
     }
 }
-

@@ -1,23 +1,21 @@
-﻿using System;
-using AquaPic.Globals;
+﻿using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.PowerDriver;
-using AquaPic.SerialBus;
 using AquaPic.AlarmRuntime;
 using AquaPic.TemperatureModule;
 using AquaPic.CoilRuntime;
 
 namespace AquaPic.LightingModule
 {
-    public partial class Lighting 
+    public partial class Lighting
     {
-        private class LightingFixture
+        public class LightingFixture
     	{
             public string name;
-            public int timeOnOffsetMinutes;
-            public int timeOffOffsetMinutes;
-            public TimeDate timeOn;
-            public TimeDate timeOff;
+            public int onTimeOffset;
+            public int offTimeOffset;
+            public TimeDate onTime;
+            public TimeDate offTime;
             public LightingTime lightingTime;
             public Mode mode;
             public MyState lightingOn;
@@ -26,87 +24,81 @@ namespace AquaPic.LightingModule
             public Coil plugControl;
 
             public LightingFixture (
-                byte powerID,
-                byte plugID,
-                string name,
-                int timeOnOffsetMinutes,
-                int timeOffOffsetMinutes,
+                string name, 
+                byte powerID, 
+                byte plugID, 
+                Time onTime, 
+                Time offTime, 
                 LightingTime lightingTime,
-                bool highTempLockout
-            ) {
-                // Power Plug Setup
-                this.plug.Group = powerID;
-                this.plug.Individual = plugID;
-                plugControl = Power.AddOutlet (this.plug, name, MyState.Off);
-                plugControl.ConditionChecker = PlugControlHandler;
-
-                Power.AddHandlerOnStateChange (this.plug, LightingPlugStateChange);
-
+                bool highTempLockout)
+            {
                 this.name = name;
-                this.timeOnOffsetMinutes = timeOnOffsetMinutes;
-                this.timeOffOffsetMinutes = timeOffOffsetMinutes;
+
+                plug.Group = powerID;
+                plug.Individual = plugID;
+
+                // sets time to today and whatever onTime and offTime are
+                this.onTime = new TimeDate (onTime);
+                this.offTime = new TimeDate (offTime);
+
                 this.lightingTime = lightingTime;
-                this.mode = Mode.Auto;
-                this.lightingOn = MyState.Off;
+
                 this.highTempLockout = highTempLockout;
 
-                timeOn = TimeDate.Now;
-                timeOff = TimeDate.Now;
+                onTimeOffset = 0;
+                offTimeOffset = 0;
+
+                mode = Mode.Manual;
+
+                lightingOn = MyState.Off;
+
+                plugControl = Power.AddOutlet (plug, this.name, MyState.Off);
+                plugControl.ConditionChecker = PlugControlHandler;
+                Power.AddHandlerOnStateChange (plug, LightingPlugStateChange);
 
                 if (this.highTempLockout) {
                     int alarmIdx = Temperature.HighTemperatureAlarmIndex;
                     Alarm.AddPostHandler (alarmIdx, sender => Power.AlarmShutdownOutlet (plug));
                 }
-    		}
-
-            public void SetOnOffTime (TimeDate onTime, TimeDate offTime) {
-                if (mode == Mode.Auto) {
-                    timeOn.setTimeDate (onTime);
-                    timeOff.setTimeDate (offTime);
-
-                    timeOn.addMinToTime (timeOnOffsetMinutes);
-                    timeOff.addMinToTime (timeOffOffsetMinutes);
-                }
-            }
-
-            public void SetOnTime (TimeDate onTime) {
-                if (mode == Mode.Auto) {
-                    timeOn.setTimeDate (onTime);
-
-                    timeOn.addMinToTime (timeOnOffsetMinutes);
-                }
-            }
-
-            public void SetOffTime (TimeDate offTime) {
-                if (mode == Mode.Auto) {
-                    timeOff.setTimeDate (offTime);
-
-                    timeOff.addMinToTime (timeOffOffsetMinutes);
-                }
             }
 
             protected bool PlugControlHandler () {
-//                if (Power.GetPlugMode (plug) == Mode.Manual) {
-//                    if (Power.GetManualPlugState (plug) == MyState.On)
-//                        return true;
-//                    else
-//                        return false;
-//                } else {
-                    if (highTempLockout && Alarm.CheckAlarming (Temperature.HighTemperatureAlarmIndex))
-                        return false;
+                if (highTempLockout && Alarm.CheckAlarming (Temperature.HighTemperatureAlarmIndex))
+                    return false;
 
-                    TimeDate now = TimeDate.Now;
-                    if ((timeOn.compareTo (now) > 0) && (timeOff.compareTo (now) < 0)) {
-                        //time is after sun rise and before sun set
-                        return true;
-                    } else {
-                        return false;
+                TimeDate now = TimeDate.Now;
+                if ((onTime.compareTo (now) > 0) && (offTime.compareTo (now) < 0)) {
+                    //time is after on time and before off time
+                    return true;
+                } else {
+                    if (lightingOn == MyState.On) { // lights are on and are supposed to be off, update next on/off times
+                        if (lightingTime == LightingTime.Daytime) {
+                            // its dusk and daytime lighting on/off time is rise and set tomorrow respectfully
+                            SetOnTime (SunRiseTomorrow);
+                            SetOffTime (SunSetTomorrow);
+                        } else { // lighting time is nighttime
+                            // its dawn and nighttime lighting on/off time is set today because we're already on the current day,
+                            // and rise time tomorrow respectfully
+                            SetOnTime (SunSetToday);
+                            SetOffTime (SunRiseTomorrow);
+                        }
                     }
-//                }
+                    return false;
+                }
             }
 
             public void LightingPlugStateChange (object sender, StateChangeEventArgs args) {
                 lightingOn = args.state;
+            }
+
+            public void SetOnTime (TimeDate newOnTime) {
+                onTime = newOnTime;
+                onTime.AddMinutes (onTimeOffset);
+            }
+
+            public void SetOffTime (TimeDate newOffTime) {
+                offTime = newOffTime;
+                offTime.AddMinutes (offTimeOffset);
             }
     	}
     }
