@@ -19,15 +19,15 @@ namespace AquaPic.CoilRuntime
         }
 
         public void Execute () {
-            if (ConditionChecker != null)
-                State = ConditionChecker ();
+            if (ConditionChecker != null)       // do we have a condition check method
+                State = ConditionChecker ();    // yes, lets run it to find out the new state
 
-            if (State) {
-                if (OutputTrue != null)
-                    OutputTrue ();
+            if (State) {                        // if state is true
+                if (OutputTrue != null)         // do we have a method to run if the state is true     
+                    OutputTrue ();              // yes, lets run it
             } else {
-                if (OutputFalse != null)
-                    OutputFalse ();
+                if (OutputFalse != null)        // do we have a method to run if the state is false
+                    OutputFalse ();             // yes, lets run it
             }
         }
     }

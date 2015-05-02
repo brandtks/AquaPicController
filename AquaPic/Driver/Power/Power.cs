@@ -13,17 +13,21 @@ namespace AquaPic.PowerDriver
         private static List<PowerStrip> pwrStrips = new List<PowerStrip> ();
 
         public static void Run () {
-            for (int i = 0; i < pwrStrips.Count; ++i) {
+            foreach (var strip in pwrStrips) {
                 #if !SIMULATION
-                pwrStrips [i].GetStatus ();
+                strip.GetStatus ();
                 #endif
 
-                for (int j = 0; j < pwrStrips [i].Outlets.Length; ++j) {
-                    if (pwrStrips [i].Outlets [j].mode == Mode.Manual) {
-                        if (pwrStrips [i].Outlets [j].manualState != pwrStrips [i].Outlets [j].currentState)
-                            pwrStrips [i].SetOutletState ((byte)j, pwrStrips [i].Outlets [j].manualState, false);
+                int i = 0;
+                foreach (var outlet in strip.Outlets) { // could, probably should use a for loop but its just extra words
+                    if (outlet.mode == Mode.Manual) {
+                        if (outlet.manualState != outlet.currentState)
+                            strip.SetOutletState ((byte)i, outlet.manualState, false);
+                        
                     } else
-                        pwrStrips [i].Outlets [j].OutletControl.Execute ();
+                        outlet.OutletControl.Execute ();
+
+                    ++i;
                 }
             }
         }

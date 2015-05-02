@@ -1,7 +1,8 @@
 ﻿using System;
+using AquaPic.AnalogOutputDriver;
 using AquaPic.Globals;
 using AquaPic.Utilites;
-using AquaPic.AnalogOutputDriver;
+using AquaPic.ValueRuntime;
 
 namespace AquaPic.LightingModule
 {
@@ -9,37 +10,32 @@ namespace AquaPic.LightingModule
     {
         public class DimmingLightingFixture : LightingFixture
         {
-            public float currentDimmingLevel { get; set; }
-            public float minDimmingOutput { get; set; }
-            public float maxDimmingOutput { get; set; }
+            public float currentDimmingLevel;
+            public float minDimmingOutput;
+            public float maxDimmingOutput;
             public IndividualControl dimCh;
             public AnalogType type;
+            public Value valueControl;
+            public Mode dimmingMode;
 
-            public DimmingLightingFixture (byte powerID,
-                                           byte plugID,
-                                           byte cardID,
-                                           byte channelID,
-                                           AnalogType type,
-                                           string name,               
-                                           int onTimeOffsetMinutes,
-                                           int offTimeOffsetMinutes,
-                                           Time minOnTime,
-                                           Time maxOnTime,
-                                           Time minOffTime,
-                                           Time maxOffTime,
-                                           float minDimmingOutput,
-                                           float maxDimmingOutput,
-                                           LightingTime lightingTime,
-                                           bool highTempLockout)
-            : base (powerID, 
+            public DimmingLightingFixture (
+                string name,
+                byte powerID,
+                byte plugID,
+                Time onTime,
+                Time offTime,
+                byte cardID,
+                byte channelID,
+                float minDimmingOutput,
+                float maxDimmingOutput,
+                AnalogType type,
+                LightingTime lightingTime,
+                bool highTempLockout)
+            : base (name,
+                    powerID, 
                     plugID, 
-                    name, 
-                    onTimeOffsetMinutes, 
-                    offTimeOffsetMinutes, 
-                    minOnTime,
-                    maxOnTime,
-                    minOffTime,
-                    maxOffTime,
+                    onTime,
+                    offTime,
                     lightingTime, 
                     highTempLockout) 
             {
@@ -48,22 +44,29 @@ namespace AquaPic.LightingModule
                 this.type = type;
                 this.minDimmingOutput = minDimmingOutput;
                 this.maxDimmingOutput = maxDimmingOutput;
-                AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this.type, name);
+                dimmingMode = Mode.Auto;
+                valueControl = AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this.type, name);
+                valueControl.ValueGetter = SetDimmingLevel;
             }
 
-            public void SetDimmingLevel (float dimmingLevel) {
-                currentDimmingLevel = dimmingLevel;
+            public float SetDimmingLevel () {
+                if (lightingOn == MyState.On) {
+                    if (dimmingMode == Mode.Auto) {
+                        TimeDate now = TimeDate.Now;
 
-                if (currentDimmingLevel > maxDimmingOutput)
-                    currentDimmingLevel = maxDimmingOutput;
+                        currentDimmingLevel = Utils.CalcParabola (
+                            onTime, 
+                            offTime, 
+                            now, 
+                            minDimmingOutput, 
+                            maxDimmingOutput
+                        );
+                    }
 
-                if (currentDimmingLevel < minDimmingOutput)
-                    currentDimmingLevel = minDimmingOutput;
+                    return currentDimmingLevel.Map (0.0f, 100.0f, 0, 1024); // PIC16F1936 has 10bit PWM
+                }
 
-                currentDimmingLevel = currentDimmingLevel.Map (0.0f, 100.0f, 0, 1024); // PIC16F1936 has 10bit PWM
-                int level = Convert.ToInt32(currentDimmingLevel);
-                    
-                AnalogOutput.SetAnalogValue (dimCh, level);
+                return 0.0f;
             }
         }
     }

@@ -8,7 +8,7 @@ namespace AquaPic
 {
     public partial class LightingWindow : MyBackgroundWidget
     {
-        public LightingWindow (ButtonReleaseEventHandler OnTouchButtonRelease) : base ("Lighting", OnTouchButtonRelease) {
+        public LightingWindow (MenuReleaseHandler OnMenuRelease) : base (2, OnMenuRelease) {
             TouchSelectorSwitch ss = new TouchSelectorSwitch (0, 3, 1, MyOrientation.Vertical);
             ss.AddSelectedColorOption (0, 0.50, 0.25, 0.25);
             ss.AddSelectedColorOption (1, 0.25, 0.25, 0.50);

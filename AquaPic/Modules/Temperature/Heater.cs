@@ -11,38 +11,38 @@ namespace AquaPic.TemperatureModule
     {
         private class Heater 
         {
-            private string code = @"
-                using System;
-                using AquaPic.PowerDriver;
-                using AquaPic.Globals;
-                using AquaPic.AlarmRuntime;
-
-                namespace ScriptingInterface
-                {
-                    public class ScriptCoil
-                    {
-                        public static bool CoilCondition () {
-                            if (Power.GetPlugMode (Plug) == Mode.Manual) {
-                                if (Power.GetManualPlugState (Plug) == MyState.On)
-                                    return true;
-                                else
-                                    return false;
-                            } else {
-                                if (Alarm.CheckAlarming (HighTemperatureAlarmIndex))
-                                    return false;
-
-                                if (ControlTemperature) {
-                                    if (WaterColumnTemperature >= (Setpoint + BandWidth))
-                                        return false;
-
-                                    if (WaterColumnTemperature <= (Setpoint - BandWidth))
-                                        return true;
-                                }
-                                return true;
-                            }
-                        }
-                    }
-                }";
+//            private string code = @"
+//                using System;
+//                using AquaPic.PowerDriver;
+//                using AquaPic.Globals;
+//                using AquaPic.AlarmRuntime;
+//
+//                namespace ScriptingInterface
+//                {
+//                    public class ScriptCoil
+//                    {
+//                        public static bool CoilCondition () {
+//                            if (Power.GetPlugMode (Plug) == Mode.Manual) {
+//                                if (Power.GetManualPlugState (Plug) == MyState.On)
+//                                    return true;
+//                                else
+//                                    return false;
+//                            } else {
+//                                if (Alarm.CheckAlarming (HighTemperatureAlarmIndex))
+//                                    return false;
+//
+//                                if (ControlTemperature) {
+//                                    if (WaterColumnTemperature >= (Setpoint + BandWidth))
+//                                        return false;
+//
+//                                    if (WaterColumnTemperature <= (Setpoint - BandWidth))
+//                                        return true;
+//                                }
+//                                return true;
+//                            }
+//                        }
+//                    }
+//                }";
 
             public IndividualControl Plug;
             public bool ControlTemperature;

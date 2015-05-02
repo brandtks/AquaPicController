@@ -1,66 +1,145 @@
 ﻿using System;
-using System.Timers;
-using System.IO;
 using System.Collections.Generic;
-using Gtk;
 using Cairo;
+using Gtk;
+using MyWidgetLibrary;
 
-namespace MyWidgetLibrary
+namespace AquaPic
 {
+    public delegate void MenuReleaseHandler (int screenKey);
+
     public class MyMenuBar : EventBox
     {
-        public bool showMenu;
+        private int currentScreen;
+        private int highlightedScreen;
+        private uint timer;
+        private bool menuTouched;
+        private event MenuReleaseHandler MenuReleaseEvent;
 
-        public MyMenuBar () {
+        public MyMenuBar (int currentScreen, MenuReleaseHandler OnMenuRelease) {
             this.Visible = true;
             this.VisibleWindow = false;
-            this.SetSizeRequest (1280, 200);
+            this.SetSizeRequest (800, 435);
 
-            this.showMenu = false;
+            this.currentScreen = currentScreen;
+            this.highlightedScreen = currentScreen;
+            this.MenuReleaseEvent = OnMenuRelease;
 
             this.ExposeEvent += onExpose;
-            this.ButtonReleaseEvent += onButtonRelease;
+            this.ButtonPressEvent += OnButtonPress;
+            this.ButtonReleaseEvent += OnButtonRelease;
         }
 
         protected void onExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
-                if (showMenu) {
-                    cr.Arc (640, 8855, 8205, 265 * (Math.PI / 180), 275 * (Math.PI / 180));
-                    cr.LineTo (1280, 675);
-                    cr.LineTo (1280, 800);
-                    cr.LineTo (0, 800);
-                    cr.LineTo (0, 675);
-                    cr.ClosePath ();
-                    cr.SetSourceRGBA (0.4, 0.4, 0.4, 0.85);
+                int x = 0;
+                int width = 133;
+
+                for (int i = 0; i < GuiGlobal.screenData.Count; ++i) {
+                    if ((x == 0) || (x == (GuiGlobal.screenData.Count - 1)))
+                        width = 134;
+                    else
+                        width = 133;
+
+                    if ((i == currentScreen) || (menuTouched && (i == highlightedScreen)))
+                        cr.Rectangle (x, 435, width, 45);
+                    else
+                        cr.Rectangle (x, 472, width, 8);
+                    
+                    GuiGlobal.screenData [i].color.SetSource (cr);
                     cr.Fill ();
 
-                    cr.Arc (640, 650, 50, 0, 2 * Math.PI);
-                    cr.SetSourceRGBA (0.1, 0.1, 0.1, 1);
-                    cr.Fill ();
-                } else {
-                    cr.Arc (640, 800, 50, Math.PI, 2*Math.PI);
-                    cr.SetSourceRGBA (0.1, 0.1, 0.1, 0.75);
-                    cr.Fill ();
+                    x += width;
                 }
+                    
+                x = (currentScreen * 133) + 1;
+
+                Pango.Layout l = new Pango.Layout (this.PangoContext);
+                l.Width = Pango.Units.FromPixels (width);
+                l.Wrap = Pango.WrapMode.Word;
+                l.Alignment = Pango.Alignment.Center;
+                //l.SetText (ButtonLabel);
+                l.SetMarkup ("<span color=\"black\">"
+                    + GuiGlobal.screenData [currentScreen].name 
+                    + "</span>");
+                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), x, Allocation.Top + 14, l);
+
+                if ((menuTouched) && (currentScreen != highlightedScreen)) {
+                    x = (highlightedScreen * 133) + 1;
+                    l.SetMarkup ("<span color=\"black\">"
+                        + GuiGlobal.screenData [highlightedScreen].name 
+                        + "</span>");
+                    GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), x, Allocation.Top + 14, l);
+                }
+
+                l.Dispose ();
             }
         }
 
-        protected void onButtonRelease (object sender, ButtonReleaseEventArgs args) {
+        protected void OnButtonPress (object o, ButtonPressEventArgs args) {
+            timer = GLib.Timeout.Add (20, OnTimerEvent);
+            menuTouched = true;
+            QueueDraw ();
+        }
+
+        protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
+            menuTouched = false;
+
             int x = (int)args.Event.X;
             int y = (int)args.Event.Y;
 
-            if (showMenu) {
-                if ((x >= 590) && (x <= 690) && (y >= 0) && (y <= 100)) {
-                    showMenu = false;
-                    QueueDraw ();
-                }
-            } else {
-                if (((x >= 590) && (x <= 690)) && (y >= 150)) {
-                    GdkWindow.Raise ();
-                    showMenu = true;
-                    QueueDraw ();
+            if ((y >= 0) && (y <= Allocation.Height)) {
+                int left = 0;
+                int width;
+
+                for (int i = 0; i < GuiGlobal.screenData.Count; ++i) {
+                    if ((x == 0) || (x == (GuiGlobal.screenData.Count - 1)))
+                        width = 134;
+                    else
+                        width = 133;
+
+                    if ((x >= left) && (x <= (left + width))) {
+                        highlightedScreen = i;
+                        QueueDraw ();
+                        break;
+                    }
+
+                    left += width;
                 }
             }
+
+            if (MenuReleaseEvent != null)
+                MenuReleaseEvent (highlightedScreen);
+        }
+
+        protected bool OnTimerEvent () {
+            if (menuTouched) {
+                int x, y;
+                GetPointer (out x, out y);
+
+                if ((y >= 0) && (y <= Allocation.Height)) {
+                    int left = 0;
+                    int width;
+
+                    for (int i = 0; i < GuiGlobal.screenData.Count; ++i) {
+                        if ((x == 0) || (x == (GuiGlobal.screenData.Count - 1)))
+                            width = 134;
+                        else
+                            width = 133;
+
+                        if ((x >= left) && (x <= (left + width))) {
+                            highlightedScreen = i;
+                            QueueDraw ();
+                            break;
+                        }
+
+                        left += width;
+                    }
+                }
+            }
+
+            return menuTouched;
         }
 
         /* old stuff

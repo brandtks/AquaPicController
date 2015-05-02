@@ -62,19 +62,10 @@ namespace AquaPic.PowerDriver
                 this.Outlets = new OutletData[8];
                 for (int i = 0; i < 8; ++i) {
                     int plugID = i;
-                    string plugName = "p" + plugID.ToString() + "." + this.name;
+                    string plugName = this.name + "." + "p" + plugID.ToString() ;
                         
                     this.Outlets [plugID] = new OutletData (
                         plugName,
-                        delegate() {
-                            if (Outlets [plugID].mode == Mode.Manual) {
-                                if (Outlets [plugID].manualState == MyState.On)
-                                    return true;
-                                else
-                                    return false;
-                            }
-                            return false;
-                        },
                         delegate() {
                             SetOutletState ((byte)plugID, MyState.On, false);
                         },

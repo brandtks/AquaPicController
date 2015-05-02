@@ -10,26 +10,29 @@ namespace AquaPic
 {
     public partial class PowerWindow : MyBackgroundWidget
     {
-        private TouchSelectorSwitch[] selectors;
+        private PowerOutletSlider[] selectors;
         private int powerID;
         private TouchComboBox combo;
 
-        public PowerWindow (ButtonReleaseEventHandler OnTouchButtonRelease) : base ("Power", OnTouchButtonRelease) {
+        public PowerWindow (MenuReleaseHandler OnMenuRelease) : base (1, OnMenuRelease) {
             powerID = 0;
 
             int x, y;
-            selectors = new TouchSelectorSwitch[8];
+            selectors = new PowerOutletSlider[8];
             for (int i = 0; i < 8; ++i) {
-                selectors [i] = new TouchSelectorSwitch (i, 3, 0, MyOrientation.Horizontal);
+                selectors [i] = new PowerOutletSlider (i);
+
                 selectors [i].SelectorChanged += OnSelectorChanged;
+
                 if (i < 4) {
-                    x = (i * 100) + 200;
-                    y = 100;
+                    x = (i * 180) + 40;
+                    y = 140;
                 } else {
-                    x = ((i - 4) * 100) + 200;
-                    y = 150;
+                    x = ((i - 4) * 180) + 40;
+                    y = 200;
                 }
                 Put (selectors [i], x, y);
+
                 selectors [i].Show ();
             }
 
@@ -40,14 +43,39 @@ namespace AquaPic
             Put (combo, 620, 25);
             combo.Show ();
 
+            GetPowerData ();
+
             Show ();
         }
 
-        protected void GetPowerData (int powerID) {
+        protected void GetPowerData () {
             MyState[] states = Power.GetAllStates (powerID);
             Mode[] modes = Power.GetAllModes (powerID);
             string[] names = Power.GetAllOutletNames (powerID);
-            
+
+            int i = 0;
+            foreach (var selector in selectors) {
+                selector.OutletName = names [i];
+
+                if (states [i] == MyState.On) {
+                    selector.Status = "On";
+                    selector.StatusColor.ChangeColor("secb");
+                } else {
+                    selector.Status = "Off";
+                    selector.StatusColor.ChangeColor("grey4");
+                }
+
+                if (modes [i] == Mode.Auto) {
+                    selector.CurrentSelected = 1;
+                } else { // mode is manual
+                    if (states [i] == MyState.On) {
+                        selector.CurrentSelected = 2;
+                    } else {
+                        selector.CurrentSelected = 0;
+                    }
+                }
+                ++i;
+            }
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
@@ -60,7 +88,7 @@ namespace AquaPic
                     Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
                 }
                 powerID = id;
-                GetPowerData (powerID);
+                GetPowerData ();
                 ic.Group = (byte)powerID;
                 for (int i = 0; i < selectors.Length; ++i) {
                     ic.Individual = (byte)i;
@@ -78,20 +106,23 @@ namespace AquaPic
 
             if (ss.CurrentSelected == 1) // auto
                 Power.SetOutletMode (ic, Mode.Auto);
-            else if (ss.CurrentSelected == 0) // manual and state off
+            else if (ss.CurrentSelected == 0) { // manual and state off
+                Power.SetOutletMode (ic, Mode.Manual);
                 Power.SetManualOutletState (ic, MyState.Off);
-            else if (ss.CurrentSelected == 2) // manual and state on
+            } else if (ss.CurrentSelected == 2) {// manual and state on
+                Power.SetOutletMode (ic, Mode.Manual);
                 Power.SetManualOutletState (ic, MyState.On);
+            }
         }
 
         protected void PlugStateChange (object sender, StateChangeEventArgs args) {
             if (args.powerID == powerID) {
-                if (args.state == MyState.On) {
-                    foreach (var color in selectors [args.outletID].BkgndColorOptions)
-                        color.ChangeColor ("blue");
-                } else {
-                    foreach (var color in selectors [args.outletID].BkgndColorOptions)
-                        color.ChangeColor (0.15, 0.15, 0.15);
+                if (args.mode == Mode.Auto) {
+                    if (args.state == MyState.On) {
+                        selectors [args.outletID].SliderColorOptions [1].ChangeColor ("pri");
+                    } else {
+                        selectors [args.outletID].SliderColorOptions [1].ChangeColor ("grey4");
+                    }
                 }
                 selectors [args.outletID].QueueDraw ();
             }

@@ -20,6 +20,16 @@ namespace AquaPic.Utilites
             }
         }
 
+        public TimeDate (int year, byte month, byte day, byte hours, byte mins, byte secs, byte millisecs) {
+            this.year = year;
+            this.month = month;
+            this.day = day;
+            this.hour = hours;
+            this.min = mins;
+            this.sec = secs;
+            this.millisec = millisecs;
+        }
+
         public TimeDate (byte hours, byte mins, byte secs) {
             DateTime now = DateTime.Now;
 			this.year = now.Year;
@@ -41,15 +51,13 @@ namespace AquaPic.Utilites
             this.sec = secs;
             this.millisec = millisecs;
         }
+            
+        public TimeDate (int year, byte month, byte day, byte hours, byte mins, byte secs) 
+            : this (year, month, day, hours, mins, secs, 0) {
+        }
 
-		public TimeDate (int years, byte months, byte days, byte hours, byte mins, byte secs, byte millisecs) {
-            this.year = years;
-            this.month = months;
-            this.day = days;
-            this.hour = hours;
-            this.min = mins;
-            this.sec = secs;
-            this.millisec = millisecs;
+        public TimeDate (int year, byte month, byte day, byte hours, byte mins) 
+            : this (year, month, day, hours, mins, 0, 0) {
         }
 
         public TimeDate (DateTime value) {
@@ -84,7 +92,7 @@ namespace AquaPic.Utilites
 			this.millisec = (byte)value.Millisecond;
         }
 
-        public void setTimeDate (TimeDate value) {
+        public void SetTimeDate (TimeDate value) {
             year = value.year;
             month = value.month;
             day = value.day;
@@ -94,7 +102,7 @@ namespace AquaPic.Utilites
             millisec = value.millisec;
         }
 
-        public void setTimeDate (DateTime value) {
+        public void SetTimeDate (DateTime value) {
 			year = value.Year;
 			month = (byte)value.Month;
 			day = (byte)value.Day;
@@ -104,7 +112,7 @@ namespace AquaPic.Utilites
 			millisec = (byte)value.Millisecond;
         }
 
-        public void setTimeDate (Time value) {
+        public void SetTimeDate (Time value) {
             DateTime now = DateTime.Now;
             this.year = now.Year;
             this.month = (byte)now.Month;
@@ -115,7 +123,7 @@ namespace AquaPic.Utilites
             this.millisec = value.millisec;
         }
 
-        public void updateDateToToday () {
+        public void UpdateDateToToday () {
             DateTime now = DateTime.Now;
             year = now.Year;
             month = (byte)now.Month;
@@ -123,28 +131,26 @@ namespace AquaPic.Utilites
         }
 
         // returns 1 if after value, -1 if before value
-        public int compareTo (TimeDate value) {
-            DateTime val = value.toDateTime ();
-            return val.CompareTo (toDateTime ());
+        public int CompareTo (TimeDate value) {
+            return ToDateTime ().CompareTo (value.ToDateTime ());
         }
 
         // returns 1 if after value, -1 if before value
-        public int compareTo (DateTime value) {
-            return value.CompareTo (toDateTime());
+        public int CompareTo (DateTime value) {
+            return ToDateTime ().CompareTo (value);
         }
 
         // returns 1 if after value, -1 if before value
-        public int compareToTime (TimeDate value) {
+        public int CompareToTime (TimeDate value) {
             return TimeSpan.Compare (toTimeSpan (), value.toTimeSpan ());
         }
 
         public double DifferenceInTime(TimeDate value) {
-            DateTime val = value.toDateTime();
-            TimeSpan span = val.Subtract(this.toDateTime());
+            TimeSpan span = ToDateTime ().Subtract (value.ToDateTime ());
             return span.TotalMinutes;
         }
 
-        public DateTime toDateTime () {
+        public DateTime ToDateTime () {
             DateTime val = new DateTime (year, month, day, hour, min, sec, millisec);
             return val;
         }
@@ -162,13 +168,13 @@ namespace AquaPic.Utilites
 //        }
 
         public void AddDay (int value) {
-            DateTime val = toDateTime ();
+            DateTime val = ToDateTime ();
             val = val.AddDays (value);
-            setTimeDate (val);
+            SetTimeDate (val);
         }
 
 		public override string ToString () {
-			DateTime val = toDateTime ();
+			DateTime val = ToDateTime ();
 			return val.ToString ();
 		}
 

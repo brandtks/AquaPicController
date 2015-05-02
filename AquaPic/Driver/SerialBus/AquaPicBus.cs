@@ -190,7 +190,7 @@ namespace AquaPic.SerialBus
                                 Thread.Sleep (1000);
                         } catch (Exception ex) {
                             Console.WriteLine ("An exception happened");
-                            Console.WriteLine (ex.ToString ());
+                            //Console.WriteLine (ex.ToString ());
                             Thread.Sleep (1000);
                         }
                     } while (!fileOpen);

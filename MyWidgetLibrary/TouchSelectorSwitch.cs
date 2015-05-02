@@ -17,6 +17,11 @@ namespace MyWidgetLibrary
         }
     }
 
+    public enum MySliderSize : byte {
+        Small = 1,
+        Large
+    }
+
     public class TouchSelectorSwitch : EventBox
     {
         private bool clicked;
@@ -26,9 +31,11 @@ namespace MyWidgetLibrary
         public int SelectionCount;
         public int CurrentSelected;
         public MyOrientation Orientation;
+        public MySliderSize SliderSize;
         public MyColor[] BkgndColorOptions;
-        public MyColor[] TextColorOptions;
-        public string[] NameOptions;
+//        public MyColor[] TextColorOptions;
+        public MyColor[] SliderColorOptions;
+//        public string[] TextOptions;
         public byte Id;
 
         public event SelectorChangedEventHandler SelectorChanged;
@@ -41,17 +48,23 @@ namespace MyWidgetLibrary
             this.SelectionCount = selectionCount;
             this.CurrentSelected = currentSelectedIndex;
             this.Orientation = orientation;
+            this.SliderSize = MySliderSize.Small;
+
             this.BkgndColorOptions = new MyColor[this.SelectionCount];
             for (int i = 0; i < BkgndColorOptions.Length; ++i)
-                this.BkgndColorOptions [i] = new MyColor (0.15, 0.15, 0.15);
+                this.BkgndColorOptions [i] = new MyColor ("grey0");
 
-            this.TextColorOptions = new MyColor[this.SelectionCount];
-            for (int i = 0; i < BkgndColorOptions.Length; ++i)
-                this.TextColorOptions [i] = new MyColor ("black");
+//            this.TextColorOptions = new MyColor[this.SelectionCount];
+//            for (int i = 0; i < BkgndColorOptions.Length; ++i)
+//                this.TextColorOptions [i] = new MyColor ("black");
 
-            this.NameOptions = new string[this.SelectionCount];
-            for (int i = 0; i < NameOptions.Length; ++i)
-                this.NameOptions [i] = string.Empty;
+            this.SliderColorOptions = new MyColor[this.SelectionCount];
+            for (int i = 0; i < SliderColorOptions.Length; ++i)
+                this.SliderColorOptions [i] = new MyColor ("grey4");
+
+//            this.TextOptions = new string[this.SelectionCount];
+//            for (int i = 0; i < TextOptions.Length; ++i)
+//                this.TextOptions [i] = string.Empty;
 
             this.clicked = false;
             this.clickTimer = 0;
@@ -83,13 +96,13 @@ namespace MyWidgetLibrary
             BkgndColorOptions [selectionIndex].ChangeColor (R, G, B);
         }
 
-        public void AddSelectedTextColorOption (int selectionIndex, string colorName) {
-            TextColorOptions [selectionIndex].ChangeColor (colorName);
-        }
+//        public void AddSelectedTextColorOption (int selectionIndex, string colorName) {
+//            TextColorOptions [selectionIndex].ChangeColor (colorName);
+//        }
 
-        public void AddSelectedNameOption (int selectionIndex, string name) {
-            NameOptions [selectionIndex] = name;
-        }
+//        public void AddSelectedNameOption (int selectionIndex, string name) {
+//            TextOptions [selectionIndex] = name;
+//        }
 
         protected void onExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
@@ -100,12 +113,19 @@ namespace MyWidgetLibrary
 
                 int seperation, sliderSize, sliderLength, sliderMax, x, y;
 
-                if (Orientation == MyOrientation.Horizontal) {
-                    sliderSize = height;
+                if (Orientation == MyOrientation.Horizontal) {  
+                    if (SliderSize == MySliderSize.Small)
+                        sliderSize = height;
+                    else {
+                        sliderSize = width / SelectionCount;
+                        sliderSize += (SelectionCount - 2) * 8;
+                    }
+
                     sliderLength = width - sliderSize;
                     sliderMax = left + sliderLength;
 
                     seperation = sliderLength / (SelectionCount - 1);
+
                     seperation *= CurrentSelected;
 
                     if (clicked)
@@ -118,11 +138,18 @@ namespace MyWidgetLibrary
                         x = sliderMax;
                     y = top;
                 } else {
-                    sliderSize = width;
+                    if (SliderSize == MySliderSize.Small)
+                        sliderSize = width;
+                    else {
+                        sliderSize = height / SelectionCount;
+                        sliderSize += (SelectionCount - 2) * 8;
+                    }
+
                     sliderLength = height - sliderSize;
                     sliderMax = top + sliderLength;
 
                     seperation = sliderLength / (SelectionCount - 1);
+
                     seperation *= CurrentSelected;
 
                     if (clicked)
@@ -138,8 +165,12 @@ namespace MyWidgetLibrary
 
                 // Background 
                 //cr.Rectangle (left, top, width, height);
-                WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, 10);
-                cr.SetSourceRGB (BkgndColorOptions [CurrentSelected].R, BkgndColorOptions [CurrentSelected].G, BkgndColorOptions [CurrentSelected].B);
+                if (Orientation == MyOrientation.Horizontal)
+                    WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, height / 2);
+                else
+                    WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
+                //cr.SetSourceRGB (BkgndColorOptions [CurrentSelected].R, BkgndColorOptions [CurrentSelected].G, BkgndColorOptions [CurrentSelected].B);
+                BkgndColorOptions [CurrentSelected].SetSource (cr);
                 cr.FillPreserve ();
                 cr.LineWidth = 1;
                 cr.SetSourceRGB (0.0, 0.0, 0.0);
@@ -147,31 +178,35 @@ namespace MyWidgetLibrary
 
                 // Slider
                 //cr.Rectangle (x, y, sliderSize, sliderSize);
-                WidgetGlobal.DrawRoundedRectangle (cr, x, y, sliderSize, sliderSize, 10);
-                cr.SetSourceRGB (0.85, 0.85, 0.85);
+                if (Orientation == MyOrientation.Horizontal)
+                    WidgetGlobal.DrawRoundedRectangle (cr, x, y, sliderSize, height, height / 2);
+                else
+                    WidgetGlobal.DrawRoundedRectangle (cr, x, y, width, sliderSize, width / 2);
+                //cr.SetSourceRGB (SliderColorOptions [CurrentSelected].R, SliderColorOptions [CurrentSelected].G, SliderColorOptions [CurrentSelected].B);
+                SliderColorOptions [CurrentSelected].SetSource (cr);
                 cr.FillPreserve ();
                 cr.LineWidth = 1;
                 cr.SetSourceRGB (0.0, 0.0, 0.0);
                 cr.Stroke ();
 
-                if (!clicked) {
-                    if ((SelectionCount == 2) && (Orientation == MyOrientation.Horizontal)) {
-                        if (!string.IsNullOrWhiteSpace (NameOptions [CurrentSelected])) {
-                            Pango.Layout l = new Pango.Layout (PangoContext);
-                            l.Width = Pango.Units.FromPixels (sliderLength);
-                            l.Wrap = Pango.WrapMode.WordChar;
-                            l.Alignment = Pango.Alignment.Center;
-                            if (CurrentSelected == 0)
-                                x += sliderSize;
-                            else
-                                x = left;
-                            l.SetMarkup ("<span color=" + (char)34 + TextColorOptions [CurrentSelected].ToHTML () + (char)34 + ">" + NameOptions [CurrentSelected] + "</span>"); 
-                            l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
-                            GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), x, top + 1, l);
-                            l.Dispose ();
-                        }
-                    }
-                }
+//                if (!clicked) {
+//                    if ((SelectionCount == 2) && (Orientation == MyOrientation.Horizontal)) {
+//                        if (!string.IsNullOrWhiteSpace (TextOptions [CurrentSelected])) {
+//                            Pango.Layout l = new Pango.Layout (PangoContext);
+//                            l.Width = Pango.Units.FromPixels (sliderLength);
+//                            l.Wrap = Pango.WrapMode.WordChar;
+//                            l.Alignment = Pango.Alignment.Center;
+//                            if (CurrentSelected == 0)
+//                                x += sliderSize;
+//                            else
+//                                x = left;
+//                            l.SetMarkup ("<span color=" + (char)34 + TextColorOptions [CurrentSelected].ToHTML () + (char)34 + ">" + TextOptions [CurrentSelected] + "</span>"); 
+//                            l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+//                            GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), x, top + 1, l);
+//                            l.Dispose ();
+//                        }
+//                    }
+//                }
             }
         }
 
@@ -190,53 +225,41 @@ namespace MyWidgetLibrary
 
             if (Orientation == MyOrientation.Horizontal) {
                 int x = (int)args.Event.X;
+                int sliderLength = Allocation.Width;
+                int seperation = sliderLength / SelectionCount;
 
-                if ((x < (click1 + 25) && (x > (click1 - 25))))
-                    CurrentSelected = ++CurrentSelected % SelectionCount;
+                if (x < 0)
+                    CurrentSelected = 0;
+                else if (x > sliderLength)
+                    CurrentSelected = SelectionCount - 1;
                 else {
-                    int sliderSize = Allocation.Height;
-                    int sliderLength = Allocation.Width - sliderSize;
-                    int sliderMax = Allocation.Left + sliderLength;
-                    int seperation = sliderLength / (SelectionCount - 1);
-
-                    if (x < 0)
-                        CurrentSelected = 0;
-                    else if (x > sliderMax)
-                        CurrentSelected = SelectionCount - 1;
-                    else {
-                        for (int i = 0; i < SelectionCount; ++i) {
-                            int leftBoundery = i * seperation;
-                            int rightBoundery = (i + 1) * seperation;
-                            if ((x >= leftBoundery) && (x <= rightBoundery)) {
-                                CurrentSelected = i;
-                                break;
-                            }
+                    for (int i = 0; i < SelectionCount; ++i) {
+                        int leftBoundery = i * seperation;
+                        int rightBoundery = (i + 1) * seperation;
+                        if ((x >= leftBoundery) && (x <= rightBoundery)) {
+                            CurrentSelected = i;
+                            break;
                         }
                     }
                 }
             } else {
                 int y = (int)args.Event.Y;
+                int sliderSize = Allocation.Width;
+                int sliderLength = Allocation.Height - sliderSize;
+                int sliderMax = Allocation.Height;
+                int seperation = sliderLength / (SelectionCount - 1);
 
-                if ((y < (click1 + 25) && (y > (click1 - 25))))
-                    CurrentSelected = ++CurrentSelected % SelectionCount;
+                if (y < 0)
+                    CurrentSelected = 0;
+                else if (y > sliderMax)
+                    CurrentSelected = SelectionCount - 1;
                 else {
-                    int sliderSize = Allocation.Width;
-                    int sliderLength = Allocation.Height - sliderSize;
-                    int sliderMax = Allocation.Top + sliderLength;
-                    int seperation = sliderLength / (SelectionCount - 1);
-
-                    if (y < 0)
-                        CurrentSelected = 0;
-                    else if (y > sliderMax)
-                        CurrentSelected = SelectionCount - 1;
-                    else {
-                        for (int i = 0; i < SelectionCount; ++i) {
-                            int leftBoundery = i * seperation;
-                            int rightBoundery = (i + 1) * seperation;
-                            if ((y >= leftBoundery) && (y <= rightBoundery)) {
-                                CurrentSelected = i;
-                                break;
-                            }
+                    for (int i = 0; i < SelectionCount; ++i) {
+                        int leftBoundery = i * seperation;
+                        int rightBoundery = (i + 1) * seperation;
+                        if ((y >= leftBoundery) && (y <= rightBoundery)) {
+                            CurrentSelected = i;
+                            break;
                         }
                     }
                 }

@@ -38,16 +38,26 @@ namespace AquaPic.PluginRuntime
         public void RunInitialize (string typeName) {
             if (compiled) {
                 Type type = pluginAssembly.GetType (typeName);
-                MethodInfo method = type.GetMethod ("Initialize");
-                method.Invoke (null, null);
+
+                MethodInfo method = null;
+                if (type != null)
+                    method = type.GetMethod ("Initialize");
+
+                if (method != null)
+                    method.Invoke (null, null);
             }
         }
 
         public void RunPlugin () {
             if (compiled) {
                 Type type = pluginAssembly.GetType ("ScriptingInterface.PluginScript");
-                MethodInfo method = type.GetMethod ("RuntimePlugin");
-                method.Invoke (null, null);
+
+                MethodInfo method = null;
+                if (type != null)
+                    method = type.GetMethod ("RuntimePlugin");
+
+                if (method != null)
+                    method.Invoke (null, null);
             }
         }
     }

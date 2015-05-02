@@ -2,11 +2,12 @@
 using Gtk;
 using AquaPic.AlarmRuntime;
 using AquaPic.AnalogInputDriver;
+using AquaPic.AnalogOutputDriver;
+using AquaPic.DigitalInputDriver;
 using AquaPic.LightingModule;
+using AquaPic.PluginRuntime;
 using AquaPic.PowerDriver;
 using AquaPic.TemperatureModule;
-using AquaPic.DigitalInputDriver;
-using AquaPic.PluginRuntime;
 
 namespace AquaPic.TaskManagerRuntime
 {
@@ -36,9 +37,9 @@ namespace AquaPic.TaskManagerRuntime
         protected static bool On1000Tasks () {
             AnalogInput.Run ();
             DigitalInput.Run ();
+            AnalogOutput.Run ();
 
             Temperature.Run ();
-            Lighting.Run ();
             Alarm.Run ();
             Plugin.Run ();
             return true; // restarts timer

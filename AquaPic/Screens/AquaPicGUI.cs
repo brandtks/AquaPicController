@@ -11,7 +11,10 @@ namespace AquaPic
         private PowerWindow powerScreen;
         private MainWindow mainScreen;
         private LightingWindow lighingScreen;
-        private string currentScreen;
+        private WaveWindow waveScreen;
+        private ConditionWindow conditionScreen;
+        private SettingsWindow settingsScreen;
+        private int currentScreen;
 
         #if SIMULATION
         private Process simulator;
@@ -23,10 +26,10 @@ namespace AquaPic
         public AquaPicGUI () : base (Gtk.WindowType.Toplevel) {
         #endif
             this.Name = "AquaPic.GUI";
-            this.Title = global::Mono.Unix.Catalog.GetString ("GUI");
+            this.Title = global::Mono.Unix.Catalog.GetString ("AquaPic Controller Version 1");
             this.WindowPosition = ((global::Gtk.WindowPosition)(4));
-            this.DefaultWidth = 1280;
-            this.DefaultHeight = 800;
+            this.DefaultWidth = 800;
+            this.DefaultHeight = 480;
             this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
             this.Resizable = false;
             this.AllowGrow = false;
@@ -35,8 +38,8 @@ namespace AquaPic
             this.simulator = simulator;
             #endif
 
-            this.mainScreen = new MainWindow (OnButtonTouch);
-            this.currentScreen = "Main";
+            this.mainScreen = new MainWindow (OnMenuRelease);
+            this.currentScreen = 0;
 
             this.Add (mainScreen);
 
@@ -57,28 +60,35 @@ namespace AquaPic
             a.RetVal = true;
         }
 
-        protected void OnButtonTouch (object sender, ButtonReleaseEventArgs args) {
-            var b = sender as TouchButton;
+        protected void OnMenuRelease (int screenKey) {
+            if (screenKey != currentScreen) {
+                ClearChildren ();
+                currentScreen = screenKey;
 
-            if (string.Compare (b.Text, currentScreen, StringComparison.InvariantCultureIgnoreCase) != 0) {
-                switch (b.Text) {
-                case "Main":
-                    ClearChildren ();
-                    mainScreen = new MainWindow (OnButtonTouch);
-                    currentScreen = "Main";
+                switch (currentScreen) {
+                case 0:
+                    mainScreen = new MainWindow (OnMenuRelease);
                     Add (mainScreen);
                     break;
-                case "Power":
-                    ClearChildren ();
-                    powerScreen = new PowerWindow (OnButtonTouch);
-                    currentScreen = "Power";
+                case 1:
+                    powerScreen = new PowerWindow (OnMenuRelease);
                     Add (powerScreen);
                     break;
-                case "Lighting":
-                    ClearChildren ();
-                    lighingScreen = new LightingWindow (OnButtonTouch);
-                    currentScreen = "Lighting";
+                case 2:
+                    lighingScreen = new LightingWindow (OnMenuRelease);
                     Add (lighingScreen);
+                    break;
+                case 3:
+                    waveScreen = new WaveWindow (OnMenuRelease);
+                    Add (waveScreen);
+                    break;
+                case 4:
+                    conditionScreen = new ConditionWindow (OnMenuRelease);
+                    Add (conditionScreen);
+                    break;
+                case 5:
+                    settingsScreen = new SettingsWindow (OnMenuRelease);
+                    Add (settingsScreen);
                     break;
                 default:
                     break;

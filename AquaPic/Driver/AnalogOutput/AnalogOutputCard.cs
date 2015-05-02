@@ -1,7 +1,7 @@
 ﻿using System;
-using AquaPic.SerialBus;
 using AquaPic.AlarmRuntime;
 using AquaPic.Globals;
+using AquaPic.SerialBus;
 
 namespace AquaPic.AnalogOutputDriver
 {
@@ -25,8 +25,14 @@ namespace AquaPic.AnalogOutputDriver
                 this.cardID = cardID;
                 this.communicationAlarmIndex = Alarm.Subscribe(address.ToString () + " communication fault", "Analog output card at address " + this.slave.Address.ToString ());
                 this.channels = new AnalogOutputChannel[4];
-                for (int i = 0; i < this.channels.Length; ++i)
-                    this.channels [i] = new AnalogOutputChannel ();
+                for (int i = 0; i < channels.Length; ++i) {
+                    int chId = i;
+                    this.channels [chId] = new AnalogOutputChannel (
+                        delegate(float value) {
+                            SetAnalogValue ((byte)chId, Convert.ToInt32 (value));
+                        }
+                    );
+                }
             }
 
             protected void OnSlaveStatusUpdate (object sender) {
@@ -65,12 +71,16 @@ namespace AquaPic.AnalogOutputDriver
 
             #if SIMULATION
             public void SetAnalogValue (byte channelID, int value) {
-                const int messageLength = 2;
-                string[] message = new string[messageLength];
-                message [0] = channelID.ToString ();
-                message [1] = value.ToString ();
+                if (value != channels [channelID].value) {
+                    channels [channelID].value = value;
 
-                slave.Write (31, message, messageLength);
+                    const int messageLength = 2;
+                    string[] message = new string[messageLength];
+                    message [0] = channelID.ToString ();
+                    message [1] = value.ToString ();
+
+                    slave.Write (31, message, messageLength);
+                }
             }
             #else
             public void SetAnalogValue (byte channelID, int value) {

@@ -1,5 +1,6 @@
 ﻿using System;
 using AquaPic.Globals;
+using AquaPic.ValueRuntime;
 
 namespace AquaPic.AnalogOutputDriver
 {
@@ -9,7 +10,8 @@ namespace AquaPic.AnalogOutputDriver
         {
             public AnalogType type;
             public string name { get; set; }
-            public float value { get; set; }
+            public int value { get; set; }
+            public Value ValueControl;
 
             /*
             public AnalogOutputChannel (AnalogType type, string name) {
@@ -20,10 +22,13 @@ namespace AquaPic.AnalogOutputDriver
             }
             */
 
-            public AnalogOutputChannel () {
+            public AnalogOutputChannel (ValueSetterHandler valueSetter) {
                 this.type = AnalogType.None;
                 this.name = null;
-                this.value = 0.0f;
+                this.value = 0;
+
+                ValueControl = new Value ();
+                ValueControl.ValueSetter += valueSetter;
             }
         }
     }

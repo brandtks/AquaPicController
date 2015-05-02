@@ -13,10 +13,10 @@ namespace MyWidgetLibrary
 
     public class TouchButton : EventBox
     {
-        public MyColor ButtonColor { get; set; }
-        public string Text { get; set; }
-        public string TextColor { get; set; }
-        public ButtonClickAction clickAction { get; set; }
+        public MyColor ButtonColor;
+        public string Text;
+        public MyColor TextColor;
+        public ButtonClickAction clickAction;
 
         public event ButtonReleaseEventHandler TouchButtonReleasedHandler;
 
@@ -24,12 +24,12 @@ namespace MyWidgetLibrary
             this.Visible = true;
             this.VisibleWindow = false;
 
-            this.ButtonColor = new MyColor ("red", 0.8);
+            this.ButtonColor = new MyColor ("pri", 0.9);
             this.Text = "";
-            this.TextColor = "black";
+            this.TextColor = new MyColor ("black");
             this.HeightRequest = 115;
             this.WidthRequest = 115;
-            this.clickAction = ButtonClickAction.NoTransparency;
+            this.clickAction = ButtonClickAction.Darken;
 
             this.ExposeEvent += onExpose;
             this.ButtonPressEvent += onTouchButtonPress;
@@ -45,7 +45,7 @@ namespace MyWidgetLibrary
 
                 //cr.Rectangle (left, top, width, height);
                 WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
-                cr.SetSourceRGBA (ButtonColor.R, ButtonColor.G, ButtonColor.B, ButtonColor.A);
+                ButtonColor.SetSource (cr);
                 cr.Fill ();
 
                 Pango.Layout l = new Pango.Layout (this.PangoContext);
@@ -53,7 +53,7 @@ namespace MyWidgetLibrary
                 l.Wrap = Pango.WrapMode.Word;
                 l.Alignment = Pango.Alignment.Center;
                 //l.SetText (ButtonLabel);
-                l.SetMarkup ("<span color=" + (char)34 + TextColor + (char)34 + ">" + Text + "</span>"); 
+                l.SetMarkup ("<span color=" + (char)34 + TextColor.ToHTML () + (char)34 + ">" + Text + "</span>"); 
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
                 //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, (top + (height / 2)) - 6, l);
                 GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
@@ -63,11 +63,11 @@ namespace MyWidgetLibrary
 
         protected void onTouchButtonPress (object o, ButtonPressEventArgs args) {
             if (clickAction == ButtonClickAction.NoTransparency)
-                ButtonColor.SetTemporaryAlpha (1.0f);
+                ButtonColor.ModifyAlpha (1.0f);
             else if (clickAction == ButtonClickAction.Brighten)
-                ButtonColor.ModifyColor (1.05f);
+                ButtonColor.ModifyColor (1.25);
             else if (clickAction == ButtonClickAction.Darken)
-                ButtonColor.ModifyColor (0.75f);
+                ButtonColor.ModifyColor (0.75);
 
             this.QueueDraw ();
         }

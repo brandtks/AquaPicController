@@ -1,17 +1,21 @@
 ﻿using System;
-using Gtk;
 using Cairo;
+using Gtk;
+using MyWidgetLibrary;
 
-namespace MyWidgetLibrary
+namespace AquaPic
 {
     public class MyNotificationBar : EventBox
     {
         private uint updateTimer;
+        private int currentScreen;
 
-        public MyNotificationBar () {
+        public MyNotificationBar (int currentScreen) {
             this.Visible = true;
             this.VisibleWindow = false;
             this.SetSizeRequest (800, 19);
+
+            this.currentScreen = currentScreen;
 
             this.updateTimer = GLib.Timeout.Add (1000, onTimer);
 
@@ -38,9 +42,13 @@ namespace MyWidgetLibrary
                 cr.ClosePath ();
 
                 Gradient pat = new LinearGradient (0, 19, 800, 19);
+                /*
                 pat.AddColorStop (0.0, new Color (0.15, 0.15, 0.15, 0.15));
                 pat.AddColorStop (0.5, new Color (0.95, 0.95, 0.95, 0.95));
-                pat.AddColorStop (1.0, new Color (0.15, 0.15, 0.15, 0.15));
+                pat.AddColorStop (1.0, new Color (0.15, 0.15, 0.15, 0.15));*/
+                pat.AddColorStop (0.0, MyColor.NewColor ("grey2", 0.35));
+                pat.AddColorStop (0.5,GuiGlobal.screenData [currentScreen].color.ToColor ());
+                pat.AddColorStop (1.0, MyColor.NewColor ("grey2", 0.35));
                 cr.SetSource (pat);
                 cr.Fill ();
                 pat.Dispose ();

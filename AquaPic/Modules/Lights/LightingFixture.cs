@@ -1,4 +1,5 @@
-﻿using AquaPic.Globals;
+﻿using System;
+using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.PowerDriver;
 using AquaPic.AlarmRuntime;
@@ -67,8 +68,8 @@ namespace AquaPic.LightingModule
                     return false;
 
                 TimeDate now = TimeDate.Now;
-                if ((onTime.compareTo (now) > 0) && (offTime.compareTo (now) < 0)) {
-                    //time is after on time and before off time
+                if ((now.CompareTo (onTime) > 0) && (now.CompareTo (offTime) < 0)) {
+                    //now is after on time and before off time
                     return true;
                 } else {
                     if (lightingOn == MyState.On) { // lights are on and are supposed to be off, update next on/off times

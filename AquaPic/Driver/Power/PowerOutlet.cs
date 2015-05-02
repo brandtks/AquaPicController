@@ -28,7 +28,7 @@ namespace AquaPic.PowerDriver
             public event ModeChangedHandler onAuto;
             public event ModeChangedHandler onManual;
 
-            public OutletData (string name, ConditionCheckHandler manualControl, OutputHandler outputTrue, OutputHandler outputFalse) {
+            public OutletData (string name, OutputHandler outputTrue, OutputHandler outputFalse) {
                 this.name = name;
                 this.currentState = MyState.Off;
                 this.manualState = MyState.Off;
@@ -38,7 +38,9 @@ namespace AquaPic.PowerDriver
                 this.wattPower = 0.0f;
                 this.powerFactor = 1.0f;
                 this.OutletControl = new Coil ();
-                this.OutletControl.ConditionChecker = manualControl;
+                this.OutletControl.ConditionChecker = delegate() {
+                    return false;
+                };
                 this.OutletControl.OutputTrue += outputTrue;
                 this.OutletControl.OutputFalse += outputFalse;
 

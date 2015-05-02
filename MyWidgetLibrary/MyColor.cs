@@ -16,58 +16,93 @@ namespace MyWidgetLibrary
         private float storedB;
         private float storedA;
 
+        private string colorName;
+        private string storedColorName;
+
         private static Dictionary<string, float[]> colorLookup = new Dictionary<string, float[]> () {
             { "red", new float [3] { 1.0f, 0.0f, 0.0f} },
             { "green", new float [3] { 0.0f, 1.0f, 0.0f} },
             { "blue", new float [3] { 0.0f, 0.0f, 1.0f} },
             { "yellow", new float [3] { 1.0f, 1.0f, 0.0f} },
             { "grey", new float [3] { 0.5f, 0.5f, 0.5f} },
-            { "dark grey", new float [3] { 0.2f, 0.2f, 0.2f} },
-            { "light grey", new float [3] { 0.75f, 0.75f, 0.75f} },
+            { "dgrey", new float [3] { 0.15f, 0.15f, 0.15f} },
+            { "lgrey", new float [3] { 0.85f, 0.85f, 0.85f} },
             { "black", new float [3] { 0.0f, 0.0f, 0.0f} },
-            { "white", new float [3] { 1.0f, 1.0f, 1.0f} }
+            { "white", new float [3] { 1.0f, 1.0f, 1.0f} },
+
+            { "pri", new float [3] { 0.40392f, 0.8902f, 0f} }, // greenish
+            { "seca", new float [3] { 0.00784f, 0.55686f, 0.60784f} }, // blueish
+            { "secc", new float [3] { 1f, 0.99216f, 0.25098f} }, // yellowish
+            { "secb", new float [3] { 1f, 0.60392f, 0.25098f} }, // orangish
+            { "compl", new float [3] { 0.89412f, 0f, 0.27059f} }, // pinkish
+            { "grey0", new float [3] { 0.15f, 0.15f, 0.15f} },
+            { "grey1", new float [3] { 0.35f, 0.35f, 0.35f} },
+            { "grey2", new float [3] { 0.50f, 0.50f, 0.50f} },
+            { "grey3", new float [3] { 0.70f, 0.70f, 0.70f} },
+            { "grey4", new float [3] { 0.85f, 0.85f, 0.85f} }
         };
 
         public MyColor (string color, double A = 1.0) {
             try {
-                string c = color.ToLower ();
-                this.R = colorLookup [c] [0];
-                this.G = colorLookup [c] [1];
-                this.B = colorLookup [c] [2];
+                colorName = color.ToLower ();
+                this.R = colorLookup [colorName] [0];
+                this.G = colorLookup [colorName] [1];
+                this.B = colorLookup [colorName] [2];
             } catch {
+                colorName = string.Empty;
                 this.R = 0.0f;
                 this.G = 0.0f;
                 this.B = 0.0f;
             }
 
             this.A = (float)A;
+
+            storedR = R;
+            storedG = G;
+            storedB = B;
+            storedA = this.A;
+            storedColorName = colorName;
         }
 
         public MyColor (double R, double G, double B, double A = 1.0) {
+            colorName = string.Empty;
             this.R = (float)R;
             this.G = (float)G;
             this.B = (float)B;
             this.A = (float)A;
+            storedR = this.R;
+            storedG = this.G;
+            storedB = this.B;
+            storedA = this.A;
+            storedColorName = colorName;
         }
 
         public MyColor (byte R, byte G, byte B, double A = 1.0) {
+            colorName = string.Empty;
             this.R = (float)(R/255);
             this.G = (float)(G/255);
             this.B = (float)(B/255);
             this.A = (float)A;
+            storedR = this.R;
+            storedG = this.G;
+            storedB = this.B;
+            storedA = this.A;
+            storedColorName = colorName;
         }
 
         public void ChangeColor (string color, double a = 1.0) {
             storedR = R;
             storedG = G;
             storedB = B;
+            storedColorName = colorName;
 
             try {
-                string c = color.ToLower ();
-                R = colorLookup [c] [0];
-                G = colorLookup [c] [1];
-                B = colorLookup [c] [2];
+                colorName = color.ToLower ();
+                R = colorLookup [colorName] [0];
+                G = colorLookup [colorName] [1];
+                B = colorLookup [colorName] [2];
             } catch {
+                colorName = storedColorName;
                 R = storedR;
                 G = storedG;
                 B = storedB;
@@ -87,7 +122,7 @@ namespace MyWidgetLibrary
             this.A = (float)a;
         }
 
-        public void SetTemporaryAlpha (double a) {
+        public void ModifyAlpha (double a) {
             storedA = A;
             A = (float)a;
         }
@@ -126,8 +161,40 @@ namespace MyWidgetLibrary
             return html;
         }
 
+        public static string ToHTML (string color) {
+            byte r, g, b;
+
+            try {
+                r = (byte)(colorLookup [color] [0] * 255);
+                g = (byte)(colorLookup [color] [1] * 255);
+                b = (byte)(colorLookup [color] [2] * 255);
+            } catch {
+                r = 0;
+                g = 0;
+                b = 0;
+            }
+
+            string html = string.Format ("#{0:X2}{1:X2}{2:X2}", r, g, b);
+            return html;
+        }
+
         public void SetSource (Context cr) {
-            cr.SetSourceRGB (R, G, B);
+            cr.SetSourceRGBA (R, G, B, A);
+        }
+
+        public static Color NewColor (string color, double a = 1.0) {
+            try {
+                double r = colorLookup [color] [0];
+                double g = colorLookup [color] [1];
+                double b = colorLookup [color] [2];
+                return new Color (r, g, b, a);
+            } catch {
+                return new Color (0.0, 0.0, 0.0);
+            }
+        }
+
+        public Color ToColor () {
+            return new Color (R, G, B, A);
         }
     }
 }

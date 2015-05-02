@@ -22,11 +22,6 @@ namespace AquaPic
 {
 	class MainClass
 	{
-        static int powerStrip1 = -1;
-        static int powerStrip2 = -1;
-        static int analogInputCard1 = -1;
-        static int analogOutputCard1 = -1;
-
         public static void Main (string[] args)
 		{
             Application.Init ();
@@ -39,14 +34,14 @@ namespace AquaPic
             Thread.Sleep (2000);
             #endif
 
-            powerStrip1 = Power.AddPowerStrip (16, "PS1", false);
-            powerStrip2 = Power.AddPowerStrip (17, "PS2", false);
+            int powerStrip1 = Power.AddPowerStrip (16, "PS1", false);
+            int powerStrip2 = Power.AddPowerStrip (17, "PS2", false);
 
             // Analog Input
-            analogInputCard1 = AnalogInput.AddCard (20, "AI1");
+            int analogInputCard1 = AnalogInput.AddCard (20, "AI1");
 
             // Analog Output
-            analogOutputCard1 = AnalogOutput.AddCard (30, "AQ1");
+            int analogOutputCard1 = AnalogOutput.AddCard (30, "AQ1");
 
             // Digital Input
             DigitalInput.AddCard (40, "DI1");
@@ -57,38 +52,35 @@ namespace AquaPic
             Temperature.AddHeater (powerStrip1, 7, "Top Heater");
 
             // Lighting
-            Lighting.AddLight (
+            int lightingID = Lighting.AddLight (
                 "White LED", 
                 powerStrip1, 
                 0,
-                0,
-                0,
                 analogOutputCard1,
                 0,
-                AnalogType.ZeroTen,
                 10.0f,
-                100.0f
+                75.0f
             );
-            Lighting.AddLight (
+            Lighting.SetupAutoOnOffTime (lightingID);
+
+            lightingID = Lighting.AddLight (
                 "Actinic LED", 
                 powerStrip1, 
-                1, 
-                -15, 
-                15,
+                1,
                 analogOutputCard1,
                 1,
-                AnalogType.ZeroTen,
                 10.0f,
-                100.0f
+                75.0f
             );
-            Lighting.AddLight (
+            Lighting.SetupAutoOnOffTime (lightingID, -15, 15);
+
+            lightingID = Lighting.AddLight (
                 "Refugium",
                 powerStrip1,
                 2,
-                0,
-                0,
                 LightingTime.Nighttime
             );
+            Lighting.SetupAutoOnOffTime (lightingID);
 
             /*
             Coil plugControl = Power.AddOutlet (powerStrip1, 5, "Test", MyState.On);

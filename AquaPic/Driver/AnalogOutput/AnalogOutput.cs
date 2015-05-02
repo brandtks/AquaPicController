@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AquaPic.Globals;
+using AquaPic.ValueRuntime;
 
 namespace AquaPic.AnalogOutputDriver
 {
@@ -14,18 +15,27 @@ namespace AquaPic.AnalogOutputDriver
             //cards = new List<AnalogOutputCard> ();
         //}
 
+        public static void Run () {
+            foreach (var card in cards) {
+                foreach (var channel in card.channels) {
+                    channel.ValueControl.Execute ();
+                }
+            }
+        }
+
         public static int AddCard (int address, string name) {
             int count = cards.Count;
             cards.Add (new AnalogOutputCard ((byte)address, (byte)count));
             return count;
         }
 
-        public static void AddChannel (IndividualControl channel, AnalogType type, string name) {
-            cards [channel.Group].AddChannel (channel.Individual, type, name);
+        public static Value AddChannel (IndividualControl channel, AnalogType type, string name) {
+            return AddChannel (channel.Group, channel.Individual, type, name);
         }
 
-        public static void AddChannel (int cardID, int channelID, AnalogType type, string name) {
+        public static Value AddChannel (int cardID, int channelID, AnalogType type, string name) {
             cards [cardID].AddChannel (channelID, type, name);
+            return cards [cardID].channels [channelID].ValueControl;
         }
 
         public static void SetAnalogValue (IndividualControl channel, int value) {
