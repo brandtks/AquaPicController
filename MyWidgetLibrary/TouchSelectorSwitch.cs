@@ -79,9 +79,9 @@ namespace MyWidgetLibrary
                 this.HeightRequest = 80;
             }
 
-            this.ExposeEvent += onExpose;
-            this.ButtonPressEvent += onSelectorPress;
-            this.ButtonReleaseEvent += onSelectorRelease;
+            this.ExposeEvent += OnExpose;
+            this.ButtonPressEvent += OnSelectorPress;
+            this.ButtonReleaseEvent += OnSelectorRelease;
         }
 
         public TouchSelectorSwitch () : this (0, 2, 0, MyOrientation.Horizontal) { }
@@ -104,7 +104,7 @@ namespace MyWidgetLibrary
 //            TextOptions [selectionIndex] = name;
 //        }
 
-        protected void onExpose (object sender, ExposeEventArgs args) {
+        protected void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 int height = Allocation.Height;
                 int width = Allocation.Width;
@@ -210,7 +210,7 @@ namespace MyWidgetLibrary
             }
         }
 
-        protected void onSelectorPress (object o, ButtonPressEventArgs args) {
+        protected void OnSelectorPress (object o, ButtonPressEventArgs args) {
             clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
             clicked = true;
 
@@ -220,7 +220,7 @@ namespace MyWidgetLibrary
                 click1 = (int)args.Event.Y;
         }
 
-        protected void onSelectorRelease (object o, ButtonReleaseEventArgs args) {
+        protected void OnSelectorRelease (object o, ButtonReleaseEventArgs args) {
             clicked = false;
 
             if (Orientation == MyOrientation.Horizontal) {

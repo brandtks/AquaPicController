@@ -151,9 +151,9 @@ namespace AquaPic.SerialBus
                                 fs.Write (wb, 0, wb.Length);
                             }
                             fileOpen = true;
-                        } catch (Exception ex) {
-                            Console.WriteLine ("An exception happened");
-                            Console.WriteLine (ex.ToString ());
+                        } catch {
+                            Console.WriteLine ("File is most likely being read");
+                            //Console.WriteLine (ex.ToString ());
                             Thread.Sleep (1000);
                         }
                     } while (!fileOpen);
@@ -188,8 +188,8 @@ namespace AquaPic.SerialBus
 
                             if (!fileOpen)
                                 Thread.Sleep (1000);
-                        } catch (Exception ex) {
-                            Console.WriteLine ("An exception happened");
+                        } catch {
+                            Console.WriteLine ("File is most likely being read");
                             //Console.WriteLine (ex.ToString ());
                             Thread.Sleep (1000);
                         }

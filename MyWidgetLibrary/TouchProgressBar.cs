@@ -46,8 +46,9 @@ namespace MyWidgetLibrary
             this.ButtonReleaseEvent += OnProgressBarRelease;
         }
 
-        public TouchProgressBar () :
-        this (new MyColor ("light grey"), new MyColor ("green"), 0.0f, false, MyOrientation.Vertical) { }
+        public TouchProgressBar () 
+            : this (new MyColor ("grey4"), new MyColor ("pri"), 0.0f, false, MyOrientation.Vertical) { 
+        }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {

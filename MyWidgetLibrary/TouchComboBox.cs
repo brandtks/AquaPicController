@@ -30,7 +30,7 @@ namespace MyWidgetLibrary
         private int height;
         private int secondClick;
 
-        public event ComboBoxChangedEventHandler Changed;
+        public event ComboBoxChangedEventHandler ChangedEvent;
 
         public TouchComboBox () {
             this.Visible = true;
@@ -41,11 +41,11 @@ namespace MyWidgetLibrary
             this.listDropdown = false;
             this.timer = 0;
             this.highlighted = 0;
-            this.height = 25;
+            this.height = 30;
             this.secondClick = 0;
 
             this.WidthRequest = 175;
-            this.HeightRequest = 25;
+            this.HeightRequest = height;
 
             this.ExposeEvent += OnExpose;
             this.ButtonPressEvent += OnComboBoxPressed;
@@ -66,9 +66,9 @@ namespace MyWidgetLibrary
                 if (listDropdown) {
                     int listHeight;
                     if (List.Count > 0)
-                        listHeight = List.Count * 25 + height;
+                        listHeight = List.Count * 30 + height;
                     else
-                        listHeight = 25 + height;
+                        listHeight = 30 + height;
 
                     this.HeightRequest = listHeight;
 
@@ -91,7 +91,7 @@ namespace MyWidgetLibrary
                     if (highlighted != -1) {
                         int y = top + height + (height * highlighted);
                         cr.Rectangle (left + 1, y + 1, width - 2, height - 2);
-                        cr.SetSourceRGB (0.65, 0.65, 0.65);
+                        MyColor.SetSource (cr, "pri");
                         cr.Fill ();
                     }
 
@@ -100,7 +100,7 @@ namespace MyWidgetLibrary
                     l.Alignment = Pango.Alignment.Left;
                     l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
                     for (int i = 0; i < List.Count; ++i) {
-                        int y = top + height + 5 + (height * i);
+                        int y = top + height + 6 + (height * i);
                         l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + List [i] + "</span>"); 
                         GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, y, l);
                     }
@@ -109,7 +109,7 @@ namespace MyWidgetLibrary
                 } else {
                     this.HeightRequest = 30;
 
-                    WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, height / 2);
+                    WidgetGlobal.DrawRoundedRectangle (cr, left, top, width - 2, height, height / 2);
                     cr.SetSourceRGB (0.85, 0.85, 0.85);
                     cr.FillPreserve ();
                     cr.LineWidth = 0.85;
@@ -134,7 +134,7 @@ namespace MyWidgetLibrary
                     l.Alignment = Pango.Alignment.Left;
                     l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
                     l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
-                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, top + 4, l);
+                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, top + 6, l);
                     l.Dispose ();
                 }
             }
@@ -152,7 +152,11 @@ namespace MyWidgetLibrary
                 cr.Arc (x + radius, top + radius, radius, -Math.PI / 2, Math.PI / 2);
             cr.LineTo (x, top + height);
             cr.ClosePath ();
-            cr.SetSourceRGB (0.35, 0.35, 0.35);
+
+            if (listDropdown)
+                MyColor.SetSource (cr, "grey2");
+            else
+                MyColor.SetSource (cr, "grey1");
             cr.FillPreserve ();
             cr.LineWidth = 0.85;
             cr.SetSourceRGB (0.0, 0.0, 0.0);
@@ -166,10 +170,7 @@ namespace MyWidgetLibrary
             cr.LineTo (x + triSize, y);
             cr.LineTo (x + triSize / 2, y + triSize);
             cr.ClosePath ();
-            if (listDropdown)
-                cr.SetSourceRGB (0.65, 0.65, 0.65);
-            else
-                cr.SetSourceRGB (0.85, 0.85, 0.85);
+            MyColor.SetSource (cr, "seca");
             cr.Fill ();
         }
 
@@ -194,8 +195,8 @@ namespace MyWidgetLibrary
                     if ((y >= topWindow) && (y <= bottomWindow)) {
                         Active = i;
                         listDropdown = false;
-                        if (Changed != null)
-                            Changed (this, new ComboBoxChangedEventArgs (Active, List [Active]));
+                        if (ChangedEvent != null)
+                            ChangedEvent (this, new ComboBoxChangedEventArgs (Active, List [Active]));
                         QueueDraw ();
                         break;
                     }

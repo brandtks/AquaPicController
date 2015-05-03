@@ -7,7 +7,7 @@ namespace MyWidgetLibrary
     public class TouchLabel : EventBox
     {
         public string Text;
-        public MyColor FontColor;
+        public MyColor TextColor;
         public int FontSize;
         public Justify Justification;
 
@@ -16,7 +16,7 @@ namespace MyWidgetLibrary
             this.VisibleWindow = false;
 
             this.Text = null;
-            this.FontColor = new MyColor ("black");
+            this.TextColor = new MyColor ("black");
             this.FontSize = 11;
             this.Justification = Justify.Left;
 
@@ -31,7 +31,7 @@ namespace MyWidgetLibrary
                 Pango.Layout l = new Pango.Layout (PangoContext);
                 l.Wrap = Pango.WrapMode.WordChar;
                 l.Alignment = Pango.Alignment.Left;
-                l.SetMarkup ("<span color=" + (char)34 + FontColor.ToHTML () + (char)34 + ">" + Text + "</span>"); 
+                l.SetMarkup ("<span color=" + (char)34 + TextColor.ToHTML () + (char)34 + ">" + Text + "</span>"); 
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New " + FontSize.ToString ());
 
                 if (Justification == Justify.Right) {

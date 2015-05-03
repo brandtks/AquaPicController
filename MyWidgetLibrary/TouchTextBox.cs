@@ -51,9 +51,11 @@ namespace MyWidgetLibrary
                     l.Width = Pango.Units.FromPixels (width - 5);
                 } else if (Justification == Justify.Center)
                     l.Alignment = Pango.Alignment.Center;
-                l.SetMarkup ("<span color=" + (char)34 + FontColor.ToHTML () + (char)34 + ">" + Text + "</span>"); 
+                l.SetMarkup ("<span color=\"" + FontColor.ToHTML () + "\">" 
+                    + Text 
+                    + "</span>");
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New " + FontSize.ToString ());
-                GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left, top + 5, l);
+                GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left, top + 6, l);
                 l.Dispose ();
             }
         }

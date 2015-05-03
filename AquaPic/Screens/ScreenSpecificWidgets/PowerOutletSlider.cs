@@ -29,10 +29,10 @@ namespace AquaPic
             Status = "Off";
             StatusColor = new MyColor ("grey4");
 
-            ExposeEvent += OnExpose;
+            ExposeEvent += OnOutletExpose;
         }
 
-        protected void OnExpose (object sender, ExposeEventArgs args) {
+        protected void OnOutletExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 int seperation = Allocation.Width / SelectionCount;
                 int x = Allocation.Left;

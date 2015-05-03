@@ -10,37 +10,58 @@ namespace AquaPic.LightingModule
         //public static Lighting Main = new Lighting ();
 
         private static List<LightingFixture> fixtures;
-        public static TimeDate SunRiseToday;
-        public static TimeDate SunSetToday;
-        public static TimeDate SunRiseTomorrow;
-        public static TimeDate SunSetTomorrow;
+        public static TimeDate sunRiseToday;
+        public static TimeDate sunSetToday;
+        public static TimeDate sunRiseTomorrow;
+        public static TimeDate sunSetTomorrow;
 
-        public static Time MinSunRise;
-        public static Time MaxSunRise;
+        public static Time minSunRise;
+        public static Time maxSunRise;
 
-        public static Time MinSunSet;
-        public static Time MaxSunSet;
+        public static Time minSunSet;
+        public static Time mMaxSunSet;
 
-        public static Time DefaultSunRise;
-        public static Time DefaultSunSet;
+        public static Time defaultSunRise;
+        public static Time defaultSunSet;
 
         static Lighting () {
             fixtures = new List<LightingFixture> ();
-            RiseSetCalc.GetRiseSetTimes (out SunRiseToday, out SunSetToday);
-            SunRiseTomorrow = RiseSetCalc.GetRiseTimeTomorrow ();
-            SunSetTomorrow = RiseSetCalc.GetSetTimeTomorrow ();
 
-            MinSunRise = new Time (6, 30, 0);
-            MaxSunSet = new Time (7, 45, 0);
+            minSunRise = new Time (7, 00, 0);
+            maxSunRise = new Time (7, 45, 0);
 
-            MinSunSet = new Time (19, 30, 0);
-            MaxSunSet = new Time (21, 00, 0);
+            minSunSet = new Time (19, 30, 0);
+            mMaxSunSet = new Time (21, 00, 0);
 
-            DefaultSunRise = new Time (7, 30, 0);
-            DefaultSunSet = new Time (20, 30, 0);
+            defaultSunRise = new Time (7, 30, 0);
+            defaultSunSet = new Time (20, 30, 0);
+
+            RiseSetCalc.GetRiseSetTimes (out sunRiseToday, out sunSetToday);
+            sunRiseTomorrow = RiseSetCalc.GetRiseTimeTomorrow ();
+            sunSetTomorrow = RiseSetCalc.GetSetTimeTomorrow ();
+
+            if (sunRiseToday.CompareToTime (minSunRise) < 0) // sunrise is before minimum
+                sunRiseToday.SetTime (minSunRise);
+            if (sunRiseToday.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
+                sunRiseToday.SetTime (maxSunRise);
+
+            if (sunSetToday.CompareToTime (minSunSet) < 0) // sunset is before minimum
+                sunSetToday.SetTime (minSunSet);
+            if (sunSetToday.CompareToTime (mMaxSunSet) > 0) // sunset is after maximum
+                sunSetToday.SetTime (mMaxSunSet);
+
+            if (sunRiseTomorrow.CompareToTime (minSunRise) < 0) // sunrise is before minimum
+                sunRiseTomorrow.SetTime (minSunRise);
+            if (sunRiseTomorrow.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
+                sunRiseTomorrow.SetTime (maxSunRise);
+
+            if (sunSetTomorrow.CompareToTime (minSunSet) < 0) // sunset is before minimum
+                sunSetTomorrow.SetTime (minSunSet);
+            if (sunSetTomorrow.CompareToTime (mMaxSunSet) > 0) // sunset is after maximum
+                sunSetTomorrow.SetTime (mMaxSunSet);
         }
 
-        /*
+        /* Might add reading file for min and max times and default times
         public static void Init () {
             RiseSetCalc.GetRiseSetTimes (out SunRiseToday, out SunSetToday);
             RiseSetCalc.GetRiseTimeTomorrow (out SunRiseTomorrow);
@@ -57,11 +78,11 @@ namespace AquaPic.LightingModule
             Time onTime, offTime;
 
             if (lightingTime == LightingTime.Daytime) {
-                onTime = DefaultSunRise;
-                offTime = DefaultSunSet;
+                onTime = defaultSunRise;
+                offTime = defaultSunSet;
             } else {
-                onTime = DefaultSunSet;
-                offTime = DefaultSunRise;
+                onTime = defaultSunSet;
+                offTime = defaultSunRise;
             }
 
             fixtures.Add (new LightingFixture (
@@ -91,11 +112,11 @@ namespace AquaPic.LightingModule
             Time onTime, offTime;
 
             if (lightingTime == LightingTime.Daytime) {
-                onTime = DefaultSunRise;
-                offTime = DefaultSunSet;
+                onTime = defaultSunRise;
+                offTime = defaultSunSet;
             } else {
-                onTime = DefaultSunSet;
-                offTime = DefaultSunRise;
+                onTime = defaultSunSet;
+                offTime = defaultSunRise;
             }
 
             fixtures.Add (new DimmingLightingFixture (
@@ -127,66 +148,59 @@ namespace AquaPic.LightingModule
             light.mode = Mode.Auto;
 
             TimeDate now = TimeDate.Now;
-            if ((now.CompareTo (SunRiseToday) > 0) && (now.CompareTo (SunSetToday) < 0)) {
+            if ((now.CompareTo (sunRiseToday) > 0) && (now.CompareTo (sunSetToday) < 0)) {
                 // time is after sunrise but before sunset so normal daytime
                 if (light.lightingTime == LightingTime.Daytime) { 
-                    light.SetOnTime (SunRiseToday);
-                    light.SetOffTime (SunSetToday);
+                    light.SetOnTime (sunRiseToday);
+                    light.SetOffTime (sunSetToday);
                 } else {
-                    light.SetOnTime (SunSetToday);
-                    light.SetOffTime (SunRiseTomorrow);
+                    light.SetOnTime (sunSetToday);
+                    light.SetOffTime (sunRiseTomorrow);
                 }
-            } else if (now.CompareTo (SunRiseToday) < 0) { // time is before sunrise today
+            } else if (now.CompareTo (sunRiseToday) < 0) { // time is before sunrise today
                 if (light.lightingTime == LightingTime.Daytime) { 
                     // lights are supposed to be off, no special funny business required
-                    light.SetOnTime (SunRiseToday);
-                    light.SetOffTime (SunSetToday);
+                    light.SetOnTime (sunRiseToday);
+                    light.SetOffTime (sunSetToday);
                 } else { // lights are supposed to be on, a little funny bussiness is required
                     light.onTime = now; // no need to worry about offset
-                    light.SetOffTime (SunRiseToday); // night time lighting turns off at sunrise
+                    light.SetOffTime (sunRiseToday); // night time lighting turns off at sunrise
                 }
             } else { // time is after sunrise
                 if (light.lightingTime == LightingTime.Daytime) { 
-                    light.SetOnTime (SunRiseTomorrow);
-                    light.SetOffTime (SunRiseTomorrow);
+                    light.SetOnTime (sunRiseTomorrow);
+                    light.SetOffTime (sunRiseTomorrow);
                 } else {
-                    light.SetOnTime (SunSetToday);
-                    light.SetOffTime (SunRiseTomorrow);
+                    light.SetOnTime (sunSetToday);
+                    light.SetOffTime (sunRiseTomorrow);
                 }
             }
         }
 
         public static void AtMidnight () {
-            RiseSetCalc.GetRiseSetTimes (out SunRiseToday, out SunSetToday);
-            SunRiseTomorrow = RiseSetCalc.GetRiseTimeTomorrow ();
-            SunSetTomorrow = RiseSetCalc.GetSetTimeTomorrow ();
+            RiseSetCalc.GetRiseSetTimes (out sunRiseToday, out sunSetToday);
+            sunRiseTomorrow = RiseSetCalc.GetRiseTimeTomorrow ();
+            sunSetTomorrow = RiseSetCalc.GetSetTimeTomorrow ();
 
-            if (SunRiseToday.CompareToTime (MinSunRise) < 0) // sunrise is before minimum
-                SunRiseToday.SetTime (MinSunRise);
-            else if (SunRiseToday.CompareToTime (MaxSunRise) > 0) // sunrise is after maximum
-                SunRiseToday.SetTime (MaxSunRise);
+            if (sunRiseToday.CompareToTime (minSunRise) < 0) // sunrise is before minimum
+                sunRiseToday.SetTime (minSunRise);
+            else if (sunRiseToday.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
+                sunRiseToday.SetTime (maxSunRise);
 
-            if (SunSetToday.CompareToTime (MinSunSet) < 0) // sunset is before minimum
-                SunSetToday.SetTime (MinSunSet);
-            else if (SunSetToday.CompareToTime (MaxSunSet) > 0) // sunset is after maximum
-                SunSetToday.SetTime (MaxSunSet);
+            if (sunSetToday.CompareToTime (minSunSet) < 0) // sunset is before minimum
+                sunSetToday.SetTime (minSunSet);
+            else if (sunSetToday.CompareToTime (mMaxSunSet) > 0) // sunset is after maximum
+                sunSetToday.SetTime (mMaxSunSet);
 
-            if (SunRiseTomorrow.CompareToTime (MinSunRise) < 0) // sunrise is before minimum
-                SunRiseTomorrow.SetTime (MinSunRise);
-            else if (SunRiseTomorrow.CompareToTime (MaxSunRise) > 0) // sunrise is after maximum
-                SunRiseTomorrow.SetTime (MaxSunRise);
+            if (sunRiseTomorrow.CompareToTime (minSunRise) < 0) // sunrise is before minimum
+                sunRiseTomorrow.SetTime (minSunRise);
+            else if (sunRiseTomorrow.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
+                sunRiseTomorrow.SetTime (maxSunRise);
 
-            if (SunSetTomorrow.CompareToTime (MinSunSet) < 0) // sunset is before minimum
-                SunSetTomorrow.SetTime (MinSunSet);
-            else if (SunSetTomorrow.CompareToTime (MaxSunSet) > 0) // sunset is after maximum
-                SunSetTomorrow.SetTime (MaxSunSet);
-
-            // update on/off time for daytime lighting
-            /*
-            foreach (var fixture in fixtures) {
-                if (fixture.lightingTime == LightingTime.Daytime)
-                    fixture.SetOnOffTime (SunRiseToday, SunSetToday);
-            }*/
+            if (sunSetTomorrow.CompareToTime (minSunSet) < 0) // sunset is before minimum
+                sunSetTomorrow.SetTime (minSunSet);
+            else if (sunSetTomorrow.CompareToTime (mMaxSunSet) > 0) // sunset is after maximum
+                sunSetTomorrow.SetTime (mMaxSunSet);
         }
 
         public static int GetLightIndex (string name) {
@@ -196,111 +210,32 @@ namespace AquaPic.LightingModule
             }
             return -1;
         }
-    }
-}
 
-/* OLD STUFF
-public static int AddLight (string name,
-                            int powerID,
-                            int plugID,         
-                            int onTimeOffsetMinutes, 
-                            int offTimeOffsetMinutes,
-                            Time minOnTime = new Time (7, 0, 0),
-                            Time maxOnTime = new Time (7, 30, 0),
-                            Time minOffTime = new Time (19, 0, 0),
-                            Time maxOffTime = new Time (21, 0, 0),
-                            LightingTime lightingTime = LightingTime.Daytime,
-                            bool highTempLockout = true) 
-{
-    int count = fixtures.Count;
-    fixtures.Add (
-        new LightingFixture ((byte)powerID, 
-                             (byte)plugID, 
-                             name, 
-                             onTimeOffsetMinutes, 
-                             offTimeOffsetMinutes, 
-                             minOnTime,
-                             maxOnTime,
-                             minOffTime,
-                             maxOffTime,
-                             lightingTime,
-                             highTempLockout));
+        public static string[] GetAllFixtureNames () {
+            string[] names = new string[fixtures.Count];
+            for (int i = 0; i < fixtures.Count; ++i)
+                names [i] = fixtures [i].name;
+            return names;
+        }
 
-    if (fixtures [count].lightingTime == LightingTime.Daytime)
-        fixtures [count].SetOnOffTime (SunRiseToday, SunSetToday);
-    else
-        fixtures [count].SetOnOffTime (SunSetToday, SunRiseTomorrow);
+        public static float GetCurrentDimmingLevel (int fixtureID) {
+            if (fixtures [fixtureID] is DimmingLightingFixture) {
+                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                return fixture.currentDimmingLevel;
+            }
+            return 0.0f;
+        }
 
-    return count;
-}
+        public static Mode GetDimmingMode (int fixtureID) {
+            if (fixtures [fixtureID] is DimmingLightingFixture) {
+                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                return fixture.dimmingMode;
+            }
+            return Mode.Manual;
+        }
 
-public static int AddLight (string name,  
-                            int powerID,
-                            int plugID,
-                            int onTimeOffsetMinutes, 
-                            int offTimeOffsetMinutes,
-                            int cardID,
-                            int channelID,
-                            AnalogType type,
-                            float minDimmingOutput,
-                            float maxDimmingOutput,
-                            Time minOnTime = new Time (7, 0, 0),
-                            Time maxOnTime = new Time (7, 30, 0),
-                            Time minOffTime = new Time (19, 0, 0),
-                            Time maxOffTime = new Time (21, 0, 0),
-                            LightingTime lightingTime = LightingTime.Daytime,
-                            bool highTempLockout = true) 
-{
-    int count = fixtures.Count;
-    fixtures.Add (
-        new DimmingLightingFixture ((byte)powerID, 
-                                    (byte)plugID,
-                                    (byte)cardID,
-                                    (byte)channelID,
-                                    type,
-                                    name, 
-                                    onTimeOffsetMinutes, 
-                                    offTimeOffsetMinutes, 
-                                    minOnTime,
-                                    maxOnTime,
-                                    minOffTime,
-                                    maxOffTime,
-                                    minDimmingOutput,
-                                    maxDimmingOutput,
-                                    lightingTime,
-                                    highTempLockout));
-
-    if (fixtures [count].lightingTime == LightingTime.Daytime)
-        fixtures [count].SetOnOffTime (SunRiseToday, SunSetToday);
-    else
-        fixtures [count].SetOnOffTime (SunSetToday, SunRiseTomorrow);
-
-    return count;
-}
-
-public static void Run () {
-    TimeDate now = TimeDate.Now;
-
-    foreach (var fixture in fixtures) {
-        var obj = fixture as DimmingLightingFixture;
-            if (obj != null) {
-                if ((obj.lightingOn == MyState.On) && (obj.mode == Mode.Auto))
-                    obj.SetDimmingLevel (
-                        Utils.CalcParabola (
-                            obj.timeOn, 
-                            obj.timeOff, 
-                            now, 
-                            obj.minDimmingOutput, 
-                            obj.maxDimmingOutput
-                        ));
+        public static bool IsDimmingFixture (int fixtureID) {
+            return fixtures [fixtureID] is DimmingLightingFixture;
         }
     }
 }
-
-public static void AtSunrise () {
-    // update on/off time for nighttime lighting
-    foreach (var fixture in fixtures) {
-        if (fixture.lightingTime == LightingTime.Nighttime)
-            fixture.SetOnOffTime (SunSetToday, SunRiseTomorrow);
-        }
-}*/

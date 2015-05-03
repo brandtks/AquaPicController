@@ -18,11 +18,11 @@ namespace AquaPic.LightingModule
             public TimeDate onTime;
             public TimeDate offTime;
             public LightingTime lightingTime;
-            public Mode mode;
             public MyState lightingOn;
             public bool highTempLockout;
             public IndividualControl plug;
             public Coil plugControl;
+            public Mode mode;
 
             public LightingFixture (
                 string name, 
@@ -46,10 +46,10 @@ namespace AquaPic.LightingModule
 
                 this.highTempLockout = highTempLockout;
 
+                mode = Mode.Manual;
+
                 onTimeOffset = 0;
                 offTimeOffset = 0;
-
-                mode = Mode.Manual;
 
                 lightingOn = MyState.Off;
 
@@ -72,16 +72,18 @@ namespace AquaPic.LightingModule
                     //now is after on time and before off time
                     return true;
                 } else {
-                    if (lightingOn == MyState.On) { // lights are on and are supposed to be off, update next on/off times
-                        if (lightingTime == LightingTime.Daytime) {
-                            // its dusk and daytime lighting on/off time is rise and set tomorrow respectfully
-                            SetOnTime (SunRiseTomorrow);
-                            SetOffTime (SunSetTomorrow);
-                        } else { // lighting time is nighttime
-                            // its dawn and nighttime lighting on/off time is set today because we're already on the current day,
-                            // and rise time tomorrow respectfully
-                            SetOnTime (SunSetToday);
-                            SetOffTime (SunRiseTomorrow);
+                    if (mode == Mode.Auto) { // only update times if mode is auto
+                        if (lightingOn == MyState.On) { // lights are on and are supposed to be off, update next on/off times
+                            if (lightingTime == LightingTime.Daytime) {
+                                // its dusk and daytime lighting on/off time is rise and set tomorrow respectfully
+                                SetOnTime (sunRiseTomorrow);
+                                SetOffTime (sunSetTomorrow);
+                            } else { // lighting time is nighttime
+                                // its dawn and nighttime lighting on/off time is set today because we're already on the current day,
+                                // and rise time tomorrow respectfully
+                                SetOnTime (sunSetToday);
+                                SetOffTime (sunRiseTomorrow);
+                            }
                         }
                     }
                     return false;
@@ -93,12 +95,12 @@ namespace AquaPic.LightingModule
             }
 
             public void SetOnTime (TimeDate newOnTime) {
-                onTime = newOnTime;
+                onTime.SetTimeDate (newOnTime);
                 onTime.AddMinutes (onTimeOffset);
             }
 
             public void SetOffTime (TimeDate newOffTime) {
-                offTime = newOffTime;
+                offTime.SetTimeDate (newOffTime);
                 offTime.AddMinutes (offTimeOffset);
             }
     	}

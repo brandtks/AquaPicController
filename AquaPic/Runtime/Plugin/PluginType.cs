@@ -27,10 +27,10 @@ namespace AquaPic.PluginRuntime
             this.path = path;
 
             try {
-                Console.WriteLine ("Compiling " + this.name);
+                //Console.WriteLine ("Compiling " + this.name);
                 pluginAssembly = Plugin.CompileCode (ref compiled, this.name, this.path);
             } catch {
-                Console.WriteLine ("failed compiling " + this.name);
+                //Console.WriteLine ("failed compiling " + this.name);
                 compiled = false;
             }
         }

@@ -26,6 +26,10 @@ namespace AquaPic.Utilites
             : this (hours, mins, secs, 0) {
         }
 
+        public Time (byte hours, byte mins)
+            : this (hours, mins, 0, 0) {
+        }
+
         public Time (TimeSpan value) 
             : this ((byte)value.Hours, (byte)value.Minutes, (byte)value.Seconds, (byte)value.Milliseconds) {
         }
@@ -39,17 +43,17 @@ namespace AquaPic.Utilites
         }
 
         public void SetTime (TimeSpan value) {
-			hour = (byte)value.Hours;
-			min = (byte)value.Minutes;
-			sec = (byte)value.Seconds;
-			millisec = (byte)value.Milliseconds;
+			this.hour = (byte)value.Hours;
+			this.min = (byte)value.Minutes;
+			this.sec = (byte)value.Seconds;
+			this.millisec = (byte)value.Milliseconds;
         }
 
         public void SetTime (Time value) {
-            hour = value.hour;
-            min = value.min;
-            sec = value.sec;
-            millisec = value.millisec;
+            this.hour = value.hour;
+            this.min = value.min;
+            this.sec = value.sec;
+            this.millisec = value.millisec;
         }
 
         public TimeSpan toTimeSpan () {
@@ -58,7 +62,7 @@ namespace AquaPic.Utilites
         }
 
         public int CompareToTime (Time value) {
-            return TimeSpan.Compare (value.toTimeSpan (), toTimeSpan ());
+            return TimeSpan.Compare (toTimeSpan (), value.toTimeSpan ());
         }
 
         public void AddMinutes (int value) {

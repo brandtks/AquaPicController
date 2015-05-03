@@ -182,6 +182,22 @@ namespace MyWidgetLibrary
             cr.SetSourceRGBA (R, G, B, A);
         }
 
+        public static void SetSource (Context cr, string color, double a = 1.0) {
+            double r, g, b;
+
+            try {
+                r = colorLookup [color] [0];
+                g = colorLookup [color] [1];
+                b = colorLookup [color] [2];
+            } catch {
+                r = 0.0;
+                g = 0.0;
+                b = 0.0;
+            }
+
+            cr.SetSourceRGBA (r, g, b, a);
+        }
+
         public static Color NewColor (string color, double a = 1.0) {
             try {
                 double r = colorLookup [color] [0];

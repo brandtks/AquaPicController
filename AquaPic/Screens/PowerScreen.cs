@@ -15,9 +15,15 @@ namespace AquaPic
         private TouchComboBox combo;
 
         public PowerWindow (MenuReleaseHandler OnMenuRelease) : base (1, OnMenuRelease) {
+            MyBox box1 = new MyBox (780, 395);
+            Put (box1, 10, 30);
+            box1.Show ();
+
             powerID = 0;
 
             int x, y;
+            IndividualControl ic;
+            ic.Group = (byte)powerID;
             selectors = new PowerOutletSlider[8];
             for (int i = 0; i < 8; ++i) {
                 selectors [i] = new PowerOutletSlider (i);
@@ -29,23 +35,37 @@ namespace AquaPic
                     y = 140;
                 } else {
                     x = ((i - 4) * 180) + 40;
-                    y = 200;
+                    y = 240;
                 }
                 Put (selectors [i], x, y);
 
                 selectors [i].Show ();
+
+                ic.Individual = (byte)i;
+                Power.AddHandlerOnStateChange (ic, PlugStateChange);
             }
 
             string[] pwrNames = Power.GetAllPowerStripNames ();
             combo = new TouchComboBox (pwrNames);
             combo.Active = powerID;
-            combo.Changed += OnComboChanged;
-            Put (combo, 620, 25);
+            combo.ChangedEvent += OnComboChanged;
+            Put (combo, 610, 35);
             combo.Show ();
 
             GetPowerData ();
 
             Show ();
+        }
+
+        public override void Dispose () {
+            IndividualControl ic;
+            ic.Group = (byte)powerID;
+            for (int i = 0; i < selectors.Length; ++i) {
+                ic.Individual = (byte)i;
+                Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
+            }
+
+            base.Dispose ();
         }
 
         protected void GetPowerData () {
@@ -87,8 +107,10 @@ namespace AquaPic
                     ic.Individual = (byte)i;
                     Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
                 }
+
                 powerID = id;
                 GetPowerData ();
+
                 ic.Group = (byte)powerID;
                 for (int i = 0; i < selectors.Length; ++i) {
                     ic.Individual = (byte)i;
@@ -117,14 +139,22 @@ namespace AquaPic
 
         protected void PlugStateChange (object sender, StateChangeEventArgs args) {
             if (args.powerID == powerID) {
-                if (args.mode == Mode.Auto) {
-                    if (args.state == MyState.On) {
-                        selectors [args.outletID].SliderColorOptions [1].ChangeColor ("pri");
-                    } else {
-                        selectors [args.outletID].SliderColorOptions [1].ChangeColor ("grey4");
-                    }
+
+                if (args.state == MyState.On) {
+                    selectors [args.outletID].Status = "On";
+                    selectors [args.outletID].StatusColor.ChangeColor ("secb");
+                } else {
+                    selectors [args.outletID].Status = "Off";
+                    selectors [args.outletID].StatusColor.ChangeColor("grey4");
                 }
-                selectors [args.outletID].QueueDraw ();
+
+                // have to call QueueDrawArea because there is text that needs to be draw
+                // outside the widgets allocated area
+                selectors [args.outletID].QueueDrawArea (
+                    Allocation.Left, 
+                    Allocation.Top - 10, 
+                    Allocation.Width, 
+                    Allocation.Height + 10);
             }
         }
     }

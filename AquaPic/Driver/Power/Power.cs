@@ -155,17 +155,17 @@ namespace AquaPic.PowerDriver
             return false;
         }
 
-        public static string GetApbStatus (int powerID) {
-            return Utils.GetDescription (pwrStrips [powerID].slave.Status);
-        }
-
-        public static int GetApbResponseTime (int powerID) {
-            return pwrStrips [powerID].slave.ResponeTime;
-        }
-
-        public static int GetApbAddress (int powerID) {
-            return pwrStrips [powerID].slave.Address;
-        }
+//        public static string GetApbStatus (int powerID) {
+//            return Utils.GetDescription (pwrStrips [powerID].slave.Status);
+//        }
+//
+//        public static int GetApbResponseTime (int powerID) {
+//            return pwrStrips [powerID].slave.ResponeTime;
+//        }
+//
+//        public static int GetApbAddress (int powerID) {
+//            return pwrStrips [powerID].slave.Address;
+//        }
 
         public static void AddHandlerOnAuto (IndividualControl outlet, ModeChangedHandler handler) {
             pwrStrips [outlet.Group].Outlets [outlet.Individual].onAuto += handler;

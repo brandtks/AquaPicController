@@ -33,13 +33,13 @@ namespace AquaPic
         protected void onExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 int x = 0;
-                int width = 133;
+                int width = 134;
 
                 for (int i = 0; i < GuiGlobal.screenData.Count; ++i) {
-                    if ((x == 0) || (x == (GuiGlobal.screenData.Count - 1)))
-                        width = 134;
-                    else
-                        width = 133;
+//                    if ((x == 1) || (x == (GuiGlobal.screenData.Count - 1)))
+//                        width = 134;
+//                    else
+//                        width = 133;
 
                     if ((i == currentScreen) || (menuTouched && (i == highlightedScreen)))
                         cr.Rectangle (x, 435, width, 45);
@@ -51,22 +51,21 @@ namespace AquaPic
 
                     x += width;
                 }
-                    
-                x = (currentScreen * 133) + 1;
 
                 Pango.Layout l = new Pango.Layout (this.PangoContext);
                 l.Width = Pango.Units.FromPixels (width);
                 l.Wrap = Pango.WrapMode.Word;
                 l.Alignment = Pango.Alignment.Center;
-                //l.SetText (ButtonLabel);
+                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+
+                x = (currentScreen * width) + 1;
                 l.SetMarkup ("<span color=\"black\">"
                     + GuiGlobal.screenData [currentScreen].name 
                     + "</span>");
-                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
                 GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), x, Allocation.Top + 14, l);
 
                 if ((menuTouched) && (currentScreen != highlightedScreen)) {
-                    x = (highlightedScreen * 133) + 1;
+                    x = (highlightedScreen * width) + 1;
                     l.SetMarkup ("<span color=\"black\">"
                         + GuiGlobal.screenData [highlightedScreen].name 
                         + "</span>");

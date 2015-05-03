@@ -60,8 +60,9 @@ namespace AquaPic.PowerDriver
                 this.Updated = true;
                 #endif
 
-                if (onStateChange != null)
+                if (onStateChange != null) {
                     onStateChange (this, args);
+                }
             }
 
             public void OnModeChangedAuto (ModeChangeEventArgs args) {
