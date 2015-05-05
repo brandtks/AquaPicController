@@ -38,7 +38,7 @@ namespace MyWidgetLibrary
 //        public string[] TextOptions;
         public byte Id;
 
-        public event SelectorChangedEventHandler SelectorChanged;
+        public event SelectorChangedEventHandler SelectorChangedEvent;
 
         public TouchSelectorSwitch (int id, int selectionCount, int currentSelectedIndex, MyOrientation orientation) {
             this.Visible = true;
@@ -267,8 +267,8 @@ namespace MyWidgetLibrary
 
             QueueDraw ();
 
-            if (SelectorChanged != null)
-                SelectorChanged (this, new SelectorChangedEventArgs (CurrentSelected, Id));
+            if (SelectorChangedEvent != null)
+                SelectorChangedEvent (this, new SelectorChangedEventArgs (CurrentSelected, Id));
         }
 
         protected bool OnTimerEvent () {

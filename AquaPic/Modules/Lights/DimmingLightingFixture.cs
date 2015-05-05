@@ -11,12 +11,15 @@ namespace AquaPic.LightingModule
         public class DimmingLightingFixture : LightingFixture
         {
             public float currentDimmingLevel;
+            public float autoDimmingLevel;
+            public float requestedDimmingLevel;
             public float minDimmingOutput;
             public float maxDimmingOutput;
             public IndividualControl dimCh;
             public AnalogType type;
             public Value valueControl;
             public Mode dimmingMode;
+            public RateOfChangeLimiter rocl;
 
             public DimmingLightingFixture (
                 string name,
@@ -39,6 +42,10 @@ namespace AquaPic.LightingModule
                     lightingTime, 
                     highTempLockout) 
             {
+                currentDimmingLevel = 0.0f;
+                autoDimmingLevel = 0.0f;
+                requestedDimmingLevel = 0.0f;
+                rocl = new RateOfChangeLimiter (1.0f);
                 this.dimCh.Group = cardID;
                 this.dimCh.Individual = channelID;
                 this.type = type;
@@ -51,17 +58,21 @@ namespace AquaPic.LightingModule
 
             public float SetDimmingLevel () {
                 if (lightingOn == MyState.On) {
-                    if (dimmingMode == Mode.Auto) {
-                        TimeDate now = TimeDate.Now;
+                    TimeDate now = TimeDate.Now;
 
-                        currentDimmingLevel = Utils.CalcParabola (
-                            onTime, 
-                            offTime, 
-                            now, 
-                            minDimmingOutput, 
-                            maxDimmingOutput
-                        );
+                    autoDimmingLevel = Utils.CalcParabola (
+                        onTime, 
+                        offTime, 
+                        now, 
+                        minDimmingOutput, 
+                        maxDimmingOutput
+                    );
+
+                    if (dimmingMode == Mode.Auto) {
+                        requestedDimmingLevel = autoDimmingLevel;
                     }
+
+                    currentDimmingLevel = rocl.RateOfChange(requestedDimmingLevel);
 
                     return currentDimmingLevel.Map (0.0f, 100.0f, 0, 1024); // PIC16F1936 has 10bit PWM
                 }

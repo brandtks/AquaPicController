@@ -19,7 +19,7 @@ namespace AquaPic.LightingModule
         public static Time maxSunRise;
 
         public static Time minSunSet;
-        public static Time mMaxSunSet;
+        public static Time maxSunSet;
 
         public static Time defaultSunRise;
         public static Time defaultSunSet;
@@ -31,7 +31,7 @@ namespace AquaPic.LightingModule
             maxSunRise = new Time (7, 45, 0);
 
             minSunSet = new Time (19, 30, 0);
-            mMaxSunSet = new Time (21, 00, 0);
+            maxSunSet = new Time (21, 00, 0);
 
             defaultSunRise = new Time (7, 30, 0);
             defaultSunSet = new Time (20, 30, 0);
@@ -47,8 +47,8 @@ namespace AquaPic.LightingModule
 
             if (sunSetToday.CompareToTime (minSunSet) < 0) // sunset is before minimum
                 sunSetToday.SetTime (minSunSet);
-            if (sunSetToday.CompareToTime (mMaxSunSet) > 0) // sunset is after maximum
-                sunSetToday.SetTime (mMaxSunSet);
+            if (sunSetToday.CompareToTime (maxSunSet) > 0) // sunset is after maximum
+                sunSetToday.SetTime (maxSunSet);
 
             if (sunRiseTomorrow.CompareToTime (minSunRise) < 0) // sunrise is before minimum
                 sunRiseTomorrow.SetTime (minSunRise);
@@ -57,8 +57,8 @@ namespace AquaPic.LightingModule
 
             if (sunSetTomorrow.CompareToTime (minSunSet) < 0) // sunset is before minimum
                 sunSetTomorrow.SetTime (minSunSet);
-            if (sunSetTomorrow.CompareToTime (mMaxSunSet) > 0) // sunset is after maximum
-                sunSetTomorrow.SetTime (mMaxSunSet);
+            if (sunSetTomorrow.CompareToTime (maxSunSet) > 0) // sunset is after maximum
+                sunSetTomorrow.SetTime (maxSunSet);
         }
 
         /* Might add reading file for min and max times and default times
@@ -169,7 +169,7 @@ namespace AquaPic.LightingModule
             } else { // time is after sunrise
                 if (light.lightingTime == LightingTime.Daytime) { 
                     light.SetOnTime (sunRiseTomorrow);
-                    light.SetOffTime (sunRiseTomorrow);
+                    light.SetOffTime (sunSetTomorrow);
                 } else {
                     light.SetOnTime (sunSetToday);
                     light.SetOffTime (sunRiseTomorrow);
@@ -189,8 +189,8 @@ namespace AquaPic.LightingModule
 
             if (sunSetToday.CompareToTime (minSunSet) < 0) // sunset is before minimum
                 sunSetToday.SetTime (minSunSet);
-            else if (sunSetToday.CompareToTime (mMaxSunSet) > 0) // sunset is after maximum
-                sunSetToday.SetTime (mMaxSunSet);
+            else if (sunSetToday.CompareToTime (maxSunSet) > 0) // sunset is after maximum
+                sunSetToday.SetTime (maxSunSet);
 
             if (sunRiseTomorrow.CompareToTime (minSunRise) < 0) // sunrise is before minimum
                 sunRiseTomorrow.SetTime (minSunRise);
@@ -199,8 +199,8 @@ namespace AquaPic.LightingModule
 
             if (sunSetTomorrow.CompareToTime (minSunSet) < 0) // sunset is before minimum
                 sunSetTomorrow.SetTime (minSunSet);
-            else if (sunSetTomorrow.CompareToTime (mMaxSunSet) > 0) // sunset is after maximum
-                sunSetTomorrow.SetTime (mMaxSunSet);
+            else if (sunSetTomorrow.CompareToTime (maxSunSet) > 0) // sunset is after maximum
+                sunSetTomorrow.SetTime (maxSunSet);
         }
 
         public static int GetLightIndex (string name) {
@@ -226,6 +226,22 @@ namespace AquaPic.LightingModule
             return 0.0f;
         }
 
+        public static float GetAutoDimmingLevel (int fixtureID) {
+            if (fixtures [fixtureID] is DimmingLightingFixture) {
+                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                return fixture.autoDimmingLevel;
+            }
+            return 0.0f;
+        }
+
+        public static float GetRequestedDimmingLevel (int fixtureID) {
+            if (fixtures [fixtureID] is DimmingLightingFixture) {
+                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                return fixture.requestedDimmingLevel;
+            }
+            return 0.0f;
+        }
+
         public static Mode GetDimmingMode (int fixtureID) {
             if (fixtures [fixtureID] is DimmingLightingFixture) {
                 var fixture = fixtures [fixtureID] as DimmingLightingFixture;
@@ -236,6 +252,29 @@ namespace AquaPic.LightingModule
 
         public static bool IsDimmingFixture (int fixtureID) {
             return fixtures [fixtureID] is DimmingLightingFixture;
+        }
+
+        public static void SetMode (int fixtureID, Mode mode) {
+            if (fixtures [fixtureID] is DimmingLightingFixture) {
+                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                fixture.dimmingMode = mode;
+            }
+        }
+
+        public static void SetDimmingLevel (int fixtureID, float level) {
+            if (fixtures [fixtureID] is DimmingLightingFixture) {
+                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                if (fixture.dimmingMode == Mode.Manual)
+                    fixture.requestedDimmingLevel = level;
+            }
+        }
+
+        public static TimeDate GetOnTime (int fixtureID) {
+            return fixtures [fixtureID].onTime;
+        }
+
+        public static TimeDate GetOffTime (int fixtureID) {
+            return fixtures [fixtureID].offTime;
         }
     }
 }

@@ -28,7 +28,7 @@ namespace AquaPic
             for (int i = 0; i < 8; ++i) {
                 selectors [i] = new PowerOutletSlider (i);
 
-                selectors [i].SelectorChanged += OnSelectorChanged;
+                selectors [i].SelectorChangedEvent += OnSelectorChanged;
 
                 if (i < 4) {
                     x = (i * 180) + 40;

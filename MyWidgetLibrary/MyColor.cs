@@ -20,16 +20,6 @@ namespace MyWidgetLibrary
         private string storedColorName;
 
         private static Dictionary<string, float[]> colorLookup = new Dictionary<string, float[]> () {
-            { "red", new float [3] { 1.0f, 0.0f, 0.0f} },
-            { "green", new float [3] { 0.0f, 1.0f, 0.0f} },
-            { "blue", new float [3] { 0.0f, 0.0f, 1.0f} },
-            { "yellow", new float [3] { 1.0f, 1.0f, 0.0f} },
-            { "grey", new float [3] { 0.5f, 0.5f, 0.5f} },
-            { "dgrey", new float [3] { 0.15f, 0.15f, 0.15f} },
-            { "lgrey", new float [3] { 0.85f, 0.85f, 0.85f} },
-            { "black", new float [3] { 0.0f, 0.0f, 0.0f} },
-            { "white", new float [3] { 1.0f, 1.0f, 1.0f} },
-
             { "pri", new float [3] { 0.40392f, 0.8902f, 0f} }, // greenish
             { "seca", new float [3] { 0.00784f, 0.55686f, 0.60784f} }, // blueish
             { "secc", new float [3] { 1f, 0.99216f, 0.25098f} }, // yellowish
@@ -43,16 +33,31 @@ namespace MyWidgetLibrary
         };
 
         public MyColor (string color, double A = 1.0) {
+            bool colorFound;
+
             try {
                 colorName = color.ToLower ();
-                this.R = colorLookup [colorName] [0];
-                this.G = colorLookup [colorName] [1];
-                this.B = colorLookup [colorName] [2];
+                R = colorLookup [colorName] [0];
+                G = colorLookup [colorName] [1];
+                B = colorLookup [colorName] [2];
+                colorFound = true;
             } catch {
-                colorName = string.Empty;
-                this.R = 0.0f;
-                this.G = 0.0f;
-                this.B = 0.0f;
+                colorFound = false;
+//                colorName = string.Empty;
+//                this.R = 0.0f;
+//                this.G = 0.0f;
+//                this.B = 0.0f;
+            }
+
+            if (!colorFound) {
+                Gdk.Color c = new Gdk.Color ();
+                colorFound = Gdk.Color.Parse (color, ref c);
+                if (colorFound) {
+                    R = (float)(c.Red / 255);
+                    G = (float)(c.Green / 255);
+                    B = (float)(c.Blue / 255);
+                } else
+                    throw new Exception ("No color could be found matching that description");
             }
 
             this.A = (float)A;
@@ -96,16 +101,26 @@ namespace MyWidgetLibrary
             storedB = B;
             storedColorName = colorName;
 
+            bool colorFound;
             try {
                 colorName = color.ToLower ();
                 R = colorLookup [colorName] [0];
                 G = colorLookup [colorName] [1];
                 B = colorLookup [colorName] [2];
+                colorFound = true;
             } catch {
-                colorName = storedColorName;
-                R = storedR;
-                G = storedG;
-                B = storedB;
+                colorFound = false;
+            }
+
+            if (!colorFound) {
+                Gdk.Color c = new Gdk.Color ();
+                colorFound = Gdk.Color.Parse (color, ref c);
+                if (colorFound) {
+                    R = (float)(c.Red / 255);
+                    G = (float)(c.Green / 255);
+                    B = (float)(c.Blue / 255);
+                } else
+                    throw new Exception ("No color could be found matching that description");
             }
                 
             A = (float)a;
