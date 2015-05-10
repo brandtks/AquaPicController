@@ -165,9 +165,13 @@ namespace AquaPic
             requestTextBox.TextChangedEvent += (sender, args) => {
                 try {
                     float newLevel = Convert.ToSingle (args.text);
+                    if (newLevel < 0.0f)
+                        newLevel = 0.0f;
+                    if (newLevel > 100.0f)
+                        newLevel = 100.0f;
                     Lighting.SetDimmingLevel (fixtureID, newLevel);
                 } catch (Exception ex) {
-                    MessageBox.Show (ex.Message);
+                    MessageBox.Show (ex.ToString ());
                 }
             };
             Put (requestTextBox, 633, 231);

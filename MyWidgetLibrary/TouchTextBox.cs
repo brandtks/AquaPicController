@@ -75,13 +75,13 @@ namespace MyWidgetLibrary
 
         protected void OnTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
             if (enableTouch) {
-                TouchValueInput_osk t = new TouchValueInput_osk (
-                    (value) => {
+                TouchNumberInput t = new TouchNumberInput ();
+                t.NumberSetEvent += (value) => {
                         text = value;
 
                         if (TextChangedEvent != null)
                             TextChangedEvent (this, new TextChangedEventArgs (text));
-                    });
+                    };
                 
                 t.Show ();
             }
