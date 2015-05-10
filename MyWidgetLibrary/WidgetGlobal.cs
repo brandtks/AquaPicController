@@ -38,5 +38,18 @@ namespace MyWidgetLibrary
             cr.Restore ();
         }
     }
+
+    public class MessageBox {
+        public static void Show (string msg) {
+            var ms = new MessageDialog (
+                null,
+                DialogFlags.DestroyWithParent,
+                MessageType.Other,
+                ButtonsType.Ok,
+                msg);
+            ms.Run ();
+            ms.Destroy ();
+        }
+    }
 }
 

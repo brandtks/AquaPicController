@@ -95,6 +95,10 @@ namespace MyWidgetLibrary
             storedColorName = colorName;
         }
 
+        public static implicit operator MyColor (string name) {
+            return new MyColor (name);
+        }
+
         public void ChangeColor (string color, double a = 1.0) {
             storedR = R;
             storedG = G;
@@ -131,10 +135,10 @@ namespace MyWidgetLibrary
             storedG = G;
             storedB = B;
 
-            this.R = (float)r;
-            this.G = (float)g;
-            this.B = (float)b;
-            this.A = (float)a;
+            R = (float)r;
+            G = (float)g;
+            B = (float)b;
+            A = (float)a;
         }
 
         public void ModifyAlpha (double a) {

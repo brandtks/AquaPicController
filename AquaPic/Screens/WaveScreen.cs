@@ -5,7 +5,7 @@ using MyWidgetLibrary;
 
 namespace AquaPic
 {
-    public partial class WaveWindow : MyBackgroundWidget
+    public class WaveWindow : MyBackgroundWidget
     {
         public WaveWindow (MenuReleaseHandler OnMenuRelease) : base (3, OnMenuRelease) {
             Show ();

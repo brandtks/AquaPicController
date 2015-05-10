@@ -4,12 +4,24 @@ using Cairo;
 
 namespace MyWidgetLibrary
 {
+    public delegate void TextChangedHandler (object sender, TextChangedEventArgs args);
+
+    public class TextChangedEventArgs : EventArgs {
+        public string text;
+
+        public TextChangedEventArgs (string text) {
+            this.text = text;
+        }
+    }
+
     public class TouchTextBox : EventBox
     {
         public string text;
         public MyColor textColor;
         public int textSize;
         public Justify textAlignment;
+        public bool enableTouch;
+        public TextChangedHandler TextChangedEvent;
 
         public TouchTextBox () {
             this.Visible = true;
@@ -24,6 +36,7 @@ namespace MyWidgetLibrary
             this.HeightRequest = 30;
 
             this.ExposeEvent += OnExpose;
+            ButtonReleaseEvent += OnTouchButtonRelease;
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
@@ -57,6 +70,20 @@ namespace MyWidgetLibrary
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New " + textSize.ToString ());
                 GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left, top + 6, l);
                 l.Dispose ();
+            }
+        }
+
+        protected void OnTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
+            if (enableTouch) {
+                TouchValueInput_osk t = new TouchValueInput_osk (
+                    (value) => {
+                        text = value;
+
+                        if (TextChangedEvent != null)
+                            TextChangedEvent (this, new TextChangedEventArgs (text));
+                    });
+                
+                t.Show ();
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using Gtk;
 using Cairo;
+using Gtk;
 using MyWidgetLibrary;
 
 namespace AquaPic

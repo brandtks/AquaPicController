@@ -11,7 +11,8 @@ namespace AquaPic
             { 2, new ScreenData ("Lighting", "seca") },
             { 3, new ScreenData ("Wave", "secc") },
             { 4, new ScreenData ("Condition", "compl") },
-            { 5, new ScreenData ("Settings", "grey4") }
+            { 5, new ScreenData ("Settings", "grey4") },
+            { 6, new ScreenData ("Value Input", "pri") }
         };
 
         static GuiGlobal () {

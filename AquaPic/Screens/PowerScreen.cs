@@ -8,7 +8,7 @@ using AquaPic.Globals;
 
 namespace AquaPic
 {
-    public partial class PowerWindow : MyBackgroundWidget
+    public class PowerWindow : MyBackgroundWidget
     {
         private PowerOutletSlider[] selectors;
         private int powerID;
@@ -31,11 +31,11 @@ namespace AquaPic
                 selectors [i].SelectorChangedEvent += OnSelectorChanged;
 
                 if (i < 4) {
-                    x = (i * 180) + 40;
-                    y = 140;
+                    x = (i * 190) + 30;
+                    y = 155;
                 } else {
-                    x = ((i - 4) * 180) + 40;
-                    y = 240;
+                    x = ((i - 4) * 190) + 30;
+                    y = 235;
                 }
                 Put (selectors [i], x, y);
 
@@ -79,10 +79,10 @@ namespace AquaPic
 
                 if (states [i] == MyState.On) {
                     selector.Status = "On";
-                    selector.StatusColor.ChangeColor("secb");
+                    selector.StatusColor = "secb";
                 } else {
                     selector.Status = "Off";
-                    selector.StatusColor.ChangeColor("grey4");
+                    selector.StatusColor = "grey4";
                 }
 
                 if (modes [i] == Mode.Auto) {
@@ -142,10 +142,10 @@ namespace AquaPic
 
                 if (args.state == MyState.On) {
                     selectors [args.outletID].Status = "On";
-                    selectors [args.outletID].StatusColor.ChangeColor ("secb");
+                    selectors [args.outletID].StatusColor = "secb";
                 } else {
                     selectors [args.outletID].Status = "Off";
-                    selectors [args.outletID].StatusColor.ChangeColor("grey4");
+                    selectors [args.outletID].StatusColor = "grey4";
                 }
 
                 // have to call QueueDrawArea because there is text that needs to be draw

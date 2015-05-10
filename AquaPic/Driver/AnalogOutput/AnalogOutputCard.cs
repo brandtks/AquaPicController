@@ -16,21 +16,19 @@ namespace AquaPic.AnalogOutputDriver
 
             public AnalogOutputCard (byte address, byte cardID) {
                 try {
-                    this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
-                    this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
+                    slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
+                    slave.OnStatusUpdate += OnSlaveStatusUpdate;
                 } catch (Exception ex) {
                     Console.WriteLine (ex.ToString ());
                     Console.WriteLine (ex.Message);
                 }
                 this.cardID = cardID;
-                this.communicationAlarmIndex = Alarm.Subscribe(address.ToString () + " communication fault", "Analog output card at address " + this.slave.Address.ToString ());
-                this.channels = new AnalogOutputChannel[4];
+                communicationAlarmIndex = Alarm.Subscribe(address.ToString () + " communication fault", "Analog output card at address " + this.slave.Address.ToString ());
+                channels = new AnalogOutputChannel[4];
                 for (int i = 0; i < channels.Length; ++i) {
                     int chId = i;
                     this.channels [chId] = new AnalogOutputChannel (
-                        delegate(float value) {
-                            SetAnalogValue ((byte)chId, Convert.ToInt32 (value));
-                        }
+                        (float value) => SetAnalogValue ((byte)chId, Convert.ToInt32 (value))
                     );
                 }
             }

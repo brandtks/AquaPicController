@@ -18,8 +18,6 @@ namespace MyWidgetLibrary
         public MyColor TextColor;
         public ButtonClickAction clickAction;
 
-        public event ButtonReleaseEventHandler TouchButtonReleasedHandler;
-
         public TouchButton () {
             this.Visible = true;
             this.VisibleWindow = false;
@@ -27,8 +25,8 @@ namespace MyWidgetLibrary
             this.ButtonColor = new MyColor ("pri", 0.9);
             this.Text = "";
             this.TextColor = new MyColor ("black");
-            this.HeightRequest = 115;
-            this.WidthRequest = 115;
+            this.HeightRequest = 45;
+            this.WidthRequest = 45;
             this.clickAction = ButtonClickAction.Darken;
 
             this.ExposeEvent += onExpose;
@@ -55,8 +53,8 @@ namespace MyWidgetLibrary
                 //l.SetText (ButtonLabel);
                 l.SetMarkup ("<span color=" + (char)34 + TextColor.ToHTML () + (char)34 + ">" + Text + "</span>"); 
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
-                //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, (top + (height / 2)) - 6, l);
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
+                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, (top + (height / 2)) - 6, l);
+                //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
                 l.Dispose ();
             }
         }
@@ -79,9 +77,6 @@ namespace MyWidgetLibrary
                 ButtonColor.RestoreColor ();
 
             this.QueueDraw ();
-
-            if (TouchButtonReleasedHandler != null)
-                TouchButtonReleasedHandler (this, args);
         }
     }
 }

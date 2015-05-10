@@ -28,7 +28,7 @@ namespace AquaPic.AnalogOutputDriver
                 this.value = 0;
 
                 ValueControl = new Value ();
-                ValueControl.ValueSetter += valueSetter;
+                ValueControl.ValueSetter = valueSetter;
             }
         }
     }

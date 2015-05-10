@@ -7,13 +7,12 @@ using AquaPic.Globals;
 
 namespace AquaPic
 {
-    public partial class LightingWindow : MyBackgroundWidget
+    public class LightingWindow : MyBackgroundWidget
     {
         private int fixtureID;
         private TouchComboBox combo;
         private LightingModeSlider modeSelector;
         private TouchLayeredProgressBar dimmingProgressBar;
-        //private TouchProgressBar dimmingLevel;
         private TouchLabel dimmingHeader;
         private TouchTextBox dimmingTextBox;
         private TouchLabel dimmingLabel;
@@ -28,6 +27,7 @@ namespace AquaPic
         private bool dimmingIsManual;
 
         public LightingWindow (MenuReleaseHandler OnMenuRelease) : base (2, OnMenuRelease) {
+            
             #region base level screen stuff that doesn't change after draw
             MyBox box1 = new MyBox (385, 395);
             Put (box1, 10, 30);
@@ -37,81 +37,89 @@ namespace AquaPic
             Put (box2, 405, 30);
             box2.Show ();
 
-            MyBox box3 = new MyBox (195, 350);
+            MyBox box3 = new MyBox (205, 350);
             box3.color = "grey2";
             Put (box3, 410, 70);
             box3.Show ();
 
-            MyBox box4 = new MyBox (175, 350);
+            MyBox box4 = new MyBox (165, 350);
             box4.color = "grey2";
-            Put (box4, 610, 70);
+            Put (box4, 620, 70);
             box4.Show ();
 
             TouchLabel fixtureLabel = new TouchLabel ();
             fixtureLabel.Text = "Lighting Fixtures";
-            fixtureLabel.TextColor.ChangeColor ("pri");
+            //fixtureLabel.TextColor.ChangeColor ("pri");
+            fixtureLabel.TextColor = "pri";
             fixtureLabel.TextSize = 12;
             Put (fixtureLabel, 413, 40);
             fixtureLabel.Show ();
 
             TouchLabel onTimeLabel = new TouchLabel ();
             onTimeLabel.Text = "On Time";
-            onTimeLabel.TextColor.ChangeColor ("grey4"); 
+            onTimeLabel.TextColor = "grey4"; 
             Put (onTimeLabel, 415, 75);
             onTimeLabel.Show ();
 
             TouchLabel offTimeLabel = new TouchLabel ();
             offTimeLabel.Text = "Off Time";
-            offTimeLabel.TextColor.ChangeColor ("grey4"); 
+            offTimeLabel.TextColor = "grey4"; 
             Put (offTimeLabel, 415, 130);
             offTimeLabel.Show ();
 
+            TouchLabel genInfoLabel = new TouchLabel ();
+            genInfoLabel.Text = "General Lighting Information";
+            genInfoLabel.TextColor = "pri";
+            genInfoLabel.TextSize = 12;
+            Put (genInfoLabel, 15, 40);
+            genInfoLabel.Show ();
+
             TouchLabel sunRiseLabel = new TouchLabel ();
             sunRiseLabel.Text = "Sunrise Today";
-            sunRiseLabel.TextColor.ChangeColor ("grey4"); 
-            Put (sunRiseLabel, 15, 39);
+            sunRiseLabel.TextColor = "grey4"; 
+            Put (sunRiseLabel, 15, 74);
             sunRiseLabel.Show ();
 
             TouchTextBox sunRise = new TouchTextBox ();
             sunRise.WidthRequest = 200;
             sunRise.text = Lighting.sunRiseToday.ToString ();
-            Put (sunRise, 190, 35);
+            Put (sunRise, 190, 70);
             sunRise.Show ();
 
             TouchLabel sunSetLabel = new TouchLabel ();
             sunSetLabel.Text = "Sunset Today";
-            sunSetLabel.TextColor.ChangeColor ("grey4"); 
-            Put (sunSetLabel, 15, 74);
+            sunSetLabel.TextColor = "grey4"; 
+            Put (sunSetLabel, 15, 109);
             sunSetLabel.Show ();
 
             TouchTextBox sunSet = new TouchTextBox ();
             sunSet.WidthRequest = 200;
             sunSet.text = Lighting.sunSetToday.ToString ();
-            Put (sunSet, 190, 70);
+            Put (sunSet, 190, 105);
             sunSet.Show ();
 
             TouchLabel sunRiseTomorrowLabel = new TouchLabel ();
             sunRiseTomorrowLabel.Text = "Sunrise Tomorrow";
-            sunRiseTomorrowLabel.TextColor.ChangeColor ("grey4"); 
-            Put (sunRiseTomorrowLabel, 15, 109);
+            sunRiseTomorrowLabel.TextColor = "grey4"; 
+            Put (sunRiseTomorrowLabel, 15, 144);
             sunRiseTomorrowLabel.Show ();
 
             TouchTextBox sunRiseTomorrow = new TouchTextBox ();
             sunRiseTomorrow.WidthRequest = 200;
             sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToString ();
-            Put (sunRiseTomorrow, 190, 105);
+            Put (sunRiseTomorrow, 190, 140);
             sunRiseTomorrow.Show ();
 
             TouchLabel sunSetTomorrowLabel = new TouchLabel ();
             sunSetTomorrowLabel.Text = "Sunset Tomorrow";
-            sunSetTomorrowLabel.TextColor.ChangeColor ("grey4"); 
-            Put (sunSetTomorrowLabel, 15, 144);
+            sunSetTomorrowLabel.TextColor = "grey4"; 
+            Put (sunSetTomorrowLabel, 15, 179);
             sunSetTomorrowLabel.Show ();
 
             TouchTextBox sunSetTomorrow = new TouchTextBox ();
             sunSetTomorrow.WidthRequest = 200;
             sunSetTomorrow.text = Lighting.sunSetTomorrow.ToString ();
-            Put (sunSetTomorrow, 190, 140);
+            Put (sunSetTomorrow, 190, 175);
             sunSetTomorrow.Show ();
             #endregion
 
@@ -120,7 +128,7 @@ namespace AquaPic
             dimmingHeader = new TouchLabel ();
             dimmingHeader.TextAlignment = Justify.Center;
             dimmingHeader.AreaWidth = 165;
-            dimmingHeader.TextColor.ChangeColor ("secb");
+            dimmingHeader.TextColor = "secb";
             Put (dimmingHeader, 615, 77);
             dimmingHeader.Show ();
 
@@ -131,8 +139,8 @@ namespace AquaPic
 
             dimmingProgressBar = new TouchLayeredProgressBar ();
             //dimmingLevel = new TouchProgressBar ();
-            dimmingProgressBar.colorProgress.ChangeColor ("seca");
-            dimmingProgressBar.colorProgressSecondary.ChangeColor ("pri");
+            dimmingProgressBar.colorProgress = "seca";
+            dimmingProgressBar.colorProgressSecondary = "pri";
             dimmingProgressBar.drawPrimaryWhenEqual = false;
             dimmingProgressBar.ProgressChangedEvent += OnProgressChanged;
             dimmingProgressBar.ProgressChangingEvent += OnProgressChanging;
@@ -146,7 +154,7 @@ namespace AquaPic
 
             dimmingLabel = new TouchLabel ();
             dimmingLabel.Text = "Current";
-            dimmingLabel.TextColor.ChangeColor ("pri");
+            dimmingLabel.TextColor = "pri";
             dimmingLabel.AreaWidth = 125;
             dimmingLabel.TextAlignment = Justify.Right;
             Put (dimmingLabel, 608, 147);
@@ -154,12 +162,20 @@ namespace AquaPic
 
             requestTextBox = new TouchTextBox ();
             requestTextBox.textAlignment = Justify.Center;
+            requestTextBox.TextChangedEvent += (sender, args) => {
+                try {
+                    float newLevel = Convert.ToSingle (args.text);
+                    Lighting.SetDimmingLevel (fixtureID, newLevel);
+                } catch (Exception ex) {
+                    MessageBox.Show (ex.Message);
+                }
+            };
             Put (requestTextBox, 633, 231);
             requestTextBox.Show ();
 
             requestLabel = new TouchLabel ();
             requestLabel.Text = "Requested";
-            requestLabel.TextColor.ChangeColor ("seca");
+            requestLabel.TextColor = "seca";
             requestLabel.TextColor.ModifyColor (1.45);
             requestLabel.AreaWidth = 125;
             requestLabel.TextAlignment = Justify.Right;
@@ -175,7 +191,7 @@ namespace AquaPic
 
             autoLabel = new TouchLabel ();
             autoLabel.Text = "Auto";
-            autoLabel.TextColor.ChangeColor ("grey4");
+            autoLabel.TextColor = "grey4";
             autoLabel.AreaWidth = 75;
             autoLabel.TextAlignment = Justify.Right;
             autoLabel.WidthRequest = 75;
@@ -184,12 +200,12 @@ namespace AquaPic
             autoLabel.Show ();
 
             onTimeTextBox = new TouchTextBox ();
-            onTimeTextBox.WidthRequest = 185;
+            onTimeTextBox.WidthRequest = 195;
             Put (onTimeTextBox, 415, 95);
             onTimeTextBox.Show ();
 
             offTimeTextBox = new TouchTextBox ();
-            offTimeTextBox.WidthRequest = 185;
+            offTimeTextBox.WidthRequest = 195;
             Put (offTimeTextBox, 415, 150);
             offTimeTextBox.Show ();
 
@@ -222,10 +238,14 @@ namespace AquaPic
                 dimmingIsManual = m == Mode.Manual;
                 if (!dimmingIsManual) {
                     modeSelector.CurrentSelected = 1;
+                    dimmingProgressBar.enableTouch = false;
+                    requestTextBox.enableTouch = false;
                     autoTextBox.Visible = false;
                     autoLabel.Visible = false;
                 } else {
                     modeSelector.CurrentSelected = 0;
+                    dimmingProgressBar.enableTouch = true;
+                    requestTextBox.enableTouch = true;
                     autoTextBox.Visible = true;
                     autoLabel.Visible = true;
                     autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
@@ -245,6 +265,7 @@ namespace AquaPic
                 dimmingIsManual = false;
                 modeSelector.Visible = false;
                 dimmingProgressBar.Visible = false;
+                dimmingProgressBar.enableTouch = false;
                 dimmingTextBox.Visible = false;
                 dimmingLabel.Visible = false;
                 autoTextBox.Visible = false;
@@ -292,6 +313,7 @@ namespace AquaPic
             if (args.currentSelectedIndex == 0) {
                 Lighting.SetMode (fixtureID, Mode.Manual);
                 dimmingProgressBar.enableTouch = true;
+                requestTextBox.enableTouch = true;
                 autoTextBox.Visible = true;
                 autoLabel.Visible = true;
                 dimmingIsManual = true;
@@ -299,6 +321,7 @@ namespace AquaPic
             } else {
                 Lighting.SetMode (fixtureID, Mode.Auto);
                 dimmingProgressBar.enableTouch = false;
+                requestTextBox.enableTouch = false;
                 autoTextBox.Visible = false;
                 autoLabel.Visible = false;
                 dimmingIsManual = false;

@@ -1,6 +1,7 @@
 ﻿using System;
 using AquaPic.AnalogOutputDriver;
 using AquaPic.Globals;
+using AquaPic.PowerDriver;
 using AquaPic.Utilites;
 using AquaPic.ValueRuntime;
 
@@ -54,6 +55,16 @@ namespace AquaPic.LightingModule
                 dimmingMode = Mode.Auto;
                 valueControl = AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this.type, name);
                 valueControl.ValueGetter = SetDimmingLevel;
+
+                // if the Plug is manually turned on or off set dimming to manual
+                Power.AddHandlerOnManual (
+                    plug,
+                    (sender, args) => dimmingMode = Mode.Manual);
+
+                // if the plug is returned to auto set dimming to auto
+                Power.AddHandlerOnAuto (
+                    plug,
+                    (sender, args) => dimmingMode = Mode.Auto);
             }
 
             public float SetDimmingLevel () {
@@ -76,8 +87,12 @@ namespace AquaPic.LightingModule
 
                     return currentDimmingLevel.Map (0.0f, 100.0f, 0, 1024); // PIC16F1936 has 10bit PWM
                 }
+                 
+                autoDimmingLevel = 0.0f;
+                requestedDimmingLevel = 0.0f;
+                currentDimmingLevel = 0.0f;
 
-                return 0.0f;
+                return currentDimmingLevel;
             }
         }
     }
