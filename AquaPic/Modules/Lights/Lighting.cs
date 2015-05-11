@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using AquaPic.Globals;
 using AquaPic.Utilites;
 
@@ -27,14 +30,40 @@ namespace AquaPic.LightingModule
         static Lighting () {
             fixtures = new List<LightingFixture> ();
 
-            minSunRise = new Time (7, 00, 0);
-            maxSunRise = new Time (7, 45, 0);
+            string path = string.Format (
+                "{0}{1}", 
+                Environment.GetEnvironmentVariable ("AquaPic"), 
+                @"\AquaPicRuntimeProject\lightingProperties.json");
 
-            minSunSet = new Time (19, 30, 0);
-            maxSunSet = new Time (21, 00, 0);
+            using (StreamReader reader = File.OpenText (path)) {
+                JObject jo = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
 
-            defaultSunRise = new Time (7, 30, 0);
-            defaultSunSet = new Time (20, 30, 0);
+                RiseSetCalc.latitude = Convert.ToDouble (jo ["latitude"]);
+                RiseSetCalc.longitude = Convert.ToDouble (jo ["longitude"]);
+                RiseSetCalc.timeZone = Convert.ToInt32 (jo ["timeZone"]);
+
+                defaultSunRise = new Time (
+                    Convert.ToByte (jo ["defaultSunRise"] ["hour"]),
+                    Convert.ToByte (jo ["defaultSunRise"] ["minute"]));
+                defaultSunSet = new Time (
+                    Convert.ToByte (jo ["defaultSunSet"] ["hour"]),
+                    Convert.ToByte (jo ["defaultSunSet"] ["minute"]));
+
+                minSunRise = new Time (
+                    Convert.ToByte (jo ["minSunRise"] ["hour"]),
+                    Convert.ToByte (jo ["minSunRise"] ["minute"]));
+                maxSunRise = new Time (
+                    Convert.ToByte (jo ["maxSunRise"] ["hour"]),
+                    Convert.ToByte (jo ["maxSunRise"] ["minute"]));
+
+                minSunSet = new Time (
+                    Convert.ToByte (jo ["minSunSet"] ["hour"]),
+                    Convert.ToByte (jo ["minSunSet"] ["minute"]));
+
+                maxSunSet = new Time (
+                    Convert.ToByte (jo ["maxSunSet"] ["hour"]),
+                    Convert.ToByte (jo ["maxSunSet"] ["minute"]));
+            }
 
             RiseSetCalc.GetRiseSetTimes (out sunRiseToday, out sunSetToday);
             sunRiseTomorrow = RiseSetCalc.GetRiseTimeTomorrow ();

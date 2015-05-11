@@ -27,7 +27,6 @@ namespace AquaPic
         private bool dimmingIsManual;
 
         public LightingWindow (MenuReleaseHandler OnMenuRelease) : base (2, OnMenuRelease) {
-            
             #region base level screen stuff that doesn't change after draw
             MyBox box1 = new MyBox (385, 395);
             Put (box1, 10, 30);

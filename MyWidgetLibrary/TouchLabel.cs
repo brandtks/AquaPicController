@@ -21,6 +21,8 @@ namespace MyWidgetLibrary
             this.TextSize = 11;
             this.TextAlignment = Justify.Left;
             AreaWidth = 0;
+            HeightRequest = 30;
+            WidthRequest = 200;
 
             this.ExposeEvent += OnExpose;
         }

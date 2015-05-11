@@ -5,9 +5,9 @@ namespace AquaPic.LightingModule
 {
 	public static class RiseSetCalc
     {
-        public static double latitude = 41.181946;
-        public static double longitude = -85.063345;
-        public static int timeZone = -4;
+        public static double latitude;
+        public static double longitude;
+        public static int timeZone;
 
         public static void GetRiseSetTimes (out TimeDate rise, out TimeDate sSet) {
 			double julianDate = calcJD (DateTime.Today);
