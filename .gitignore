@@ -6,3 +6,6 @@ obj/
 *.userprefs
 *.sln
 *.csproj
+*.dll
+*.pdb
+*.xml

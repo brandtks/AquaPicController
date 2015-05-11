@@ -1,4 +1,2 @@
-DO NOT USE THIS
-IT IS NOT TEST
-MOST OF IT IS GARBAGE
-ONLY UPLOADED FOR VERSION CONTROL
+Mostly here for version control
+Extremely unfinished, unpolished, and ugly
