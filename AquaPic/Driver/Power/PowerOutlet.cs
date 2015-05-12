@@ -38,7 +38,7 @@ namespace AquaPic.PowerDriver
                 this.wattPower = 0.0f;
                 this.powerFactor = 1.0f;
                 this.OutletControl = new Coil ();
-                this.OutletControl.ConditionChecker = delegate() {
+                this.OutletControl.ConditionChecker = () => {
                     return false;
                 };
                 this.OutletControl.OutputTrue += outputTrue;

@@ -13,8 +13,9 @@ namespace AquaPic.AnalogOutputDriver
             public byte cardID;
             public int communicationAlarmIndex;
             public AnalogOutputChannel[] channels;
+            public string name;
 
-            public AnalogOutputCard (byte address, byte cardID) {
+            public AnalogOutputCard (byte address, byte cardID, string name) {
                 try {
                     slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
                     slave.OnStatusUpdate += OnSlaveStatusUpdate;
@@ -23,6 +24,7 @@ namespace AquaPic.AnalogOutputDriver
                     Console.WriteLine (ex.Message);
                 }
                 this.cardID = cardID;
+                this.name = name;
                 communicationAlarmIndex = Alarm.Subscribe(address.ToString () + " communication fault", "Analog output card at address " + this.slave.Address.ToString ());
                 channels = new AnalogOutputChannel[4];
                 for (int i = 0; i < channels.Length; ++i) {

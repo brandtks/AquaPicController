@@ -21,6 +21,8 @@ namespace AquaPic.AnalogInputDriver
         }
 
         public static void AddChannel (int cardID, int channelID, AnalogType type, string name) {
+            if (cardID == -1)
+                throw new Exception ("Card does not exist");
             cards [cardID].AddChannel (channelID, type, name);
         }
 
@@ -47,6 +49,14 @@ namespace AquaPic.AnalogInputDriver
             }
 
             return cards [card].channels [channel].value;
+        }
+
+        public static int GetCardIndex (string name) {
+            for (int i = 0; i < cards.Count; ++i) {
+                if (cards [i].name == name)
+                    return i;
+            }
+            return -1;
         }
     }
 }

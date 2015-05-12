@@ -20,28 +20,9 @@ namespace AquaPic.PowerDriver
             public string name;
             public OutletData[] Outlets;
 
-            //<Future>
-//            public powerStrip (byte address, byte powerID, string[] names, byte rtnToRequestedMask) {
-//                this._address = address;
-//                this._powerID = powerID;
-//                this._commsAlarmIdx = alarm.subscribe ("APB communication error", "Power Strip at address " + this.address.ToString ());
-//                this._powerAvailAlarmIdx = alarm.subscribe ("Loss of power", "Mains power not available at address " + this.address.ToString ());
-//                this.commsStatus = APBstatus.notOpen;
-//                this.acPowerAvail = false;
-//                this.plugs = new plugData[8];
-//                for (int i = 0; i < 8; ++i) {
-//                    this.plugs [i] = new plugData (names[i], mtob (rtnToRequestedMask, i));
-//                }
-//    		}
-
             public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) {
-                try { // if address is already used this will throw an exception
-                    this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
-                    this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
-                } catch (Exception ex) {
-                    Console.WriteLine (ex.ToString ());
-                    Console.WriteLine (ex.Message);
-                }
+                this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
+                this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
 
                 this.powerID = powerID;
 
@@ -66,12 +47,8 @@ namespace AquaPic.PowerDriver
                         
                     this.Outlets [plugID] = new OutletData (
                         plugName,
-                        delegate() {
-                            SetOutletState ((byte)plugID, MyState.On, false);
-                        },
-                        delegate() {
-                            SetOutletState ((byte)plugID, MyState.Off, false);
-                        });
+                        () => SetOutletState ((byte)plugID, MyState.On, false),
+                        () => SetOutletState ((byte)plugID, MyState.Off, false));
                 }
             }
 
@@ -200,10 +177,13 @@ namespace AquaPic.PowerDriver
                     else
                         message [1] = "false";
 
-                    slave.ReadWrite (30, message, messageLength, 0, 
-                        delegate (CallbackArgs args) {
-                            Outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state, Outlets [outletID].mode));
-                        });
+                    slave.ReadWrite (
+                        30, 
+                        message, 
+                        messageLength, 
+                        0, 
+                        (CallbackArgs args) => Outlets [outletID].OnChangeState (
+                            new StateChangeEventArgs (outletID, powerID, state, Outlets [outletID].mode)));
                 }
             }
             #else
@@ -237,13 +217,12 @@ namespace AquaPic.PowerDriver
                             ptr, 
                             sizeof(byte) * messageLength, 
                             0, 
-                            delegate(CallbackArgs args) {
-                                Outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state, Outlets [outletID].mode));
-                            });
+                            (CallbackArgs args) =>Outlets [outletID].OnChangeState (
+                                new StateChangeEventArgs (outletID, powerID, state, Outlets [outletID].mode)));
                     }
                 }
 
-                // @test
+                // <TEST> this is here only because the slave never responds so the callback never happens
                 Outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state, Outlets [outletID].mode));
             }
             #endif

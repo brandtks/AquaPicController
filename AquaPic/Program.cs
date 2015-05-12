@@ -8,6 +8,7 @@ using AquaPic.AlarmRuntime;
 using AquaPic.AnalogInputDriver;
 using AquaPic.AnalogOutputDriver;
 using AquaPic.DigitalInputDriver;
+using AquaPic.EquipmentRuntime;
 using AquaPic.Globals;
 using AquaPic.LightingModule;
 using AquaPic.PowerDriver;
@@ -34,29 +35,19 @@ namespace AquaPic
             Thread.Sleep (2000);
             #endif
 
-            int powerStrip1 = Power.AddPowerStrip (16, "PS1", false);
-            int powerStrip2 = Power.AddPowerStrip (17, "PS2", false);
-
-            // Analog Input
-            int analogInputCard1 = AnalogInput.AddCard (20, "AI1");
-
-            // Analog Output
-            int analogOutputCard1 = AnalogOutput.AddCard (30, "AQ1");
-
-            // Digital Input
-            DigitalInput.AddCard (40, "DI1");
+            Equipment.AddFromJson ();
 
             // Temperature
-            Temperature.AddTemperatureProbe (analogInputCard1, 0, "Sump Temperature");
-            Temperature.AddHeater (powerStrip1, 6, "Bottom Heater");
-            Temperature.AddHeater (powerStrip1, 7, "Top Heater");
+            Temperature.AddTemperatureProbe (AnalogInput.GetCardIndex ("AI1"), 0, "Sump Temperature");
+            Temperature.AddHeater (Power.GetPowerStripIndex("PS1"), 6, "Bottom Heater");
+            Temperature.AddHeater (Power.GetPowerStripIndex("PS1"), 7, "Top Heater");
 
             // Lighting
             int lightingID = Lighting.AddLight (
                 "White LED", 
-                powerStrip1, 
+                Power.GetPowerStripIndex("PS1"), 
                 0,
-                analogOutputCard1,
+                AnalogOutput.GetCardIndex ("AQ1"),
                 0,
                 10.0f,
                 75.0f
@@ -65,9 +56,9 @@ namespace AquaPic
 
             lightingID = Lighting.AddLight (
                 "Actinic LED", 
-                powerStrip1, 
+                Power.GetPowerStripIndex("PS1"), 
                 1,
-                analogOutputCard1,
+                AnalogOutput.GetCardIndex ("AQ1"),
                 1,
                 10.0f,
                 75.0f
@@ -76,23 +67,13 @@ namespace AquaPic
 
             lightingID = Lighting.AddLight (
                 "Refugium",
-                powerStrip1,
+                Power.GetPowerStripIndex("PS1"),
                 2,
                 LightingTime.Nighttime
             );
             Lighting.SetupAutoOnOffTime (lightingID);
 
-            /*
-            Coil plugControl = Power.AddOutlet (powerStrip1, 5, "Test", MyState.On);
-            OutletPlugin p = new OutletPlugin ("TestPlugControl", "ScriptTest.cs");
-            plugControl.ConditionChecker = delegate() {
-                bool b = p.RunOutletCondition ();
-                return b;
-            };*/
-
             Plugin.AddPlugins ();
-
-            //uint timer = GLib.Timeout.Add (250, test);
 
             TaskManager.Start ();
 
@@ -104,12 +85,5 @@ namespace AquaPic
             win.Show ();
 			Application.Run ();
 		}
-
-        protected static bool test () {
-            //Lighting.Run ();
-            //Temperature.Run ();
-
-            return true;
-        }
 	}
 }

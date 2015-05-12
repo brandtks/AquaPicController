@@ -92,9 +92,7 @@ namespace AquaPic.SerialBus
                 status = stat;
 
                 if (OnStatusUpdate != null)
-                    Gtk.Application.Invoke (delegate {
-                        OnStatusUpdate (this);
-                    });
+                    Gtk.Application.Invoke ((sender, e) => OnStatusUpdate (this));
             }
         }
     }

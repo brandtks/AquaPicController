@@ -10,8 +10,11 @@ namespace AquaPic.PluginRuntime
 {
     public class Plugin
     {
-        public static Dictionary<string, PluginType> AllPlugins = new Dictionary<string, PluginType> ();
+        public static Dictionary<string, PluginScript> AllPlugins = new Dictionary<string, PluginScript> ();
 
+        /* <TODO> I want to add some sort of json file adding plugins
+         * Use that to control what plugins to load, and flags to set
+         */
         public static void AddPlugins () {
             StringBuilder sb = new StringBuilder ();
             sb.Append (Environment.GetEnvironmentVariable ("AquaPic"));
@@ -29,13 +32,13 @@ namespace AquaPic.PluginRuntime
                 //Console.WriteLine ("{0} at file path {1}", name, path);
 
                 foreach (var line in File.ReadLines (path)) {
-                    if (line.Contains ("OutletPluginScript")) {
-                        AllPlugins.Add (name, new OutletPlugin (name, path));
-                        AllPlugins [name].RunInitialize ("ScriptingInterface.OutletPluginScript");
+                    if (line.Contains ("IOutletScript")) {
+                        AllPlugins.Add (name, new OutletScript (name, path));
+                        AllPlugins [name].RunInitialize ();
                         break;
-                    } else if (line.Contains ("PluginScript")) {
-                        AllPlugins.Add (name, new PluginType (name, path));
-                        AllPlugins [name].RunInitialize ("ScriptingInterface.PluginScript");
+                    } else if (line.Contains ("IPluginScript")) {
+                        AllPlugins.Add (name, new PluginScript (name, path));
+                        AllPlugins [name].RunInitialize ();
                     }
                 }
             }
@@ -43,15 +46,13 @@ namespace AquaPic.PluginRuntime
 
         public static void Run () {
             foreach (var p in AllPlugins.Values) {
-                if (p is OutletPlugin) {
-
-                } else {
+                if (p.flags.HasFlag (PluginFlags.Cyclic)) {
                     p.RunPlugin ();
                 }
             }
         }
 
-        public static Assembly CompileCode (ref bool compiledOk, string name, string sourceFileLocation) {
+        public static bool CompileCode (out Assembly pluginAssembly, string name, string sourceFileLocation) {
             CSharpCodeProvider provider = new CSharpCodeProvider ();
             CompilerParameters options = new CompilerParameters();
 
@@ -66,12 +67,12 @@ namespace AquaPic.PluginRuntime
                 foreach (CompilerError error in result.Errors)
                     Console.WriteLine ("Error ({0}): {1}", error.ErrorNumber, error.ErrorText);
 
-                compiledOk = false;
-                return null;
+                pluginAssembly = null;
+                return false;
             }
 
-            compiledOk = true;
-            return Assembly.LoadFrom (name + ".dll");
+            pluginAssembly = Assembly.LoadFrom (name + ".dll");
+            return true;
         }
     }
 }

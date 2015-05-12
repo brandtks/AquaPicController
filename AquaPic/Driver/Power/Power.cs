@@ -52,6 +52,8 @@ namespace AquaPic.PowerDriver
         }
 
         public static Coil AddOutlet (int powerID, int outletID, string name, MyState fallback) {
+            if (powerID == -1)
+                throw new Exception ("Card does not exist");
             pwrStrips [powerID].Outlets [outletID].name = name;
             pwrStrips [powerID].Outlets [outletID].fallback = fallback;
             pwrStrips [powerID].Outlets [outletID].mode = Mode.Auto;
@@ -70,8 +72,8 @@ namespace AquaPic.PowerDriver
             MyState fallback
         ) {
             Coil c = AddOutlet (powerID, outletID, name, fallback);
-            c.ConditionChecker = delegate() {
-                OutletPlugin p = Plugin.AllPlugins [pluginName] as OutletPlugin;
+            c.ConditionChecker = () => {
+                OutletScript p = Plugin.AllPlugins [pluginName] as OutletScript;
                 return p.RunOutletCondition ();
             };
         }

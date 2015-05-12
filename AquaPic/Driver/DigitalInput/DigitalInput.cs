@@ -18,10 +18,12 @@ namespace AquaPic.DigitalInputDriver
         }
 
         public static void AddInput (IndividualControl input, string name) {
-            cards [input.Group].inputs [input.Individual].name = name;
+            AddInput (input.Group, input.Individual, name);
         }
 
         public static void AddInput (int cardID, int inputID, string name) {
+            if (cardID == -1)
+                throw new Exception ("Card does not exist");
             cards [cardID].inputs [inputID].name = name;
         }
 
@@ -48,6 +50,14 @@ namespace AquaPic.DigitalInputDriver
 //        public static bool GetInputIndividualControl (string name, ref IndividualControl input) {
 //
 //        }
+
+        public static int GetCardIndex (string name) {
+            for (int i = 0; i < cards.Count; ++i) {
+                if (cards [i].name == name)
+                    return i;
+            }
+            return -1;
+        }
     }
 }
 

@@ -112,7 +112,9 @@ namespace AquaPic.SerialBus
         }
         #else
         private unsafe void queueMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
-            messageBuffer.Enqueue (new Message (slave, func, writeData, writeSize, readSize, callback));
+            // <TEST> if uart is null the port isn't open so don't queue the message
+            if (uart != null)
+                messageBuffer.Enqueue (new Message (slave, func, writeData, writeSize, readSize, callback));
         }
         #endif
 
@@ -173,11 +175,8 @@ namespace AquaPic.SerialBus
                                     for (int i = 0; i < m.responseLength; ++i)
                                         m.readData [i] = lines [1 + i];
 
-                                    if (m.callback != null) {
-                                        Gtk.Application.Invoke ( delegate {
-                                            m.callback (new CallbackArgs (m.readData));
-                                        });
-                                    }
+                                    if (m.callback != null)
+                                        Gtk.Application.Invoke (() => m.callback (new CallbackArgs (m.readData)));
 
                                     fileOpen = true;
                                 }
@@ -218,9 +217,7 @@ namespace AquaPic.SerialBus
 
                                     if (checkResponse (ref m.readBuffer)) {
                                         if (m.callback != null) {
-                                            Gtk.Application.Invoke ( delegate {
-                                                m.callback (new CallbackArgs (m.readBuffer));
-                                            });
+                                            Gtk.Application.Invoke ((sender, e) => m.callback (new CallbackArgs (m.readBuffer)));
                                         }
                                         m.slave.updateStatus (AquaPicBusStatus.communicationSuccess, (int)stopwatch.ElapsedMilliseconds);
                                         break;

@@ -1,16 +1,25 @@
 ﻿using System;
 
-namespace ScriptingInterface
+namespace AquaPic.PluginRuntime
 {
-    public interface OutletPluginScript
+    [Flags]
+    public enum PluginFlags {
+        None = 0,
+        Compiled = 1,
+        Cyclic = 2,
+        Outlet = 4,
+        Initializer = 8,
+        OneShot = 16
+    }
+
+    public interface IOutletScript : IPluginScript
     {
-        void Initialize ();
         bool OutletCondition ();
     }
 
-    public interface PluginScript
+    public interface IPluginScript
     {
         void Initialize ();
-        void RuntimePlugin ();
+        void RunScript ();
     }
 }

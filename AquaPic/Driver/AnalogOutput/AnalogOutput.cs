@@ -25,7 +25,7 @@ namespace AquaPic.AnalogOutputDriver
 
         public static int AddCard (int address, string name) {
             int count = cards.Count;
-            cards.Add (new AnalogOutputCard ((byte)address, (byte)count));
+            cards.Add (new AnalogOutputCard ((byte)address, (byte)count, name));
             return count;
         }
 
@@ -34,12 +34,22 @@ namespace AquaPic.AnalogOutputDriver
         }
 
         public static Value AddChannel (int cardID, int channelID, AnalogType type, string name) {
+            if (cardID == -1)
+                throw new Exception ("Card does not exist");
             cards [cardID].AddChannel (channelID, type, name);
             return cards [cardID].channels [channelID].ValueControl;
         }
 
         public static void SetAnalogValue (IndividualControl channel, int value) {
             cards [channel.Group].SetAnalogValue (channel.Individual, value);
+        }
+
+        public static int GetCardIndex (string name) {
+            for (int i = 0; i < cards.Count; ++i) {
+                if (cards [i].name == name)
+                    return i;
+            }
+            return -1;
         }
     }
 }
