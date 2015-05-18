@@ -10,7 +10,7 @@ namespace AquaPic.PluginRuntime
 {
     public class Plugin
     {
-        public static Dictionary<string, PluginScript> AllPlugins = new Dictionary<string, PluginScript> ();
+        public static Dictionary<string, BaseScript> AllPlugins = new Dictionary<string, BaseScript> ();
 
         /* <TODO> I want to add some sort of json file adding plugins
          * Use that to control what plugins to load, and flags to set
@@ -36,9 +36,11 @@ namespace AquaPic.PluginRuntime
                         AllPlugins.Add (name, new OutletScript (name, path));
                         AllPlugins [name].RunInitialize ();
                         break;
-                    } else if (line.Contains ("IPluginScript")) {
-                        AllPlugins.Add (name, new PluginScript (name, path));
+                    } else if (line.Contains ("ICyclicScript")) {
+                        AllPlugins.Add (name, new CyclicScript (name, path));
                         AllPlugins [name].RunInitialize ();
+                    } else if (line.Contains ("IStartupScript")) {
+                        StartupScript temp = new StartupScript (name, path);
                     }
                 }
             }
@@ -46,32 +48,30 @@ namespace AquaPic.PluginRuntime
 
         public static void Run () {
             foreach (var p in AllPlugins.Values) {
-                if (p.flags.HasFlag (PluginFlags.Cyclic)) {
-                    p.RunPlugin ();
+                if (p.flags.HasFlag (ScriptFlags.Cyclic)) {
+                    p.RunPlugin (ScriptFlags.Cyclic);
                 }
             }
         }
 
-        public static bool CompileCode (out Assembly pluginAssembly, string name, string sourceFileLocation) {
+        public static bool CompileCode (string scriptName, string filePath) {
             CSharpCodeProvider provider = new CSharpCodeProvider ();
             CompilerParameters options = new CompilerParameters();
 
             options.GenerateExecutable = false; // create dll
-            options.OutputAssembly = name + ".dll";
+            options.OutputAssembly = scriptName + ".dll";
             options.GenerateInMemory = false;
             options.ReferencedAssemblies.Add (Assembly.GetExecutingAssembly ().Location);
 
-            CompilerResults result = provider.CompileAssemblyFromFile(options, sourceFileLocation);
+            CompilerResults result = provider.CompileAssemblyFromFile (options, filePath);
 
             if (result.Errors.HasErrors) {
                 foreach (CompilerError error in result.Errors)
                     Console.WriteLine ("Error ({0}): {1}", error.ErrorNumber, error.ErrorText);
-
-                pluginAssembly = null;
+                
                 return false;
             }
 
-            pluginAssembly = Assembly.LoadFrom (name + ".dll");
             return true;
         }
     }

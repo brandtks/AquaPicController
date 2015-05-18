@@ -1,51 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using AquaPic.AlarmRuntime;
 using AquaPic.AnalogInputDriver;
 using AquaPic.Globals;
 using AquaPic.PowerDriver;
+using AquaPic.Utilites;
 
 namespace AquaPic.TemperatureModule
 {
     public partial class Temperature
     {
-        //public static Temperature Main = new Temperature ();
-
-        public static float highTempAlarmSetpoint = 82;
-        public static float lowTempAlarmSetpoint = 75;
+        private static float highTempAlarmSetpoint;
+        private static float lowTempAlarmSetpoint;
+        private static int highTempAlarmIdx;
+        private static int lowTempAlarmIdx;
 
         public static int HighTemperatureAlarmIndex {
-            get { return columnTemp._highTempAlarmIdx; }
+            get { return highTempAlarmIdx; }
         }
         public static int LowTemperatureAlarmIndex {
-            get { return columnTemp._lowTempAlarmIdx; }
+            get { return lowTempAlarmIdx; }
         }
 
-        private static List<Heater> heaters = new List<Heater> ();
+        private static List<Heater> heaters;
+        public static List<IndividualControl> channels;
 
-        private static ColumnTemperature columnTemp = new ColumnTemperature (HighTempHandler);
-        public static float WaterColumnTemperature {
-            get { return columnTemp.temperature; }
+        private static float temperature;
+        public static float WaterTemperature {
+            get { return temperature; }
         }
 
-        //private Temperature () {
-            //_highTempAlarmIdx = -1;
-            //_lowTempAlarmIdx = -1;
-            //heaters = new List<Heater> ();
-        //}
+        static Temperature () {
+            heaters = new List<Heater> ();
+            channels = new List<IndividualControl> ();
 
-//        public static void Init () {
-//            _highTempAlarmIdx = Alarm.Subscribe ("High temperature", "Water column temperature too high");
-//            _lowTempAlarmIdx = Alarm.Subscribe ("Low temperature", "Water column temperature too low");
-//            Alarm.AddPostHandler (_highTempAlarmIdx, HighTempHandler);
-//            Alarm.AddPostHandler (_lowTempAlarmIdx, LowTempHandler);
-//        }
+            string path = string.Format (
+                "{0}{1}", 
+                Environment.GetEnvironmentVariable ("AquaPic"), 
+                @"\AquaPicRuntimeProject\tempProperties.json");
 
-        public static void AddTemperatureProbe (int cardID, int channelID, string name, bool waterColumn = true) {
-            AnalogInput.AddChannel (cardID, channelID, AnalogType.Temperature, name);
-            if (waterColumn) {
-                columnTemp.AddColumnTemperature (cardID, channelID);
+            using (StreamReader reader = File.OpenText (path)) {
+                JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
+                highTempAlarmSetpoint = Convert.ToSingle (jo ["highTempAlarmSetpoint"]);
+                lowTempAlarmSetpoint = Convert.ToSingle (jo ["lowTempAlarmSetpoint"]);
             }
+
+            highTempAlarmIdx = Alarm.Subscribe ("High temperature", "Water column temperature too high");
+            lowTempAlarmIdx = Alarm.Subscribe ("Low temperature", "Water column temperature too low");
+
+            Alarm.AddPostHandler (
+                highTempAlarmIdx, 
+                (sender) => {
+                    foreach (var heater in heaters)
+                        Power.AlarmShutdownOutlet (heater.Plug);
+                });
+
+            temperature = 0.0f;
+        }
+
+        public static void AddTemperatureProbe (int cardID, int channelID, string name) {
+            AnalogInput.AddChannel (cardID, channelID, AnalogType.Temperature, name);
+            IndividualControl ch = new IndividualControl ();
+            ch.Group = (byte)cardID;
+            ch.Individual = (byte)channelID;
+            channels.Add (ch);
         }
 
         public static void AddHeater (
@@ -60,12 +81,18 @@ namespace AquaPic.TemperatureModule
         }
 
         public static void Run () {
-            columnTemp.GetColumnTemperature ();
-        }
+            temperature = 0.0f;
+            for (int i = 0; i < channels.Count; ++i)
+                temperature += AnalogInput.GetAnalogValue (channels [i]);
+            temperature /= channels.Count;
 
-        private static void HighTempHandler (object sender) {
-            for (int i = 0; i < heaters.Count; ++i)
-                Power.AlarmShutdownOutlet (heaters [i].Plug);
+            temperature = temperature.Map (0, 4096, 32.0f, 100.0f);
+
+            if (temperature >= highTempAlarmSetpoint) 
+                Alarm.Post (highTempAlarmIdx);
+
+            if (temperature <= lowTempAlarmSetpoint)
+                Alarm.Post (lowTempAlarmIdx);
         }
     }
 }

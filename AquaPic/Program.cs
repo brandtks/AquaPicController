@@ -43,18 +43,18 @@ namespace AquaPic
             Temperature.AddHeater (Power.GetPowerStripIndex("PS1"), 7, "Top Heater");
 
             // Lighting
-            int lightingID = Lighting.AddLight (
-                "White LED", 
-                Power.GetPowerStripIndex("PS1"), 
-                0,
-                AnalogOutput.GetCardIndex ("AQ1"),
-                0,
-                10.0f,
-                75.0f
-            );
-            Lighting.SetupAutoOnOffTime (lightingID);
+//            int lightingID = Lighting.AddLight (
+//                "White LED", 
+//                Power.GetPowerStripIndex("PS1"), 
+//                0,
+//                AnalogOutput.GetCardIndex ("AQ1"),
+//                0,
+//                10.0f,
+//                75.0f
+//            );
+//            Lighting.SetupAutoOnOffTime (lightingID);
 
-            lightingID = Lighting.AddLight (
+            int lightingID = Lighting.AddLight (
                 "Actinic LED", 
                 Power.GetPowerStripIndex("PS1"), 
                 1,
