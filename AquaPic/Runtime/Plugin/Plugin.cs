@@ -32,15 +32,18 @@ namespace AquaPic.PluginRuntime
                 //Console.WriteLine ("{0} at file path {1}", name, path);
 
                 foreach (var line in File.ReadLines (path)) {
-                    if (line.Contains ("IOutletScript")) {
-                        AllPlugins.Add (name, new OutletScript (name, path));
-                        AllPlugins [name].RunInitialize ();
-                        break;
-                    } else if (line.Contains ("ICyclicScript")) {
+//                    if (line.Contains ("IOutletScript")) {
+//                        AllPlugins.Add (name, new OutletScript (name, path));
+//                        AllPlugins [name].RunInitialize ();
+//                        break;
+//                    } else if (line.Contains ("ICyclicScript")) {
+                    if (line.Contains ("ICyclicScript")) {    
                         AllPlugins.Add (name, new CyclicScript (name, path));
                         AllPlugins [name].RunInitialize ();
                     } else if (line.Contains ("IStartupScript")) {
                         StartupScript temp = new StartupScript (name, path);
+                    } else if (line.Contains ("IEventScript")) {
+                        AllPlugins.Add (name, new EventScript (name, path));
                     }
                 }
             }

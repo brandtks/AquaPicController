@@ -13,18 +13,18 @@ namespace MyWidgetLibrary
 
     public class TouchButton : EventBox
     {
-        public MyColor ButtonColor;
-        public string Text;
-        public MyColor TextColor;
+        public MyColor buttonColor;
+        public string text;
+        public MyColor textColor;
         public ButtonClickAction clickAction;
 
         public TouchButton () {
             this.Visible = true;
             this.VisibleWindow = false;
 
-            this.ButtonColor = new MyColor ("pri", 0.9);
-            this.Text = "";
-            this.TextColor = new MyColor ("black");
+            this.buttonColor = "pri";
+            this.text = "";
+            this.textColor = "black";
             this.HeightRequest = 45;
             this.WidthRequest = 45;
             this.clickAction = ButtonClickAction.Darken;
@@ -43,17 +43,19 @@ namespace MyWidgetLibrary
 
                 //cr.Rectangle (left, top, width, height);
                 WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
-                ButtonColor.SetSource (cr);
+                buttonColor.SetSource (cr);
                 cr.Fill ();
 
                 Pango.Layout l = new Pango.Layout (this.PangoContext);
-                l.Width = Pango.Units.FromPixels (width);
+                l.Width = Pango.Units.FromPixels (width - 2);
                 l.Wrap = Pango.WrapMode.Word;
                 l.Alignment = Pango.Alignment.Center;
                 //l.SetText (ButtonLabel);
-                l.SetMarkup ("<span color=" + (char)34 + TextColor.ToHTML () + (char)34 + ">" + Text + "</span>"); 
+                l.SetMarkup ("<span color=" + (char)34 + textColor.ToHTML () + (char)34 + ">" + text + "</span>"); 
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, (top + (height / 2)) - 6, l);
+                int y = (top + (height / 2)) - 6;
+                y -= ((l.LineCount - 1) * 9);
+                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 1, y, l);
                 //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
                 l.Dispose ();
             }
@@ -61,20 +63,20 @@ namespace MyWidgetLibrary
 
         protected void onTouchButtonPress (object o, ButtonPressEventArgs args) {
             if (clickAction == ButtonClickAction.NoTransparency)
-                ButtonColor.ModifyAlpha (1.0f);
+                buttonColor.ModifyAlpha (1.0f);
             else if (clickAction == ButtonClickAction.Brighten)
-                ButtonColor.ModifyColor (1.25);
+                buttonColor.ModifyColor (1.25);
             else if (clickAction == ButtonClickAction.Darken)
-                ButtonColor.ModifyColor (0.75);
+                buttonColor.ModifyColor (0.75);
 
             this.QueueDraw ();
         }
 
         protected void onTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
             if (clickAction == ButtonClickAction.NoTransparency)
-                ButtonColor.RestoreAlpha ();
+                buttonColor.RestoreAlpha ();
             else if ((clickAction == ButtonClickAction.Brighten) || (clickAction == ButtonClickAction.Darken))
-                ButtonColor.RestoreColor ();
+                buttonColor.RestoreColor ();
 
             this.QueueDraw ();
         }

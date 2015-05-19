@@ -30,6 +30,7 @@ namespace AquaPic.PluginRuntime
                 //<TODO> figure out how to delete the assembly file
                 //int idx = path.LastIndexOf ('\\') + 1;
                 //string newPath = path.Substring (0, idx) + name + ".dll";
+                //File.Delete (newPath);
             }
         }
     }

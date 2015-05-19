@@ -40,9 +40,9 @@ namespace AquaPic.AnalogOutputDriver
             return cards [cardID].channels [channelID].ValueControl;
         }
 
-        public static void SetAnalogValue (IndividualControl channel, int value) {
-            cards [channel.Group].SetAnalogValue (channel.Individual, value);
-        }
+//        public static void SetAnalogValue (IndividualControl channel, int value) {
+//            cards [channel.Group].SetAnalogValue (channel.Individual, value);
+//        }
 
         public static int GetCardIndex (string name) {
             for (int i = 0; i < cards.Count; ++i) {

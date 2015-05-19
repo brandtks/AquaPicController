@@ -37,42 +37,6 @@ namespace AquaPic
 
             Equipment.AddFromJson ();
 
-            // Temperature
-            Temperature.AddTemperatureProbe (AnalogInput.GetCardIndex ("AI1"), 0, "Sump Temperature");
-            Temperature.AddHeater (Power.GetPowerStripIndex("PS1"), 6, "Bottom Heater");
-            Temperature.AddHeater (Power.GetPowerStripIndex("PS1"), 7, "Top Heater");
-
-            // Lighting
-//            int lightingID = Lighting.AddLight (
-//                "White LED", 
-//                Power.GetPowerStripIndex("PS1"), 
-//                0,
-//                AnalogOutput.GetCardIndex ("AQ1"),
-//                0,
-//                10.0f,
-//                75.0f
-//            );
-//            Lighting.SetupAutoOnOffTime (lightingID);
-
-            int lightingID = Lighting.AddLight (
-                "Actinic LED", 
-                Power.GetPowerStripIndex("PS1"), 
-                1,
-                AnalogOutput.GetCardIndex ("AQ1"),
-                1,
-                10.0f,
-                75.0f
-            );
-            Lighting.SetupAutoOnOffTime (lightingID, -15, 15);
-
-            lightingID = Lighting.AddLight (
-                "Refugium",
-                Power.GetPowerStripIndex("PS1"),
-                2,
-                LightingTime.Nighttime
-            );
-            Lighting.SetupAutoOnOffTime (lightingID);
-
             Plugin.AddPlugins ();
 
             TaskManager.Start ();

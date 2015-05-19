@@ -9,18 +9,23 @@ namespace AquaPic.ValueRuntime
     {
         public ValueGetterHandler ValueGetter;
         public ValueSetterHandler ValueSetter;
+        private float value;
 
         public Value () {
         }
 
         public void Execute () {
-            float value = 0.0f;
+            float newValue = 0.0f;
 
             if (ValueGetter != null)
-                value = ValueGetter ();
+                newValue = ValueGetter ();
 
-            if (ValueSetter != null)
-                ValueSetter (value);
+            if (value != newValue) {
+                value = newValue;
+
+                if (ValueSetter != null)
+                    ValueSetter (value);
+            }
         }
     }
 }

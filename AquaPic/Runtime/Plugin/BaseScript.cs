@@ -66,7 +66,7 @@ namespace AquaPic.PluginRuntime
                     var i = instance as ICyclicScript;
                     i.RunScript ();
                 } catch {
-                    if (!flags.HasFlag (ScriptFlags.Outlet)) // if its not an outlet script mark plugin as bad
+//                    if (!flags.HasFlag (ScriptFlags.Outlet)) // if its not an outlet script mark plugin as bad
                         flags &= ~ScriptFlags.Compiled;
                 }
             }

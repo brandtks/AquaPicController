@@ -21,7 +21,10 @@ namespace AquaPic.Globals
 
     public enum MyState : byte {
         Off = 0,
-        On = 1
+        On = 1,
+        Set,
+        Reset,
+        Invalid
     }
 
     public enum LightingTime : byte {

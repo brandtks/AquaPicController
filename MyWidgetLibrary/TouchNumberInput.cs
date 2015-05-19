@@ -81,7 +81,7 @@ namespace MyWidgetLibrary
                     plusMinus.key = "-"; 
                 }
 
-                plusMinus.Text = plusMinus.key.ToString ();
+                plusMinus.text = plusMinus.key.ToString ();
                 plusMinus.QueueDraw ();
             };
             fix.Put (plusMinus, 5, 185);
@@ -97,7 +97,7 @@ namespace MyWidgetLibrary
             fix.Put (clear, 155, 85);
 
             TouchButton enter = new TouchButton ();
-            enter.Text = Convert.ToChar (0x23CE).ToString ();
+            enter.text = Convert.ToChar (0x23CE).ToString ();
             enter.HeightRequest = 95;
             enter.ButtonReleaseEvent += (o, args) => {
                 if (NumberSetEvent != null)
@@ -117,7 +117,7 @@ namespace MyWidgetLibrary
 
             public KeyButton (string key, bool sendKey = true) {
                 this.key = key;
-                this.Text = key;
+                this.text = key;
                 if (sendKey)
                     ButtonReleaseEvent += (o, args) => SendKeys.SendWait (key);
                 
@@ -125,7 +125,7 @@ namespace MyWidgetLibrary
 
             public KeyButton (string key, string text, bool sendKey = true) 
                 : this (key, sendKey) {
-                this.Text = text;
+                this.text = text;
             }
         }
     }

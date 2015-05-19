@@ -64,35 +64,27 @@ namespace AquaPic.PowerDriver
             return pwrStrips [powerID].Outlets [outletID].OutletControl;
         }
 
-        public static void AddPluginOutlet (
-            string pluginName, 
-            int powerID, 
-            int outletID, 
-            string name, 
-            MyState fallback
-        ) {
-            Coil c = AddOutlet (powerID, outletID, name, fallback);
-            c.ConditionChecker = () => {
-                OutletScript p = Plugin.AllPlugins [pluginName] as OutletScript;
-                return p.RunOutletCondition ();
-            };
-        }
+//        public static void AddPluginOutlet (
+//            string pluginName, 
+//            int powerID, 
+//            int outletID, 
+//            string name, 
+//            MyState fallback
+//        ) {
+//            Coil c = AddOutlet (powerID, outletID, name, fallback);
+//            c.ConditionChecker = () => {
+//                OutletScript p = Plugin.AllPlugins [pluginName] as OutletScript;
+//                return p.RunOutletCondition ();
+//            };
+//        }
 
         public static void SetManualOutletState (IndividualControl outlet, MyState state) {
             pwrStrips [outlet.Group].Outlets [outlet.Individual].manualState = state;
         }
 
-//        public static MyState GetManualPlugState (IndividualControl plug) {
-//            return pwrStrips [plug.Group].plugs [plug.Individual].manualState;
-//        }
-
         public static void AlarmShutdownOutlet (IndividualControl outlet) {
             pwrStrips [outlet.Group].SetOutletState (outlet.Individual, MyState.Off, true);
         }
-
-//        protected static void SetPlugState (IndividualControl plug, MyState state) {
-//            pwrStrips [plug.Group].SetPlugState (plug.Individual, state, false);
-//        }
 
         public static void SetOutletMode (IndividualControl outlet, Mode mode) {
             pwrStrips [outlet.Group].SetPlugMode (outlet.Individual, mode);
@@ -156,18 +148,6 @@ namespace AquaPic.PowerDriver
 
             return false;
         }
-
-//        public static string GetApbStatus (int powerID) {
-//            return Utils.GetDescription (pwrStrips [powerID].slave.Status);
-//        }
-//
-//        public static int GetApbResponseTime (int powerID) {
-//            return pwrStrips [powerID].slave.ResponeTime;
-//        }
-//
-//        public static int GetApbAddress (int powerID) {
-//            return pwrStrips [powerID].slave.Address;
-//        }
 
         public static void AddHandlerOnAuto (IndividualControl outlet, ModeChangedHandler handler) {
             pwrStrips [outlet.Group].Outlets [outlet.Individual].onAuto += handler;

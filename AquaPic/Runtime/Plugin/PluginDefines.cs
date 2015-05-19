@@ -7,15 +7,15 @@ namespace AquaPic.PluginRuntime
         None = 0,
         Compiled = 1,
         Cyclic = 2,
-        Outlet = 4,
+        //Outlet = 4,
         Event = 8,
         Initializer = 16
     }
 
-    public interface IOutletScript : IStartupScript
-    {
-        bool OutletCondition ();
-    }
+//    public interface IOutletScript : IStartupScript
+//    {
+//        bool OutletCondition ();
+//    }
 
     public interface ICyclicScript : IStartupScript, IEventScript
     { }
