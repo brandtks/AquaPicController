@@ -6,21 +6,21 @@ namespace MyWidgetLibrary
 {
     public class TouchLabel : EventBox
     {
-        public string Text;
-        public MyColor TextColor;
-        public int TextSize;
-        public int AreaWidth;
-        public Justify TextAlignment;
+        public string text;
+        public MyColor textColor;
+        public int textSize;
+        public int areaWidth;
+        public Justify textAlignment;
 
         public TouchLabel () {
             this.Visible = true;
             this.VisibleWindow = false;
 
-            this.Text = null;
-            this.TextColor = new MyColor ("black");
-            this.TextSize = 11;
-            this.TextAlignment = Justify.Left;
-            AreaWidth = 0;
+            this.text = null;
+            this.textColor = new MyColor ("black");
+            this.textSize = 11;
+            this.textAlignment = Justify.Left;
+            areaWidth = 0;
             HeightRequest = 30;
             WidthRequest = 200;
 
@@ -34,18 +34,18 @@ namespace MyWidgetLibrary
 
                 Pango.Layout l = new Pango.Layout (PangoContext);
                 l.Wrap = Pango.WrapMode.WordChar;
-                if (AreaWidth != 0)
-                    l.Width = Pango.Units.FromPixels (AreaWidth);
+                if (areaWidth != 0)
+                    l.Width = Pango.Units.FromPixels (areaWidth);
                 
-                if (TextAlignment == Justify.Left)
+                if (textAlignment == Justify.Left)
                     l.Alignment = Pango.Alignment.Left;
-                else if (TextAlignment == Justify.Right)
+                else if (textAlignment == Justify.Right)
                     l.Alignment = Pango.Alignment.Right;
                 else // center
                     l.Alignment = Pango.Alignment.Center;
                 
-                l.SetMarkup ("<span color=" + (char)34 + TextColor.ToHTML () + (char)34 + ">" + Text + "</span>"); 
-                l.FontDescription = Pango.FontDescription.FromString ("Courier New " + TextSize.ToString ());
+                l.SetMarkup ("<span color=" + (char)34 + textColor.ToHTML () + (char)34 + ">" + text + "</span>"); 
+                l.FontDescription = Pango.FontDescription.FromString ("Courier New " + textSize.ToString ());
 
 //                if (Justification == Justify.Right) {
 //                    int width, height;

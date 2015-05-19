@@ -58,7 +58,7 @@ namespace AquaPic.TemperatureModule
                         Power.AlarmShutdownOutlet (heater.Plug);
                 });
 
-            temperature = 0.0f;
+            temperature = 32.0f;
         }
 
         public static void AddTemperatureProbe (int cardID, int channelID, string name) {

@@ -53,9 +53,9 @@ namespace MyWidgetLibrary
                 Gdk.Color c = new Gdk.Color ();
                 colorFound = Gdk.Color.Parse (color, ref c);
                 if (colorFound) {
-                    R = (float)(c.Red / 255);
-                    G = (float)(c.Green / 255);
-                    B = (float)(c.Blue / 255);
+                    R = (float)(c.Red / 65535);
+                    G = (float)(c.Green / 65535);
+                    B = (float)(c.Blue / 65535);
                 } else
                     throw new Exception ("No color could be found matching that description");
             }
@@ -184,9 +184,10 @@ namespace MyWidgetLibrary
             byte r, g, b;
 
             try {
-                r = (byte)(colorLookup [color] [0] * 255);
-                g = (byte)(colorLookup [color] [1] * 255);
-                b = (byte)(colorLookup [color] [2] * 255);
+                MyColor c = new MyColor (color);
+                r = (byte)(c.R * 255);
+                g = (byte)(c.G * 255);
+                b = (byte)(c.B * 255);
             } catch {
                 r = 0;
                 g = 0;
@@ -202,33 +203,28 @@ namespace MyWidgetLibrary
         }
 
         public static void SetSource (Context cr, string color, double a = 1.0) {
-            double r, g, b;
+            MyColor c;
 
             try {
-                r = colorLookup [color] [0];
-                g = colorLookup [color] [1];
-                b = colorLookup [color] [2];
+                c = new MyColor (color);
+                cr.SetSourceRGBA (c.R, c.G, c.B, a);
             } catch {
-                r = 0.0;
-                g = 0.0;
-                b = 0.0;
+                cr.SetSourceRGBA (0.0, 0.0, 0.0, a);
             }
-
-            cr.SetSourceRGBA (r, g, b, a);
         }
 
-        public static Color NewColor (string color, double a = 1.0) {
+        public static Color NewGdkColor (string color, double a = 1.0) {
+            MyColor c;
+
             try {
-                double r = colorLookup [color] [0];
-                double g = colorLookup [color] [1];
-                double b = colorLookup [color] [2];
-                return new Color (r, g, b, a);
+                c = new MyColor (color);
+                return new Color (c.R, c.G, c.B, a);
             } catch {
                 return new Color (0.0, 0.0, 0.0);
             }
         }
 
-        public Color ToColor () {
+        public Color ToGdkColor () {
             return new Color (R, G, B, A);
         }
     }

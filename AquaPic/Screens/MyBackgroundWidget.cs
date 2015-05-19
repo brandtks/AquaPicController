@@ -102,9 +102,9 @@ namespace AquaPic
                 cr.Rectangle (0, 0, 800, 480);
 
                 Gradient pat = new LinearGradient (400, 0, 400, 480);
-                pat.AddColorStop (0.0, MyColor.NewColor ("grey0"));
-                pat.AddColorStop (0.5, MyColor.NewColor ("grey1"));
-                pat.AddColorStop (1.0, MyColor.NewColor ("grey0"));
+                pat.AddColorStop (0.0, MyColor.NewGdkColor ("grey0"));
+                pat.AddColorStop (0.5, MyColor.NewGdkColor ("grey1"));
+                pat.AddColorStop (1.0, MyColor.NewGdkColor ("grey0"));
                 cr.SetSource (pat);
 
                 //cr.SetSourceRGB (0.82, 0.85, 0.88);

@@ -47,35 +47,35 @@ namespace AquaPic
             box4.Show ();
 
             TouchLabel fixtureLabel = new TouchLabel ();
-            fixtureLabel.Text = "Lighting Fixtures";
+            fixtureLabel.text = "Lighting Fixtures";
             //fixtureLabel.TextColor.ChangeColor ("pri");
-            fixtureLabel.TextColor = "pri";
-            fixtureLabel.TextSize = 12;
+            fixtureLabel.textColor = "pri";
+            fixtureLabel.textSize = 12;
             Put (fixtureLabel, 413, 40);
             fixtureLabel.Show ();
 
             TouchLabel onTimeLabel = new TouchLabel ();
-            onTimeLabel.Text = "On Time";
-            onTimeLabel.TextColor = "grey4"; 
+            onTimeLabel.text = "On Time";
+            onTimeLabel.textColor = "grey4"; 
             Put (onTimeLabel, 415, 75);
             onTimeLabel.Show ();
 
             TouchLabel offTimeLabel = new TouchLabel ();
-            offTimeLabel.Text = "Off Time";
-            offTimeLabel.TextColor = "grey4"; 
+            offTimeLabel.text = "Off Time";
+            offTimeLabel.textColor = "grey4"; 
             Put (offTimeLabel, 415, 130);
             offTimeLabel.Show ();
 
             TouchLabel genInfoLabel = new TouchLabel ();
-            genInfoLabel.Text = "General Lighting Information";
-            genInfoLabel.TextColor = "pri";
-            genInfoLabel.TextSize = 12;
+            genInfoLabel.text = "General Lighting Information";
+            genInfoLabel.textColor = "pri";
+            genInfoLabel.textSize = 12;
             Put (genInfoLabel, 15, 40);
             genInfoLabel.Show ();
 
             TouchLabel sunRiseLabel = new TouchLabel ();
-            sunRiseLabel.Text = "Sunrise Today";
-            sunRiseLabel.TextColor = "grey4"; 
+            sunRiseLabel.text = "Sunrise Today";
+            sunRiseLabel.textColor = "grey4"; 
             Put (sunRiseLabel, 15, 74);
             sunRiseLabel.Show ();
 
@@ -86,8 +86,8 @@ namespace AquaPic
             sunRise.Show ();
 
             TouchLabel sunSetLabel = new TouchLabel ();
-            sunSetLabel.Text = "Sunset Today";
-            sunSetLabel.TextColor = "grey4"; 
+            sunSetLabel.text = "Sunset Today";
+            sunSetLabel.textColor = "grey4"; 
             Put (sunSetLabel, 15, 109);
             sunSetLabel.Show ();
 
@@ -98,8 +98,8 @@ namespace AquaPic
             sunSet.Show ();
 
             TouchLabel sunRiseTomorrowLabel = new TouchLabel ();
-            sunRiseTomorrowLabel.Text = "Sunrise Tomorrow";
-            sunRiseTomorrowLabel.TextColor = "grey4"; 
+            sunRiseTomorrowLabel.text = "Sunrise Tomorrow";
+            sunRiseTomorrowLabel.textColor = "grey4"; 
             Put (sunRiseTomorrowLabel, 15, 144);
             sunRiseTomorrowLabel.Show ();
 
@@ -110,8 +110,8 @@ namespace AquaPic
             sunRiseTomorrow.Show ();
 
             TouchLabel sunSetTomorrowLabel = new TouchLabel ();
-            sunSetTomorrowLabel.Text = "Sunset Tomorrow";
-            sunSetTomorrowLabel.TextColor = "grey4"; 
+            sunSetTomorrowLabel.text = "Sunset Tomorrow";
+            sunSetTomorrowLabel.textColor = "grey4"; 
             Put (sunSetTomorrowLabel, 15, 179);
             sunSetTomorrowLabel.Show ();
 
@@ -125,9 +125,9 @@ namespace AquaPic
             fixtureID = 0;
 
             dimmingHeader = new TouchLabel ();
-            dimmingHeader.TextAlignment = Justify.Center;
-            dimmingHeader.AreaWidth = 165;
-            dimmingHeader.TextColor = "secb";
+            dimmingHeader.textAlignment = Justify.Center;
+            dimmingHeader.areaWidth = 165;
+            dimmingHeader.textColor = "secb";
             Put (dimmingHeader, 615, 77);
             dimmingHeader.Show ();
 
@@ -152,10 +152,10 @@ namespace AquaPic
             dimmingTextBox.Show ();
 
             dimmingLabel = new TouchLabel ();
-            dimmingLabel.Text = "Current";
-            dimmingLabel.TextColor = "pri";
-            dimmingLabel.AreaWidth = 125;
-            dimmingLabel.TextAlignment = Justify.Right;
+            dimmingLabel.text = "Current";
+            dimmingLabel.textColor = "pri";
+            dimmingLabel.areaWidth = 125;
+            dimmingLabel.textAlignment = Justify.Right;
             Put (dimmingLabel, 608, 147);
             dimmingLabel.Show ();
 
@@ -177,11 +177,11 @@ namespace AquaPic
             requestTextBox.Show ();
 
             requestLabel = new TouchLabel ();
-            requestLabel.Text = "Requested";
-            requestLabel.TextColor = "seca";
-            requestLabel.TextColor.ModifyColor (1.45);
-            requestLabel.AreaWidth = 125;
-            requestLabel.TextAlignment = Justify.Right;
+            requestLabel.text = "Requested";
+            requestLabel.textColor = "seca";
+            requestLabel.textColor.ModifyColor (1.45);
+            requestLabel.areaWidth = 125;
+            requestLabel.textAlignment = Justify.Right;
             requestLabel.WidthRequest = 125;
             requestLabel.HeightRequest = 25;
             Put (requestLabel, 608, 210);
@@ -193,10 +193,10 @@ namespace AquaPic
             autoTextBox.Show ();
 
             autoLabel = new TouchLabel ();
-            autoLabel.Text = "Auto";
-            autoLabel.TextColor = "grey4";
-            autoLabel.AreaWidth = 75;
-            autoLabel.TextAlignment = Justify.Right;
+            autoLabel.text = "Auto";
+            autoLabel.textColor = "grey4";
+            autoLabel.areaWidth = 75;
+            autoLabel.textAlignment = Justify.Right;
             autoLabel.WidthRequest = 75;
             autoLabel.HeightRequest = 20;
             Put (autoLabel, 596, 389);
@@ -228,7 +228,7 @@ namespace AquaPic
         protected void GetFixtureData () {
             isDimmingFixture = Lighting.IsDimmingFixture (fixtureID);
             if (isDimmingFixture) {
-                dimmingHeader.Text = "Dimming Control";
+                dimmingHeader.text = "Dimming Control";
 
                 modeSelector.Visible = true;
                 dimmingProgressBar.Visible = true;
@@ -264,7 +264,7 @@ namespace AquaPic
 
                 timer = GLib.Timeout.Add (1000, OnTimer);
             } else {
-                dimmingHeader.Text = "Dimming not available";
+                dimmingHeader.text = "Dimming not available";
                 dimmingIsManual = false;
                 modeSelector.Visible = false;
                 dimmingProgressBar.Visible = false;

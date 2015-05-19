@@ -46,9 +46,9 @@ namespace AquaPic
                 pat.AddColorStop (0.0, new Color (0.15, 0.15, 0.15, 0.15));
                 pat.AddColorStop (0.5, new Color (0.95, 0.95, 0.95, 0.95));
                 pat.AddColorStop (1.0, new Color (0.15, 0.15, 0.15, 0.15));*/
-                pat.AddColorStop (0.0, MyColor.NewColor ("grey2", 0.35));
-                pat.AddColorStop (0.5,GuiGlobal.screenData [currentScreen].color.ToColor ());
-                pat.AddColorStop (1.0, MyColor.NewColor ("grey2", 0.35));
+                pat.AddColorStop (0.0, MyColor.NewGdkColor ("grey2", 0.35));
+                pat.AddColorStop (0.5,GuiGlobal.screenData [currentScreen].color.ToGdkColor ());
+                pat.AddColorStop (1.0, MyColor.NewGdkColor ("grey2", 0.35));
                 cr.SetSource (pat);
                 cr.Fill ();
                 pat.Dispose ();
