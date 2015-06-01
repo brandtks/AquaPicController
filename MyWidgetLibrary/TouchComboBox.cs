@@ -25,10 +25,10 @@ namespace MyWidgetLibrary
         public int Active;
 
         private bool listDropdown;
-        private uint timer;
+        private bool secondClick;
         private int highlighted;
         private int height;
-        private int secondClick;
+
 
         public event ComboBoxChangedEventHandler ChangedEvent;
 
@@ -39,10 +39,9 @@ namespace MyWidgetLibrary
             this.List = new List<string> ();
             this.Active = -1;
             this.listDropdown = false;
-            this.timer = 0;
+            secondClick = false;
             this.highlighted = 0;
             this.height = 30;
-            this.secondClick = 0;
 
             this.WidthRequest = 175;
             this.HeightRequest = height;
@@ -175,8 +174,11 @@ namespace MyWidgetLibrary
         }
 
         protected void OnComboBoxPressed (object o, ButtonPressEventArgs args) {
-            secondClick = ++secondClick % 2;
-            timer = GLib.Timeout.Add (20, OnTimerEvent);
+            if (listDropdown)
+                secondClick = true;
+            else
+                secondClick = false;
+            GLib.Timeout.Add (20, OnTimerEvent);
             listDropdown = true;
             highlighted = Active;
             QueueDraw ();
@@ -203,7 +205,7 @@ namespace MyWidgetLibrary
                 }
             }
 
-            if (secondClick == 0) {
+            if (secondClick) {
                 listDropdown = false;
                 QueueDraw ();
             }

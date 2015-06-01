@@ -68,6 +68,7 @@ namespace AquaPic
 
             TouchLabel genInfoLabel = new TouchLabel ();
             genInfoLabel.text = "General Lighting Information";
+            genInfoLabel.WidthRequest = 370;
             genInfoLabel.textColor = "pri";
             genInfoLabel.textSize = 12;
             Put (genInfoLabel, 15, 40);
@@ -125,8 +126,8 @@ namespace AquaPic
             fixtureID = 0;
 
             dimmingHeader = new TouchLabel ();
-            dimmingHeader.textAlignment = Justify.Center;
-            dimmingHeader.areaWidth = 165;
+            dimmingHeader.textAlignment = MyAlignment.Center;
+            dimmingHeader.WidthRequest = 165;
             dimmingHeader.textColor = "secb";
             Put (dimmingHeader, 615, 77);
             dimmingHeader.Show ();
@@ -147,20 +148,20 @@ namespace AquaPic
             dimmingProgressBar.Show ();
 
             dimmingTextBox = new TouchTextBox ();
-            dimmingTextBox.textAlignment = Justify.Center;
+            dimmingTextBox.textAlignment = MyAlignment.Center;
             Put (dimmingTextBox, 633, 168);
             dimmingTextBox.Show ();
 
             dimmingLabel = new TouchLabel ();
             dimmingLabel.text = "Current";
             dimmingLabel.textColor = "pri";
-            dimmingLabel.areaWidth = 125;
-            dimmingLabel.textAlignment = Justify.Right;
+            dimmingLabel.WidthRequest = 125;
+            dimmingLabel.textAlignment = MyAlignment.Right;
             Put (dimmingLabel, 608, 147);
             dimmingLabel.Show ();
 
             requestTextBox = new TouchTextBox ();
-            requestTextBox.textAlignment = Justify.Center;
+            requestTextBox.textAlignment = MyAlignment.Center;
             requestTextBox.TextChangedEvent += (sender, args) => {
                 try {
                     float newLevel = Convert.ToSingle (args.text);
@@ -180,23 +181,23 @@ namespace AquaPic
             requestLabel.text = "Requested";
             requestLabel.textColor = "seca";
             requestLabel.textColor.ModifyColor (1.45);
-            requestLabel.areaWidth = 125;
-            requestLabel.textAlignment = Justify.Right;
+            requestLabel.WidthRequest = 125;
+            requestLabel.textAlignment = MyAlignment.Right;
             requestLabel.WidthRequest = 125;
             requestLabel.HeightRequest = 25;
             Put (requestLabel, 608, 210);
             requestLabel.Show ();
 
             autoTextBox = new TouchTextBox ();
-            autoTextBox.textAlignment = Justify.Center;
+            autoTextBox.textAlignment = MyAlignment.Center;
             Put (autoTextBox, 680, 385);
             autoTextBox.Show ();
 
             autoLabel = new TouchLabel ();
             autoLabel.text = "Auto";
             autoLabel.textColor = "grey4";
-            autoLabel.areaWidth = 75;
-            autoLabel.textAlignment = Justify.Right;
+            autoLabel.WidthRequest = 75;
+            autoLabel.textAlignment = MyAlignment.Right;
             autoLabel.WidthRequest = 75;
             autoLabel.HeightRequest = 20;
             Put (autoLabel, 596, 389);
@@ -261,6 +262,11 @@ namespace AquaPic
                 level = Lighting.GetRequestedDimmingLevel (fixtureID);
                 dimmingProgressBar.currentProgress = level / 100.0f;
                 requestTextBox.text = string.Format ("{0:N2}", level);
+
+                // bastardized way of getting the combobox in front of other widgets
+                // I think there's another way to do this but I can't remember what it is or if it ever works
+                combo.Visible = false;
+                combo.Visible = true;
 
                 timer = GLib.Timeout.Add (1000, OnTimer);
             } else {

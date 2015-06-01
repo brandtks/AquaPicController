@@ -10,8 +10,11 @@ namespace AquaPic
 {
     public class MainWindow : MyBackgroundWidget
     {
-        TouchPlot phPlot;
-        TouchPlot tempPlot;
+        TouchLinePlotWidget phPlot;
+        TouchLinePlotWidget tempPlot;
+        TouchBarPlotWidget waterLevel;
+        TouchBarPlotWidget whiteLedDimming;
+        TouchBarPlotWidget actinicLedDimming;
 
         public MainWindow (MenuReleaseHandler OnMenuRelease) : base (0, OnMenuRelease) {
             TouchButton b1 = new TouchButton ();
@@ -38,31 +41,34 @@ namespace AquaPic
             b2.text = "Water Change";
             Put (b2, 685, 330);
 
-            phPlot = new TouchPlot ();
+            phPlot = new TouchLinePlotWidget ();
             phPlot.text = "pH";
             Put (phPlot, 7, 30);
 
-            tempPlot = new TouchPlot ();
+            tempPlot = new TouchLinePlotWidget ();
             tempPlot.text = "Temperature";
             tempPlot.currentValue = Temperature.WaterTemperature;
             Put (tempPlot, 7, 130);
 
-            var box3 = new TouchPlot ();
+            var box3 = new TouchLinePlotWidget ();
             box3.text = "thingy 1";
             Put (box3, 7, 230);
 
-            var box4 = new TouchPlot ();
+            var box4 = new TouchLinePlotWidget ();
             box4.text = "thingy 2";
             Put (box4, 7, 330);
 
-            var box5 = new MyBox (108, 195);
-            Put (box5, 459, 30);
+            waterLevel = new TouchBarPlotWidget ();
+            waterLevel.text = "Water Level";
+            Put (waterLevel, 459, 30);
 
-            var box6 = new MyBox (108, 195);
-            Put (box6, 572, 30);
+            whiteLedDimming = new TouchBarPlotWidget ();
+            whiteLedDimming.text = "White LED";
+            Put (whiteLedDimming, 572, 30);
 
-            var box7 = new MyBox (108, 195);
-            Put (box7, 685, 30);
+            actinicLedDimming = new TouchBarPlotWidget ();
+            actinicLedDimming.text = "Actinic LED";
+            Put (actinicLedDimming, 685, 30);
 
             GLib.Timeout.Add (1000, OnUpdateTimer);
 

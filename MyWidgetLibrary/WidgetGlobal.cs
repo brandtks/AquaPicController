@@ -4,12 +4,6 @@ using Gtk;
 
 namespace MyWidgetLibrary
 {
-    public enum Justify : byte {
-        Right = 1,
-        Left,
-        Center
-    }
-
     public enum MyOrientation : byte {
         Vertical = 1,
         Horizontal
@@ -17,8 +11,6 @@ namespace MyWidgetLibrary
 
     public static class WidgetGlobal
     {
-        static WidgetGlobal () { }
-
         public static void DrawRoundedRectangle (Cairo.Context cr, double x, double y, double width, double height, double radius) {
             cr.Save ();
 

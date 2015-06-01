@@ -62,14 +62,16 @@ namespace MyWidgetLibrary
         }
 
         protected void onTouchButtonPress (object o, ButtonPressEventArgs args) {
-            if (clickAction == ButtonClickAction.NoTransparency)
-                buttonColor.ModifyAlpha (1.0f);
-            else if (clickAction == ButtonClickAction.Brighten)
-                buttonColor.ModifyColor (1.25);
-            else if (clickAction == ButtonClickAction.Darken)
-                buttonColor.ModifyColor (0.75);
+            if (args.Event.Type == Gdk.EventType.ButtonPress) {
+                if (clickAction == ButtonClickAction.NoTransparency)
+                    buttonColor.ModifyAlpha (1.0f);
+                else if (clickAction == ButtonClickAction.Brighten)
+                    buttonColor.ModifyColor (1.25);
+                else if (clickAction == ButtonClickAction.Darken)
+                    buttonColor.ModifyColor (0.75);
 
-            this.QueueDraw ();
+                this.QueueDraw ();
+            }
         }
 
         protected void onTouchButtonRelease (object o, ButtonReleaseEventArgs args) {

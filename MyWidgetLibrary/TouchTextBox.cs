@@ -19,7 +19,7 @@ namespace MyWidgetLibrary
         public string text;
         public MyColor textColor;
         public int textSize;
-        public Justify textAlignment;
+        public MyAlignment textAlignment;
         public bool enableTouch;
         public TextChangedHandler TextChangedEvent;
 
@@ -30,7 +30,7 @@ namespace MyWidgetLibrary
             this.text = null;
             this.textColor = new MyColor ("black");
             this.textSize = 11;
-            this.textAlignment = Justify.Left;
+            this.textAlignment = MyAlignment.Left;
 
             this.WidthRequest = 100;
             this.HeightRequest = 30;
@@ -56,13 +56,13 @@ namespace MyWidgetLibrary
                 Pango.Layout l = new Pango.Layout (PangoContext);
                 l.Width = Pango.Units.FromPixels (width);
                 l.Wrap = Pango.WrapMode.Word;
-                if (textAlignment == Justify.Left) {
+                if (textAlignment == MyAlignment.Left) {
                     l.Alignment = Pango.Alignment.Left;
                     left += 5;
-                } else if (textAlignment == Justify.Right) {
+                } else if (textAlignment == MyAlignment.Right) {
                     l.Alignment = Pango.Alignment.Right;
                     l.Width = Pango.Units.FromPixels (width - 5);
-                } else if (textAlignment == Justify.Center)
+                } else if (textAlignment == MyAlignment.Center)
                     l.Alignment = Pango.Alignment.Center;
                 l.SetMarkup ("<span color=\"" + textColor.ToHTML () + "\">" 
                     + text 
