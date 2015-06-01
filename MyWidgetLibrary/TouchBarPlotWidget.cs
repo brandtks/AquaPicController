@@ -18,7 +18,7 @@ namespace MyWidgetLibrary
                 return bar.currentProgress;
             }
             set {
-                bar.currentProgress = value;
+                bar.currentProgress = value / 100;
                 textBox.text = value.ToString ("0.0");
             }
         }
@@ -36,14 +36,21 @@ namespace MyWidgetLibrary
             label = new TouchLabel ();
             label.text = "Plot";
             label.textColor = "pri";
-            label.textRender.orientation = MyOrientation.Vertical;
+            label.WidthRequest = 187;
             Put (label, 4, 2);
 
             bar = new TouchProgressBar ();
-            bar.HeightRequest = 185;
-            Put (bar, 73, 5);
+            bar.HeightRequest = 168;
+            bar.WidthRequest = 20;
+            Put (bar, 83, 22);
 
             textBox = new TouchTextBox ();
+            textBox.WidthRequest = 75;
+            textBox.HeightRequest = 35;
+            textBox.textSize = 16;
+            textBox.text = "0.0";
+            textBox.textAlignment = MyAlignment.Center;
+            Put (textBox, 4, 28);
         }
 
     }

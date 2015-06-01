@@ -5,6 +5,7 @@ using MyWidgetLibrary;
 using AquaPic.Globals;
 using AquaPic.StateRuntime;
 using AquaPic.TemperatureModule;
+using AquaPic.LightingModule;
 
 namespace AquaPic
 {
@@ -91,6 +92,12 @@ namespace AquaPic
         protected bool OnUpdateTimer () {
             tempPlot.currentValue = Temperature.WaterTemperature;
             tempPlot.QueueDraw ();
+
+            whiteLedDimming.currentValue = Lighting.GetCurrentDimmingLevel (Lighting.GetLightIndex ("White LED"));
+            whiteLedDimming.QueueDraw ();
+
+            actinicLedDimming.currentValue = Lighting.GetCurrentDimmingLevel (Lighting.GetLightIndex ("Actinic LED"));
+            actinicLedDimming.QueueDraw ();
 
             return true;
         }

@@ -15,15 +15,15 @@ namespace MyWidgetLibrary
 
         public float currentValue {
             get {
-                return Convert.ToSingle (currentTextBox.text);
+                return Convert.ToSingle (textBox.text);
             }
             set {
-                currentTextBox.text = value.ToString ("0.0");
+                textBox.text = value.ToString ("0.0");
             }
         }
 
         private TouchLabel displayLabel;
-        private TouchTextBox currentTextBox;
+        private TouchTextBox textBox;
 
         public TouchLinePlotWidget () {
             SetSizeRequest (447, 95);
@@ -48,13 +48,13 @@ namespace MyWidgetLibrary
             label1.WidthRequest = 320;
             Put (label1, 120, 5);
 
-            currentTextBox = new TouchTextBox ();
-            currentTextBox.WidthRequest = 80;
-            currentTextBox.HeightRequest = 35;
-            currentTextBox.textSize = 16;
-            currentTextBox.text = "0.0";
-            currentTextBox.textAlignment = MyAlignment.Center;
-            Put (currentTextBox, 18, 30);
+            textBox = new TouchTextBox ();
+            textBox.WidthRequest = 80;
+            textBox.HeightRequest = 35;
+            textBox.textSize = 14;
+            textBox.text = "0.0";
+            textBox.textAlignment = MyAlignment.Center;
+            Put (textBox, 18, 30);
 
             ShowAll ();
         }
