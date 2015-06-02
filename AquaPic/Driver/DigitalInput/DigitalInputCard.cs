@@ -2,7 +2,6 @@
 using AquaPic.SerialBus;
 using AquaPic.AlarmRuntime;
 using AquaPic.Utilites;
-using AquaPic.Globals;
 
 namespace AquaPic.DigitalInputDriver
 {

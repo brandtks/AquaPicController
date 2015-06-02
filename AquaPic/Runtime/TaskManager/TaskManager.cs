@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Gtk;
 using AquaPic.AlarmRuntime;
 using AquaPic.AnalogInputDriver;
@@ -11,38 +12,61 @@ using AquaPic.TemperatureModule;
 
 namespace AquaPic.TaskManagerRuntime
 {
+    public delegate void RunHandler ();
+
     public class TaskManager
     {
-        //public TaskManager () {
-        //}
-
-        static uint timer250;
-        static uint timer1000;
+        private static Dictionary<int, List<ITask>> tasks = new Dictionary<int, List<ITask>> ();
 
         public static void Start () {
-            #if SIMULATION
-            timer250 = GLib.Timeout.Add (500, On250Tasks);
-            timer1000 = GLib.Timeout.Add (4000, On1000Tasks);
-            #else
-            timer250 = GLib.Timeout.Add (250, On250Tasks);
-            timer1000 = GLib.Timeout.Add (1000, On1000Tasks);
-            #endif
+            foreach (var timeInterval in tasks.Keys) {
+                #if SIMULATION
+                int time = timeInterval * 4;
+                GLib.Timeout.Add (time, () => {
+                    foreach (var task in tasks[timeInterval])
+                        task.OnRun ();
+                    return true;
+                });
+                #else
+                GLib.Timeout.Add ((uint)timeInterval, () => {
+                    foreach (var task in tasks[timeInterval])
+                        task.OnRun ();
+                    return true;
+                });
+                #endif
+            }
         }
 
-        protected static bool On250Tasks () {
-            Power.Run ();
-            return true; // restarts timer
+        public static void AddTask (string name, int timeInterval, RunHandler OnRun) {
+            if (TaskExists (name))
+                throw new Exception ("Task already exists");
+
+            if (!tasks.ContainsKey (timeInterval))
+                tasks.Add (timeInterval, new List<ITask> ());
+
+            tasks [timeInterval].Add (new ITask (name, OnRun));
         }
 
-        protected static bool On1000Tasks () {
-            AnalogInput.Run ();
-            DigitalInput.Run ();
-            AnalogOutput.Run ();
+        public static bool TaskExists (string name) {
+            foreach (var taskList in tasks.Values) {
+                foreach (var task in taskList) {
+                    if (string.Compare (task.name, name, StringComparison.InvariantCultureIgnoreCase) == 0)
+                        return true;
+                }
+            }
 
-            Temperature.Run ();
-            Alarm.Run ();
-            Plugin.Run ();
-            return true; // restarts timer
+            return false;
+        }
+
+        private class ITask
+        {
+            public RunHandler OnRun;
+            public string name;
+
+            public ITask (string name, RunHandler OnRun) {
+                this.name = name;
+                this.OnRun = OnRun;
+            }
         }
     }
 }

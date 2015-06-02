@@ -1,7 +1,6 @@
 ﻿using System;
-using AquaPic.Utilites;
 
-namespace AquaPic.Globals
+namespace AquaPic.Utilites
 {
     public enum Mode : byte {
         Manual = 1,

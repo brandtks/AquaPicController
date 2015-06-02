@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AquaPic.Globals
+namespace AquaPic.Utilites
 {
     public struct IndividualControl {
         public byte Group;

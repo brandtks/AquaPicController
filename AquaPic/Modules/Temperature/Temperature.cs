@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using AquaPic.AlarmRuntime;
 using AquaPic.AnalogInputDriver;
-using AquaPic.Globals;
 using AquaPic.PowerDriver;
 using AquaPic.Utilites;
 
@@ -40,7 +39,7 @@ namespace AquaPic.TemperatureModule
             string path = string.Format (
                 "{0}{1}", 
                 Environment.GetEnvironmentVariable ("AquaPic"), 
-                @"\AquaPicRuntimeProject\tempProperties.json");
+                @"\AquaPicRuntimeProject\Settings\tempProperties.json");
 
             using (StreamReader reader = File.OpenText (path)) {
                 JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
@@ -59,6 +58,8 @@ namespace AquaPic.TemperatureModule
                 });
 
             temperature = 32.0f;
+
+            TaskManagerRuntime.TaskManager.AddTask ("Temperature", 1000, Run);
         }
 
         public static void AddTemperatureProbe (int cardID, int channelID, string name) {

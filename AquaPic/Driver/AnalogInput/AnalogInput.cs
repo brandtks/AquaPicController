@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.Globals;
+using AquaPic.Utilites;
 
 namespace AquaPic.AnalogInputDriver
 {
     public partial class AnalogInput
     {
-        //public static AnalogInput Main = new AnalogInput ();
-
         private static List<AnalogInputCard> cards = new List<AnalogInputCard> ();
 
-        //private AnalogInput () {
-            //cards = new List<AnalogInputCard> ();
-        //}
+        static AnalogInput () {
+            TaskManagerRuntime.TaskManager.AddTask ("Analog Input", 1000, Run);
+        }
 
         public static int AddCard (int address, string name) {
             int count = cards.Count;

@@ -1,5 +1,5 @@
 ﻿using System;
-using AquaPic.Globals;
+using AquaPic.Utilites;
 
 namespace AquaPic.PowerDriver
 {

@@ -2,10 +2,11 @@
 using Gtk;
 using Cairo;
 using MyWidgetLibrary;
-using AquaPic.Globals;
+using AquaPic.Utilites;
 using AquaPic.StateRuntime;
 using AquaPic.TemperatureModule;
 using AquaPic.LightingModule;
+using AquaPic.TimerRuntime;
 
 namespace AquaPic
 {

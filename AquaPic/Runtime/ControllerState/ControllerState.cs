@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.Globals;
+using AquaPic.Utilites;
 
 namespace AquaPic.StateRuntime
 {
@@ -23,6 +23,16 @@ namespace AquaPic.StateRuntime
                 states [name].state = MyState.Reset;
             else
                 states.Add (name, new IState (MyState.Reset));
+        }
+
+        public static void Toggle (string name) {
+            if (states.ContainsKey (name)) {
+                if (states [name].state == MyState.Set)
+                    states [name].state = MyState.Reset;
+                else
+                    states [name].state = MyState.Set;
+            } else
+                states.Add (name, new IState (MyState.Set)); // technically we started with the state reset
         }
 
         public static MyState Check (string name) {

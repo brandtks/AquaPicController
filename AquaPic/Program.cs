@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Threading;
 #if SIMULATION
 using System.Diagnostics;
+using System.Threading;
 #endif
 using Gtk;
 using AquaPic.AlarmRuntime;
@@ -9,7 +9,6 @@ using AquaPic.AnalogInputDriver;
 using AquaPic.AnalogOutputDriver;
 using AquaPic.DigitalInputDriver;
 using AquaPic.EquipmentRuntime;
-using AquaPic.Globals;
 using AquaPic.LightingModule;
 using AquaPic.PowerDriver;
 using AquaPic.SerialBus;
@@ -18,6 +17,7 @@ using AquaPic.CoilRuntime;
 using AquaPic.PluginRuntime;
 using AquaPic.TemperatureModule;
 using AquaPic.Utilites;
+using AquaPic.TimerRuntime;
 
 namespace AquaPic
 {
@@ -35,7 +35,7 @@ namespace AquaPic
             #endif
 
             Equipment.AddFromJson ();
-
+            
             Plugin.AddPlugins ();
 
             TaskManager.Start ();
@@ -51,8 +51,6 @@ namespace AquaPic
             #endif
             win.Show ();
 			Application.Run ();
-
-
 		}
 	}
 }

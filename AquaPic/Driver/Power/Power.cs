@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic; // for List
-using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.SerialBus;
 using AquaPic.CoilRuntime;
@@ -11,6 +10,10 @@ namespace AquaPic.PowerDriver
     public partial class Power
     {
         private static List<PowerStrip> pwrStrips = new List<PowerStrip> ();
+
+        static Power () {
+            TaskManagerRuntime.TaskManager.AddTask ("Power", 250, Run);
+        }
 
         public static void Run () {
             foreach (var strip in pwrStrips) {

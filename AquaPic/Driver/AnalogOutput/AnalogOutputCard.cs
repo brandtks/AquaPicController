@@ -1,6 +1,6 @@
 ﻿using System;
 using AquaPic.AlarmRuntime;
-using AquaPic.Globals;
+using AquaPic.Utilites;
 using AquaPic.SerialBus;
 
 namespace AquaPic.AnalogOutputDriver

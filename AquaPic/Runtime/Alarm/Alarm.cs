@@ -8,9 +8,9 @@ namespace AquaPic.AlarmRuntime
     {
         private static List<AlarmType> alarms = new List<AlarmType> ();
 
-        //static Alarm () {
-            //alarms = new List<AlarmType> ();
-        //}
+        static Alarm () {
+            TaskManagerRuntime.TaskManager.AddTask ("Alarm", 1000, Run);
+        }
 
         public static void Run () {
 

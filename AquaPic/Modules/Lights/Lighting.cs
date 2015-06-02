@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using AquaPic.Globals;
 using AquaPic.Utilites;
 
 namespace AquaPic.LightingModule
@@ -33,7 +32,7 @@ namespace AquaPic.LightingModule
             string path = string.Format (
                 "{0}{1}", 
                 Environment.GetEnvironmentVariable ("AquaPic"), 
-                @"\AquaPicRuntimeProject\lightingProperties.json");
+                @"\AquaPicRuntimeProject\Settings\lightingProperties.json");
 
             using (StreamReader reader = File.OpenText (path)) {
                 JObject jo = (JObject)JToken.ReadFrom(new JsonTextReader(reader));

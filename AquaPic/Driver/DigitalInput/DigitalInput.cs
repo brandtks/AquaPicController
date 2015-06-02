@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AquaPic.CoilRuntime;
-using AquaPic.Globals;
+using AquaPic.Utilites;
 
 namespace AquaPic.DigitalInputDriver
 {
@@ -9,7 +9,9 @@ namespace AquaPic.DigitalInputDriver
     {
         private static List<DigitalInputCard> cards = new List<DigitalInputCard> ();
 
-        //public DigitalInput () { }
+        static DigitalInput () {
+            TaskManagerRuntime.TaskManager.AddTask ("Digital Input", 1000, Run);
+        }
 
         public static int AddCard (int address, string name) {
             int count = cards.Count;

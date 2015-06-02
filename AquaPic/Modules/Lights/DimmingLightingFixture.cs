@@ -1,8 +1,7 @@
 ﻿using System;
 using AquaPic.AnalogOutputDriver;
-using AquaPic.Globals;
-using AquaPic.PowerDriver;
 using AquaPic.Utilites;
+using AquaPic.PowerDriver;
 using AquaPic.ValueRuntime;
 
 namespace AquaPic.LightingModule
@@ -91,6 +90,7 @@ namespace AquaPic.LightingModule
                 autoDimmingLevel = 0.0f;
                 requestedDimmingLevel = 0.0f;
                 currentDimmingLevel = 0.0f;
+                rocl.Reset ();
 
                 return currentDimmingLevel;
             }

@@ -27,6 +27,10 @@ namespace AquaPic.Utilites
             oldValue = rtnValue;
             return rtnValue;
         }
+
+        public void Reset () {
+            oldValue = 0.0f;
+        }
     }
 }
 

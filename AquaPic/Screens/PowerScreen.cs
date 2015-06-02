@@ -4,7 +4,7 @@ using Gtk;
 using Cairo;
 using MyWidgetLibrary;
 using AquaPic.PowerDriver;
-using AquaPic.Globals;
+using AquaPic.Utilites;
 
 namespace AquaPic
 {

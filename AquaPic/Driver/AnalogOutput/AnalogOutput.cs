@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.Globals;
+using AquaPic.Utilites;
 using AquaPic.ValueRuntime;
 
 namespace AquaPic.AnalogOutputDriver
 {
     public partial class AnalogOutput
     {
-        //public static AnalogOutput Main = new AnalogOutput ();
-
         private static List<AnalogOutputCard> cards = new List<AnalogOutputCard> ();
 
-        //private AnalogOutput () {
-            //cards = new List<AnalogOutputCard> ();
-        //}
+        static AnalogOutput () {
+            TaskManagerRuntime.TaskManager.AddTask ("Analog Output", 1000, Run);
+        }
 
         public static void Run () {
             foreach (var card in cards) {

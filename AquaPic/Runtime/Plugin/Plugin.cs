@@ -12,13 +12,17 @@ namespace AquaPic.PluginRuntime
     {
         public static Dictionary<string, BaseScript> AllPlugins = new Dictionary<string, BaseScript> ();
 
+        static Plugin () {
+            TaskManagerRuntime.TaskManager.AddTask ("Plugin", 1000, Run);
+        }
+
         /* <TODO> I want to add some sort of json file adding plugins
          * Use that to control what plugins to load, and flags to set
          */
         public static void AddPlugins () {
             StringBuilder sb = new StringBuilder ();
             sb.Append (Environment.GetEnvironmentVariable ("AquaPic"));
-            sb.Append (@"\AquaPicRuntimeProject\");
+            sb.Append (@"\AquaPicRuntimeProject\Scripts\");
             var topPath = sb.ToString ();
             var files = Directory.GetFiles (topPath, "*.cs");
 
@@ -62,8 +66,13 @@ namespace AquaPic.PluginRuntime
             CompilerParameters options = new CompilerParameters();
 
             options.GenerateExecutable = false; // create dll
-            options.OutputAssembly = scriptName + ".dll";
-            options.GenerateInMemory = false;
+            StringBuilder sb = new StringBuilder ();
+            sb.Append (Environment.GetEnvironmentVariable ("AquaPic"));
+            sb.Append (@"\AquaPicRuntimeProject\Scripts\dll\");
+            sb.Append (scriptName);
+            sb.Append (".dll");
+            //options.OutputAssembly = scriptName + ".dll";
+            options.OutputAssembly = sb.ToString ();
             options.ReferencedAssemblies.Add (Assembly.GetExecutingAssembly ().Location);
 
             CompilerResults result = provider.CompileAssemblyFromFile (options, filePath);

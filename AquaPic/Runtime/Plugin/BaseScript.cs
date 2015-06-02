@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Text;
 
 namespace AquaPic.PluginRuntime
 {
@@ -21,7 +22,13 @@ namespace AquaPic.PluginRuntime
             try {
                 //Console.WriteLine ("Compiling " + this.name);
                 if (Plugin.CompileCode (this.name, this.path)) {
-                    pluginAssembly = Assembly.LoadFrom (name + ".dll");
+                    StringBuilder sb = new StringBuilder ();
+                    sb.Append (Environment.GetEnvironmentVariable ("AquaPic"));
+                    sb.Append (@"\AquaPicRuntimeProject\Scripts\dll\");
+                    sb.Append (name);
+                    sb.Append (".dll");
+                    //pluginAssembly = Assembly.LoadFrom (name + ".dll");
+                    pluginAssembly = Assembly.LoadFrom (sb.ToString ());
                     flags |= ScriptFlags.Compiled;
                 }
             } catch {

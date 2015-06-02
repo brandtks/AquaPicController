@@ -3,7 +3,7 @@ using Gtk;
 using Cairo;
 using MyWidgetLibrary;
 using AquaPic.LightingModule;
-using AquaPic.Globals;
+using AquaPic.Utilites;
 
 namespace AquaPic
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using AquaPic;
 using AquaPic.SerialBus;
 using AquaPic.AlarmRuntime;
-using AquaPic.Globals;
 using AquaPic.Utilites;
 using AquaPic.CoilRuntime;
 

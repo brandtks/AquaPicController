@@ -16,7 +16,7 @@ namespace AquaPic.EquipmentRuntime
             string path = string.Format (
                 "{0}{1}", 
                 Environment.GetEnvironmentVariable ("AquaPic"), 
-                @"\AquaPicRuntimeProject\Equipment.json");
+                @"\AquaPicRuntimeProject\Settings\Equipment.json");
 
             using (StreamReader reader = File.OpenText (path)) {
                 JArray ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));
