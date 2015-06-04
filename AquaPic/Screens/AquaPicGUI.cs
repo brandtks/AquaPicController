@@ -8,14 +8,6 @@ namespace AquaPic
 {
     public partial class AquaPicGUI : Gtk.Window
     {
-        private PowerWindow powerScreen;
-        private MainWindow mainScreen;
-        private LightingWindow lighingScreen;
-        private WaveWindow waveScreen;
-        private ConditionWindow conditionScreen;
-        private SettingsWindow settingsScreen;
-        private int currentScreen;
-
         #if SIMULATION
         private Process simulator;
         #endif
@@ -38,14 +30,10 @@ namespace AquaPic
             this.simulator = simulator;
             #endif
 
-            this.mainScreen = new MainWindow (OnMenuRelease);
-            this.currentScreen = 0;
+            GuiGlobal.ChangeScreenEvent += ScreenChange;
 
-            this.Add (mainScreen);
-
-//            powerScreen = new PowerWindow (OnButtonTouch);
-//            currentScreen = "Power";
-//            Add (powerScreen);
+            GuiGlobal.currentScreen = "Main";
+            Add (GuiGlobal.screenData ["Main"].CreateInstance ());
 
             this.Show ();
         }
@@ -60,41 +48,14 @@ namespace AquaPic
             a.RetVal = true;
         }
 
-        protected void OnMenuRelease (int screenKey) {
-            if (screenKey != currentScreen) {
+        public void ScreenChange (ScreenData screen) {
+            if (GuiGlobal.currentScreen != screen.name) {
+                GuiGlobal.currentScreen = screen.name;
                 ClearChildren ();
-                currentScreen = screenKey;
 
-                switch (currentScreen) {
-                case 0:
-                    mainScreen = new MainWindow (OnMenuRelease);
-                    Add (mainScreen);
-                    break;
-                case 1:
-                    powerScreen = new PowerWindow (OnMenuRelease);
-                    Add (powerScreen);
-                    break;
-                case 2:
-                    lighingScreen = new LightingWindow (OnMenuRelease);
-                    Add (lighingScreen);
-                    break;
-                case 3:
-                    waveScreen = new WaveWindow (OnMenuRelease);
-                    Add (waveScreen);
-                    break;
-                case 4:
-                    conditionScreen = new ConditionWindow (OnMenuRelease);
-                    Add (conditionScreen);
-                    break;
-                case 5:
-                    settingsScreen = new SettingsWindow (OnMenuRelease);
-                    Add (settingsScreen);
-                    break;
-                default:
-                    break;
-                }
+                Add (screen.CreateInstance ());
 
-                this.QueueDraw ();
+                QueueDraw ();
             }
         }
 

@@ -26,7 +26,7 @@ namespace AquaPic
         private bool isDimmingFixture;
         private bool dimmingIsManual;
 
-        public LightingWindow (MenuReleaseHandler OnMenuRelease) : base (2, OnMenuRelease) {
+        public LightingWindow () : base () {
             #region base level screen stuff that doesn't change after draw
             MyBox box1 = new MyBox (385, 395);
             Put (box1, 10, 30);
@@ -223,7 +223,7 @@ namespace AquaPic
 
             GetFixtureData ();
 
-            Show ();
+            ShowAll ();
         }
 
         protected void GetFixtureData () {

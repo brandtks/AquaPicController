@@ -7,17 +7,12 @@ namespace AquaPic
 {
     public class MyNotificationBar : EventBox
     {
-        private uint updateTimer;
-        private int currentScreen;
-
-        public MyNotificationBar (int currentScreen) {
+        public MyNotificationBar () {
             this.Visible = true;
             this.VisibleWindow = false;
             this.SetSizeRequest (800, 19);
 
-            this.currentScreen = currentScreen;
-
-            this.updateTimer = GLib.Timeout.Add (1000, onTimer);
+            GLib.Timeout.Add (1000, onTimer);
 
             this.ExposeEvent += onExpose;
         }
@@ -42,12 +37,8 @@ namespace AquaPic
                 cr.ClosePath ();
 
                 Gradient pat = new LinearGradient (0, 19, 800, 19);
-                /*
-                pat.AddColorStop (0.0, new Color (0.15, 0.15, 0.15, 0.15));
-                pat.AddColorStop (0.5, new Color (0.95, 0.95, 0.95, 0.95));
-                pat.AddColorStop (1.0, new Color (0.15, 0.15, 0.15, 0.15));*/
                 pat.AddColorStop (0.0, MyColor.NewGdkColor ("grey2", 0.35));
-                pat.AddColorStop (0.5,GuiGlobal.screenData [currentScreen].color.ToGdkColor ());
+                pat.AddColorStop (0.5, GuiGlobal.screenData [GuiGlobal.currentScreen].color.ToGdkColor ());
                 pat.AddColorStop (1.0, MyColor.NewGdkColor ("grey2", 0.35));
                 cr.SetSource (pat);
                 cr.Fill ();

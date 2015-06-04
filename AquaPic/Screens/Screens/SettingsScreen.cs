@@ -7,8 +7,8 @@ namespace AquaPic
 {
     public class SettingsWindow : MyBackgroundWidget
     {
-        public SettingsWindow (MenuReleaseHandler OnMenuRelease) : base (5, OnMenuRelease) {
-            Show ();
+        public SettingsWindow () : base () {
+            ShowAll ();
         }
     }
 }

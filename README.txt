@@ -1,2 +1,4 @@
 Mostly here for version control
-Extremely unfinished, unpolished, and ugly
+-------------------------------------
+Looking a little better these days
+Actually has some basic functionality

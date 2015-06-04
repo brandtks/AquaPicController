@@ -14,7 +14,7 @@ namespace AquaPic
         private int powerID;
         private TouchComboBox combo;
 
-        public PowerWindow (MenuReleaseHandler OnMenuRelease) : base (1, OnMenuRelease) {
+        public PowerWindow () : base () {
             MyBox box1 = new MyBox (780, 395);
             Put (box1, 10, 30);
             box1.Show ();
@@ -54,7 +54,7 @@ namespace AquaPic
 
             GetPowerData ();
 
-            Show ();
+            ShowAll ();
         }
 
         public override void Dispose () {
