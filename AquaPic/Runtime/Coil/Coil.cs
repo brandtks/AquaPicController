@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.PluginRuntime;
 
-namespace AquaPic.CoilRuntime
+namespace AquaPic.Runtime
 {
     public delegate bool ConditionCheckHandler ();
     public delegate void OutputHandler ();

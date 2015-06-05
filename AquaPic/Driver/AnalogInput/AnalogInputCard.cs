@@ -1,9 +1,9 @@
 ﻿using System;
 using AquaPic.Utilites;
 using AquaPic.SerialBus;
-using AquaPic.AlarmRuntime;
+using AquaPic.Runtime;
 
-namespace AquaPic.AnalogInputDriver
+namespace AquaPic.Drivers
 {
     public partial class AnalogInput
     {
@@ -36,7 +36,7 @@ namespace AquaPic.AnalogInputDriver
                 this.communicationAlarmIndex = Alarm.Subscribe (address.ToString () + " communication fault", "Analog Input card at address " + this.slave.Address.ToString ());
                 this.channels = new AnalogInputChannel[4];
                 for (int i = 0; i < this.channels.Length; ++i) {
-                    this.channels [i] = new AnalogInputChannel (); 
+                    this.channels [i] = new AnalogInputChannel (this.name + ".i" + i.ToString ()); 
                 }
                 this.updating = false;
             }

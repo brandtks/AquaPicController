@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Text;
 
-namespace AquaPic.PluginRuntime
+namespace AquaPic.Runtime
 {
     public class BaseScript
     {

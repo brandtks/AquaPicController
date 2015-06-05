@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.CoilRuntime;
 
-namespace AquaPic.AlarmRuntime
+namespace AquaPic.Runtime
 {
     public partial class Alarm
     {
         private static List<AlarmType> alarms = new List<AlarmType> ();
 
         static Alarm () {
-            TaskManagerRuntime.TaskManager.AddTask ("Alarm", 1000, Run);
+            TaskManager.AddTask ("Alarm", 1000, Run);
         }
 
         public static void Run () {

@@ -1,7 +1,6 @@
 ﻿using System;
-using AquaPic.CoilRuntime;
 
-namespace AquaPic.DigitalInputDriver
+namespace AquaPic.Drivers
 {
     public partial class DigitalInput
     {

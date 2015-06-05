@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace AquaPic.PluginRuntime
+namespace AquaPic.Runtime
 {
     public class EventScript : BaseScript
     {

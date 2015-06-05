@@ -1,10 +1,9 @@
 ﻿using System;
-using AquaPic.AnalogOutputDriver;
+using AquaPic.Drivers;
 using AquaPic.Utilites;
-using AquaPic.PowerDriver;
-using AquaPic.ValueRuntime;
+using AquaPic.Runtime;
 
-namespace AquaPic.LightingModule
+namespace AquaPic.Modules
 {
     public partial class Lighting
     {

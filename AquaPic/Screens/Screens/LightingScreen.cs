@@ -2,7 +2,10 @@
 using Gtk;
 using Cairo;
 using MyWidgetLibrary;
-using AquaPic.LightingModule;
+using AquaPic.Drivers;
+using AquaPic.Modules;
+using AquaPic.Runtime;
+using AquaPic.SerialBus;
 using AquaPic.Utilites;
 
 namespace AquaPic

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AquaPic.ValueRuntime
+namespace AquaPic.Runtime
 {
     public delegate float ValueGetterHandler ();
     public delegate void ValueSetterHandler (float value);

@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using AquaPic.AlarmRuntime;
-using AquaPic.AnalogInputDriver;
-using AquaPic.PowerDriver;
+using AquaPic.Runtime;
+using AquaPic.Drivers;
 using AquaPic.Utilites;
 
-namespace AquaPic.TemperatureModule
+namespace AquaPic.Modules
 {
     public partial class Temperature
     {
@@ -59,7 +58,7 @@ namespace AquaPic.TemperatureModule
 
             temperature = 32.0f;
 
-            TaskManagerRuntime.TaskManager.AddTask ("Temperature", 1000, Run);
+            TaskManager.AddTask ("Temperature", 1000, Run);
         }
 
         public static void AddTemperatureProbe (int cardID, int channelID, string name) {

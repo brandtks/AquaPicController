@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace AquaPic.PluginRuntime
+namespace AquaPic.Runtime
 {
     public class StartupScript : BaseScript
     {
@@ -22,8 +22,10 @@ namespace AquaPic.PluginRuntime
                                 i.Initialize ();
                             } else
                                 flags &= ~ScriptFlags.Compiled;
-                        } catch {
+                        } catch (Exception ex) {
                             flags &= ~ScriptFlags.Compiled;
+                            Console.WriteLine (ex.Message);
+                            Console.WriteLine (ex.ToString ());
                         }
                     }
                 }

@@ -1,7 +1,6 @@
 ﻿using System;
-using AquaPic.TimerRuntime;
 
-namespace AquaPic.CoilRuntime
+namespace AquaPic.Runtime
 {
     public class ResultLogicOperation
     {

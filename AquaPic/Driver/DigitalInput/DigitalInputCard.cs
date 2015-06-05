@@ -1,9 +1,9 @@
 ﻿using System;
 using AquaPic.SerialBus;
-using AquaPic.AlarmRuntime;
+using AquaPic.Runtime;
 using AquaPic.Utilites;
 
-namespace AquaPic.DigitalInputDriver
+namespace AquaPic.Drivers
 {
     public partial class DigitalInput
     {
@@ -30,7 +30,7 @@ namespace AquaPic.DigitalInputDriver
                 int numberInputs = 6;
                 this.inputs = new DigitalInputInput[numberInputs];
                 for (int i = 0; i < numberInputs; ++i)
-                    inputs [i] = new DigitalInputInput (i.ToString() + " input on " + this.name);
+                    inputs [i] = new DigitalInputInput (this.name + ".i" + i.ToString ());
             }
 
             protected void OnSlaveStatusUpdate (object sender) {

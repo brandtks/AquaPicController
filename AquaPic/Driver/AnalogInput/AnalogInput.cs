@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using AquaPic.Utilites;
+using AquaPic.Runtime;
 
-namespace AquaPic.AnalogInputDriver
+namespace AquaPic.Drivers
 {
     public partial class AnalogInput
     {
         private static List<AnalogInputCard> cards = new List<AnalogInputCard> ();
 
         static AnalogInput () {
-            TaskManagerRuntime.TaskManager.AddTask ("Analog Input", 1000, Run);
+            TaskManager.AddTask ("Analog Input", 1000, Run);
         }
 
         public static int AddCard (int address, string name) {
@@ -21,6 +22,14 @@ namespace AquaPic.AnalogInputDriver
         public static void AddChannel (int cardID, int channelID, AnalogType type, string name) {
             if (cardID == -1)
                 throw new Exception ("Card does not exist");
+
+            if ((channelID < 0) || (channelID >= cards [cardID].channels.Length))
+                throw new Exception ("Input ID out of range");
+
+            string s = string.Format ("{0}.i{1}", cards [cardID].name, channelID);
+            if (cards [cardID].channels [channelID].name != s)
+                throw new Exception (string.Format ("Channel already taken by {0}", cards [cardID].channels [channelID].name));
+            
             cards [cardID].AddChannel (channelID, type, name);
         }
 

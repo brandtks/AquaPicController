@@ -1,8 +1,8 @@
 ﻿using System;
 using AquaPic.Utilites;
-using AquaPic.ValueRuntime;
+using AquaPic.Runtime;
 
-namespace AquaPic.AnalogOutputDriver
+namespace AquaPic.Drivers
 {
     public partial class AnalogOutput
     {
@@ -22,9 +22,9 @@ namespace AquaPic.AnalogOutputDriver
             }
             */
 
-            public AnalogOutputChannel (ValueSetterHandler valueSetter) {
+            public AnalogOutputChannel (string name, ValueSetterHandler valueSetter) {
                 this.type = AnalogType.None;
-                this.name = null;
+                this.name = name;
                 this.value = 0;
 
                 ValueControl = new Value ();

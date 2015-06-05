@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AquaPic.PluginRuntime
+namespace AquaPic.Runtime
 {
     [Flags]
     public enum ScriptFlags {
@@ -11,11 +11,6 @@ namespace AquaPic.PluginRuntime
         Event = 8,
         Initializer = 16
     }
-
-//    public interface IOutletScript : IStartupScript
-//    {
-//        bool OutletCondition ();
-//    }
 
     public interface ICyclicScript : IStartupScript, IEventScript
     { }

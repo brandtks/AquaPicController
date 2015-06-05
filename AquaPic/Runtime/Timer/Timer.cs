@@ -1,7 +1,6 @@
 ﻿using System;
-using AquaPic.StateRuntime;
 
-namespace AquaPic.TimerRuntime
+namespace AquaPic.Runtime
 {
     public delegate void TimerElapsedHandler (object sender, TimerElapsedEventArgs args);
 

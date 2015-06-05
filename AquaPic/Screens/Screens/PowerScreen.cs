@@ -3,7 +3,10 @@ using System.IO;
 using Gtk;
 using Cairo;
 using MyWidgetLibrary;
-using AquaPic.PowerDriver;
+using AquaPic.Drivers;
+using AquaPic.Modules;
+using AquaPic.Runtime;
+using AquaPic.SerialBus;
 using AquaPic.Utilites;
 
 namespace AquaPic

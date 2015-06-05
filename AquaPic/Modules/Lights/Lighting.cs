@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using AquaPic.Utilites;
 
-namespace AquaPic.LightingModule
+namespace AquaPic.Modules
 {
     public partial class Lighting
     {

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using AquaPic;
 using AquaPic.SerialBus;
-using AquaPic.AlarmRuntime;
+using AquaPic.Runtime;
 using AquaPic.Utilites;
-using AquaPic.CoilRuntime;
 
-namespace AquaPic.PowerDriver
+namespace AquaPic.Drivers
 {
     public partial class Power
     {
@@ -17,7 +16,7 @@ namespace AquaPic.PowerDriver
             public int powerLossAlarmIndex;
             public bool AcPowerAvailable;
             public string name;
-            public OutletData[] Outlets;
+            public OutletData[] outlets;
 
             public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) {
                 this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
@@ -39,12 +38,12 @@ namespace AquaPic.PowerDriver
                 this.name = name;
                 this.AcPowerAvailable = false;
 
-                this.Outlets = new OutletData[8];
+                this.outlets = new OutletData[8];
                 for (int i = 0; i < 8; ++i) {
                     int plugID = i;
                     string plugName = this.name + "." + "p" + plugID.ToString() ;
                         
-                    this.Outlets [plugID] = new OutletData (
+                    this.outlets [plugID] = new OutletData (
                         plugName,
                         () => SetOutletState ((byte)plugID, MyState.On, false),
                         () => SetOutletState ((byte)plugID, MyState.Off, false));
@@ -118,7 +117,7 @@ namespace AquaPic.PowerDriver
                 if (!AcPowerAvailable)
                     Alarm.Post (powerLossAlarmIndex);
 
-                for (int i = 0; i < Outlets.Length; ++i) {
+                for (int i = 0; i < outlets.Length; ++i) {
                     if (Utils.mtob (status.currentAvailableMask, i))
                         ReadOutletCurrent ((byte)i);
                 }
@@ -158,7 +157,7 @@ namespace AquaPic.PowerDriver
                     callArgs.copyBuffer (&message, sizeof(AmpComms));
                 }
 
-                Outlets [message.outletID].SetAmpCurrent (message.current);
+                outlets [message.outletID].SetAmpCurrent (message.current);
 
             }
             #endif
@@ -198,7 +197,7 @@ namespace AquaPic.PowerDriver
 //                    plugs [plugID].requestedState = state;
 
                 // plugs [plugID].currentState = state;
-                Outlets [outletID].manualState = state;
+                outlets [outletID].manualState = state;
 
                 byte[] message = new byte[messageLength];
 
@@ -216,22 +215,22 @@ namespace AquaPic.PowerDriver
                             ptr, 
                             sizeof(byte) * messageLength, 
                             0, 
-                            (CallbackArgs args) =>Outlets [outletID].OnChangeState (
-                                new StateChangeEventArgs (outletID, powerID, state, Outlets [outletID].mode)));
+                            (CallbackArgs args) =>outlets [outletID].OnChangeState (
+                                new StateChangeEventArgs (outletID, powerID, state, outlets [outletID].mode)));
                     }
                 }
 
                 // <TEST> this is here only because the slave never responds so the callback never happens
-                Outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state, Outlets [outletID].mode));
+                outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state, outlets [outletID].mode));
             }
             #endif
 
             public void SetPlugMode (byte outletID, Mode mode) {
-                Outlets [outletID].mode = mode;
-                if (Outlets [outletID].mode == Mode.Auto)
-                    Outlets [outletID].OnModeChangedAuto (new ModeChangeEventArgs (outletID, powerID, Outlets [outletID].mode));
+                outlets [outletID].mode = mode;
+                if (outlets [outletID].mode == Mode.Auto)
+                    outlets [outletID].OnModeChangedAuto (new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
                 else
-                    Outlets [outletID].OnModeChangedManual (new ModeChangeEventArgs (outletID, powerID, Outlets [outletID].mode));
+                    outlets [outletID].OnModeChangedManual (new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
             }
 
             protected void OnSlaveStatusUpdate (object sender) {

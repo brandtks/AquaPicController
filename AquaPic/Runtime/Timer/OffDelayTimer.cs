@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 
-namespace AquaPic.TimerRuntime
+namespace AquaPic.Runtime
 {
     public class OnDelayTimer : Timer
     {

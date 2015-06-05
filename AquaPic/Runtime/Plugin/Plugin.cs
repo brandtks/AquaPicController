@@ -6,14 +6,14 @@ using System.Reflection;
 using System.Text;
 using Microsoft.CSharp;
 
-namespace AquaPic.PluginRuntime
+namespace AquaPic.Runtime
 {
     public class Plugin
     {
         public static Dictionary<string, BaseScript> AllPlugins = new Dictionary<string, BaseScript> ();
 
         static Plugin () {
-            TaskManagerRuntime.TaskManager.AddTask ("Plugin", 1000, Run);
+            TaskManager.AddTask ("Plugin", 1000, Run);
         }
 
         /* <TODO> I want to add some sort of json file adding plugins

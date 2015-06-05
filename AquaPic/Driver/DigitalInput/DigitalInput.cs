@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.CoilRuntime;
+using AquaPic.Runtime;
 using AquaPic.Utilites;
 
-namespace AquaPic.DigitalInputDriver
+namespace AquaPic.Drivers
 {
     public partial class DigitalInput
     {
         private static List<DigitalInputCard> cards = new List<DigitalInputCard> ();
 
         static DigitalInput () {
-            TaskManagerRuntime.TaskManager.AddTask ("Digital Input", 1000, Run);
+            TaskManager.AddTask ("Digital Input", 1000, Run);
         }
 
         public static int AddCard (int address, string name) {
@@ -26,6 +26,14 @@ namespace AquaPic.DigitalInputDriver
         public static void AddInput (int cardID, int inputID, string name) {
             if (cardID == -1)
                 throw new Exception ("Card does not exist");
+
+            if ((inputID < 0) || (cardID >= cards [cardID].inputs.Length))
+                throw new Exception ("Input ID out of range");
+
+            string s = string.Format ("{0}.i{1}", cards [cardID].name, inputID);
+            if (cards [cardID].inputs [inputID].name != s)
+                throw new Exception (string.Format ("Input already taken by {0}", cards [cardID].inputs [inputID].name));
+            
             cards [cardID].inputs [inputID].name = name;
         }
 
@@ -48,10 +56,6 @@ namespace AquaPic.DigitalInputDriver
 
             return cards [card].inputs [channel].state;
         }
-
-//        public static bool GetInputIndividualControl (string name, ref IndividualControl input) {
-//
-//        }
 
         public static int GetCardIndex (string name) {
             for (int i = 0; i < cards.Count; ++i) {

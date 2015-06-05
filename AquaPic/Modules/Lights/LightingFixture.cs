@@ -1,11 +1,10 @@
 ﻿using System;
 using AquaPic.Utilites;
-using AquaPic.PowerDriver;
-using AquaPic.AlarmRuntime;
-using AquaPic.TemperatureModule;
-using AquaPic.CoilRuntime;
+using AquaPic.Drivers;
+using AquaPic.Runtime;
+using AquaPic.Modules;
 
-namespace AquaPic.LightingModule
+namespace AquaPic.Modules
 {
     public partial class Lighting
     {

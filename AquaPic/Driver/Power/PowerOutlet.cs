@@ -1,8 +1,8 @@
 ﻿using System;
 using AquaPic.Utilites;
-using AquaPic.CoilRuntime;
+using AquaPic.Runtime;
 
-namespace AquaPic.PowerDriver
+namespace AquaPic.Drivers
 {
     public partial class Power 
     {

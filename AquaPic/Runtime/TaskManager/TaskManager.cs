@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Gtk;
-using AquaPic.AlarmRuntime;
-using AquaPic.AnalogInputDriver;
-using AquaPic.AnalogOutputDriver;
-using AquaPic.DigitalInputDriver;
-using AquaPic.LightingModule;
-using AquaPic.PluginRuntime;
-using AquaPic.PowerDriver;
-using AquaPic.TemperatureModule;
+using AquaPic.Drivers;
+using AquaPic.Modules;
 
-namespace AquaPic.TaskManagerRuntime
+namespace AquaPic.Runtime
 {
     public delegate void RunHandler ();
 

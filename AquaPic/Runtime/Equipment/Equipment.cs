@@ -3,12 +3,9 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using AquaPic.AnalogInputDriver;
-using AquaPic.AnalogOutputDriver;
-using AquaPic.DigitalInputDriver;
-using AquaPic.PowerDriver;
+using AquaPic.Drivers;
 
-namespace AquaPic.EquipmentRuntime
+namespace AquaPic.Runtime
 {
     public class Equipment
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AquaPic.AlarmRuntime
+namespace AquaPic.Runtime
 {
     public partial class Alarm
     {

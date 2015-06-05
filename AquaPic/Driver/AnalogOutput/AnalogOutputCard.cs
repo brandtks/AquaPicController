@@ -1,9 +1,9 @@
 ﻿using System;
-using AquaPic.AlarmRuntime;
+using AquaPic.Runtime;
 using AquaPic.Utilites;
 using AquaPic.SerialBus;
 
-namespace AquaPic.AnalogOutputDriver
+namespace AquaPic.Drivers
 {
     public partial class AnalogOutput
     {
@@ -30,6 +30,7 @@ namespace AquaPic.AnalogOutputDriver
                 for (int i = 0; i < channels.Length; ++i) {
                     int chId = i;
                     this.channels [chId] = new AnalogOutputChannel (
+                        this.name + ".q" + i.ToString (),
                         (float value) => SetAnalogValue ((byte)chId, Convert.ToInt32 (value))
                     );
                 }

@@ -4,20 +4,11 @@ using System.Diagnostics;
 using System.Threading;
 #endif
 using Gtk;
-using AquaPic.AlarmRuntime;
-using AquaPic.AnalogInputDriver;
-using AquaPic.AnalogOutputDriver;
-using AquaPic.DigitalInputDriver;
-using AquaPic.EquipmentRuntime;
-using AquaPic.LightingModule;
-using AquaPic.PowerDriver;
+using AquaPic.Drivers;
+using AquaPic.Modules;
+using AquaPic.Runtime;
 using AquaPic.SerialBus;
-using AquaPic.TaskManagerRuntime;
-using AquaPic.CoilRuntime;
-using AquaPic.PluginRuntime;
-using AquaPic.TemperatureModule;
 using AquaPic.Utilites;
-using AquaPic.TimerRuntime;
 
 namespace AquaPic
 {

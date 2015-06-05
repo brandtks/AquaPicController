@@ -1,15 +1,15 @@
 ﻿using System;
 using AquaPic.Utilites;
 
-namespace AquaPic.AnalogInputDriver
+namespace AquaPic.Drivers
 {
     public partial class AnalogInput
     {
         private class AnalogInputChannel
         {
             public AnalogType type;
-            public string name { get; set; }
-            public float value { get; set; }
+            public string name;
+            public float value;
 
             /*
             public AnalogInputChannel (AnalogType type, string name) {
@@ -20,9 +20,9 @@ namespace AquaPic.AnalogInputDriver
             }
             */
 
-            public AnalogInputChannel () {
+            public AnalogInputChannel (string name) {
                 this.type = AnalogType.None;
-                this.name = null;
+                this.name = name;
                 this.value = 0.0f;
             }
         }

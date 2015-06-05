@@ -1,11 +1,9 @@
 ﻿using System;
-using AquaPic.PowerDriver;
+using AquaPic.Drivers;
 using AquaPic.Utilites;
-using AquaPic.CoilRuntime;
-using AquaPic.AlarmRuntime;
-using AquaPic.PluginRuntime;
+using AquaPic.Runtime;
 
-namespace AquaPic.TemperatureModule
+namespace AquaPic.Modules
 {
     public partial class Temperature
     {

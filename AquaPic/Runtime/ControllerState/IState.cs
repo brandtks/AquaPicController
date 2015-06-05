@@ -1,7 +1,7 @@
 ﻿using System;
 using AquaPic.Utilites;
 
-namespace AquaPic.StateRuntime
+namespace AquaPic.Runtime
 {
     public partial class ControllerState
     {
