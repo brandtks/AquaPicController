@@ -16,7 +16,7 @@ namespace AquaPic.TimerRuntime
 
     public class Timer
     {
-        private bool _enabled;
+        protected bool _enabled;
         public bool enabled {
             get {
                 return _enabled;
@@ -25,8 +25,11 @@ namespace AquaPic.TimerRuntime
                 _enabled = value;
                 if (_enabled)
                     Start ();
+                else
+                    Stop ();
             }
         }
+        protected uint timerId;
 
         public TimerElapsedHandler TimerElapsedEvent;
         public uint timerInterval; 
@@ -38,15 +41,17 @@ namespace AquaPic.TimerRuntime
             _enabled = false;
             this.timerInterval = timerInterval;
             autoReset = true;
+            timerId = 0;
         }
 
         public void Start () {
             _enabled = true;
-            GLib.Timeout.Add (timerInterval, OnTimeout);
+            timerId = GLib.Timeout.Add (timerInterval, OnTimeout);
         }
 
         public void Stop () {
             _enabled = false;
+            GLib.Source.Remove (timerId);
         }
 
         protected bool OnTimeout () {
