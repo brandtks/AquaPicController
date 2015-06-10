@@ -3,23 +3,21 @@ using MyWidgetLibrary;
 
 namespace AquaPic
 {
-    public delegate MyBackgroundWidget CreateInstanceHandler ();
+    public delegate MyBackgroundWidget CreateInstanceHandler (params object[] options);
 
     public class ScreenData
     {
         public string name;
-        public MyColor color;
         CreateInstanceHandler CreateInstanceEvent;
         
-        public ScreenData (string name, string color, CreateInstanceHandler CreateInstanceEvent) {
+        public ScreenData (string name, CreateInstanceHandler CreateInstanceEvent) {
             this.name = name;
-            this.color = new MyColor (color);
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 
-        public MyBackgroundWidget CreateInstance () {
+        public MyBackgroundWidget CreateInstance (params object[] options) {
             if (CreateInstanceEvent != null)
-                return CreateInstanceEvent ();
+                return CreateInstanceEvent (options);
             else
                 throw new Exception ("No screen constructor");
         }

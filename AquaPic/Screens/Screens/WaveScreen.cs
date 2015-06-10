@@ -7,7 +7,7 @@ namespace AquaPic
 {
     public class WaveWindow : MyBackgroundWidget
     {
-        public WaveWindow () : base () {
+        public WaveWindow (params object[] options) : base () {
             ShowAll ();
         }
     }

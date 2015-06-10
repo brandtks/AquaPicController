@@ -71,7 +71,7 @@ namespace AquaPic.Runtime
             if (result.Errors.HasErrors) {
                 foreach (CompilerError error in result.Errors) {
                     Console.WriteLine ("Error ({0}): {1}", error.ErrorNumber, error.ErrorText);
-                    Console.WriteLine ("Line {0}, Column {1}", error.Line, error.Column);
+                    Console.WriteLine ("At Line {0}, Column {1}", error.Line, error.Column);
                 }
                 
                 return false;

@@ -17,7 +17,7 @@ namespace AquaPic
         private int powerID;
         private TouchComboBox combo;
 
-        public PowerWindow () : base () {
+        public PowerWindow (params object[] options) : base () {
             MyBox box1 = new MyBox (780, 395);
             Put (box1, 10, 30);
             box1.Show ();

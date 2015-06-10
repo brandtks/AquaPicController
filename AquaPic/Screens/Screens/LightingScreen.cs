@@ -29,7 +29,7 @@ namespace AquaPic
         private bool isDimmingFixture;
         private bool dimmingIsManual;
 
-        public LightingWindow () : base () {
+        public LightingWindow (params object[] options) : base () {
             #region base level screen stuff that doesn't change after draw
             MyBox box1 = new MyBox (385, 395);
             Put (box1, 10, 30);

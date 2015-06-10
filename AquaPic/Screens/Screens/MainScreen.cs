@@ -18,7 +18,7 @@ namespace AquaPic
         TouchBarPlotWidget whiteLedDimming;
         TouchBarPlotWidget actinicLedDimming;
 
-        public MainWindow () : base () {
+        public MainWindow (params object[] options) : base () {
             TouchButton b1 = new TouchButton ();
             b1.ButtonReleaseEvent += OnButtonClick;
             MyState s1 = ControllerState.Check ("Clean Skimmer");

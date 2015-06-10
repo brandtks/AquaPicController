@@ -7,7 +7,7 @@ namespace AquaPic
 {
     public class ConditionWindow : MyBackgroundWidget
     {
-        public ConditionWindow () : base () {
+        public ConditionWindow (params object[] options) : base () {
             ShowAll ();
         }
     }

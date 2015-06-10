@@ -53,7 +53,7 @@ namespace MyWidgetLibrary
                 //l.SetText (ButtonLabel);
                 l.SetMarkup ("<span color=" + (char)34 + textColor.ToHTML () + (char)34 + ">" + text + "</span>"); 
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
-                int y = (top + (height / 2)) - 6;
+                int y = (top + (height / 2)) - 8;
                 y -= ((l.LineCount - 1) * 9);
                 GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 1, y, l);
                 //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);

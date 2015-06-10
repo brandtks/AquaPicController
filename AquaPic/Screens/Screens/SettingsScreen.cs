@@ -7,7 +7,7 @@ namespace AquaPic
 {
     public class SettingsWindow : MyBackgroundWidget
     {
-        public SettingsWindow () : base () {
+        public SettingsWindow (params object[] options) : base () {
             ShowAll ();
         }
     }

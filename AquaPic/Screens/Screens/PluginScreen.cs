@@ -8,7 +8,7 @@ namespace AquaPic
 {
     public class PluginWindow : MyBackgroundWidget
     {
-        public PluginWindow () : base () {
+        public PluginWindow (params object[] options) : base () {
             var box = new MyBox (780, 395);
             Put (box, 10, 30);
 
@@ -19,10 +19,9 @@ namespace AquaPic
                 b.SetSizeRequest (250, 30);
                 b.text = p.name;
                 b.textColor = "black";
-                if (p.flags.HasFlag (ScriptFlags.Compiled))
-                    b.buttonColor = "pri";
-                else
+                if (!p.flags.HasFlag (ScriptFlags.Compiled))
                     b.buttonColor = "compl";
+                b.ButtonReleaseEvent += OnButtonClick;
                 Put (b, x, y);
 
                 x += 260;
@@ -34,6 +33,11 @@ namespace AquaPic
             }
 
             ShowAll ();
+        }
+
+        protected void OnButtonClick (object sender, ButtonReleaseEventArgs args) {
+            TouchButton b = sender as TouchButton;
+            GuiGlobal.ChangeScreens ("Edit Plugin", Plugin.AllPlugins [b.text]);
         }
     }
 }
