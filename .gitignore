@@ -3,6 +3,8 @@
 ### XamarinStudio ###
 bin/
 obj/
+Properties/
+gtk-gui/
 *.userprefs
 *.sln
 *.csproj
