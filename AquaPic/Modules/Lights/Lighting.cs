@@ -247,62 +247,83 @@ namespace AquaPic.Modules
         }
 
         public static float GetCurrentDimmingLevel (int fixtureID) {
-            if (fixtures [fixtureID] is DimmingLightingFixture) {
-                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                return fixture.currentDimmingLevel;
+            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
+                if (fixtures [fixtureID] is DimmingLightingFixture) {
+                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                    return fixture.currentDimmingLevel;
+                }
             }
             return 0.0f;
         }
 
         public static float GetAutoDimmingLevel (int fixtureID) {
-            if (fixtures [fixtureID] is DimmingLightingFixture) {
-                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                return fixture.autoDimmingLevel;
+            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
+                if (fixtures [fixtureID] is DimmingLightingFixture) {
+                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                    return fixture.autoDimmingLevel;
+                }
             }
             return 0.0f;
         }
 
         public static float GetRequestedDimmingLevel (int fixtureID) {
-            if (fixtures [fixtureID] is DimmingLightingFixture) {
-                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                return fixture.requestedDimmingLevel;
+            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
+                if (fixtures [fixtureID] is DimmingLightingFixture) {
+                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                    return fixture.requestedDimmingLevel;
+                }
             }
             return 0.0f;
         }
 
         public static Mode GetDimmingMode (int fixtureID) {
-            if (fixtures [fixtureID] is DimmingLightingFixture) {
-                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                return fixture.dimmingMode;
+            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
+                if (fixtures [fixtureID] is DimmingLightingFixture) {
+                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                    return fixture.dimmingMode;
+                }
             }
             return Mode.Manual;
         }
 
         public static bool IsDimmingFixture (int fixtureID) {
-            return fixtures [fixtureID] is DimmingLightingFixture;
+            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
+                return fixtures [fixtureID] is DimmingLightingFixture;
+            }
+            return false;
         }
 
         public static void SetMode (int fixtureID, Mode mode) {
-            if (fixtures [fixtureID] is DimmingLightingFixture) {
-                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                fixture.dimmingMode = mode;
+            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
+                if (fixtures [fixtureID] is DimmingLightingFixture) {
+                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                    fixture.dimmingMode = mode;
+                }
             }
         }
 
         public static void SetDimmingLevel (int fixtureID, float level) {
-            if (fixtures [fixtureID] is DimmingLightingFixture) {
-                var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                if (fixture.dimmingMode == Mode.Manual)
-                    fixture.requestedDimmingLevel = level;
+            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
+                if (fixtures [fixtureID] is DimmingLightingFixture) {
+                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+                    if (fixture.dimmingMode == Mode.Manual)
+                        fixture.requestedDimmingLevel = level;
+                }
             }
         }
 
         public static TimeDate GetOnTime (int fixtureID) {
-            return fixtures [fixtureID].onTime;
+            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
+                return fixtures [fixtureID].onTime;
+            }
+            return TimeDate.Zero;
         }
 
         public static TimeDate GetOffTime (int fixtureID) {
-            return fixtures [fixtureID].offTime;
+            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
+                return fixtures [fixtureID].offTime;
+            }
+            return TimeDate.Zero;
         }
     }
 }

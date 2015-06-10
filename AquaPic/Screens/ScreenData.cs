@@ -9,13 +9,11 @@ namespace AquaPic
     {
         public string name;
         public MyColor color;
-        public int menuPosition;
         CreateInstanceHandler CreateInstanceEvent;
         
-        public ScreenData (string name, string color, int menuPosition, CreateInstanceHandler CreateInstanceEvent) {
+        public ScreenData (string name, string color, CreateInstanceHandler CreateInstanceEvent) {
             this.name = name;
             this.color = new MyColor (color);
-            this.menuPosition = menuPosition;
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 

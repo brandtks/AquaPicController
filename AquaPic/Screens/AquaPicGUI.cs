@@ -33,7 +33,8 @@ namespace AquaPic
             GuiGlobal.ChangeScreenEvent += ScreenChange;
 
             GuiGlobal.currentScreen = "Main";
-            Add (GuiGlobal.screenData ["Main"].CreateInstance ());
+            GuiGlobal.currentSelectedMenu = "Main";
+            Add (GuiGlobal.allWindows ["Main"].CreateInstance ());
 
             this.Show ();
         }
@@ -49,14 +50,9 @@ namespace AquaPic
         }
 
         public void ScreenChange (ScreenData screen) {
-            if (GuiGlobal.currentScreen != screen.name) {
-                GuiGlobal.currentScreen = screen.name;
-                ClearChildren ();
-
-                Add (screen.CreateInstance ());
-
-                QueueDraw ();
-            }
+            ClearChildren ();
+            Add (screen.CreateInstance ());
+            QueueDraw ();
         }
 
         protected void ClearChildren () {

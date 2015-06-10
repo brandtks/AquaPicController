@@ -18,8 +18,8 @@ namespace AquaPic
             VisibleWindow = false;
             SetSizeRequest (800, 435);
 
-            currentScreen = GuiGlobal.currentScreen;
-            highlightedScreen = GuiGlobal.currentScreen;
+            currentScreen = GuiGlobal.currentSelectedMenu;
+            highlightedScreen = GuiGlobal.currentSelectedMenu;
 
             ExposeEvent += onExpose;
             ButtonPressEvent += OnButtonPress;
@@ -31,14 +31,14 @@ namespace AquaPic
                 int x = 0;
                 int width = 134;
 
-                foreach (var screen in GuiGlobal.screenData.Values) {
-
-                    if ((GuiGlobal.currentScreen == screen.name) || (menuTouched && (highlightedScreen == screen.name)))
+                foreach (var screen in GuiGlobal.menuWindows) {
+                    ScreenData s = GuiGlobal.allWindows [screen];
+                    if ((GuiGlobal.currentSelectedMenu == s.name) || (menuTouched && (highlightedScreen == s.name)))
                         cr.Rectangle (x, 435, width, 45);
                     else
                         cr.Rectangle (x, 472, width, 8);
 
-                    screen.color.SetSource (cr);
+                    MyColor.SetSource (cr, GuiGlobal.menuColors [GuiGlobal.menuWindows.IndexOf (screen)]);
                     cr.Fill ();
 
                     x += width;
@@ -50,16 +50,16 @@ namespace AquaPic
                 l.Alignment = Pango.Alignment.Center;
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
 
-                x = (GuiGlobal.screenData [currentScreen].menuPosition * width) + 1;
+                x = (GuiGlobal.menuWindows.IndexOf (currentScreen) * width) + 1;
                 l.SetMarkup ("<span color=\"black\">"
-                    + GuiGlobal.screenData [currentScreen].name 
+                    + GuiGlobal.allWindows [currentScreen].name 
                     + "</span>");
                 GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), x, Allocation.Top + 14, l);
 
                 if ((menuTouched) && (currentScreen != highlightedScreen)) {
-                    x = (GuiGlobal.screenData [highlightedScreen].menuPosition * width) + 1;
+                    x = (GuiGlobal.menuWindows.IndexOf (highlightedScreen) * width) + 1;
                     l.SetMarkup ("<span color=\"black\">"
-                        + GuiGlobal.screenData [highlightedScreen].name 
+                        + GuiGlobal.allWindows [highlightedScreen].name 
                         + "</span>");
                     GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), x, Allocation.Top + 14, l);
                 }
@@ -84,16 +84,17 @@ namespace AquaPic
                 int left = 0;
                 int width;
 
-                for (int i = 0; i < GuiGlobal.screenData.Count; ++i) {
-                    if ((x == 0) || (x == (GuiGlobal.screenData.Count - 1)))
+                for (int i = 0; i < GuiGlobal.menuWindows.Count; ++i) {
+                    if ((x == 0) || (x == (GuiGlobal.menuWindows.Count - 1)))
                         width = 134;
                     else
                         width = 133;
 
                     if ((x >= left) && (x <= (left + width))) {
-                        foreach (var screen in GuiGlobal.screenData.Values) {
-                            if (screen.menuPosition == i) {
-                                highlightedScreen = screen.name;
+                        foreach (var screen in GuiGlobal.menuWindows) {
+                            int menuPosition = GuiGlobal.menuWindows.IndexOf (screen);
+                            if (menuPosition == i) {
+                                highlightedScreen = screen;
                                 break;
                             }
                         }
@@ -117,16 +118,17 @@ namespace AquaPic
                     int left = 0;
                     int width;
 
-                    for (int i = 0; i < GuiGlobal.screenData.Count; ++i) {
-                        if ((x == 0) || (x == (GuiGlobal.screenData.Count - 1)))
+                    for (int i = 0; i < GuiGlobal.menuWindows.Count; ++i) {
+                        if ((x == 0) || (x == (GuiGlobal.menuWindows.Count - 1)))
                             width = 134;
                         else
                             width = 133;
 
                         if ((x >= left) && (x <= (left + width))) {
-                            foreach (var screen in GuiGlobal.screenData.Values) {
-                                if (screen.menuPosition == i) {
-                                    highlightedScreen = screen.name;
+                            foreach (var screen in GuiGlobal.menuWindows) {
+                                int menuPosition = GuiGlobal.menuWindows.IndexOf (screen);
+                                if (menuPosition == i) {
+                                    highlightedScreen = screen;
                                     break;
                                 }
                             }

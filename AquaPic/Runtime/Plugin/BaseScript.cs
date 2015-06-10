@@ -20,21 +20,20 @@ namespace AquaPic.Runtime
 
             Assembly pluginAssembly = null;
             try {
-                //Console.WriteLine ("Compiling " + this.name);
-                if (Plugin.CompileCode (this.name, this.path)) {
+                if (Plugin.CompileCode (this)) {
                     StringBuilder sb = new StringBuilder ();
                     sb.Append (Environment.GetEnvironmentVariable ("AquaPic"));
                     sb.Append (@"\AquaPicRuntimeProject\Scripts\dll\");
                     sb.Append (name);
                     sb.Append (".dll");
-                    //pluginAssembly = Assembly.LoadFrom (name + ".dll");
                     pluginAssembly = Assembly.LoadFrom (sb.ToString ());
                     flags |= ScriptFlags.Compiled;
                 }
-            } catch {
-                //Console.WriteLine ("failed compiling " + this.name);
+            } catch (Exception ex) {
                 flags &= ~ScriptFlags.Compiled;
+                Console.WriteLine ("{0} compiled flag was just cleared at {1}", name, "constructor");
             }
+
             if (pluginAssembly != null)
                 CreateInstance (pluginAssembly);
         }
@@ -48,7 +47,7 @@ namespace AquaPic.Runtime
 
                             if (instance == null)
                                 flags &= ~ScriptFlags.Compiled;
-                        } catch {
+                        } catch (Exception ex) {
                             flags &= ~ScriptFlags.Compiled;
                         }
                     }
@@ -61,7 +60,7 @@ namespace AquaPic.Runtime
                 try {
                     IStartupScript i = instance as IStartupScript;
                     i.Initialize ();
-                } catch {
+                } catch (Exception ex) {
                     flags &= ~ScriptFlags.Compiled;
                 }
             }
@@ -72,9 +71,8 @@ namespace AquaPic.Runtime
                 try {
                     var i = instance as ICyclicScript;
                     i.RunScript ();
-                } catch {
-//                    if (!flags.HasFlag (ScriptFlags.Outlet)) // if its not an outlet script mark plugin as bad
-                        flags &= ~ScriptFlags.Compiled;
+                } catch (Exception ex) {
+                    flags &= ~ScriptFlags.Compiled;
                 }
             }
         }

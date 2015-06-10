@@ -38,7 +38,7 @@ namespace AquaPic
 
                 Gradient pat = new LinearGradient (0, 19, 800, 19);
                 pat.AddColorStop (0.0, MyColor.NewGdkColor ("grey2", 0.35));
-                pat.AddColorStop (0.5, GuiGlobal.screenData [GuiGlobal.currentScreen].color.ToGdkColor ());
+                pat.AddColorStop (0.5, MyColor.NewGdkColor (GuiGlobal.menuColors [GuiGlobal.menuWindows.IndexOf (GuiGlobal.currentSelectedMenu)]));
                 pat.AddColorStop (1.0, MyColor.NewGdkColor ("grey2", 0.35));
                 cr.SetSource (pat);
                 cr.Fill ();

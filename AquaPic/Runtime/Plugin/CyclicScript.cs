@@ -18,7 +18,7 @@ namespace AquaPic.Runtime
 
                             if (instance == null)
                                 flags &= ~ScriptFlags.Compiled;
-                        } catch {
+                        } catch (Exception ex) {
                             flags &= ~ScriptFlags.Compiled;
                         }
                     }
