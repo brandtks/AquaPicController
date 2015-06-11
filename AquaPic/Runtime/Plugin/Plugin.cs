@@ -54,6 +54,8 @@ namespace AquaPic.Runtime
 
         //public static bool CompileCode (string scriptName, string filePath) {
         public static bool CompileCode (BaseScript script) {
+            script.errors.Clear ();
+
             CSharpCodeProvider provider = new CSharpCodeProvider ();
             CompilerParameters options = new CompilerParameters();
 
@@ -70,8 +72,14 @@ namespace AquaPic.Runtime
 
             if (result.Errors.HasErrors) {
                 foreach (CompilerError error in result.Errors) {
-                    Console.WriteLine ("Error ({0}): {1}", error.ErrorNumber, error.ErrorText);
-                    Console.WriteLine ("At Line {0}, Column {1}", error.Line, error.Column);
+                    //Console.WriteLine ("Error ({0}): {1}", error.ErrorNumber, error.ErrorText);
+                    //Console.WriteLine ("At Line {0}, Column {1}", error.Line, error.Column);
+
+                    StringBuilder e = new StringBuilder ();
+                    e.AppendLine (string.Format ("  Error ({0}): {1}", error.ErrorNumber, error.ErrorText));
+                    e.Append (string.Format ("  File {0}, Line {1}", error.FileName, error.Line));
+
+                    script.errors.Add (new ScriptMessage ("CompileCode", e.ToString ()));
                 }
                 
                 return false;

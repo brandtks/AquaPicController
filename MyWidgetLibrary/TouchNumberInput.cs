@@ -8,7 +8,7 @@ namespace MyWidgetLibrary
 {
     public delegate void NumberSetEventHandler (string value);
 
-    public class TouchNumberInput : Gtk.Window
+    public class TouchNumberInput : Gtk.Dialog
     {
         public NumberSetEventHandler NumberSetEvent;
 
@@ -16,14 +16,14 @@ namespace MyWidgetLibrary
         private KeyButton[] buttons;
         private Fixed fix;
 
-        public TouchNumberInput () : base (Gtk.WindowType.Toplevel){
+        public TouchNumberInput () {
             Name = "AquaPic.Keyboard.Input";
             Title = "Input";
             WindowPosition = (Gtk.WindowPosition)4;
             DefaultWidth = 205;
             DefaultHeight = 235;
-            Resizable = false;
-            AllowGrow = false;
+            //Resizable = false;
+            //AllowGrow = false;
 
             fix = new Fixed ();
             fix.WidthRequest = 205;
@@ -106,6 +106,11 @@ namespace MyWidgetLibrary
                 Destroy ();
             };
             fix.Put (enter, 155, 135);
+
+            foreach (Widget w in this.Children) {
+                Remove (w);
+                w.Dispose ();
+            }
 
             Add (fix);
             fix.ShowAll ();

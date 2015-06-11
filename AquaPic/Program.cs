@@ -31,10 +31,6 @@ namespace AquaPic
 
             TaskManager.Start ();
 
-//            string Resource_File = @"C:\Program Files\GTK2-Runtime\share\themes\Unity\gtk-2.0\gtkrc";
-//            Gtk.Rc.AddDefaultFile (Resource_File);
-//            Gtk.Rc.Parse (Resource_File);
-
             #if SIMULATION
             AquaPicGUI win = new AquaPicGUI (simulator);
             #else
@@ -43,5 +39,5 @@ namespace AquaPic
             win.Show ();
 			Application.Run ();
 		}
-	}
+    }
 }

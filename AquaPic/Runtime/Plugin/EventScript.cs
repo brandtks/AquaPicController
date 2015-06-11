@@ -20,6 +20,7 @@ namespace AquaPic.Runtime
                                 flags &= ~ScriptFlags.Compiled;
                         } catch (Exception ex) {
                             flags &= ~ScriptFlags.Compiled;
+                            errors.Add (new ScriptMessage ("EventScript Constructor", ex.ToString ()));
                         }
                     }
                 }

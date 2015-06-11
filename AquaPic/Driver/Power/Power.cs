@@ -55,7 +55,7 @@ namespace AquaPic.Drivers
 
         public static Coil AddOutlet (int powerID, int outletID, string name, MyState fallback) {
             if (powerID == -1)
-                throw new Exception ("Power stript ID does not exist");
+                throw new Exception ("Power strip ID does not exist");
 
             if ((outletID < 0) || (outletID >= pwrStrips [powerID].outlets.Length))
                 throw new Exception ("Outlet ID out of range");

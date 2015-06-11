@@ -83,7 +83,8 @@ namespace MyWidgetLibrary
                             TextChangedEvent (this, new TextChangedEventArgs (text));
                     };
                 
-                t.Show ();
+                t.Run ();
+                t.Destroy ();
             }
         }
     }

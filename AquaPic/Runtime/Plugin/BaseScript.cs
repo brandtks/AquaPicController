@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
@@ -11,13 +12,19 @@ namespace AquaPic.Runtime
         public ScriptFlags flags;
         public string name;
         public string path;
+        public HashSet<ScriptMessage> errors;
         
         public BaseScript (string name, string path) {
             this.name = name;
             this.path = path;
             flags = ScriptFlags.None;
             instance = null;
+            errors = new HashSet<ScriptMessage> ();
 
+            CompileAndLoad ();
+        }
+
+        public void CompileAndLoad () {
             Assembly pluginAssembly = null;
             try {
                 if (Plugin.CompileCode (this)) {
@@ -31,11 +38,15 @@ namespace AquaPic.Runtime
                 }
             } catch (Exception ex) {
                 flags &= ~ScriptFlags.Compiled;
-                Console.WriteLine ("{0} compiled flag was just cleared at {1}", name, "constructor");
+                errors.Add (new ScriptMessage ("Base Constructor", "  " + ex.ToString ()));
             }
 
             if (pluginAssembly != null)
                 CreateInstance (pluginAssembly);
+            else {
+                flags &= ~ScriptFlags.Compiled;
+                errors.Add (new ScriptMessage ("Base Constructor", "  .dll Assembly was not loaded"));
+            }
         }
 
         protected virtual void CreateInstance (Assembly pluginAssembly) {
@@ -45,10 +56,13 @@ namespace AquaPic.Runtime
                         try {
                             instance = Activator.CreateInstance (t) as IScript;
 
-                            if (instance == null)
+                            if (instance == null) {
                                 flags &= ~ScriptFlags.Compiled;
+                                errors.Add (new ScriptMessage ("CreateInstance", "  Instance of script could not be created"));
+                            }
                         } catch (Exception ex) {
                             flags &= ~ScriptFlags.Compiled;
+                            errors.Add (new ScriptMessage ("CreateInstance", "  " + ex.ToString ()));
                         }
                     }
                 }
@@ -62,6 +76,7 @@ namespace AquaPic.Runtime
                     i.Initialize ();
                 } catch (Exception ex) {
                     flags &= ~ScriptFlags.Compiled;
+                    errors.Add (new ScriptMessage ("RunInitialize", "  " + ex.ToString ()));
                 }
             }
         }
@@ -73,6 +88,7 @@ namespace AquaPic.Runtime
                     i.RunScript ();
                 } catch (Exception ex) {
                     flags &= ~ScriptFlags.Compiled;
+                    errors.Add (new ScriptMessage ("RunPlugin", "  " + ex.ToString ()));
                 }
             }
         }
