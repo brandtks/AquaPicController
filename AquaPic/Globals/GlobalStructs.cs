@@ -3,8 +3,8 @@
 namespace AquaPic.Utilites
 {
     public struct IndividualControl {
-        public byte Group;
-        public byte Individual;
+        public int Group;
+        public int Individual;
     }
 
     public struct CommValueFloat {

@@ -17,12 +17,6 @@ namespace AquaPic.Runtime
                         try {
                             instance = Activator.CreateInstance (t) as IStartupScript;
 
-//                            if (instance != null) {
-//                                IStartupScript i = instance as IStartupScript;
-//                                i.Initialize ();
-//                            } else
-//                                flags &= ~ScriptFlags.Compiled;
-
                             if (instance == null)
                                 flags &= ~ScriptFlags.Compiled;
                         } catch (Exception ex) {

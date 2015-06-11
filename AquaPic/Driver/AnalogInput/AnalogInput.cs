@@ -19,6 +19,10 @@ namespace AquaPic.Drivers
             return count;
         }
 
+        public static void AddChannel (IndividualControl channel, AnalogType type, string name) {
+            AddChannel (channel.Group, channel.Individual, type, name);
+        }
+
         public static void AddChannel (int cardID, int channelID, AnalogType type, string name) {
             if (cardID == -1)
                 throw new Exception ("Card does not exist");
@@ -41,7 +45,7 @@ namespace AquaPic.Drivers
 
         public static float GetAnalogValue (IndividualControl channel, bool realTimeUpdate = false) {
             if (realTimeUpdate) {
-                cards [channel.Group].GetValue (channel.Individual);
+                cards [channel.Group].GetValue ((byte)channel.Individual);
                 while (cards [channel.Group].updating)
                     continue;
             }

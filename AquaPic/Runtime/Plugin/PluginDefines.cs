@@ -7,13 +7,14 @@ namespace AquaPic.Runtime
         None = 0,
         Compiled = 1,
         Cyclic = 2,
-        //Outlet = 4,
-        Event = 8,
-        Initializer = 16
+        Event = 4,
+        Initializer = 8
     }
 
-    public interface ICyclicScript : IStartupScript, IEventScript
-    { }
+    public interface ICyclicScript : IStartupScript
+    { 
+        void CyclicRun ();
+    }
 
     public interface IStartupScript : IScript
     {
@@ -22,7 +23,7 @@ namespace AquaPic.Runtime
 
     public interface IEventScript : IScript
     {
-        void RunScript ();
+        void OneShotRun ();
     }
 
     public interface IScript

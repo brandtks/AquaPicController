@@ -126,6 +126,7 @@ namespace AquaPic
             sunSetTomorrow.Show ();
             #endregion
 
+            dimmingIsManual = false;
             fixtureID = 0;
 
             dimmingHeader = new TouchLabel ();
@@ -193,18 +194,16 @@ namespace AquaPic
 
             autoTextBox = new TouchTextBox ();
             autoTextBox.textAlignment = MyAlignment.Center;
+            autoTextBox.Visible = false;
             Put (autoTextBox, 680, 385);
-            autoTextBox.Show ();
 
             autoLabel = new TouchLabel ();
             autoLabel.text = "Auto";
             autoLabel.textColor = "grey4";
-            autoLabel.WidthRequest = 75;
             autoLabel.textAlignment = MyAlignment.Right;
-            autoLabel.WidthRequest = 75;
-            autoLabel.HeightRequest = 20;
+            autoLabel.SetSizeRequest (75, 20);
+            autoLabel.Visible = false;
             Put (autoLabel, 596, 389);
-            autoLabel.Show ();
 
             onTimeTextBox = new TouchTextBox ();
             onTimeTextBox.WidthRequest = 195;
@@ -248,7 +247,9 @@ namespace AquaPic
                     dimmingProgressBar.enableTouch = false;
                     requestTextBox.enableTouch = false;
                     autoTextBox.Visible = false;
+                    autoTextBox.QueueDraw ();
                     autoLabel.Visible = false;
+                    autoLabel.QueueDraw ();
                 } else {
                     modeSelector.CurrentSelected = 0;
                     dimmingProgressBar.enableTouch = true;

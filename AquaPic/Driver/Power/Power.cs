@@ -79,11 +79,11 @@ namespace AquaPic.Drivers
         }
 
         public static void AlarmShutdownOutlet (IndividualControl outlet) {
-            pwrStrips [outlet.Group].SetOutletState (outlet.Individual, MyState.Off, true);
+            pwrStrips [outlet.Group].SetOutletState ((byte)outlet.Individual, MyState.Off, true);
         }
 
         public static void SetOutletMode (IndividualControl outlet, Mode mode) {
-            pwrStrips [outlet.Group].SetPlugMode (outlet.Individual, mode);
+            pwrStrips [outlet.Group].SetPlugMode ((byte)outlet.Individual, mode);
         }
 
         public static MyState GetOutletState (IndividualControl outlet) {

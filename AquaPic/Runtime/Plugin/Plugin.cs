@@ -31,13 +31,13 @@ namespace AquaPic.Runtime
                     name = path.Substring (idxBackslash, (idxPeriod - idxBackslash));
 
                 foreach (var line in File.ReadLines (path)) {
-                    if (line.Contains ("ICyclicScript")) {    
+                    if (line.Contains (": ICyclicScript")) {
                         AllPlugins.Add (name, new CyclicScript (name, path));
                         AllPlugins [name].RunInitialize ();
-                    } else if (line.Contains ("IStartupScript")) {
+                    } else if (line.Contains (": IStartupScript")) {
                         AllPlugins.Add (name, new StartupScript (name, path));
                         AllPlugins [name].RunInitialize ();
-                    } else if (line.Contains ("IEventScript")) {
+                    } else if (line.Contains (": IEventScript")) {
                         AllPlugins.Add (name, new EventScript (name, path));
                     }
                 }
@@ -47,7 +47,7 @@ namespace AquaPic.Runtime
         public static void Run () {
             foreach (var p in AllPlugins.Values) {
                 if (p.flags.HasFlag (ScriptFlags.Cyclic)) {
-                    p.RunPlugin (ScriptFlags.Cyclic);
+                    p.CyclicRun ();
                 }
             }
         }
@@ -66,7 +66,21 @@ namespace AquaPic.Runtime
             sb.Append (script.name);
             sb.Append (".dll");
             options.OutputAssembly = sb.ToString ();
+
             options.ReferencedAssemblies.Add (Assembly.GetExecutingAssembly ().Location);
+
+            AssemblyName[] aNames = Assembly.GetExecutingAssembly ().GetReferencedAssemblies ();
+            foreach (var aName in aNames) {
+                if (aName.Name != "Mono.Cairo") { // for whatever reason Mono.Cairo done screws up ReflectionOnlyLoad
+                    string path = Assembly.ReflectionOnlyLoad (aName.FullName).Location;
+                    options.ReferencedAssemblies.Add (path);
+                }
+            }
+
+            // for whatever reason Mono.Cairo done screws up ReflectionOnlyLoad and 
+            // atk-sharp isn't in the Referenced Assemblies
+            options.ReferencedAssemblies.Add (@"C:\Windows\Microsoft.Net\assembly\GAC_MSIL\Mono.Cairo\v4.0_4.0.0.0__0738eb9f132ed756\Mono.Cairo.dll");
+            options.ReferencedAssemblies.Add (@"C:\Windows\Microsoft.Net\assembly\GAC_MSIL\atk-sharp\v4.0_2.12.0.0__35e10195dab3c99f\atk-sharp.dll");
 
             CompilerResults result = provider.CompileAssemblyFromFile (options, script.path);
 
@@ -76,8 +90,8 @@ namespace AquaPic.Runtime
                     //Console.WriteLine ("At Line {0}, Column {1}", error.Line, error.Column);
 
                     StringBuilder e = new StringBuilder ();
-                    e.AppendLine (string.Format ("  Error ({0}): {1}", error.ErrorNumber, error.ErrorText));
-                    e.Append (string.Format ("  File {0}, Line {1}", error.FileName, error.Line));
+                    e.AppendLine (string.Format ("  Error ({0}): {1} ", error.ErrorNumber, error.ErrorText));
+                    e.Append (string.Format ("  File {0}, Line {1} ", error.FileName, error.Line));
 
                     script.errors.Add (new ScriptMessage ("CompileCode", e.ToString ()));
                 }

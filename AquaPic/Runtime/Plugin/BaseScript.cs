@@ -8,7 +8,8 @@ namespace AquaPic.Runtime
     public class BaseScript
     {
         //protected Assembly pluginAssembly;
-        protected IScript instance;
+
+        public IScript instance;
         public ScriptFlags flags;
         public string name;
         public string path;
@@ -33,11 +34,13 @@ namespace AquaPic.Runtime
                     sb.Append (@"\AquaPicRuntimeProject\Scripts\dll\");
                     sb.Append (name);
                     sb.Append (".dll");
+
                     pluginAssembly = Assembly.LoadFrom (sb.ToString ());
                     flags |= ScriptFlags.Compiled;
                 }
             } catch (Exception ex) {
                 flags &= ~ScriptFlags.Compiled;
+                //Console.WriteLine (ex.ToString ());
                 errors.Add (new ScriptMessage ("Base Constructor", "  " + ex.ToString ()));
             }
 
@@ -47,6 +50,8 @@ namespace AquaPic.Runtime
                 flags &= ~ScriptFlags.Compiled;
                 errors.Add (new ScriptMessage ("Base Constructor", "  .dll Assembly was not loaded"));
             }
+
+
         }
 
         protected virtual void CreateInstance (Assembly pluginAssembly) {
@@ -62,6 +67,7 @@ namespace AquaPic.Runtime
                             }
                         } catch (Exception ex) {
                             flags &= ~ScriptFlags.Compiled;
+                            //Console.WriteLine (ex.ToString ());
                             errors.Add (new ScriptMessage ("CreateInstance", "  " + ex.ToString ()));
                         }
                     }
@@ -81,11 +87,23 @@ namespace AquaPic.Runtime
             }
         }
 
-        public virtual void RunPlugin (ScriptFlags flag) {
-            if (flags.HasFlag (ScriptFlags.Compiled | flag)) {
+        public virtual void CyclicRun () {
+            if (flags.HasFlag (ScriptFlags.Compiled | ScriptFlags.Cyclic)) {
                 try {
                     var i = instance as ICyclicScript;
-                    i.RunScript ();
+                    i.CyclicRun ();
+                } catch (Exception ex) {
+                    flags &= ~ScriptFlags.Compiled;
+                    errors.Add (new ScriptMessage ("RunPlugin", "  " + ex.ToString ()));
+                }
+            }
+        }
+
+        public virtual void OneShotRun () {
+            if (flags.HasFlag (ScriptFlags.Compiled | ScriptFlags.Event)) {
+                try {
+                    var i = instance as IEventScript;
+                    i.OneShotRun ();
                 } catch (Exception ex) {
                     flags &= ~ScriptFlags.Compiled;
                     errors.Add (new ScriptMessage ("RunPlugin", "  " + ex.ToString ()));
