@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Media;
 
 namespace AquaPic.Runtime
 {
@@ -6,38 +7,67 @@ namespace AquaPic.Runtime
     {
         private class AlarmType
         {
-            public string shortName;
-            public string longName;
-            public uint count;
-            public bool alarming;
-            public bool acknowledged;
+            private bool _alarming;
+            private bool _acknowledged;
+            public bool alarming {
+                get {
+                    return _alarming;
+                }
+            }
+            public bool acknowledged {
+                get {
+                    return _acknowledged;
+                }
+            }
+
+            public string name;
+            public string description;
             public bool clearOnAck;
-            public event AlarmHandler onPost;
-            public event AlarmHandler onAcknowledge;
-            public event AlarmHandler onClear;
+            public bool audible;
+            public event AlarmHandler postEvent;
+            public event AlarmHandler acknowledgeEvent;
+            public event AlarmHandler clearEvent;
 
-            public AlarmType (string shortName, string longName, bool clearOnAck) {
-                this.shortName = shortName;
-                this.longName = longName;
-                this.count = 0;
-                this.alarming = false;
-                this.acknowledged = false;
+            public AlarmType (string name, string description, bool audible, bool clearOnAck) {
+                _alarming = false;
+                _acknowledged = false;
+
+                this.name = name;
+                this.description = description;
                 this.clearOnAck = clearOnAck;
+                this.audible = audible;
             }
 
-            public void OnAlarmPost () {
-                if (onPost != null)
-                    onPost (this);
+            public void PostAlarm () {
+                if (!_alarming) {
+                    _alarming = true;
+                    _acknowledged = false;
+
+                    if (audible)
+                        SystemSounds.Beep.Play ();
+
+                    if (postEvent != null)
+                        postEvent (this);
+                }
             }
 
-            public void OnAlarmAcknowledge () {
-                if (onAcknowledge != null)
-                    onAcknowledge (this);
+            public void AcknowledgeAlarm () {
+                _acknowledged = true;
+
+                if (acknowledgeEvent != null)
+                    acknowledgeEvent (this);
+                
+                if (clearOnAck)
+                    ClearAlarm ();
             }
 
-            public void OnAlarmClear () {
-                if (onClear != null)
-                    onClear (this);
+            public void ClearAlarm () {
+                _alarming = false;
+
+                if (_acknowledged) {
+                    if (clearEvent != null)
+                        clearEvent (this);
+                }
             }
         }
     }

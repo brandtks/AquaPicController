@@ -55,10 +55,10 @@ namespace AquaPic.Runtime
             }
         }
 
-        //public static bool CompileCode (string scriptName, string filePath) {
         public static bool CompileCode (BaseScript script) {
             script.errors.Clear ();
 
+            // <WINDOWS> CSharpCodeProvider does not work with Mono
             CSharpCodeProvider provider = new CSharpCodeProvider ();
             CompilerParameters options = new CompilerParameters();
 

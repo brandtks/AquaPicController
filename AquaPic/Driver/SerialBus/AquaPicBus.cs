@@ -76,7 +76,6 @@ namespace AquaPic.SerialBus
         #else
         public void Open (string port, int baudRate) {
             try {
-                //<TODO> Determine port for Radxa Rock "/dev/ttyAMA0"
                 uart = new SerialPort (port, baudRate, Parity.Space, 8);
                 uart.StopBits = StopBits.One;
                 uart.Handshake = Handshake.None;

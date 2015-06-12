@@ -196,6 +196,7 @@ namespace AquaPic
             autoTextBox.textAlignment = MyAlignment.Center;
             autoTextBox.Visible = false;
             Put (autoTextBox, 680, 385);
+            autoTextBox.Show ();
 
             autoLabel = new TouchLabel ();
             autoLabel.text = "Auto";
@@ -204,6 +205,7 @@ namespace AquaPic
             autoLabel.SetSizeRequest (75, 20);
             autoLabel.Visible = false;
             Put (autoLabel, 596, 389);
+            autoLabel.Show ();
 
             onTimeTextBox = new TouchTextBox ();
             onTimeTextBox.WidthRequest = 195;
@@ -225,7 +227,7 @@ namespace AquaPic
 
             GetFixtureData ();
 
-            ShowAll ();
+            Show ();
         }
 
         public override void Dispose () {
@@ -253,9 +255,7 @@ namespace AquaPic
                     dimmingProgressBar.enableTouch = false;
                     requestTextBox.enableTouch = false;
                     autoTextBox.Visible = false;
-                    autoTextBox.QueueDraw ();
                     autoLabel.Visible = false;
-                    autoLabel.QueueDraw ();
                 } else {
                     modeSelector.CurrentSelected = 0;
                     dimmingProgressBar.enableTouch = true;

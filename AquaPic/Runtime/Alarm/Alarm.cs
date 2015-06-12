@@ -15,48 +15,43 @@ namespace AquaPic.Runtime
 
         }
 
-        public static int Subscribe (string shortName, string longName, bool clearOnAck = false) {
-            int index = alarms.Count;
-            alarms.Add (new AlarmType (shortName, longName, clearOnAck));
-            return index;
+        public static int Subscribe (string name, string description, bool audible = false, bool clearOnAck = false) {
+            AlarmType a = new AlarmType (name, description, audible, clearOnAck);
+            alarms.Add (a);
+            return alarms.IndexOf (a);
         }
 
         public static void Post (int index) {
-            if (!alarms [index].alarming) {
-                alarms [index].alarming = true;
-                alarms [index].acknowledged = false;
-                alarms [index].count = 1;
-            } else
-                ++alarms [index].count;
+            alarms [index].PostAlarm ();
         }
 
         public static void Clear (int index) {
-            alarms [index].alarming = false;
-            alarms [index].count = 0;
+            alarms [index].ClearAlarm ();
         }
 
         public static void Acknowledge () {
-            for (int i = 0; i < alarms.Count; ++i) {
-                alarms [i].acknowledged = true;
-                if (alarms [i].clearOnAck)
-                    Clear (i);
-            }
+            foreach (var alarm in alarms)
+                alarm.AcknowledgeAlarm ();
         }
 
         public static bool CheckAlarming (int index) {
             return alarms [index].alarming;
         }
 
+        public static bool CheckAcknowledged (int index) {
+            return alarms [index].acknowledged;
+        }
+
         public static void AddPostHandler (int index, AlarmHandler handler) {
-            alarms [index].onPost += handler;
+            alarms [index].postEvent += handler;
         }
 
         public static void AddAcknowledgeHandler (int index, AlarmHandler handler) {
-            alarms [index].onAcknowledge += handler;
+            alarms [index].acknowledgeEvent += handler;
         }
 
         public static void AddClearHandler (int index, AlarmHandler handler) {
-            alarms [index].onClear += handler;
+            alarms [index].clearEvent += handler;
         }
     }
 }
