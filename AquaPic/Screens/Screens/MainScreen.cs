@@ -18,6 +18,8 @@ namespace AquaPic
         TouchBarPlotWidget whiteLedDimming;
         TouchBarPlotWidget actinicLedDimming;
 
+        uint timerId;
+
         public MainWindow (params object[] options) : base () {
             TouchButton b1 = new TouchButton ();
             b1.ButtonReleaseEvent += OnButtonClick;
@@ -72,9 +74,15 @@ namespace AquaPic
             actinicLedDimming.text = "Actinic LED";
             Put (actinicLedDimming, 685, 30);
 
-            GLib.Timeout.Add (1000, OnUpdateTimer);
+            timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
 
             ShowAll ();
+        }
+
+        public override void Dispose () {
+            GLib.Source.Remove (timerId);
+
+            base.Dispose ();
         }
 
         protected void OnButtonClick (object sender, ButtonReleaseEventArgs args) {
@@ -99,6 +107,10 @@ namespace AquaPic
 
             actinicLedDimming.currentValue = Lighting.GetCurrentDimmingLevel (Lighting.GetLightIndex ("Actinic LED"));
             actinicLedDimming.QueueDraw ();
+
+            BaseScript bs = Plugin.AllPlugins ["WaterLevel"];
+            waterLevel.currentValue = Convert.ToSingle (bs.OneShotRun ());
+            waterLevel.QueueDraw ();
 
             return true;
         }

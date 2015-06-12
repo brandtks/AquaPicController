@@ -19,7 +19,7 @@ namespace MyWidgetLibrary
             }
             set {
                 bar.currentProgress = value / 100;
-                textBox.text = value.ToString ("0.0");
+                textBox.text = value.ToString ("F1");
             }
         }
 

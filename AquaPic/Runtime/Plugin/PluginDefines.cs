@@ -11,6 +11,15 @@ namespace AquaPic.Runtime
         Initializer = 8
     }
 
+    public class AquaPicScript : Attribute
+    {
+        public string scriptType;
+
+        public AquaPicScript (string scriptType) {
+            this.scriptType = scriptType;
+        }
+    }
+
     public interface ICyclicScript : IStartupScript
     { 
         void CyclicRun ();
@@ -23,8 +32,11 @@ namespace AquaPic.Runtime
 
     public interface IEventScript : IScript
     {
-        void OneShotRun ();
+        object OneShotRun ();
     }
+
+    public interface IModuleScript : ICyclicScript, IEventScript
+    { }
 
     public interface IScript
     { }

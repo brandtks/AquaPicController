@@ -17,16 +17,30 @@ namespace MyWidgetLibrary
 
     public class TouchProgressBar : EventBox
     {
+        private float _currentProgress;
+        public float currentProgress {
+            get {
+                return _currentProgress;
+            }
+            set {
+                if (value < 0.0f)
+                    _currentProgress = 0.0f;
+                else if (value > 1.0f)
+                    _currentProgress = 1.0f;
+                else
+                    _currentProgress = value;
+            }
+        }
+
         public MyColor colorBackground;
         public MyColor colorProgress;
-        public float currentProgress;
         public bool enableTouch;
         public MyOrientation orientation;
 
         public ProgressChangeEventHandler ProgressChangedEvent;
         public ProgressChangeEventHandler ProgressChangingEvent;
 
-        private uint timer;
+        private uint timerId;
         private bool clicked;
 
         public TouchProgressBar (
@@ -41,10 +55,10 @@ namespace MyWidgetLibrary
 
             this.colorBackground = colorBackground;
             this.colorProgress = colorProgress;
-            this.currentProgress = currentProgress;
+            this._currentProgress = currentProgress;
             this.enableTouch = enableTouch;
             this.orientation = orientation;
-            this.timer = 0;
+            this.timerId = 0;
             this.clicked = false;
 
             if (this.orientation == MyOrientation.Vertical) {
@@ -77,7 +91,7 @@ namespace MyWidgetLibrary
                     colorBackground.SetSource (cr);
                     cr.Fill ();
 
-                    difference = (int)(height * currentProgress);
+                    difference = (int)(height * _currentProgress);
                     top += (height - difference);
                     cr.Rectangle (left, top, width, difference);
                     colorProgress.SetSource (cr);
@@ -88,7 +102,7 @@ namespace MyWidgetLibrary
 
         protected void OnProgressBarPress (object o, ButtonPressEventArgs args) {
             if (enableTouch) {
-                timer = GLib.Timeout.Add (20, OnTimerEvent);
+                timerId = GLib.Timeout.Add (20, OnTimerEvent);
                 clicked = true;
             }
         }
@@ -97,7 +111,7 @@ namespace MyWidgetLibrary
             clicked = false;
 
             if (ProgressChangedEvent != null)
-                ProgressChangedEvent (this, new ProgressChangeEventArgs (currentProgress));
+                ProgressChangedEvent (this, new ProgressChangeEventArgs (_currentProgress));
         }
 
         protected bool OnTimerEvent () {
@@ -105,17 +119,17 @@ namespace MyWidgetLibrary
                 int x, y;
                 GetPointer (out x, out y);
                 if (orientation == MyOrientation.Vertical)
-                    currentProgress = (float)(Allocation.Height - y) / (float)Allocation.Height;
+                    _currentProgress = (float)(Allocation.Height - y) / (float)Allocation.Height;
                 else
-                    currentProgress = (float)(Allocation.Width - x) / (float)Allocation.Width;
+                    _currentProgress = (float)(Allocation.Width - x) / (float)Allocation.Width;
 
-                if (currentProgress > 1.0f)
-                    currentProgress = 1.0f;
-                if (currentProgress < 0.0f)
-                    currentProgress = 0.0f;
+                if (_currentProgress > 1.0f)
+                    _currentProgress = 1.0f;
+                if (_currentProgress < 0.0f)
+                    _currentProgress = 0.0f;
 
                 if (ProgressChangingEvent != null)
-                    ProgressChangingEvent (this, new ProgressChangeEventArgs (currentProgress));
+                    ProgressChangingEvent (this, new ProgressChangeEventArgs (_currentProgress));
 
                 QueueDraw ();
             }

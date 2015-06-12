@@ -50,8 +50,6 @@ namespace AquaPic.Runtime
                 flags &= ~ScriptFlags.Compiled;
                 errors.Add (new ScriptMessage ("Base Constructor", "  .dll Assembly was not loaded"));
             }
-
-
         }
 
         protected virtual void CreateInstance (Assembly pluginAssembly) {
@@ -99,16 +97,18 @@ namespace AquaPic.Runtime
             }
         }
 
-        public virtual void OneShotRun () {
+        public virtual object OneShotRun () {
             if (flags.HasFlag (ScriptFlags.Compiled | ScriptFlags.Event)) {
                 try {
                     var i = instance as IEventScript;
-                    i.OneShotRun ();
+                    return i.OneShotRun ();
                 } catch (Exception ex) {
                     flags &= ~ScriptFlags.Compiled;
                     errors.Add (new ScriptMessage ("RunPlugin", "  " + ex.ToString ()));
                 }
             }
+
+            return null;
         }
     }
 }

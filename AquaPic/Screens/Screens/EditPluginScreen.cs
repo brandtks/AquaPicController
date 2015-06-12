@@ -45,6 +45,8 @@ namespace AquaPic
                     b.ButtonReleaseEvent += (o, args) => {
                         if (script.errors.Count != 0) {
                             script.CompileAndLoad ();
+                            if (script.flags.HasFlag (ScriptFlags.Initializer))
+                                script.RunInitialize ();
                             DisplayErrors (script);
                             tb.QueueDraw ();
                         } else {

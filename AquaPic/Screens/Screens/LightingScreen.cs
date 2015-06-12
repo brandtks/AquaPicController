@@ -25,7 +25,7 @@ namespace AquaPic
         private TouchLabel requestLabel;
         private TouchTextBox onTimeTextBox;
         private TouchTextBox offTimeTextBox;
-        private uint timer;
+        private uint timerId;
         private bool isDimmingFixture;
         private bool dimmingIsManual;
 
@@ -228,6 +228,12 @@ namespace AquaPic
             ShowAll ();
         }
 
+        public override void Dispose () {
+            GLib.Source.Remove (timerId);
+
+            base.Dispose ();
+        }
+
         protected void GetFixtureData () {
             isDimmingFixture = Lighting.IsDimmingFixture (fixtureID);
             if (isDimmingFixture) {
@@ -272,7 +278,7 @@ namespace AquaPic
                 combo.Visible = false;
                 combo.Visible = true;
 
-                timer = GLib.Timeout.Add (1000, OnTimer);
+                timerId = GLib.Timeout.Add (1000, OnTimer);
             } else {
                 dimmingHeader.text = "Dimming not available";
                 dimmingIsManual = false;

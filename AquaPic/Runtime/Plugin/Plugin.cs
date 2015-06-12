@@ -31,13 +31,16 @@ namespace AquaPic.Runtime
                     name = path.Substring (idxBackslash, (idxPeriod - idxBackslash));
 
                 foreach (var line in File.ReadLines (path)) {
-                    if (line.Contains (": ICyclicScript")) {
+                    if (line.Contains ("[AquaPicScript (\"ICyclicScript\")]")) {
                         AllPlugins.Add (name, new CyclicScript (name, path));
                         AllPlugins [name].RunInitialize ();
-                    } else if (line.Contains (": IStartupScript")) {
+                    } else if (line.Contains ("[AquaPicScript (\"IStartupScript\")]")) {
                         AllPlugins.Add (name, new StartupScript (name, path));
                         AllPlugins [name].RunInitialize ();
-                    } else if (line.Contains (": IEventScript")) {
+                    } else if (line.Contains ("[AquaPicScript (\"IModuleScript\")]")) {
+                        AllPlugins.Add (name, new ModuleScript (name, path));
+                        AllPlugins [name].RunInitialize ();
+                    } else if (line.Contains ("[AquaPicScript (\"IEventScript\")]")) {
                         AllPlugins.Add (name, new EventScript (name, path));
                     }
                 }
