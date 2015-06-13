@@ -47,6 +47,14 @@ namespace AquaPic
             menu.Show ();
         }
 
+        public override void Dispose () {
+            foreach (var w in this.Children) {
+                w.Dispose ();
+            }
+
+            base.Dispose ();
+        }
+
         protected void OnBackGroundExpose (object sender, ExposeEventArgs args) {
             var box = sender as EventBox;
             using (Context cr = Gdk.CairoHelper.Create (box.GdkWindow)) {

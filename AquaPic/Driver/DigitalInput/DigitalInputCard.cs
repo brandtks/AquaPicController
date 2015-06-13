@@ -23,8 +23,7 @@ namespace AquaPic.Drivers
                 this.cardID = cardID;
                 this.name = name;
                 this.communicationAlarmIndex = Alarm.Subscribe (
-                    this.slave.Address.ToString () + "commication fault",
-                    this.name + "serial communications fault");
+                    this.slave.Address.ToString () + "commication fault");
                 this.updating = false;
 
                 int numberInputs = 6;

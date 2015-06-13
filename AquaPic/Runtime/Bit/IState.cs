@@ -3,7 +3,7 @@ using AquaPic.Utilites;
 
 namespace AquaPic.Runtime
 {
-    public partial class ControllerState
+    public partial class Bit
     {
         private class IState
         {

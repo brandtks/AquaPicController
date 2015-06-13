@@ -7,26 +7,30 @@ namespace AquaPic.Runtime
     {
         private static List<AlarmType> alarms = new List<AlarmType> ();
 
-        static Alarm () {
-            TaskManager.AddTask ("Alarm", 1000, Run);
+        public static int totalAlarms {
+            get {
+                return alarms.Count;
+            }
         }
 
-        public static void Run () {
+        public static int Subscribe (string name, bool audible = false, bool clearOnAck = false) {
+            if (!ListContains (name)) {
+                AlarmType a = new AlarmType (name, audible, clearOnAck);
+                alarms.Add (a);
+                return alarms.IndexOf (a);
+            } 
 
-        }
-
-        public static int Subscribe (string name, string description, bool audible = false, bool clearOnAck = false) {
-            AlarmType a = new AlarmType (name, description, audible, clearOnAck);
-            alarms.Add (a);
-            return alarms.IndexOf (a);
+            return ListIndexOf (name);
         }
 
         public static void Post (int index) {
-            alarms [index].PostAlarm ();
+            if ((index >= 0) && (index <= (alarms.Count - 1)))
+                alarms [index].PostAlarm ();
         }
 
         public static void Clear (int index) {
-            alarms [index].ClearAlarm ();
+            if ((index >= 0) && (index <= (alarms.Count - 1)))
+                alarms [index].ClearAlarm ();
         }
 
         public static void Acknowledge () {
@@ -35,23 +39,85 @@ namespace AquaPic.Runtime
         }
 
         public static bool CheckAlarming (int index) {
-            return alarms [index].alarming;
+            if ((index >= 0) && (index <= (alarms.Count - 1)))
+                return alarms [index].alarming;
+            return false;
+        }
+
+        public static bool CheckAlarming (string name) {
+            int index = ListIndexOf (name);
+            return CheckAlarming (index);
         }
 
         public static bool CheckAcknowledged (int index) {
-            return alarms [index].acknowledged;
+            if ((index >= 0) && (index <= (alarms.Count - 1)))
+                return alarms [index].acknowledged;
+            return false;
+        }
+
+        public static bool CheckAcknowledged (string name) {
+            int index = ListIndexOf (name);
+            return CheckAcknowledged (index);
         }
 
         public static void AddPostHandler (int index, AlarmHandler handler) {
-            alarms [index].postEvent += handler;
+            if ((index >= 0) && (index <= (alarms.Count - 1)))
+                alarms [index].postEvent += handler;
         }
 
         public static void AddAcknowledgeHandler (int index, AlarmHandler handler) {
-            alarms [index].acknowledgeEvent += handler;
+            if ((index >= 0) && (index <= (alarms.Count - 1)))
+                alarms [index].acknowledgeEvent += handler;
         }
 
         public static void AddClearHandler (int index, AlarmHandler handler) {
-            alarms [index].clearEvent += handler;
+            if ((index >= 0) && (index <= (alarms.Count - 1)))
+                alarms [index].clearEvent += handler;
+        }
+
+        public static bool ListContains (string name) {
+            foreach (var a in alarms) {
+                if (string.Equals (a.name, name, StringComparison.InvariantCultureIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static int ListIndexOf (string name) {
+            for (int i = 0; i < alarms.Count; ++i) {
+                if (string.Equals (alarms [i].name, name, StringComparison.InvariantCultureIgnoreCase))
+                    return i;
+            }
+
+            return -1;
+        }
+
+        public static int AlarmCount () {
+            int alarming = 0;
+            foreach (var a in alarms) {
+                if (a.alarming)
+                    ++alarming;
+            }
+            return alarming;
+        }
+
+        public static List<AlarmData> GetAllAlarming () {
+            List<AlarmData> alarming = new List<AlarmData> ();
+            foreach (var a in alarms) {
+                if ((!a.acknowledged) || (a.alarming && a.acknowledged))
+                    alarming.Add (a);
+            }
+            return alarming;
+        }
+
+        public static List<AlarmData> GetAllNotAcknowledged () {
+            List<AlarmData> notAck = new List<AlarmData> ();
+            foreach (var a in alarms) {
+                if (a.alarming && !a.acknowledged)
+                    notAck.Add (a);
+            }
+            return notAck;
         }
     }
 }

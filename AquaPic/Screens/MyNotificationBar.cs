@@ -1,20 +1,38 @@
 ﻿using System;
+using System.Collections.Generic;
 using Cairo;
 using Gtk;
+using AquaPic.Runtime;
 using MyWidgetLibrary;
 
 namespace AquaPic
 {
     public class MyNotificationBar : EventBox
     {
+        private uint timerId;
+        private int displayedAlarm;
+        private int updateAlarm;
+        private string alarmName;
+
+        private string currentscreen = GuiGlobal.currentScreen;
+
         public MyNotificationBar () {
             this.Visible = true;
             this.VisibleWindow = false;
             this.SetSizeRequest (800, 19);
 
-            GLib.Timeout.Add (1000, onTimer);
+            timerId = GLib.Timeout.Add (1000, onTimer);
+            displayedAlarm = 0;
+            updateAlarm = 0;
+            UpdateAlarmText ();
 
             this.ExposeEvent += onExpose;
+            ButtonReleaseEvent += OnButtonRelease;
+        }
+
+        public override void Dispose () {
+            GLib.Source.Remove (timerId);
+            base.Dispose ();
         }
 
         protected void onExpose (object sender, ExposeEventArgs args) {
@@ -46,18 +64,56 @@ namespace AquaPic
 
                 Pango.Layout l = new Pango.Layout (this.PangoContext);
                 l.Width = Pango.Units.FromPixels (120);
-                l.Wrap = Pango.WrapMode.Word;
-                l.Alignment = Pango.Alignment.Right;
-                l.SetMarkup ("<span color=" + (char)34 + "white" + (char)34 + ">" + DateTime.Now.ToLongTimeString () + "</span>"); 
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+
+                l.Alignment = Pango.Alignment.Right;
+                l.SetMarkup ("<span color=\"white\">" 
+                    + DateTime.Now.ToLongTimeString () 
+                    + "</span>");
                 GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), 680, 0, l);
+
+                string fontColor;
+                if (alarmName == "No Alarms")
+                    fontColor = "white";
+                else
+                    fontColor = MyColor.ToHTML ("compl");
+                l.Alignment = Pango.Alignment.Left;
+                l.Width = Pango.Units.FromPixels (250);
+                l.SetMarkup ("<span color=\""
+                    + fontColor
+                    + "\">" 
+                    + alarmName
+                    + "</span>");
+                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), 0, 0, l);
+
                 l.Dispose ();
             }
         }
 
         protected bool onTimer () {
+            updateAlarm = ++updateAlarm % 6;
+            if (updateAlarm == 0)
+                UpdateAlarmText ();
+            
             QueueDraw ();
             return true;
+        }
+
+        protected void UpdateAlarmText () {
+            List<AlarmData> notAck = Alarm.GetAllNotAcknowledged ();
+
+            if (notAck.Count != 0) {
+                alarmName = notAck [displayedAlarm].name;
+                displayedAlarm = ++displayedAlarm % notAck.Count;
+            } else if (Alarm.AlarmCount () != 0)
+                alarmName = "Alarms";
+            else
+                alarmName = "No Alarms";
+        }
+
+        protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
+            if ((args.Event.X >= 0.0) && (args.Event.X <= 250.0))
+                GuiGlobal.ChangeScreens ("Alarms");
         }
     }
 }

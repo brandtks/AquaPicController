@@ -15,7 +15,7 @@ namespace AquaPic.Runtime
         public static void Start () {
             foreach (var timeInterval in tasks.Keys) {
                 #if SIMULATION
-                int time = timeInterval * 4;
+                uint time = (uint)timeInterval * 4;
                 GLib.Timeout.Add (time, () => {
                     foreach (var task in tasks[timeInterval])
                         task.OnRun ();

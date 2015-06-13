@@ -33,7 +33,7 @@ namespace AquaPic.Drivers
 
                 this.cardID = cardID;
                 this.name = name;
-                this.communicationAlarmIndex = Alarm.Subscribe (address.ToString () + " communication fault", "Analog Input card at address " + this.slave.Address.ToString ());
+                this.communicationAlarmIndex = Alarm.Subscribe (address.ToString () + " communication fault");
                 this.channels = new AnalogInputChannel[4];
                 for (int i = 0; i < this.channels.Length; ++i) {
                     this.channels [i] = new AnalogInputChannel (this.name + ".i" + i.ToString ()); 

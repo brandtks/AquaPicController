@@ -25,7 +25,7 @@ namespace AquaPic.Drivers
                 }
                 this.cardID = cardID;
                 this.name = name;
-                communicationAlarmIndex = Alarm.Subscribe(address.ToString () + " communication fault", "Analog output card at address " + this.slave.Address.ToString ());
+                communicationAlarmIndex = Alarm.Subscribe(address.ToString () + " communication fault");
                 channels = new AnalogOutputChannel[4];
                 for (int i = 0; i < channels.Length; ++i) {
                     int chId = i;

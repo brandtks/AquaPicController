@@ -25,13 +25,11 @@ namespace AquaPic.Drivers
                 this.powerID = powerID;
 
                 this.commsAlarmIdx = Alarm.Subscribe (
-                    this.slave.Address.ToString () + " communication fault", 
-                    this.name + "serial communications fault");
+                    this.slave.Address.ToString () + " communication fault");
 
                 if (alarmOnLossOfPower && (powerLossAlarmIndex == -1))
                     this.powerLossAlarmIndex = Alarm.Subscribe (
-                        "Loss of power", 
-                        "Mains power not available at " + this.name);
+                        "Loss of power");
                 else
                     this.powerLossAlarmIndex = powerLossAlarmIndex;
 
@@ -97,7 +95,7 @@ namespace AquaPic.Drivers
             protected void GetStatusCallback (CallbackArgs callArgs) {
                 AcPowerAvailable = Convert.ToBoolean(callArgs.readMessage[3]);
                 byte mask = Convert.ToByte(callArgs.readMessage[4]);
-                for (int i = 0; i < Outlets.Length; ++i) {
+                for (int i = 0; i < outlets.Length; ++i) {
                     if (Utils.mtob (mask, i))
                         ReadOutletCurrent (i);
                 }
@@ -143,7 +141,7 @@ namespace AquaPic.Drivers
             protected void ReadOutletCurrentCallback (CallbackArgs callArgs) {
                 int plug = Convert.ToInt32(callArgs.readMessage [3]);
                 float current = Convert.ToSingle(callArgs.readMessage [4]);
-                Outlets [plug].SetAmpCurrent (current);
+                outlets [plug].SetAmpCurrent (current);
 
             }
             #else
@@ -164,8 +162,8 @@ namespace AquaPic.Drivers
 
             #if SIMULATION
             public void SetOutletState (byte outletID, MyState state, bool modeOverride) {
-                if ((state != Outlets [outletID].currentState) && (Outlets [outletID].Updated)) {
-                    Outlets [outletID].Updated = false;
+                if ((state != outlets [outletID].currentState) && (outlets [outletID].Updated)) {
+                    outlets [outletID].Updated = false;
 
                     const int messageLength = 2;
                     string[] message = new string[messageLength];
@@ -180,8 +178,8 @@ namespace AquaPic.Drivers
                         message, 
                         messageLength, 
                         0, 
-                        (CallbackArgs args) => Outlets [outletID].OnChangeState (
-                            new StateChangeEventArgs (outletID, powerID, state, Outlets [outletID].mode)));
+                        (CallbackArgs args) => outlets [outletID].OnChangeState (
+                            new StateChangeEventArgs (outletID, powerID, state, outlets [outletID].mode)));
                 }
             }
             #else

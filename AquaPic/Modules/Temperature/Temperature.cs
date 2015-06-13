@@ -46,8 +46,8 @@ namespace AquaPic.Modules
                 lowTempAlarmSetpoint = Convert.ToSingle (jo ["lowTempAlarmSetpoint"]);
             }
 
-            highTempAlarmIdx = Alarm.Subscribe ("High temperature", "Water column temperature too high");
-            lowTempAlarmIdx = Alarm.Subscribe ("Low temperature", "Water column temperature too low");
+            highTempAlarmIdx = Alarm.Subscribe ("High temperature");
+            lowTempAlarmIdx = Alarm.Subscribe ("Low temperature");
 
             Alarm.AddPostHandler (
                 highTempAlarmIdx, 

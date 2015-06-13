@@ -17,7 +17,8 @@ namespace AquaPic
             { "Plugins", new ScreenData ("Plugins", (options) => {return new PluginWindow (options);}) },
             { "Settings", new ScreenData ("Settings", (options) => {return new SettingsWindow (options);}) },
             { "Menu", new ScreenData ("Menu", (options) => {return new MenuWindow (options);}) },
-            { "Edit Plugin", new ScreenData ("Edit Plugin", (options) => {return new EditPluginWindow (options);}) }
+            { "Edit Plugin", new ScreenData ("Edit Plugin", (options) => {return new EditPluginWindow (options);}) },
+            { "Alarms", new ScreenData ("Alarms", (options) => {return new AlarmWindow (options);}) }
         };
         public static string currentScreen;
 

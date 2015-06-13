@@ -175,7 +175,7 @@ namespace AquaPic.SerialBus
                                         m.readData [i] = lines [1 + i];
 
                                     if (m.callback != null)
-                                        Gtk.Application.Invoke (() => m.callback (new CallbackArgs (m.readData)));
+                                        Gtk.Application.Invoke ((o, args) => m.callback (new CallbackArgs (m.readData)));
 
                                     fileOpen = true;
                                 }

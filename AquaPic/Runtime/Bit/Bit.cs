@@ -4,8 +4,7 @@ using AquaPic.Utilites;
 
 namespace AquaPic.Runtime
 {
-    //<TODO> find a new name, I don't like ControllerState
-    public partial class ControllerState
+    public partial class Bit
     {
         private static Dictionary<string, IState> states = new Dictionary<string, IState> ();
 
@@ -25,7 +24,7 @@ namespace AquaPic.Runtime
                 states.Add (name, new IState (MyState.Reset));
         }
 
-        public static void Toggle (string name) {
+        public static MyState Toggle (string name) {
             if (states.ContainsKey (name)) {
                 if (states [name].state == MyState.Set)
                     states [name].state = MyState.Reset;
@@ -33,6 +32,8 @@ namespace AquaPic.Runtime
                     states [name].state = MyState.Set;
             } else
                 states.Add (name, new IState (MyState.Set)); // technically we started with the state reset
+
+            return states [name].state;
         }
 
         public static MyState Check (string name) {
