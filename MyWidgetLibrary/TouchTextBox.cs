@@ -77,7 +77,7 @@ namespace MyWidgetLibrary
             if (enableTouch) {
                 TouchNumberInput t = new TouchNumberInput ();
                 t.NumberSetEvent += (value) => {
-                        text = value;
+                        this.text = value;
 
                         if (TextChangedEvent != null)
                             TextChangedEvent (this, new TextChangedEventArgs (text));
@@ -85,6 +85,7 @@ namespace MyWidgetLibrary
                 
                 t.Run ();
                 t.Destroy ();
+                QueueDraw ();
             }
         }
     }

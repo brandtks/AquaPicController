@@ -26,6 +26,33 @@ namespace AquaPic.Modules
         public static Time defaultSunRise;
         public static Time defaultSunSet;
 
+        public static double latitude {
+            get {
+                return RiseSetCalc.latitude;
+            }
+            set {
+                RiseSetCalc.latitude = value;
+            }
+        }
+
+        public static double longitude {
+            get {
+                return RiseSetCalc.longitude;
+            }
+            set {
+                RiseSetCalc.longitude = value;
+            }
+        }
+
+        public static int timeZone {
+            get {
+                return RiseSetCalc.timeZone;
+            }
+            set {
+                RiseSetCalc.timeZone = value;
+            }
+        }
+
         static Lighting () {
             fixtures = new List<LightingFixture> ();
 
@@ -88,13 +115,6 @@ namespace AquaPic.Modules
             if (sunSetTomorrow.CompareToTime (maxSunSet) > 0) // sunset is after maximum
                 sunSetTomorrow.SetTime (maxSunSet);
         }
-
-        /* Might add reading file for min and max times and default times
-        public static void Init () {
-            RiseSetCalc.GetRiseSetTimes (out SunRiseToday, out SunSetToday);
-            RiseSetCalc.GetRiseTimeTomorrow (out SunRiseTomorrow);
-            RiseSetCalc.GetSetTimeYesterday (out SunSetYesterday);
-        }*/
 
         public static int AddLight (
             string name,

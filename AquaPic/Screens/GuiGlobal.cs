@@ -22,7 +22,7 @@ namespace AquaPic
         };
         public static string currentScreen;
 
-        public static List<string> menuWindows = new List<string> () {"Main", "Power", "Lighting", "Plugins", "Settings", "Menu"};
+        public static List<string> menuWindows = new List<string> () {"Main", "Lighting", "Power", "Plugins", "Settings", "Menu"};
         public static string[] menuColors = new string[6] {"pri", "secb", "seca", "secc", "compl", "grey4"};
         public static string currentSelectedMenu;
 

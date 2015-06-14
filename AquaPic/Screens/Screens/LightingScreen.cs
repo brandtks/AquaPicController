@@ -225,6 +225,17 @@ namespace AquaPic
             Put (combo, 600, 35);
             combo.Show ();
 
+            var settingsBtn = new TouchButton ();
+            settingsBtn.text = "Settings";
+            settingsBtn.SetSizeRequest (100, 30);
+            settingsBtn.ButtonReleaseEvent += (o, args) => {
+                var s = new LightingSettings ();
+                s.Run ();
+                s.Destroy ();
+            };
+            Put (settingsBtn, 15, 390);
+            settingsBtn.Show ();
+
             GetFixtureData ();
 
             Show ();

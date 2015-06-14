@@ -22,8 +22,6 @@ namespace MyWidgetLibrary
             WindowPosition = (Gtk.WindowPosition)4;
             DefaultWidth = 205;
             DefaultHeight = 235;
-            //Resizable = false;
-            //AllowGrow = false;
 
             fix = new Fixed ();
             fix.WidthRequest = 205;
@@ -75,6 +73,7 @@ namespace MyWidgetLibrary
                 if (plusMinus.key == "-") {
                     int pos = 0;
                     entryBox.InsertText ("-", ref pos);
+                    ++entryBox.Position;
                     plusMinus.key = "+"; 
                 } else {
                     entryBox.DeleteText (0, 1);
@@ -93,7 +92,10 @@ namespace MyWidgetLibrary
             fix.Put (delete, 155, 35);
 
             KeyButton clear = new KeyButton ("C", false);
-            clear.ButtonReleaseEvent += (o, args) => entryBox.Text = string.Empty;
+            clear.ButtonReleaseEvent += (o, args) => {
+                plusMinus.key = "-";
+                entryBox.Text = string.Empty;
+            };
             fix.Put (clear, 155, 85);
 
             TouchButton enter = new TouchButton ();
