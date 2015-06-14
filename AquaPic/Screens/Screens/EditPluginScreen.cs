@@ -9,7 +9,8 @@ namespace AquaPic
 {
     public class EditPluginWindow : MyBackgroundWidget
     {
-        protected TouchTextBox tb;
+        protected TextView tv;
+        protected VScrollbar vsb;
 
         public EditPluginWindow (params object[] options) : base () {
             var box = new MyBox (780, 395);
@@ -26,8 +27,16 @@ namespace AquaPic
             label.WidthRequest = 780;
             label.textAlignment = MyAlignment.Center;
 
-            tb = new TouchTextBox ();
-            tb.SetSizeRequest (770, 315);
+            tv = new TextView ();
+            tv.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
+            tv.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
+            tv.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
+            tv.CanFocus = false;
+
+            ScrolledWindow sw = new ScrolledWindow ();
+            sw.SetSizeRequest (770, 315);
+            sw.Add (tv);
+            Put (sw, 15, 60);
 
             BaseScript script = null;
             foreach (var opt in options) {
@@ -48,7 +57,7 @@ namespace AquaPic
                             if (script.flags.HasFlag (ScriptFlags.Initializer))
                                 script.RunInitialize ();
                             DisplayErrors (script);
-                            tb.QueueDraw ();
+                            tv.QueueDraw ();
                         } else {
                             MessageBox.Show ("Script is already running.\nCannot recomile and load");
                         }
@@ -67,15 +76,16 @@ namespace AquaPic
             }
 
             Put (label, 10, 35);
-            Put (tb, 15, 60);
+           
             ShowAll ();
         }
 
         protected void DisplayErrors (BaseScript script) {
-            if (script.errors.Count == 0)
-                tb.text = "No errors in script";
-            else {
-                tb.text = string.Empty;
+            TextBuffer tb = tv.Buffer;
+            if (script.errors.Count == 0) {
+                tb.Text = "No errors in script";
+            } else {
+                tb.Text = string.Empty;
 
                 foreach (var error in script.errors) {
                     StringBuilder sb = new StringBuilder ();
@@ -83,7 +93,7 @@ namespace AquaPic
                     sb.AppendLine (error.message);
                     sb.AppendLine ();
 
-                    tb.text += sb.ToString ();
+                    tb.Text += sb.ToString ();
                 }
             }
         }

@@ -22,17 +22,19 @@ namespace AquaPic
             int y = 35;
             foreach (var name in screenNames) {
                 ScreenData screen = GuiGlobal.allWindows [name];
-                var b = new TouchButton ();
-                b.SetSizeRequest (250, 30);
-                b.text = screen.name;
-                b.textColor = "black";
-                b.ButtonReleaseEvent += OnButtonClick;
-                Put (b, x, y);
+                if (screen.showInMenu) {
+                    var b = new TouchButton ();
+                    b.SetSizeRequest (250, 30);
+                    b.text = screen.name;
+                    b.textColor = "black";
+                    b.ButtonReleaseEvent += OnButtonClick;
+                    Put (b, x, y);
 
-                x += 260;  
-                if (x >= 795) {
-                    x = 15;
-                    y += 40;
+                    x += 260;  
+                    if (x >= 795) {
+                        x = 15;
+                        y += 40;
+                    }
                 }
             }
 

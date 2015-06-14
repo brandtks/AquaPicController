@@ -16,14 +16,18 @@ namespace AquaPic
         public MyMenuBar () {
             Visible = true;
             VisibleWindow = false;
-            SetSizeRequest (800, 435);
+            SetSizeRequest (800, 45);
 
-            currentScreen = GuiGlobal.currentSelectedMenu;
-            highlightedScreen = GuiGlobal.currentSelectedMenu;
+            UpdateScreens ();
 
             ExposeEvent += onExpose;
             ButtonPressEvent += OnButtonPress;
             ButtonReleaseEvent += OnButtonRelease;
+        }
+
+        public void UpdateScreens () {
+            currentScreen = GuiGlobal.currentSelectedMenu;
+            highlightedScreen = GuiGlobal.currentSelectedMenu;
         }
 
         protected void onExpose (object sender, ExposeEventArgs args) {

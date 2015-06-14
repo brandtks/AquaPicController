@@ -31,13 +31,18 @@ namespace AquaPic
 
             TaskManager.Start ();
 
+            string Resource_File = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
+            Gtk.Rc.AddDefaultFile (Resource_File);
+            Gtk.Rc.Parse (Resource_File);
+
             #if SIMULATION
             AquaPicGUI win = new AquaPicGUI (simulator);
             #else
             AquaPicGUI win = new AquaPicGUI ();
             #endif
+
             win.Show ();
-			Application.Run ();
+            Application.Run ();
 		}
     }
 }

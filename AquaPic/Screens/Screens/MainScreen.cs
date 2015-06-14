@@ -20,7 +20,7 @@ namespace AquaPic
 
         uint timerId;
 
-        //int testAlarmIndex;
+//        int testAlarmIndex;
 
         public MainWindow (params object[] options) : base () {
             TouchButton b1 = new TouchButton ();
@@ -108,7 +108,7 @@ namespace AquaPic
         }
 
 //        protected void OnTestButtonClick (object sender, ButtonReleaseEventArgs args) {
-//            MyState s = ControllerState.Toggle ("Test Alarm");
+//            MyState s = Bit.Toggle ("Test Alarm");
 //
 //            if (s == MyState.Set)
 //                Alarm.Post (testAlarmIndex);

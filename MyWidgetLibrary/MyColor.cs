@@ -213,7 +213,7 @@ namespace MyWidgetLibrary
             }
         }
 
-        public static Color NewGdkColor (string color, double a = 1.0) {
+        public static Color NewCairoColor (string color, double a = 1.0) {
             MyColor c;
 
             try {
@@ -224,8 +224,19 @@ namespace MyWidgetLibrary
             }
         }
 
-        public Color ToGdkColor () {
+        public Color NewCairoColor () {
             return new Color (R, G, B, A);
+        }
+
+        public static Gdk.Color NewGtkColor (string color) {
+            MyColor c;
+
+            try {
+                c = new MyColor (color);
+                return new Gdk.Color ((byte)(c.R * 255), (byte)(c.G * 255), (byte)(c.B * 255));
+            } catch {
+                return new Gdk.Color ();
+            }
         }
     }
 }

@@ -9,20 +9,20 @@ namespace AquaPic
     public static class GuiGlobal
     {
         public static Dictionary<string, ScreenData> allWindows = new Dictionary<string, ScreenData> () {
-            { "Main", new ScreenData ("Main", (options) => {return new MainWindow (options);}) },
-            { "Power", new ScreenData ("Power", (options) => {return new PowerWindow (options);}) },
-            { "Lighting", new ScreenData ("Lighting", (options) => {return new LightingWindow (options);}) },
-            { "Wave", new ScreenData ("Wave", (options) => {return new WaveWindow (options);}) },
-            { "Condition", new ScreenData ("Condition", (options) => {return new ConditionWindow (options);}) },
-            { "Plugins", new ScreenData ("Plugins", (options) => {return new PluginWindow (options);}) },
-            { "Settings", new ScreenData ("Settings", (options) => {return new SettingsWindow (options);}) },
-            { "Menu", new ScreenData ("Menu", (options) => {return new MenuWindow (options);}) },
-            { "Edit Plugin", new ScreenData ("Edit Plugin", (options) => {return new EditPluginWindow (options);}) },
-            { "Alarms", new ScreenData ("Alarms", (options) => {return new AlarmWindow (options);}) }
+            { "Main", new ScreenData ("Main", true, (options) => {return new MainWindow (options);}) },
+            { "Power", new ScreenData ("Power", true, (options) => {return new PowerWindow (options);}) },
+            { "Lighting", new ScreenData ("Lighting", true, (options) => {return new LightingWindow (options);}) },
+            { "Wave", new ScreenData ("Wave", true, (options) => {return new WaveWindow (options);}) },
+            { "Condition", new ScreenData ("Condition", true, (options) => {return new ConditionWindow (options);}) },
+            { "Plugins", new ScreenData ("Plugins", true, (options) => {return new PluginWindow (options);}) },
+            { "Settings", new ScreenData ("Settings", true, (options) => {return new SettingsWindow (options);}) },
+            { "Menu", new ScreenData ("Menu", true, (options) => {return new MenuWindow (options);}) },
+            { "Edit Plugin", new ScreenData ("Edit Plugin", false, (options) => {return new EditPluginWindow (options);}) },
+            { "Alarms", new ScreenData ("Alarms", true, (options) => {return new AlarmWindow (options);}) }
         };
         public static string currentScreen;
 
-        public static List<string> menuWindows = new List<string> () {"Menu", "Main", "Power", "Lighting", "Plugins", "Settings"};
+        public static List<string> menuWindows = new List<string> () {"Main", "Power", "Lighting", "Plugins", "Settings", "Menu"};
         public static string[] menuColors = new string[6] {"pri", "secb", "seca", "secc", "compl", "grey4"};
         public static string currentSelectedMenu;
 
@@ -44,6 +44,16 @@ namespace AquaPic
                 if (ChangeScreenEvent != null)
                     ChangeScreenEvent (allWindows [name], options);
             }
+        }
+
+        public static void SwitchMenuScreen (string name, int position) {
+            if ((position < 0) || (position >= menuWindows.Count))
+                throw new Exception ("Screen posistion out of bounds");
+
+            if (!allWindows.ContainsKey (name))
+                throw new Exception ("Screen does not exist");
+
+            menuWindows [position] = name;
         }
     }
 }

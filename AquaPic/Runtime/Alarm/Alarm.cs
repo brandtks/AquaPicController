@@ -7,6 +7,8 @@ namespace AquaPic.Runtime
     {
         private static List<AlarmType> alarms = new List<AlarmType> ();
 
+        public static event AlarmHandler AlarmsUpdatedEvent;
+
         public static int totalAlarms {
             get {
                 return alarms.Count;
@@ -24,16 +26,25 @@ namespace AquaPic.Runtime
         }
 
         public static void Post (int index) {
+            if (AlarmsUpdatedEvent != null)
+                AlarmsUpdatedEvent (null);
+
             if ((index >= 0) && (index <= (alarms.Count - 1)))
                 alarms [index].PostAlarm ();
         }
 
         public static void Clear (int index) {
+            if (AlarmsUpdatedEvent != null)
+                AlarmsUpdatedEvent (null);
+
             if ((index >= 0) && (index <= (alarms.Count - 1)))
                 alarms [index].ClearAlarm ();
         }
 
         public static void Acknowledge () {
+            if (AlarmsUpdatedEvent != null)
+                AlarmsUpdatedEvent (null);
+
             foreach (var alarm in alarms)
                 alarm.AcknowledgeAlarm ();
         }

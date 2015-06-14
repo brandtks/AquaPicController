@@ -17,17 +17,18 @@ namespace AquaPic
         private string currentscreen = GuiGlobal.currentScreen;
 
         public MyNotificationBar () {
-            this.Visible = true;
-            this.VisibleWindow = false;
-            this.SetSizeRequest (800, 19);
+            Visible = true;
+            VisibleWindow = false;
+            SetSizeRequest (800, 19);
 
             timerId = GLib.Timeout.Add (1000, onTimer);
             displayedAlarm = 0;
             updateAlarm = 0;
             UpdateAlarmText ();
 
-            this.ExposeEvent += onExpose;
+            ExposeEvent += onExpose;
             ButtonReleaseEvent += OnButtonRelease;
+            Alarm.AlarmsUpdatedEvent += OnAllAlarmsUpdated;
         }
 
         public override void Dispose () {
@@ -55,9 +56,9 @@ namespace AquaPic
                 cr.ClosePath ();
 
                 Gradient pat = new LinearGradient (0, 19, 800, 19);
-                pat.AddColorStop (0.0, MyColor.NewGdkColor ("grey2", 0.35));
-                pat.AddColorStop (0.5, MyColor.NewGdkColor (GuiGlobal.menuColors [GuiGlobal.menuWindows.IndexOf (GuiGlobal.currentSelectedMenu)]));
-                pat.AddColorStop (1.0, MyColor.NewGdkColor ("grey2", 0.35));
+                pat.AddColorStop (0.0, MyColor.NewCairoColor ("grey2", 0.35));
+                pat.AddColorStop (0.5, MyColor.NewCairoColor ("pri"));
+                pat.AddColorStop (1.0, MyColor.NewCairoColor ("grey2", 0.35));
                 cr.SetSource (pat);
                 cr.Fill ();
                 pat.Dispose ();
@@ -114,6 +115,11 @@ namespace AquaPic
         protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
             if ((args.Event.X >= 0.0) && (args.Event.X <= 250.0))
                 GuiGlobal.ChangeScreens ("Alarms");
+        }
+
+        protected void OnAllAlarmsUpdated (object sender) {
+            UpdateAlarmText ();
+            QueueDraw ();
         }
     }
 }

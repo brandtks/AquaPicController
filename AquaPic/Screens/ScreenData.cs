@@ -8,10 +8,12 @@ namespace AquaPic
     public class ScreenData
     {
         public string name;
-        CreateInstanceHandler CreateInstanceEvent;
+        public CreateInstanceHandler CreateInstanceEvent;
+        public bool showInMenu; 
         
-        public ScreenData (string name, CreateInstanceHandler CreateInstanceEvent) {
+        public ScreenData (string name, bool showInMenu, CreateInstanceHandler CreateInstanceEvent) {
             this.name = name;
+            this.showInMenu = showInMenu;
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 

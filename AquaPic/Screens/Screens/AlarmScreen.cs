@@ -10,16 +10,12 @@ namespace AquaPic
 {
     public class AlarmWindow : MyBackgroundWidget
     {
-        private AlarmLabel[] labels;
+        private TextView tv;
         private uint timerId;
 
         public AlarmWindow (params object[] options) : base () {
             var box = new MyBox (780, 395);
             Put (box, 10, 30);
-
-            var box2 = new MyBox (770, 315);
-            box2.color = "grey2";
-            Put (box2, 15, 60);
 
             var label = new TouchLabel ();
             label.text = "Current Alarms";
@@ -38,14 +34,17 @@ namespace AquaPic
             };
             Put (b, 685, 380);
 
-            int y = 65;
-            labels = new AlarmLabel[Alarm.totalAlarms];
-            for (var i = 0; i < labels.Length; ++i) {
-                labels [i] = new AlarmLabel ();
-                Put (labels [i], 20, y);
-                labels [i].Show ();
-                y += 25;
-            }
+            tv = new TextView ();
+            tv.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
+            tv.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
+            tv.CanFocus = false;
+
+            ScrolledWindow sw = new ScrolledWindow ();
+            sw.SetSizeRequest (770, 315);
+            sw.Add (tv);
+            tv.Show ();
+            Put (sw, 15, 60);
+            sw.Show ();
 
             OnTimer ();
 
@@ -61,60 +60,25 @@ namespace AquaPic
 
         protected bool OnTimer () {
             List<AlarmData> alarming = Alarm.GetAllAlarming ();
-            for (var i = 0; i < labels.Length; ++i) {
-                if (i < alarming.Count) {
-                    if (alarming [i].acknowledged)
-                        labels [i].color = "seca";
-                    else
-                        labels [i].color = "compl";
-                    labels [i].nameLabel.text = alarming [i].name;
-                    labels [i].dateLabel.text = alarming [i].postTime.ToString ("MM/dd hh:mm");
-                    labels [i].box.Visible = true;
-                } else {
-                    labels [i].nameLabel.text = string.Empty;
-                    labels [i].dateLabel.text = string.Empty;
-                    labels [i].box.Visible = false;
-                }
-                labels [i].QueueDraw ();
+            TextBuffer tb = tv.Buffer;
+            tb.Text = string.Empty;
+            int line = 0;
+
+            foreach (var a in alarming) {
+                var tag = new TextTag (null);
+                if (a.acknowledged)
+                    tag.ForegroundGdk = MyColor.NewGtkColor ("seca");
+                else
+                    tag.ForegroundGdk = MyColor.NewGtkColor ("compl");
+                TextTagTable ttt = tb.TagTable;
+                ttt.Add (tag);
+
+                var ti = tb.GetIterAtLine (line);
+                tb.InsertWithTags (ref ti, string.Format ("({0:MM/dd hh:mm}): {1}\n", a.postTime, a.name), tag);
+                ++line;
             }
 
             return true;
-        }
-    }
-
-    public class AlarmLabel : Fixed
-    {
-        public string color {
-            set {
-                nameLabel.textColor = value;
-                dateLabel.textColor = value;
-            }
-        }
-
-        public TouchLabel nameLabel;
-        public TouchLabel dateLabel;
-        public MyBox box;
-
-        public AlarmLabel () {
-            SetSizeRequest (760, 20);
-
-            box = new MyBox (760, 20);
-            box.color = "grey4";
-            box.transparency = 1.0f;
-            Put (box, 0, 0);
-            box.Show ();
-
-            nameLabel = new TouchLabel ();
-            nameLabel.WidthRequest = 595;
-            nameLabel.textAlignment = MyAlignment.Left;
-            Put (nameLabel, 5, 0);
-            nameLabel.Show ();
-
-            dateLabel = new TouchLabel ();
-            dateLabel.WidthRequest = 155;
-            dateLabel.textAlignment = MyAlignment.Right;
-            Put (dateLabel, 600, 0);
-            dateLabel.Show ();
         }
     }
 }
