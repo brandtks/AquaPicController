@@ -11,9 +11,11 @@ namespace AquaPic.Runtime
     public class Plugin
     {
         public static Dictionary<string, BaseScript> AllPlugins = new Dictionary<string, BaseScript> ();
+        private static int alarm;
 
         static Plugin () {
-            TaskManager.AddTask ("Plugin", 1000, Run);
+            TaskManager.AddCyclicInterrupt ("Plugin", 1000, Run);
+            alarm = Alarm.Subscribe ("Plugin Failed");
         }
 
         public static void AddPlugins () {
@@ -48,17 +50,27 @@ namespace AquaPic.Runtime
         }
 
         public static void Run () {
+            bool atleastOnePluginFailed = false;
+
             foreach (var p in AllPlugins.Values) {
+                if (!p.flags.HasFlag (ScriptFlags.Compiled))
+                    atleastOnePluginFailed = true;
+
                 if (p.flags.HasFlag (ScriptFlags.Cyclic)) {
                     p.CyclicRun ();
                 }
             }
+
+            if (atleastOnePluginFailed)
+                Alarm.Post (alarm);
+            else if (Alarm.CheckAlarming (alarm))
+                Alarm.Clear (alarm); 
         }
 
         public static bool CompileCode (BaseScript script) {
             script.errors.Clear ();
 
-            // <WINDOWS> CSharpCodeProvider does not work with Mono
+            // <WINDOWS> CSharpCodeProvider does not work with Mono, does work in the mono framework on windows, linux not tested
             CSharpCodeProvider provider = new CSharpCodeProvider ();
             CompilerParameters options = new CompilerParameters();
 

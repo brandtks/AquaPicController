@@ -58,7 +58,7 @@ namespace AquaPic.Modules
 
             temperature = 32.0f;
 
-            TaskManager.AddTask ("Temperature", 1000, Run);
+            TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);
         }
 
         public static void AddTemperatureProbe (int cardID, int channelID, string name) {

@@ -84,6 +84,8 @@ namespace AquaPic
             actinicLedDimming.text = "Actinic LED";
             Put (actinicLedDimming, 685, 30);
 
+            OnUpdateTimer ();
+
             timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
 
             ShowAll ();

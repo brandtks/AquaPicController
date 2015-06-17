@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using AquaPic.Runtime;
 using AquaPic.Utilites;
 
 namespace AquaPic.Modules
 {
     public partial class Lighting
     {
-        //public static Lighting Main = new Lighting ();
-
         private static List<LightingFixture> fixtures;
         public static TimeDate sunRiseToday;
         public static TimeDate sunSetToday;
@@ -48,9 +47,6 @@ namespace AquaPic.Modules
             get {
                 return RiseSetCalc.timeZone;
             }
-            set {
-                RiseSetCalc.timeZone = value;
-            }
         }
 
         static Lighting () {
@@ -66,7 +62,6 @@ namespace AquaPic.Modules
 
                 RiseSetCalc.latitude = Convert.ToDouble (jo ["latitude"]);
                 RiseSetCalc.longitude = Convert.ToDouble (jo ["longitude"]);
-                RiseSetCalc.timeZone = Convert.ToInt32 (jo ["timeZone"]);
 
                 defaultSunRise = new Time (
                     Convert.ToByte (jo ["defaultSunRise"] ["hour"]),
@@ -91,29 +86,8 @@ namespace AquaPic.Modules
                     Convert.ToByte (jo ["maxSunSet"] ["minute"]));
             }
 
-            RiseSetCalc.GetRiseSetTimes (out sunRiseToday, out sunSetToday);
-            sunRiseTomorrow = RiseSetCalc.GetRiseTimeTomorrow ();
-            sunSetTomorrow = RiseSetCalc.GetSetTimeTomorrow ();
-
-            if (sunRiseToday.CompareToTime (minSunRise) < 0) // sunrise is before minimum
-                sunRiseToday.SetTime (minSunRise);
-            if (sunRiseToday.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
-                sunRiseToday.SetTime (maxSunRise);
-
-            if (sunSetToday.CompareToTime (minSunSet) < 0) // sunset is before minimum
-                sunSetToday.SetTime (minSunSet);
-            if (sunSetToday.CompareToTime (maxSunSet) > 0) // sunset is after maximum
-                sunSetToday.SetTime (maxSunSet);
-
-            if (sunRiseTomorrow.CompareToTime (minSunRise) < 0) // sunrise is before minimum
-                sunRiseTomorrow.SetTime (minSunRise);
-            if (sunRiseTomorrow.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
-                sunRiseTomorrow.SetTime (maxSunRise);
-
-            if (sunSetTomorrow.CompareToTime (minSunSet) < 0) // sunset is before minimum
-                sunSetTomorrow.SetTime (minSunSet);
-            if (sunSetTomorrow.CompareToTime (maxSunSet) > 0) // sunset is after maximum
-                sunSetTomorrow.SetTime (maxSunSet);
+            UpdateRiseSetTimes ();
+            TaskManager.AddTimeOfDayInterrupt ("RiseSetUpdate", new Time (0, 0), () => UpdateRiseSetTimes ());
         }
 
         public static int AddLight (
@@ -225,7 +199,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static void AtMidnight () {
+        public static void UpdateRiseSetTimes () {
             RiseSetCalc.GetRiseSetTimes (out sunRiseToday, out sunSetToday);
             sunRiseTomorrow = RiseSetCalc.GetRiseTimeTomorrow ();
             sunSetTomorrow = RiseSetCalc.GetSetTimeTomorrow ();

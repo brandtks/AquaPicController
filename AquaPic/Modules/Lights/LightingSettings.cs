@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Cairo;
 using Gtk;
 using Newtonsoft.Json;
@@ -25,8 +26,13 @@ namespace AquaPic
             settings.Add (t.label.text, t);
 
             t = new TouchLabelTextBox ();
-            t.label.text = "Time Zone";
-            t.textBox.text = Lighting.timeZone.ToString ();
+            t.label.text = "Default Sunrise";
+            t.textBox.text = Lighting.defaultSunRise.TimeToString ();
+            settings.Add (t.label.text, t);
+
+            t = new TouchLabelTextBox ();
+            t.label.text = "Default Sunset";
+            t.textBox.text = Lighting.defaultSunSet.TimeToString ();
             settings.Add (t.label.text, t);
 
             t = new TouchLabelTextBox ();
@@ -53,8 +59,6 @@ namespace AquaPic
         }
 
         protected bool OnSave (object sender) {
-            bool success;
-
             try {
                 Lighting.latitude = Convert.ToDouble (settings ["Latitude"].textBox.text);
             } catch {
@@ -70,9 +74,16 @@ namespace AquaPic
             }
 
             try {
-                Lighting.timeZone = Convert.ToInt32 (settings ["Time Zone"].textBox.text);
+                Lighting.defaultSunRise = ToTime (settings ["Default Sunrise"].textBox.text);
             } catch {
-                MessageBox.Show ("Improper time zone format");
+                MessageBox.Show ("Improper time format, ##:##");
+                return false;
+            }
+
+            try {
+                Lighting.defaultSunSet = ToTime (settings ["Default Sunset"].textBox.text);
+            } catch {
+                MessageBox.Show ("Improper time format, ##:##");
                 return false;
             }
 
@@ -103,6 +114,50 @@ namespace AquaPic
                 MessageBox.Show ("Improper time format, ##:##");
                 return false;
             }
+
+            JObject jo = new JObject ();
+
+            jo.Add (new JProperty ("latitude", Lighting.latitude.ToString ()));
+            jo.Add (new JProperty ("longitude", Lighting.longitude.ToString ()));
+
+            jo.Add (new JProperty ("defaultSunRise", 
+                new JObject (
+                    new JProperty ("hour", Lighting.defaultSunRise.hour.ToString ()), 
+                    new JProperty ("minute", Lighting.defaultSunRise.min.ToString ()))));
+
+            jo.Add (new JProperty ("defaultSunSet", 
+                new JObject (
+                    new JProperty ("hour", Lighting.defaultSunSet.hour.ToString ()), 
+                    new JProperty ("minute", Lighting.defaultSunSet.min.ToString ()))));
+
+            jo.Add (new JProperty ("minSunRise", 
+                new JObject (
+                    new JProperty ("hour", Lighting.minSunRise.hour.ToString ()), 
+                    new JProperty ("minute", Lighting.minSunRise.min.ToString ()))));
+
+            jo.Add (new JProperty ("maxSunRise", 
+                new JObject (
+                    new JProperty ("hour", Lighting.maxSunRise.hour.ToString ()), 
+                    new JProperty ("minute", Lighting.maxSunRise.min.ToString ()))));
+
+            jo.Add (new JProperty ("minSunSet", 
+                new JObject (
+                    new JProperty ("hour", Lighting.minSunSet.hour.ToString ()), 
+                    new JProperty ("minute", Lighting.minSunSet.min.ToString ()))));
+
+            jo.Add (new JProperty ("maxSunSet", 
+                new JObject (
+                    new JProperty ("hour", Lighting.maxSunSet.hour.ToString ()), 
+                    new JProperty ("minute", Lighting.maxSunSet.min.ToString ()))));
+
+            string path = string.Format (
+                "{0}{1}", 
+                Environment.GetEnvironmentVariable ("AquaPic"), 
+                @"\AquaPicRuntimeProject\Settings\lightingProperties.json");
+
+            File.WriteAllText (path, jo.ToString ());
+
+            Lighting.UpdateRiseSetTimes ();
 
             return true;
         }

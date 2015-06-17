@@ -13,9 +13,6 @@ namespace AquaPic.Utilites
 
 	public static class Utils
 	{
-		static Utils () {
-		}
-
 		public static string GetDescription (Enum en) {
 			Type type = en.GetType ();
 			MemberInfo[] memInfo = type.GetMember (en.ToString());
@@ -36,6 +33,10 @@ namespace AquaPic.Utilites
             double radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
             double delta = max - min;
             return min + (float)(delta * Math.Sin(radian));
+        }
+
+        public static uint SecondsToMilliseconds (double seconds) {
+            return (uint)Math.Round (seconds * 1000);
         }
 
         public static double ToRadians (this double angle) {

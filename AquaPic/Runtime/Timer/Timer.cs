@@ -61,11 +61,6 @@ namespace AquaPic.Runtime
             return _enabled & autoReset;
         }
 
-        public static uint FromSeconds (double seconds) {
-            return (uint)Math.Round (seconds * 1000);
-
-        }
-
 //        public static uint ParseTimer (string timeInterval) {
 //            int pos = timeInterval.IndexOf (':');
 //            while (pos != -1) {

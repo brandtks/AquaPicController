@@ -12,7 +12,7 @@ namespace AquaPic
             { "Main", new ScreenData ("Main", true, (options) => {return new MainWindow (options);}) },
             { "Power", new ScreenData ("Power", true, (options) => {return new PowerWindow (options);}) },
             { "Lighting", new ScreenData ("Lighting", true, (options) => {return new LightingWindow (options);}) },
-            { "Wave", new ScreenData ("Wave", true, (options) => {return new WaveWindow (options);}) },
+            { "Temperature", new ScreenData ("Temperature", true, (options) => {return new TemperatureWindow (options);}) },
             { "Condition", new ScreenData ("Condition", true, (options) => {return new ConditionWindow (options);}) },
             { "Plugins", new ScreenData ("Plugins", true, (options) => {return new PluginWindow (options);}) },
             { "Settings", new ScreenData ("Settings", true, (options) => {return new SettingsWindow (options);}) },

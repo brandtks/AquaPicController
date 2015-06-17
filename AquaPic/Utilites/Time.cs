@@ -34,6 +34,10 @@ namespace AquaPic.Utilites
             : this ((byte)value.Hours, (byte)value.Minutes, (byte)value.Seconds, (byte)value.Milliseconds) {
         }
 
+        public Time (Time value)
+            : this (value.hour, value.min, value.sec, value.millisec) {
+        }
+
         public Time () {
             DateTime value = DateTime.Now;
 			this.hour = (byte)value.Hour;
@@ -63,6 +67,16 @@ namespace AquaPic.Utilites
 
         public int CompareToTime (Time value) {
             return TimeSpan.Compare (toTimeSpan (), value.toTimeSpan ());
+        }
+
+        public bool EqualsShortTime (DateTime value) {
+            if (value.Hour != hour)
+                return false;
+
+            if (value.Minute != min)
+                return false;
+
+            return true;
         }
 
         public void AddMinutes (int value) {

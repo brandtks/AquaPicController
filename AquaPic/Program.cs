@@ -4,10 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 #endif
 using Gtk;
-using AquaPic.Drivers;
-using AquaPic.Modules;
 using AquaPic.Runtime;
-using AquaPic.SerialBus;
 using AquaPic.Utilites;
 
 namespace AquaPic
@@ -29,11 +26,17 @@ namespace AquaPic
             
             Plugin.AddPlugins ();
 
-            TaskManager.Start ();
-
-            string Resource_File = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
+            string Resource_File = @"C:\Program Files (x86)\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
+            //string Resource_File = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
             Gtk.Rc.AddDefaultFile (Resource_File);
             Gtk.Rc.Parse (Resource_File);
+
+            //<Test> here to test time of day interrupts
+            Time now = new Time ();
+            now.AddMinutes (1);
+            TaskManager.AddTimeOfDayInterrupt ("test1", new Time (now), () => Console.WriteLine ("Test 1 time of day run"));
+            now.AddMinutes (1);
+            TaskManager.AddTimeOfDayInterrupt ("test2", new Time (now), () => Console.WriteLine ("Test 2 time of day run"));
 
             #if SIMULATION
             AquaPicGUI win = new AquaPicGUI (simulator);

@@ -10,7 +10,7 @@ namespace AquaPic.Drivers
         private static List<AnalogOutputCard> cards = new List<AnalogOutputCard> ();
 
         static AnalogOutput () {
-            TaskManager.AddTask ("Analog Output", 1000, Run);
+            TaskManager.AddCyclicInterrupt ("Analog Output", 1000, Run);
         }
 
         public static void Run () {

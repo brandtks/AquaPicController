@@ -9,43 +9,41 @@ namespace AquaPic.Modules
         public static double longitude;
         public static int timeZone;
 
-        public static void GetRiseSetTimes (out TimeDate rise, out TimeDate sSet) {
-			double julianDate = calcJD (DateTime.Today);
-			double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
-			double setUTC = calcSunSetUTC (julianDate, latitude, longitude);
+        static RiseSetCalc () {
+            timeZone = TimeZoneInfo.Local.BaseUtcOffset.Hours;
+        }
 
-            rise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
-            sSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
+        public static void GetRiseSetTimes (out TimeDate rise, out TimeDate sSet) {
+            rise = GetRiseTime ();
+            sSet = GetSetTime ();
 		}
 	    
         public static TimeDate GetRiseTime () {
             double julianDate = calcJD (DateTime.Today);
             double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
-            return new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            TimeDate rise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            if (TimeZoneInfo.Local.IsDaylightSavingTime (DateTime.Now))
+                rise.AddMinutes (60);
+            return rise;
         }
 
         public static TimeDate GetSetTime () {
             double julianDate = calcJD (DateTime.Today);
             double setUTC = calcSunSetUTC (julianDate, latitude, longitude);
-            return new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
+            TimeDate sSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
+            if (TimeZoneInfo.Local.IsDaylightSavingTime (DateTime.Now))
+                sSet.AddMinutes (60);
+            return sSet;
         }
 
         public static TimeDate GetRiseTimeTomorrow () {
-            DateTime today = DateTime.Today;
-            double julianDate = calcJD (today.Year, today.Month, today.Day + 1);
-            double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
-
-            TimeDate riseTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            TimeDate riseTomorrow = GetRiseTime ();
             riseTomorrow.AddDay (1);
             return riseTomorrow;
         }
 
         public static TimeDate GetSetTimeTomorrow () {
-            DateTime today = DateTime.Today;
-            double julianDate = calcJD (today.Year, today.Month, today.Day + 1);
-            double riseUTC = calcSunSetUTC (julianDate, latitude, longitude);
-
-            TimeDate setTomorrow = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            TimeDate setTomorrow = GetSetTime ();
             setTomorrow.AddDay (1);
             return setTomorrow;
         }

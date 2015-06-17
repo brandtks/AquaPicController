@@ -10,7 +10,7 @@ namespace AquaPic.Drivers
         private static List<DigitalInputCard> cards = new List<DigitalInputCard> ();
 
         static DigitalInput () {
-            TaskManager.AddTask ("Digital Input", 1000, Run);
+            TaskManager.AddCyclicInterrupt ("Digital Input", 1000, Run);
         }
 
         public static int AddCard (int address, string name) {

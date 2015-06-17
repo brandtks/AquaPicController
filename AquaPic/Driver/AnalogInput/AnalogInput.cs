@@ -10,7 +10,7 @@ namespace AquaPic.Drivers
         private static List<AnalogInputCard> cards = new List<AnalogInputCard> ();
 
         static AnalogInput () {
-            TaskManager.AddTask ("Analog Input", 1000, Run);
+            TaskManager.AddCyclicInterrupt ("Analog Input", 1000, Run);
         }
 
         public static int AddCard (int address, string name) {

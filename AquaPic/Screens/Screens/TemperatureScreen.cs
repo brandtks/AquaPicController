@@ -5,9 +5,11 @@ using MyWidgetLibrary;
 
 namespace AquaPic
 {
-    public class WaveWindow : MyBackgroundWidget
+    public class TemperatureWindow : MyBackgroundWidget
     {
-        public WaveWindow (params object[] options) : base () {
+        public TemperatureWindow (params object[] options) : base () {
+
+
             ShowAll ();
         }
     }

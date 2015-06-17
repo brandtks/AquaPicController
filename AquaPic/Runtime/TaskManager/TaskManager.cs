@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Gtk;
 using AquaPic.Drivers;
 using AquaPic.Modules;
+using AquaPic.Utilites;
 
 namespace AquaPic.Runtime
 {
@@ -10,41 +11,56 @@ namespace AquaPic.Runtime
 
     public class TaskManager
     {
-        private static Dictionary<int, List<ITask>> tasks = new Dictionary<int, List<ITask>> ();
+        private static Dictionary<uint, List<ICyclicTask>> cyclicTasks = new Dictionary<uint, List<ICyclicTask>> ();
+        private static List<ITodTask> todTasks = new List<ITodTask> ();
 
-        public static void Start () {
-            foreach (var timeInterval in tasks.Keys) {
-                #if SIMULATION
-                uint time = (uint)timeInterval * 4;
-                GLib.Timeout.Add (time, () => {
-                    foreach (var task in tasks[timeInterval])
-                        task.OnRun ();
-                    return true;
-                });
-                #else
-                GLib.Timeout.Add ((uint)timeInterval, () => {
-                    foreach (var task in tasks[timeInterval])
-                        task.OnRun ();
-                    return true;
-                });
-                #endif
-            }
+        static TaskManager () {
+            AddCyclicInterrupt ("TimeOfDayInterrupts", 5000, () => {
+                DateTime now = DateTime.Now;
+
+                if ((now.Second >= 0) && (now.Second <= 4)) {
+                    foreach (var task in todTasks) {
+                        if (task.time.EqualsShortTime (now))
+                            task.OnRun ();
+                    }
+                }
+            });
         }
 
-        public static void AddTask (string name, int timeInterval, RunHandler OnRun) {
-            if (TaskExists (name))
+        public static void AddCyclicInterrupt (string name, uint timeInterval, RunHandler OnRun) {
+            if (CyclicInterruptExists (name))
                 throw new Exception ("Task already exists");
 
-            if (!tasks.ContainsKey (timeInterval))
-                tasks.Add (timeInterval, new List<ITask> ());
+            if (!cyclicTasks.ContainsKey (timeInterval)) {
+                cyclicTasks.Add (timeInterval, new List<ICyclicTask> ());
 
-            tasks [timeInterval].Add (new ITask (name, OnRun));
+                #if SIMULATION
+                uint time = timeInterval * 4;
+                #else
+                uint time = timeInterval;
+                #endif
+
+                GLib.Timeout.Add (time, () => {
+                    foreach (var task in cyclicTasks[timeInterval])
+                        task.OnRun ();
+                    return true;
+                });
+            }
+
+            cyclicTasks [timeInterval].Add (new ICyclicTask (name, OnRun));
         }
 
-        public static bool TaskExists (string name) {
-            foreach (var taskList in tasks.Values) {
+        public static void AddTimeOfDayInterrupt (string name, Time time, RunHandler OnRun) {
+            if (TimeOfDayInterruptExists (name))
+                throw new Exception ("Task already exists");
+
+            todTasks.Add (new ITodTask (name, time, OnRun));
+        }
+
+        public static bool CyclicInterruptExists (string name) {
+            foreach (var taskList in cyclicTasks.Values) {
                 foreach (var task in taskList) {
-                    if (string.Compare (task.name, name, StringComparison.InvariantCultureIgnoreCase) == 0)
+                    if (string.Equals (task.name, name, StringComparison.InvariantCultureIgnoreCase))
                         return true;
                 }
             }
@@ -52,14 +68,32 @@ namespace AquaPic.Runtime
             return false;
         }
 
-        private class ITask
+        public static bool TimeOfDayInterruptExists (string name) {
+            foreach (var task in todTasks) {
+                if (string.Equals (task.name, name, StringComparison.InvariantCultureIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private class ICyclicTask
         {
             public RunHandler OnRun;
             public string name;
 
-            public ITask (string name, RunHandler OnRun) {
+            public ICyclicTask (string name, RunHandler OnRun) {
                 this.name = name;
                 this.OnRun = OnRun;
+            }
+        }
+
+        private class ITodTask : ICyclicTask
+        {
+            public Time time;
+
+            public ITodTask (string name, Time time, RunHandler OnRun) : base (name, OnRun) {
+                this.time = time;
             }
         }
     }
