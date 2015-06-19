@@ -43,12 +43,12 @@ namespace AquaPic.Runtime
             timerId = 0;
         }
 
-        public void Start () {
+        public virtual void Start () {
             _enabled = true;
             timerId = GLib.Timeout.Add (timerInterval, OnTimeout);
         }
 
-        public void Stop () {
+        public virtual void Stop () {
             _enabled = false;
             GLib.Source.Remove (timerId);
         }

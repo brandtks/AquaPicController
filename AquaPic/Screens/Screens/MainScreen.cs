@@ -29,7 +29,7 @@ namespace AquaPic
             if (s1 == MyState.Set)
                 b1.buttonColor = "pri";
             else
-                b1.buttonColor = "grey3";
+                b1.buttonColor = "seca";
             b1.HeightRequest = 95;
             b1.WidthRequest = 108;
             b1.text = "Clean Skimmer";
@@ -41,7 +41,7 @@ namespace AquaPic
             if (s1 == MyState.Set)
                 b2.buttonColor = "pri";
             else
-                b2.buttonColor = "grey3";
+                b2.buttonColor = "seca";
             b2.HeightRequest = 95;
             b2.WidthRequest = 108;
             b2.text = "Water Change";
@@ -84,6 +84,9 @@ namespace AquaPic
             actinicLedDimming.text = "Actinic LED";
             Put (actinicLedDimming, 685, 30);
 
+            var t = new DeluxeTimerWidget ("main");
+            Put (t, 459, 230);
+
             OnUpdateTimer ();
 
             timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
@@ -102,7 +105,7 @@ namespace AquaPic
             MyState s = Bit.Check (stateText);
             if (s == MyState.Set) {
                 Bit.Reset (stateText);
-                b.buttonColor = "grey3";
+                b.buttonColor = "seca";
             } else {
                 Bit.Set (stateText);
                 b.buttonColor = "pri";

@@ -77,11 +77,13 @@ namespace MyWidgetLibrary
             if (enableTouch) {
                 TouchNumberInput t = new TouchNumberInput ();
                 t.NumberSetEvent += (value) => {
+                    if (!string.IsNullOrWhiteSpace (value)) {
                         this.text = value;
 
                         if (TextChangedEvent != null)
                             TextChangedEvent (this, new TextChangedEventArgs (text));
-                    };
+                    }
+                };
                 
                 t.Run ();
                 t.Destroy ();
