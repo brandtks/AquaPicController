@@ -40,7 +40,7 @@ namespace AquaPic
                     Allocation.Top - 20, 
                     Allocation.Width + 10, 
                     Allocation.Height + 40);
-                MyColor.SetSource (cr, "grey2", 0.55);
+                MyColor.SetSource (cr, "grey3", 0.55);
                 cr.Fill ();
 
                 int seperation = Allocation.Width / SelectionCount;

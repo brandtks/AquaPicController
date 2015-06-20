@@ -1,137 +1,245 @@
 ﻿using System;
 using Gtk;
+using Cairo;
 using MyWidgetLibrary;
 
 namespace AquaPic.Runtime
 {
     public class DeluxeTimerWidget : Fixed
     {
-        public DeluxeTimer timer;
-
+        private DeluxeTimer[] timers;
+        private TouchTab[] tabs;
+        private int t;
         private TouchTextBox minutes;
         private TouchTextBox seconds;
         private UpDownButtons minUpDown;
         private UpDownButtons secUpDown;
+        private TouchButton startStopButton;
+        private TouchButton resetButton;
 
         public DeluxeTimerWidget (string name) {
+            t = 0;
+
             SetSizeRequest (334, 95);
 
-            timer = DeluxeTimer.GetTimer (name);
-            timer.TimerInterumEvent += OnTimerInterum;
+            timers = new DeluxeTimer[3];
+            for (int i = 0; i < timers.Length; ++i) {
+                timers [i] = DeluxeTimer.GetTimer ("Timer " + name + " " + (i + 1).ToString ());
+                timers [i].TimerInterumEvent += OnTimerInterum;
+                timers [i].TimerElapsedEvent += OnTimerElapsed;
+                timers [i].TimerStartEvent += OnTimerStartStop;
+                timers [i].TimerStopEvent += OnTimerStartStop;
+            }
+            var box1 = new MyBox (334, 95);
+            Put (box1, 0, 0);
 
-            var box = new MyBox (334, 95);
-            Put (box, 0, 0);
+            var box2 = new MyBox (334, 66);
+            box2.color = "grey3";
+            Put (box2, 0, 29);
+
+            tabs = new TouchTab[3];
+            for (int i = 0; i < tabs.Length; ++i) {
+                tabs [i] = new TouchTab ();
+                tabs [i].text = "Timer " + (i + 1).ToString ();
+                tabs [i].ButtonReleaseEvent += OnTabButtonRelease;
+                Put (tabs [i], 0 + (111 * i), 0);
+            }
 
             minutes = new TouchTextBox ();
             minutes.enableTouch = true;
-            minutes.SetSizeRequest (75, 89);
-            Put (minutes, 3, 3);
+            minutes.SetSizeRequest (75, 61);
+            minutes.textAlignment = MyAlignment.Center;
+            Put (minutes, 3, 32);
 
             minUpDown = new UpDownButtons ();
             minUpDown.up.ButtonReleaseEvent += (o, args) => {
-                if (!timer.enabled) {
+                if (!timers[t].enabled) {
                     uint time = (Convert.ToUInt32 (minutes.text) + 1) * 60;
                     time += Convert.ToUInt32 (seconds.text);
-                    UpdateText (time);
+                    UpdateTime (time);
                 }
             };
             minUpDown.down.ButtonReleaseEvent += (o, args) => {
-                if (!timer.enabled) {
+                if (!timers[t].enabled) {
                     if (minutes.text != "0") {
                         uint time = (Convert.ToUInt32 (minutes.text) - 1) * 60;
                         time += Convert.ToUInt32 (seconds.text);
-                        UpdateText (time);
+                        UpdateTime (time);
                     }
                 }
             };
-            Put (minUpDown, 79, 3);
+            Put (minUpDown, 79, 32);
 
             seconds = new TouchTextBox ();
             seconds.enableTouch = true;
-            seconds.TextChangedEvent += (sender, args) => UpdateText (Convert.ToUInt32 (args.text));
-            seconds.SetSizeRequest (75, 89);
-            Put (seconds, 125, 3);
+            seconds.textAlignment = MyAlignment.Center;
+            seconds.TextChangedEvent += (sender, args) => {
+                uint time = Convert.ToUInt32 (args.text);
+
+                if (time < 60)
+                    time += Convert.ToUInt32 (minutes.text) * 60;
+
+                UpdateTime (time);
+            };
+            seconds.SetSizeRequest (75, 61);
+            Put (seconds, 125, 32);
 
             secUpDown = new UpDownButtons ();
             secUpDown.up.ButtonPressEvent += (o, args) => {
-                if (!timer.enabled) {
+                if (!timers[t].enabled) {
                     uint time = Convert.ToUInt32 (minutes.text) * 60;
                     time += Convert.ToUInt32 (seconds.text);
                     ++time;
-                    UpdateText (time);
+                    UpdateTime (time);
                 }
             };
             secUpDown.down.ButtonPressEvent += (o, args) => {
-                if (!timer.enabled) {
+                if (!timers[t].enabled) {
                     uint time = Convert.ToUInt32 (minutes.text) * 60;
                     time += Convert.ToUInt32 (seconds.text);
                     if (time != 0) {
                         --time;
-                        UpdateText (time);
+                        UpdateTime (time);
                     }
                 }
             };
-            Put (secUpDown, 201, 3);
+            Put (secUpDown, 201, 32);
 
-            var b = new TouchButton ();
-            b.SetSizeRequest (89, 89);
-            if (timer.enabled) {
-                b.text = "Stop";
-                b.buttonColor = "pri";
-            } else {
-                b.text = "Start";
-                b.buttonColor = "seca";
+            startStopButton = new TouchButton ();
+            startStopButton.SetSizeRequest (83, 30);
+            startStopButton.ButtonReleaseEvent += OnStartStopButtonRelease;
+            Put (startStopButton, 248, 32);
+
+            resetButton = new TouchButton ();
+            resetButton.SetSizeRequest (83, 30);
+            resetButton.text = "Reset";
+            resetButton.ButtonReleaseEvent += OnResetButtonRelease;
+            Put (resetButton, 248, 63);
+
+            if (timers [t].enabled)
+                UpdateTime (timers [t].secondsRemaining, false);
+            else
+                UpdateTime (timers [t].totalSeconds, false);
+        }
+
+        public override void Dispose () {
+            foreach (var timer in timers) {
+                timer.TimerElapsedEvent -= OnTimerElapsed;
+                timer.TimerStartEvent -= OnTimerStartStop;
+                timer.TimerStopEvent -= OnTimerStartStop;
+                timer.TimerInterumEvent -= OnTimerInterum;
             }
-            b.ButtonReleaseEvent += OnButtonRelease;
-            Put (b, 248, 3);
 
-            UpdateText (timer.secondsRemaining);
+            base.Dispose ();
         }
 
         protected void OnTimerInterum (object sender) {
-            UpdateText (timer.secondsRemaining);
+            DeluxeTimer timer = sender as DeluxeTimer;
+            int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
+            if (t == tIdx)
+                UpdateTime (timer.secondsRemaining, false);
         }
 
-        protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            TouchButton b = sender as TouchButton;
+        protected void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
+            Console.WriteLine ("Timer Widget Elapsed");
+            DeluxeTimer timer = sender as DeluxeTimer;
+            int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
+            if (t == tIdx)
+                UpdateTime (timers [t].totalSeconds);
+        }
 
-            if (b.text == "Start") {
-                timer.SetTime (Convert.ToUInt32 (minutes.text), Convert.ToUInt32 (seconds.text));
-                timer.Start ();
-                b.text = "Stop";
-                b.buttonColor = "pri";
+        protected void OnTimerStartStop (object sender) {
+            DeluxeTimer timer = sender as DeluxeTimer;
+            int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
+            if (t == tIdx)
+                UpdateTime (timers [t].secondsRemaining, false);
+        }
+
+        protected void OnStartStopButtonRelease (object sender, ButtonReleaseEventArgs args) {
+            if (startStopButton.text == "Start") {
+                timers[t].SetTime (Convert.ToUInt32 (minutes.text), Convert.ToUInt32 (seconds.text));
+                timers[t].Start ();
             } else {
-                timer.Stop ();
-                b.text = "Start";
-                b.buttonColor = "seca";
+                timers[t].Stop ();
             }
 
-            b.QueueDraw ();
+            UpdateScreen ();
         }
 
-        protected void UpdateText (uint time) {
+        protected void OnResetButtonRelease (object sender, ButtonReleaseEventArgs args) {
+            if (timers [t].enabled) {
+                timers [t].Stop ();
+            }
+
+            if (timers [t].secondsRemaining != timers [t].totalSeconds)
+                UpdateTime (timers [t].totalSeconds);
+
+            UpdateScreen ();
+        }
+
+        protected void OnTabButtonRelease (object sender, ButtonReleaseEventArgs args) {
+            TouchTab b = sender as TouchTab;
+            t = Convert.ToInt32 ((b.text [b.text.Length - 1]).ToString ()) - 1;
+
+            if (timers [t].enabled)
+                UpdateTime (timers [t].secondsRemaining, false);
+            else
+                UpdateTime (timers [t].totalSeconds, false);
+        }
+
+        protected void UpdateTime (uint time, bool changeTimerTime = true) {
             minutes.text = (time / 60).ToString ();
             seconds.text = (time % 60).ToString ();
             minutes.QueueDraw ();
             seconds.QueueDraw ();
 
-            if (!timer.enabled) {
-                if (time == 0) {
-                    secUpDown.down.buttonColor = "grey3";
-                    secUpDown.down.QueueDraw ();
-                } else {
-                    secUpDown.down.buttonColor = "pri";
-                    secUpDown.down.QueueDraw ();
-                }
-
-                if (minutes.text == "0") {
-                    minUpDown.down.buttonColor = "grey3";
-                    minUpDown.down.QueueDraw ();
-                } else {
-                    minUpDown.down.buttonColor = "pri";
-                    minUpDown.down.QueueDraw ();
-                }
+            if (changeTimerTime) {
+                timers [t].totalSeconds = time;
+                if (!timers [t].enabled)
+                    timers [t].secondsRemaining = time;
             }
+
+            UpdateScreen ();
+        }
+
+        protected void UpdateScreen () {
+            for (int i = 0; i < tabs.Length; ++i) {
+                if (i == t)
+                    tabs [i].color = "pri";
+                else
+                    tabs [i].color = "grey3";
+
+                tabs [i].QueueDraw ();
+            }
+
+            if ((timers [t].secondsRemaining == timers [t].totalSeconds) && !timers [t].enabled)
+                resetButton.buttonColor = "grey2";
+            else
+                resetButton.buttonColor = "pri";
+
+            if (timers[t].enabled) {
+                startStopButton.text = "Stop";
+                startStopButton.buttonColor = "pri";
+            } else {
+                startStopButton.text = "Start";
+                startStopButton.buttonColor = "seca";
+
+                if (timers [t].totalSeconds == 0)
+                    secUpDown.down.buttonColor = "grey2";
+                else
+                    secUpDown.down.buttonColor = "pri";
+
+                if (minutes.text == "0")
+                    minUpDown.down.buttonColor = "grey2";
+                else
+                    minUpDown.down.buttonColor = "pri";
+
+                secUpDown.down.QueueDraw ();
+                minUpDown.down.QueueDraw ();
+            }
+
+            resetButton.QueueDraw ();
+            startStopButton.QueueDraw ();
         }
     }
 
@@ -141,17 +249,85 @@ namespace AquaPic.Runtime
         public TouchButton down;
 
         public UpDownButtons () {
-            SetSizeRequest (44, 89);
+            SetSizeRequest (44, 61);
 
             up = new TouchButton ();
-            up.SetSizeRequest (44, 44);
+            up.SetSizeRequest (44, 30);
             up.text = Convert.ToChar (0x22C0).ToString (); // 2191
             Put (up, 0, 0);
 
             down = new TouchButton ();
-            down.SetSizeRequest (44, 44);
+            down.SetSizeRequest (44, 30);
             down.text = Convert.ToChar (0x22C1).ToString (); // 2193
-            Put (down, 0, 45);
+            Put (down, 0, 31);
+        }
+    }
+
+    public class TouchTab : EventBox
+    {
+        public MyColor color;
+        public string text;
+
+        public TouchTab () {
+            SetSizeRequest (111, 29);
+
+            VisibleWindow = false;
+            ExposeEvent += OnEventBoxExpose;
+            ButtonPressEvent += OnEventBoxButtonPress;
+            ButtonReleaseEvent += OnEventBoxButtonRelease;
+
+            color = "pri";
+            text = string.Empty;
+        }
+
+        protected void OnEventBoxExpose (object sender, ExposeEventArgs args) {
+            EventBox eb = sender as EventBox;
+
+            using (Context cr = Gdk.CairoHelper.Create (eb.GdkWindow)) {
+                int height = Allocation.Height;
+                int width = Allocation.Width;
+                int top = Allocation.Top;
+                int left = Allocation.Left;
+                int radius = 10;
+
+                cr.MoveTo (left, top + radius);
+                cr.Arc (left + radius, top + radius, radius, Math.PI, -Math.PI / 2);
+                cr.LineTo (left + width - radius, top);
+                cr.Arc (left + width - radius, top + radius, radius, -Math.PI / 2, 0);
+                cr.LineTo (left + width, top + height);
+                cr.LineTo (left, top + height);
+                cr.ClosePath ();
+
+                color.SetSource (cr);
+                cr.FillPreserve ();
+
+                cr.LineWidth = 0.5;
+                MyColor.SetSource (cr, "black");
+                cr.Stroke ();
+
+                Pango.Layout l = new Pango.Layout (eb.PangoContext);
+                l.Width = Pango.Units.FromPixels (width - 2);
+                l.Wrap = Pango.WrapMode.Word;
+                l.Alignment = Pango.Alignment.Center;
+                l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
+                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+                int y = (top + (height / 2)) - 8;
+                y -= ((l.LineCount - 1) * 9);
+                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 1, y, l);
+                l.Dispose ();
+            }
+        }
+
+        protected void OnEventBoxButtonPress (object o, ButtonPressEventArgs args) {
+            if (args.Event.Type == Gdk.EventType.ButtonPress) {
+                color.ModifyColor (0.75);
+                this.QueueDraw ();
+            }
+        }
+
+        protected void OnEventBoxButtonRelease (object o, ButtonReleaseEventArgs args) {
+            color.RestoreColor ();
+            this.QueueDraw ();
         }
     }
 }

@@ -84,7 +84,7 @@ namespace AquaPic
             actinicLedDimming.text = "Actinic LED";
             Put (actinicLedDimming, 685, 30);
 
-            var t = new DeluxeTimerWidget ("main");
+            var t = new DeluxeTimerWidget ("Main");
             Put (t, 459, 230);
 
             OnUpdateTimer ();

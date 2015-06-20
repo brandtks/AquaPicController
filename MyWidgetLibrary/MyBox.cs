@@ -15,7 +15,7 @@ namespace MyWidgetLibrary
 
             WidthRequest = width;
             HeightRequest = height;
-            this.color = "grey1";
+            this.color = "grey2";
             transparency = 0.55f;
 
             ExposeEvent += OnExpose;

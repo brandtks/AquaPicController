@@ -26,13 +26,13 @@ namespace AquaPic
             
             Plugin.AddPlugins ();
 
-            string Resource_File = @"C:\Program Files (x86)\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
-            //string Resource_File = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
-            Gtk.Rc.AddDefaultFile (Resource_File);
-            Gtk.Rc.Parse (Resource_File);
+            //string RESOURCE_FILE = @"C:\Program Files (x86)\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
+            string RESOURCE_FILE = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
+            Gtk.Rc.AddDefaultFile (RESOURCE_FILE);
+            Gtk.Rc.Parse (RESOURCE_FILE);
 
             //<Test> here to test time of day interrupts
-            Time now = new Time ();
+            Time now = new Time (); // sets the instanse with DateTime.Now
             now.AddMinutes (1);
             TaskManager.AddTimeOfDayInterrupt ("test1", new Time (now), () => Console.WriteLine ("Test 1 time of day run"));
             now.AddMinutes (1);

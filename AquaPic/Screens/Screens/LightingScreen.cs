@@ -40,12 +40,12 @@ namespace AquaPic
             box2.Show ();
 
             MyBox box3 = new MyBox (205, 350);
-            box3.color = "grey2";
+            box3.color = "grey3";
             Put (box3, 410, 70);
             box3.Show ();
 
             MyBox box4 = new MyBox (165, 350);
-            box4.color = "grey2";
+            box4.color = "grey3";
             Put (box4, 620, 70);
             box4.Show ();
 

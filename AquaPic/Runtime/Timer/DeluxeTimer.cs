@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using MyWidgetLibrary;
 
 namespace AquaPic.Runtime
 {
-    public delegate void TimerInterumHandler (object sender);
+    public delegate void TimerHandler (object sender);
 
     public class DeluxeTimer : Timer
     {
@@ -14,7 +15,9 @@ namespace AquaPic.Runtime
         public uint secondsRemaining;
         public uint totalSeconds;
 
-        public TimerInterumHandler TimerInterumEvent;
+        public TimerHandler TimerInterumEvent;
+        public TimerHandler TimerStartEvent;
+        public TimerHandler TimerStopEvent;
 
         private DeluxeTimer (string name, uint minutes, uint seconds) : base (1000) {
             this.name = name;
@@ -36,14 +39,20 @@ namespace AquaPic.Runtime
         }
 
         public override void Start () {
-            secondsRemaining = totalSeconds;
-            _enabled = true;
-            timerId = GLib.Timeout.Add (1000, OnTimer);
+            if (totalSeconds > 0) {
+                secondsRemaining = totalSeconds;
+                _enabled = true;
+                timerId = GLib.Timeout.Add (1000, OnTimer);
+                if (TimerStartEvent != null)
+                    TimerStartEvent (this);
+            }
         }
 
         public override void Stop () {
             _enabled = false;
             GLib.Source.Remove (timerId);
+            if (TimerStopEvent != null)
+                TimerStopEvent (this);
         }
 
         public void SetTime (uint minutes, uint seconds) {
@@ -58,9 +67,15 @@ namespace AquaPic.Runtime
                     TimerInterumEvent (this);
 
                 if (secondsRemaining <= 0) {
+                    _enabled = false;
+                    secondsRemaining = totalSeconds;
+
+                    // We want any user code to execute first before the dialog screen is shown
                     if (TimerElapsedEvent != null)
                         TimerElapsedEvent (this, new TimerElapsedEventArgs ());
-                    Stop ();
+
+                    Console.WriteLine ("{0:T}: Calling Dialog to indicate {1} elapsed", DateTime.Now, name); 
+                    MessageBox.Show (string.Format ("{0}", name));
                 }
             }
             return _enabled;
