@@ -32,11 +32,11 @@ namespace AquaPic
             Gtk.Rc.Parse (RESOURCE_FILE);
 
             //<Test> here to test time of day interrupts
-            Time now = new Time (); // sets the instanse with DateTime.Now
-            now.AddMinutes (1);
-            TaskManager.AddTimeOfDayInterrupt ("test1", new Time (now), () => Console.WriteLine ("Test 1 time of day run"));
-            now.AddMinutes (1);
-            TaskManager.AddTimeOfDayInterrupt ("test2", new Time (now), () => Console.WriteLine ("Test 2 time of day run"));
+//            Time now = new Time (); // sets the instanse with DateTime.Now
+//            now.AddMinutes (1);
+//            TaskManager.AddTimeOfDayInterrupt ("test1", new Time (now), () => Console.WriteLine ("Test 1 time of day run"));
+//            now.AddMinutes (1);
+//            TaskManager.AddTimeOfDayInterrupt ("test2", new Time (now), () => Console.WriteLine ("Test 2 time of day run"));
 
             #if SIMULATION
             AquaPicGUI win = new AquaPicGUI (simulator);

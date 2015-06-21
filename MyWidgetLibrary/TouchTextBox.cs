@@ -53,23 +53,30 @@ namespace MyWidgetLibrary
                 cr.LineWidth = 0.75;
                 cr.Stroke ();
 
-                Pango.Layout l = new Pango.Layout (PangoContext);
-                l.Width = Pango.Units.FromPixels (width);
-                l.Wrap = Pango.WrapMode.Word;
-                if (textAlignment == MyAlignment.Left) {
-                    l.Alignment = Pango.Alignment.Left;
-                    left += 5;
-                } else if (textAlignment == MyAlignment.Right) {
-                    l.Alignment = Pango.Alignment.Right;
-                    l.Width = Pango.Units.FromPixels (width - 5);
-                } else if (textAlignment == MyAlignment.Center)
-                    l.Alignment = Pango.Alignment.Center;
-                l.SetMarkup ("<span color=\"" + textColor.ToHTML () + "\">" 
-                    + text 
-                    + "</span>");
-                l.FontDescription = Pango.FontDescription.FromString ("Courier New " + textSize.ToString ());
-                GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left, top + 6, l);
-                l.Dispose ();
+//                Pango.Layout l = new Pango.Layout (PangoContext);
+//                l.Width = Pango.Units.FromPixels (width);
+//                l.Wrap = Pango.WrapMode.Word;
+//                if (textAlignment == MyAlignment.Left) {
+//                    l.Alignment = Pango.Alignment.Left;
+//                    left += 5;
+//                } else if (textAlignment == MyAlignment.Right) {
+//                    l.Alignment = Pango.Alignment.Right;
+//                    l.Width = Pango.Units.FromPixels (width - 5);
+//                } else if (textAlignment == MyAlignment.Center)
+//                    l.Alignment = Pango.Alignment.Center;
+//                l.SetMarkup ("<span color=\"" + textColor.ToHTML () + "\">" 
+//                    + text 
+//                    + "</span>");
+//                l.FontDescription = Pango.FontDescription.FromString ("Courier New " + textSize.ToString ());
+//                GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left, top + 6, l);
+//                l.Dispose ();
+
+                MyText t = text;
+                t.font.color = textColor;
+                t.font.size = textSize;
+                t.alignment = textAlignment;
+                t.textWrap = MyTextWrap.Shrink;
+                t.Render (this, left + 3, top, width - 6, height);
             }
         }
 

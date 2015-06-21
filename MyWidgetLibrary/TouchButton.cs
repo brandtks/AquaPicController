@@ -41,23 +41,28 @@ namespace MyWidgetLibrary
                 int top = Allocation.Top;
                 int left = Allocation.Left;
 
-                //cr.Rectangle (left, top, width, height);
                 WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
                 buttonColor.SetSource (cr);
                 cr.Fill ();
 
-                Pango.Layout l = new Pango.Layout (this.PangoContext);
-                l.Width = Pango.Units.FromPixels (width - 2);
-                l.Wrap = Pango.WrapMode.Word;
-                l.Alignment = Pango.Alignment.Center;
-                //l.SetText (ButtonLabel);
-                l.SetMarkup ("<span color=" + (char)34 + textColor.ToHTML () + (char)34 + ">" + text + "</span>"); 
-                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
-                int y = (top + (height / 2)) - 8;
-                y -= ((l.LineCount - 1) * 9);
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 1, y, l);
-                //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
-                l.Dispose ();
+//                Pango.Layout l = new Pango.Layout (this.PangoContext);
+//                l.Width = Pango.Units.FromPixels (width - 2);
+//                l.Wrap = Pango.WrapMode.Word;
+//                l.Alignment = Pango.Alignment.Center;
+//                //l.SetText (ButtonLabel);
+//                l.SetMarkup ("<span color=" + (char)34 + textColor.ToHTML () + (char)34 + ">" + text + "</span>"); 
+//                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+//                int y = (top + (height / 2)) - 8;
+//                y -= ((l.LineCount - 1) * 9);
+//                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 1, y, l);
+//                //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
+//                l.Dispose ();
+
+                MyText t = text;
+                t.font.color = textColor;
+                t.textWrap = MyTextWrap.WordWrap;
+                t.alignment = MyAlignment.Center;
+                t.Render (this, left + 3, top, width - 6, height);
             }
         }
 

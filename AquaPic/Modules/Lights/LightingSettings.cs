@@ -26,12 +26,12 @@ namespace AquaPic
             settings.Add (t.label.text, t);
 
             t = new TouchLabelTextBox ();
-            t.label.text = "Default Sunrise";
+            t.label.text = "Default Rise";
             t.textBox.text = Lighting.defaultSunRise.TimeToString ();
             settings.Add (t.label.text, t);
 
             t = new TouchLabelTextBox ();
-            t.label.text = "Default Sunset";
+            t.label.text = "Default Set";
             t.textBox.text = Lighting.defaultSunSet.TimeToString ();
             settings.Add (t.label.text, t);
 

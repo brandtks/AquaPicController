@@ -33,7 +33,7 @@ namespace AquaPic
             b1.HeightRequest = 95;
             b1.WidthRequest = 108;
             b1.text = "Clean Skimmer";
-            Put (b1, 572, 330);
+            Put (b1, 572, 230);
 
             TouchButton b2 = new TouchButton ();
             b2.ButtonReleaseEvent += OnButtonClick;
@@ -45,7 +45,7 @@ namespace AquaPic
             b2.HeightRequest = 95;
             b2.WidthRequest = 108;
             b2.text = "Water Change";
-            Put (b2, 685, 330);
+            Put (b2, 685, 230);
 
 //            var b3 = new TouchButton ();
 //            b3.ButtonReleaseEvent += OnTestButtonClick;
@@ -85,7 +85,7 @@ namespace AquaPic
             Put (actinicLedDimming, 685, 30);
 
             var t = new DeluxeTimerWidget ("Main");
-            Put (t, 459, 230);
+            Put (t, 459, 330);
 
             OnUpdateTimer ();
 

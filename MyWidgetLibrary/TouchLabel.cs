@@ -77,9 +77,6 @@ namespace MyWidgetLibrary
 //                cr.MoveTo (x, y);
 //                cr.ShowText (text);
 
-                //textRender.Render (cr, Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
-                textRender.Render (this, Allocation.Left, Allocation.Top, Allocation.Width);
-
 //                Pango.Layout l = new Pango.Layout (PangoContext);
 //                l.Wrap = Pango.WrapMode.WordChar;
 //                if (WidthRequest != 200)
@@ -97,6 +94,9 @@ namespace MyWidgetLibrary
 //
 //                GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), Allocation.Left, Allocation.Top, l);
 //                l.Dispose ();
+
+                //textRender.Render (cr, Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
+                textRender.Render (this, Allocation.Left, Allocation.Top, Allocation.Width);
             }
         }
     }

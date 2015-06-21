@@ -24,76 +24,74 @@ namespace MyWidgetLibrary
             return new MyText (name);
         }
 
-//        public void Render (Context cr, int x, int y, int width, int height) {
-//            cr.SelectFontFace("Courier New", FontSlant.Normal, FontWeight.Normal);
-//            cr.SetFontSize (font.size * 1.4);
-//
-//            TextExtents te = cr.TextExtents (text);
-//            FontExtents fe = cr.FontExtents;
-//
-//            y += ((int)fe.Height - (int)fe.Descent); 
-//            if (alignment == MyAlignment.Right)
-//                x += (width - (int)te.Width);
-//            else if (alignment == MyAlignment.Center)
-//                x += ((width / 2) - ((int)te.Width / 2));
-//
-//            string t;
-//            if (te.Width > width) {
-//                double difference = te.Width - (double)width;
-//                int glyphs = (int)Math.Floor ((difference / fe.MaxXAdvance) + 0.5);
-//                t = text.Substring (0, text.Length - glyphs);
-//                t = string.Format ("{0}...", t);
-//            } else
-//                t = text;
-//            
-//            font.color.SetSource (cr);
-//            if (orientation == MyOrientation.Horizontal) {
-//                cr.MoveTo (x, y);
-//                cr.ShowText (t);
-//            } else { // orientation is vertical
-//                for (int i = 0; i < t.Length; ++i) {
-//                    int y2 = y + ((int)fe.Height * i);
-//                    cr.MoveTo (x, y2);
-//                    cr.ShowText (string.Format("{0}", t [i]));
-//                }
-//            }
-//        }
-
         public void Render (object sender, int x, int y, int width) {
+            Render (sender, x, y, width, -1);
+        }
+
+        public void Render (object sender, int x, int y, int width, int height) {
             Bin widget = sender as Bin;
             Pango.Layout l = new Pango.Layout (widget.PangoContext);
 
             l.FontDescription = Pango.FontDescription.FromString (font.fontName + " " + font.size.ToString ());
             l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
-            if (orientation == MyOrientation.Horizontal) {
-                //l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
+//            if (orientation == MyOrientation.Horizontal) {
+////                l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
-                if (alignment == MyAlignment.Left)
-                    l.Alignment = Pango.Alignment.Left;
-                else if (alignment == MyAlignment.Right)
-                    l.Alignment = Pango.Alignment.Right;
-                else // center
-                    l.Alignment = Pango.Alignment.Center;
+            if (alignment == MyAlignment.Left)
+                l.Alignment = Pango.Alignment.Left;
+            else if (alignment == MyAlignment.Right)
+                l.Alignment = Pango.Alignment.Right;
+            else // center
+                l.Alignment = Pango.Alignment.Center;
 
-                l.Wrap = Pango.WrapMode.Word;
-                l.Width = Pango.Units.FromPixels (width);
+            l.Wrap = Pango.WrapMode.Word;
+            l.Width = Pango.Units.FromPixels (width);
 
-                if ((l.LineCount > 1) && (textWrap == MyTextWrap.None)) {
-                    Pango.LayoutLine[] ll = l.Lines;
-                    string firstLine = text.Substring (0, ll [1].StartIndex - 1);
-                    int lastSpace = firstLine.LastIndexOf (' ');
-                    if (lastSpace != -1)
-                        firstLine = firstLine.Substring (0, lastSpace);
-                    l.SetText (firstLine + "...");
-                }
-            } else {
-                //<TODO> cheesy work around to get somewhat vertical text. Gravity attribute does not seem to work
-                l.Wrap = Pango.WrapMode.Char;
-                l.Width = Pango.Units.FromPixels (5);
-                l.Spacing = Pango.Units.FromPixels (0);
-                //l.SetMarkup ("<span gravity=\"east\" color=\"" + font.color.ToHTML () + "\">" + text + "</span>");
+            string displayedText = text;
+            if ((l.LineCount > 1) && (textWrap == MyTextWrap.None)) {
+                Pango.LayoutLine[] ll = l.Lines;
+                displayedText = text.Substring (0, ll [1].StartIndex - 1);
+                int lastSpace = displayedText.LastIndexOf (' ');
+                if (lastSpace != -1)
+                    displayedText = displayedText.Substring (0, lastSpace);
+                displayedText = displayedText + "...";
+                l.SetText (displayedText);
             }
+
+            int w, h;
+            l.GetPixelSize (out w, out h);
+
+            if (w > width) {
+                if (textWrap == MyTextWrap.None) {
+                    while (w > width) {
+                        displayedText = displayedText.Remove (displayedText.Length - 1);
+                        l.SetText (displayedText);
+                        l.GetPixelSize (out w, out h);
+                    }
+                } else if (textWrap == MyTextWrap.Shrink) {
+                    int K = l.FontDescription.Size / font.size;
+                    int fs = font.size;
+                    while ((w > width) && (fs > 0)) {
+                        --fs;
+                        l.FontDescription.Size = fs * K;
+                        l.SetText (displayedText);
+                        l.GetPixelSize (out w, out h);
+                    }
+                }
+            }
+
+            if (height != -1) {
+                y = (y + (height / 2)) - (h / 2);
+            }
+
+//            } else {
+//                //<TODO> cheesy work around to get somewhat vertical text. Gravity attribute does not seem to work
+//                //l.SetMarkup ("<span gravity=\"east\" color=\"" + font.color.ToHTML () + "\">" + text + "</span>");
+////                l.Wrap = Pango.WrapMode.Char;
+////                l.Width = Pango.Units.FromPixels (5);
+////                l.Spacing = Pango.Units.FromPixels (0);
+//            }
 
             widget.GdkWindow.DrawLayout (widget.Style.TextGC (StateType.Normal), x, y, l);
             l.Dispose ();
@@ -121,7 +119,8 @@ namespace MyWidgetLibrary
 
     public enum MyTextWrap : byte {
         None = 1,
-        WordWrap
+        WordWrap,
+        Shrink
     }
 }
 

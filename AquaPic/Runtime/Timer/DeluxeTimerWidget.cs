@@ -30,11 +30,9 @@ namespace AquaPic.Runtime
                 timers [i].TimerStartEvent += OnTimerStartStop;
                 timers [i].TimerStopEvent += OnTimerStartStop;
             }
-            var box1 = new MyBox (334, 95);
-            Put (box1, 0, 0);
 
-            var box2 = new MyBox (334, 66);
-            box2.color = "grey3";
+            var box2 = new MyBox (333, 66);
+            box2.color = "grey2";
             Put (box2, 0, 29);
 
             tabs = new TouchTab[3];
@@ -46,9 +44,15 @@ namespace AquaPic.Runtime
             }
 
             minutes = new TouchTextBox ();
-            minutes.enableTouch = true;
             minutes.SetSizeRequest (75, 61);
+            minutes.enableTouch = true;
+            minutes.textSize = 16;
             minutes.textAlignment = MyAlignment.Center;
+            minutes.TextChangedEvent += (sender, args) => {
+                uint time = Convert.ToUInt32 (args.text) * 60;
+                time += Convert.ToUInt32 (seconds.text);
+                UpdateTime (time);
+            };
             Put (minutes, 3, 32);
 
             minUpDown = new UpDownButtons ();
@@ -71,8 +75,10 @@ namespace AquaPic.Runtime
             Put (minUpDown, 79, 32);
 
             seconds = new TouchTextBox ();
+            seconds.SetSizeRequest (75, 61);
             seconds.enableTouch = true;
             seconds.textAlignment = MyAlignment.Center;
+            seconds.textSize = 16;
             seconds.TextChangedEvent += (sender, args) => {
                 uint time = Convert.ToUInt32 (args.text);
 
@@ -81,7 +87,6 @@ namespace AquaPic.Runtime
 
                 UpdateTime (time);
             };
-            seconds.SetSizeRequest (75, 61);
             Put (seconds, 125, 32);
 
             secUpDown = new UpDownButtons ();

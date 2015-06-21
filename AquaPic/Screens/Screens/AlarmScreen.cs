@@ -62,7 +62,6 @@ namespace AquaPic
             List<AlarmData> alarming = Alarm.GetAllAlarming ();
             TextBuffer tb = tv.Buffer;
             tb.Text = string.Empty;
-            int line = 0;
 
             foreach (var a in alarming) {
                 var tag = new TextTag (null);
@@ -73,9 +72,8 @@ namespace AquaPic
                 TextTagTable ttt = tb.TagTable;
                 ttt.Add (tag);
 
-                var ti = tb.GetIterAtLine (line);
+                var ti = tb.EndIter;
                 tb.InsertWithTags (ref ti, string.Format ("({0:MM/dd hh:mm}): {1}\n", a.postTime, a.name), tag);
-                ++line;
             }
 
             return true;
