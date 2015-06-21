@@ -88,10 +88,10 @@ namespace AquaPic.Modules
 
             temperature = temperature.Map (0, 4096, 32.0f, 100.0f);
 
-            if (temperature >= highTempAlarmSetpoint) 
+            if (temperature > highTempAlarmSetpoint)
                 Alarm.Post (highTempAlarmIdx);
 
-            if (temperature <= lowTempAlarmSetpoint)
+            if (temperature < lowTempAlarmSetpoint)
                 Alarm.Post (lowTempAlarmIdx);
         }
     }

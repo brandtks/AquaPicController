@@ -26,27 +26,37 @@ namespace AquaPic.Runtime
         }
 
         public static void Post (int index) {
-            if (AlarmsUpdatedEvent != null)
-                AlarmsUpdatedEvent (null);
+            if ((index >= 0) && (index <= (alarms.Count - 1))) {
+                if (!alarms [index].alarming) {
+                    alarms [index].PostAlarm ();
 
-            if ((index >= 0) && (index <= (alarms.Count - 1)))
-                alarms [index].PostAlarm ();
+                    EventLogger.Add (string.Format ("{0} posted", alarms [index].name));
+
+                    if (AlarmsUpdatedEvent != null)
+                        AlarmsUpdatedEvent (null);
+                }
+            }
         }
 
         public static void Clear (int index) {
-            if (AlarmsUpdatedEvent != null)
-                AlarmsUpdatedEvent (null);
-
-            if ((index >= 0) && (index <= (alarms.Count - 1)))
+            if ((index >= 0) && (index <= (alarms.Count - 1))) {
                 alarms [index].ClearAlarm ();
+
+                EventLogger.Add (string.Format ("{0} cleared", alarms [index].name));
+
+                if (AlarmsUpdatedEvent != null)
+                    AlarmsUpdatedEvent (null);
+            }
         }
 
         public static void Acknowledge () {
-            if (AlarmsUpdatedEvent != null)
-                AlarmsUpdatedEvent (null);
-
             foreach (var alarm in alarms)
                 alarm.AcknowledgeAlarm ();
+
+            EventLogger.Add ("All alarms acknowledged");
+
+            if (AlarmsUpdatedEvent != null)
+                AlarmsUpdatedEvent (null);
         }
 
         public static bool CheckAlarming (int index) {

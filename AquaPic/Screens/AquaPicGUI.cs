@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Cairo;
 using Gtk;
 using MyWidgetLibrary;
+using AquaPic.Runtime;
 
 namespace AquaPic
 {
@@ -33,6 +34,12 @@ namespace AquaPic
             #if SIMULATION
             this.simulator = simulator;
             #endif
+
+            GLib.ExceptionManager.UnhandledException += (args) => {
+                Exception ex = args.ExceptionObject as Exception;
+                EventLogger.Add (ex.ToString ());
+                args.ExitApplication = false;
+            };
 
             GuiGlobal.ChangeScreenEvent += ScreenChange;
 

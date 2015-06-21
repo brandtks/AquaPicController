@@ -34,6 +34,9 @@ namespace MyWidgetLibrary
             entryBox = new Entry ();
             entryBox.WidthRequest = 205;
             entryBox.CanFocus = true;
+            entryBox.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
+            entryBox.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
+            entryBox.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
             entryBox.Activated += (sender, e) => {
                 if (NumberSetEvent != null)
                     NumberSetEvent (entryBox.Text);
