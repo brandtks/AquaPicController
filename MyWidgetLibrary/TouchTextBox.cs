@@ -21,7 +21,7 @@ namespace MyWidgetLibrary
         public int textSize;
         public MyAlignment textAlignment;
         public bool enableTouch;
-        public TextChangedHandler TextChangedEvent;
+        public event TextChangedHandler TextChangedEvent;
 
         public TouchTextBox () {
             this.Visible = true;

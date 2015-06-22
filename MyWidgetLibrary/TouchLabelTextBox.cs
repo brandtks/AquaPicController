@@ -16,7 +16,7 @@ namespace MyWidgetLibrary
             label.WidthRequest = 115;
             label.textAlignment = MyAlignment.Right;
             label.textColor = "white";
-            Put (label, 0, 3);
+            Put (label, 0, 4);
             label.Show ();
 
             textBox = new TouchTextBox ();

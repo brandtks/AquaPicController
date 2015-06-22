@@ -15,9 +15,9 @@ namespace AquaPic.Runtime
         public uint secondsRemaining;
         public uint totalSeconds;
 
-        public TimerHandler TimerInterumEvent;
-        public TimerHandler TimerStartEvent;
-        public TimerHandler TimerStopEvent;
+        public event TimerHandler TimerInterumEvent;
+        public event TimerHandler TimerStartEvent;
+        public event TimerHandler TimerStopEvent;
 
         private DeluxeTimer (string name, uint minutes, uint seconds) : base (1000) {
             this.name = name;
@@ -71,10 +71,8 @@ namespace AquaPic.Runtime
                     secondsRemaining = totalSeconds;
 
                     // We want any user code to execute first before the dialog screen is shown
-                    if (TimerElapsedEvent != null)
-                        TimerElapsedEvent (this, new TimerElapsedEventArgs ());
-
-                    Console.WriteLine ("{0:T}: Calling Dialog to indicate {1} elapsed", DateTime.Now, name); 
+                    CallElapsedEvents ();
+                     
                     MessageBox.Show (string.Format ("{0}", name));
                 }
             }

@@ -9,8 +9,8 @@ namespace AquaPic.Runtime
     public class Coil
     {
         public ConditionCheckHandler ConditionChecker;
-        public event OutputHandler OutputTrue;
-        public event OutputHandler OutputFalse;
+        public OutputHandler OutputTrue;
+        public OutputHandler OutputFalse;
         public bool State;
 
         public Coil () {

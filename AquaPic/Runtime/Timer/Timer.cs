@@ -30,7 +30,7 @@ namespace AquaPic.Runtime
         }
         protected uint timerId;
 
-        public TimerElapsedHandler TimerElapsedEvent;
+        public event TimerElapsedHandler TimerElapsedEvent;
         public uint timerInterval; 
         public bool autoReset;
 
@@ -54,19 +54,15 @@ namespace AquaPic.Runtime
         }
 
         protected bool OnTimeout () {
-            if (_enabled) {
-                if (TimerElapsedEvent != null)
-                    TimerElapsedEvent (this, new TimerElapsedEventArgs ());
-            }
+            if (_enabled)
+                CallElapsedEvents ();
             return _enabled & autoReset;
         }
 
-//        public static uint ParseTimer (string timeInterval) {
-//            int pos = timeInterval.IndexOf (':');
-//            while (pos != -1) {
-//
-//            }
-//        }
+        protected void CallElapsedEvents () {
+            if (TimerElapsedEvent != null)
+                TimerElapsedEvent (this, new TimerElapsedEventArgs ());
+        }
     }
 }
 

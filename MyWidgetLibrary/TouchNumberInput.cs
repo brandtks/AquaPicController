@@ -10,7 +10,7 @@ namespace MyWidgetLibrary
 
     public class TouchNumberInput : Gtk.Dialog
     {
-        public NumberSetEventHandler NumberSetEvent;
+        public event NumberSetEventHandler NumberSetEvent;
 
         private Entry entryBox;
         private KeyButton[] buttons;

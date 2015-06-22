@@ -232,6 +232,11 @@ namespace AquaPic
                 var s = new LightingSettings ();
                 s.Run ();
                 s.Destroy ();
+
+                sunRise.text = Lighting.sunRiseToday.ToString ();
+                sunSet.text = Lighting.sunSetToday.ToString ();
+                sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToString ();
+                sunSetTomorrow.text = Lighting.sunSetTomorrow.ToString ();
             };
             Put (settingsBtn, 15, 390);
             settingsBtn.Show ();

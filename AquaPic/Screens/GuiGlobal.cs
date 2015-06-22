@@ -16,18 +16,18 @@ namespace AquaPic
             { "Condition", new ScreenData ("Condition", true, (options) => {return new ConditionWindow (options);}) },
             { "Plugins", new ScreenData ("Plugins", true, (options) => {return new PluginWindow (options);}) },
             { "Settings", new ScreenData ("Settings", true, (options) => {return new SettingsWindow (options);}) },
-            { "Menu", new ScreenData ("Menu", true, (options) => {return new MenuWindow (options);}) },
+            { "Menu", new ScreenData ("Menu", false, (options) => {return new MenuWindow (options);}) },
             { "Edit Plugin", new ScreenData ("Edit Plugin", false, (options) => {return new EditPluginWindow (options);}) },
             { "Alarms", new ScreenData ("Alarms", true, (options) => {return new AlarmWindow (options);}) },
             { "Logger", new ScreenData ("Logger", true, (options) => {return new LoggerWindow (options);}) }
         };
         public static string currentScreen;
 
-        public static List<string> menuWindows = new List<string> () {"Main", "Lighting", "Power", "Plugins", "Settings", "Menu"};
+        public static List<string> menuWindows = new List<string> () {"Main", "Lighting", "Power", "Plugins", "Temperature", "Menu"};
         public static string[] menuColors = new string[6] {"pri", "secb", "seca", "secc", "compl", "grey4"};
         public static string currentSelectedMenu;
 
-        public static ChangeScreenHandler ChangeScreenEvent;
+        public static event ChangeScreenHandler ChangeScreenEvent;
 
         static GuiGlobal () {
         }

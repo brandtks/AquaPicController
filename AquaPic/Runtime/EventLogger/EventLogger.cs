@@ -9,7 +9,7 @@ namespace AquaPic.Runtime
     public class EventLogger
     {
         public static TextBuffer buffer;
-        public static EventAddedHandler EventAddedEvent;
+        public static event EventAddedHandler EventAddedEvent;
 
         static EventLogger () {
             TextTagTable ttt = new TextTagTable ();

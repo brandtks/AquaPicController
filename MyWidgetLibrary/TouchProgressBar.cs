@@ -37,8 +37,8 @@ namespace MyWidgetLibrary
         public bool enableTouch;
         public MyOrientation orientation;
 
-        public ProgressChangeEventHandler ProgressChangedEvent;
-        public ProgressChangeEventHandler ProgressChangingEvent;
+        public event ProgressChangeEventHandler ProgressChangedEvent;
+        public event ProgressChangeEventHandler ProgressChangingEvent;
 
         private uint timerId;
         private bool clicked;
