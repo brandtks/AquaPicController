@@ -1,10 +1,28 @@
 ﻿using System;
 using Gtk;
 using Cairo;
+using MyWidgetLibrary;
 
-namespace MyWidgetLibrary
+namespace AquaPic
 {
-    public class TouchLinePlotWidget : Fixed
+    public delegate LinePlotWidget CreateLinePlotHandler ();
+
+    public class LinePlotData {
+        public CreateLinePlotHandler CreateInstanceEvent;
+
+        public LinePlotData (CreateLinePlotHandler CreateInstanceEvent) {
+            this.CreateInstanceEvent = CreateInstanceEvent;
+        }
+
+        public LinePlotWidget CreateInstance () {
+            if (CreateInstanceEvent != null)
+                return CreateInstanceEvent ();
+            else
+                throw new Exception ("No line plot constructor implemented");
+        }
+    }
+
+    public class LinePlotWidget : Fixed
     {
         public string text {
             get { return displayLabel.text; }
@@ -25,7 +43,7 @@ namespace MyWidgetLibrary
         private TouchLabel displayLabel;
         private TouchTextBox textBox;
 
-        public TouchLinePlotWidget () {
+        public LinePlotWidget () {
             SetSizeRequest (447, 95);
 
             var box1 = new MyBox (447, 95);
@@ -42,7 +60,7 @@ namespace MyWidgetLibrary
             box2.transparency = 0.85f;
             Put (box2, 116, 3);
 
-            //<TEMP> just here until I get a plot library and plotting done
+            //<TEMPORARY> just here until I get a plot library and data logging
             var label1 = new TouchLabel ();
             label1.text = "Not Implemented: For line plot";
             label1.WidthRequest = 320;
@@ -57,6 +75,10 @@ namespace MyWidgetLibrary
             Put (textBox, 18, 30);
 
             ShowAll ();
+        }
+
+        public virtual void OnUpdate () {
+            throw new Exception ("Update method not implemented");
         }
     }
 }

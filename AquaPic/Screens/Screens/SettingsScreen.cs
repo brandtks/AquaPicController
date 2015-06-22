@@ -13,8 +13,8 @@ namespace AquaPic
             TouchLabel l = new TouchLabel ();
             l.text = "Testing";
             l.WidthRequest = 50;
-            l.textRender.textWrap = MyTextWrap.Shrink;
-            l.textRender.orientation = MyOrientation.Vertical;
+            l.render.textWrap = MyTextWrap.Shrink;
+            l.render.orientation = MyOrientation.Vertical;
             Put (l, 100, 100);
             l.Show ();
         }

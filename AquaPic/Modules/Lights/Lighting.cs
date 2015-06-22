@@ -88,6 +88,9 @@ namespace AquaPic.Modules
 
             UpdateRiseSetTimes ();
             TaskManager.AddTimeOfDayInterrupt ("RiseSetUpdate", new Time (0, 0), () => UpdateRiseSetTimes ());
+
+            MainWindowWidgets.barPlots.Add ("Actinic LED", new BarPlotData (() => {return new ActinicBarPlot ();}));
+            MainWindowWidgets.barPlots.Add ("White LED", new BarPlotData (() => {return new WhiteBarPlot ();}));
         }
 
         public static int AddLight (

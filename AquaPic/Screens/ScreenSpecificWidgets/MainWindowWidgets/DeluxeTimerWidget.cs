@@ -2,8 +2,9 @@
 using Gtk;
 using Cairo;
 using MyWidgetLibrary;
+using AquaPic.Runtime;
 
-namespace AquaPic.Runtime
+namespace AquaPic
 {
     public class DeluxeTimerWidget : Fixed
     {
@@ -41,6 +42,7 @@ namespace AquaPic.Runtime
                 tabs [i].text = "Timer " + (i + 1).ToString ();
                 tabs [i].ButtonReleaseEvent += OnTabButtonRelease;
                 Put (tabs [i], 0 + (111 * i), 0);
+                tabs [i].Show ();
             }
 
             minutes = new TouchTextBox ();
@@ -73,6 +75,7 @@ namespace AquaPic.Runtime
                 }
             };
             Put (minUpDown, 79, 32);
+            minUpDown.Show ();
 
             seconds = new TouchTextBox ();
             seconds.SetSizeRequest (75, 61);
@@ -109,6 +112,7 @@ namespace AquaPic.Runtime
                 }
             };
             Put (secUpDown, 201, 32);
+            secUpDown.Show ();
 
             startStopButton = new TouchButton ();
             startStopButton.SetSizeRequest (83, 30);

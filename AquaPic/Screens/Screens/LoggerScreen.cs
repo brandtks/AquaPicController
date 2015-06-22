@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Gtk;
 using Cairo;
@@ -11,7 +12,6 @@ namespace AquaPic
     public class LoggerWindow : MyBackgroundWidget
     {
         private TextView tv;
-        private uint timerId;
 
         public LoggerWindow (params object[] options) : base () {
             var box = new MyBox (780, 395);
@@ -28,22 +28,14 @@ namespace AquaPic
             var b = new TouchButton ();
             b.SetSizeRequest (100, 40);
             b.text = "Clear Logger";
-            b.ButtonReleaseEvent += (o, args) => {
-                var ms = new MessageDialog (
-                    null,
-                    DialogFlags.DestroyWithParent,
-                    MessageType.Question,
-                    ButtonsType.YesNo,
-                    "Are you sure you want to clear all the contents of the event logger");
-                
-                ms.Response += (sender, a) => {
-                    if (a.ResponseId == ResponseType.Yes)
-                        EventLogger.buffer.Clear ();
-                };
-                ms.Run ();
-                ms.Destroy ();
-            };
+            b.ButtonReleaseEvent += OnClearButtonRelease;
             Put (b, 685, 380);
+
+            b = new TouchButton ();
+            b.SetSizeRequest (100, 40);
+            b.text = "Save Logger";
+            b.ButtonReleaseEvent += (o, args) => SaveEvents ();
+            Put (b, 575, 380);
 
             tv = new TextView ();
             tv.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
@@ -73,6 +65,60 @@ namespace AquaPic
         protected void OnEventAdded () {
             tv.Buffer = EventLogger.buffer;
             tv.Show ();
+        }
+
+        protected void OnClearButtonRelease (object sender, ButtonReleaseEventArgs args) {
+            var ms = new MessageDialog (
+                null,
+                DialogFlags.DestroyWithParent,
+                MessageType.Question,
+                ButtonsType.YesNo,
+                "Save events before clearing");
+
+            ms.Response += (o, a) => {
+                if (a.ResponseId == ResponseType.Yes) {
+                    SaveEvents ();
+                    EventLogger.buffer.Clear ();
+                } else if (a.ResponseId == ResponseType.No) {
+                    var d = new MessageDialog (
+                        null,
+                        DialogFlags.DestroyWithParent,
+                        MessageType.Question,
+                        ButtonsType.YesNo,
+                        "Are you sure you want to clear all the contents of the event logger");
+
+                    d.Response += (obj, arg) => {
+                        if (arg.ResponseId == ResponseType.Yes)
+                            EventLogger.buffer.Clear ();
+                    };
+
+                    d.Run ();
+                    d.Destroy ();
+                }
+            };
+
+            ms.Run ();
+            ms.Destroy ();
+        }
+
+        protected void SaveEvents () {
+            if (!string.IsNullOrWhiteSpace (EventLogger.buffer.Text)) {
+                string path = string.Format (
+                              @"{0}\AquaPicRuntimeProject\Logs\{1:yy-MM-dd-HH-mm-ss}.txt", 
+                              Environment.GetEnvironmentVariable ("AquaPic"),
+                              DateTime.Now);
+
+                List<string> lines = new List<string> ();
+                for (int i = 0; i < EventLogger.buffer.LineCount; ++i) {
+                    TextIter tis = EventLogger.buffer.GetIterAtLine (i);
+                    TextIter tie = EventLogger.buffer.GetIterAtLine (i + 1);
+                    lines.Add (EventLogger.buffer.GetText (tis, tie, true));
+                }
+
+                string[] l = lines.ToArray ();
+
+                File.WriteAllLines (path, l);
+            }
         }
     }
 }

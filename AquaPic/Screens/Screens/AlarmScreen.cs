@@ -73,7 +73,7 @@ namespace AquaPic
                 ttt.Add (tag);
 
                 var ti = tb.EndIter;
-                tb.InsertWithTags (ref ti, string.Format ("({0:MM/dd hh:mm}): {1}\n", a.postTime, a.name), tag);
+                tb.InsertWithTags (ref ti, string.Format ("{0:MM/dd hh:mm:ss}: {1}\n", a.postTime, a.name), tag);
             }
 
             return true;

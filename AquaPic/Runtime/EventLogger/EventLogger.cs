@@ -22,12 +22,14 @@ namespace AquaPic.Runtime
             buffer.TagTable.Add (tag);
 
             var ti = buffer.EndIter;
-            buffer.InsertWithTags (ref ti, string.Format ("({0:MM/dd hh:mm}): ", DateTime.Now), tag);
+            buffer.InsertWithTags (ref ti, string.Format ("{0:MM/dd hh:mm:ss}: ", DateTime.Now), tag);
 
             ti = buffer.EndIter;
             buffer.Insert (ref ti, string.Format ("{0}\n", message));
 
-            Console.WriteLine ("({0:MM/dd hh:mm}): {1}", DateTime.Now, message);
+            #if DEBUG
+            Console.WriteLine ("{0:MM/dd hh:mm:ss}: {1}", DateTime.Now, message);
+            #endif
 
             if (EventAddedEvent != null)
                 EventAddedEvent ();

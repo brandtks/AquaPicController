@@ -1,10 +1,28 @@
 ﻿using System;
 using Gtk;
 using Cairo;
+using MyWidgetLibrary;
 
-namespace MyWidgetLibrary
+namespace AquaPic
 {
-    public class TouchBarPlotWidget : Fixed
+    public delegate BarPlotWidget CreateBarPlotHandler ();
+
+    public class BarPlotData {
+        public CreateBarPlotHandler CreateInstanceEvent;
+
+        public BarPlotData (CreateBarPlotHandler CreateInstanceEvent) {
+            this.CreateInstanceEvent = CreateInstanceEvent;
+        }
+
+        public BarPlotWidget CreateInstance () {
+            if (CreateInstanceEvent != null)
+                return CreateInstanceEvent ();
+            else
+                throw new Exception ("No bar plot constructor implemented");
+        }
+    }
+
+    public class BarPlotWidget : Fixed
     {
         public string text {
             get { return label.text; }
@@ -27,7 +45,7 @@ namespace MyWidgetLibrary
         private TouchTextBox textBox;
         private TouchLabel label;
 
-        public TouchBarPlotWidget () {
+        public BarPlotWidget () {
             SetSizeRequest (108, 195);
 
             var box = new MyBox (108, 195);
@@ -50,9 +68,12 @@ namespace MyWidgetLibrary
             textBox.textSize = 16;
             textBox.text = "0.0";
             textBox.textAlignment = MyAlignment.Center;
-            Put (textBox, 4, 28);
+            Put (textBox, 3, 28);
         }
 
+        public virtual void OnUpdate () {
+            throw new Exception ("Update method not implemented");
+        }
     }
 }
 

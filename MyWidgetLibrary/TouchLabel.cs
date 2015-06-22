@@ -6,41 +6,41 @@ namespace MyWidgetLibrary
 {
     public class TouchLabel : EventBox
     {
-        public MyText textRender;
+        public MyText render;
 
         public string text {
             get {
-                return textRender.text;
+                return render.text;
             }
             set {
-                textRender.text = value;
+                render.text = value;
             }
         }
 
         public MyColor textColor {
             get {
-                return textRender.font.color;
+                return render.font.color;
             }
             set {
-                textRender.font.color = value;
+                render.font.color = value;
             }
         }
 
         public int textSize {
             get {
-                return textRender.font.size;
+                return render.font.size;
             }
             set {
-                textRender.font.size = value;
+                render.font.size = value;
             }
         }
 
         public MyAlignment textAlignment {
             get {
-                return textRender.alignment;
+                return render.alignment;
             }
             set {
-                textRender.alignment = value;
+                render.alignment = value;
             }
         }
 
@@ -48,7 +48,7 @@ namespace MyWidgetLibrary
             this.Visible = true;
             this.VisibleWindow = false;
 
-            textRender = new MyText (string.Empty);
+            render = new MyText (string.Empty);
 
             HeightRequest = 30;
             WidthRequest = 200;
@@ -96,7 +96,7 @@ namespace MyWidgetLibrary
 //                l.Dispose ();
 
                 //textRender.Render (cr, Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
-                textRender.Render (this, Allocation.Left, Allocation.Top, Allocation.Width);
+                render.Render (this, Allocation.Left, Allocation.Top, Allocation.Width);
             }
         }
     }
