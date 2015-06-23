@@ -175,24 +175,8 @@ namespace AquaPic.Utilites
 
 		public override string ToString () {
 			DateTime val = ToDateTime ();
-			return val.ToString ();
-		}
-
-        /*
-        public override string ToString (string format) {
-			DateTime val = toDateTime ();
-			return val.ToString (format);
-		}
-
-        public override string ToString (IFormatProvider provider) {
-			DateTime val = toDateTime ();
-			return val.ToString (provider);
-		}
-
-        public override string ToString (string format, IFormatProvider provider) {
-			DateTime val = toDateTime ();
-			return val.ToString (format, provider);
-		} */     
+			return val.ToString ("yy/MM/dd h:mm tt");
+		} 
     }
 }
 

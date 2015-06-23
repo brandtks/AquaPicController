@@ -91,8 +91,14 @@ namespace AquaPic.Utilites
         }
 
 		public string TimeToString () {
-			TimeSpan val = toTimeSpan ();
-			return val.ToString ();
+            int h = hour;
+            string t = "AM";
+
+            if (h > 12) {
+                h %= 12;
+                t = "PM";
+            }
+            return string.Format ("{0}:{1:00} {2}", h, min, t);
 		}
     }
 }

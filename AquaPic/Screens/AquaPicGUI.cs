@@ -87,6 +87,7 @@ namespace AquaPic
 
         public void ScreenChange (ScreenData screen, params object[] options) {
             f.Remove (current);
+            current.Destroy ();
             current.Dispose ();
             current = screen.CreateInstance (options);
             f.Put (current, 0, 0);

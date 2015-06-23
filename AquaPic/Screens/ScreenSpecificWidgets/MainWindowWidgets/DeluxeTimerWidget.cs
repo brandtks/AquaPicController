@@ -250,93 +250,93 @@ namespace AquaPic
             resetButton.QueueDraw ();
             startStopButton.QueueDraw ();
         }
-    }
 
-    public class UpDownButtons : Fixed
-    {
-        public TouchButton up;
-        public TouchButton down;
+        private class UpDownButtons : Fixed
+        {
+            public TouchButton up;
+            public TouchButton down;
 
-        public UpDownButtons () {
-            SetSizeRequest (44, 61);
+            public UpDownButtons () {
+                SetSizeRequest (44, 61);
 
-            up = new TouchButton ();
-            up.SetSizeRequest (44, 30);
-            up.text = Convert.ToChar (0x22C0).ToString (); // 2191
-            Put (up, 0, 0);
+                up = new TouchButton ();
+                up.SetSizeRequest (44, 30);
+                up.text = Convert.ToChar (0x22C0).ToString (); // 2191
+                Put (up, 0, 0);
 
-            down = new TouchButton ();
-            down.SetSizeRequest (44, 30);
-            down.text = Convert.ToChar (0x22C1).ToString (); // 2193
-            Put (down, 0, 31);
-        }
-    }
-
-    public class TouchTab : EventBox
-    {
-        public MyColor color;
-        public string text;
-
-        public TouchTab () {
-            SetSizeRequest (111, 29);
-
-            VisibleWindow = false;
-            ExposeEvent += OnEventBoxExpose;
-            ButtonPressEvent += OnEventBoxButtonPress;
-            ButtonReleaseEvent += OnEventBoxButtonRelease;
-
-            color = "pri";
-            text = string.Empty;
-        }
-
-        protected void OnEventBoxExpose (object sender, ExposeEventArgs args) {
-            EventBox eb = sender as EventBox;
-
-            using (Context cr = Gdk.CairoHelper.Create (eb.GdkWindow)) {
-                int height = Allocation.Height;
-                int width = Allocation.Width;
-                int top = Allocation.Top;
-                int left = Allocation.Left;
-                int radius = 10;
-
-                cr.MoveTo (left, top + radius);
-                cr.Arc (left + radius, top + radius, radius, Math.PI, -Math.PI / 2);
-                cr.LineTo (left + width - radius, top);
-                cr.Arc (left + width - radius, top + radius, radius, -Math.PI / 2, 0);
-                cr.LineTo (left + width, top + height);
-                cr.LineTo (left, top + height);
-                cr.ClosePath ();
-
-                color.SetSource (cr);
-                cr.FillPreserve ();
-
-                cr.LineWidth = 0.5;
-                MyColor.SetSource (cr, "black");
-                cr.Stroke ();
-
-                Pango.Layout l = new Pango.Layout (eb.PangoContext);
-                l.Width = Pango.Units.FromPixels (width - 2);
-                l.Wrap = Pango.WrapMode.Word;
-                l.Alignment = Pango.Alignment.Center;
-                l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
-                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
-                int y = (top + (height / 2)) - 8;
-                y -= ((l.LineCount - 1) * 9);
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 1, y, l);
-                l.Dispose ();
+                down = new TouchButton ();
+                down.SetSizeRequest (44, 30);
+                down.text = Convert.ToChar (0x22C1).ToString (); // 2193
+                Put (down, 0, 31);
             }
         }
 
-        protected void OnEventBoxButtonPress (object o, ButtonPressEventArgs args) {
-            if (args.Event.Type == Gdk.EventType.ButtonPress) {
-                color.ModifyColor (0.75);
+        private class TouchTab : EventBox
+        {
+            public MyColor color;
+            public string text;
+
+            public TouchTab () {
+                SetSizeRequest (111, 29);
+
+                VisibleWindow = false;
+                ExposeEvent += OnEventBoxExpose;
+                ButtonPressEvent += OnEventBoxButtonPress;
+                ButtonReleaseEvent += OnEventBoxButtonRelease;
+
+                color = "pri";
+                text = string.Empty;
+            }
+
+            protected void OnEventBoxExpose (object sender, ExposeEventArgs args) {
+                EventBox eb = sender as EventBox;
+
+                using (Context cr = Gdk.CairoHelper.Create (eb.GdkWindow)) {
+                    int height = Allocation.Height;
+                    int width = Allocation.Width;
+                    int top = Allocation.Top;
+                    int left = Allocation.Left;
+                    int radius = 10;
+
+                    cr.MoveTo (left, top + radius);
+                    cr.Arc (left + radius, top + radius, radius, Math.PI, -Math.PI / 2);
+                    cr.LineTo (left + width - radius, top);
+                    cr.Arc (left + width - radius, top + radius, radius, -Math.PI / 2, 0);
+                    cr.LineTo (left + width, top + height);
+                    cr.LineTo (left, top + height);
+                    cr.ClosePath ();
+
+                    color.SetSource (cr);
+                    cr.FillPreserve ();
+
+                    cr.LineWidth = 0.5;
+                    MyColor.SetSource (cr, "black");
+                    cr.Stroke ();
+
+                    Pango.Layout l = new Pango.Layout (eb.PangoContext);
+                    l.Width = Pango.Units.FromPixels (width - 2);
+                    l.Wrap = Pango.WrapMode.Word;
+                    l.Alignment = Pango.Alignment.Center;
+                    l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
+                    l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+                    int y = (top + (height / 2)) - 8;
+                    y -= ((l.LineCount - 1) * 9);
+                    GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 1, y, l);
+                    l.Dispose ();
+                }
+            }
+
+            protected void OnEventBoxButtonPress (object o, ButtonPressEventArgs args) {
+                if (args.Event.Type == Gdk.EventType.ButtonPress) {
+                    color.ModifyColor (0.75);
+                    this.QueueDraw ();
+                }
+            }
+
+            protected void OnEventBoxButtonRelease (object o, ButtonReleaseEventArgs args) {
+                color.RestoreColor ();
                 this.QueueDraw ();
             }
-        }
-
-        protected void OnEventBoxButtonRelease (object o, ButtonReleaseEventArgs args) {
-            color.RestoreColor ();
-            this.QueueDraw ();
         }
     }
 }

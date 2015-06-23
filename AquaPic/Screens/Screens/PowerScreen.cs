@@ -31,14 +31,14 @@ namespace AquaPic
             for (int i = 0; i < 8; ++i) {
                 selectors [i] = new PowerOutletSlider (i);
 
-                selectors [i].SelectorChangedEvent += OnSelectorChanged;
+                selectors [i].ss.SelectorChangedEvent += OnSelectorChanged;
 
                 if (i < 4) {
-                    x = (i * 190) + 30;
-                    y = 155;
+                    x = (i * 190) + 25;
+                    y = 135;
                 } else {
-                    x = ((i - 4) * 190) + 30;
-                    y = 235;
+                    x = ((i - 4) * 190) + 25;
+                    y = 215;
                 }
                 Put (selectors [i], x, y);
 
@@ -78,23 +78,23 @@ namespace AquaPic
 
             int i = 0;
             foreach (var selector in selectors) {
-                selector.OutletName = names [i];
+                selector.OutletName.text = names [i];
 
                 if (states [i] == MyState.On) {
-                    selector.Status = "On";
-                    selector.StatusColor = "secb";
+                    selector.Status.text = "On";
+                    selector.Status.textColor = "secb";
                 } else {
-                    selector.Status = "Off";
-                    selector.StatusColor = "grey4";
+                    selector.Status.text = "Off";
+                    selector.Status.textColor = "grey4";
                 }
 
                 if (modes [i] == Mode.Auto) {
-                    selector.CurrentSelected = 1;
+                    selector.ss.CurrentSelected = 1;
                 } else { // mode is manual
                     if (states [i] == MyState.On) {
-                        selector.CurrentSelected = 2;
+                        selector.ss.CurrentSelected = 2;
                     } else {
-                        selector.CurrentSelected = 0;
+                        selector.ss.CurrentSelected = 0;
                     }
                 }
                 ++i;
@@ -144,11 +144,11 @@ namespace AquaPic
             if (args.powerID == powerID) {
 
                 if (args.state == MyState.On) {
-                    selectors [args.outletID].Status = "On";
-                    selectors [args.outletID].StatusColor = "secb";
+                    selectors [args.outletID].Status.text = "On";
+                    selectors [args.outletID].Status.textColor = "secb";
                 } else {
-                    selectors [args.outletID].Status = "Off";
-                    selectors [args.outletID].StatusColor = "grey4";
+                    selectors [args.outletID].Status.text = "Off";
+                    selectors [args.outletID].Status.textColor = "grey4";
                 }
 
                 // have to call QueueDrawArea because there is text that needs to be draw

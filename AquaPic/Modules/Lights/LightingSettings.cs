@@ -164,16 +164,32 @@ namespace AquaPic
 
         protected Time ToTime (string value) {
             int pos = value.IndexOf (":");
-            if (pos != 2)
+
+            if ((pos != 2) || (pos != 1))
                 throw new Exception ();
 
-            string hourString = value.Substring (0, 2);
-            byte hour = Convert.ToByte (hourString);
+            string hourString = value.Substring (0, pos);
+            int hour = Convert.ToInt32 (hourString);
 
-            string minString = value.Substring (3, 2);
-            byte min = Convert.ToByte (minString);
+            if ((hour < 0) || (hour > 23))
+                throw new Exception ();
 
-            return new Time (hour, min);
+            string minString = value.Substring (pos + 1, 2);
+            int min = Convert.ToInt32 (minString);
+
+            if ((min < 0) || (min > 59))
+                throw new Exception ();
+
+            pos = value.Length;
+            if (pos > 3) {
+                string last = value.Substring (pos - 2);
+                if (last == "pm") {
+                    if ((hour >= 1) && (hour <= 12))
+                        hour = (hour + 12) % 24;
+                }
+            }
+
+            return new Time ((byte)hour, (byte)min);
         }
     }
 }
