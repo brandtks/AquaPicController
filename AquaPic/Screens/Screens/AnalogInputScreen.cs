@@ -24,6 +24,9 @@ namespace AquaPic
             displays = new AnalogChannelDisplay[4];
             for (int i = 0; i < 4; ++i) {
                 displays [i] = new AnalogChannelDisplay ();
+                displays [i].divisionSteps = 4096;
+                displays [i].ForceButtonReleaseEvent += OnForceRelease;
+                displays [i].ValueChangedEvent += OnValueChanged;
                 Put (displays [i], 20, 75 + (i * 60));
             }
 
@@ -68,14 +71,65 @@ namespace AquaPic
             }
         }
 
+        protected void OnForceRelease (object sender, ButtonReleaseEventArgs args) {
+            AnalogChannelDisplay d = sender as AnalogChannelDisplay;
+
+            IndividualControl ic;
+            ic.Group = (byte)cardId;
+            ic.Individual = AnalogInput.GetChannelIndex (cardId, d.label.text);
+
+            Mode m = AnalogInput.GetMode (ic);
+
+            if (m == Mode.Auto) {
+                AnalogInput.SetMode (ic, Mode.Manual);
+                d.progressBar.enableTouch = true;
+                d.textBox.enableTouch = true;
+                d.button.buttonColor = "pri";
+            } else {
+                AnalogInput.SetMode (ic, Mode.Auto);
+                d.progressBar.enableTouch = false;
+                d.textBox.enableTouch = false;
+                d.button.buttonColor = "grey4";
+            }
+
+            d.QueueDraw ();
+        }
+
+        protected void OnValueChanged (object sender, float value) {
+            AnalogChannelDisplay d = sender as AnalogChannelDisplay;
+
+            IndividualControl ic;
+            ic.Group = (byte)cardId;
+            ic.Individual = AnalogInput.GetChannelIndex (cardId, d.label.text);
+
+            Mode m = AnalogInput.GetMode (ic);
+
+            if (m == Mode.Manual)
+                AnalogInput.SetValue (ic, value);
+
+            d.QueueDraw ();
+        }
+
         protected void GetCardData () {
             string[] names = AnalogInput.GetAllChannelNames (cardId);
             float[] values = AnalogInput.GetAllValues (cardId);
+            Mode[] modes = AnalogInput.GetAllModes (cardId);
 
             int i = 0;
             foreach (var d in displays) {
                 d.label.text = names [i];
                 d.currentValue = values [i];
+
+                if (modes [i] == Mode.Auto) {
+                    d.progressBar.enableTouch = false;
+                    d.textBox.enableTouch = false;
+                    d.button.buttonColor = "grey4";
+                } else {
+                    d.progressBar.enableTouch = true;
+                    d.textBox.enableTouch = true;
+                    d.button.buttonColor = "pri";
+                }
+
                 d.QueueDraw ();
 
                 ++i;

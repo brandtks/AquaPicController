@@ -8,7 +8,10 @@ namespace AquaPic
     public class SettingsWindow : MyBackgroundWidget
     {
         public SettingsWindow (params object[] options) : base () {
-            ShowAll ();
+            TouchProgressBar pb = new TouchProgressBar (MyOrientation.Horizontal);
+            pb.enableTouch = true;
+            Put (pb, 100, 150);
+            pb.Show ();
 
             TouchLabel l = new TouchLabel ();
             l.text = "Testing";
@@ -17,6 +20,8 @@ namespace AquaPic
             l.render.orientation = MyOrientation.Vertical;
             Put (l, 100, 100);
             l.Show ();
+
+            ShowAll ();
         }
     }
 }

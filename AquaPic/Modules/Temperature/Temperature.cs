@@ -96,9 +96,17 @@ namespace AquaPic.Modules
 
             if (temperature > highTempAlarmSetpoint)
                 Alarm.Post (highTempAlarmIdx);
+            else {
+                if (Alarm.CheckAlarming (highTempAlarmIdx))
+                    Alarm.Clear (highTempAlarmIdx);
+            }
 
             if (temperature < lowTempAlarmSetpoint)
                 Alarm.Post (lowTempAlarmIdx);
+            else {
+                if (Alarm.CheckAlarming (lowTempAlarmIdx))
+                    Alarm.Clear (lowTempAlarmIdx);
+            }
         }
 
         public static string[] GetAllHeaterNames () {

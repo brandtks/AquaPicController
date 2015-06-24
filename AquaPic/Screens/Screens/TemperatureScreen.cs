@@ -44,7 +44,7 @@ namespace AquaPic
             temp.WidthRequest = 200;
             temp.HeightRequest = 35;
             temp.textSize = 14;
-            temp.text = Temperature.WaterTemperature.ToString ();
+            temp.text = Temperature.WaterTemperature.ToString ("F1");
             Put (temp, 190, 70);
             temp.Show ();
 
@@ -58,7 +58,7 @@ namespace AquaPic
 
             var tempSetpoint = new TouchTextBox ();
             tempSetpoint.WidthRequest = 200;
-            tempSetpoint.text = Temperature.temperatureSetpoint.ToString ();
+            tempSetpoint.text = Temperature.temperatureSetpoint.ToString ("F1");
             Put (tempSetpoint, 190, 110);
             tempSetpoint.Show ();
 
@@ -72,7 +72,7 @@ namespace AquaPic
 
             var tempDeadband = new TouchTextBox ();
             tempDeadband.WidthRequest = 200;
-            tempDeadband.text = (Temperature.temperatureDeadband * 2).ToString ();
+            tempDeadband.text = (Temperature.temperatureDeadband * 2).ToString ("F1");
             Put (tempDeadband, 190, 145);
             tempDeadband.Show ();
 
@@ -102,8 +102,8 @@ namespace AquaPic
                 var s = new TemperatureSettings ();
                 s.Run ();
                 s.Destroy ();
-                tempSetpoint.text = Temperature.temperatureSetpoint.ToString ();
-                tempDeadband.text = (Temperature.temperatureDeadband * 2).ToString ();
+                tempSetpoint.text = Temperature.temperatureSetpoint.ToString ("F1");
+                tempDeadband.text = (Temperature.temperatureDeadband * 2).ToString ("F1");
             };
             Put (settingsBtn, 15, 390);
             settingsBtn.Show ();
@@ -139,8 +139,8 @@ namespace AquaPic
                 setpoint.Visible = true;
                 deadband.Visible = true;
 
-                setpoint.textBox.text = Temperature.GetHeaterSetpoint (heaterId).ToString ();
-                deadband.textBox.text = Temperature.GetHeaterDeadband (heaterId).ToString ();
+                setpoint.textBox.text = Temperature.GetHeaterSetpoint (heaterId).ToString ("F1");
+                deadband.textBox.text = Temperature.GetHeaterDeadband (heaterId).ToString ("F1");
             }
 
             heaterLabel.QueueDraw ();

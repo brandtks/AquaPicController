@@ -12,11 +12,13 @@ namespace AquaPic.Drivers
             public string name { get; set; }
             public int value { get; set; }
             public Value ValueControl;
+            public Mode mode;
 
             public AnalogOutputChannel (string name, ValueSetterHandler valueSetter) {
                 this.type = AnalogType.None;
                 this.name = name;
                 this.value = 0;
+                mode = Mode.Auto;
 
                 ValueControl = new Value ();
                 ValueControl.ValueSetter = valueSetter;

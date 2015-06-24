@@ -31,7 +31,7 @@ namespace AquaPic.Drivers
                     int chId = i;
                     this.channels [chId] = new AnalogOutputChannel (
                         this.name + ".q" + i.ToString (),
-                        (float value) => SetAnalogValue ((byte)chId, Convert.ToInt32 (value))
+                        (float value) => SetAnalogValue ((byte)chId, value.ToInt ())
                     );
                 }
             }

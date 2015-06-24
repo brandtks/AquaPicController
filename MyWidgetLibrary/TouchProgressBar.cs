@@ -134,7 +134,7 @@ namespace MyWidgetLibrary
                 if (_orient == MyOrientation.Vertical)
                     _currentProgress = (float)(Allocation.Height - y) / (float)Allocation.Height;
                 else
-                    _currentProgress = (float)(Allocation.Width - x) / (float)Allocation.Width;
+                    _currentProgress = (float)x / (float)Allocation.Width;
 
                 if (_currentProgress > 1.0f)
                     _currentProgress = 1.0f;

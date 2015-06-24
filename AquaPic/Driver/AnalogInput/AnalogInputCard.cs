@@ -98,8 +98,10 @@ namespace AquaPic.Drivers
                 }
 
                 for (int i = 0; i < channels.Length; ++i) {
-                    channels [i].value = values [i];
+                    if (channels [i].mode == Mode.Auto)
+                        channels [i].value = values [i];
                 }
+
                 updating = false;
             }
             #endif
@@ -114,9 +116,11 @@ namespace AquaPic.Drivers
             }
             #else
             public unsafe void GetValue (byte ch) {
-                byte message = ch;
-                updating = true;
-                slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueFloat), GetValueCallback);
+                if (channels [ch].mode == Mode.Auto) {
+                    byte message = ch;
+                    updating = true;
+                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueFloat), GetValueCallback);
+                }
             }
             #endif
 
@@ -133,7 +137,7 @@ namespace AquaPic.Drivers
                 unsafe {
                     args.copyBuffer (&vg, sizeof(CommValueFloat));
                 }
-
+                   
                 channels [vg.channel].value = vg.value;
                 updating = false;
             }

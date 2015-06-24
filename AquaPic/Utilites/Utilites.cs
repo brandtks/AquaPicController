@@ -82,6 +82,14 @@ namespace AquaPic.Utilites
                 return value;
         }
 
+        public static int ToInt (this double value) {
+            return (int)Math.Floor (value + 0.5);
+        }
+
+        public static int ToInt (this float value) {
+            return (int)Math.Floor (value + 0.5);
+        }
+
         public static bool mtob (byte mask, int shift) {
             byte b = mask;
             byte _shift = (byte)shift;

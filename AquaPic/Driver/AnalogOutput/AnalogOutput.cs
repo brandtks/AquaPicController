@@ -15,8 +15,15 @@ namespace AquaPic.Drivers
 
         public static void Run () {
             foreach (var card in cards) {
+                byte chId = 0;
                 foreach (var channel in card.channels) {
-                    channel.ValueControl.Execute ();
+                    if (channel.mode == Mode.Auto) {
+                        channel.ValueControl.Execute ();
+                        channel.value = channel.ValueControl.value.ToInt ();
+                    } else
+                        card.SetAnalogValue (chId, Convert.ToInt32 (channel.value));
+
+                    ++chId;
                 }
             }
         }
@@ -32,7 +39,7 @@ namespace AquaPic.Drivers
         }
 
         public static Value AddChannel (int cardID, int channelID, AnalogType type, string name) {
-            if (cardID == -1)
+            if ((cardID < 0) && (cardID >= cards.Count))
                 throw new Exception ("Card does not exist");
 
             if ((channelID < 0) || (channelID >= cards [cardID].channels.Length))
@@ -51,6 +58,17 @@ namespace AquaPic.Drivers
                 if (string.Equals (cards [i].name, name, StringComparison.InvariantCultureIgnoreCase))
                     return i;
             }
+            return -1;
+        }
+
+        public static int GetChannelIndex (int cardId, string name) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                for (int i = 0; i < cards [cardId].channels.Length; ++i) {
+                    if (string.Equals (cards [cardId].channels [i].name, name, StringComparison.InvariantCultureIgnoreCase))
+                        return i;
+                }
+            }
+
             return -1;
         }
 
@@ -103,7 +121,8 @@ namespace AquaPic.Drivers
                 float[] types = new float[cards [cardId].channels.Length];
 
                 for (int i = 0; i < types.Length; ++i)
-                    types [i] = cards [cardId].channels [i].ValueControl.value;
+                    //types [i] = cards [cardId].channels [i].ValueControl.value;
+                    types [i] = cards [cardId].channels [i].value;
 
                 return types;
             }
@@ -118,6 +137,46 @@ namespace AquaPic.Drivers
             }
 
             return 0.0f;
+        }
+
+        public static void SetValue (IndividualControl ic, float value) {
+            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
+                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length)) {
+                    if (cards [ic.Group].channels [ic.Individual].mode == Mode.Manual)
+                        cards [ic.Group].channels [ic.Individual].value = value.ToInt ();
+                    else
+                        throw new Exception ("Can only modify analong output value with channel forced");
+                }
+            }
+        }
+
+        public static void SetMode (IndividualControl ic, Mode mode) {
+            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
+                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length))
+                    cards [ic.Group].channels [ic.Individual].mode = mode;
+            }
+        }
+
+        public static Mode[] GetAllModes (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                Mode[] modes = new Mode[cards [cardId].channels.Length];
+
+                for (int i = 0; i < modes.Length; ++i)
+                    modes [i] = cards [cardId].channels [i].mode;
+
+                return modes;
+            }
+
+            return null;
+        }
+
+        public static Mode GetMode (IndividualControl ic) {
+            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
+                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length))
+                    return cards [ic.Group].channels [ic.Individual].mode;
+            }
+
+            return Mode.Manual;
         }
     }
 }
