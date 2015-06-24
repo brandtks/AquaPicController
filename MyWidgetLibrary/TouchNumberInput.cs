@@ -12,8 +12,7 @@ namespace MyWidgetLibrary
     {
         public event NumberSetEventHandler NumberSetEvent;
 
-        private Entry entryBox;
-        private KeyButton[] buttons;
+        private Entry entry;
         private Fixed fix;
 
         public TouchNumberInput () {
@@ -21,35 +20,35 @@ namespace MyWidgetLibrary
             Title = "Input";
             WindowPosition = (Gtk.WindowPosition)4;
             DefaultWidth = 205;
-            DefaultHeight = 235;
+            DefaultHeight = 285;
 
             fix = new Fixed ();
             fix.WidthRequest = 205;
-            fix.HeightRequest = 235;
+            fix.HeightRequest = 285;
 
-            MyBox bkgnd = new MyBox (205, 235);
+            MyBox bkgnd = new MyBox (205, 285);
             bkgnd.color = "black";
             fix.Put (bkgnd, 0, 0);
 
-            entryBox = new Entry ();
-            entryBox.WidthRequest = 205;
-            entryBox.CanFocus = true;
-            entryBox.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
-            entryBox.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
-            entryBox.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
-            entryBox.Activated += (sender, e) => {
+            entry = new Entry ();
+            entry.WidthRequest = 205;
+            entry.CanFocus = true;
+            entry.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
+            entry.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
+            entry.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
+            entry.Activated += (sender, e) => {
                 if (NumberSetEvent != null)
-                    NumberSetEvent (entryBox.Text);
+                    NumberSetEvent (entry.Text);
 
                 Destroy ();
             };
-            fix.Put (entryBox, 0, 0);
-            entryBox.GrabFocus ();
+            fix.Put (entry, 0, 0);
+            entry.GrabFocus ();
 
             int x, y;
-            buttons = new KeyButton[10];
+            var buttons = new KeyButton[10];
             for (int i = 0; i < buttons.Length; ++i) {
-                buttons [i] = new KeyButton (i.ToString ());
+                buttons [i] = new KeyButton (i.ToString (), OnButtonRelease);
 
                 if (i == 0) {
                     x = 55;
@@ -71,42 +70,102 @@ namespace MyWidgetLibrary
                 fix.Put (buttons [i], x, y);
             }
 
-            KeyButton plusMinus = new KeyButton ("-", false);
+            KeyButton plusMinus = new KeyButton ("-", null);
             plusMinus.ButtonReleaseEvent += (o, args) => {
-                if (plusMinus.key == "-") {
+                if (plusMinus.text == "-") {
                     int pos = 0;
-                    entryBox.InsertText ("-", ref pos);
-                    ++entryBox.Position;
-                    plusMinus.key = "+"; 
+                    entry.InsertText ("-", ref pos);
+                    ++entry.Position;
+                    plusMinus.text = "+"; 
                 } else {
-                    entryBox.DeleteText (0, 1);
-                    plusMinus.key = "-"; 
+                    entry.DeleteText (0, 1);
+                    plusMinus.text = "-"; 
                 }
 
-                plusMinus.text = plusMinus.key.ToString ();
+                plusMinus.text = plusMinus.text.ToString ();
                 plusMinus.QueueDraw ();
             };
             fix.Put (plusMinus, 5, 185);
 
-            KeyButton period = new KeyButton (".");
+            KeyButton period = new KeyButton (".", OnButtonRelease);
             fix.Put (period, 105, 185);
 
-            KeyButton delete = new KeyButton ("{BS}", Convert.ToChar (0x02FF).ToString ());
+            KeyButton delete = new KeyButton (Convert.ToChar (0x25C0).ToString (), null); //02FF
+            delete.ButtonReleaseEvent += (o, args) => {
+                int pos = entry.Position;
+                entry.DeleteText (entry.Position - 1, entry.Position);
+            };
             fix.Put (delete, 155, 35);
 
-            KeyButton clear = new KeyButton ("C", false);
+            KeyButton clear = new KeyButton ("C", null);
             clear.ButtonReleaseEvent += (o, args) => {
-                plusMinus.key = "-";
-                entryBox.Text = string.Empty;
+                plusMinus.text = "-";
+                entry.Text = string.Empty;
             };
             fix.Put (clear, 155, 85);
+
+            KeyButton semi = new KeyButton (":", OnButtonRelease);
+            fix.Put (semi, 5, 235);
+
+            KeyButton pm = new KeyButton ("PM", null);
+            pm.ButtonReleaseEvent += (o, args) => {
+                int len = entry.Text.Length;
+                if (len >= 3) {
+                    string last = entry.Text.Substring (len - 2);
+                    if (last == "AM") {
+                        int pos = entry.Text.Length - 2;
+                        entry.DeleteText (pos, pos + 2);
+                        entry.InsertText ("PM", ref pos);
+                    } else if (last == "PM") {
+                        int pos = entry.Text.Length - 3;
+                        entry.DeleteText (pos, pos + 3);
+                    } else {
+                        int pos = entry.Text.Length;
+                        entry.InsertText (" PM", ref pos);
+                    }
+                } else {
+                    int pos = entry.Text.Length;
+                    entry.InsertText (" PM", ref pos);
+                }
+            };
+            fix.Put (pm, 55, 235);
+
+            KeyButton am = new KeyButton ("AM", null);
+            am.ButtonReleaseEvent += (o, args) => {
+                int len = entry.Text.Length;
+                if (len >= 3) {
+                    string last = entry.Text.Substring (len - 2);
+                    if (last == "PM") {
+                        int pos = entry.Text.Length - 2;
+                        entry.DeleteText (pos, pos + 2);
+                        entry.InsertText ("AM", ref pos);
+                    } else if (last == "AM") {
+                        int pos = entry.Text.Length - 3;
+                        entry.DeleteText (pos, pos + 3);
+                    } else {
+                        int pos = entry.Text.Length;
+                        entry.InsertText (" AM", ref pos);
+                    }
+                } else {
+                    int pos = entry.Text.Length;
+                    entry.InsertText (" AM", ref pos);
+                }
+            };
+            fix.Put (am, 105, 235);
+
+            KeyButton cancel = new KeyButton ("Cancel", null);
+            cancel.textSize = 9;
+            cancel.ButtonReleaseEvent += (o, args) => {
+                Destroy ();
+            };
+            fix.Put (cancel, 155, 235);
 
             TouchButton enter = new TouchButton ();
             enter.text = Convert.ToChar (0x23CE).ToString ();
             enter.HeightRequest = 95;
             enter.ButtonReleaseEvent += (o, args) => {
                 if (NumberSetEvent != null)
-                    NumberSetEvent (entryBox.Text);
+                    NumberSetEvent (entry.Text);
 
                 Destroy ();
             };
@@ -122,20 +181,19 @@ namespace MyWidgetLibrary
             Show ();
         }
 
+        protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
+            KeyButton k = sender as KeyButton;
+            int pos = entry.Position;
+            entry.InsertText (k.text, ref pos);
+            ++entry.Position;
+        }
+
         private class KeyButton : TouchButton {
-            public string key;
-
-            public KeyButton (string key, bool sendKey = true) {
-                this.key = key;
-                this.text = key;
-                if (sendKey)
-                    ButtonReleaseEvent += (o, args) => SendKeys.SendWait (key);
-                
-            }
-
-            public KeyButton (string key, string text, bool sendKey = true) 
-                : this (key, sendKey) {
+            public KeyButton (string text, ButtonReleaseEventHandler handler) {
                 this.text = text;
+                this.textSize = 13;
+                if (handler != null)
+                    ButtonReleaseEvent += handler;
             }
         }
     }

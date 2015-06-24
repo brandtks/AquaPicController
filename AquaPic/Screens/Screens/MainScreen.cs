@@ -180,42 +180,7 @@ namespace AquaPic
             base.Dispose ();
         }
 
-//        protected void OnButtonClick (object sender, ButtonReleaseEventArgs args) {
-//            TouchButton b = sender as TouchButton;
-//            string stateText = b.text;
-//            MyState s = Bit.Check (stateText);
-//            if (s == MyState.Set) {
-//                Bit.Reset (stateText);
-//                b.buttonColor = "seca";
-//            } else {
-//                Bit.Set (stateText);
-//                b.buttonColor = "pri";
-//            }
-//        }
-
-//        protected void OnTestButtonClick (object sender, ButtonReleaseEventArgs args) {
-//            MyState s = Bit.Toggle ("Test Alarm");
-//
-//            if (s == MyState.Set)
-//                Alarm.Post (testAlarmIndex);
-//            else
-//                Alarm.Clear (testAlarmIndex);
-//        }
-
         protected bool OnUpdateTimer () {
-//            tempPlot.currentValue = Temperature.WaterTemperature;
-//            tempPlot.QueueDraw ();
-//
-//            whiteLedDimming.currentValue = Lighting.GetCurrentDimmingLevel (Lighting.GetLightIndex ("White LED"));
-//            whiteLedDimming.QueueDraw ();
-//
-//            actinicLedDimming.currentValue = Lighting.GetCurrentDimmingLevel (Lighting.GetLightIndex ("Actinic LED"));
-//            actinicLedDimming.QueueDraw ();
-//
-//            BaseScript bs = Plugin.AllPlugins ["WaterLevel"];
-//            waterLevel.currentValue = Convert.ToSingle (bs.OneShotRun ());
-//            waterLevel.QueueDraw ();
-
             foreach (var lp in linePlots) {
                 lp.OnUpdate ();
                 lp.QueueDraw ();

@@ -36,7 +36,7 @@ namespace AquaPic.Drivers
                 throw new Exception ("Card does not exist");
 
             if ((channelID < 0) || (channelID >= cards [cardID].channels.Length))
-                throw new Exception ("Input ID out of range");
+                throw new ArgumentOutOfRangeException ("Input ID out of range");
 
             string s = string.Format ("{0}.q{1}", cards [cardID].name, channelID);
             if (cards [cardID].channels [channelID].name != s)
@@ -46,16 +46,78 @@ namespace AquaPic.Drivers
             return cards [cardID].channels [channelID].ValueControl;
         }
 
-//        public static void SetAnalogValue (IndividualControl channel, int value) {
-//            cards [channel.Group].SetAnalogValue (channel.Individual, value);
-//        }
-
         public static int GetCardIndex (string name) {
             for (int i = 0; i < cards.Count; ++i) {
-                if (cards [i].name == name)
+                if (string.Equals (cards [i].name, name, StringComparison.InvariantCultureIgnoreCase))
                     return i;
             }
             return -1;
+        }
+
+        public static string[] GetAllCardNames () {
+            string[] names = new string[cards.Count];
+
+            for (int i = 0; i < cards.Count; ++i)
+                names [i] = cards [i].name;
+
+            return names;
+        }
+
+        public static string[] GetAllChannelNames (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                string[] names = new string[cards [cardId].channels.Length];
+
+                for (int i = 0; i < names.Length; ++i)
+                    names [i] = cards [cardId].channels [i].name;
+
+                return names;
+            }
+
+            return null;
+        }
+
+        public static AnalogType[] GetAllAnalogTypes (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                AnalogType[] types = new AnalogType[cards [cardId].channels.Length];
+
+                for (int i = 0; i < types.Length; ++i)
+                    types [i] = cards [cardId].channels [i].type;
+
+                return types;
+            }
+
+            return null;
+        }
+
+        public static AnalogType GetAnalogType (IndividualControl ic) {
+            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
+                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length))
+                    return cards [ic.Group].channels [ic.Individual].type;
+            }
+
+            return AnalogType.None;
+        }
+
+        public static float[] GetAllValues (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                float[] types = new float[cards [cardId].channels.Length];
+
+                for (int i = 0; i < types.Length; ++i)
+                    types [i] = cards [cardId].channels [i].ValueControl.value;
+
+                return types;
+            }
+
+            return null;
+        }
+
+        public static float GetValue (IndividualControl ic) {
+            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
+                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length))
+                    return cards [ic.Group].channels [ic.Individual].ValueControl.value;
+            }
+
+            return 0.0f;
         }
     }
 }

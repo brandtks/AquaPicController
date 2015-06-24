@@ -14,7 +14,7 @@ namespace AquaPic
     {
         private int fixtureID;
         private TouchComboBox combo;
-        private LightingModeSlider modeSelector;
+        private ModeSelector modeSelector;
         private TouchLayeredProgressBar dimmingProgressBar;
         private TouchLabel dimmingHeader;
         private TouchTextBox dimmingTextBox;
@@ -136,7 +136,7 @@ namespace AquaPic
             Put (dimmingHeader, 615, 77);
             dimmingHeader.Show ();
 
-            modeSelector = new LightingModeSlider ();
+            modeSelector = new ModeSelector ();
             modeSelector.SelectorChangedEvent += OnSelectorChanged;
             Put (modeSelector, 630, 105);
             modeSelector.Show ();

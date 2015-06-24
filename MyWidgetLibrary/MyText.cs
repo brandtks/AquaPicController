@@ -20,6 +20,8 @@ namespace MyWidgetLibrary
             textWrap = MyTextWrap.WordWrap;
         }
 
+        public MyText () : this (string.Empty) { }
+
         public static implicit operator MyText (string name) {
             return new MyText (name);
         }
@@ -105,7 +107,7 @@ namespace MyWidgetLibrary
         public string fontName;
 
         public MyFont () {
-            color = "black";
+            color = "white";
             size = 11;
             fontName = "Courier New";
         }

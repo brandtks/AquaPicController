@@ -51,7 +51,7 @@ namespace MyWidgetLibrary
                 int width = Allocation.Width;
                 int height = Allocation.Height;
 
-                if (orientation == MyOrientation.Vertical) {
+                if (_orient == MyOrientation.Vertical) {
                     cr.Rectangle (left, top, width, height);
                     colorBackground.SetSource (cr);
                     cr.Fill ();
@@ -73,7 +73,7 @@ namespace MyWidgetLibrary
         }
 
         protected void DrawPrimary (Context cr) {
-            if (orientation == MyOrientation.Vertical) {
+            if (_orient == MyOrientation.Vertical) {
                 int height = Allocation.Height;
                 int difference = (int)(height * currentProgress);
                 int top = Allocation.Top;
@@ -85,7 +85,7 @@ namespace MyWidgetLibrary
         }
 
         protected void DrawSecondary (Context cr) {
-            if (orientation == MyOrientation.Vertical) {
+            if (_orient == MyOrientation.Vertical) {
                 int height = Allocation.Height;
                 int difference = (int)(height * currentProgressSecondary);
                 int top = Allocation.Top;

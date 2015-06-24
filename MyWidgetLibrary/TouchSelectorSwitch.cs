@@ -96,14 +96,6 @@ namespace MyWidgetLibrary
             BkgndColorOptions [selectionIndex].ChangeColor (R, G, B);
         }
 
-//        public void AddSelectedTextColorOption (int selectionIndex, string colorName) {
-//            TextColorOptions [selectionIndex].ChangeColor (colorName);
-//        }
-
-//        public void AddSelectedNameOption (int selectionIndex, string name) {
-//            TextOptions [selectionIndex] = name;
-//        }
-
         protected void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 int height = Allocation.Height;

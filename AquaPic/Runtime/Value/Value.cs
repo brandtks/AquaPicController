@@ -9,10 +9,7 @@ namespace AquaPic.Runtime
     {
         public ValueGetterHandler ValueGetter;
         public ValueSetterHandler ValueSetter;
-        private float value;
-
-        public Value () {
-        }
+        public float value;
 
         public void Execute () {
             float newValue = 0.0f;

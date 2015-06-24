@@ -122,7 +122,7 @@ namespace AquaPic
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            int id = Lighting.GetLightIndex (e.ActiveText);
+            int id = Temperature.GetHeaterIndex (e.ActiveText);
             if (id != -1) {
                 heaterId = id;
                 GetHeaterData ();
@@ -131,7 +131,7 @@ namespace AquaPic
 
         protected void GetHeaterData () {
             if (Temperature.ControlsTemperature (heaterId)) {
-                heaterLabel.text = "Heater control based upon global setpoints";
+                heaterLabel.text = string.Format ("{0} control based upon global setpoints", Temperature.GetHeaterName (heaterId));
                 setpoint.Visible = false;
                 deadband.Visible = false;
             } else {

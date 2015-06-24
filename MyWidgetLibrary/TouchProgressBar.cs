@@ -17,6 +17,7 @@ namespace MyWidgetLibrary
 
     public class TouchProgressBar : EventBox
     {
+        protected MyOrientation _orient;
         private float _currentProgress;
         public float currentProgress {
             get {
@@ -35,7 +36,6 @@ namespace MyWidgetLibrary
         public MyColor colorBackground;
         public MyColor colorProgress;
         public bool enableTouch;
-        public MyOrientation orientation;
 
         public event ProgressChangeEventHandler ProgressChangedEvent;
         public event ProgressChangeEventHandler ProgressChangingEvent;
@@ -57,11 +57,11 @@ namespace MyWidgetLibrary
             this.colorProgress = colorProgress;
             this._currentProgress = currentProgress;
             this.enableTouch = enableTouch;
-            this.orientation = orientation;
+            _orient = orientation;
             this.timerId = 0;
             this.clicked = false;
 
-            if (this.orientation == MyOrientation.Vertical) {
+            if (_orient == MyOrientation.Vertical) {
                 this.WidthRequest = 30;
                 this.HeightRequest = 200;
             } else {
@@ -78,6 +78,10 @@ namespace MyWidgetLibrary
             : this (new MyColor ("grey4"), new MyColor ("pri"), 0.0f, false, MyOrientation.Vertical) { 
         }
 
+        public TouchProgressBar (MyOrientation orientation)
+            : this (new MyColor ("grey4"), new MyColor ("pri"), 0.0f, false, orientation) {
+        }
+
         protected void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 int left = Allocation.Left;
@@ -86,7 +90,7 @@ namespace MyWidgetLibrary
                 int height = Allocation.Height;
                 int difference;
 
-                if (orientation == MyOrientation.Vertical) {
+                if (_orient == MyOrientation.Vertical) {
                     cr.Rectangle (left, top, width, height);
                     colorBackground.SetSource (cr);
                     cr.Fill ();
@@ -94,6 +98,15 @@ namespace MyWidgetLibrary
                     difference = (int)(height * _currentProgress);
                     top += (height - difference);
                     cr.Rectangle (left, top, width, difference);
+                    colorProgress.SetSource (cr);
+                    cr.Fill ();
+                } else {
+                    cr.Rectangle (left, top, width, height);
+                    colorBackground.SetSource (cr);
+                    cr.Fill ();
+
+                    difference = (int)(width * _currentProgress);
+                    cr.Rectangle (left, top, difference, height);
                     colorProgress.SetSource (cr);
                     cr.Fill ();
                 }
@@ -118,7 +131,7 @@ namespace MyWidgetLibrary
             if (clicked) {
                 int x, y;
                 GetPointer (out x, out y);
-                if (orientation == MyOrientation.Vertical)
+                if (_orient == MyOrientation.Vertical)
                     _currentProgress = (float)(Allocation.Height - y) / (float)Allocation.Height;
                 else
                     _currentProgress = (float)(Allocation.Width - x) / (float)Allocation.Width;

@@ -89,7 +89,7 @@ namespace AquaPic.Modules
         public static void Run () {
             temperature = 0.0f;
             foreach (var ch in channels)
-                temperature += AnalogInput.GetAnalogValue (ch);
+                temperature += AnalogInput.GetValue (ch);
             temperature /= channels.Count;
 
             temperature = temperature.Map (0, 4096, 32.0f, 100.0f);
@@ -106,6 +106,13 @@ namespace AquaPic.Modules
             for (int i = 0; i < heaters.Count; ++i)
                 names [i] = heaters [i].name;
             return names;
+        }
+
+        public static string GetHeaterName (int heaterId) {
+            if ((heaterId >= 0) && (heaterId < heaters.Count)) {
+                return heaters [heaterId].name;
+            }
+            return string.Empty;
         }
 
         public static int GetHeaterIndex (string name) {

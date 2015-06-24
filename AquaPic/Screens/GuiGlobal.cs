@@ -19,7 +19,9 @@ namespace AquaPic
             { "Menu", new ScreenData ("Menu", false, (options) => {return new MenuWindow (options);}) },
             { "Edit Plugin", new ScreenData ("Edit Plugin", false, (options) => {return new EditPluginWindow (options);}) },
             { "Alarms", new ScreenData ("Alarms", true, (options) => {return new AlarmWindow (options);}) },
-            { "Logger", new ScreenData ("Logger", true, (options) => {return new LoggerWindow (options);}) }
+            { "Logger", new ScreenData ("Logger", true, (options) => {return new LoggerWindow (options);}) },
+            { "Analog Output", new ScreenData ("Analog Output", true, (options) => {return new AnalogOutputWindow (options);}) },
+            { "Analog Input", new ScreenData ("Analog Input", true, (options) => {return new AnalogInputWindow (options);}) }
         };
         public static string currentScreen;
 

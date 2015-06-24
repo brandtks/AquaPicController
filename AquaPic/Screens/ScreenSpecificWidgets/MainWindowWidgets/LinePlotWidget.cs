@@ -63,6 +63,7 @@ namespace AquaPic
             //<TEMPORARY> just here until I get a plot library and data logging
             var label1 = new TouchLabel ();
             label1.text = "Not Implemented: For line plot";
+            label1.textColor = "black";
             label1.WidthRequest = 320;
             Put (label1, 120, 5);
 

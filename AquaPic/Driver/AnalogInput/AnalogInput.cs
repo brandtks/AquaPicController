@@ -43,31 +43,69 @@ namespace AquaPic.Drivers
             }
         }
 
-        public static float GetAnalogValue (IndividualControl channel, bool realTimeUpdate = false) {
-            if (realTimeUpdate) {
-                cards [channel.Group].GetValue ((byte)channel.Individual);
-                while (cards [channel.Group].updating)
-                    continue;
-            }
-            return cards [channel.Group].channels [channel.Individual].value;
+        public static float GetValue (IndividualControl channel, bool realTimeUpdate = false) {
+            return GetValue (channel.Group, channel.Individual, realTimeUpdate);
         }
 
-        public static float GetInputValue (int card, int channel, bool realTimeUpdate = false) {
-            if (realTimeUpdate) {
-                cards [card].GetValue ((byte)channel);
-                while (cards [card].updating)
-                    continue;
+        public static float GetValue (int card, int channel, bool realTimeUpdate = false) {
+            if ((card >= 0) && (card < cards.Count)) {
+                if (realTimeUpdate) {
+                    cards [card].GetValue ((byte)channel);
+                    while (cards [card].updating)
+                        continue;
+                }
+
+                if ((channel >= 0) && (channel < cards [card].channels.Length)) {
+                    return cards [card].channels [channel].value;
+                }
+
+                return 0.0f;
             }
 
-            return cards [card].channels [channel].value;
+            return 0.0f;
+        }
+
+        public static float[] GetAllValues (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                float[] types = new float[cards [cardId].channels.Length];
+
+                for (int i = 0; i < types.Length; ++i)
+                    types [i] = cards [cardId].channels [i].value;
+
+                return types;
+            }
+
+            return null;
         }
 
         public static int GetCardIndex (string name) {
             for (int i = 0; i < cards.Count; ++i) {
-                if (cards [i].name == name)
+                if (string.Equals (cards [i].name, name, StringComparison.InvariantCultureIgnoreCase))
                     return i;
             }
             return -1;
+        }
+
+        public static string[] GetAllCardNames () {
+            string[] names = new string[cards.Count];
+
+            for (int i = 0; i < cards.Count; ++i)
+                names [i] = cards [i].name;
+
+            return names;
+        }
+
+        public static string[] GetAllChannelNames (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                string[] names = new string[cards [cardId].channels.Length];
+
+                for (int i = 0; i < names.Length; ++i)
+                    names [i] = cards [cardId].channels [i].name;
+
+                return names;
+            }
+
+            return null;
         }
     }
 }
