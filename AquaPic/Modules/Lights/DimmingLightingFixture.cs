@@ -63,6 +63,8 @@ namespace AquaPic.Modules
                 Power.AddHandlerOnAuto (
                     plug,
                     (sender, args) => dimmingMode = Mode.Auto);
+
+                MainWindowWidgets.barPlots.Add (name, new BarPlotData (() => {return new DimmingLightBarPlot (name, () => {return currentDimmingLevel;});}));
             }
 
             public float SetDimmingLevel () {
