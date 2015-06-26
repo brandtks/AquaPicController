@@ -6,7 +6,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic
 {
-    public class PluginWindow : MyBackgroundWidget
+    public class PluginWindow : WindowBase
     {
         public PluginWindow (params object[] options) : base () {
             var box = new MyBox (780, 395);

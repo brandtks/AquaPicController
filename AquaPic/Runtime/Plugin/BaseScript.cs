@@ -97,18 +97,16 @@ namespace AquaPic.Runtime
             }
         }
 
-        public virtual object OneShotRun () {
+        public virtual void OneShotRun (ref object rtnValue) {
             if (flags.HasFlag (ScriptFlags.Compiled | ScriptFlags.Event)) {
                 try {
                     var i = instance as IEventScript;
-                    return i.OneShotRun ();
+                    i.OneShotRun (ref rtnValue);
                 } catch (Exception ex) {
                     flags &= ~ScriptFlags.Compiled;
                     errors.Add (new ScriptMessage ("RunPlugin", "  " + ex.ToString ()));
                 }
             }
-
-            return null;
         }
     }
 }

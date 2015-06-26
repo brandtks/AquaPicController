@@ -7,7 +7,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic
 {
-    public class EditPluginWindow : MyBackgroundWidget
+    public class EditPluginWindow : WindowBase
     {
         protected TextView tv;
         protected VScrollbar vsb;

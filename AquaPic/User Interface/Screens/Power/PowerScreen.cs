@@ -11,7 +11,7 @@ using AquaPic.Utilites;
 
 namespace AquaPic
 {
-    public class PowerWindow : MyBackgroundWidget
+    public class PowerWindow : WindowBase
     {
         private PowerOutletSlider[] selectors;
         private int powerID;
@@ -35,10 +35,12 @@ namespace AquaPic
 
                 if (i < 4) {
                     x = (i * 190) + 25;
-                    y = 135;
+                    //y = 135;
+                    y = 85;
                 } else {
                     x = ((i - 4) * 190) + 25;
-                    y = 215;
+                    //y = 215;
+                    y = 240;
                 }
                 Put (selectors [i], x, y);
 
@@ -150,14 +152,8 @@ namespace AquaPic
                     selectors [args.outletID].Status.text = "Off";
                     selectors [args.outletID].Status.textColor = "grey4";
                 }
-
-                // have to call QueueDrawArea because there is text that needs to be draw
-                // outside the widgets allocated area
-                selectors [args.outletID].QueueDrawArea (
-                    Allocation.Left, 
-                    Allocation.Top - 10, 
-                    Allocation.Width, 
-                    Allocation.Height + 10);
+                   
+                selectors [args.outletID].QueueDraw ();
             }
         }
     }

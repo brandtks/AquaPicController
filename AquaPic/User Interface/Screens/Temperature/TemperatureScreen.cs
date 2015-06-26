@@ -6,7 +6,7 @@ using AquaPic.Modules;
 
 namespace AquaPic
 {
-    public class TemperatureWindow : MyBackgroundWidget
+    public class TemperatureWindow : WindowBase
     {
         TouchComboBox combo;
         TouchLabelTextBox setpoint;

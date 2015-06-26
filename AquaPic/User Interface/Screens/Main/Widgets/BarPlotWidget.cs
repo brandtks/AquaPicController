@@ -36,10 +36,12 @@ namespace AquaPic
                 return bar.currentProgress;
             }
             set {
-                bar.currentProgress = value / 100;
+                bar.currentProgress = value / fullScale;
                 textBox.text = value.ToString ("F1");
             }
         }
+
+        public float fullScale;
 
         private TouchProgressBar bar;
         private TouchTextBox textBox;
@@ -61,6 +63,8 @@ namespace AquaPic
             bar.HeightRequest = 168;
             bar.WidthRequest = 20;
             Put (bar, 83, 22);
+
+            fullScale = 100.0f;
 
             textBox = new TouchTextBox ();
             textBox.WidthRequest = 75;

@@ -6,7 +6,7 @@ using MyWidgetLibrary;
 
 namespace AquaPic
 {
-    public class MenuWindow : MyBackgroundWidget
+    public class MenuWindow : WindowBase
     {
         public MenuWindow (params object[] options) : base () {
             var box = new MyBox (780, 395);

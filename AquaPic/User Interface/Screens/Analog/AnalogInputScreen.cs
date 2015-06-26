@@ -7,7 +7,7 @@ using AquaPic.Utilites;
 
 namespace AquaPic
 {
-    public class AnalogInputWindow : MyBackgroundWidget
+    public class AnalogInputWindow : WindowBase
     {
         TouchComboBox combo;
         int cardId;

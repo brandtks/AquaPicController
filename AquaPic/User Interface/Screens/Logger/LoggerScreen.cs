@@ -9,7 +9,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic
 {
-    public class LoggerWindow : MyBackgroundWidget
+    public class LoggerWindow : WindowBase
     {
         private TextView tv;
 

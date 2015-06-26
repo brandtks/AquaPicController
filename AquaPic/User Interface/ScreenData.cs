@@ -3,7 +3,7 @@ using MyWidgetLibrary;
 
 namespace AquaPic
 {
-    public delegate MyBackgroundWidget CreateInstanceHandler (params object[] options);
+    public delegate WindowBase CreateInstanceHandler (params object[] options);
 
     public class ScreenData
     {
@@ -17,7 +17,7 @@ namespace AquaPic
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 
-        public MyBackgroundWidget CreateInstance (params object[] options) {
+        public WindowBase CreateInstance (params object[] options) {
             if (CreateInstanceEvent != null)
                 return CreateInstanceEvent (options);
             else

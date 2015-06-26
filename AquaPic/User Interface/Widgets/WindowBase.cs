@@ -6,11 +6,11 @@ using MyWidgetLibrary;
 
 namespace AquaPic
 {
-    public class MyBackgroundWidget : Fixed
+    public class WindowBase : Fixed
     {
 //        private Image background;
 
-        public MyBackgroundWidget () {
+        public WindowBase () {
             SetSizeRequest (800, 416);
 
 //            Gdk.Pixbuf display = new Gdk.Pixbuf("images/background2.jpg");

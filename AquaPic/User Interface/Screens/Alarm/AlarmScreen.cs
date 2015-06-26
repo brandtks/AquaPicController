@@ -8,7 +8,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic
 {
-    public class AlarmWindow : MyBackgroundWidget
+    public class AlarmWindow : WindowBase
     {
         private TextView tv;
         private uint timerId;

@@ -32,7 +32,7 @@ namespace AquaPic.Runtime
 
     public interface IEventScript : IScript
     {
-        object OneShotRun ();
+        void OneShotRun (ref object rtnValue);
     }
 
     public interface IModuleScript : ICyclicScript, IEventScript

@@ -11,7 +11,7 @@ using AquaPic.Utilites;
 
 namespace AquaPic
 {
-    public class MainWindow : MyBackgroundWidget
+    public class MainWindow : WindowBase
     {
 //        LinePlotWidget phPlot;
 //        LinePlotWidget tempPlot;

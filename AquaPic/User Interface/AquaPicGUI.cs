@@ -13,7 +13,7 @@ namespace AquaPic
         private Process simulator;
         #endif
 
-        MyBackgroundWidget current;
+        WindowBase current;
         Fixed f;
         MyMenuBar menu;
 

@@ -10,7 +10,7 @@ using AquaPic.Utilites;
 
 namespace AquaPic
 {
-    public class LightingWindow : MyBackgroundWidget
+    public class LightingWindow : WindowBase
     {
         private int fixtureID;
         private TouchComboBox combo;
