@@ -20,6 +20,7 @@ namespace MyWidgetLibrary
         public MyColor textColor;
         public int textSize;
         public MyAlignment textAlignment;
+        public MyColor bkgndColor;
         public bool enableTouch;
         public event TextChangedHandler TextChangedEvent;
 
@@ -31,6 +32,8 @@ namespace MyWidgetLibrary
             this.textColor = new MyColor ("black");
             this.textSize = 11;
             this.textAlignment = MyAlignment.Left;
+
+            bkgndColor = "grey4";
 
             this.WidthRequest = 100;
             this.HeightRequest = 30;
@@ -47,7 +50,7 @@ namespace MyWidgetLibrary
                 int height = Allocation.Height;
 
                 WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, 3);
-                cr.SetSourceRGB (0.85, 0.85, 0.85);
+                bkgndColor.SetSource (cr);
                 cr.FillPreserve ();
                 cr.SetSourceRGB (0.0, 0.0, 0.0);
                 cr.LineWidth = 0.75;

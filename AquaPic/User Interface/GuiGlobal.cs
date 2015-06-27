@@ -20,7 +20,8 @@ namespace AquaPic
             { "Alarms", new ScreenData ("Alarms", true, (options) => {return new AlarmWindow (options);}) },
             { "Logger", new ScreenData ("Logger", true, (options) => {return new LoggerWindow (options);}) },
             { "Analog Output", new ScreenData ("Analog Output", true, (options) => {return new AnalogOutputWindow (options);}) },
-            { "Analog Input", new ScreenData ("Analog Input", true, (options) => {return new AnalogInputWindow (options);}) }
+            { "Analog Input", new ScreenData ("Analog Input", true, (options) => {return new AnalogInputWindow (options);}) },
+            { "Digital Input", new ScreenData ("Digital Input", true, (options) => {return new DigitalInputWindow (options);}) }
         };
         public static string currentScreen;
 

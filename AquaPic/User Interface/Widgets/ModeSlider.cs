@@ -7,7 +7,7 @@ namespace AquaPic
 {
     public class ModeSelector : TouchSelectorSwitch
     {
-        private string[] labels;
+        public string[] labels;
 
         public ModeSelector () : base (0, 2, 0, MyOrientation.Horizontal) {
             SliderSize = MySliderSize.Large;

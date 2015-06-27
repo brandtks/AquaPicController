@@ -59,10 +59,106 @@ namespace AquaPic.Drivers
 
         public static int GetCardIndex (string name) {
             for (int i = 0; i < cards.Count; ++i) {
-                if (cards [i].name == name)
+                if (string.Equals (cards [i].name, name, StringComparison.InvariantCultureIgnoreCase))
                     return i;
             }
+
             return -1;
+        }
+
+        public static int GetInputIndex (int cardId, string name) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                for (int i = 0; i < cards [cardId].inputs.Length; ++i) {
+                    if (string.Equals (cards [cardId].inputs [i].name, name, StringComparison.InvariantCultureIgnoreCase))
+                        return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public static string[] GetAllCardNames () {
+            string[] names = new string[cards.Count];
+
+            for (int i = 0; i < cards.Count; ++i)
+                names [i] = cards [i].name;
+
+            return names;
+        }
+
+        public static string[] GetAllInputNames (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                string[] names = new string[cards [cardId].inputs.Length];
+
+                for (int i = 0; i < names.Length; ++i)
+                    names [i] = cards [cardId].inputs [i].name;
+
+                return names;
+            }
+
+            return null;
+        }
+
+        public static bool[] GetAllStates (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                bool[] types = new bool[cards [cardId].inputs.Length];
+
+                for (int i = 0; i < types.Length; ++i)
+                    types [i] = cards [cardId].inputs [i].state;
+
+                return types;
+            }
+
+            return null;
+        }
+
+        public static bool GetState (IndividualControl ic) {
+            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
+                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].inputs.Length))
+                    return cards [ic.Group].inputs [ic.Individual].state;
+            }
+
+            return false;
+        }
+
+        public static void SetState (IndividualControl ic, bool state) {
+            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
+                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].inputs.Length)) {
+                    if (cards [ic.Group].inputs [ic.Individual].mode == Mode.Manual)
+                        cards [ic.Group].inputs [ic.Individual].state = state;
+                    else
+                        throw new Exception ("Can only modify state with input forced");
+                }
+            }
+        }
+
+        public static void SetMode (IndividualControl ic, Mode mode) {
+            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
+                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].inputs.Length))
+                    cards [ic.Group].inputs [ic.Individual].mode = mode;
+            }
+        }
+
+        public static Mode[] GetAllModes (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                Mode[] modes = new Mode[cards [cardId].inputs.Length];
+
+                for (int i = 0; i < modes.Length; ++i)
+                    modes [i] = cards [cardId].inputs [i].mode;
+
+                return modes;
+            }
+
+            return null;
+        }
+
+        public static Mode GetMode (IndividualControl ic) {
+            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
+                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].inputs.Length))
+                    return cards [ic.Group].inputs [ic.Individual].mode;
+            }
+
+            return Mode.Manual;
         }
     }
 }

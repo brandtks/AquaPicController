@@ -68,6 +68,7 @@ namespace AquaPic
             int id = AnalogInput.GetCardIndex (e.ActiveText);
             if (id != -1) {
                 cardId = id;
+                GetCardData ();
             }
         }
 

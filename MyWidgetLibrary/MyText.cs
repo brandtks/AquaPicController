@@ -40,15 +40,15 @@ namespace MyWidgetLibrary
 //            if (orientation == MyOrientation.Horizontal) {
 ////                l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
+            l.Wrap = Pango.WrapMode.Word;
+            l.Width = Pango.Units.FromPixels (width);
+
             if (alignment == MyAlignment.Left)
                 l.Alignment = Pango.Alignment.Left;
             else if (alignment == MyAlignment.Right)
                 l.Alignment = Pango.Alignment.Right;
             else // center
                 l.Alignment = Pango.Alignment.Center;
-
-            l.Wrap = Pango.WrapMode.Word;
-            l.Width = Pango.Units.FromPixels (width);
 
             string displayedText = text;
             if ((l.LineCount > 1) && (textWrap == MyTextWrap.None)) {

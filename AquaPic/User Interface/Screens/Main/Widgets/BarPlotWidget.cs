@@ -56,7 +56,9 @@ namespace AquaPic
             label = new TouchLabel ();
             label.text = "Plot";
             label.textColor = "pri";
-            label.WidthRequest = 187;
+            label.WidthRequest = 100;
+            label.textAlignment = MyAlignment.Center;
+            label.render.textWrap = MyTextWrap.Shrink;
             Put (label, 4, 2);
 
             bar = new TouchProgressBar ();
@@ -72,7 +74,7 @@ namespace AquaPic
             textBox.textSize = 16;
             textBox.text = "0.0";
             textBox.textAlignment = MyAlignment.Center;
-            Put (textBox, 3, 28);
+            Put (textBox, 3, 22);
         }
 
         public virtual void OnUpdate () {

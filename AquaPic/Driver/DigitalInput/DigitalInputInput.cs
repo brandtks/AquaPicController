@@ -1,4 +1,5 @@
 ﻿using System;
+using AquaPic.Utilites;
 
 namespace AquaPic.Drivers
 {
@@ -8,10 +9,12 @@ namespace AquaPic.Drivers
         {
             public bool state;
             public string name;
+            public Mode mode;
 
             public DigitalInputInput (string name) {
                 this.state = false;
                 this.name = name;
+                mode = Mode.Auto;
             }
         }
     }
