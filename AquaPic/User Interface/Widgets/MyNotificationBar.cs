@@ -104,6 +104,9 @@ namespace AquaPic
             List<AlarmData> notAck = Alarm.GetAllNotAcknowledged ();
 
             if (notAck.Count != 0) {
+                if (displayedAlarm >= notAck.Count)
+                    displayedAlarm = 0;
+
                 alarmName = notAck [displayedAlarm].name;
                 displayedAlarm = ++displayedAlarm % notAck.Count;
             } else if (Alarm.AlarmCount () != 0)

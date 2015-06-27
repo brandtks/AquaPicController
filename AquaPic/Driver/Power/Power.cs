@@ -11,7 +11,9 @@ namespace AquaPic.Drivers
         private static List<PowerStrip> pwrStrips = new List<PowerStrip> ();
 
         static Power () {
-            TaskManager.AddCyclicInterrupt ("Power", 250, Run);
+            //<TEST> this doesn't need to be this fast for now
+            //TaskManager.AddCyclicInterrupt ("Power", 250, Run);
+            TaskManager.AddCyclicInterrupt ("Power", 1000, Run);
         }
 
         public static void Run () {

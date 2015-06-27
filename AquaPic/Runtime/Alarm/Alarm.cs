@@ -135,7 +135,7 @@ namespace AquaPic.Runtime
         public static List<AlarmData> GetAllNotAcknowledged () {
             List<AlarmData> notAck = new List<AlarmData> ();
             foreach (var a in alarms) {
-                if (a.alarming && !a.acknowledged)
+                if (!a.acknowledged)
                     notAck.Add (a);
             }
             return notAck;

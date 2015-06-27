@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace AquaPic.Utilites
 {
@@ -8,7 +9,7 @@ namespace AquaPic.Utilites
         public float maxRateOfChange;
 
         public RateOfChangeLimiter (float maxRateOfChange) {
-            this.oldValue = 0.0f;
+            oldValue = 0.0f;
             this.maxRateOfChange = maxRateOfChange;
         }
 
