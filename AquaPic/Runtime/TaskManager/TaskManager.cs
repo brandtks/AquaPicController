@@ -11,13 +11,10 @@ namespace AquaPic.Runtime
 
     public class TaskManager
     {
-        private static List<uint> timerIds = new List<uint> ();
         private static Dictionary<uint, List<ICyclicTask>> cyclicTasks = new Dictionary<uint, List<ICyclicTask>> ();
         private static List<ITodTask> todTasks = new List<ITodTask> ();
 
         static TaskManager () {
-
-
             AddCyclicInterrupt ("TimeOfDayInterrupts", 5000, () => {
                 DateTime now = DateTime.Now;
 
@@ -43,7 +40,7 @@ namespace AquaPic.Runtime
                 uint time = timeInterval;
                 #endif
 
-                uint id = GLib.Timeout.Add (time, () => {
+                GLib.Timeout.Add (time, () => {
                     foreach (var task in cyclicTasks[timeInterval]) {
                         try {
                             task.OnRun ();
@@ -55,18 +52,10 @@ namespace AquaPic.Runtime
 
                     return true;
                 });
-
-                timerIds.Add (id);
             }
 
             //add the task to the time interval
             cyclicTasks [timeInterval].Add (new ICyclicTask (name, OnRun));
-        }
-
-        public static bool MonitorTimer () {
-            
-
-            return true;
         }
 
         public static void AddTimeOfDayInterrupt (string name, Time time, RunHandler OnRun) {
