@@ -150,10 +150,9 @@ namespace AquaPic
                     new JProperty ("hour", Lighting.maxSunSet.hour.ToString ()), 
                     new JProperty ("minute", Lighting.maxSunSet.min.ToString ()))));
 
-            string path = string.Format (
-                "{0}{1}", 
-                Environment.GetEnvironmentVariable ("AquaPic"), 
-                @"\AquaPicRuntimeProject\Settings\lightingProperties.json");
+            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = System.IO.Path.Combine (path, "Settings");
+            path = System.IO.Path.Combine (path, "lightingProperties.json");
 
             File.WriteAllText (path, jo.ToString ());
 

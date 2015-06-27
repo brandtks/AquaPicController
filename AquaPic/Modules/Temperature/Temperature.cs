@@ -37,10 +37,9 @@ namespace AquaPic.Modules
             heaters = new List<Heater> ();
             channels = new List<IndividualControl> ();
 
-            string path = string.Format (
-                "{0}{1}", 
-                Environment.GetEnvironmentVariable ("AquaPic"), 
-                @"\AquaPicRuntimeProject\Settings\tempProperties.json");
+            string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = Path.Combine (path, "Settings");
+            path = Path.Combine (path, "tempProperties.json");
 
             using (StreamReader reader = File.OpenText (path)) {
                 JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));

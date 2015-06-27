@@ -92,10 +92,9 @@ namespace AquaPic
             linePlots = new List<LinePlotWidget> ();
             barPlots = new List<BarPlotWidget> ();
 
-            string path = string.Format (
-                "{0}{1}", 
-                Environment.GetEnvironmentVariable ("AquaPic"), 
-                @"\AquaPicRuntimeProject\Settings\MainScreen.json");
+            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = System.IO.Path.Combine (path, "Settings");
+            path = System.IO.Path.Combine (path, "MainScreen.json");
 
             using (StreamReader reader = File.OpenText (path)) {
                 JArray ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));

@@ -52,10 +52,9 @@ namespace AquaPic.Modules
         static Lighting () {
             fixtures = new List<LightingFixture> ();
 
-            string path = string.Format (
-                "{0}{1}", 
-                Environment.GetEnvironmentVariable ("AquaPic"), 
-                @"\AquaPicRuntimeProject\Settings\lightingProperties.json");
+            string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = Path.Combine (path, "Settings");
+            path = Path.Combine (path, "lightingProperties.json");
 
             using (StreamReader reader = File.OpenText (path)) {
                 JObject jo = (JObject)JToken.ReadFrom(new JsonTextReader(reader));

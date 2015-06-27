@@ -103,10 +103,9 @@ namespace AquaPic
 
         protected void SaveEvents () {
             if (!string.IsNullOrWhiteSpace (EventLogger.buffer.Text)) {
-                string path = string.Format (
-                              @"{0}\AquaPicRuntimeProject\Logs\{1:yy-MM-dd-HH-mm-ss}.txt", 
-                              Environment.GetEnvironmentVariable ("AquaPic"),
-                              DateTime.Now);
+                string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+                path = System.IO.Path.Combine (path, "Logs");
+                path = System.IO.Path.Combine (path, DateTime.Now.ToString ("yy-MM-dd-HH-mm-ss") + ".txt");
 
                 List<string> lines = new List<string> ();
                 for (int i = 0; i < EventLogger.buffer.LineCount; ++i) {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Text;
 
@@ -29,13 +30,12 @@ namespace AquaPic.Runtime
             Assembly pluginAssembly = null;
             try {
                 if (Plugin.CompileCode (this)) {
-                    StringBuilder sb = new StringBuilder ();
-                    sb.Append (Environment.GetEnvironmentVariable ("AquaPic"));
-                    sb.Append (@"\AquaPicRuntimeProject\Scripts\dll\");
-                    sb.Append (name);
-                    sb.Append (".dll");
+                    var dllPath = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+                    dllPath = Path.Combine (dllPath, "Scripts");
+                    dllPath = Path.Combine (dllPath, "dll");
+                    dllPath = Path.Combine (dllPath, name + ".dll");
 
-                    pluginAssembly = Assembly.LoadFrom (sb.ToString ());
+                    pluginAssembly = Assembly.LoadFrom (dllPath);
                     flags |= ScriptFlags.Compiled;
                 }
             } catch (Exception ex) {

@@ -74,10 +74,9 @@ namespace AquaPic
             jo.Add (new JProperty ("tempSetpoint", Temperature.temperatureSetpoint.ToString ()));
             jo.Add (new JProperty ("deadband", (Temperature.temperatureDeadband * 2).ToString ()));
 
-            string path = string.Format (
-                "{0}{1}", 
-                Environment.GetEnvironmentVariable ("AquaPic"), 
-                @"\AquaPicRuntimeProject\Settings\tempProperties.json");
+            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = System.IO.Path.Combine (path, "Settings");
+            path = System.IO.Path.Combine (path, "tempProperties.json");
 
             File.WriteAllText (path, jo.ToString ());
 
