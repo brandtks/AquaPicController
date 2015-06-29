@@ -35,12 +35,10 @@ namespace AquaPic
 
                 if (i < 4) {
                     x = (i * 190) + 25;
-                    //y = 135;
-                    y = 85;
+                    y = 80;
                 } else {
                     x = ((i - 4) * 190) + 25;
-                    //y = 215;
-                    y = 240;
+                    y = 250;
                 }
                 Put (selectors [i], x, y);
 

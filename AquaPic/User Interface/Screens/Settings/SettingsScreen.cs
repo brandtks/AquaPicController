@@ -8,10 +8,10 @@ namespace AquaPic
     public class SettingsWindow : WindowBase
     {
         public SettingsWindow (params object[] options) : base () {
-            MyAmpMeter am = new MyAmpMeter ();
-            am.currentAmps = 5.54;
-            Put (am, 300, 150);
-            am.Show ();
+            TouchCurvedProgressBar c = new TouchCurvedProgressBar ();
+            c.currentProgress = 0.85f;
+            Put (c, 300, 150);
+            c.Show ();
 
             ShowAll ();
         }
