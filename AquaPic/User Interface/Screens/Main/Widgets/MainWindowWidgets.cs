@@ -10,8 +10,14 @@ namespace AquaPic
         public static Dictionary<string, ButtonData> buttons;
 
         static MainWindowWidgets () {
-            linePlots = new Dictionary<string, LinePlotData> ();
-            barPlots = new Dictionary<string, BarPlotData> ();
+            linePlots = new Dictionary<string, LinePlotData> () {
+                { "Temperature", new LinePlotData (() => {return new TemperatureLinePlot ();}) }
+            };
+
+            barPlots = new Dictionary<string, BarPlotData> () {
+                { "Water Level", new BarPlotData (() => {return new WaterLevelWidget ();}) }
+            };
+
             buttons = new Dictionary<string, ButtonData> ();
         }
     }

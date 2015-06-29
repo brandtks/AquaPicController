@@ -62,8 +62,6 @@ namespace AquaPic.Modules
             temperature = 32.0f;
 
             TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);
-
-            MainWindowWidgets.linePlots.Add ("Temperature", new LinePlotData (() => {return new TemperatureLinePlot ();}));
         }
 
         public static void AddTemperatureProbe (int cardID, int channelID, string name) {
