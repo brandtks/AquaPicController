@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
 using AquaPic.Utilites;
+using AquaPic.Drivers;
 
 namespace AquaPic.Modules
 {
@@ -83,10 +84,78 @@ namespace AquaPic.Modules
                 maxSunSet = new Time (
                     Convert.ToByte (jo ["maxSunSet"] ["hour"]),
                     Convert.ToByte (jo ["maxSunSet"] ["minute"]));
+
+                // Very important to update rise/set times before we setup auto on/off for lighting fixtures
+                UpdateRiseSetTimes ();
+
+                JArray ja = (JArray)jo ["lightingFixtures"];
+                foreach (var jt in ja) {
+                    JObject obj = jt as JObject;
+                    string type = (string)obj ["type"];
+
+                    string name = (string)obj ["name"];
+                    int powerStripId = Power.GetPowerStripIndex ((string)obj ["powerStrip"]);
+                    int outletId = Convert.ToInt32 (obj ["outlet"]);
+                    bool highTempLockout = Convert.ToBoolean (obj ["highTempLockout"]);
+
+                    string lTime = (string)obj ["lightingTime"];
+                    LightingTime lightingTime;
+                    if (string.Equals (lTime, "night", StringComparison.InvariantCultureIgnoreCase)) {
+                        lightingTime = LightingTime.Nighttime;
+                    } else {
+                        lightingTime = LightingTime.Daytime;
+                    }
+
+                    int lightingId;
+                    if (string.Equals (type, "dimming", StringComparison.InvariantCultureIgnoreCase)) {
+                        int cardId = AnalogOutput.GetCardIndex ((string)obj ["dimmingCard"]);
+                        int channelId = Convert.ToInt32 (obj ["channel"]);
+                        float minDimmingOutput = Convert.ToSingle (obj ["minDimmingOutput"]);
+                        float maxDimmingOutput = Convert.ToSingle (obj ["maxDimmingOutput"]);
+
+                        string aType = (string)obj ["analogType"];
+                        AnalogType analogType;
+                        if (string.Equals (aType, "ZeroTen", StringComparison.InvariantCultureIgnoreCase)) {
+                            analogType = AnalogType.ZeroTen;
+                        } else {
+                            analogType = AnalogType.PWM;
+                        }
+
+                        lightingId = AddLight (
+                            name,
+                            powerStripId,
+                            outletId,
+                            cardId,
+                            channelId,
+                            minDimmingOutput,
+                            maxDimmingOutput,
+                            analogType,
+                            lightingTime,
+                            highTempLockout
+                        );
+                    } else {
+                        lightingId = AddLight (
+                            name,
+                            powerStripId,
+                            outletId,
+                            lightingTime,
+                            highTempLockout
+                        );
+                    }
+
+                    if (Convert.ToBoolean (obj ["autoTimeUpdate"])) {
+                        int onTimeOffset = Convert.ToInt32 (obj ["onTimeOffset"]);
+                        int offTimeOffset = Convert.ToInt32 (obj ["offTimeOffset"]);
+                        SetupAutoOnOffTime (lightingId, onTimeOffset, offTimeOffset);
+                    }
+                }
             }
 
-            UpdateRiseSetTimes ();
             TaskManager.AddTimeOfDayInterrupt ("RiseSetUpdate", new Time (0, 0), () => UpdateRiseSetTimes ());
+        }
+
+        public static void Init () {
+            EventLogger.Add ("Initializing Lighting");
         }
 
         public static int AddLight (
@@ -153,8 +222,8 @@ namespace AquaPic.Modules
                 type,
                 lightingTime,
                 highTempLockout));
-            
-            return fixtures.Count - 1;
+
+            return GetLightIndex (name);
         }
 
         public static void SetupAutoOnOffTime (

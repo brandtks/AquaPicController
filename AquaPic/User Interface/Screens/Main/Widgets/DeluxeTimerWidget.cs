@@ -150,7 +150,6 @@ namespace AquaPic
         }
 
         protected void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
-            Console.WriteLine ("Timer Widget Elapsed");
             DeluxeTimer timer = sender as DeluxeTimer;
             int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
             if (t == tIdx)

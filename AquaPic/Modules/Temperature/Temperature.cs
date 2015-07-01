@@ -47,6 +47,24 @@ namespace AquaPic.Modules
                 lowTempAlarmSetpoint = Convert.ToSingle (jo ["lowTempAlarmSetpoint"]);
                 temperatureSetpoint = Convert.ToSingle (jo ["tempSetpoint"]);
                 temperatureDeadband = Convert.ToSingle (jo ["deadband"]) / 2;
+
+                JArray ja = (JArray)jo ["temperatureProbes"];
+                foreach (var jt in ja) {
+                    JObject obj = jt as JObject;
+                    string name = (string)obj ["name"];
+                    int cardId = AnalogInput.GetCardIndex ((string)obj ["inputCard"]);
+                    int channelId = Convert.ToInt32 (obj ["channel"]);
+                    AddTemperatureProbe (cardId, channelId, name);
+                }
+
+                ja = (JArray)jo ["heaters"];
+                foreach (var jt in ja) {
+                    JObject obj = jt as JObject;
+                    string name = (string)obj ["name"];
+                    int powerStripId = Power.GetPowerStripIndex ((string)obj ["powerStrip"]);
+                    int outletId = Convert.ToInt32 (obj ["outlet"]);
+                    AddHeater (powerStripId, outletId, name);
+                }
             }
 
             highTempAlarmIdx = Alarm.Subscribe ("High temperature");
@@ -62,6 +80,10 @@ namespace AquaPic.Modules
             temperature = 32.0f;
 
             TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);
+        }
+
+        public static void Init () {
+            EventLogger.Add ("Initializing Temperature");
         }
 
         public static void AddTemperatureProbe (int cardID, int channelID, string name) {

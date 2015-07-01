@@ -3,13 +3,13 @@ using Gtk;
 
 namespace AquaPic.Runtime
 {
-    public class OnDelayTimer : Timer
+    public class OffDelayTimer : Timer
     {
         protected bool timerFinished;
 
-        public OnDelayTimer (uint timeDelay) : base (timeDelay) {
+        public OffDelayTimer (uint timeDelay) : base (timeDelay) {
             autoReset = false;
-            timerFinished = false;
+            timerFinished = true;
             TimerElapsedEvent += OnTimerElapsed;
         }
 
@@ -19,7 +19,7 @@ namespace AquaPic.Runtime
                     Start ();
             } else {
                 if (timerFinished)
-                    timerFinished = false;
+                    timerFinished = true;
                 if (_enabled)
                     Stop ();
             }
@@ -28,7 +28,7 @@ namespace AquaPic.Runtime
         }
 
         protected void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
-            timerFinished = true;
+            timerFinished = false;
         }
     }
 }

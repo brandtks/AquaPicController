@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using AquaPic.Drivers;
+using AquaPic.Modules;
 
 namespace AquaPic.Runtime
 {
@@ -48,6 +49,9 @@ namespace AquaPic.Runtime
                     }
                 }
             }
+
+            Temperature.Init ();
+            Lighting.Init ();
         }
     }
 }

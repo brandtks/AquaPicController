@@ -24,7 +24,19 @@ namespace AquaPic.Runtime
                 states.Add (name, new IState (MyState.Reset));
         }
 
-        public static MyState Toggle (string name) {
+//        public static MyState Toggle (string name) {
+//            if (states.ContainsKey (name)) {
+//                if (states [name].state == MyState.Set)
+//                    states [name].state = MyState.Reset;
+//                else
+//                    states [name].state = MyState.Set;
+//            } else
+//                states.Add (name, new IState (MyState.Set)); // technically we started with the state reset
+//
+//            return states [name].state;
+//        }
+
+        public static bool Toggle (string name) {
             if (states.ContainsKey (name)) {
                 if (states [name].state == MyState.Set)
                     states [name].state = MyState.Reset;
@@ -33,14 +45,21 @@ namespace AquaPic.Runtime
             } else
                 states.Add (name, new IState (MyState.Set)); // technically we started with the state reset
 
-            return states [name].state;
+            return states [name].state == MyState.Set;
         }
 
-        public static MyState Check (string name) {
+//        public static MyState Check (string name) {
+//            if (states.ContainsKey (name))
+//                return states [name].state;
+//            else
+//                return MyState.Invalid;
+//        }
+
+        public static bool Check (string name) {
             if (states.ContainsKey (name))
-                return states [name].state;
+                return states [name].state == MyState.Set;
             else
-                return MyState.Invalid;
+                return false;
         }
     }
 }

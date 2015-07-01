@@ -13,7 +13,7 @@ namespace AquaPic.Runtime
         }
     }
 
-    public class Timer
+    public partial class Timer
     {
         protected bool _enabled;
         public bool enabled {

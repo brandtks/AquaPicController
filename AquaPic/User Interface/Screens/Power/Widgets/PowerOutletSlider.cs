@@ -31,21 +31,23 @@ namespace AquaPic
         }
 
         public PowerOutletSlider (int id) {
-            SetSizeRequest (180, 155);
+            SetSizeRequest (180, 145);
 
-            var box = new MyBox (180, 155);
+            var box = new MyBox (180, 145);
             box.color = "grey3";
             Put (box, 0, 0);
 
             ampBar = new TouchCurvedProgressBar ();
-            Put (ampBar, 10, 5);
+            Put (ampBar, 10, 22);
+            ampBar.Show ();
 
             ampText = new TouchTextBox ();
             ampText.SetSizeRequest( 76, 20);
             ampText.textSize = 10;
             ampText.textAlignment = MyAlignment.Center;
             ampText.text = (ampBar.currentProgress * 10.0f).ToString ("F1");
-            Put (ampText, 52, 64);
+            Put (ampText, 52, 75);
+            ampText.Show ();
 
             ss = new TouchSelectorSwitch (id, 3, 0, MyOrientation.Horizontal);
             ss.SliderSize = MySliderSize.Large;
@@ -56,7 +58,7 @@ namespace AquaPic
             ss.SliderColorOptions [2] = "seca";
             ss.Name = string.Empty;
             ss.ExposeEvent += OnExpose;
-            Put (ss, 5, 105);
+            Put (ss, 5, 110);
             ss.Show ();
 
             labels = new string[3];
@@ -69,16 +71,16 @@ namespace AquaPic
             OutletName.textColor = "grey4";
             OutletName.WidthRequest = 150;
             OutletName.render.textWrap = MyTextWrap.Shrink;
-            Put (OutletName, 15, 85);
+            Put (OutletName, 5, 2);
             OutletName.Show ();
 
             Status = new TouchLabel ();
             Status.text = "Off";
             Status.textSize = 12;
             Status.textColor = "grey4";
-            Status.WidthRequest = 100;
-            Status.textAlignment = MyAlignment.Right;
-            Put (Status, 65, 137);
+            Status.WidthRequest = 66;
+            Status.textAlignment = MyAlignment.Center;
+            Put (Status, 57, 55);
             Status.Show ();
 
             ShowAll ();

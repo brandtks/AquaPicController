@@ -2,6 +2,8 @@
 using Gtk;
 using Cairo;
 using MyWidgetLibrary;
+using AquaPic.Runtime;
+using CSScriptLibrary;
 
 namespace AquaPic
 {
