@@ -9,8 +9,8 @@ namespace AquaPic
     public class TemperatureWindow : WindowBase
     {
         TouchComboBox combo;
-        TouchLabelTextBox setpoint;
-        TouchLabelTextBox deadband;
+        SettingTextBox setpoint;
+        SettingTextBox deadband;
         TouchLabel heaterLabel;
         int heaterId;
 
@@ -85,12 +85,12 @@ namespace AquaPic
             Put (heaterLabel, 410, 77);
             heaterLabel.Show ();
 
-            setpoint = new TouchLabelTextBox ();
+            setpoint = new SettingTextBox ();
             setpoint.label.text = "Setpoint";
             setpoint.textBox.enableTouch = false;
             Put (setpoint, 410, 100);
 
-            deadband = new TouchLabelTextBox ();
+            deadband = new SettingTextBox ();
             deadband.label.text = "Deadband";
             deadband.textBox.enableTouch = false;
             Put (deadband, 410, 135);

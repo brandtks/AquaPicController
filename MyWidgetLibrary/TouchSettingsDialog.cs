@@ -11,7 +11,7 @@ namespace MyWidgetLibrary
     {
         public Fixed fix;
         public event SaveHandler SaveEvent;
-        public Dictionary<string, TouchLabelTextBox> settings;
+        public Dictionary<string, SettingsWidget> settings;
 
         public TouchSettingsDialog (string name) {
             Name = "AquaPic.Settings." + name;
@@ -53,7 +53,7 @@ namespace MyWidgetLibrary
             Add (fix);
             fix.Show ();
 
-            settings = new Dictionary<string, TouchLabelTextBox> ();
+            settings = new Dictionary<string, SettingsWidget> ();
 
             Show ();
         }
@@ -76,6 +76,10 @@ namespace MyWidgetLibrary
                 if (y > 250)
                     throw new Exception ("Too many settings for window");
             }
+        }
+
+        public void AddSetting (SettingsWidget w) {
+            settings.Add (w.label.text, w);
         }
     }
 }

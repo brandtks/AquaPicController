@@ -316,7 +316,7 @@ namespace AquaPic
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            int id = Lighting.GetLightIndex (e.ActiveText);
+            int id = Lighting.GetLightingFixtureIndex (e.ActiveText);
             if (id != -1) {
                 fixtureID = id;
                 GetFixtureData ();

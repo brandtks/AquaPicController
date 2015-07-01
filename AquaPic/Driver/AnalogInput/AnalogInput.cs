@@ -13,6 +13,12 @@ namespace AquaPic.Drivers
             TaskManager.AddCyclicInterrupt ("Analog Input", 1000, Run);
         }
 
+        public static void Run () {
+            for (int i = 0; i < cards.Count; ++i) {
+                cards [i].GetValues ();
+            }
+        }
+
         public static int AddCard (int address, string name) {
             int count = cards.Count;
             cards.Add (new AnalogInputCard ((byte)address, (byte)count, name));
@@ -37,10 +43,22 @@ namespace AquaPic.Drivers
             cards [cardID].AddChannel (channelID, type, name);
         }
 
-        public static void Run () {
-            for (int i = 0; i < cards.Count; ++i) {
-                cards [i].GetValues ();
-            }
+        public static void RemoveChannel (IndividualControl channel) {
+            RemoveChannel (channel.Group, channel.Individual);
+        }
+
+        public static void RemoveChannel (int cardID, int channelID) {
+            if (cardID == -1)
+                throw new Exception ("Card does not exist");
+
+            if ((channelID < 0) || (channelID >= cards [cardID].channels.Length))
+                throw new Exception ("Input ID out of range");
+
+            string s = string.Format ("{0}.i{1}", cards [cardID].name, channelID);
+            cards [cardID].channels [channelID].name = s;
+            cards [cardID].channels [channelID].mode = Mode.Auto;
+            cards [cardID].channels [channelID].value = 0.0f;
+            cards [cardID].channels [channelID].type = AnalogType.None;
         }
 
         public static float GetValue (IndividualControl channel, bool realTimeUpdate = false) {
@@ -108,6 +126,14 @@ namespace AquaPic.Drivers
             return -1;
         }
 
+        public static string GetCardName (int cardId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                return cards [cardId].name;
+            }
+
+            return string.Empty;
+        }
+
         public static string[] GetAllCardNames () {
             string[] names = new string[cards.Count];
 
@@ -157,6 +183,19 @@ namespace AquaPic.Drivers
             }
 
             return Mode.Manual;
+        }
+
+        public static string[] GetAllAvaiableChannels () {
+            List<string> availCh = new List<string> ();
+            foreach (var card in cards) {
+                for (int i = 0; i < card.channels.Length; ++i) {
+                    string s = string.Format ("{0}.i{1}", card.name, i);
+                    if (s == card.channels [i].name)
+                        availCh.Add (s);
+                }
+            }
+
+            return availCh.ToArray ();
         }
     }
 }

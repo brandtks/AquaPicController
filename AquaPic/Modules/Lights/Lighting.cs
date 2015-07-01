@@ -223,7 +223,7 @@ namespace AquaPic.Modules
                 lightingTime,
                 highTempLockout));
 
-            return GetLightIndex (name);
+            return GetLightingFixtureIndex (name);
         }
 
         public static void SetupAutoOnOffTime (
@@ -293,7 +293,7 @@ namespace AquaPic.Modules
                 sunSetTomorrow.SetTime (maxSunSet);
         }
 
-        public static int GetLightIndex (string name) {
+        public static int GetLightingFixtureIndex (string name) {
             for (int i = 0; i < fixtures.Count; ++i) {
                 if (fixtures [i].name == name)
                     return i;

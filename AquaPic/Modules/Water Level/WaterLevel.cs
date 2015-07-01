@@ -14,13 +14,13 @@ namespace AquaPic.Modules
     public class WaterLevel
     {
         private static float _waterLevel;
-        private static IndividualControl levelSensor;
         private static int lowAlarm;
         private static int highAlarm;
         private static int probeAlarm;
 
         public static float highLevelAlarmSetpoint;
         public static float lowLevelAlarmSetpoint;
+        public static IndividualControl levelSensor;
 
         public static float waterLevel {
             get {

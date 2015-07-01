@@ -15,22 +15,22 @@ namespace AquaPic
         public TemperatureSettings () : base ("Temperature") {
             SaveEvent += OnSave;
 
-            var t = new TouchLabelTextBox ();
+            var t = new SettingTextBox ();
             t.label.text = "Setpoint";
             t.textBox.text = Temperature.temperatureSetpoint.ToString ();
             settings.Add (t.label.text, t);
 
-            t = new TouchLabelTextBox ();
+            t = new SettingTextBox ();
             t.label.text = "Deadband";
             t.textBox.text = (Temperature.temperatureDeadband * 2).ToString ();
             settings.Add (t.label.text, t);
 
-            t = new TouchLabelTextBox ();
+            t = new SettingTextBox ();
             t.label.text = "High Alarm";
             t.textBox.text = Temperature.highTempAlarmSetpoint.ToString ();
             settings.Add (t.label.text, t);
 
-            t = new TouchLabelTextBox ();
+            t = new SettingTextBox ();
             t.label.text = "Low Alarm";
             t.textBox.text = Temperature.lowTempAlarmSetpoint.ToString ();
             settings.Add (t.label.text, t);
@@ -40,28 +40,28 @@ namespace AquaPic
 
         protected bool OnSave (object sender) {
             try {
-                Temperature.temperatureSetpoint = Convert.ToSingle (settings ["Setpoint"].textBox.text);
+                Temperature.temperatureSetpoint = Convert.ToSingle (((SettingTextBox)settings ["Setpoint"]).textBox.text);
             } catch {
                 MessageBox.Show ("Improper setpoint format");
                 return false;
             }
 
             try {
-                Temperature.temperatureDeadband = Convert.ToSingle (settings ["Deadband"].textBox.text) / 2;
+                Temperature.temperatureDeadband = Convert.ToSingle (((SettingTextBox)settings ["Deadband"]).textBox.text) / 2;
             } catch {
                 MessageBox.Show ("Improper deadband format");
                 return false;
             }
 
             try {
-                Temperature.highTempAlarmSetpoint = Convert.ToSingle (settings ["High Alarm"].textBox.text);
+                Temperature.highTempAlarmSetpoint = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
             } catch {
                 MessageBox.Show ("Improper high alarm setpoint format");
                 return false;
             }
 
             try {
-                Temperature.lowTempAlarmSetpoint = Convert.ToSingle (settings ["Low Alarm"].textBox.text);
+                Temperature.lowTempAlarmSetpoint = Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text);
             } catch {
                 MessageBox.Show ("Improper low alarm setpoint format");
                 return false;

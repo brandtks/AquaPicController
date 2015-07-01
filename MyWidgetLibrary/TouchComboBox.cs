@@ -23,12 +23,19 @@ namespace MyWidgetLibrary
         public List<string> List;
         public string NonActiveMessage;
         public int Active;
+        public string activeText {
+            get {
+                if (Active != -1)
+                    return List [Active];
+                else
+                    return string.Empty;
+            }
+        }
 
         private bool listDropdown;
         private bool secondClick;
         private int highlighted;
         private int height;
-
 
         public event ComboBoxChangedEventHandler ChangedEvent;
 
@@ -128,13 +135,19 @@ namespace MyWidgetLibrary
                     else
                         text = List [Active];
 
-                    Pango.Layout l = new Pango.Layout (PangoContext);
-                    l.Width = Pango.Units.FromPixels (width - height);
-                    l.Alignment = Pango.Alignment.Left;
-                    l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
-                    l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
-                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, top + 6, l);
-                    l.Dispose ();
+//                    Pango.Layout l = new Pango.Layout (PangoContext);
+//                    l.Width = Pango.Units.FromPixels (width - height);
+//                    l.Alignment = Pango.Alignment.Left;
+//                    l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
+//                    l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+//                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, top + 6, l);
+//                    l.Dispose ();
+
+                    MyText t = new MyText (text);
+                    t.textWrap = MyTextWrap.Shrink;
+                    t.font.color = "black";
+                    int w = width - height - 10;
+                    t.Render (this, left + 10, top + 6, w);
                 }
             }
         }

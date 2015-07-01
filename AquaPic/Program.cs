@@ -26,8 +26,8 @@ namespace AquaPic
             
             Plugin.AddPlugins ();
 
-            //string RESOURCE_FILE = @"C:\Program Files (x86)\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
-            string RESOURCE_FILE = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
+            string RESOURCE_FILE = @"C:\Program Files (x86)\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
+            //string RESOURCE_FILE = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
             Gtk.Rc.AddDefaultFile (RESOURCE_FILE);
             Gtk.Rc.Parse (RESOURCE_FILE);
 
