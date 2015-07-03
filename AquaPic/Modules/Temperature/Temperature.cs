@@ -26,7 +26,7 @@ namespace AquaPic.Modules
         public static float temperatureDeadband;
 
         private static List<Heater> heaters;
-        public static List<IndividualControl> channels;
+        private static List<TemperatureProbe> probes;
 
         private static float temperature;
         public static float WaterTemperature {
@@ -35,7 +35,8 @@ namespace AquaPic.Modules
 
         static Temperature () {
             heaters = new List<Heater> ();
-            channels = new List<IndividualControl> ();
+            probes = new List<TemperatureProbe> ();
+
 
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
@@ -54,7 +55,7 @@ namespace AquaPic.Modules
                     string name = (string)obj ["name"];
                     int cardId = AnalogInput.GetCardIndex ((string)obj ["inputCard"]);
                     int channelId = Convert.ToInt32 (obj ["channel"]);
-                    AddTemperatureProbe (cardId, channelId, name);
+                    AddTemperatureProbe (name, cardId, channelId);
                 }
 
                 ja = (JArray)jo ["heaters"];
@@ -63,7 +64,7 @@ namespace AquaPic.Modules
                     string name = (string)obj ["name"];
                     int powerStripId = Power.GetPowerStripIndex ((string)obj ["powerStrip"]);
                     int outletId = Convert.ToInt32 (obj ["outlet"]);
-                    AddHeater (powerStripId, outletId, name);
+                    AddHeater (name, powerStripId, outletId);
                 }
             }
 
@@ -86,32 +87,12 @@ namespace AquaPic.Modules
             EventLogger.Add ("Initializing Temperature");
         }
 
-        public static void AddTemperatureProbe (int cardID, int channelID, string name) {
-            AnalogInput.AddChannel (cardID, channelID, AnalogType.Temperature, name);
-            IndividualControl ch = new IndividualControl ();
-            ch.Group = (byte)cardID;
-            ch.Individual = (byte)channelID;
-            channels.Add (ch);
-        }
-
-        public static void AddHeater (
-            int powerID, 
-            int plugID,
-            string name,
-            bool controlTemp = true, 
-            float setpoint = 78.0f, 
-            float deadband = 0.4f)
-        {
-            heaters.Add (new Heater (name, (byte)powerID, (byte)plugID, controlTemp, setpoint, deadband));
-        }
-
         public static void Run () {
             temperature = 0.0f;
-            foreach (var ch in channels)
-                temperature += AnalogInput.GetValue (ch);
-            temperature /= channels.Count;
+            foreach (var ch in probes)
+                temperature += ch.GetTemperature ();
 
-            temperature = temperature.Map (0, 4096, 32.0f, 100.0f);
+            temperature /= probes.Count;
 
             if (temperature > highTempAlarmSetpoint)
                 Alarm.Post (highTempAlarmIdx);
@@ -126,6 +107,29 @@ namespace AquaPic.Modules
                 if (Alarm.CheckAlarming (lowTempAlarmIdx))
                     Alarm.Clear (lowTempAlarmIdx);
             }
+        }
+
+        public static void AddTemperatureProbe (string name, int cardID, int channelID) {
+            probes.Add (new TemperatureProbe (name, cardID, channelID));
+        }
+
+//        public static void AddHeater (
+//            int powerID, 
+//            int plugID,
+//            string name,
+//            bool controlTemp = true, 
+//            float setpoint = 78.0f, 
+//            float deadband = 0.4f)
+//        {
+//            heaters.Add (new Heater (name, (byte)powerID, (byte)plugID, controlTemp, setpoint, deadband));
+//        }
+
+        public static void AddHeater (
+            string name,
+            int powerID, 
+            int plugID)
+        {
+            heaters.Add (new Heater (name, (byte)powerID, (byte)plugID));
         }
 
         public static string[] GetAllHeaterNames () {
@@ -150,26 +154,81 @@ namespace AquaPic.Modules
             return -1;
         }
 
-        public static bool ControlsTemperature (int heaterId) {
+        public static IndividualControl GetHeaterIndividualControl (int heaterId) {
             if ((heaterId >= 0) && (heaterId < heaters.Count)) {
-                return heaters [heaterId].controlWaterTemperature;
+                return heaters [heaterId].plug;
             }
-            return false;
+
+            throw new ArgumentOutOfRangeException ("heaterId is out of range");
         }
 
-        public static float GetHeaterSetpoint (int heaterId) {
+        public static void SetHeaterIndividualControl (int heaterId, IndividualControl ic) {
             if ((heaterId >= 0) && (heaterId < heaters.Count)) {
-                return heaters [heaterId].setpoint;
+                Power.RemoveOutlet (heaters [heaterId].plug);
+                heaters [heaterId].plug = ic;
+                Power.AddOutlet (heaters [heaterId].plug, heaters [heaterId].name, MyState.On);
             }
-            return 0.0f;
         }
 
-        public static float GetHeaterDeadband (int heaterId) {
-            if ((heaterId >= 0) && (heaterId < heaters.Count)) {
-                return heaters [heaterId].deadband * 2;
-            }
-            return 0.0f;
+        public static string[] GetAllTemperatureProbeNames () {
+            string[] names = new string[probes.Count];
+            for (int i = 0; i < names.Length; ++i)
+                names [i] = probes [i].name;
+
+            return names;
         }
+
+        public static string GetTemperatureProbeName (int probeIdx) {
+            if ((probeIdx >= 0) && (probeIdx < probes.Count))
+                return probes [probeIdx].name;
+
+            throw new ArgumentOutOfRangeException ("probeIdx is out of range");
+        }
+
+        public static int GetTemperatureProbeIndex (string name) {
+            for (int i = 0; i < probes.Count; ++i) {
+                if (string.Equals (name, probes [i].name, StringComparison.InvariantCultureIgnoreCase))
+                    return i;
+            }
+
+            throw new ArgumentException (name + " does not exists");
+        }
+
+        public static IndividualControl GetTemperatureProbeIndividualControl (int probeIdx) {
+            if ((probeIdx >= 0) && (probeIdx < probes.Count))
+                return probes [probeIdx].channel;
+
+            throw new ArgumentOutOfRangeException ("probeIdx is out of range");
+        }
+
+        public static void SetTemperatureProbeIndividualControl (int probeIdx, IndividualControl ic) {
+            if ((probeIdx >= 0) && (probeIdx < probes.Count)) {
+                AnalogInput.RemoveChannel (probes [probeIdx].channel);
+                probes [probeIdx].channel = ic;
+                AnalogInput.AddChannel (probes [probeIdx].channel, AnalogType.Temperature, probes [probeIdx].name);
+            }
+        }
+
+//        public static bool ControlsTemperature (int heaterId) {
+//            if ((heaterId >= 0) && (heaterId < heaters.Count)) {
+//                return heaters [heaterId].controlWaterTemperature;
+//            }
+//            return false;
+//        }
+
+//        public static float GetHeaterSetpoint (int heaterId) {
+//            if ((heaterId >= 0) && (heaterId < heaters.Count)) {
+//                return heaters [heaterId].setpoint;
+//            }
+//            return 0.0f;
+//        }
+
+//        public static float GetHeaterDeadband (int heaterId) {
+//            if ((heaterId >= 0) && (heaterId < heaters.Count)) {
+//                return heaters [heaterId].deadband * 2;
+//            }
+//            return 0.0f;
+//        }
     }
 }
 

@@ -40,8 +40,10 @@ namespace MyWidgetLibrary
 //            if (orientation == MyOrientation.Horizontal) {
 ////                l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
-            //l.Wrap = Pango.WrapMode.Word;
-            //l.Width = Pango.Units.FromPixels (width);
+            if (textWrap == MyTextWrap.WordWrap) {
+                l.Wrap = Pango.WrapMode.Word;
+                l.Width = Pango.Units.FromPixels (width);
+            }
 
             if (alignment == MyAlignment.Left)
                 l.Alignment = Pango.Alignment.Left;
@@ -80,15 +82,14 @@ namespace MyWidgetLibrary
                         l.SetText (displayedText);
                         l.GetPixelSize (out w, out h);
                     }
-                } else {
-                    l.Wrap = Pango.WrapMode.Word;
                 }
+            } else {
+                l.Width = Pango.Units.FromPixels (width);
             }
 
             if (height != -1) {
                 y = (y + (height / 2)) - (h / 2);
             }
-            l.Width = Pango.Units.FromPixels (width);
 
 //            } else {
 //                //<TODO> cheesy work around to get somewhat vertical text. Gravity attribute does not seem to work

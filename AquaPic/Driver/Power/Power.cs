@@ -76,6 +76,29 @@ namespace AquaPic.Drivers
             return pwrStrips [powerID].outlets [outletID].OutletControl;
         }
 
+        public static void RemoveOutlet (IndividualControl outlet) {
+            RemoveOutlet (outlet.Group, outlet.Individual);
+        }
+
+        public static void RemoveOutlet (int powerID, int outletID) {
+            if (powerID == -1)
+                throw new Exception ("Power strip ID does not exist");
+
+            if ((outletID < 0) || (outletID >= pwrStrips [powerID].outlets.Length))
+                throw new Exception ("Outlet ID out of range");
+
+            string s = string.Format ("{0}.p{1}", pwrStrips [powerID].name, outletID);
+            pwrStrips [powerID].outlets [outletID].name = s;
+            pwrStrips [powerID].outlets [outletID].fallback = MyState.Off;
+            pwrStrips [powerID].outlets [outletID].mode = Mode.Manual;
+            pwrStrips [powerID].outlets [outletID].OutletControl.ConditionChecker = () => {
+                return false;
+            };
+            pwrStrips [powerID].SetupOutlet (
+                (byte)outletID,
+                pwrStrips [powerID].outlets [outletID].fallback);
+        }
+
         public static void SetManualOutletState (IndividualControl outlet, MyState state) {
             pwrStrips [outlet.Group].outlets [outlet.Individual].manualState = state;
         }
@@ -125,26 +148,50 @@ namespace AquaPic.Drivers
             return names;
         }
 
-        public static int GetPowerStripIndex (string name) {
-            for (int i = 0; i < pwrStrips.Count; ++i) {
-                if (string.Compare (pwrStrips [i].name, name, StringComparison.CurrentCultureIgnoreCase) == 0)
-                    return i;
-            }
-            return -1;
+        public static string GetPowerStringName (int powerID) {
+            if ((powerID >= 0) && (powerID < pwrStrips.Count))
+                return pwrStrips [powerID].name;
+
+            throw new ArgumentOutOfRangeException ("powerID is out of range");
         }
 
-        public static bool GetOutletIndividualControl (string name, ref IndividualControl outlet) {
+        public static int GetPowerStripIndex (string name) {
+            for (int i = 0; i < pwrStrips.Count; ++i) {
+                if (string.Equals (pwrStrips [i].name, name, StringComparison.CurrentCultureIgnoreCase))
+                    return i;
+            }
+
+            throw new ArgumentException (name + " does not exists");
+        }
+
+        public static IndividualControl GetOutletIndividualControl (string name) {
+            IndividualControl outlet;
+
             for (int i = 0; i < pwrStrips.Count; ++i) {
                 for (int j = 0; j < pwrStrips [i].outlets.Length; ++j) {
-                    if (string.Compare (pwrStrips [i].outlets [j].name, name, StringComparison.InvariantCultureIgnoreCase) == 0) {
+                    if (string.Equals (pwrStrips [i].outlets [j].name, name, StringComparison.InvariantCultureIgnoreCase)) {
                         outlet.Group = (byte)i;
                         outlet.Individual = (byte)j;
-                        return true;
+                        return outlet;
                     }
                 }
             }
 
-            return false;
+            throw new ArgumentException (name + " does not exists");
+        }
+
+        public static string[] GetAllAvaiblableOutlets () {
+            List<string> avail = new List<string> ();
+
+            foreach (var ps in pwrStrips) {
+                for (int i = 0; i < ps.outlets.Length; ++i) {
+                    string s = string.Format ("{0}.p{1}", ps.name, i);
+                    if (s == ps.outlets [i].name)
+                        avail.Add (s);
+                }
+            }
+
+            return avail.ToArray ();
         }
 
         public static void AddHandlerOnAuto (IndividualControl outlet, ModeChangedHandler handler) {

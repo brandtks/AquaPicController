@@ -8,20 +8,27 @@ namespace AquaPic
 {
     public class TemperatureWindow : WindowBase
     {
-        TouchComboBox combo;
-        SettingTextBox setpoint;
-        SettingTextBox deadband;
+        TouchComboBox heaterCombo;
+        TouchComboBox probeCombo;
         TouchLabel heaterLabel;
         int heaterId;
+        int probeId;
+
+//        SettingTextBox setpoint;
+//        SettingTextBox deadband;
 
         public TemperatureWindow (params object[] options) : base () {
             MyBox box1 = new MyBox (385, 395);
             Put (box1, 10, 30);
             box1.Show ();
 
-            MyBox box2 = new MyBox (385, 395);
+            MyBox box2 = new MyBox (385, 195);
             Put (box2, 405, 30);
             box2.Show ();
+
+            MyBox box3 = new MyBox (385, 195);
+            Put (box3, 405, 230);
+            box3.Show ();
 
             var label = new TouchLabel ();
             label.text = "General Temperature Information";
@@ -85,43 +92,73 @@ namespace AquaPic
             Put (heaterLabel, 410, 77);
             heaterLabel.Show ();
 
-            setpoint = new SettingTextBox ();
-            setpoint.label.text = "Setpoint";
-            setpoint.textBox.enableTouch = false;
-            Put (setpoint, 410, 100);
-
-            deadband = new SettingTextBox ();
-            deadband.label.text = "Deadband";
-            deadband.textBox.enableTouch = false;
-            Put (deadband, 410, 135);
+//            setpoint = new SettingTextBox ();
+//            setpoint.label.text = "Setpoint";
+//            setpoint.textBox.enableTouch = false;
+//            Put (setpoint, 410, 100);
+//
+//            deadband = new SettingTextBox ();
+//            deadband.label.text = "Deadband";
+//            deadband.textBox.enableTouch = false;
+//            Put (deadband, 410, 135);
 
             var settingsBtn = new TouchButton ();
-            settingsBtn.text = "Settings";
+            settingsBtn.text = "Heater Setup";
             settingsBtn.SetSizeRequest (100, 30);
             settingsBtn.ButtonReleaseEvent += (o, args) => {
+                var s = new HeaterSettings (heaterId);
+                s.Run ();
+                s.Destroy ();
+            };
+            Put (settingsBtn, 410, 190);
+            settingsBtn.Show ();
+
+            var settingsBtn2 = new TouchButton ();
+            settingsBtn2.text = "Settings";
+            settingsBtn2.SetSizeRequest (100, 30);
+            settingsBtn2.ButtonReleaseEvent += (o, args) => {
                 var s = new TemperatureSettings ();
                 s.Run ();
                 s.Destroy ();
                 tempSetpoint.text = Temperature.temperatureSetpoint.ToString ("F1");
                 tempDeadband.text = (Temperature.temperatureDeadband * 2).ToString ("F1");
             };
-            Put (settingsBtn, 15, 390);
-            settingsBtn.Show ();
+            Put (settingsBtn2, 15, 390);
+            settingsBtn2.Show ();
 
-            string[] names = Temperature.GetAllHeaterNames ();
-            combo = new TouchComboBox (names);
-            combo.Active = heaterId;
-            combo.WidthRequest = 235;
-            combo.ChangedEvent += OnComboChanged;
-            Put (combo, 550, 35);
-            combo.Show ();
+            var settingsBtn3 = new TouchButton ();
+            settingsBtn3.text = "Probe Setup";
+            settingsBtn3.SetSizeRequest (100, 30);
+            settingsBtn3.ButtonReleaseEvent += (o, args) => {
+                var s = new ProbeSettings (probeId);
+                s.Run ();
+                s.Destroy ();
+            };
+            Put (settingsBtn3, 410, 390);
+            settingsBtn3.Show ();
+
+            string[] hNames = Temperature.GetAllHeaterNames ();
+            heaterCombo = new TouchComboBox (hNames);
+            heaterCombo.Active = heaterId;
+            heaterCombo.WidthRequest = 235;
+            heaterCombo.ChangedEvent += OnHeaterComboChanged;
+            Put (heaterCombo, 550, 35);
+            heaterCombo.Show ();
+
+            string[] pNames = Temperature.GetAllTemperatureProbeNames ();
+            probeCombo = new TouchComboBox (pNames);
+            probeCombo.Active = probeId;
+            probeCombo.WidthRequest = 235;
+            probeCombo.ChangedEvent += OnHeaterComboChanged;
+            Put (probeCombo, 550, 235);
+            probeCombo.Show ();
 
             GetHeaterData ();
 
             Show ();
         }
 
-        protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
+        protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
             int id = Temperature.GetHeaterIndex (e.ActiveText);
             if (id != -1) {
                 heaterId = id;
@@ -129,23 +166,35 @@ namespace AquaPic
             }
         }
 
-        protected void GetHeaterData () {
-            if (Temperature.ControlsTemperature (heaterId)) {
-                heaterLabel.text = string.Format ("{0} control based upon global setpoints", Temperature.GetHeaterName (heaterId));
-                setpoint.Visible = false;
-                deadband.Visible = false;
-            } else {
-                heaterLabel.text = "Heater Control Setpoints";
-                setpoint.Visible = true;
-                deadband.Visible = true;
-
-                setpoint.textBox.text = Temperature.GetHeaterSetpoint (heaterId).ToString ("F1");
-                deadband.textBox.text = Temperature.GetHeaterDeadband (heaterId).ToString ("F1");
+        protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            int id = Temperature.GetTemperatureProbeIndex (e.ActiveText);
+            if (id != -1) {
+                probeId = id;
+                GetProbeData ();
             }
+        }
+
+        protected void GetHeaterData () {
+//            if (Temperature.ControlsTemperature (heaterId)) {
+                heaterLabel.text = string.Format ("{0} control based upon global setpoints", Temperature.GetHeaterName (heaterId));
+//                setpoint.Visible = false;
+//                deadband.Visible = false;
+//            } else {
+//                heaterLabel.text = "Heater Control Setpoints";
+//                setpoint.Visible = true;
+//                deadband.Visible = true;
+//
+//                setpoint.textBox.text = Temperature.GetHeaterSetpoint (heaterId).ToString ("F1");
+//                deadband.textBox.text = Temperature.GetHeaterDeadband (heaterId).ToString ("F1");
+//            }
 
             heaterLabel.QueueDraw ();
-            setpoint.QueueDraw ();
-            deadband.QueueDraw ();
+//            setpoint.QueueDraw ();
+//            deadband.QueueDraw ();
+        }
+
+        protected void GetProbeData () {
+
         }
     }
 }

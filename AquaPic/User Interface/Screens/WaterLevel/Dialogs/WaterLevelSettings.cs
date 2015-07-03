@@ -71,7 +71,7 @@ namespace AquaPic
                     AnalogInput.AddChannel (WaterLevel.levelSensor, AnalogType.Level, "Water Level");
                 }
             } catch {
-
+                return false;
             }
 
             JObject jo = new JObject ();

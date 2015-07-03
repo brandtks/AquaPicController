@@ -41,8 +41,8 @@ namespace AquaPic.Drivers
                 this.OutletControl.ConditionChecker = () => {
                     return false;
                 };
-                this.OutletControl.OutputTrue += outputTrue;
-                this.OutletControl.OutputFalse += outputFalse;
+                this.OutletControl.OutputTrue = outputTrue;
+                this.OutletControl.OutputFalse = outputFalse;
 
                 #if SIMULATION
                 this.Updated = true;

@@ -78,8 +78,24 @@ namespace AquaPic
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
-            File.WriteAllText (path, jo.ToString ());
+            string text = File.ReadAllText (path);
+            int start = text.IndexOf ('"');
+            int end = text.IndexOf ("\"temperatureProbes");
 
+            string globSet = text.Substring (start, end - start);
+
+            end = globSet.LastIndexOf ('"');
+            globSet = globSet.Substring (0, end + 1);
+
+            string joText = jo.ToString ();
+            int start2 = joText.IndexOf ('"');
+            int end2 = joText.LastIndexOf ('"');
+            joText = joText.Substring (start2, end2 - start2 + 1);
+
+            text = text.Replace (globSet, joText);
+
+            File.WriteAllText (path, text);
+            
             return true;
         }
     }

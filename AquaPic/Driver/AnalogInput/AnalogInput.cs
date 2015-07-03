@@ -78,9 +78,11 @@ namespace AquaPic.Drivers
                
                     return cards [card].channels [channel].value;
                 }
+
+                throw new ArgumentOutOfRangeException ("channel is out of range");
             }
 
-            return 0.0f;
+            throw new ArgumentOutOfRangeException ("card is out of range");
         }
 
         public static void SetValue (IndividualControl channel, float value) {
@@ -104,7 +106,7 @@ namespace AquaPic.Drivers
                 return types;
             }
 
-            return null;
+            throw new ArgumentOutOfRangeException ("cardId is out of range");
         }
 
         public static int GetCardIndex (string name) {
@@ -112,7 +114,8 @@ namespace AquaPic.Drivers
                 if (string.Equals (cards [i].name, name, StringComparison.InvariantCultureIgnoreCase))
                     return i;
             }
-            return -1;
+
+            throw new ArgumentException (name + " does not exists");
         }
 
         public static int GetChannelIndex (int cardId, string name) {
@@ -121,9 +124,11 @@ namespace AquaPic.Drivers
                     if (string.Equals (cards [cardId].channels [i].name, name, StringComparison.InvariantCultureIgnoreCase))
                         return i;
                 }
+
+                throw new ArgumentException (name + " does not exists");
             }
 
-            return -1;
+            throw new ArgumentOutOfRangeException ("cardId is out of range");
         }
 
         public static string GetCardName (int cardId) {
@@ -131,7 +136,7 @@ namespace AquaPic.Drivers
                 return cards [cardId].name;
             }
 
-            return string.Empty;
+            throw new ArgumentOutOfRangeException ("cardId is out of range");
         }
 
         public static string[] GetAllCardNames () {
@@ -153,7 +158,38 @@ namespace AquaPic.Drivers
                 return names;
             }
 
-            return null;
+            throw new ArgumentOutOfRangeException ("cardId is out of range");
+        }
+
+        public static string GetChannelName (IndividualControl ic) {
+            return GetChannelName (ic.Group, ic.Individual);
+        }
+
+        public static string GetChannelName (int cardId, int channelId) {
+            if ((cardId >= 0) && (cardId < cards.Count)) {
+                if ((channelId >= 0) && (channelId < cards [cardId].channels.Length))
+                    return cards [cardId].channels [channelId].name;
+
+                throw new ArgumentOutOfRangeException ("channel is out of range");
+            }
+
+            throw new ArgumentOutOfRangeException ("cardId is out of range");
+        }
+
+        public static IndividualControl GetChannelIndividualControl (string name) {
+            IndividualControl outlet;
+
+            for (int i = 0; i < cards.Count; ++i) {
+                for (int j = 0; j < cards [i].channels.Length; ++j) {
+                    if (string.Equals (cards [i].channels [j].name, name, StringComparison.InvariantCultureIgnoreCase)) {
+                        outlet.Group = (byte)i;
+                        outlet.Individual = (byte)j;
+                        return outlet;
+                    }
+                }
+            }
+
+            throw new ArgumentException (name + " does not exists");
         }
 
         public static void SetMode (IndividualControl ic, Mode mode) {
@@ -173,16 +209,18 @@ namespace AquaPic.Drivers
                 return modes;
             }
 
-            return null;
+            throw new ArgumentOutOfRangeException ("cardId is out of range");
         }
 
         public static Mode GetMode (IndividualControl ic) {
             if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
                 if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length))
                     return cards [ic.Group].channels [ic.Individual].mode;
+
+                throw new ArgumentOutOfRangeException ("channel is out of range");
             }
 
-            return Mode.Manual;
+            throw new ArgumentOutOfRangeException ("ic is out of range");
         }
 
         public static string[] GetAllAvaiableChannels () {
