@@ -5,7 +5,7 @@ using Gtk;
 using MyWidgetLibrary;
 using AquaPic.Runtime;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public partial class AquaPicGUI : Gtk.Window
     {

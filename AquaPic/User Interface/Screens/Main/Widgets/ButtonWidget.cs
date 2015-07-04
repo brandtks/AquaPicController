@@ -2,7 +2,7 @@
 using Gtk;
 using MyWidgetLibrary;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public delegate ButtonWidget CreateButtonHandler ();
 

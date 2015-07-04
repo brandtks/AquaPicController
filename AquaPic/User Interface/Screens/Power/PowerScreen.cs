@@ -9,7 +9,7 @@ using AquaPic.Runtime;
 using AquaPic.SerialBus;
 using AquaPic.Utilites;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class PowerWindow : WindowBase
     {

@@ -24,9 +24,9 @@ namespace AquaPic.Drivers
             public bool Updated;
             #endif
 
-            public event StateChangeHandler onStateChange;
-            public event ModeChangedHandler onAuto;
-            public event ModeChangedHandler onManual;
+            public event StateChangeHandler StateChangeEvent;
+            public event ModeChangedHandler AutoEvent;
+            public event ModeChangedHandler ManualEvent;
 
             public OutletData (string name, OutputHandler outputTrue, OutputHandler outputFalse) {
                 this.name = name;
@@ -60,26 +60,19 @@ namespace AquaPic.Drivers
                 this.Updated = true;
                 #endif
 
-                if (onStateChange != null) {
-                    onStateChange (this, args);
+                if (StateChangeEvent != null) {
+                    StateChangeEvent (this, args);
                 }
             }
 
             public void OnModeChangedAuto (ModeChangeEventArgs args) {
-//                if (returnToRequested) {
-//                    IndividualControl p;
-//                    p.Group = args.powerID;
-//                    p.Individual = args.plugID;
-//                    SetPlugState (p, requestedState);
-//                }
-
-                if (onAuto != null)
-                    onAuto (this, args);
+                if (AutoEvent != null)
+                    AutoEvent (this, args);
             }
 
             public void OnModeChangedManual (ModeChangeEventArgs args) {
-                if (onManual != null)
-                    onManual (this, args);
+                if (ManualEvent != null)
+                    ManualEvent (this, args);
             }
         }
     }

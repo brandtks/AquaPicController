@@ -4,7 +4,7 @@ using MyWidgetLibrary;
 using AquaPic.Runtime;
 using AquaPic.Modules;
 
-namespace AquaPic 
+namespace AquaPic.UserInterface
 {
     public class WaterLevelWindow : WindowBase
     {

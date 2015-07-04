@@ -4,7 +4,7 @@ using Cairo;
 using MyWidgetLibrary;
 using AquaPic.Utilites;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class PowerOutletSlider : Fixed
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class TemperatureLinePlot : LinePlotWidget
     {

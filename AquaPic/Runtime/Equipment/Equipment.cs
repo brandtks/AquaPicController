@@ -13,7 +13,7 @@ namespace AquaPic.Runtime
         public static void AddFromJson () {
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
-            path = Path.Combine (path, "Equipment.json");
+            path = Path.Combine (path, "equipment.json");
 
             using (StreamReader reader = File.OpenText (path)) {
                 JArray ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));

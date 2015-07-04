@@ -2,6 +2,7 @@
 using AquaPic.Drivers;
 using AquaPic.Utilites;
 using AquaPic.Runtime;
+using AquaPic.UserInterface;
 
 namespace AquaPic.Modules
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using MyWidgetLibrary;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public delegate WindowBase CreateInstanceHandler (params object[] options);
 

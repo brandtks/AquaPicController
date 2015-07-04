@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
 using AquaPic.Utilites;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class MainWindow : WindowBase
     {
@@ -94,7 +94,7 @@ namespace AquaPic
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
-            path = System.IO.Path.Combine (path, "MainScreen.json");
+            path = System.IO.Path.Combine (path, "mainScreen.json");
 
             using (StreamReader reader = File.OpenText (path)) {
                 JArray ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));

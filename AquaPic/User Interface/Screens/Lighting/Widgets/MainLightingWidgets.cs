@@ -1,7 +1,7 @@
 ﻿using System;
 using AquaPic.Modules;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public delegate float GetDimmingLevelHandler ();
 

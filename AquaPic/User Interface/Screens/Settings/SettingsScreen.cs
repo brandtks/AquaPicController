@@ -5,7 +5,7 @@ using MyWidgetLibrary;
 using AquaPic.Runtime;
 using CSScriptLibrary;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class SettingsWindow : WindowBase
     {

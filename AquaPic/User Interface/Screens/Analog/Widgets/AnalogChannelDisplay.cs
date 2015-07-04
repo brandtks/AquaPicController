@@ -4,7 +4,7 @@ using Cairo;
 using MyWidgetLibrary;
 using AquaPic.Utilites;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public delegate void ValueChangedHandler (object sender, float value);
 

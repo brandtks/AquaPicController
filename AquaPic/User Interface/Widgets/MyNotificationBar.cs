@@ -5,7 +5,7 @@ using Gtk;
 using AquaPic.Runtime;
 using MyWidgetLibrary;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class MyNotificationBar : EventBox
     {

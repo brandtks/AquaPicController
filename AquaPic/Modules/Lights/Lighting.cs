@@ -156,6 +156,8 @@ namespace AquaPic.Modules
 
         public static void Init () {
             EventLogger.Add ("Initializing Lighting");
+
+
         }
 
         public static int AddLight (

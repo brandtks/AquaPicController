@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public delegate void ChangeScreenHandler (ScreenData screen, params object[] options);
 

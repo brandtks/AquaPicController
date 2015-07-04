@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Gtk;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
 using AquaPic.SerialBus;

@@ -4,7 +4,7 @@ using Cairo;
 using Gtk;
 using MyWidgetLibrary;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class MyMenuBar : EventBox
     {

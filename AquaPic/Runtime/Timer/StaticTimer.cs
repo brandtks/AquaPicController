@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace AquaPic.Runtime
 {
@@ -7,7 +9,14 @@ namespace AquaPic.Runtime
     {
         protected static Dictionary<string, OnDelayTimer> odts = new Dictionary<string, OnDelayTimer> ();
 
-        public static bool OnDelay (string name, string time, bool enable) {
+        // method is not inlined because we are saving the calling method as the KEY for the dictionary of on delay timers
+        [MethodImplAttribute(MethodImplOptions.NoInlining)]
+        public static bool OnDelay (string time, bool enable) {
+            StackTrace stackTrace = new StackTrace();
+            string name = stackTrace.GetFrame (1).GetMethod ().Name;
+
+            Console.WriteLine ("OnDelay caller is {0}", name);
+
             if (!odts.ContainsKey (name)) {
                 uint timeDelay = ParseTime (time);
                 odts.Add (name, new OnDelayTimer (timeDelay));

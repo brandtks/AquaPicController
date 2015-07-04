@@ -132,6 +132,26 @@ namespace AquaPic.Modules
             heaters.Add (new Heater (name, (byte)powerID, (byte)plugID));
         }
 
+        public static void AddHeater (int powerID, int plugID) {
+            string name = string.Format ("heater {0}", heaters.Count);
+            heaters.Add (new Heater (name, (byte)powerID, (byte)plugID));
+        }
+
+        public static void RemoveHeater (int heaterId) {
+            if ((heaterId >= 0) && (heaterId < heaters.Count)) {
+                Heater h = heaters [heaterId];
+                Power.RemoveOutlet (h.plug);
+                heaters.Remove (h);
+                return;
+            }
+
+            throw new ArgumentOutOfRangeException ("heaterId is out of range");
+        }
+
+        public static int GetHeaterCount () {
+            return heaters.Count;
+        }
+
         public static string[] GetAllHeaterNames () {
             string[] names = new string[heaters.Count];
             for (int i = 0; i < heaters.Count; ++i)
@@ -151,7 +171,8 @@ namespace AquaPic.Modules
                 if (string.Equals (name, heaters [i].name, StringComparison.InvariantCultureIgnoreCase))
                     return i;
             }
-            return -1;
+
+            throw new ArgumentException (name + " does not exists");
         }
 
         public static IndividualControl GetHeaterIndividualControl (int heaterId) {
@@ -159,7 +180,7 @@ namespace AquaPic.Modules
                 return heaters [heaterId].plug;
             }
 
-            throw new ArgumentOutOfRangeException ("heaterId is out of range");
+            throw new ArgumentOutOfRangeException ("heaterId");
         }
 
         public static void SetHeaterIndividualControl (int heaterId, IndividualControl ic) {
@@ -182,7 +203,7 @@ namespace AquaPic.Modules
             if ((probeIdx >= 0) && (probeIdx < probes.Count))
                 return probes [probeIdx].name;
 
-            throw new ArgumentOutOfRangeException ("probeIdx is out of range");
+            throw new ArgumentOutOfRangeException ("probeIdx");
         }
 
         public static int GetTemperatureProbeIndex (string name) {
@@ -198,7 +219,7 @@ namespace AquaPic.Modules
             if ((probeIdx >= 0) && (probeIdx < probes.Count))
                 return probes [probeIdx].channel;
 
-            throw new ArgumentOutOfRangeException ("probeIdx is out of range");
+            throw new ArgumentOutOfRangeException ("probeIdx");
         }
 
         public static void SetTemperatureProbeIndividualControl (int probeIdx, IndividualControl ic) {

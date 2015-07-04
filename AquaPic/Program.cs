@@ -6,6 +6,7 @@ using System.Threading;
 using Gtk;
 using AquaPic.Runtime;
 using AquaPic.Utilites;
+using AquaPic.UserInterface;
 
 namespace AquaPic
 {
@@ -26,10 +27,15 @@ namespace AquaPic
             
             Plugin.AddPlugins ();
 
-            string RESOURCE_FILE = @"C:\Program Files (x86)\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
-            //string RESOURCE_FILE = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
-            Gtk.Rc.AddDefaultFile (RESOURCE_FILE);
-            Gtk.Rc.Parse (RESOURCE_FILE);
+            string proc = Environment.GetEnvironmentVariable ("PROCESSOR_ARCHITECTURE");
+            string resourceFile;
+            if (proc == "x86")
+                resourceFile = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
+            else
+                resourceFile = @"C:\Program Files (x86)\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
+            
+            Gtk.Rc.AddDefaultFile (resourceFile);
+            Gtk.Rc.Parse (resourceFile);
 
             //<Test> here to test time of day interrupts
 //            Time now = new Time (); // sets the instanse with DateTime.Now

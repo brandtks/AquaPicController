@@ -91,9 +91,11 @@ namespace AquaPic.Drivers
             pwrStrips [powerID].outlets [outletID].name = s;
             pwrStrips [powerID].outlets [outletID].fallback = MyState.Off;
             pwrStrips [powerID].outlets [outletID].mode = Mode.Manual;
+
             pwrStrips [powerID].outlets [outletID].OutletControl.ConditionChecker = () => {
                 return false;
             };
+
             pwrStrips [powerID].SetupOutlet (
                 (byte)outletID,
                 pwrStrips [powerID].outlets [outletID].fallback);
@@ -148,7 +150,7 @@ namespace AquaPic.Drivers
             return names;
         }
 
-        public static string GetPowerStringName (int powerID) {
+        public static string GetPowerStripName (int powerID) {
             if ((powerID >= 0) && (powerID < pwrStrips.Count))
                 return pwrStrips [powerID].name;
 
@@ -195,19 +197,27 @@ namespace AquaPic.Drivers
         }
 
         public static void AddHandlerOnAuto (IndividualControl outlet, ModeChangedHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].onAuto += handler;
+            pwrStrips [outlet.Group].outlets [outlet.Individual].AutoEvent += handler;
+        }
+
+        public static void RemoveHandlerOnAuto (IndividualControl outlet, ModeChangedHandler handler) {
+            pwrStrips [outlet.Group].outlets [outlet.Individual].AutoEvent -= handler;
         }
 
         public static void AddHandlerOnManual (IndividualControl outlet, ModeChangedHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].onManual += handler;
+            pwrStrips [outlet.Group].outlets [outlet.Individual].ManualEvent += handler;
+        }
+
+        public static void RemoveHandlerOnManual (IndividualControl outlet, ModeChangedHandler handler) {
+            pwrStrips [outlet.Group].outlets [outlet.Individual].ManualEvent -= handler;
         }
 
         public static void AddHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].onStateChange += handler;
+            pwrStrips [outlet.Group].outlets [outlet.Individual].StateChangeEvent += handler;
         }
 
         public static void RemoveHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].onStateChange -= handler;
+            pwrStrips [outlet.Group].outlets [outlet.Individual].StateChangeEvent -= handler;
         }
     }
 }

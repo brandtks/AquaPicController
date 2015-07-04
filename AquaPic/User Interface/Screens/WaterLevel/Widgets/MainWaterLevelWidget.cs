@@ -2,7 +2,7 @@
 using AquaPic.Modules;
 using MyWidgetLibrary;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class WaterLevelWidget : BarPlotWidget 
     {

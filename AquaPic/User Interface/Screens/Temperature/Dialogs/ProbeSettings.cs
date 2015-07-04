@@ -9,7 +9,7 @@ using AquaPic.Modules;
 using AquaPic.Utilites;
 using AquaPic.Drivers;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class ProbeSettings : TouchSettingsDialog
     {
@@ -22,12 +22,17 @@ namespace AquaPic
 
             var c = new SettingComboBox ();
             c.label.text = "Input Channel";
-            string name = Temperature.GetTemperatureProbeName (probeIdx);
-            IndividualControl ic = AnalogInput.GetChannelIndividualControl (name);
-            string cardName = AnalogInput.GetCardName (ic.Group);
-            c.combo.List.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
+
+            if (this.probeIdx != 1) {
+                IndividualControl ic = Temperature.GetTemperatureProbeIndividualControl (probeIdx);
+                string cardName = AnalogInput.GetCardName (ic.Group);
+                c.combo.List.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
+                c.combo.Active = 0;
+            } else {
+                c.combo.NonActiveMessage = "Please select channel";
+            }
+
             c.combo.List.AddRange (AnalogInput.GetAllAvaiableChannels ());
-            c.combo.Active = 0;
             AddSetting (c);
 
             DrawSettings ();
@@ -46,16 +51,15 @@ namespace AquaPic
                 ic.Individual = channelId;
 
                 Temperature.SetTemperatureProbeIndividualControl (probeIdx, ic);
-            
-
+                
                 JObject jo = new JObject ();
 
                 jo.Add (new JProperty ("temperatureProbes", 
                     new JArray (
                         new JObject (
                             new JProperty ("name", Temperature.GetTemperatureProbeName (probeIdx)),
-                            new JProperty ("inputCard", AnalogInput.GetCardName (Temperature.GetTemperatureProbeIndividualControl (probeIdx).Group)), 
-                            new JProperty ("channel", Temperature.GetTemperatureProbeIndividualControl (probeIdx).Individual.ToString ())))));
+                            new JProperty ("inputCard", AnalogInput.GetCardName (ic.Group)), 
+                            new JProperty ("channel", ic.Individual.ToString ())))));
 
                 string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
                 path = System.IO.Path.Combine (path, "Settings");

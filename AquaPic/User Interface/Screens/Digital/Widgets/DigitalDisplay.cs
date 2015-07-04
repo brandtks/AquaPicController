@@ -3,7 +3,7 @@ using Gtk;
 using Cairo;
 using MyWidgetLibrary;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class DigitalDisplay : Fixed
     {

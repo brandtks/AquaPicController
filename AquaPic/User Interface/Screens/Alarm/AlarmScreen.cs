@@ -6,7 +6,7 @@ using Cairo;
 using MyWidgetLibrary;
 using AquaPic.Runtime;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class AlarmWindow : WindowBase
     {

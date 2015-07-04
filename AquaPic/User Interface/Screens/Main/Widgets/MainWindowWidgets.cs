@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class MainWindowWidgets
     {

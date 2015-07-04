@@ -5,7 +5,7 @@ using MyWidgetLibrary;
 using AquaPic.Drivers;
 using AquaPic.Utilites;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class AnalogInputWindow : WindowBase
     {

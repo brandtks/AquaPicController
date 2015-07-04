@@ -4,7 +4,7 @@ using Cairo;
 using MyWidgetLibrary;
 using AquaPic.Modules;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class TemperatureWindow : WindowBase
     {
@@ -106,9 +106,19 @@ namespace AquaPic
             settingsBtn.text = "Heater Setup";
             settingsBtn.SetSizeRequest (100, 30);
             settingsBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new HeaterSettings (heaterId);
+                string name = Temperature.GetHeaterName (heaterId);
+                var s = new HeaterSettings (name, heaterId, true);
                 s.Run ();
                 s.Destroy ();
+
+                try {
+                    Temperature.GetHeaterIndex (name);
+                } catch (ArgumentException) {
+                    heaterCombo.List.Remove (name);
+                    heaterId = 0;
+                    heaterCombo.Active = heaterId;
+                    GetProbeData ();
+                }
             };
             Put (settingsBtn, 410, 190);
             settingsBtn.Show ();
@@ -141,6 +151,7 @@ namespace AquaPic
             heaterCombo = new TouchComboBox (hNames);
             heaterCombo.Active = heaterId;
             heaterCombo.WidthRequest = 235;
+            heaterCombo.List.Add ("New heater...");
             heaterCombo.ChangedEvent += OnHeaterComboChanged;
             Put (heaterCombo, 550, 35);
             heaterCombo.Show ();
@@ -159,15 +170,28 @@ namespace AquaPic
         }
 
         protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            int id = Temperature.GetHeaterIndex (e.ActiveText);
-            if (id != -1) {
-                heaterId = id;
+            if (e.ActiveText == "New heater...") {
+                var s = new HeaterSettings ("New Heater", -1, false);
+                s.Run ();
+                s.Destroy ();
+
+                heaterId = Temperature.GetHeaterCount () - 1;
+                int listIdx = heaterCombo.List.IndexOf ("New heater...");
+                heaterCombo.List.Insert (listIdx, Temperature.GetHeaterName (heaterId));
+                heaterCombo.Active = listIdx;
                 GetHeaterData ();
+            } else {
+                int id = Temperature.GetHeaterIndex (e.ActiveText);
+                if (id != -1) {
+                    heaterId = id;
+                    GetHeaterData ();
+                }
             }
         }
 
         protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
             int id = Temperature.GetTemperatureProbeIndex (e.ActiveText);
+
             if (id != -1) {
                 probeId = id;
                 GetProbeData ();

@@ -8,7 +8,7 @@ using MyWidgetLibrary;
 using AquaPic.Modules;
 using AquaPic.Utilites;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class LightingSettings : TouchSettingsDialog
     {

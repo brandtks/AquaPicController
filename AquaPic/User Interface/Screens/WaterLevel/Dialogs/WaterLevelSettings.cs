@@ -9,7 +9,7 @@ using AquaPic.Modules;
 using AquaPic.Utilites;
 using AquaPic.Drivers;
 
-namespace AquaPic
+namespace AquaPic.UserInterface
 {
     public class LevelSettings : TouchSettingsDialog
     {
