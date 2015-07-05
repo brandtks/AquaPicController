@@ -125,7 +125,7 @@ namespace AquaPic.UserInterface
                                 linePlots.Add (lp);
 
                             } else {
-                                EventLogger.Add (string.Format ("Unknown line plot for main window: {0}", name));
+                                Logger.Add (string.Format ("Unknown line plot for main window: {0}", name));
                             }
 
                             break;
@@ -141,7 +141,7 @@ namespace AquaPic.UserInterface
                                 barPlots.Add (bp);
 
                             } else {
-                                EventLogger.Add (string.Format ("Unknown bar plot for main window: {0}", name));
+                                Logger.Add (string.Format ("Unknown bar plot for main window: {0}", name));
                             }
 
                             break;
@@ -155,13 +155,13 @@ namespace AquaPic.UserInterface
                                 b.Show ();
 
                             } else {
-                                EventLogger.Add (string.Format ("Unknown button for main window: {0}", name));
+                                Logger.Add (string.Format ("Unknown button for main window: {0}", name));
                             }
 
                             break;
                         }
                     default:
-                        EventLogger.Add (string.Format ("Unknown widget for main window: {0}", type));
+                        Logger.Add (string.Format ("Unknown widget for main window: {0}", type));
                         break;
                     }
                 }

@@ -8,6 +8,15 @@ namespace MyWidgetLibrary
     {
         public TouchLabel label;
 
+        public virtual string text {
+            get {
+                return label.text;
+            }
+            set {
+                label.text = value;
+            }
+        }
+
         public SettingsWidget () {
             SetSizeRequest (290, 30);
 
@@ -27,6 +36,16 @@ namespace MyWidgetLibrary
     public class SettingTextBox : SettingsWidget
     {
         public TouchTextBox textBox;
+
+        public override string text {
+            get {
+                return label.text;
+            }
+            set {
+                textBox.name = value;
+                label.text = value;
+            }
+        }
         
         public SettingTextBox () : base () {
             textBox = new TouchTextBox ();

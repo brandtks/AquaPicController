@@ -19,11 +19,26 @@ namespace AquaPic.UserInterface
             this.heaterIdx = heaterIdx;
 
             SaveEvent += OnSave;
-            DeleteEvent += OnDelete;
+            DeleteButtonEvent += OnDelete;
+
+            var t = new SettingTextBox ();
+            t.text = "Name";
+            if (heaterIdx != -1)
+                t.textBox.text = Temperature.GetHeaterName (heaterIdx);
+            else
+                t.textBox.text = "Enter name";
+            t.textBox.TextChangedEvent += (sender, args) => {
+                if (string.IsNullOrWhiteSpace (args.text))
+                    args.keepText = false;
+                else if (!Temperature.HeaterNameOk (args.text)) {
+                    MessageBox.Show ("Heater name already exists");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             var c = new SettingComboBox ();
             c.label.text = "Outlet";
-
             if (heaterIdx != -1) {
                 IndividualControl ic = Temperature.GetHeaterIndividualControl (heaterIdx);
                 string psName = Power.GetPowerStripName (ic.Group);
@@ -32,7 +47,6 @@ namespace AquaPic.UserInterface
             } else {
                 c.combo.NonActiveMessage = "Select outlet";
             }
-
             c.combo.List.AddRange (Power.GetAllAvaiblableOutlets ());
             AddSetting (c);
 
@@ -51,10 +65,16 @@ namespace AquaPic.UserInterface
 
             if (heaterIdx == -1) {
                 if (((SettingComboBox)settings ["Outlet"]).combo.Active != -1) {
+                    string name = ((SettingTextBox)settings ["Name"]).textBox.text;
+                    if (name == "Enter name") {
+                        MessageBox.Show ("Invalid heater name");
+                        return false;
+                    }
+
                     IndividualControl ic = new IndividualControl ();
                     ParseOutlet (str, ref ic.Group, ref ic.Individual);
 
-                    Temperature.AddHeater (ic.Group, ic.Individual);
+                    Temperature.AddHeater (name, ic.Group, ic.Individual);
 
                     JObject jo = new JObject ();
 
@@ -63,6 +83,25 @@ namespace AquaPic.UserInterface
                     jo.Add (new JProperty ("outlet", ic.Individual.ToString ()));
 
                     string joText = jo.ToString ();
+
+                    //format, aka proper indexing, of joText
+                    string nl = Environment.NewLine;
+                    int lineEnd = joText.IndexOf (nl);
+                    string insert = "    ";
+                    int insertIdx = 0;
+                    while (lineEnd != -1) {
+                        joText = joText.Insert (insertIdx, insert);
+
+                        insertIdx += (lineEnd + insert.Length + nl.Length);
+
+                        string formatter = joText.Substring (insertIdx);
+                        lineEnd = formatter.IndexOf (nl);
+                    }
+
+                    insertIdx = joText.LastIndexOf ('}');
+                    joText = joText.Insert (insertIdx, insert);
+
+                    Console.WriteLine ("joText: {0}", joText);
 
                     string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
                     path = System.IO.Path.Combine (path, "Settings");
@@ -73,7 +112,6 @@ namespace AquaPic.UserInterface
                     string heaterText = "heaters";
                     int start = text.IndexOf (heaterText) + heaterText.Length + 1;
                     string temp = text.Substring (start);
-
 
                     // this '}' is the very last curly bracket and we want the second to last
                     int end = temp.LastIndexOf ('}');
@@ -97,6 +135,9 @@ namespace AquaPic.UserInterface
                     return false;
                 }
             } else if (!str.StartsWith ("Current:")) {
+                string name = ((SettingTextBox)settings ["Name"]).textBox.text;
+                Temperature.SetHeaterName (heaterIdx, name);
+
                 IndividualControl ic = Temperature.GetHeaterIndividualControl (heaterIdx);
                 int previousOutletId = ic.Individual;
                 ParseOutlet (str, ref ic.Group, ref ic.Individual);
@@ -140,16 +181,35 @@ namespace AquaPic.UserInterface
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
             string text = File.ReadAllText (path);
-            int start = text.IndexOf (string.Format ("\"name\": \"{0}\"", Temperature.GetHeaterName (heaterIdx)));
+
+            string startSearch = string.Format ("\"name\": \"{0}\"", Temperature.GetHeaterName (heaterIdx));
+            int start = text.IndexOf (startSearch);
+
             string endSearch = string.Format ("\"outlet\": \"{0}\"", Temperature.GetHeaterIndividualControl (heaterIdx).Individual);
             int endLength = endSearch.Length;
-            int end = text.IndexOf (endSearch) + endLength - 1;
-            end = text.IndexOf ('}', end);
-            if (text [end + 1] == ',')
-                ++end;
+            int objectEnd = text.IndexOf (endSearch, start) + endLength - 1;
 
-            string deleteText = text.Substring (0, end);
-            start = deleteText.LastIndexOf ('{');
+            //finds the open curly backet that starts the next heater's object
+            int end = text.IndexOf ('{', objectEnd);
+            if (end == -1) { //this heater object is the last in the array
+                end = text.IndexOf ('}', objectEnd);
+                //grabs all the text before this heater's object
+                string temp = text.Substring (0, start);
+                //finds the last common which seperates this heater from the previous
+                start = temp.LastIndexOf (',');
+
+                //makes sure this isn't the last heater we are deleting
+                int lastObjectCheck = temp.LastIndexOf ('[');
+                if (start < lastObjectCheck)
+                    start = lastObjectCheck + 1;
+            } else {
+                //subtact one from the index since it currently points to the curly bracket for the next heater object
+                --end;
+                //removes all other heater objects so we can find the opening curly bracket
+                string deleteText = text.Substring (0, end);
+                //the last opening curly bracket will be the beginning of this heater's object
+                start = deleteText.LastIndexOf ('{');
+            }
 
             text = text.Remove (start, end - start + 1);
 

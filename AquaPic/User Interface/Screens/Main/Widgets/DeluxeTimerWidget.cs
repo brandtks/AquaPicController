@@ -51,9 +51,13 @@ namespace AquaPic.UserInterface
             minutes.textSize = 16;
             minutes.textAlignment = MyAlignment.Center;
             minutes.TextChangedEvent += (sender, args) => {
-                uint time = Convert.ToUInt32 (args.text) * 60;
-                time += Convert.ToUInt32 (seconds.text);
-                UpdateTime (time);
+                try {
+                    uint time = Convert.ToUInt32 (args.text) * 60;
+                    time += Convert.ToUInt32 (seconds.text);
+                    UpdateTime (time);
+                } catch {
+                    args.keepText = false;
+                }
             };
             Put (minutes, 3, 32);
 
@@ -83,12 +87,16 @@ namespace AquaPic.UserInterface
             seconds.textAlignment = MyAlignment.Center;
             seconds.textSize = 16;
             seconds.TextChangedEvent += (sender, args) => {
-                uint time = Convert.ToUInt32 (args.text);
+                try {
+                    uint time = Convert.ToUInt32 (args.text);
 
-                if (time < 60)
-                    time += Convert.ToUInt32 (minutes.text) * 60;
+                    if (time < 60)
+                        time += Convert.ToUInt32 (minutes.text) * 60;
 
-                UpdateTime (time);
+                    UpdateTime (time);
+                } catch {
+                    args.keepText = false;
+                }
             };
             Put (seconds, 125, 32);
 

@@ -30,7 +30,7 @@ namespace AquaPic.Runtime
                 if (!alarms [index].alarming) {
                     alarms [index].PostAlarm ();
 
-                    EventLogger.Add (string.Format ("{0} posted", alarms [index].name));
+                    Logger.Add (string.Format ("{0} posted", alarms [index].name));
 
                     if (AlarmsUpdatedEvent != null)
                         AlarmsUpdatedEvent (null);
@@ -42,7 +42,7 @@ namespace AquaPic.Runtime
             if ((index >= 0) && (index <= (alarms.Count - 1))) {
                 alarms [index].ClearAlarm ();
 
-                EventLogger.Add (string.Format ("{0} cleared", alarms [index].name));
+                Logger.Add (string.Format ("{0} cleared", alarms [index].name));
 
                 if (AlarmsUpdatedEvent != null)
                     AlarmsUpdatedEvent (null);
@@ -53,7 +53,7 @@ namespace AquaPic.Runtime
             foreach (var alarm in alarms)
                 alarm.AcknowledgeAlarm ();
 
-            EventLogger.Add ("All alarms acknowledged");
+            Logger.Add ("All alarms acknowledged");
 
             if (AlarmsUpdatedEvent != null)
                 AlarmsUpdatedEvent (null);

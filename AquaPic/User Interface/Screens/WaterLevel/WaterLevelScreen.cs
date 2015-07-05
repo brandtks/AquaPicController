@@ -18,7 +18,7 @@ namespace AquaPic.UserInterface
             Put (b, 15, 35);
 
             tb = new TouchTextBox ();
-            tb.text = WaterLevel.waterLevel.ToString ();
+            tb.text = WaterLevel.waterLevel.ToString ("F2");
             tb.WidthRequest = 200;
             Put (tb, 15, 85);
 
@@ -45,7 +45,7 @@ namespace AquaPic.UserInterface
         }
 
         public bool OnUpdateTimer () {
-            tb.text = WaterLevel.waterLevel.ToString ();
+            tb.text = WaterLevel.waterLevel.ToString ("F2");
             tb.QueueDraw ();
 
             return true;

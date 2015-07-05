@@ -42,7 +42,7 @@ namespace AquaPic.UserInterface
             tv.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
             tv.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
             tv.CanFocus = false;
-            tv.Buffer = EventLogger.buffer;
+            tv.Buffer = Logger.buffer;
 
             ScrolledWindow sw = new ScrolledWindow ();
             sw.SetSizeRequest (770, 315);
@@ -51,19 +51,19 @@ namespace AquaPic.UserInterface
             Put (sw, 15, 60);
             sw.Show ();
 
-            EventLogger.EventAddedEvent += OnEventAdded;
+            Logger.EventAddedEvent += OnEventAdded;
 
             Show ();
         }
 
         public override void Dispose () {
-            EventLogger.EventAddedEvent -= OnEventAdded;
+            Logger.EventAddedEvent -= OnEventAdded;
 
             base.Dispose ();
         }
 
         protected void OnEventAdded () {
-            tv.Buffer = EventLogger.buffer;
+            tv.Buffer = Logger.buffer;
             tv.Show ();
         }
 
@@ -78,7 +78,7 @@ namespace AquaPic.UserInterface
             ms.Response += (o, a) => {
                 if (a.ResponseId == ResponseType.Yes) {
                     SaveEvents ();
-                    EventLogger.buffer.Clear ();
+                    Logger.buffer.Clear ();
                 } else if (a.ResponseId == ResponseType.No) {
                     var d = new MessageDialog (
                         null,
@@ -89,7 +89,7 @@ namespace AquaPic.UserInterface
 
                     d.Response += (obj, arg) => {
                         if (arg.ResponseId == ResponseType.Yes)
-                            EventLogger.buffer.Clear ();
+                            Logger.buffer.Clear ();
                     };
 
                     d.Run ();
@@ -102,16 +102,16 @@ namespace AquaPic.UserInterface
         }
 
         protected void SaveEvents () {
-            if (!string.IsNullOrWhiteSpace (EventLogger.buffer.Text)) {
+            if (!string.IsNullOrWhiteSpace (Logger.buffer.Text)) {
                 string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
                 path = System.IO.Path.Combine (path, "Logs");
                 path = System.IO.Path.Combine (path, DateTime.Now.ToString ("yy-MM-dd-HH-mm-ss") + ".txt");
 
                 List<string> lines = new List<string> ();
-                for (int i = 0; i < EventLogger.buffer.LineCount; ++i) {
-                    TextIter tis = EventLogger.buffer.GetIterAtLine (i);
-                    TextIter tie = EventLogger.buffer.GetIterAtLine (i + 1);
-                    lines.Add (EventLogger.buffer.GetText (tis, tie, true));
+                for (int i = 0; i < Logger.buffer.LineCount; ++i) {
+                    TextIter tis = Logger.buffer.GetIterAtLine (i);
+                    TextIter tie = Logger.buffer.GetIterAtLine (i + 1);
+                    lines.Add (Logger.buffer.GetText (tis, tie, true));
                 }
 
                 string[] l = lines.ToArray ();

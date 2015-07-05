@@ -37,7 +37,7 @@ namespace AquaPic.UserInterface
 
             GLib.ExceptionManager.UnhandledException += (args) => {
                 Exception ex = args.ExceptionObject as Exception;
-                EventLogger.Add (ex.ToString ());
+                Logger.Add (ex.ToString ());
                 args.ExitApplication = false;
             };
 

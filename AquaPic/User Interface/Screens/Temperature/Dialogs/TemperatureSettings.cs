@@ -16,22 +16,22 @@ namespace AquaPic.UserInterface
             SaveEvent += OnSave;
 
             var t = new SettingTextBox ();
-            t.label.text = "Setpoint";
+            t.text = "Setpoint";
             t.textBox.text = Temperature.temperatureSetpoint.ToString ();
             settings.Add (t.label.text, t);
 
             t = new SettingTextBox ();
-            t.label.text = "Deadband";
+            t.text = "Deadband";
             t.textBox.text = (Temperature.temperatureDeadband * 2).ToString ();
             settings.Add (t.label.text, t);
 
             t = new SettingTextBox ();
-            t.label.text = "High Alarm";
+            t.text = "High Alarm";
             t.textBox.text = Temperature.highTempAlarmSetpoint.ToString ();
             settings.Add (t.label.text, t);
 
             t = new SettingTextBox ();
-            t.label.text = "Low Alarm";
+            t.text = "Low Alarm";
             t.textBox.text = Temperature.lowTempAlarmSetpoint.ToString ();
             settings.Add (t.label.text, t);
 

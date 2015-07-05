@@ -17,17 +17,17 @@ namespace AquaPic.UserInterface
             SaveEvent += OnSave;
 
             var t = new SettingTextBox ();
-            t.label.text = "High Alarm";
+            t.text = "High Alarm";
             t.textBox.text = WaterLevel.highLevelAlarmSetpoint.ToString ();
             AddSetting (t);
 
             t = new SettingTextBox ();
-            t.label.text = "Low Alarm";
+            t.text = "Low Alarm";
             t.textBox.text = WaterLevel.lowLevelAlarmSetpoint.ToString ();
             AddSetting (t);
 
             var c = new SettingComboBox ();
-            c.label.text = "Level Input";
+            c.text = "Level Input";
             string[] availCh = AnalogInput.GetAllAvaiableChannels ();
             IndividualControl ic = WaterLevel.levelSensor;
             string chName = AnalogInput.GetCardName (ic.Group);

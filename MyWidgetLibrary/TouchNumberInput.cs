@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 using System.Windows.Forms;
 using Cairo;
@@ -14,13 +15,16 @@ namespace MyWidgetLibrary
 
         private Entry entry;
         private Fixed fix;
+        private Process osk;
 
-        public TouchNumberInput () {
+        public TouchNumberInput (bool timeInput = false) {
             Name = "AquaPic.Keyboard.Input";
             Title = "Input";
             WindowPosition = (Gtk.WindowPosition)4;
             DefaultWidth = 205;
             DefaultHeight = 285;
+
+            DestroyEvent += OnDestroy;
 
             fix = new Fixed ();
             fix.WidthRequest = 205;
@@ -31,7 +35,7 @@ namespace MyWidgetLibrary
             fix.Put (bkgnd, 0, 0);
 
             entry = new Entry ();
-            entry.WidthRequest = 205;
+            entry.WidthRequest = 150;
             entry.CanFocus = true;
             entry.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
             entry.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
@@ -42,8 +46,19 @@ namespace MyWidgetLibrary
 
                 Destroy ();
             };
+
             fix.Put (entry, 0, 0);
             entry.GrabFocus ();
+
+            var b = new TouchButton ();
+            b.HeightRequest = 30;
+            b.ButtonReleaseEvent += (o, args) => {
+                //<WINDOWS> need different virtual keyboard for Linux
+                Console.WriteLine ("Starting On Screen KeyBoard");
+                osk = Process.Start ("osk.exe");
+            };
+            fix.Put (b, 155, 0);
+            b.Show ();
 
             int x, y;
             var buttons = new KeyButton[10];
@@ -104,53 +119,65 @@ namespace MyWidgetLibrary
             };
             fix.Put (clear, 155, 85);
 
-            KeyButton semi = new KeyButton (":", OnButtonRelease);
+            KeyButton semi;
+            if (timeInput)
+                semi = new KeyButton (":", OnButtonRelease);
+            else {
+                semi = new KeyButton (":", null);
+                semi.buttonColor = "grey3";
+            }
             fix.Put (semi, 5, 235);
 
             KeyButton pm = new KeyButton ("PM", null);
-            pm.ButtonReleaseEvent += (o, args) => {
-                int len = entry.Text.Length;
-                if (len >= 3) {
-                    string last = entry.Text.Substring (len - 2);
-                    if (last == "AM") {
-                        int pos = entry.Text.Length - 2;
-                        entry.DeleteText (pos, pos + 2);
-                        entry.InsertText ("PM", ref pos);
-                    } else if (last == "PM") {
-                        int pos = entry.Text.Length - 3;
-                        entry.DeleteText (pos, pos + 3);
+            if (timeInput) {
+                pm.ButtonReleaseEvent += (o, args) => {
+                    int len = entry.Text.Length;
+                    if (len >= 3) {
+                        string last = entry.Text.Substring (len - 2);
+                        if (last == "AM") {
+                            int pos = entry.Text.Length - 2;
+                            entry.DeleteText (pos, pos + 2);
+                            entry.InsertText ("PM", ref pos);
+                        } else if (last == "PM") {
+                            int pos = entry.Text.Length - 3;
+                            entry.DeleteText (pos, pos + 3);
+                        } else {
+                            int pos = entry.Text.Length;
+                            entry.InsertText (" PM", ref pos);
+                        }
                     } else {
                         int pos = entry.Text.Length;
                         entry.InsertText (" PM", ref pos);
                     }
-                } else {
-                    int pos = entry.Text.Length;
-                    entry.InsertText (" PM", ref pos);
-                }
-            };
+                };
+            } else
+                pm.buttonColor = "grey3";
             fix.Put (pm, 55, 235);
 
             KeyButton am = new KeyButton ("AM", null);
-            am.ButtonReleaseEvent += (o, args) => {
-                int len = entry.Text.Length;
-                if (len >= 3) {
-                    string last = entry.Text.Substring (len - 2);
-                    if (last == "PM") {
-                        int pos = entry.Text.Length - 2;
-                        entry.DeleteText (pos, pos + 2);
-                        entry.InsertText ("AM", ref pos);
-                    } else if (last == "AM") {
-                        int pos = entry.Text.Length - 3;
-                        entry.DeleteText (pos, pos + 3);
+            if (timeInput) {
+                am.ButtonReleaseEvent += (o, args) => {
+                    int len = entry.Text.Length;
+                    if (len >= 3) {
+                        string last = entry.Text.Substring (len - 2);
+                        if (last == "PM") {
+                            int pos = entry.Text.Length - 2;
+                            entry.DeleteText (pos, pos + 2);
+                            entry.InsertText ("AM", ref pos);
+                        } else if (last == "AM") {
+                            int pos = entry.Text.Length - 3;
+                            entry.DeleteText (pos, pos + 3);
+                        } else {
+                            int pos = entry.Text.Length;
+                            entry.InsertText (" AM", ref pos);
+                        }
                     } else {
                         int pos = entry.Text.Length;
                         entry.InsertText (" AM", ref pos);
                     }
-                } else {
-                    int pos = entry.Text.Length;
-                    entry.InsertText (" AM", ref pos);
-                }
-            };
+                };
+            } else
+                am.buttonColor = "grey3";
             fix.Put (am, 105, 235);
 
             KeyButton cancel = new KeyButton ("Cancel", null);
@@ -179,6 +206,13 @@ namespace MyWidgetLibrary
             Add (fix);
             fix.ShowAll ();
             Show ();
+        }
+
+        protected void OnDestroy (object sender, DestroyEventArgs args) {
+            if (osk != null) {
+                osk.CloseMainWindow ();
+                osk.Close ();
+            }
         }
 
         protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {

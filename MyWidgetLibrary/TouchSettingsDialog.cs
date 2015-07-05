@@ -11,7 +11,7 @@ namespace MyWidgetLibrary
     {
         public Fixed fix;
         public event SaveHandler SaveEvent;
-        public event SaveHandler DeleteEvent;
+        public event SaveHandler DeleteButtonEvent;
         public Dictionary<string, SettingsWidget> settings;
         public bool includeDelete;
 
@@ -19,7 +19,7 @@ namespace MyWidgetLibrary
 
         public TouchSettingsDialog (string name, bool includeDelete) {
             Name = "AquaPic.Settings." + name;
-            Title = name + "Settings";
+            Title = name + " Settings";
             WindowPosition = (Gtk.WindowPosition)4;
             SetSizeRequest (600, 320);
 
@@ -72,8 +72,8 @@ namespace MyWidgetLibrary
                         if (a.ResponseId == ResponseType.Yes) {
                             bool success = true;
 
-                            if (DeleteEvent != null)
-                                success = DeleteEvent (this);
+                            if (DeleteButtonEvent != null)
+                                success = DeleteButtonEvent (this);
 
                             if (!success)
                                 MessageBox.Show ("Error while deleting " + name);

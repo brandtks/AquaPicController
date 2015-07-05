@@ -16,104 +16,133 @@ namespace AquaPic.UserInterface
             SaveEvent += OnSave;
 
             var t = new SettingTextBox ();
-            t.label.text = "Latitude";
+            t.text = "Latitude";
             t.textBox.text = Lighting.latitude.ToString ();
-            settings.Add (t.label.text, t);
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Convert.ToDouble (args.text);
+                } catch {
+                    MessageBox.Show ("Improper latitude format");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             t = new SettingTextBox ();
-            t.label.text = "Longitude";
+            t.text = "Longitude";
             t.textBox.text = Lighting.longitude.ToString ();
-            settings.Add (t.label.text, t);
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Convert.ToDouble (args.text);
+                } catch {
+                    MessageBox.Show ("Improper Longitude format");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             t = new SettingTextBox ();
-            t.label.text = "Default Rise";
+            t.text = "Default Rise";
+            t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.defaultSunRise.TimeToString ();
-            settings.Add (t.label.text, t);
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Time time = ToTime (args.text);
+                    args.text = time.TimeToString ();
+                } catch {
+                    MessageBox.Show ("Improper time format, ##:##");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             t = new SettingTextBox ();
-            t.label.text = "Default Set";
+            t.text = "Default Set";
+            t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.defaultSunSet.TimeToString ();
-            settings.Add (t.label.text, t);
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Time time = ToTime (args.text);
+                    args.text = time.TimeToString ();
+                } catch {
+                    MessageBox.Show ("Improper time format, ##:##");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             t = new SettingTextBox ();
-            t.label.text = "Min Sunrise";
+            t.text = "Min Sunrise";
+            t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.minSunRise.TimeToString ();
-            settings.Add (t.label.text, t);
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Time time = ToTime (args.text);
+                    args.text = time.TimeToString ();
+                } catch {
+                    MessageBox.Show ("Improper time format, ##:##");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             t = new SettingTextBox ();
-            t.label.text = "Max Sunrise";
+            t.text = "Max Sunrise";
+            t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.maxSunRise.TimeToString ();
-            settings.Add (t.label.text, t);
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Time time = ToTime (args.text);
+                    args.text = time.TimeToString ();
+                } catch {
+                    MessageBox.Show ("Improper time format, ##:##");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             t = new SettingTextBox ();
-            t.label.text = "Min Sunset";
+            t.text = "Min Sunset";
+            t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.minSunSet.TimeToString ();
-            settings.Add (t.label.text, t);
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Time time = ToTime (args.text);
+                    args.text = time.TimeToString ();
+                } catch {
+                    MessageBox.Show ("Improper time format, ##:##");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             t = new SettingTextBox ();
-            t.label.text = "Max Sunset";
+            t.text = "Max Sunset";
+            t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.maxSunSet.TimeToString ();
-            settings.Add (t.label.text, t);
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Time time = ToTime (args.text);
+                    args.text = time.TimeToString ();
+                } catch {
+                    MessageBox.Show ("Improper time format, ##:##");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             DrawSettings ();
         }
 
         protected bool OnSave (object sender) {
-            try {
-                Lighting.latitude = Convert.ToDouble (((SettingTextBox)settings ["Latitude"]).textBox.text);
-            } catch {
-                MessageBox.Show ("Improper latitude format");
-                return false;
-            }
-
-            try {
-                Lighting.longitude = Convert.ToDouble (((SettingTextBox)settings ["Longitude"]).textBox.text);
-            } catch {
-                MessageBox.Show ("Improper longitude format");
-                return false;
-            }
-
-            try {
-                Lighting.defaultSunRise = ToTime (((SettingTextBox)settings ["Default Sunrise"]).textBox.text);
-            } catch {
-                MessageBox.Show ("Improper time format, ##:##");
-                return false;
-            }
-
-            try {
-                Lighting.defaultSunSet = ToTime (((SettingTextBox)settings ["Default Sunset"]).textBox.text);
-            } catch {
-                MessageBox.Show ("Improper time format, ##:##");
-                return false;
-            }
-
-            try {
-                Lighting.minSunRise = ToTime (((SettingTextBox)settings ["Min Sunrise"]).textBox.text);
-            } catch {
-                MessageBox.Show ("Improper time format, ##:##");
-                return false;
-            }
-
-            try {
-                Lighting.maxSunRise = ToTime (((SettingTextBox)settings ["Max Sunrise"]).textBox.text);
-            } catch {
-                MessageBox.Show ("Improper time format, ##:##");
-                return false;
-            }
-
-            try {
-                Lighting.minSunSet = ToTime (((SettingTextBox)settings ["Min Sunset"]).textBox.text);
-            } catch {
-                MessageBox.Show ("Improper time format, ##:##");
-                return false;
-            }
-
-            try {
-                Lighting.maxSunSet = ToTime (((SettingTextBox)settings ["Max Sunset"]).textBox.text);
-            } catch {
-                MessageBox.Show ("Improper time format, ##:##");
-                return false;
-            }
+            Lighting.latitude = Convert.ToDouble (((SettingTextBox)settings ["Latitude"]).textBox.text);
+            Lighting.longitude = Convert.ToDouble (((SettingTextBox)settings ["Longitude"]).textBox.text);
+            Lighting.defaultSunRise = ToTime (((SettingTextBox)settings ["Default Sunrise"]).textBox.text);
+            Lighting.defaultSunSet = ToTime (((SettingTextBox)settings ["Default Sunset"]).textBox.text);
+            Lighting.minSunRise = ToTime (((SettingTextBox)settings ["Min Sunrise"]).textBox.text);
+            Lighting.maxSunRise = ToTime (((SettingTextBox)settings ["Max Sunrise"]).textBox.text);
+            Lighting.minSunSet = ToTime (((SettingTextBox)settings ["Min Sunset"]).textBox.text);
+            Lighting.maxSunSet = ToTime (((SettingTextBox)settings ["Max Sunset"]).textBox.text);
 
             JObject jo = new JObject ();
 
@@ -164,7 +193,7 @@ namespace AquaPic.UserInterface
         protected Time ToTime (string value) {
             int pos = value.IndexOf (":");
 
-            if ((pos != 2) || (pos != 1))
+            if ((pos != 1) && (pos != 2))
                 throw new Exception ();
 
             string hourString = value.Substring (0, pos);
@@ -172,7 +201,7 @@ namespace AquaPic.UserInterface
 
             if ((hour < 0) || (hour > 23))
                 throw new Exception ();
-
+            
             string minString = value.Substring (pos + 1, 2);
             int min = Convert.ToInt32 (minString);
 

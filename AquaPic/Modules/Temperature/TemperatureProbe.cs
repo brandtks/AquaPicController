@@ -22,7 +22,7 @@ namespace AquaPic.Modules
 
             public float GetTemperature () {
                 temperature = AnalogInput.GetValue (channel);
-                temperature.Map (0, 4096, 32.0f, 100.0f);
+                temperature = temperature.Map (0, 4096, 32.0f, 100.0f);
                 return temperature;
             }
         }

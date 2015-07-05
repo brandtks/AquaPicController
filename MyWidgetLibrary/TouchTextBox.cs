@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Gtk;
 using Cairo;
 
@@ -8,35 +9,43 @@ namespace MyWidgetLibrary
 
     public class TextChangedEventArgs : EventArgs {
         public string text;
+        public bool keepText;
 
         public TextChangedEventArgs (string text) {
             this.text = text;
+            keepText = true;
         }
     }
 
     public class TouchTextBox : EventBox
     {
         public string text;
+        public string name;
         public MyColor textColor;
         public int textSize;
         public MyAlignment textAlignment;
         public MyColor bkgndColor;
         public bool enableTouch;
+        public bool includeTimeFunctions;
         public event TextChangedHandler TextChangedEvent;
 
         public TouchTextBox () {
             this.Visible = true;
             this.VisibleWindow = false;
 
-            this.text = null;
+            this.WidthRequest = 100;
+            this.HeightRequest = 30;
+
+            this.text = string.Empty;
+            name = string.Empty;
             this.textColor = new MyColor ("black");
             this.textSize = 11;
             this.textAlignment = MyAlignment.Left;
 
             bkgndColor = "grey4";
 
-            this.WidthRequest = 100;
-            this.HeightRequest = 30;
+            enableTouch = false;
+            includeTimeFunctions = false;
 
             this.ExposeEvent += OnExpose;
             ButtonReleaseEvent += OnTouchButtonRelease;
@@ -85,13 +94,20 @@ namespace MyWidgetLibrary
 
         protected void OnTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
             if (enableTouch) {
-                TouchNumberInput t = new TouchNumberInput ();
+                TouchNumberInput t = new TouchNumberInput (includeTimeFunctions);
+
+                if (!string.IsNullOrWhiteSpace (name))
+                    t.Title = name;
+                
                 t.NumberSetEvent += (value) => {
                     if (!string.IsNullOrWhiteSpace (value)) {
-                        this.text = value;
+                        TextChangedEventArgs a = new TextChangedEventArgs (value);
 
                         if (TextChangedEvent != null)
-                            TextChangedEvent (this, new TextChangedEventArgs (text));
+                            TextChangedEvent (this, a);
+
+                        if (a.keepText) 
+                            text = a.text;
                     }
                 };
                 

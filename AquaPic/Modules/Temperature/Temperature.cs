@@ -84,7 +84,7 @@ namespace AquaPic.Modules
         }
 
         public static void Init () {
-            EventLogger.Add ("Initializing Temperature");
+            Logger.Add ("Initializing Temperature");
         }
 
         public static void Run () {
@@ -129,12 +129,19 @@ namespace AquaPic.Modules
             int powerID, 
             int plugID)
         {
-            heaters.Add (new Heater (name, (byte)powerID, (byte)plugID));
+            if (HeaterNameOk (name))
+                heaters.Add (new Heater (name, (byte)powerID, (byte)plugID));
+            else
+                throw new Exception (string.Format ("Heater: {0} already exists", name));
         }
 
-        public static void AddHeater (int powerID, int plugID) {
-            string name = string.Format ("heater {0}", heaters.Count);
-            heaters.Add (new Heater (name, (byte)powerID, (byte)plugID));
+        public static bool HeaterNameOk (string name) {
+            try {
+                GetHeaterIndex (name);
+                return false;
+            } catch {
+                return true;
+            }
         }
 
         public static void RemoveHeater (int heaterId) {
@@ -163,7 +170,19 @@ namespace AquaPic.Modules
             if ((heaterId >= 0) && (heaterId < heaters.Count)) {
                 return heaters [heaterId].name;
             }
-            return string.Empty;
+
+            throw new ArgumentOutOfRangeException ("heaterId");
+        }
+
+        public static void SetHeaterName (int heaterId, string name) {
+            if ((heaterId >= 0) && (heaterId < heaters.Count)) {
+                if (HeaterNameOk (name))
+                    heaters [heaterId].name = name;
+                else
+                    throw new Exception (string.Format ("Heater: {0} already exists", name));
+            }
+
+            throw new ArgumentOutOfRangeException ("heaterId");
         }
 
         public static int GetHeaterIndex (string name) {
