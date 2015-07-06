@@ -75,10 +75,11 @@ namespace AquaPic.UserInterface
                     ParseOutlet (str, ref ic.Group, ref ic.Individual);
 
                     Temperature.AddHeater (name, ic.Group, ic.Individual);
+                    heaterIdx = Temperature.GetHeaterIndex (name);
 
                     JObject jo = new JObject ();
 
-                    jo.Add (new JProperty ("name", Temperature.GetHeaterName (Temperature.GetHeaterCount () - 1)));
+                    jo.Add (new JProperty ("name", Temperature.GetHeaterName (heaterIdx)));
                     jo.Add (new JProperty ("powerStrip", Power.GetPowerStripName (ic.Group)));
                     jo.Add (new JProperty ("outlet", ic.Individual.ToString ()));
 
@@ -97,11 +98,8 @@ namespace AquaPic.UserInterface
                         string formatter = joText.Substring (insertIdx);
                         lineEnd = formatter.IndexOf (nl);
                     }
-
                     insertIdx = joText.LastIndexOf ('}');
                     joText = joText.Insert (insertIdx, insert);
-
-                    Console.WriteLine ("joText: {0}", joText);
 
                     string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
                     path = System.IO.Path.Combine (path, "Settings");
@@ -140,6 +138,7 @@ namespace AquaPic.UserInterface
 
                 IndividualControl ic = Temperature.GetHeaterIndividualControl (heaterIdx);
                 int previousOutletId = ic.Individual;
+
                 ParseOutlet (str, ref ic.Group, ref ic.Individual);
 
                 Temperature.SetHeaterIndividualControl (heaterIdx, ic);
@@ -149,6 +148,11 @@ namespace AquaPic.UserInterface
                 jo.Add (new JProperty ("name", Temperature.GetHeaterName (heaterIdx)));
                 jo.Add (new JProperty ("powerStrip", Power.GetPowerStripName (ic.Group)));
                 jo.Add (new JProperty ("outlet", ic.Individual.ToString ()));
+
+                string joText = jo.ToString ();
+                int jStart = joText.IndexOf ('"');
+                int jEnd = joText.LastIndexOf ('"');
+                joText = joText.Substring (jStart, jEnd - jStart + 1);
 
                 string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
                 path = System.IO.Path.Combine (path, "Settings");
@@ -161,11 +165,6 @@ namespace AquaPic.UserInterface
                 int endLength = endSearch.Length;
                 int end = text.IndexOf (endSearch) + endLength;
                 string globSet = text.Substring (start, end - start);
-                 
-                string joText = jo.ToString ();
-                int jStart = joText.IndexOf ('"');
-                int jEnd = joText.LastIndexOf ('"');
-                joText = joText.Substring (jStart, jEnd - jStart + 1);
 
                 text = text.Replace (globSet, joText);
 

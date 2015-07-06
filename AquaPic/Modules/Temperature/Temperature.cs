@@ -109,9 +109,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static void AddTemperatureProbe (string name, int cardID, int channelID) {
-            probes.Add (new TemperatureProbe (name, cardID, channelID));
-        }
+
 
 //        public static void AddHeater (
 //            int powerID, 
@@ -176,9 +174,10 @@ namespace AquaPic.Modules
 
         public static void SetHeaterName (int heaterId, string name) {
             if ((heaterId >= 0) && (heaterId < heaters.Count)) {
-                if (HeaterNameOk (name))
+                if (HeaterNameOk (name)) {
                     heaters [heaterId].name = name;
-                else
+                    return;
+                } else
                     throw new Exception (string.Format ("Heater: {0} already exists", name));
             }
 
@@ -210,6 +209,35 @@ namespace AquaPic.Modules
             }
         }
 
+        public static void AddTemperatureProbe (string name, int cardID, int channelID) {
+            if (TemperatureProbeNameOk (name))
+                probes.Add (new TemperatureProbe (name, cardID, channelID));
+            else
+                throw new Exception (string.Format ("Probe: {0} already exists", name));
+        }
+
+        public static void RemoveTemperatureProbe (int probeId) {
+            if ((probeId >= 0) && (probeId < probes.Count)) {
+                TemperatureProbe p = probes [probeId];
+                AnalogInput.RemoveChannel (p.channel);
+                probes.Remove (p);
+            } else 
+                throw new ArgumentOutOfRangeException ("probeId");
+        }
+
+        public static bool TemperatureProbeNameOk (string name) {
+            try {
+                GetTemperatureProbeIndex (name);
+                return false;
+            } catch {
+                return true;
+            }
+        }
+
+        public static int GetTemperatureProbeCount () {
+            return probes.Count;
+        }
+
         public static string[] GetAllTemperatureProbeNames () {
             string[] names = new string[probes.Count];
             for (int i = 0; i < names.Length; ++i)
@@ -222,7 +250,19 @@ namespace AquaPic.Modules
             if ((probeIdx >= 0) && (probeIdx < probes.Count))
                 return probes [probeIdx].name;
 
-            throw new ArgumentOutOfRangeException ("probeIdx");
+            throw new ArgumentOutOfRangeException ("probeId");
+        }
+
+        public static void SetTemperatureProbeName (int probeId, string name) {
+            if ((probeId >= 0) && (probeId < probes.Count)) {
+                if (TemperatureProbeNameOk (name)) {
+                    probes [probeId].name = name;
+                    return;
+                } else
+                    throw new Exception (string.Format ("Probe: {0} already exists", name));
+            }
+
+            throw new ArgumentOutOfRangeException ("probeId");
         }
 
         public static int GetTemperatureProbeIndex (string name) {
@@ -234,19 +274,26 @@ namespace AquaPic.Modules
             throw new ArgumentException (name + " does not exists");
         }
 
-        public static IndividualControl GetTemperatureProbeIndividualControl (int probeIdx) {
-            if ((probeIdx >= 0) && (probeIdx < probes.Count))
-                return probes [probeIdx].channel;
+        public static IndividualControl GetTemperatureProbeIndividualControl (int probeId) {
+            if ((probeId >= 0) && (probeId < probes.Count))
+                return probes [probeId].channel;
 
-            throw new ArgumentOutOfRangeException ("probeIdx");
+            throw new ArgumentOutOfRangeException ("probeId");
         }
 
-        public static void SetTemperatureProbeIndividualControl (int probeIdx, IndividualControl ic) {
-            if ((probeIdx >= 0) && (probeIdx < probes.Count)) {
-                AnalogInput.RemoveChannel (probes [probeIdx].channel);
-                probes [probeIdx].channel = ic;
-                AnalogInput.AddChannel (probes [probeIdx].channel, AnalogType.Temperature, probes [probeIdx].name);
+        public static void SetTemperatureProbeIndividualControl (int probeId, IndividualControl ic) {
+            if ((probeId >= 0) && (probeId < probes.Count)) {
+                AnalogInput.RemoveChannel (probes [probeId].channel);
+                probes [probeId].channel = ic;
+                AnalogInput.AddChannel (probes [probeId].channel, AnalogType.Temperature, probes [probeId].name);
             }
+        }
+
+        public static float GetTemperatureProbeTemperature (int probeId) {
+            if ((probeId >= 0) && (probeId < probes.Count))
+                return probes [probeId].temperature;
+
+            throw new ArgumentOutOfRangeException ("probeId");
         }
 
 //        public static bool ControlsTemperature (int heaterId) {

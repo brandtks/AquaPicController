@@ -11,8 +11,11 @@ namespace AquaPic.UserInterface
         TouchComboBox heaterCombo;
         TouchComboBox probeCombo;
         TouchLabel heaterLabel;
+        TouchTextBox probeTempTextbox;
+        TouchTextBox tempTextBox;
         int heaterId;
         int probeId;
+        uint timerId;
 
 //        SettingTextBox setpoint;
 //        SettingTextBox deadband;
@@ -47,13 +50,13 @@ namespace AquaPic.UserInterface
             Put (tempLabel, 15, 75);
             tempLabel.Show ();
 
-            var temp = new TouchTextBox ();
-            temp.WidthRequest = 200;
-            temp.HeightRequest = 35;
-            temp.textSize = 14;
-            temp.text = Temperature.WaterTemperature.ToString ("F1");
-            Put (temp, 190, 70);
-            temp.Show ();
+            tempTextBox = new TouchTextBox ();
+            tempTextBox.WidthRequest = 200;
+            tempTextBox.HeightRequest = 35;
+            tempTextBox.textSize = 14;
+            tempTextBox.text = Temperature.WaterTemperature.ToString ("F1");
+            Put (tempTextBox, 190, 70);
+            tempTextBox.Show ();
 
             var setpointlabel = new TouchLabel ();
             setpointlabel.text = "Setpoint";
@@ -102,10 +105,10 @@ namespace AquaPic.UserInterface
 //            deadband.textBox.enableTouch = false;
 //            Put (deadband, 410, 135);
 
-            var settingsBtn = new TouchButton ();
-            settingsBtn.text = "Heater Setup";
-            settingsBtn.SetSizeRequest (100, 30);
-            settingsBtn.ButtonReleaseEvent += (o, args) => {
+            var heaterSetupBtn = new TouchButton ();
+            heaterSetupBtn.text = "Heater Setup";
+            heaterSetupBtn.SetSizeRequest (100, 30);
+            heaterSetupBtn.ButtonReleaseEvent += (o, args) => {
                 string name = Temperature.GetHeaterName (heaterId);
                 var s = new HeaterSettings (name, heaterId, true);
                 s.Run ();
@@ -117,35 +120,57 @@ namespace AquaPic.UserInterface
                     heaterCombo.List.Remove (name);
                     heaterId = 0;
                     heaterCombo.Active = heaterId;
-                    GetProbeData ();
+                    GetHeaterData ();
                 }
             };
-            Put (settingsBtn, 410, 190);
-            settingsBtn.Show ();
+            Put (heaterSetupBtn, 410, 190);
+            heaterSetupBtn.Show ();
 
-            var settingsBtn2 = new TouchButton ();
-            settingsBtn2.text = "Settings";
-            settingsBtn2.SetSizeRequest (100, 30);
-            settingsBtn2.ButtonReleaseEvent += (o, args) => {
+            var globalSettingsBtn = new TouchButton ();
+            globalSettingsBtn.text = "Settings";
+            globalSettingsBtn.SetSizeRequest (100, 30);
+            globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new TemperatureSettings ();
                 s.Run ();
                 s.Destroy ();
                 tempSetpoint.text = Temperature.temperatureSetpoint.ToString ("F1");
                 tempDeadband.text = (Temperature.temperatureDeadband * 2).ToString ("F1");
             };
-            Put (settingsBtn2, 15, 390);
-            settingsBtn2.Show ();
+            Put (globalSettingsBtn, 15, 390);
+            globalSettingsBtn.Show ();
 
-            var settingsBtn3 = new TouchButton ();
-            settingsBtn3.text = "Probe Setup";
-            settingsBtn3.SetSizeRequest (100, 30);
-            settingsBtn3.ButtonReleaseEvent += (o, args) => {
-                var s = new ProbeSettings (probeId);
+            var probeSetupBtn = new TouchButton ();
+            probeSetupBtn.text = "Probe Setup";
+            probeSetupBtn.SetSizeRequest (100, 30);
+            probeSetupBtn.ButtonReleaseEvent += (o, args) => {
+                string name = Temperature.GetTemperatureProbeName (probeId);
+                var s = new ProbeSettings (name, probeId, true);
                 s.Run ();
                 s.Destroy ();
+
+                try {
+                    Temperature.GetTemperatureProbeIndex (name);
+                } catch (ArgumentException) {
+                    probeCombo.List.Remove (name);
+                    probeId = 0;
+                    probeCombo.Active = heaterId;
+                    GetProbeData ();
+                }
             };
-            Put (settingsBtn3, 410, 390);
-            settingsBtn3.Show ();
+            Put (probeSetupBtn, 410, 390);
+            probeSetupBtn.Show ();
+
+            var tLabel = new TouchLabel ();
+            tLabel.text = "Temperature";
+            tLabel.textAlignment = MyAlignment.Right;
+            tLabel.WidthRequest = 100;
+            Put (tLabel, 410, 304);
+            tLabel.Show ();
+
+            probeTempTextbox = new TouchTextBox ();
+            probeTempTextbox.WidthRequest = 200;
+            Put (probeTempTextbox, 515, 300);
+            probeTempTextbox.Show ();
 
             string[] hNames = Temperature.GetAllHeaterNames ();
             heaterCombo = new TouchComboBox (hNames);
@@ -160,13 +185,23 @@ namespace AquaPic.UserInterface
             probeCombo = new TouchComboBox (pNames);
             probeCombo.Active = probeId;
             probeCombo.WidthRequest = 235;
-            probeCombo.ChangedEvent += OnHeaterComboChanged;
+            probeCombo.List.Add ("New probe...");
+            probeCombo.ChangedEvent += OnProbeComboChanged;
             Put (probeCombo, 550, 235);
             probeCombo.Show ();
 
             GetHeaterData ();
+            GetProbeData ();
+
+            timerId = GLib.Timeout.Add (1000, OnTimer);
 
             Show ();
+        }
+
+        public override void Dispose () {
+            GLib.Source.Remove (timerId);
+
+            base.Dispose ();
         }
 
         protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
@@ -179,22 +214,39 @@ namespace AquaPic.UserInterface
                 int listIdx = heaterCombo.List.IndexOf ("New heater...");
                 heaterCombo.List.Insert (listIdx, Temperature.GetHeaterName (heaterId));
                 heaterCombo.Active = listIdx;
+                heaterCombo.QueueDraw ();
                 GetHeaterData ();
             } else {
-                int id = Temperature.GetHeaterIndex (e.ActiveText);
-                if (id != -1) {
+                try {
+                    int id = Temperature.GetHeaterIndex (e.ActiveText);
                     heaterId = id;
                     GetHeaterData ();
+                } catch {
+                    ;
                 }
             }
         }
 
         protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            int id = Temperature.GetTemperatureProbeIndex (e.ActiveText);
+            if (e.ActiveText == "New probe...") {
+                var s = new ProbeSettings ("New probe", -1, false);
+                s.Run ();
+                s.Destroy ();
 
-            if (id != -1) {
-                probeId = id;
+                probeId = Temperature.GetTemperatureProbeCount () - 1;
+                int listIdx = probeCombo.List.IndexOf ("New probe...");
+                probeCombo.List.Insert (listIdx, Temperature.GetTemperatureProbeName (probeId));
+                probeCombo.Active = listIdx;
+                probeCombo.QueueDraw ();
                 GetProbeData ();
+            } else {
+                try {
+                    int id = Temperature.GetTemperatureProbeIndex (e.ActiveText);
+                    probeId = id;
+                    GetProbeData ();
+                } catch {
+                    ;
+                }
             }
         }
 
@@ -218,7 +270,16 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetProbeData () {
+            probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeId).ToString ("F2");
+            probeTempTextbox.QueueDraw ();
+        }
 
+        protected bool OnTimer () {
+            GetProbeData ();
+            tempTextBox.text = Temperature.WaterTemperature.ToString ("F1");
+            tempTextBox.QueueDraw ();
+
+            return true;
         }
     }
 }

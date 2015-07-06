@@ -51,7 +51,7 @@ namespace MyWidgetLibrary
             this.height = 30;
 
             this.WidthRequest = 175;
-            this.HeightRequest = height;
+            this.HeightRequest = height + 2;
 
             this.ExposeEvent += OnExpose;
             this.ButtonPressEvent += OnComboBoxPressed;
@@ -65,9 +65,9 @@ namespace MyWidgetLibrary
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
-                int left = Allocation.Left;
+                int left = Allocation.Left + 1;
                 int top = Allocation.Top;
-                int width = Allocation.Width;
+                int width = Allocation.Width - 2;
 
                 if (listDropdown) {
                     int listHeight;
@@ -76,7 +76,7 @@ namespace MyWidgetLibrary
                     else
                         listHeight = 30 + height;
 
-                    this.HeightRequest = listHeight;
+                    this.HeightRequest = listHeight + 2;
 
                     int radius = height / 2;
                     cr.MoveTo (left, top + radius);
@@ -147,7 +147,7 @@ namespace MyWidgetLibrary
                     t.textWrap = MyTextWrap.Shrink;
                     t.font.color = "black";
                     int w = width - height - 10;
-                    t.Render (this, left + 10, top + 6, w);
+                    t.Render (this, left + 10, top, w, height);
                 }
             }
         }

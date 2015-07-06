@@ -38,6 +38,7 @@ namespace AquaPic.UserInterface
             Put (b, 575, 380);
 
             tv = new TextView ();
+            tv.Editable = false;
             tv.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
             tv.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
             tv.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));

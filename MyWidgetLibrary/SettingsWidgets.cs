@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Cairo;
 using Gtk;
 
@@ -67,5 +68,50 @@ namespace MyWidgetLibrary
             combo.Show ();
         }
     }
+
+//    public class SettingEntry : SettingsWidget
+//    {
+//        public event TextChangedHandler TextChangedEvent;
+//
+//        public Entry entry;
+//        private Process osk;
+//        private string oldText;
+//
+//        public SettingEntry () : base () {
+//            entry = new Entry ();
+//            entry.SetSizeRequest (170, 30);
+//            entry.CanFocus = true;
+//            entry.Activated += (sender, e) => {
+//                TextChangedEventArgs args = new TextChangedEventArgs (entry.Text);
+//                if (TextChangedEvent != null)
+//                    TextChangedEvent (this, args);
+//
+//                if (!args.keepText)
+//                    entry.Text = oldText;
+//
+//                if (osk != null) {
+//                    osk.CloseMainWindow ();
+//                    osk.Close ();
+//                }
+//            };
+//
+//            entry.FocusInEvent += (o, args) => {
+//                oldText = entry.Text;
+//                entry.Text = string.Empty;
+//                if (osk == null)
+//                    osk = Process.Start ("osk.exe");
+//            };
+//
+//            entry.FocusOutEvent += (o, args) => {
+//                if (osk != null) {
+//                    osk.CloseMainWindow ();
+//                    osk.Close ();
+//                }
+//            };
+//
+//            Put (entry, 120, 0);
+//            entry.Show ();
+//        }
+//    }
 }
 
