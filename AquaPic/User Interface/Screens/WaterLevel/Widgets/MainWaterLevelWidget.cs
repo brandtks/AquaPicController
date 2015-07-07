@@ -28,19 +28,21 @@ namespace AquaPic.UserInterface
         }
 
         public override void OnUpdate () {
-            if (WaterLevel.waterLevel < 0.0f) {
-                currentValue = 0.0f;
-                if (WaterLevel.waterLevel <= 1.0f) {
-                    flashUpdate = ++flashUpdate % 2;
-                    if (flashUpdate < 1)
-                        label.Visible = true;
-                    else
-                        label.Visible = false;
+            if (WaterLevel.analogSensorEnabled) {
+                if (WaterLevel.analogWaterLevel < 0.0f) {
+                    currentValue = 0.0f;
+                    if (WaterLevel.analogWaterLevel <= 1.0f) {
+                        flashUpdate = ++flashUpdate % 2;
+                        if (flashUpdate < 1)
+                            label.Visible = true;
+                        else
+                            label.Visible = false;
+                    }
+                } else {
+                    currentValue = WaterLevel.analogWaterLevel;
+                    label.Visible = false;
+                    flashUpdate = 0;
                 }
-            } else {
-                currentValue = WaterLevel.waterLevel;
-                label.Visible = false;
-                flashUpdate = 0;
             }
         }
     }

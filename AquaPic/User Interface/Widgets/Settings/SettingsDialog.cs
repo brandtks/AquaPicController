@@ -14,6 +14,7 @@ namespace MyWidgetLibrary
         public event SaveHandler DeleteButtonEvent;
         public Dictionary<string, SettingsWidget> settings;
         public bool includeDelete;
+        public bool showOptional;
 
         public TouchSettingsDialog (string name) : this (name, false) { }
 
@@ -94,16 +95,17 @@ namespace MyWidgetLibrary
 
             settings = new Dictionary<string, SettingsWidget> ();
 
+            showOptional = true;
+
             Show ();
         }
 
         protected void DrawSettings () {
             int x = 5;
             int y = 5;
-
+            
             foreach (var s in settings.Values) {
                 fix.Put (s, x, y);
-                s.Show ();
 
                 if (x == 5)
                     x = 305;
@@ -115,9 +117,29 @@ namespace MyWidgetLibrary
                 if (y > 250)
                     throw new Exception ("Too many settings for window");
             }
+
+            UpdateSettingsVisibility ();
         }
 
-        public void AddSetting (SettingsWidget w) {
+        protected void UpdateSettingsVisibility () {
+            foreach (var s in settings.Values) {
+                if (s.optionalSetting && showOptional)
+                    s.Visible = true;
+                else if (!s.optionalSetting)
+                    s.Visible = true;
+                else
+                    s.Visible = false;
+
+                s.QueueDraw ();
+            }
+        }
+
+        protected void AddSetting (SettingsWidget w) {
+            settings.Add (w.label.text, w);
+        }
+
+        protected void AddOptionalSetting (SettingsWidget w) {
+            w.optionalSetting = true;
             settings.Add (w.label.text, w);
         }
     }

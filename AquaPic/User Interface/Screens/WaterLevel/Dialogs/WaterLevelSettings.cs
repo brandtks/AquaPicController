@@ -16,40 +16,62 @@ namespace AquaPic.UserInterface
         public LevelSettings () : base ("Water Level") {
             SaveEvent += OnSave;
 
+            var s = new SettingSelectorSwitch ();
+            s.text = "Enable";
+            s.selectorSwitch.SelectorChangedEvent += (sender, args) => {
+                if (args.currentSelectedIndex == 0)
+                    showOptional = true;
+                else
+                    showOptional = false;
+
+                UpdateSettingsVisibility ();
+            };
+            AddSetting (s);
+
             var t = new SettingTextBox ();
             t.text = "High Alarm";
-            t.textBox.text = WaterLevel.highLevelAlarmSetpoint.ToString ();
-            AddSetting (t);
+            t.textBox.text = WaterLevel.highAnalogLevelAlarmSetpoint.ToString ();
+            AddOptionalSetting (t);
 
             t = new SettingTextBox ();
             t.text = "Low Alarm";
-            t.textBox.text = WaterLevel.lowLevelAlarmSetpoint.ToString ();
-            AddSetting (t);
+            t.textBox.text = WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ();
+            AddOptionalSetting (t);
 
             var c = new SettingComboBox ();
-            c.text = "Level Input";
+            c.text = "Sensor Channel";
             string[] availCh = AnalogInput.GetAllAvaiableChannels ();
-            IndividualControl ic = WaterLevel.levelSensor;
+            IndividualControl ic = WaterLevel.analogSensorChannel;
             string chName = AnalogInput.GetCardName (ic.Group);
             chName = string.Format ("{0}.i{1}", chName, ic.Individual);
             c.combo.List.Add (string.Format ("Current: {0}", chName));
             c.combo.List.AddRange (availCh);
             c.combo.Active = 0;
-            AddSetting (c);
+            AddOptionalSetting (c);
 
             DrawSettings ();
         }
 
         protected bool OnSave (object sender) {
             try {
-                WaterLevel.highLevelAlarmSetpoint = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
+                SettingSelectorSwitch s = settings ["Enable"] as SettingSelectorSwitch;
+                if (s.selectorSwitch.CurrentSelected == 0)
+                    WaterLevel.SetAnalogSensorEnable (true);
+                else
+                    WaterLevel.SetAnalogSensorEnable (false);
+            } catch {
+                return false;
+            }
+
+            try {
+                WaterLevel.highAnalogLevelAlarmSetpoint = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
             } catch {
                 MessageBox.Show ("Improper high alarm setpoint format");
                 return false;
             }
 
             try {
-                WaterLevel.lowLevelAlarmSetpoint = Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text);
+                WaterLevel.lowAnalogLevelAlarmSetpoint = Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text);
             } catch {
                 MessageBox.Show ("Improper low alarm setpoint format");
                 return false;
@@ -62,13 +84,11 @@ namespace AquaPic.UserInterface
                     string cardName = s.Substring (0, idx);
                     int cardId = AnalogInput.GetCardIndex (cardName);
                     int channelId = Convert.ToByte (s.Substring (idx + 2));
-                   
-                    AnalogInput.RemoveChannel (WaterLevel.levelSensor);
 
-                    WaterLevel.levelSensor.Group = (byte)cardId;
-                    WaterLevel.levelSensor.Individual = (byte)channelId;
-
-                    AnalogInput.AddChannel (WaterLevel.levelSensor, AnalogType.Level, "Water Level");
+                    IndividualControl ic;
+                    ic.Group = (byte)cardId;
+                    ic.Individual = (byte)channelId;
+                    WaterLevel.SetAnalogSensorIndividualControl (ic);
                 }
             } catch {
                 return false;
@@ -76,12 +96,13 @@ namespace AquaPic.UserInterface
 
             JObject jo = new JObject ();
 
-            jo.Add (new JProperty ("highLevelAlarmSetpoint", WaterLevel.highLevelAlarmSetpoint.ToString ()));
-            jo.Add (new JProperty ("lowLevelAlarmSetpoint", WaterLevel.lowLevelAlarmSetpoint.ToString ()));
-            jo.Add (new JProperty ("sensor", 
+            jo.Add (new JProperty ("enableAnalogSensor", WaterLevel.analogSensorEnabled.ToString ()));
+            jo.Add (new JProperty ("highAnalogLevelAlarmSetpoint", WaterLevel.highAnalogLevelAlarmSetpoint.ToString ()));
+            jo.Add (new JProperty ("lowAnalogLevelAlarmSetpoint", WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ()));
+            jo.Add (new JProperty ("analogSensorChannel", 
                 new JObject (
-                    new JProperty ("Group", AnalogInput.GetCardName (WaterLevel.levelSensor.Group)), 
-                    new JProperty ("Individual", WaterLevel.levelSensor.Individual.ToString ()))));
+                    new JProperty ("Group", AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group)), 
+                    new JProperty ("Individual", WaterLevel.analogSensorChannel.Individual.ToString ()))));
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");

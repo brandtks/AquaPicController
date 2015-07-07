@@ -29,7 +29,7 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             label = new TouchLabel ();
-            label.text = "Lighting Fixtures";
+            label.text = "Auto Top Off";
             label.textColor = "pri";
             label.textSize = 12;
             Put (label, 413, 40);
@@ -42,7 +42,7 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             tb = new TouchTextBox ();
-            tb.text = WaterLevel.waterLevel.ToString ("F2");
+            tb.text = WaterLevel.analogWaterLevel.ToString ("F2");
             tb.WidthRequest = 200;
             Put (tb, 190, 70);
 
@@ -74,7 +74,7 @@ namespace AquaPic.UserInterface
         }
 
         public bool OnUpdateTimer () {
-            tb.text = WaterLevel.waterLevel.ToString ("F2");
+            tb.text = WaterLevel.analogWaterLevel.ToString ("F2");
             tb.QueueDraw ();
 
             return true;

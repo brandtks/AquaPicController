@@ -27,7 +27,7 @@ namespace AquaPic.UserInterface
 
         public static string currentScreen;
 
-        public static List<string> menuWindows = new List<string> () {"Main", "Lighting", "Water Level", "Power", "Temperature", "Menu"};
+        public static List<string> menuWindows = new List<string> () {"Main", "Power", "Water Level", "Lighting", "Temperature", "Menu"};
         public static string[] menuColors = new string[6] {"pri", "secb", "seca", "secc", "compl", "grey4"};
         public static string currentSelectedMenu;
 
