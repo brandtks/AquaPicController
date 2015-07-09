@@ -8,7 +8,7 @@ namespace AquaPic.UserInterface
 {
     public class MyMenuBar : EventBox
     {
-        private string currentScreen;
+        private string currentMenu;
         private string highlightedScreen;
         private uint timer;
         private bool menuTouched;
@@ -26,7 +26,7 @@ namespace AquaPic.UserInterface
         }
 
         public void UpdateScreens () {
-            currentScreen = GuiGlobal.currentSelectedMenu;
+            currentMenu = GuiGlobal.currentSelectedMenu;
             highlightedScreen = GuiGlobal.currentSelectedMenu;
         }
 
@@ -37,9 +37,9 @@ namespace AquaPic.UserInterface
 
                 foreach (var screen in GuiGlobal.menuWindows) {
                     ScreenData s = GuiGlobal.allWindows [screen];
-                    if ((GuiGlobal.currentSelectedMenu == s.name) || (menuTouched && (highlightedScreen == s.name)))
+                    if ((GuiGlobal.currentScreen == s.name) || (menuTouched && (highlightedScreen == s.name))) {
                         cr.Rectangle (x, 435, width, 45);
-                    else
+                    } else
                         cr.Rectangle (x, 472, width, 8);
 
                     MyColor.SetSource (cr, GuiGlobal.menuColors [GuiGlobal.menuWindows.IndexOf (screen)]);
@@ -54,13 +54,15 @@ namespace AquaPic.UserInterface
                 l.Alignment = Pango.Alignment.Center;
                 l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
 
-                x = (GuiGlobal.menuWindows.IndexOf (currentScreen) * width) + 1;
-                l.SetMarkup ("<span color=\"black\">"
-                    + GuiGlobal.allWindows [currentScreen].name 
+                if (currentMenu == GuiGlobal.currentScreen) {
+                    x = (GuiGlobal.menuWindows.IndexOf (currentMenu) * width) + 1;
+                    l.SetMarkup ("<span color=\"black\">"
+                    + GuiGlobal.allWindows [currentMenu].name
                     + "</span>");
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), x, Allocation.Top + 14, l);
+                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), x, Allocation.Top + 14, l);
+                }
 
-                if ((menuTouched) && (currentScreen != highlightedScreen)) {
+                if ((menuTouched) && (GuiGlobal.currentScreen != highlightedScreen)) {
                     x = (GuiGlobal.menuWindows.IndexOf (highlightedScreen) * width) + 1;
                     l.SetMarkup ("<span color=\"black\">"
                         + GuiGlobal.allWindows [highlightedScreen].name 

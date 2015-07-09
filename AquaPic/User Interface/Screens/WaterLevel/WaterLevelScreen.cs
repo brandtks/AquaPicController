@@ -16,12 +16,16 @@ namespace AquaPic.UserInterface
             Put (box1, 10, 30);
             box1.Show ();
 
-            MyBox box2 = new MyBox (385, 395);
+            MyBox box2 = new MyBox (385, 195);
             Put (box2, 405, 30);
             box2.Show ();
 
+            MyBox box3 = new MyBox (385, 195);
+            Put (box3, 405, 230);
+            box3.Show ();
+
             var label = new TouchLabel ();
-            label.text = "Water Level Sensor";
+            label.text = "Auto Top Off";
             label.WidthRequest = 370;
             label.textColor = "pri";
             label.textSize = 12;
@@ -29,7 +33,7 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             label = new TouchLabel ();
-            label.text = "Auto Top Off";
+            label.text = "Water Level Sensor";
             label.textColor = "pri";
             label.textSize = 12;
             Put (label, 413, 40);
@@ -38,13 +42,13 @@ namespace AquaPic.UserInterface
             label = new TouchLabel ();
             label.text = "Water Level";
             label.textColor = "grey4"; 
-            Put (label, 15, 74);
+            Put (label, 410, 74);
             label.Show ();
 
             tb = new TouchTextBox ();
             tb.text = WaterLevel.analogWaterLevel.ToString ("F2");
             tb.WidthRequest = 200;
-            Put (tb, 190, 70);
+            Put (tb, 585, 70);
 
             var settingsBtn = new TouchButton ();
             settingsBtn.text = "Settings";
@@ -54,13 +58,13 @@ namespace AquaPic.UserInterface
                 s.Run ();
                 s.Destroy ();
             };
-            Put (settingsBtn, 15, 390);
+            Put (settingsBtn, 410, 190);
             settingsBtn.Show ();
 
             var b = new TouchButton ();
             b.text = "Calibrate";
             b.SetSizeRequest (100, 30);
-            Put (b, 120, 390);
+            Put (b, 515, 190);
 
             timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
 

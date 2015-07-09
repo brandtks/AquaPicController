@@ -113,8 +113,11 @@ namespace AquaPic.UserInterface
                 var s = new TemperatureSettings ();
                 s.Run ();
                 s.Destroy ();
+
                 tempSetpoint.text = Temperature.temperatureSetpoint.ToString ("F1");
+                tempSetpoint.QueueDraw ();
                 tempDeadband.text = (Temperature.temperatureDeadband * 2).ToString ("F1");
+                tempDeadband.QueueDraw ();
             };
             Put (globalSettingsBtn, 15, 390);
             globalSettingsBtn.Show ();
