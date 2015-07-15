@@ -109,8 +109,6 @@ namespace AquaPic.Modules
             }
         }
 
-
-
 //        public static void AddHeater (
 //            int powerID, 
 //            int plugID,
@@ -150,7 +148,7 @@ namespace AquaPic.Modules
                 return;
             }
 
-            throw new ArgumentOutOfRangeException ("heaterId is out of range");
+            throw new ArgumentOutOfRangeException ("heaterId");
         }
 
         public static int GetHeaterCount () {
@@ -285,7 +283,7 @@ namespace AquaPic.Modules
             if ((probeId >= 0) && (probeId < probes.Count)) {
                 AnalogInput.RemoveChannel (probes [probeId].channel);
                 probes [probeId].channel = ic;
-                AnalogInput.AddChannel (probes [probeId].channel, AnalogType.Temperature, probes [probeId].name);
+                AnalogInput.AddChannel (probes [probeId].channel, probes [probeId].name);
             }
         }
 

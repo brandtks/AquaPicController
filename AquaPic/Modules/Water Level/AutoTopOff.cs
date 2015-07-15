@@ -4,7 +4,7 @@ namespace AquaPic.Modules
 {
     public partial class WaterLevel
     {
-        public class AutoTopOff
+        private class AutoTopOff
         {
             public AutoTopOff () {
                 

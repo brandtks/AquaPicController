@@ -49,7 +49,7 @@ namespace AquaPic.UserInterface
                         return;
                     }
 
-                    float lowAlarmStpnt = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
+                    float lowAlarmStpnt = Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text);
 
                     if (lowAlarmStpnt >= highAlarmStpnt) {
                         MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
@@ -119,7 +119,13 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            JObject jo = new JObject ();
+            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = System.IO.Path.Combine (path, "Settings");
+            path = System.IO.Path.Combine (path, "waterLevelProperties.json");
+
+            string jstring = File.ReadAllText (path);
+            JObject jo = (JObject)JToken.Parse (jstring);
+
             if (enable) {
                 float lowAlarmStpnt = Convert.ToSingle (Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text));
 
@@ -166,30 +172,20 @@ namespace AquaPic.UserInterface
                 //this has to be last because if for whatever reason something above this crashes we need leave the module disable
                 WaterLevel.SetAnalogSensorEnable (enable);
 
-                jo.Add (new JProperty ("enableAnalogSensor", WaterLevel.analogSensorEnabled.ToString ()));
-                jo.Add (new JProperty ("highAnalogLevelAlarmSetpoint", WaterLevel.highAnalogLevelAlarmSetpoint.ToString ()));
-                jo.Add (new JProperty ("lowAnalogLevelAlarmSetpoint", WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ()));
-                jo.Add (new JProperty ("analogSensorChannel", 
-                    new JObject (
-                        new JProperty ("Group", AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group)), 
-                        new JProperty ("Individual", WaterLevel.analogSensorChannel.Individual.ToString ()))));
-
-
+                jo ["enableAnalogSensor"] = WaterLevel.analogSensorEnabled.ToString ();
+                jo ["highAnalogLevelAlarmSetpoint"] = WaterLevel.highAnalogLevelAlarmSetpoint.ToString ();
+                jo ["lowAnalogLevelAlarmSetpoint"] = WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ();
+                jo ["analogSensorChannel"] ["Group"] = AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group);
+                jo ["analogSensorChannel"] ["Individual"] = WaterLevel.analogSensorChannel.Individual.ToString ();
             } else {
                 WaterLevel.SetAnalogSensorEnable (enable);
 
-                jo.Add (new JProperty ("enableAnalogSensor", WaterLevel.analogSensorEnabled.ToString ()));
-                jo.Add (new JProperty ("highAnalogLevelAlarmSetpoint", string.Empty));
-                jo.Add (new JProperty ("lowAnalogLevelAlarmSetpoint", string.Empty));
-                jo.Add (new JProperty ("analogSensorChannel", 
-                    new JObject (
-                        new JProperty ("Group", string.Empty), 
-                        new JProperty ("Individual", string.Empty))));
+                jo ["enableAnalogSensor"] = WaterLevel.analogSensorEnabled.ToString ();
+                jo ["highAnalogLevelAlarmSetpoint"] = string.Empty;
+                jo ["lowAnalogLevelAlarmSetpoint"] = string.Empty;
+                jo ["analogSensorChannel"] ["Group"] = string.Empty;
+                jo ["analogSensorChannel"] ["Individual"] = string.Empty;
             }
-
-            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
-            path = System.IO.Path.Combine (path, "waterLevelProperties.json");
 
             File.WriteAllText (path, jo.ToString ());
 

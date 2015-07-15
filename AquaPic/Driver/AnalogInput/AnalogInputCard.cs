@@ -52,19 +52,18 @@ namespace AquaPic.Drivers
                 channels [ch].name = name;
             }
             #else
-            public void AddChannel (int ch, AnalogType type, string name) {
-                channels [ch].type = type;
+            public void AddChannel (int ch, string name) {
                 channels [ch].name = name;
 
-                byte[] arr = new byte[2];
-                arr [0] = (byte)ch;
-                arr [1] = (byte)channels [ch].type;
-
-                unsafe {
-                    fixed (byte* ptr = &arr [0]) {
-                        slave.Write (2, ptr, sizeof(byte) * 2);
-                    }
-                }
+//                byte[] arr = new byte[2];
+//                arr [0] = (byte)ch;
+//                arr [1] = (byte)channels [ch].type;
+//
+//                unsafe {
+//                    fixed (byte* ptr = &arr [0]) {
+//                        slave.Write (2, ptr, sizeof(byte) * 2);
+//                    }
+//                }
             }
             #endif
 
@@ -76,7 +75,7 @@ namespace AquaPic.Drivers
             #else
             public unsafe void GetValues () {
                 updating = true;
-                slave.Read (20, sizeof(float) * 4, GetValuesCallback); 
+                slave.Read (20, sizeof(Int16) * 4, GetValuesCallback); 
             }
             #endif
 
@@ -89,17 +88,17 @@ namespace AquaPic.Drivers
             }
             #else
             protected void GetValuesCallback (CallbackArgs args) {
-                float[] values = new float[4];
+                Int16[] values = new Int16[4];
 
                 unsafe {
-                    fixed (float* ptr = values) {
-                        args.copyBuffer (ptr, sizeof(float) * 4);
+                    fixed (Int16* ptr = values) {
+                        args.copyBuffer (ptr, sizeof(Int16) * 4);
                     }
                 }
 
                 for (int i = 0; i < channels.Length; ++i) {
                     if (channels [i].mode == Mode.Auto)
-                        channels [i].value = values [i];
+                        channels [i].value = (float)values [i];
                 }
 
                 updating = false;
@@ -119,7 +118,7 @@ namespace AquaPic.Drivers
                 if (channels [ch].mode == Mode.Auto) {
                     byte message = ch;
                     updating = true;
-                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueFloat), GetValueCallback);
+                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueInt), GetValueCallback);
                 }
             }
             #endif
@@ -132,13 +131,13 @@ namespace AquaPic.Drivers
             }
             #else
             protected void GetValueCallback (CallbackArgs args) {
-                CommValueFloat vg;
+                CommValueInt vg;
 
                 unsafe {
-                    args.copyBuffer (&vg, sizeof(CommValueFloat));
+                    args.copyBuffer (&vg, sizeof(CommValueInt));
                 }
                    
-                channels [vg.channel].value = vg.value;
+                channels [vg.channel].value = (float)vg.value;
                 updating = false;
             }
             #endif

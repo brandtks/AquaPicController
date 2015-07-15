@@ -60,6 +60,7 @@ namespace AquaPic.Drivers
 
                 byte[] arr = new byte[2];
                 arr [0] = (byte)ch;
+                //<NOTE> CHANGE PWM to be 255 and 0-10 to be 0
                 arr [1] = (byte)channels [ch].type;
 
                 unsafe {
@@ -87,7 +88,7 @@ namespace AquaPic.Drivers
             public void SetAnalogValue (byte channelID, int value) {
                 CommValueInt vs;
                 vs.channel = channelID;
-                vs.value = value;
+                vs.value = (Int16)value;
 
                 channels [vs.channel].value = vs.value;
 
@@ -111,7 +112,7 @@ namespace AquaPic.Drivers
                 slave.Write (30, message, messageLength);
             }
             #else
-            public void SetAllAnalogValues (int[] values) {
+            public void SetAllAnalogValues (Int16[] values) {
                 if (values.Length < 4)
                     return;
 
@@ -120,8 +121,8 @@ namespace AquaPic.Drivers
                 }
 
                 unsafe {
-                    fixed (int* ptr = &values[0]) {
-                        slave.Write (30, ptr, sizeof(int) * 4);
+                    fixed (Int16* ptr = &values[0]) {
+                        slave.Write (30, ptr, sizeof(Int16) * 4);
                     }
                 }
             }
@@ -132,7 +133,7 @@ namespace AquaPic.Drivers
             #else
             public void GetValues () {
                 unsafe {
-                    slave.Read (20, sizeof(float) * 4, GetValuesCallback); 
+                    slave.Read (20, sizeof(Int16) * 4, GetValuesCallback); 
                 }
             }
             #endif
@@ -141,11 +142,11 @@ namespace AquaPic.Drivers
 
             #else
             protected void GetValuesCallback (CallbackArgs args) {
-                int[] values = new int[4];
+                Int16[] values = new Int16[4];
 
                 unsafe {
-                    fixed (int* ptr = values) {
-                        args.copyBuffer (ptr, sizeof(float) * 4);
+                    fixed (Int16* ptr = values) {
+                        args.copyBuffer (ptr, sizeof(Int16) * 4);
                     }
                 }
 

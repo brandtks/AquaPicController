@@ -15,7 +15,7 @@ namespace AquaPic.Drivers
             public Mode mode;
 
             public AnalogOutputChannel (string name, ValueSetterHandler valueSetter) {
-                this.type = AnalogType.None;
+                this.type = AnalogType.ZeroTen;
                 this.name = name;
                 this.value = 0;
                 mode = Mode.Auto;

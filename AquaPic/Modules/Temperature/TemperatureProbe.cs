@@ -16,7 +16,7 @@ namespace AquaPic.Modules
                 this.name = name;
                 channel.Group = (byte)cardId;
                 channel.Individual = (byte)channelId;
-                AnalogInput.AddChannel (channel, AnalogType.Temperature, this.name);
+                AnalogInput.AddChannel (channel, this.name);
                 temperature = 0.0f;
             }
 

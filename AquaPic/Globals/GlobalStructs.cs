@@ -23,14 +23,14 @@ namespace AquaPic.Utilites
         }
     }
 
-    public struct CommValueFloat {
-        public byte channel;
-        public float value;
-    }
+//    public struct CommValueFloat {
+//        public byte channel;
+//        public float value;
+//    }
 
     public struct CommValueInt {
         public byte channel;
-        public int value;
+        public Int16 value;
     }
 
     public struct CommValueBool {

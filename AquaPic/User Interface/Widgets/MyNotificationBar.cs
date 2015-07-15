@@ -79,7 +79,7 @@ namespace AquaPic.UserInterface
                 else
                     fontColor = MyColor.ToHTML ("compl");
                 l.Alignment = Pango.Alignment.Left;
-                l.Width = Pango.Units.FromPixels (400);
+                l.Width = Pango.Units.FromPixels (500);
                 l.SetMarkup ("<span color=\""
                     + fontColor
                     + "\">" 

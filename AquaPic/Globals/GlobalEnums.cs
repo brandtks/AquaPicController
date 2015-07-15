@@ -8,14 +8,11 @@ namespace AquaPic.Utilites
     }
 
     public enum AnalogType : byte {
-        None = 1,
-        Temperature,
-        Level,
-        PWM,
         [Description("0-10Vdc")]
-        ZeroTen,
+        ZeroTen = 0,
         [Description("0-5Vdc")]
-        ZeroFive
+        ZeroFive,
+        PWM = 255
     }
 
     public enum MyState : byte {

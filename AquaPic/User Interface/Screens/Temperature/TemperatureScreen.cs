@@ -25,12 +25,12 @@ namespace AquaPic.UserInterface
             Put (box1, 10, 30);
             box1.Show ();
 
-            MyBox box2 = new MyBox (385, 195);
+            MyBox box2 = new MyBox (385, 193);
             Put (box2, 405, 30);
             box2.Show ();
 
-            MyBox box3 = new MyBox (385, 195);
-            Put (box3, 405, 230);
+            MyBox box3 = new MyBox (385, 192);
+            Put (box3, 405, 233);
             box3.Show ();
 
             var label = new TouchLabel ();
@@ -142,14 +142,16 @@ namespace AquaPic.UserInterface
 
                 heaterCombo.QueueDraw ();
             };
-            Put (heaterSetupBtn, 410, 190);
+            Put (heaterSetupBtn, 410, 188);
             heaterSetupBtn.Show ();
+
+            probeId = 0;
 
             label = new TouchLabel ();
             label.text = "Probes";
             label.textColor = "pri";
             label.textSize = 12;
-            Put (label, 413, 240);
+            Put (label, 413, 243);
             label.Show ();
 
             var probeSetupBtn = new TouchButton ();
@@ -166,7 +168,7 @@ namespace AquaPic.UserInterface
                 } catch (ArgumentException) {
                     probeCombo.List.Remove (name);
                     probeId = 0;
-                    probeCombo.Active = heaterId;
+                    probeCombo.Active = probeId;
                     GetProbeData ();
                 }
 
@@ -179,12 +181,12 @@ namespace AquaPic.UserInterface
             tLabel.text = "Temperature";
             tLabel.textAlignment = MyAlignment.Right;
             tLabel.WidthRequest = 100;
-            Put (tLabel, 410, 279);
+            Put (tLabel, 410, 282);
             tLabel.Show ();
 
             probeTempTextbox = new TouchTextBox ();
             probeTempTextbox.WidthRequest = 200;
-            Put (probeTempTextbox, 585, 275);
+            Put (probeTempTextbox, 585, 278);
             probeTempTextbox.Show ();
 
             string[] hNames = Temperature.GetAllHeaterNames ();
@@ -202,7 +204,7 @@ namespace AquaPic.UserInterface
             probeCombo.WidthRequest = 235;
             probeCombo.List.Add ("New probe...");
             probeCombo.ChangedEvent += OnProbeComboChanged;
-            Put (probeCombo, 550, 235);
+            Put (probeCombo, 550, 238);
             probeCombo.Show ();
 
             GetHeaterData ();

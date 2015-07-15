@@ -113,7 +113,7 @@ namespace AquaPic.Drivers
                     return cards [ic.Group].channels [ic.Individual].type;
             }
 
-            return AnalogType.None;
+            throw new ArgumentOutOfRangeException ("ic");
         }
 
         public static float[] GetAllValues (int cardId) {

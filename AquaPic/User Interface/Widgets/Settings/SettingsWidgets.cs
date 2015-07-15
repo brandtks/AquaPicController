@@ -68,8 +68,19 @@ namespace MyWidgetLibrary
         public SettingComboBox () : base () {
             combo = new TouchComboBox ();
             combo.SetSizeRequest (170, 30);
+            combo.ButtonPressEvent += OnComboButtonPressed;
             Put (combo, 120, 0);
             combo.Show ();
+        }
+
+        protected void OnComboButtonPressed (object sender, ButtonPressEventArgs args) {
+            Fixed p = this.Parent as Fixed;
+            if (p != null) {
+                int x = this.Allocation.Left;
+                int y = this.Allocation.Top;
+                p.Remove (this);
+                p.Put (this, x, y);
+            }
         }
     }
 

@@ -25,22 +25,22 @@ namespace AquaPic.Drivers
             return count;
         }
 
-        public static void AddChannel (IndividualControl channel, AnalogType type, string name) {
-            AddChannel (channel.Group, channel.Individual, type, name);
+        public static void AddChannel (IndividualControl channel, string name) {
+            AddChannel (channel.Group, channel.Individual, name);
         }
 
-        public static void AddChannel (int cardID, int channelID, AnalogType type, string name) {
-            if (cardID == -1)
-                throw new Exception ("Card does not exist");
+        public static void AddChannel (int cardID, int channelID, string name) {
+            if ((cardID < 0) && (cardID >= cards.Count))
+                throw new ArgumentOutOfRangeException ("cardID");
 
             if ((channelID < 0) || (channelID >= cards [cardID].channels.Length))
-                throw new Exception ("Input ID out of range");
+                throw new ArgumentOutOfRangeException ("channelID");
 
             string s = string.Format ("{0}.i{1}", cards [cardID].name, channelID);
             if (cards [cardID].channels [channelID].name != s)
                 throw new Exception (string.Format ("Channel already taken by {0}", cards [cardID].channels [channelID].name));
             
-            cards [cardID].AddChannel (channelID, type, name);
+            cards [cardID].AddChannel (channelID, name);
         }
 
         public static void RemoveChannel (IndividualControl channel) {
@@ -48,17 +48,16 @@ namespace AquaPic.Drivers
         }
 
         public static void RemoveChannel (int cardID, int channelID) {
-            if (cardID == -1)
-                throw new Exception ("Card does not exist");
+            if ((cardID < 0) && (cardID >= cards.Count))
+                throw new ArgumentOutOfRangeException ("cardID");
 
             if ((channelID < 0) || (channelID >= cards [cardID].channels.Length))
-                throw new Exception ("Input ID out of range");
+                throw new ArgumentOutOfRangeException ("channelID");
 
             string s = string.Format ("{0}.i{1}", cards [cardID].name, channelID);
             cards [cardID].channels [channelID].name = s;
             cards [cardID].channels [channelID].mode = Mode.Auto;
             cards [cardID].channels [channelID].value = 0.0f;
-            cards [cardID].channels [channelID].type = AnalogType.None;
         }
 
         public static float GetValue (IndividualControl channel, bool realTimeUpdate = false) {
@@ -79,10 +78,10 @@ namespace AquaPic.Drivers
                     return cards [card].channels [channel].value;
                 }
 
-                throw new ArgumentOutOfRangeException ("channel is out of range");
+                throw new ArgumentOutOfRangeException ("channel");
             }
 
-            throw new ArgumentOutOfRangeException ("card is out of range");
+            throw new ArgumentOutOfRangeException ("card");
         }
 
         public static void SetValue (IndividualControl channel, float value) {
