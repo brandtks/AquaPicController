@@ -27,8 +27,8 @@ namespace AquaPic
             
             Plugin.AddPlugins ();
 
-            string proc = Environment.GetEnvironmentVariable ("PROCESSOR_ARCHITECTURE");
             string resourceFile;
+            string proc = Environment.GetEnvironmentVariable ("PROCESSOR_ARCHITECTURE", EnvironmentVariableTarget.Machine);
             if (proc == "x86")
                 resourceFile = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
             else

@@ -11,7 +11,6 @@ namespace AquaPic.Runtime
     public class Equipment
     {
         public static void AddFromJson () {
-            Logger.Add ("Adding equipment");
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
             path = Path.Combine (path, "equipment.json");

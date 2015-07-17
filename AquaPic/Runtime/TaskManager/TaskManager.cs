@@ -45,8 +45,8 @@ namespace AquaPic.Runtime
                         try {
                             task.OnRun ();
                         } catch (Exception ex) {
-                            Logger.Add (string.Format ("{0} throw an exception", task.name));
-                            Logger.Add (ex.ToString ());
+                            Logger.AddError (string.Format ("{0} throw an exception", task.name));
+                            Logger.AddError (ex.ToString ());
                         }
                     }
 

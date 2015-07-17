@@ -17,14 +17,9 @@ namespace AquaPic.Runtime
         }
 
         public static void Add (string message) {
-            var tag = new TextTag (null);
-            tag.ForegroundGdk = MyColor.NewGtkColor ("seca");
-            buffer.TagTable.Add (tag);
+            AppendTime ();
 
             var ti = buffer.EndIter;
-            buffer.InsertWithTags (ref ti, string.Format ("{0:MM/dd hh:mm:ss}: ", DateTime.Now), tag);
-
-            ti = buffer.EndIter;
             buffer.Insert (ref ti, string.Format ("{0}\n", message));
 
             #if DEBUG
@@ -33,6 +28,69 @@ namespace AquaPic.Runtime
 
             if (EventAddedEvent != null)
                 EventAddedEvent ();
+        }
+
+        public static void AddInfo (string message) {
+            AppendTime ();
+
+            var tag = new TextTag (null);
+            tag.ForegroundGdk = MyColor.NewGtkColor ("pri");
+            buffer.TagTable.Add (tag);
+
+            var ti = buffer.EndIter;
+            buffer.InsertWithTags (ref ti, string.Format ("{0}\n", message), tag);
+
+            #if DEBUG
+            Console.WriteLine ("{0:MM/dd hh:mm:ss}: {1}", DateTime.Now, message);
+            #endif
+
+            if (EventAddedEvent != null)
+                EventAddedEvent ();
+        }
+
+        public static void AddError (string message) {
+            AppendTime ();
+
+            var tag = new TextTag (null);
+            tag.ForegroundGdk = MyColor.NewGtkColor ("compl");
+            buffer.TagTable.Add (tag);
+
+            var ti = buffer.EndIter;
+            buffer.InsertWithTags (ref ti, string.Format ("{0}\n", message), tag);
+
+            #if DEBUG
+            Console.WriteLine ("{0:MM/dd hh:mm:ss}: {1}", DateTime.Now, message);
+            #endif
+
+            if (EventAddedEvent != null)
+                EventAddedEvent ();
+        }
+
+        public static void AddWarning (string message) {
+            AppendTime ();
+
+            var tag = new TextTag (null);
+            tag.ForegroundGdk = MyColor.NewGtkColor ("secc");
+            buffer.TagTable.Add (tag);
+
+            var ti = buffer.EndIter;
+            buffer.InsertWithTags (ref ti, string.Format ("{0}\n", message), tag);
+
+            #if DEBUG
+            Console.WriteLine ("{0:MM/dd hh:mm:ss}: {1}", DateTime.Now, message);
+            #endif
+
+            if (EventAddedEvent != null)
+                EventAddedEvent ();
+        }
+
+        protected static void AppendTime () {
+            var tag = new TextTag (null);
+            tag.ForegroundGdk = MyColor.NewGtkColor ("seca");
+            buffer.TagTable.Add (tag);
+
+            var ti = buffer.EndIter;
+            buffer.InsertWithTags (ref ti, string.Format ("{0:MM/dd hh:mm:ss}: ", DateTime.Now), tag);
         }
     }
 }

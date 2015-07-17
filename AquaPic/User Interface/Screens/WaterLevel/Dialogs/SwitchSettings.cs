@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Cairo;
 using Gtk;
@@ -92,10 +93,11 @@ namespace AquaPic.UserInterface
             c.label.text = "Function";
             string[] functions = Enum.GetNames (typeof(SwitchFunction));
             c.combo.List.AddRange (functions);
+            c.combo.List.Remove ("None");
             if (this.switchId != -1) {
                 string function = WaterLevel.GetFloatSwitchFunction (switchId).ToString ();
-                for (int i = 0; i < functions.Length; ++i) {
-                    if (function == functions [i]) {
+                for (int i = 0; i < c.combo.List.Count; ++i) {
+                    if (function == c.combo.List [i]) {
                         c.combo.Active = i;
                         break;
                     }

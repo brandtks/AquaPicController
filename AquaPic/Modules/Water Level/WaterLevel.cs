@@ -110,6 +110,17 @@ namespace AquaPic.Modules
                     SwitchType type = (SwitchType)Enum.Parse (typeof (SwitchType), (string)obj ["switchType"]);
                     SwitchFunction function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), (string)obj ["switchFuntion"]);
 
+                    if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed))
+                        Logger.AddWarning ("High level switch should be normally closed");
+                    else if ((function == SwitchFunction.LowLevel) && (type != SwitchType.NormallyClosed))
+                        Logger.AddWarning ("Low level switch should be normally closed");
+                    else if ((function == SwitchFunction.ATO) && (type != SwitchType.NormallyOpened))
+                        Logger.AddWarning ("ATO switch should be normally opened");
+                    else if (function == SwitchFunction.None) {
+                        Logger.AddWarning ("Can't add a float switch with no function");
+                        continue; // skip adding float switch since it does nothing
+                    }
+
                     AddFloatSwitch (name, ic, physicalLevel, type, function);
                 }
             }
@@ -141,7 +152,7 @@ namespace AquaPic.Modules
                 if ((activated) && (analogSensor.enable)) {
                     if (analogSensor.waterLevel > (s.physicalLevel + 1))
                         mismatch = true;
-                    if (analogSensor.waterLevel < (s.physicalLevel - 1))
+                    else if (analogSensor.waterLevel < (s.physicalLevel - 1))
                         mismatch = true;
                 }
 

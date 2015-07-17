@@ -164,7 +164,7 @@ namespace AquaPic.UserInterface
                         WaterLevel.SetAnalogSensorIndividualControl (ic);
                     }
                 } catch (Exception ex) {
-                    Logger.Add (ex.ToString ());
+                    Logger.AddError (ex.ToString ());
                     MessageBox.Show ("Something went wrong, check logger");
                     return false;
                 }

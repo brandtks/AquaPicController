@@ -4,9 +4,9 @@ using AquaPic.Utilites;
 namespace AquaPic.Modules
 {
     public enum SwitchType {
-        [Description("Normally opened")]
+        [Description("Normally Opened")]
         NormallyOpened,
-        [Description("Normally closed")]
+        [Description("Normally Closed")]
         NormallyClosed
     }
 
