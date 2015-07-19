@@ -59,6 +59,7 @@ namespace AquaPic.UserInterface
             label.WidthRequest = 100;
             label.textAlignment = MyAlignment.Center;
             label.render.textWrap = MyTextWrap.Shrink;
+            label.render.orientation = MyOrientation.Vertical;
             Put (label, 4, 2);
 
             bar = new TouchProgressBar ();

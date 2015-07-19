@@ -175,16 +175,16 @@ namespace AquaPic.UserInterface
                 jo ["enableAnalogSensor"] = WaterLevel.analogSensorEnabled.ToString ();
                 jo ["highAnalogLevelAlarmSetpoint"] = WaterLevel.highAnalogLevelAlarmSetpoint.ToString ();
                 jo ["lowAnalogLevelAlarmSetpoint"] = WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ();
-                jo ["analogSensorChannel"] ["Group"] = AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group);
-                jo ["analogSensorChannel"] ["Individual"] = WaterLevel.analogSensorChannel.Individual.ToString ();
+                jo ["inputCard"] = AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group);
+                jo ["channel"] = WaterLevel.analogSensorChannel.Individual.ToString ();
             } else {
                 WaterLevel.SetAnalogSensorEnable (enable);
 
                 jo ["enableAnalogSensor"] = WaterLevel.analogSensorEnabled.ToString ();
                 jo ["highAnalogLevelAlarmSetpoint"] = string.Empty;
                 jo ["lowAnalogLevelAlarmSetpoint"] = string.Empty;
-                jo ["analogSensorChannel"] ["Group"] = string.Empty;
-                jo ["analogSensorChannel"] ["Individual"] = string.Empty;
+                jo ["inputCard"] = string.Empty;
+                jo ["channel"] = string.Empty;
             }
 
             File.WriteAllText (path, jo.ToString ());

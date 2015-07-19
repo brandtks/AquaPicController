@@ -12,7 +12,12 @@ namespace AquaPic.Runtime
 
         public string name;
 
-        public uint secondsRemaining;
+        private uint _secondsRemaining;
+        public uint secondsRemaining {
+            get {
+                return _secondsRemaining;
+            }
+        }
         public uint totalSeconds;
 
         public event TimerHandler TimerInterumEvent;
@@ -22,7 +27,7 @@ namespace AquaPic.Runtime
         private DeluxeTimer (string name, uint minutes, uint seconds) : base (1000) {
             this.name = name;
             SetTime (minutes, seconds);
-            secondsRemaining = totalSeconds;
+            _secondsRemaining = totalSeconds;
         }
 
         public static DeluxeTimer GetTimer (string name) {
@@ -40,7 +45,7 @@ namespace AquaPic.Runtime
 
         public override void Start () {
             if (totalSeconds > 0) {
-                secondsRemaining = totalSeconds;
+                _secondsRemaining = totalSeconds;
                 _enabled = true;
                 timerId = GLib.Timeout.Add (1000, OnTimer);
                 if (TimerStartEvent != null)
@@ -61,19 +66,17 @@ namespace AquaPic.Runtime
 
         protected bool OnTimer () {
             if (_enabled) {
-                --secondsRemaining;
+                --_secondsRemaining;
 
                 if (TimerInterumEvent != null)
                     TimerInterumEvent (this);
 
-                if (secondsRemaining <= 0) {
+                if (_secondsRemaining <= 0) {
                     _enabled = false;
-                    secondsRemaining = totalSeconds;
+                    _secondsRemaining = totalSeconds;
 
                     // We want any user code to execute first before the dialog screen is shown
                     CallElapsedEvents ();
-                     
-                    MessageBox.Show (string.Format ("{0}", name));
                 }
             }
             return _enabled;

@@ -162,6 +162,8 @@ namespace AquaPic.UserInterface
             int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
             if (t == tIdx)
                 UpdateTime (timers [t].totalSeconds);
+
+            MessageBox.Show (string.Format ("{0}", timer.name));
         }
 
         protected void OnTimerStartStop (object sender) {
@@ -211,8 +213,8 @@ namespace AquaPic.UserInterface
 
             if (changeTimerTime) {
                 timers [t].totalSeconds = time;
-                if (!timers [t].enabled)
-                    timers [t].secondsRemaining = time;
+                //if (!timers [t].enabled)
+                    //timers [t]._secondsRemaining = time;
             }
 
             UpdateScreen ();

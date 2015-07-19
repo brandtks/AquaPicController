@@ -1,5 +1,6 @@
 ﻿using System;
 using AquaPic.Utilites;
+using AquaPic.Runtime;
 
 namespace AquaPic.Modules
 {
@@ -26,12 +27,14 @@ namespace AquaPic.Modules
             public SwitchFunction function;
             public float physicalLevel;
             public IndividualControl channel;
+            public OnDelayTimer odt;
 
-            public FloatSwitch () {
+            public FloatSwitch (uint timeOffset) {
                 type = SwitchType.NormallyOpened;
                 function = SwitchFunction.None;
                 physicalLevel = -1.0f;
                 channel = IndividualControl.Empty;
+                odt = new OnDelayTimer (timeOffset);
             }
         }
     }

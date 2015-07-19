@@ -12,6 +12,7 @@ namespace AquaPic.Modules
     public partial class WaterLevel
     {
         private static AnalogSensor analogSensor;
+        private static AutoTopOff ato;
         private static List<FloatSwitch> floatSwitches;
 
         private static int highSwitchAlarmIndex;
@@ -82,22 +83,23 @@ namespace AquaPic.Modules
                     lowAlarmSetpoint = Convert.ToSingle (text);
 
                 IndividualControl ic;
-                text = Convert.ToString (jo ["analogSensorChannel"] ["Group"]);
+                text = Convert.ToString (jo ["inputCard"]);
                 if (string.IsNullOrWhiteSpace (text)) {
                     ic = IndividualControl.Empty;
                     enable = false;
                 } else
                     ic.Group = AnalogInput.GetCardIndex (text);
 
-                text = (string)jo ["analogSensorChannel"] ["Individual"];
+                text = (string)jo ["channel"];
                 if (string.IsNullOrWhiteSpace (text)) {
                     ic = IndividualControl.Empty;
                     enable = false;
                 } else
-                    ic.Individual = Convert.ToInt32 (jo ["analogSensorChannel"] ["Individual"]);
+                    ic.Individual = Convert.ToInt32 (text);
 
                 analogSensor = new AnalogSensor (enable, highAlarmSetpoint, lowAlarmSetpoint, ic);
 
+                //Float Switches
                 floatSwitches = new List<FloatSwitch> ();
                 JArray ja = (JArray)jo ["floatSwitches"];
                 foreach (var jt in ja) {
@@ -109,6 +111,7 @@ namespace AquaPic.Modules
                     float physicalLevel = Convert.ToSingle (obj ["physicalLevel"]);
                     SwitchType type = (SwitchType)Enum.Parse (typeof (SwitchType), (string)obj ["switchType"]);
                     SwitchFunction function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), (string)obj ["switchFuntion"]);
+                    uint timeOffset = Timer.ParseTime ((string)obj ["timeOffset"]);
 
                     if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed))
                         Logger.AddWarning ("High level switch should be normally closed");
@@ -121,8 +124,68 @@ namespace AquaPic.Modules
                         continue; // skip adding float switch since it does nothing
                     }
 
-                    AddFloatSwitch (name, ic, physicalLevel, type, function);
+                    AddFloatSwitch (name, ic, physicalLevel, type, function, timeOffset);
                 }
+
+                //Auto Top Off
+                JObject joAto = (JObject)jo ["AutoTopOff"];
+
+                bool atoEnable = Convert.ToBoolean (joAto ["enableAto"]);
+
+                bool useAnalogSensor = Convert.ToBoolean (joAto ["useAnalogSensor"]);
+
+                float analogOnSetpoint;
+                text = (string)joAto ["analogOnSetpoint"];
+                if (string.IsNullOrWhiteSpace (text)) {
+                    analogOnSetpoint = 0.0f;
+                    useAnalogSensor = false;
+                } else 
+                    analogOnSetpoint = Convert.ToSingle (text);
+
+                float analogOffSetpoint;
+                text = (string)joAto ["analogOffSetpoint"];
+                if (string.IsNullOrWhiteSpace (text)) {
+                    analogOffSetpoint = 0.0f;
+                    useAnalogSensor = false;
+                } else 
+                    analogOffSetpoint = Convert.ToSingle (text);
+
+                bool useFloatSwitch = Convert.ToBoolean (joAto ["useFloatSwitch"]);
+
+                if (!useFloatSwitch && !useAnalogSensor)
+                    atoEnable = false;
+
+                text = (string)joAto ["powerStrip"];
+                if (string.IsNullOrWhiteSpace (text)) {
+                    ic = IndividualControl.Empty;
+                    atoEnable = false;
+                } else
+                    ic.Group = Power.GetPowerStripIndex (text);
+
+                text = (string)joAto ["outlet"];
+                if (string.IsNullOrWhiteSpace (text)) {
+                    ic = IndividualControl.Empty;
+                    atoEnable = false;
+                } else
+                    ic.Individual = Convert.ToInt32 (text);
+
+                uint maxPumpOnTime;
+                text = (string)joAto ["maxPumpOnTime"];
+                if (string.IsNullOrWhiteSpace (text)) {
+                    maxPumpOnTime = 0U;
+                    atoEnable = false;
+                } else
+                    maxPumpOnTime = Timer.ParseTime (text);
+
+                uint minPumpOffTime;
+                text = (string)joAto ["minPumpOffTime"];
+                if (string.IsNullOrWhiteSpace (text)) {
+                    minPumpOffTime = uint.MaxValue;
+                    atoEnable = false;
+                } else
+                    minPumpOffTime = Timer.ParseTime (text);
+                
+                ato = new AutoTopOff (atoEnable, useAnalogSensor, analogOnSetpoint, analogOffSetpoint, useFloatSwitch, ic, maxPumpOnTime, minPumpOffTime);
             }
 
             lowSwitchAlarmIndex = Alarm.Subscribe ("Low Water Level, Float Switch");
@@ -140,14 +203,15 @@ namespace AquaPic.Modules
             analogSensor.Run ();
 
             bool mismatch = false;
+            ato.useFloatSwitch = false; //set use float switch to false, if no ATO float switch in found it remains false
             foreach (var s in floatSwitches) {
                 bool state = DigitalInput.GetState (s.channel);
                 bool activated;
 
                 if (s.type == SwitchType.NormallyClosed)
-                    activated = !state;
+                    activated = s.odt.Evaluate (!state);
                 else
-                    activated = state;
+                    activated = s.odt.Evaluate (state);
 
                 if ((activated) && (analogSensor.enable)) {
                     if (analogSensor.waterLevel > (s.physicalLevel + 1))
@@ -170,6 +234,9 @@ namespace AquaPic.Modules
                         if (Alarm.CheckAlarming (lowSwitchAlarmIndex))
                             Alarm.Clear (lowSwitchAlarmIndex);
                     }
+                } else if (s.function == SwitchFunction.ATO) {
+                    ato.useFloatSwitch = true; //we found an ATO float switch use it
+                    ato.floatSwitchActivated = activated;
                 }
             }
 
@@ -179,6 +246,8 @@ namespace AquaPic.Modules
                 if (Alarm.CheckAlarming (switchAnalogMismatchAlarmIndex))
                     Alarm.Clear (switchAnalogMismatchAlarmIndex);
             }
+
+            ato.Run ();
         }
 
         /**************************************************************************************************************/
@@ -189,11 +258,12 @@ namespace AquaPic.Modules
             IndividualControl ic, 
             float physicalLevel, 
             SwitchType type,
-            SwitchFunction function)
+            SwitchFunction function,
+            uint timeOffset)
         {
             if (FloatSwitchNameOk (name)) {
                 if (FloatSwitchFunctionOk (function)) {
-                    FloatSwitch fs = new FloatSwitch ();
+                    FloatSwitch fs = new FloatSwitch (timeOffset);
                     fs.name = name;
                     fs.channel = ic;
                     fs.physicalLevel = physicalLevel;
@@ -234,7 +304,7 @@ namespace AquaPic.Modules
             try {
                 GetFloatSwitchIndex (name);
                 return false;
-            } catch {
+            } catch (ArgumentException) {
                 return true;
             }
         }
@@ -333,6 +403,20 @@ namespace AquaPic.Modules
                 floatSwitches [switchId].function = function;
             else 
                 throw new Exception (string.Format ("Float Switch: {0} function already exists", function));
+        }
+
+        public static uint GetFloatSwitchTimeOffset (int switchId) {
+            if ((switchId < 0) || (switchId >= floatSwitches.Count))
+                throw new ArgumentOutOfRangeException ("switchId");
+
+            return floatSwitches [switchId].odt.timerInterval;
+        }
+
+        public static void SetFloatSwitchTimeOffset (int switchId, uint timeOffset) {
+            if ((switchId < 0) || (switchId >= floatSwitches.Count))
+                throw new ArgumentOutOfRangeException ("switchId");
+
+            floatSwitches [switchId].odt.timerInterval = timeOffset;
         }
 
         public static int GetFloatSwitchCount () {

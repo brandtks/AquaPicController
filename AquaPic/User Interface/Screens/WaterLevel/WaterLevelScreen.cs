@@ -10,7 +10,7 @@ namespace AquaPic.UserInterface
     public class WaterLevelWindow : WindowBase
     {
         uint timerId;
-        TouchTextBox tb;
+        TouchTextBox analogLevelTextBox;
         TouchTextBox switchStateTextBox;
         TouchLabel switchTypeLabel;
         TouchComboBox switchCombo;
@@ -50,10 +50,10 @@ namespace AquaPic.UserInterface
             Put (label, 410, 74);
             label.Show ();
 
-            tb = new TouchTextBox ();
-            tb.text = WaterLevel.analogWaterLevel.ToString ("F2");
-            tb.WidthRequest = 200;
-            Put (tb, 585, 70);
+            analogLevelTextBox = new TouchTextBox ();
+            analogLevelTextBox.text = WaterLevel.analogWaterLevel.ToString ("F2");
+            analogLevelTextBox.WidthRequest = 200;
+            Put (analogLevelTextBox, 585, 70);
 
             var settingsBtn = new TouchButton ();
             settingsBtn.text = "Settings";
@@ -81,8 +81,8 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             var sLabel = new TouchLabel ();
-            sLabel.text = "State";
-            sLabel.WidthRequest = 100;
+            sLabel.text = "Current State";
+            sLabel.WidthRequest = 200;
             Put (sLabel, 410, 282);
             sLabel.Show ();
 
@@ -143,8 +143,8 @@ namespace AquaPic.UserInterface
         }
 
         public bool OnUpdateTimer () {
-            tb.text = WaterLevel.analogWaterLevel.ToString ("F2");
-            tb.QueueDraw ();
+            analogLevelTextBox.text = WaterLevel.analogWaterLevel.ToString ("F2");
+            analogLevelTextBox.QueueDraw ();
 
             bool state = DigitalInput.GetState (WaterLevel.GetFloatSwitchIndividualControl (switchId));
             if (state) {

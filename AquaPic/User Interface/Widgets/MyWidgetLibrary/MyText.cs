@@ -37,8 +37,8 @@ namespace MyWidgetLibrary
             l.FontDescription = Pango.FontDescription.FromString (font.fontName + " " + font.size.ToString ());
             l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
-//            if (orientation == MyOrientation.Horizontal) {
-////                l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
+            if (orientation == MyOrientation.Horizontal) {
+//                l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
             if (textWrap == MyTextWrap.WordWrap) {
                 l.Wrap = Pango.WrapMode.Word;
@@ -91,13 +91,17 @@ namespace MyWidgetLibrary
                 y = (y + (height / 2)) - (h / 2);
             }
 
-//            } else {
-//                //<TODO> cheesy work around to get somewhat vertical text. Gravity attribute does not seem to work
-//                //l.SetMarkup ("<span gravity=\"east\" color=\"" + font.color.ToHTML () + "\">" + text + "</span>");
-////                l.Wrap = Pango.WrapMode.Char;
-////                l.Width = Pango.Units.FromPixels (5);
-////                l.Spacing = Pango.Units.FromPixels (0);
-//            }
+            } else {
+                //<TODO> cheesy work around to get somewhat vertical text. Gravity attribute does not seem to work
+                //l.SetMarkup ("<span gravity=\"east\" color=\"" + font.color.ToHTML () + "\">" + text + "</span>");
+//                l.Wrap = Pango.WrapMode.Char;
+//                l.Width = Pango.Units.FromPixels (5);
+//                l.Spacing = Pango.Units.FromPixels (0);
+
+                var matrix = Pango.Matrix.Identity;
+                matrix.Rotate(270);
+                l.Context.Matrix = matrix;
+            }
 
             widget.GdkWindow.DrawLayout (widget.Style.TextGC (StateType.Normal), x, y, l);
             l.Dispose ();

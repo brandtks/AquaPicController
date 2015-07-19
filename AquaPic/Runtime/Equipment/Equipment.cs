@@ -56,7 +56,11 @@ namespace AquaPic.Runtime
 
             Temperature.Init ();
             Lighting.Init ();
+            try {
             WaterLevel.Init ();
+            } catch (Exception ex) {
+                Console.WriteLine (ex.ToString ());
+            }
         }
     }
 }
