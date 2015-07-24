@@ -34,11 +34,7 @@ namespace AquaPic.Runtime
             if (!cyclicTasks.ContainsKey (timeInterval)) { // this time interval doesn't exist, add it
                 cyclicTasks.Add (timeInterval, new List<ICyclicTask> ());
 
-                #if SIMULATION
-                uint time = timeInterval * 4;
-                #else
                 uint time = timeInterval;
-                #endif
 
                 GLib.Timeout.Add (time, () => {
                     foreach (var task in cyclicTasks[timeInterval]) {

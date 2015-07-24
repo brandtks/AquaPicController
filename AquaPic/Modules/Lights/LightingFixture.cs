@@ -51,7 +51,7 @@ namespace AquaPic.Modules
 
                 lightingOn = MyState.Off;
 
-                plugControl = Power.AddOutlet (plug, this.name, MyState.Off);
+                plugControl = Power.AddOutlet (plug, this.name, MyState.Off, "Lighting");
                 plugControl.ConditionChecker = PlugControlHandler;
                 Power.AddHandlerOnStateChange (plug, LightingPlugStateChange);
 

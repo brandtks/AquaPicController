@@ -31,7 +31,7 @@ namespace AquaPic.Modules
                 this.plug.Group = powerID;
                 this.plug.Individual = plugID;
                 this.name = name;
-                plugControl = Power.AddOutlet (this.plug, name, MyState.On);
+                plugControl = Power.AddOutlet (this.plug, name, MyState.On, "Heater");
                 plugControl.ConditionChecker = OnPlugControl;
             }
 

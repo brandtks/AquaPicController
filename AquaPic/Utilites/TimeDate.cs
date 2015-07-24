@@ -175,7 +175,7 @@ namespace AquaPic.Utilites
 
 		public override string ToString () {
 			DateTime val = ToDateTime ();
-			return val.ToString ("yy/MM/dd h:mm tt");
+			return val.ToString ("MM/dd/yy h:mm tt");
 		} 
     }
 }

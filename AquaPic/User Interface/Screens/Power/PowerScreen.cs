@@ -77,24 +77,24 @@ namespace AquaPic.UserInterface
             string[] names = Power.GetAllOutletNames (powerID);
 
             int i = 0;
-            foreach (var selector in selectors) {
-                selector.OutletName.text = names [i];
+            foreach (var s in selectors) {
+                s.OutletName.text = names [i];
 
                 if (states [i] == MyState.On) {
-                    selector.Status.text = "On";
-                    selector.Status.textColor = "secb";
+                    s.Status.text = "On";
+                    s.Status.textColor = "secb";
                 } else {
-                    selector.Status.text = "Off";
-                    selector.Status.textColor = "grey4";
+                    s.Status.text = "Off";
+                    s.Status.textColor = "grey4";
                 }
 
                 if (modes [i] == Mode.Auto) {
-                    selector.ss.CurrentSelected = 1;
+                    s.ss.CurrentSelected = 1;
                 } else { // mode is manual
                     if (states [i] == MyState.On) {
-                        selector.ss.CurrentSelected = 2;
+                        s.ss.CurrentSelected = 2;
                     } else {
-                        selector.ss.CurrentSelected = 0;
+                        s.ss.CurrentSelected = 0;
                     }
                 }
                 ++i;

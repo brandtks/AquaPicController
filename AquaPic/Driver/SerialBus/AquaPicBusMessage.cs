@@ -4,38 +4,6 @@ namespace AquaPic.SerialBus
 {
     public partial class AquaPicBus
     {
-        #if SIMULATION
-        private class Message
-        {
-            public Slave slave;
-            public string[] writeData;
-            public string[] readData;
-            public int responseLength;
-            public ResponseCallback callback;
-
-            public Message (Slave slave, int func, string[] writeMessage, int writeSize, int readSize, ResponseCallback callback) {
-                byte[] crc = new byte[2];
-
-                this.slave = slave;
-                this.writeData = new string[5 + writeSize];
-                this.responseLength = 5 + readSize;
-                this.readData = new string[responseLength];
-                this.callback = callback;
-
-                this.writeData[0] = slave.Address.ToString();
-                this.writeData[1] = func.ToString();
-                this.writeData[2] = this.writeData.Length.ToString();
-
-                if (writeMessage != null) {
-                    for (int i = 0; i < writeMessage.Length; ++i)
-                        this.writeData[3 + i] = writeMessage[i];
-                }
-
-                this.writeData[this.writeData.Length - 2] = "255";
-                this.writeData[this.writeData.Length - 1] = "255";
-            }
-        }
-        #else
         private class Message
         {
             public Slave slave;
@@ -68,7 +36,6 @@ namespace AquaPic.SerialBus
                 this.writeBuffer [this.writeBuffer.Length - 1] = crc [1];
             }
         }
-        #endif
     }
 }
 

@@ -9,19 +9,11 @@ namespace AquaPic.UserInterface
 {
     public partial class AquaPicGUI : Gtk.Window
     {
-        #if SIMULATION
-        private Process simulator;
-        #endif
-
         WindowBase current;
         Fixed f;
         MyMenuBar menu;
 
-        #if SIMULATION
-        public AquaPicGUI (Process simulator) : base (Gtk.WindowType.Toplevel) {
-        #else
         public AquaPicGUI () : base (Gtk.WindowType.Toplevel) {
-        #endif
             this.Name = "AquaPic.GUI";
             this.Title = global::Mono.Unix.Catalog.GetString ("AquaPic Controller Version 1");
             this.WindowPosition = ((global::Gtk.WindowPosition)(4));
@@ -30,10 +22,6 @@ namespace AquaPic.UserInterface
             this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
             this.Resizable = false;
             this.AllowGrow = false;
-
-            #if SIMULATION
-            this.simulator = simulator;
-            #endif
 
             GLib.ExceptionManager.UnhandledException += (args) => {
                 Exception ex = args.ExceptionObject as Exception;
@@ -76,11 +64,6 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a) {
-            #if SIMULATION
-            simulator.CloseMainWindow ();
-            simulator.Close ();
-            #endif
-
             Application.Quit ();
             a.RetVal = true;
         }

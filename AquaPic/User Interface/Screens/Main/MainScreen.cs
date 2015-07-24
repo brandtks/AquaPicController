@@ -149,14 +149,18 @@ namespace AquaPic.UserInterface
                     case "Button": {
                             string name = (string)jo ["name"];
 
-                            if (MainWindowWidgets.buttons.ContainsKey (name)) {
-                                var b = MainWindowWidgets.buttons [name].CreateInstance ();
-                                Put (b, x, y);
-                                b.Show ();
+//                            if (MainWindowWidgets.buttons.ContainsKey (name)) {
+//                                var b = MainWindowWidgets.buttons [name].CreateInstance ();
+//                                Put (b, x, y);
+//                                b.Show ();
+//
+//                            } else {
+//                                Logger.AddWarning (string.Format ("Unknown button for main window: {0}", name));
+//                            }
 
-                            } else {
-                                Logger.AddWarning (string.Format ("Unknown button for main window: {0}", name));
-                            }
+                            var b = new ButtonWidget (name);
+                            Put (b, x, y);
+                            b.Show ();
 
                             break;
                         }

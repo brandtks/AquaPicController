@@ -47,11 +47,142 @@ namespace AquaPic.Modules
             get {
                 return analogSensor.sensorChannel;
             }
+            set {
+                if (analogSensor.sensorChannel.IsNotEmpty ())
+                    AnalogInput.RemoveChannel (analogSensor.sensorChannel);
+                analogSensor.sensorChannel = value;
+                AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
+                    
+            }
         }
 
         public static bool analogSensorEnabled {
             get {
                 return analogSensor.enable;
+            }
+            set {
+                analogSensor.enable = value;
+                if (analogSensor.enable) {
+                    analogSensor.SubscribeToAlarms ();
+                
+                    try {
+                        AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
+                    } catch (Exception) {
+                        ; //channel already added
+                    }
+                } else {
+                    if (Alarm.CheckAlarming (analogSensor.highAnalogAlarmIndex))
+                        Alarm.Clear (analogSensor.highAnalogAlarmIndex);
+
+                    if (Alarm.CheckAlarming (analogSensor.lowAnalogAlarmIndex))
+                        Alarm.Clear (analogSensor.lowAnalogAlarmIndex);
+
+                    if (Alarm.CheckAlarming (analogSensor.sensorAlarmIndex))
+                        Alarm.Clear (analogSensor.sensorAlarmIndex);
+                }
+            }
+        }
+
+        public static bool atoEnabled {
+            get {
+                return ato.enable;
+            }
+            set {
+                ato.enable = value;
+                if (ato.enable) {
+                    ato.atoFailAlarmIndex = Alarm.Subscribe ("Auto top off failed");
+
+                    try {
+                        Coil c = Power.AddOutlet (ato.pumpOutlet, "ATO pump", MyState.Off, "ATO");
+                        c.ConditionChecker = () => {
+                            return ato.pumpOnRequest;
+                        };
+                    } catch (Exception) {
+                        ; // Outlet already added
+                    }
+                } else {
+                    if (Alarm.CheckAlarming (ato.atoFailAlarmIndex))
+                        Alarm.Clear (ato.atoFailAlarmIndex);
+                }
+            }
+        }
+
+        public static bool atoUseAnalogSensor {
+            get {
+                return ato.useAnalogSensor;
+            }
+            set {
+                ato.useAnalogSensor = value;
+            }
+        }
+
+        public static bool atoUseFloatSwitch {
+            get {
+                return ato.useFloatSwitch;
+            }
+            set {
+                ato.useFloatSwitch = value;
+            }
+        }
+
+        public static AutoTopOffState atoState {
+            get {
+                return ato.state;
+            }
+        }
+
+        public static uint atoTime {
+            get {
+                return ato.pumpTimer.secondsRemaining;
+            }
+        }
+
+        public static uint atoMaxRuntime {
+            get {
+                return ato.maxPumpOnTime;
+            }
+            set {
+                ato.maxPumpOnTime = value;
+            }
+        }
+
+        public static uint atoCooldown {
+            get {
+                return ato.minPumpOffTime;
+            }
+            set {
+                ato.minPumpOffTime = value;
+            }
+        }
+
+        public static IndividualControl atoPumpOutlet {
+            get {
+                return ato.pumpOutlet;
+            }
+            set {
+                if (ato.pumpOutlet.IsNotEmpty ())
+                    Power.RemoveOutlet (ato.pumpOutlet);
+                ato.pumpOutlet = value;
+                Coil c = Power.AddOutlet (ato.pumpOutlet, "ATO pump", MyState.Off, "ATO");
+                c.ConditionChecker = () => { return ato.pumpOnRequest; };
+            }
+        }
+
+        public static float atoAnalogOnSetpoint {
+            get {
+                return ato.analogOnSetpoint;
+            }
+            set {
+                ato.analogOnSetpoint = value;
+            }
+        }
+
+        public static float atoAnalogOffSetpoint {
+            get {
+                return ato.analogOffSetpoint;
+            }
+            set {
+                ato.analogOffSetpoint = value;
             }
         }
 
@@ -111,7 +242,8 @@ namespace AquaPic.Modules
                     float physicalLevel = Convert.ToSingle (obj ["physicalLevel"]);
                     SwitchType type = (SwitchType)Enum.Parse (typeof (SwitchType), (string)obj ["switchType"]);
                     SwitchFunction function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), (string)obj ["switchFuntion"]);
-                    uint timeOffset = Timer.ParseTime ((string)obj ["timeOffset"]);
+                    string tString = (string)obj ["timeOffset"];
+                    uint timeOffset = Timer.ParseTime (tString);
 
                     if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed))
                         Logger.AddWarning ("High level switch should be normally closed");
@@ -130,7 +262,7 @@ namespace AquaPic.Modules
                 //Auto Top Off
                 JObject joAto = (JObject)jo ["AutoTopOff"];
 
-                bool atoEnable = Convert.ToBoolean (joAto ["enableAto"]);
+                enable = Convert.ToBoolean (joAto ["enableAto"]);
 
                 bool useAnalogSensor = Convert.ToBoolean (joAto ["useAnalogSensor"]);
 
@@ -153,19 +285,19 @@ namespace AquaPic.Modules
                 bool useFloatSwitch = Convert.ToBoolean (joAto ["useFloatSwitch"]);
 
                 if (!useFloatSwitch && !useAnalogSensor)
-                    atoEnable = false;
+                    enable = false;
 
                 text = (string)joAto ["powerStrip"];
                 if (string.IsNullOrWhiteSpace (text)) {
                     ic = IndividualControl.Empty;
-                    atoEnable = false;
+                    enable = false;
                 } else
                     ic.Group = Power.GetPowerStripIndex (text);
 
                 text = (string)joAto ["outlet"];
                 if (string.IsNullOrWhiteSpace (text)) {
                     ic = IndividualControl.Empty;
-                    atoEnable = false;
+                    enable = false;
                 } else
                     ic.Individual = Convert.ToInt32 (text);
 
@@ -173,7 +305,7 @@ namespace AquaPic.Modules
                 text = (string)joAto ["maxPumpOnTime"];
                 if (string.IsNullOrWhiteSpace (text)) {
                     maxPumpOnTime = 0U;
-                    atoEnable = false;
+                    enable = false;
                 } else
                     maxPumpOnTime = Timer.ParseTime (text);
 
@@ -181,11 +313,11 @@ namespace AquaPic.Modules
                 text = (string)joAto ["minPumpOffTime"];
                 if (string.IsNullOrWhiteSpace (text)) {
                     minPumpOffTime = uint.MaxValue;
-                    atoEnable = false;
+                    enable = false;
                 } else
                     minPumpOffTime = Timer.ParseTime (text);
-                
-                ato = new AutoTopOff (atoEnable, useAnalogSensor, analogOnSetpoint, analogOffSetpoint, useFloatSwitch, ic, maxPumpOnTime, minPumpOffTime);
+
+                ato = new AutoTopOff (enable, useAnalogSensor, analogOnSetpoint, analogOffSetpoint, useFloatSwitch, ic, maxPumpOnTime, minPumpOffTime);
             }
 
             lowSwitchAlarmIndex = Alarm.Subscribe ("Low Water Level, Float Switch");
@@ -209,11 +341,13 @@ namespace AquaPic.Modules
                 bool activated;
 
                 if (s.type == SwitchType.NormallyClosed)
-                    activated = s.odt.Evaluate (!state);
-                else
-                    activated = s.odt.Evaluate (state);
+                    state = !state; //normally closed switches are reversed
 
-                if ((activated) && (analogSensor.enable)) {
+                activated = s.odt.Evaluate (s.activated != state); // if current state and switch activation do not match start timer
+                if (activated) // once timer has finished, toggle switch activation
+                    s.activated = !s.activated;
+
+                if ((s.activated) && (analogSensor.enable)) {
                     if (analogSensor.waterLevel > (s.physicalLevel + 1))
                         mismatch = true;
                     else if (analogSensor.waterLevel < (s.physicalLevel - 1))
@@ -221,14 +355,14 @@ namespace AquaPic.Modules
                 }
 
                 if (s.function == SwitchFunction.HighLevel) {
-                    if (activated)
+                    if (s.activated)
                         Alarm.Post (highSwitchAlarmIndex);
                     else {
                         if (Alarm.CheckAlarming (highSwitchAlarmIndex))
                             Alarm.Clear (highSwitchAlarmIndex);
                     }
                 } else if (s.function == SwitchFunction.LowLevel) {
-                    if (activated)
+                    if (s.activated)
                         Alarm.Post (lowSwitchAlarmIndex);
                     else {
                         if (Alarm.CheckAlarming (lowSwitchAlarmIndex))
@@ -236,7 +370,7 @@ namespace AquaPic.Modules
                     }
                 } else if (s.function == SwitchFunction.ATO) {
                     ato.useFloatSwitch = true; //we found an ATO float switch use it
-                    ato.floatSwitchActivated = activated;
+                    ato.floatSwitchActivated = s.activated;
                 }
             }
 
@@ -251,7 +385,7 @@ namespace AquaPic.Modules
         }
 
         /**************************************************************************************************************/
-        /* Float Switch                                                                                               */
+        /* Float Switches                                                                                             */
         /**************************************************************************************************************/
         public static void AddFloatSwitch (
             string name, 
@@ -385,6 +519,9 @@ namespace AquaPic.Modules
             if ((switchId < 0) || (switchId >= floatSwitches.Count))
                 throw new ArgumentOutOfRangeException ("switchId");
 
+            if (floatSwitches [switchId].type != type) // if swapping between NO and NC activation is reversed
+                floatSwitches [switchId].activated = !floatSwitches [switchId].activated;
+
             floatSwitches [switchId].type = type;
         }
 
@@ -421,34 +558,6 @@ namespace AquaPic.Modules
 
         public static int GetFloatSwitchCount () {
             return floatSwitches.Count;
-        }
-
-        /**************************************************************************************************************/
-        /* Analog Sensor                                                                                              */
-        /**************************************************************************************************************/
-        public static void SetAnalogSensorIndividualControl (IndividualControl ic) {
-            if (analogSensor.sensorChannel.IsNotEmpty ())
-                AnalogInput.RemoveChannel (analogSensor.sensorChannel);
-            analogSensor.sensorChannel = ic;
-            AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
-        }
-
-        public static void SetAnalogSensorEnable (bool enable) {
-            analogSensor.enable = enable;
-            if (enable)
-                analogSensor.SubscribeToAlarms ();
-            else {
-                if (analogSensor.sensorChannel.IsNotEmpty ())
-                    AnalogInput.RemoveChannel (analogSensor.sensorChannel);
-                analogSensor.sensorChannel = IndividualControl.Empty;
-
-                analogSensor.lowAlarmStpnt = 0.0f;
-                analogSensor.highAlarmStpnt = 0.0f;
-
-                Alarm.Clear (analogSensor.highAnalogAlarmIndex);
-                Alarm.Clear (analogSensor.lowAnalogAlarmIndex);
-                Alarm.Clear (analogSensor.sensorAlarmIndex);
-            }
         }
     }
 }

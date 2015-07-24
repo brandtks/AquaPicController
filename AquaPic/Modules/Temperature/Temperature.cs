@@ -203,7 +203,7 @@ namespace AquaPic.Modules
             if ((heaterId >= 0) && (heaterId < heaters.Count)) {
                 Power.RemoveOutlet (heaters [heaterId].plug);
                 heaters [heaterId].plug = ic;
-                Power.AddOutlet (heaters [heaterId].plug, heaters [heaterId].name, MyState.On);
+                Power.AddOutlet (heaters [heaterId].plug, heaters [heaterId].name, MyState.On, "Heater");
             }
         }
 

@@ -37,23 +37,10 @@ namespace AquaPic.Drivers
                     Alarm.Post (communicationAlarmIndex);
             }
 
-            #if SIMULATION
-            public unsafe void GetInputs () {
-                slave.Read (20, 1, GetInputsCallback);
-            }
-            #else
             public unsafe void GetInputs () {
                 slave.Read (20, sizeof(byte), GetInputsCallback);
             }
-            #endif
 
-            #if SIMULATION
-            protected void GetInputsCallback (CallbackArgs args) {
-                byte mask = Convert.ToByte(args.readMessage[3]);
-                for (int i = 0; i < inputs.Length; ++i)
-                    inputs [i].state = Utils.mtob (mask, i);
-            }
-            #else
             protected void GetInputsCallback (CallbackArgs args) {
                 byte stateMask;
 
@@ -64,37 +51,13 @@ namespace AquaPic.Drivers
                 for (int i = 0; i < inputs.Length; ++i)
                     inputs [i].state = Utils.mtob (stateMask, i);
             }
-            #endif
 
-            #if SIMULATION
-            public unsafe void GetInput (byte input) {
-                const int messageLength = 1;
-                string[] message = new string[messageLength];
-                message [0] = input.ToString ();
-                updating = true;
-                slave.ReadWrite (10, message, messageLength, 2, GetInputCallback);
-            }
-            #else
             public unsafe void GetInput (byte input) {
                 byte message = input;
                 updating = true;
                 slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueBool), GetInputCallback);
             }
-            #endif
 
-            #if SIMULATION
-            protected void GetInputCallback (CallbackArgs args) {
-                int plug = Convert.ToInt32 (args.readMessage [3]);
-                bool state = Convert.ToBoolean (args.readMessage [4]);
-
-                if (inputs [plug].state != state) {
-                    //do event
-                }
-
-                inputs [plug].state = state;
-                updating = false;
-            }
-            #else
             protected void GetInputCallback (CallbackArgs args) {
                 CommValueBool vg;
 
@@ -109,7 +72,6 @@ namespace AquaPic.Drivers
                 inputs [vg.channel].state = vg.value;
                 updating = false;
             }
-            #endif
         }
     }
 }

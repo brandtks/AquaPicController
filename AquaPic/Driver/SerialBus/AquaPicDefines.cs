@@ -29,15 +29,6 @@ namespace AquaPic.SerialBus
     public delegate void ResponseCallback (CallbackArgs args);
     public delegate void StatusUpdateHandler (object sender);
 
-    #if SIMULATION
-    public class CallbackArgs {
-        public string[] readMessage;
-
-        public CallbackArgs (string[] readMessage) {
-            this.readMessage = readMessage;
-        }
-    }
-    #else
     public class CallbackArgs {
         public byte[] readBuffer;
 
@@ -51,5 +42,4 @@ namespace AquaPic.SerialBus
                 *d++ = readBuffer [3 + i];
         }
     }
-    #endif
 }

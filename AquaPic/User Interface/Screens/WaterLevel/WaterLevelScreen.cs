@@ -16,6 +16,8 @@ namespace AquaPic.UserInterface
         TouchComboBox switchCombo;
         int switchId;
 
+        TouchTextBox atoStateTextBox;
+
         public WaterLevelWindow (params object[] options) : base () {
             MyBox box1 = new MyBox (385, 395);
             Put (box1, 10, 30);
@@ -29,6 +31,9 @@ namespace AquaPic.UserInterface
             Put (box3, 405, 233);
             box3.Show ();
 
+            /**************************************************************************************************************/
+            /* ATO                                                                                                        */
+            /**************************************************************************************************************/
             var label = new TouchLabel ();
             label.text = "Auto Top Off";
             label.WidthRequest = 370;
@@ -37,6 +42,33 @@ namespace AquaPic.UserInterface
             Put (label, 15, 40);
             label.Show ();
 
+            var stateLabel = new TouchLabel ();
+            stateLabel.text = "ATO State";
+            stateLabel.textColor = "grey4"; 
+            stateLabel.WidthRequest = 170;
+            Put (stateLabel, 15, 74);
+            stateLabel.Show ();
+
+            atoStateTextBox = new TouchTextBox ();
+            atoStateTextBox.WidthRequest = 200;
+            atoStateTextBox.text = WaterLevel.atoState.ToString ();
+            Put (atoStateTextBox, 190, 70);
+            atoStateTextBox.Show ();
+
+            var atoSettingsBtn = new TouchButton ();
+            atoSettingsBtn.text = "Settings";
+            atoSettingsBtn.SetSizeRequest (100, 30);
+            atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
+                var s = new AtoSettings ();
+                s.Run ();
+                s.Destroy ();
+            };
+            Put (atoSettingsBtn, 15, 390);
+            atoSettingsBtn.Show ();
+
+            /**************************************************************************************************************/
+            /* Analog water sensor                                                                                        */
+            /**************************************************************************************************************/
             label = new TouchLabel ();
             label.text = "Water Level Sensor";
             label.textColor = "pri";
@@ -154,6 +186,8 @@ namespace AquaPic.UserInterface
                 switchStateTextBox.text = "Open";
                 switchStateTextBox.bkgndColor = "seca";
             }
+
+
 
             return true;
         }

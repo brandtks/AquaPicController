@@ -18,9 +18,7 @@ namespace AquaPic.Drivers
 
         public static void Run () {
             foreach (var strip in pwrStrips) {
-                #if !SIMULATION
                 strip.GetStatus ();
-                #endif
 
                 int i = 0;
                 foreach (var outlet in strip.outlets) { // could, probably should use a for loop but its just extra words
@@ -52,10 +50,18 @@ namespace AquaPic.Drivers
         }
 
         public static Coil AddOutlet (IndividualControl outlet, string name, MyState fallback) {
-            return AddOutlet (outlet.Group, outlet.Individual, name, fallback);
+            return AddOutlet (outlet.Group, outlet.Individual, name, fallback, "Power");
+        }
+
+        public static Coil AddOutlet (IndividualControl outlet, string name, MyState fallback, string owner) {
+            return AddOutlet (outlet.Group, outlet.Individual, name, fallback, owner);
         }
 
         public static Coil AddOutlet (int powerID, int outletID, string name, MyState fallback) {
+            return AddOutlet (powerID, outletID, name, fallback, "Power");
+        }
+
+        public static Coil AddOutlet (int powerID, int outletID, string name, MyState fallback, string owner) {
             if (powerID == -1)
                 throw new Exception ("Power strip ID does not exist");
 
@@ -69,6 +75,7 @@ namespace AquaPic.Drivers
             pwrStrips [powerID].outlets [outletID].name = name;
             pwrStrips [powerID].outlets [outletID].fallback = fallback;
             pwrStrips [powerID].outlets [outletID].mode = Mode.Auto;
+            pwrStrips [powerID].outlets [outletID].owner = owner;
             pwrStrips [powerID].SetupOutlet (
                 (byte)outletID,
                 pwrStrips [powerID].outlets [outletID].fallback);
@@ -91,6 +98,7 @@ namespace AquaPic.Drivers
             pwrStrips [powerID].outlets [outletID].name = s;
             pwrStrips [powerID].outlets [outletID].fallback = MyState.Off;
             pwrStrips [powerID].outlets [outletID].mode = Mode.Manual;
+            pwrStrips [powerID].outlets [outletID].owner = "Power";
 
             pwrStrips [powerID].outlets [outletID].OutletControl.ConditionChecker = () => {
                 return false;
@@ -154,7 +162,7 @@ namespace AquaPic.Drivers
             if ((powerID >= 0) && (powerID < pwrStrips.Count))
                 return pwrStrips [powerID].name;
 
-            throw new ArgumentOutOfRangeException ("powerID is out of range");
+            throw new ArgumentOutOfRangeException ("powerID");
         }
 
         public static int GetPowerStripIndex (string name) {
@@ -194,6 +202,27 @@ namespace AquaPic.Drivers
             }
 
             return avail.ToArray ();
+        }
+
+        public static string GetOutletOwner (IndividualControl outlet) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            return pwrStrips [outlet.Group].outlets [outlet.Individual].owner;
+        }
+
+        public static string[] GetAllOutletOwners (int powerId) {
+            if ((powerId < 0) && (powerId >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("powerId");
+
+            string[] owners = new string[pwrStrips [powerId].outlets.Length];
+            for (int i = 0; i < owners.Length; ++i)
+                owners [i] = pwrStrips [powerId].outlets [i].owner;
+
+            return owners;
         }
 
         public static void AddHandlerOnAuto (IndividualControl outlet, ModeChangedHandler handler) {

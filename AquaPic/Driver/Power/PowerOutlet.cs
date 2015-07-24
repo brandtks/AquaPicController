@@ -19,10 +19,7 @@ namespace AquaPic.Drivers
             public MyState manualState;
             public MyState fallback;
             public Coil OutletControl;
-
-            #if SIMULATION
-            public bool Updated;
-            #endif
+            public string owner;
 
             public event StateChangeHandler StateChangeEvent;
             public event ModeChangedHandler AutoEvent;
@@ -43,10 +40,7 @@ namespace AquaPic.Drivers
                 };
                 this.OutletControl.OutputTrue = outputTrue;
                 this.OutletControl.OutputFalse = outputFalse;
-
-                #if SIMULATION
-                this.Updated = true;
-                #endif
+                owner = "Power";
             }
 
             public void SetAmpCurrent (float c) {
@@ -56,9 +50,6 @@ namespace AquaPic.Drivers
 
             public void OnChangeState (StateChangeEventArgs args) {
                 currentState = args.state;
-                #if SIMULATION
-                this.Updated = true;
-                #endif
 
                 if (StateChangeEvent != null) {
                     StateChangeEvent (this, args);

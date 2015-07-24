@@ -46,19 +46,6 @@ namespace AquaPic.SerialBus
                 this.Name = name;
             }
 
-            #if SIMULATION
-            public void Read (int func, int readSize, ResponseCallback callback) {
-                bus.queueMessage (this, func, null, 0, readSize, callback);
-            }
-
-            public void Write (int func, string[] writeMessage, int writeSize) {
-                bus.queueMessage (this, func, writeMessage, writeSize, 0, null);
-            }
-
-            public void ReadWrite (int func, string[] writeMessage, int writeSize, int readSize, ResponseCallback callback) {
-                bus.queueMessage (this, func, writeMessage, writeSize, readSize, callback);
-            }
-            #else
             public unsafe void Read (byte func, int readSize, ResponseCallback callback) {
                 bus.queueMessage (this, func, null, 0, readSize, callback);
             }
@@ -70,7 +57,6 @@ namespace AquaPic.SerialBus
             public unsafe void ReadWrite (byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
                 bus.queueMessage (this, func, writeData, writeSize, readSize, callback);
             }
-            #endif
 
             public void updateStatus (AquaPicBusStatus stat, int time) {
                 if (time != 0) {

@@ -41,19 +41,6 @@ namespace AquaPic.Drivers
                     Alarm.Post (communicationAlarmIndex);
             }
 
-            #if SIMULATION
-            public void AddChannel (int ch, AnalogType type, string name) {
-                channels [ch].type = type;
-                channels [ch].name = name;
-
-                const int messageLength = 2;
-                string[] message = new string[messageLength];
-                message [0] = ch.ToString ();
-                message [1] = type.ToString ();
-
-                slave.Write (2, message, messageLength);
-            }
-            #else
             public void AddChannel (int ch, AnalogType type, string name) {
                 channels [ch].type = type;
                 channels [ch].name = name;
@@ -69,22 +56,7 @@ namespace AquaPic.Drivers
                     }
                 }
             }
-            #endif
 
-            #if SIMULATION
-            public void SetAnalogValue (byte channelID, int value) {
-                if (value != channels [channelID].value) {
-                    channels [channelID].value = value;
-
-                    const int messageLength = 2;
-                    string[] message = new string[messageLength];
-                    message [0] = channelID.ToString ();
-                    message [1] = value.ToString ();
-
-                    slave.Write (31, message, messageLength);
-                }
-            }
-            #else
             public void SetAnalogValue (byte channelID, int value) {
                 CommValueInt vs;
                 vs.channel = channelID;
@@ -96,22 +68,7 @@ namespace AquaPic.Drivers
                     slave.Write (31, &vs, sizeof(CommValueInt));
                 }
             }
-            #endif
 
-            #if SIMULATION
-            public void SetAllAnalogValues (int[] values) {
-                if (values.Length < 4)
-                    return;
-
-                const int messageLength = 4;
-                string[] message = new string[messageLength];
-
-                for (int i = 0; i < values.Length; ++i)
-                    message [i] = values [i].ToString ();
-
-                slave.Write (30, message, messageLength);
-            }
-            #else
             public void SetAllAnalogValues (Int16[] values) {
                 if (values.Length < 4)
                     return;
@@ -126,21 +83,13 @@ namespace AquaPic.Drivers
                     }
                 }
             }
-            #endif
 
-            #if SIMULATION
-
-            #else
             public void GetValues () {
                 unsafe {
                     slave.Read (20, sizeof(Int16) * 4, GetValuesCallback); 
                 }
             }
-            #endif
 
-            #if SIMULATION
-
-            #else
             protected void GetValuesCallback (CallbackArgs args) {
                 Int16[] values = new Int16[4];
 
@@ -154,11 +103,7 @@ namespace AquaPic.Drivers
                     channels [i].value = values [i];
                 }
             }
-            #endif
 
-            #if SIMULATION
-
-            #else
             public void GetValue (byte ch) {
                 byte message = ch;
 
@@ -166,11 +111,7 @@ namespace AquaPic.Drivers
                     slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueInt), GetValueCallback);
                 }
             }
-            #endif
 
-            #if SIMULATION
-
-            #else
             protected void GetValueCallback (CallbackArgs args) {
                 CommValueInt vg;
 
@@ -180,7 +121,6 @@ namespace AquaPic.Drivers
 
                 channels [vg.channel].value = vg.value;
             }
-            #endif
         }
     }
 }

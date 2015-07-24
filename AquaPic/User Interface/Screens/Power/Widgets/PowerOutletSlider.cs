@@ -14,6 +14,7 @@ namespace AquaPic.UserInterface
         public TouchSelectorSwitch ss;
         public TouchCurvedProgressBar ampBar;
         public TouchTextBox ampText;
+        public TouchButton settingsButton;
 
         public float amps {
             set {
@@ -82,6 +83,11 @@ namespace AquaPic.UserInterface
             Status.textAlignment = MyAlignment.Center;
             Put (Status, 57, 55);
             Status.Show ();
+
+            settingsButton = new TouchButton ();
+            settingsButton.SetSizeRequest (30, 30);
+            Put (settingsButton, 145, 5);
+            settingsButton.Show ();
 
             ShowAll ();
         }

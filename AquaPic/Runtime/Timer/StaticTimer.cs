@@ -32,10 +32,10 @@ namespace AquaPic.Runtime
             uint time = 0;
             if (t.Length == 3) {
                 //milliseconds
-                time += Convert.ToUInt32 (t [2]);
+                time = Convert.ToUInt32 (t [2]);
 
                 //seconds
-                time += (Convert.ToUInt32 (t [1]) * 60);
+                time += (Convert.ToUInt32 (t [1]) * 1000);
 
                 //minutes
                 time += (Convert.ToUInt32 (t [0]) * 60000);

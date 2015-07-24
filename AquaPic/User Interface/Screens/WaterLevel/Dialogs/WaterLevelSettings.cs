@@ -44,7 +44,7 @@ namespace AquaPic.UserInterface
                     float highAlarmStpnt = Convert.ToSingle (args.text);
 
                     if (highAlarmStpnt < 0.0f) {
-                        MessageBox.Show ("Low alarm setpoint can't be negative");
+                        MessageBox.Show ("High alarm setpoint can't be negative");
                         args.keepText = false;
                         return;
                     }
@@ -136,6 +136,11 @@ namespace AquaPic.UserInterface
 
                 float highAlarmStpnt = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
 
+                if (highAlarmStpnt < 0.0f) {
+                    MessageBox.Show ("Low alarm setpoint can't be negative");
+                    return false;
+                }
+
                 if (lowAlarmStpnt >= highAlarmStpnt) {
                     MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
                     return false;
@@ -161,7 +166,7 @@ namespace AquaPic.UserInterface
                         IndividualControl ic;
                         ic.Group = cardId;
                         ic.Individual = channelId;
-                        WaterLevel.SetAnalogSensorIndividualControl (ic);
+                        WaterLevel.analogSensorChannel = ic;
                     }
                 } catch (Exception ex) {
                     Logger.AddError (ex.ToString ());
@@ -169,23 +174,16 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                //this has to be last because if for whatever reason something above this crashes we need leave the module disable
-                WaterLevel.SetAnalogSensorEnable (enable);
-
-                jo ["enableAnalogSensor"] = WaterLevel.analogSensorEnabled.ToString ();
-                jo ["highAnalogLevelAlarmSetpoint"] = WaterLevel.highAnalogLevelAlarmSetpoint.ToString ();
-                jo ["lowAnalogLevelAlarmSetpoint"] = WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ();
-                jo ["inputCard"] = AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group);
-                jo ["channel"] = WaterLevel.analogSensorChannel.Individual.ToString ();
-            } else {
-                WaterLevel.SetAnalogSensorEnable (enable);
-
-                jo ["enableAnalogSensor"] = WaterLevel.analogSensorEnabled.ToString ();
-                jo ["highAnalogLevelAlarmSetpoint"] = string.Empty;
-                jo ["lowAnalogLevelAlarmSetpoint"] = string.Empty;
-                jo ["inputCard"] = string.Empty;
-                jo ["channel"] = string.Empty;
             }
+
+            //this has to be last because if for whatever reason something above this crashes we need leave the module disable
+            WaterLevel.analogSensorEnabled = enable;
+
+            jo ["enableAnalogSensor"] = WaterLevel.analogSensorEnabled.ToString ();
+            jo ["highAnalogLevelAlarmSetpoint"] = WaterLevel.highAnalogLevelAlarmSetpoint.ToString ();
+            jo ["lowAnalogLevelAlarmSetpoint"] = WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ();
+            jo ["inputCard"] = AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group);
+            jo ["channel"] = WaterLevel.analogSensorChannel.Individual.ToString ();
 
             File.WriteAllText (path, jo.ToString ());
 

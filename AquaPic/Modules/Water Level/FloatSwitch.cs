@@ -23,6 +23,7 @@ namespace AquaPic.Modules
         private class FloatSwitch
         {
             public string name;
+            public bool activated;
             public SwitchType type;
             public SwitchFunction function;
             public float physicalLevel;
@@ -30,6 +31,7 @@ namespace AquaPic.Modules
             public OnDelayTimer odt;
 
             public FloatSwitch (uint timeOffset) {
+                activated = false;
                 type = SwitchType.NormallyOpened;
                 function = SwitchFunction.None;
                 physicalLevel = -1.0f;

@@ -48,19 +48,6 @@ namespace AquaPic.Drivers
                 }
             }
 
-            #if SIMULATION
-            public void SetupOutlet (byte outletID, MyState fallback) {
-                const int messageLength = 2;
-                string[] message = new string[messageLength];
-                message[0] = outletID.ToString ();
-                if (fallback == MyState.On)
-                    message[1] = "true";
-                else
-                    message[1] = "false";
-
-                slave.Write (2, message, messageLength);
-            }
-            #else
             public unsafe void SetupOutlet (byte outletID, MyState fallback) {
                 const int messageLength = 2; 
 
@@ -79,28 +66,11 @@ namespace AquaPic.Drivers
                     }
                 }
             }
-            #endif
 
-            #if SIMULATION
-            public void GetStatus () {
-                slave.Read (20, 2, GetStatusCallback);
-            }
-            #else
             public unsafe void GetStatus () {
                 slave.Read (20, sizeof(PowerComms), GetStatusCallback);
             }
-            #endif
 
-            #if SIMULATION
-            protected void GetStatusCallback (CallbackArgs callArgs) {
-                AcPowerAvailable = Convert.ToBoolean(callArgs.readMessage[3]);
-                byte mask = Convert.ToByte(callArgs.readMessage[4]);
-                for (int i = 0; i < outlets.Length; ++i) {
-                    if (Utils.mtob (mask, i))
-                        ReadOutletCurrent (i);
-                }
-            }
-            #else
             protected void GetStatusCallback (CallbackArgs callArgs) {
                 if (slave.Status != AquaPicBusStatus.communicationSuccess)
                     return;
@@ -120,31 +90,13 @@ namespace AquaPic.Drivers
                         ReadOutletCurrent ((byte)i);
                 }
             }
-            #endif
 
-            #if SIMULATION
-            public void ReadOutletCurrent (int i) {
-                const int messageLength = 1;
-                string[] m = new string[messageLength];
-                m [0] = i.ToString ();
-                slave.ReadWrite (10, m, messageLength, 2, ReadOutletCurrentCallback);
-            }
-            #else
             public void ReadOutletCurrent (byte outletID) {
                 unsafe {
                     slave.ReadWrite (10, &outletID, sizeof (byte), sizeof (AmpComms), ReadOutletCurrentCallback);
                 }
             }
-            #endif
 
-            #if SIMULATION
-            protected void ReadOutletCurrentCallback (CallbackArgs callArgs) {
-                int plug = Convert.ToInt32(callArgs.readMessage [3]);
-                float current = Convert.ToSingle(callArgs.readMessage [4]);
-                outlets [plug].SetAmpCurrent (current);
-
-            }
-            #else
             protected void ReadOutletCurrentCallback (CallbackArgs callArgs) {
                 if (slave.Status != AquaPicBusStatus.communicationSuccess)
                     return;
@@ -158,31 +110,7 @@ namespace AquaPic.Drivers
                 outlets [message.outletID].SetAmpCurrent (message.current);
 
             }
-            #endif
 
-            #if SIMULATION
-            public void SetOutletState (byte outletID, MyState state, bool modeOverride) {
-                if ((state != outlets [outletID].currentState) && (outlets [outletID].Updated)) {
-                    outlets [outletID].Updated = false;
-
-                    const int messageLength = 2;
-                    string[] message = new string[messageLength];
-                    message [0] = outletID.ToString ();
-                    if (state == MyState.On)
-                        message [1] = "true";
-                    else
-                        message [1] = "false";
-
-                    slave.ReadWrite (
-                        30, 
-                        message, 
-                        messageLength, 
-                        0, 
-                        (CallbackArgs args) => outlets [outletID].OnChangeState (
-                            new StateChangeEventArgs (outletID, powerID, state, outlets [outletID].mode)));
-                }
-            }
-            #else
             public void SetOutletState (byte outletID, MyState state, bool modeOverride) {
                 const int messageLength = 2;
 
@@ -221,7 +149,6 @@ namespace AquaPic.Drivers
                 // <TEST> this is here only because the slave never responds so the callback never happens
                 outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state, outlets [outletID].mode));
             }
-            #endif
 
             public void SetPlugMode (byte outletID, Mode mode) {
                 outlets [outletID].mode = mode;

@@ -122,7 +122,7 @@ namespace AquaPic.UserInterface
                     if (idx == -1)
                         time = Convert.ToUInt32 (args.text);
                     else {
-                        string timeString = args.text.Substring (idx);
+                        string timeString = args.text.Substring (0, idx);
                         time = Convert.ToUInt32 (timeString);
                     }
 
@@ -163,7 +163,8 @@ namespace AquaPic.UserInterface
             if (timeOffsetString != "Enter time") {
                 int idx = timeOffsetString.IndexOf ("secs", StringComparison.InvariantCultureIgnoreCase);
                 if (idx != -1)
-                    timeOffsetString = timeOffsetString.Substring (idx);
+                    timeOffsetString = timeOffsetString.Substring (0, idx);
+                
                 timeOffset = Convert.ToUInt32 (timeOffsetString) * 1000;
             }
 
@@ -228,6 +229,7 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("physicalLevel", WaterLevel.GetFloatSwitchPhysicalLevel (switchId).ToString ()));
                 jobj.Add (new JProperty ("switchType", WaterLevel.GetFloatSwitchType (switchId).ToString ())); 
                 jobj.Add (new JProperty ("switchFuntion", WaterLevel.GetFloatSwitchFunction (switchId).ToString ()));
+                jobj.Add (new JProperty ("timeOffset", string.Format ("00:{0:D2}:{1:D2}", WaterLevel.GetFloatSwitchTimeOffset (switchId) / 1000, WaterLevel.GetFloatSwitchTimeOffset (switchId) % 1000)));
 
                 ((JArray)jo ["floatSwitches"]).Add (jobj);
 
@@ -287,7 +289,7 @@ namespace AquaPic.UserInterface
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["physicalLevel"] = WaterLevel.GetFloatSwitchPhysicalLevel (switchId).ToString ();
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["switchType"] = WaterLevel.GetFloatSwitchType (switchId).ToString ();
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["switchFuntion"] = WaterLevel.GetFloatSwitchFunction (switchId).ToString ();
-                ((JArray)jo ["floatSwitches"]) [arrIdx] ["timeOffset"] = string.Format ("00:{0}:{1}", WaterLevel.GetFloatSwitchTimeOffset (switchId) / 1000, WaterLevel.GetFloatSwitchTimeOffset (switchId) % 1000);
+                ((JArray)jo ["floatSwitches"]) [arrIdx] ["timeOffset"] = string.Format ("00:{0:D2}:{1:D2}", WaterLevel.GetFloatSwitchTimeOffset (switchId) / 1000, WaterLevel.GetFloatSwitchTimeOffset (switchId) % 1000);
 
                 File.WriteAllText (path, jo.ToString ());
             }

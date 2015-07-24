@@ -25,7 +25,7 @@ namespace AquaPic.Modules
             public bool useFloatSwitch;
             public bool floatSwitchActivated;
 
-            public IndividualControl pumpPlug;
+            public IndividualControl pumpOutlet;
             public bool pumpOnRequest;
             public DeluxeTimer pumpTimer;
             public uint maxPumpOnTime;
@@ -53,7 +53,7 @@ namespace AquaPic.Modules
                 this.useFloatSwitch = useFloatSwitch;
                 floatSwitchActivated = false;
 
-                this.pumpPlug = pumpPlug;
+                this.pumpOutlet = pumpPlug;
                 pumpOnRequest = false;
                 pumpTimer = DeluxeTimer.GetTimer ("ATO");
                 pumpTimer.TimerElapsedEvent += OnTimerElapsed;
@@ -64,7 +64,7 @@ namespace AquaPic.Modules
                 atoFailAlarmIndex = Alarm.Subscribe ("Auto top off failed");
 
                 if (this.enable) {
-                    var c = Power.AddOutlet (pumpPlug, "ATO pump", MyState.Off);
+                    var c = Power.AddOutlet (pumpPlug, "ATO pump", MyState.Off, "ATO");
                     c.ConditionChecker = () => { return pumpOnRequest; };
                 }
             }

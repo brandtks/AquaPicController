@@ -46,12 +46,6 @@ namespace AquaPic.Drivers
                     Alarm.Post (communicationAlarmIndex);
             }
 
-            #if SIMULATION
-            public void AddChannel (int ch, AnalogType type, string name) {
-                channels [ch].type = type;
-                channels [ch].name = name;
-            }
-            #else
             public void AddChannel (int ch, string name) {
                 channels [ch].name = name;
 
@@ -65,28 +59,12 @@ namespace AquaPic.Drivers
 //                    }
 //                }
             }
-            #endif
 
-            #if SIMULATION
-            public void GetValues () {
-                updating = true;
-                slave.Read (20, 4, GetValuesCallback); 
-            }
-            #else
             public unsafe void GetValues () {
                 updating = true;
                 slave.Read (20, sizeof(Int16) * 4, GetValuesCallback); 
             }
-            #endif
 
-            #if SIMULATION
-            protected void GetValuesCallback (CallbackArgs args) {
-                for (int i = 0; i < channels.Length; ++i) {
-                    channels [i].value = Convert.ToSingle(args.readMessage[3 + i]);
-                }
-                updating = false;
-            }
-            #else
             protected void GetValuesCallback (CallbackArgs args) {
                 Int16[] values = new Int16[4];
 
@@ -103,17 +81,7 @@ namespace AquaPic.Drivers
 
                 updating = false;
             }
-            #endif
 
-            #if SIMULATION
-            public unsafe void GetValue (byte ch) {
-                const int messageLength = 1;
-                string[] message = new string[messageLength];
-                message [0] = ch.ToString ();
-                updating = true;
-                slave.ReadWrite (10, message, messageLength, 2, GetValueCallback);
-            }
-            #else
             public unsafe void GetValue (byte ch) {
                 if (channels [ch].mode == Mode.Auto) {
                     byte message = ch;
@@ -121,15 +89,7 @@ namespace AquaPic.Drivers
                     slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueInt), GetValueCallback);
                 }
             }
-            #endif
 
-            #if SIMULATION
-            protected void GetValueCallback (CallbackArgs args) {
-                int ch = Convert.ToInt32 (args.readMessage [3]);
-                channels [ch].value = Convert.ToSingle (args.readMessage [4]);
-                updating = false;
-            }
-            #else
             protected void GetValueCallback (CallbackArgs args) {
                 CommValueInt vg;
 
@@ -140,7 +100,6 @@ namespace AquaPic.Drivers
                 channels [vg.channel].value = (float)vg.value;
                 updating = false;
             }
-            #endif
         }
     }
 }
