@@ -117,7 +117,7 @@ namespace MyWidgetLibrary
         public MyFont () {
             color = "white";
             size = 11;
-            fontName = "Courier New";
+            fontName = "Sans";
         }
     }
 

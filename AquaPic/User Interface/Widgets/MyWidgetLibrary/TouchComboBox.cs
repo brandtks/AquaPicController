@@ -104,7 +104,7 @@ namespace MyWidgetLibrary
                     Pango.Layout l = new Pango.Layout (PangoContext);
                     l.Width = Pango.Units.FromPixels (width - height);
                     l.Alignment = Pango.Alignment.Left;
-                    l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+                    l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
                     for (int i = 0; i < List.Count; ++i) {
                         int y = top + height + 6 + (height * i);
                         l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + List [i] + "</span>"); 
@@ -139,7 +139,7 @@ namespace MyWidgetLibrary
 //                    l.Width = Pango.Units.FromPixels (width - height);
 //                    l.Alignment = Pango.Alignment.Left;
 //                    l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
-//                    l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+//                    l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
 //                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, top + 6, l);
 //                    l.Dispose ();
 

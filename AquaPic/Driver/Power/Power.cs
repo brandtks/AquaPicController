@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic; // for List
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using AquaPic.Utilites;
 using AquaPic.SerialBus;
 using AquaPic.Runtime;
@@ -11,6 +14,44 @@ namespace AquaPic.Drivers
         private static List<PowerStrip> pwrStrips = new List<PowerStrip> ();
 
         static Power () {
+            //Everything happens in Init
+        }
+
+        public static void Init () {
+            string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = Path.Combine (path, "Settings");
+            path = Path.Combine (path, "powerProperties.json");
+
+            using (StreamReader reader = File.OpenText (path)) {
+                JArray ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));
+
+                foreach (var jt in ja) {
+                    var jo = jt as JObject;
+
+                    string name = (string)jo ["name"];
+                    int powerStripId = Power.GetPowerStripIndex ((string)jo ["powerStrip"]);
+                    int outletId = Convert.ToInt32 (jo ["outlet"]);
+
+                    MyState fallback = (MyState)Enum.Parse (typeof (MyState), (string)jo ["fallback"]);
+
+                    List<string> conditions = new List<string> ();
+                    JArray cja = (JArray)jo ["conditions"];
+                    foreach (var cjt in cja) {
+                        conditions.Add ((string)cjt);
+                    }
+
+                    var script = Script.CompileOutletConditionCheck (conditions.ToArray ());
+                    if (script != null) {
+                        var c = AddOutlet (powerStripId, outletId, name, fallback);
+                        c.ConditionChecker = () => {
+                            return script.OutletConditionCheck ();
+                        };
+                    } else {
+                        Logger.AddInfo ("Error while adding outlet");
+                    }
+                }
+            }
+
             //<TEST> this doesn't need to be this fast for now
             //TaskManager.AddCyclicInterrupt ("Power", 250, Run);
             TaskManager.AddCyclicInterrupt ("Power", 1000, Run);

@@ -32,7 +32,7 @@ namespace AquaPic.UserInterface
             label.textAlignment = MyAlignment.Center;
 
             tv = new TextView ();
-            tv.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
+            tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             tv.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
             tv.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
             tv.CanFocus = false;

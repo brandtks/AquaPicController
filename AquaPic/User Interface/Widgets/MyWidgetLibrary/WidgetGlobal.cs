@@ -39,6 +39,7 @@ namespace MyWidgetLibrary
                 MessageType.Other,
                 ButtonsType.Ok,
                 msg);
+            ms.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
             ms.Run ();
             ms.Destroy ();
         }

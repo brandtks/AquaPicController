@@ -36,7 +36,7 @@ namespace MyWidgetLibrary
             entry = new Entry ();
             entry.WidthRequest = 150;
             entry.CanFocus = true;
-            entry.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
+            entry.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             entry.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
             entry.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
             entry.Activated += (sender, e) => {

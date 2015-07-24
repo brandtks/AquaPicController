@@ -118,7 +118,7 @@ namespace AquaPic.UserInterface
             } catch {
                 return false;
             }
-
+                
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");

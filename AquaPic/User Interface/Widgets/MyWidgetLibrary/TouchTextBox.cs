@@ -79,7 +79,7 @@ namespace MyWidgetLibrary
 //                l.SetMarkup ("<span color=\"" + textColor.ToHTML () + "\">" 
 //                    + text 
 //                    + "</span>");
-//                l.FontDescription = Pango.FontDescription.FromString ("Courier New " + textSize.ToString ());
+//                l.FontDescription = Pango.FontDescription.FromString ("Sans " + textSize.ToString ());
 //                GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left, top + 6, l);
 //                l.Dispose ();
 

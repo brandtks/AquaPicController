@@ -3,6 +3,7 @@ using Gtk;
 using Cairo;
 using MyWidgetLibrary;
 using AquaPic.Utilites;
+using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
@@ -86,6 +87,7 @@ namespace AquaPic.UserInterface
 
             settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
+            settingsButton.ButtonReleaseEvent += OnSettingButtonRelease;
             Put (settingsButton, 145, 5);
             settingsButton.Show ();
 
@@ -106,6 +108,15 @@ namespace AquaPic.UserInterface
                 render.text = l;
                 render.Render (tss, x, tss.Allocation.Top + 6, seperation);
                 x += seperation;
+            }
+        }
+        protected void OnSettingButtonRelease (object sender, ButtonReleaseEventArgs args) {
+            IndividualControl ic = Power.GetOutletIndividualControl (OutletName.text);
+            string owner = Power.GetOutletOwner (ic);
+            if (owner == "Power") {
+                MessageBox.Show ("Developer is feeling lazy.\nOutlet settings aren't yet implemented");
+            } else {
+                MessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
             }
         }
     }

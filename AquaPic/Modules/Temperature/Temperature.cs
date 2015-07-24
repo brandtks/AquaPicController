@@ -37,7 +37,6 @@ namespace AquaPic.Modules
             heaters = new List<Heater> ();
             probes = new List<TemperatureProbe> ();
 
-
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
             path = Path.Combine (path, "tempProperties.json");

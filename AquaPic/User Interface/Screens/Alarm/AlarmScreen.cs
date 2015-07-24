@@ -35,7 +35,7 @@ namespace AquaPic.UserInterface
             Put (b, 685, 380);
 
             tv = new TextView ();
-            tv.ModifyFont (Pango.FontDescription.FromString ("Courier New 11"));
+            tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             tv.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
             tv.CanFocus = false;
 

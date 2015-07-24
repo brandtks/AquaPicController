@@ -24,6 +24,8 @@ namespace MyWidgetLibrary
             WindowPosition = (Gtk.WindowPosition)4;
             SetSizeRequest (600, 320);
 
+            ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+
             foreach (Widget w in this.Children) {
                 Remove (w);
                 w.Dispose ();

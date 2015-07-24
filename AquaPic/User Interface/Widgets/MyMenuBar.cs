@@ -52,7 +52,7 @@ namespace AquaPic.UserInterface
                 l.Width = Pango.Units.FromPixels (width);
                 l.Wrap = Pango.WrapMode.Word;
                 l.Alignment = Pango.Alignment.Center;
-                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+                l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
 
                 if (currentMenu == GuiGlobal.currentScreen) {
                     x = (GuiGlobal.menuWindows.IndexOf (currentMenu) * width) + 1;

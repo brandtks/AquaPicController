@@ -193,7 +193,7 @@ namespace MyWidgetLibrary
 //                            else
 //                                x = left;
 //                            l.SetMarkup ("<span color=" + (char)34 + TextColorOptions [CurrentSelected].ToHTML () + (char)34 + ">" + TextOptions [CurrentSelected] + "</span>"); 
-//                            l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+//                            l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
 //                            GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), x, top + 1, l);
 //                            l.Dispose ();
 //                        }

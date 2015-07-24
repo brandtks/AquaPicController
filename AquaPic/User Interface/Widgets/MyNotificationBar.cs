@@ -65,7 +65,7 @@ namespace AquaPic.UserInterface
 
                 Pango.Layout l = new Pango.Layout (this.PangoContext);
                 l.Width = Pango.Units.FromPixels (120);
-                l.FontDescription = Pango.FontDescription.FromString ("Courier New 11");
+                l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
 
                 l.Alignment = Pango.Alignment.Right;
                 l.SetMarkup ("<span color=\"white\">" 
