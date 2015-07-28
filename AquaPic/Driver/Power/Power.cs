@@ -28,14 +28,14 @@ namespace AquaPic.Drivers
                 foreach (var jt in ja) {
                     var jo = jt as JObject;
 
-                    string name = (string)jo ["name"];
-                    int powerStripId = Power.GetPowerStripIndex ((string)jo ["powerStrip"]);
-                    int outletId = Convert.ToInt32 (jo ["outlet"]);
+                    string name = (string)jo["name"];
+                    int powerStripId = Power.GetPowerStripIndex ((string)jo["powerStrip"]);
+                    int outletId = Convert.ToInt32 (jo["outlet"]);
 
-                    MyState fallback = (MyState)Enum.Parse (typeof (MyState), (string)jo ["fallback"]);
+                    MyState fallback = (MyState)Enum.Parse (typeof (MyState), (string)jo["fallback"]);
 
                     List<string> conditions = new List<string> ();
-                    JArray cja = (JArray)jo ["conditions"];
+                    JArray cja = (JArray)jo["conditions"];
                     foreach (var cjt in cja) {
                         conditions.Add ((string)cjt);
                     }
@@ -213,6 +213,16 @@ namespace AquaPic.Drivers
             }
 
             throw new ArgumentException (name + " does not exists");
+        }
+
+        public static string GetOutletName (IndividualControl outlet) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            return pwrStrips[outlet.Group].outlets[outlet.Individual].name;
         }
 
         public static IndividualControl GetOutletIndividualControl (string name) {

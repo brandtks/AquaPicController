@@ -28,7 +28,7 @@ namespace AquaPic.Drivers
             */
 
             public AnalogInputCard (byte address, byte cardID, string name) {
-                this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
+                this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Analog Input)");
                 this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
 
                 this.cardID = cardID;

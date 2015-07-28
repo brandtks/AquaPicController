@@ -18,8 +18,8 @@ namespace AquaPic.Drivers
                 byte chId = 0;
                 foreach (var channel in card.channels) {
                     if (channel.mode == Mode.Auto) {
-                        channel.ValueControl.Execute ();
-                        channel.value = channel.ValueControl.value.ToInt ();
+                    //    channel.ValueControl.Execute ();
+                    //    channel.value = channel.ValueControl.value.ToInt ();
                     } else
                         card.SetAnalogValue (chId, Convert.ToInt32 (channel.value));
 

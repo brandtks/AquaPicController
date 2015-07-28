@@ -17,7 +17,7 @@ namespace AquaPic.Drivers
 
             public AnalogOutputCard (byte address, byte cardID, string name) {
                 try {
-                    slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
+                    slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Analog Output)");
                     slave.OnStatusUpdate += OnSlaveStatusUpdate;
                 } catch (Exception ex) {
                     Console.WriteLine (ex.ToString ());

@@ -17,13 +17,13 @@ namespace AquaPic.Drivers
             public bool updating;
 
             public DigitalInputCard (byte address, byte cardID, string name) {
-                this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address);
+                this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Digital Input)");
                 this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
 
                 this.cardID = cardID;
                 this.name = name;
                 this.communicationAlarmIndex = Alarm.Subscribe (
-                    this.slave.Address.ToString () + "commication fault");
+                    this.slave.Address.ToString () + " commication fault");
                 this.updating = false;
 
                 int numberInputs = 6;

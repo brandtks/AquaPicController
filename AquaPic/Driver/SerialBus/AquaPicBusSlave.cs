@@ -27,7 +27,7 @@ namespace AquaPic.SerialBus
             }
             public string Name { get; set; }
 
-            public Slave (AquaPicBus bus, byte address) {
+            public Slave (AquaPicBus bus, byte address, string name) {
                 if (!bus.IsAddressOk (address))
                     throw new Exception ("Address already in use");
 
@@ -37,13 +37,9 @@ namespace AquaPic.SerialBus
                 this.timeQue = new int[10];
                 this.queIdx = 0;
                 this.status = AquaPicBusStatus.notOpen;
-                this.Name = null;
+                this.Name = name;
 
                 this.bus.slaves.Add (this);
-            }
-
-            public Slave (AquaPicBus bus, byte address, string name ) : this(bus, address) {
-                this.Name = name;
             }
 
             public unsafe void Read (byte func, int readSize, ResponseCallback callback) {

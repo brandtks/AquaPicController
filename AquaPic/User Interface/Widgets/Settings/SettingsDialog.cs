@@ -16,13 +16,19 @@ namespace MyWidgetLibrary
         public bool includeDelete;
         public bool showOptional;
 
-        public TouchSettingsDialog (string name) : this (name, false) { }
+        public TouchButton saveBtn;
+        public TouchButton cancelButton;
+        public TouchButton deleteButton;
 
-        public TouchSettingsDialog (string name, bool includeDelete) {
+        public TouchSettingsDialog (string name) : this (name, false, 320) { }
+
+        public TouchSettingsDialog (string name, bool includeDelete) : this (name, includeDelete, 320) { }
+
+        public TouchSettingsDialog (string name, bool includeDelete, int height) {
             Name = "AquaPic.Settings." + name;
             Title = name + " Settings";
             WindowPosition = (Gtk.WindowPosition)4;
-            SetSizeRequest (600, 320);
+            SetSizeRequest (600, height);
 
             ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
 
@@ -32,9 +38,9 @@ namespace MyWidgetLibrary
             }
 
             fix = new Fixed ();
-            fix.SetSizeRequest (600, 320);
+            fix.SetSizeRequest (600, height);
 
-            var saveBtn = new TouchButton ();
+            saveBtn = new TouchButton ();
             saveBtn.SetSizeRequest (100, 30);
             saveBtn.text = "Save";
             saveBtn.ButtonReleaseEvent += (o, args) => {
@@ -46,20 +52,20 @@ namespace MyWidgetLibrary
                 if (success)
                     Destroy ();
             };
-            fix.Put (saveBtn, 495, 285);
+            fix.Put (saveBtn, 495, height - 35);
             saveBtn.Show ();
 
-            var cancelButton = new TouchButton ();
+            cancelButton = new TouchButton ();
             cancelButton.SetSizeRequest (100, 30);
             cancelButton.text = "Cancel";
             cancelButton.ButtonReleaseEvent += (o, args) => {
                 Destroy ();
             };
-            fix.Put (cancelButton, 385, 285);
+            fix.Put (cancelButton, 385, height - 35);
 
             this.includeDelete = includeDelete;
             if (this.includeDelete) {
-                var deleteButton = new TouchButton ();
+                deleteButton = new TouchButton ();
                 deleteButton.SetSizeRequest (100, 30);
                 deleteButton.text = "Delete";
                 deleteButton.buttonColor = "compl";
@@ -88,7 +94,7 @@ namespace MyWidgetLibrary
                     ms.Run ();
                     ms.Destroy ();
                 };
-                fix.Put (deleteButton, 10, 285);
+                fix.Put (deleteButton, 10, height - 35);
                 deleteButton.Show ();
             }
 

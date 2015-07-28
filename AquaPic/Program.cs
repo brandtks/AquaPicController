@@ -3,6 +3,8 @@ using Gtk;
 using AquaPic.Runtime;
 using AquaPic.Utilites;
 using AquaPic.UserInterface;
+using AquaPic.Drivers;
+using AquaPic.Modules;
 
 namespace AquaPic
 {
@@ -12,6 +14,11 @@ namespace AquaPic
             Application.Init ();
 
             Equipment.AddFromJson ();
+
+            Temperature.Init ();
+            Lighting.Init ();
+            WaterLevel.Init ();
+            Power.Init ();
 
 //            Commented out because I can't figure out themes on RPI
 //            string resourceFile;

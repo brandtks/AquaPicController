@@ -28,12 +28,6 @@ namespace AquaPic.Runtime
 
             string code = sb.ToString ();
 
-            #if DEBUG
-            Console.WriteLine ();
-            Console.WriteLine (code);
-            Console.WriteLine ();
-            #endif
-
             try {
                 IOutletScript outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
                 return outletScript;

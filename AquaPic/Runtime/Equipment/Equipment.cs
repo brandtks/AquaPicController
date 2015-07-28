@@ -54,13 +54,20 @@ namespace AquaPic.Runtime
                 }
             }
 
-            Temperature.Init ();
-            Lighting.Init ();
-            WaterLevel.Init ();
-            try {
-                Power.Init ();
-            } catch (Exception ex) {
-                Console.WriteLine (ex.ToString ());
+            path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = System.IO.Path.Combine (path, "Settings");
+            path = System.IO.Path.Combine (path, "generalProperties.json");
+
+            string jstring = File.ReadAllText (path);
+            JObject jobj = (JObject)JToken.Parse (jstring);
+
+            bool autoConnect = Convert.ToBoolean (jobj ["autoConnectAquaPicBus"]);
+            if (autoConnect) {
+                string port = (string)jobj ["aquaPicBusPort"];
+                if (!string.IsNullOrWhiteSpace (port)) {
+                    Logger.Add ("Starting AquaPicBus on port " + port);
+                    AquaPic.SerialBus.AquaPicBus.Bus1.Open (port);
+                }
             }
         }
     }
