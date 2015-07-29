@@ -20,6 +20,22 @@ namespace AquaPic.UserInterface
             Put (box1, 10, 30);
             box1.Show ();
 
+            if (Power.powerStripCount == 0) {
+                powerID = -1;
+
+                var l = new TouchLabel ();
+                l.text = "No Power Strips Added";
+                l.textColor = "pri";
+                l.textAlignment = MyAlignment.Center;
+                l.WidthRequest = 780;
+                Put (l, 10, 32);
+                l.Show ();
+
+                Show ();
+
+                return;
+            }
+
             powerID = 0;
 
             int x, y;
@@ -59,11 +75,13 @@ namespace AquaPic.UserInterface
         }
 
         public override void Dispose () {
-            IndividualControl ic;
-            ic.Group = (byte)powerID;
-            for (int i = 0; i < selectors.Length; ++i) {
-                ic.Individual = (byte)i;
-                Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
+            if (powerID != -1) {
+                IndividualControl ic;
+                ic.Group = (byte)powerID;
+                for (int i = 0; i < selectors.Length; ++i) {
+                    ic.Individual = (byte)i;
+                    Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
+                }
             }
 
             base.Dispose ();

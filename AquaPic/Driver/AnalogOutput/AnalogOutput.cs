@@ -9,6 +9,12 @@ namespace AquaPic.Drivers
     {
         private static List<AnalogOutputCard> cards = new List<AnalogOutputCard> ();
 
+        public static int cardCount {
+            get {
+                return cards.Count;
+            }
+        }
+
         static AnalogOutput () {
             TaskManager.AddCyclicInterrupt ("Analog Output", 1000, Run);
         }
@@ -16,15 +22,19 @@ namespace AquaPic.Drivers
         public static void Run () {
             foreach (var card in cards) {
                 byte chId = 0;
+
+                short[] values = new short[4];
+
                 foreach (var channel in card.channels) {
-                    if (channel.mode == Mode.Auto) {
-                    //    channel.ValueControl.Execute ();
-                    //    channel.value = channel.ValueControl.value.ToInt ();
-                    } else
-                        card.SetAnalogValue (chId, Convert.ToInt32 (channel.value));
+                    if (channel.mode == Mode.Auto)
+                        channel.ValueControl.Execute ();
+
+                    values [chId] = (short)channel.value;
 
                     ++chId;
                 }
+
+                card.SetAllAnalogValues (values);
             }
         }
 

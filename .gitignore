@@ -11,3 +11,4 @@ gtk-gui/
 *.dll
 *.pdb
 *.xml
+*.suo

@@ -51,7 +51,6 @@ namespace AquaPic.UserInterface
 
             TouchLabel fixtureLabel = new TouchLabel ();
             fixtureLabel.text = "Lighting Fixtures";
-            //fixtureLabel.TextColor.ChangeColor ("pri");
             fixtureLabel.textColor = "pri";
             fixtureLabel.textSize = 12;
             Put (fixtureLabel, 413, 40);
@@ -125,6 +124,16 @@ namespace AquaPic.UserInterface
             Put (sunSetTomorrow, 190, 175);
             sunSetTomorrow.Show ();
             #endregion
+
+
+            //<TODO> this is a stupid fix for when there are no lights add
+            //will be changed after I implement adding and removing lights during runtime
+            if (Lighting.lightsCount == 0) {
+                fixtureID = -1;
+                fixtureLabel.text = "No lighing fixtures added";
+                Show ();
+                return;
+            }
 
             dimmingIsManual = false;
             fixtureID = 0;

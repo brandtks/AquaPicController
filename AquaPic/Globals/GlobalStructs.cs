@@ -30,7 +30,7 @@ namespace AquaPic.Utilites
 
     public struct CommValueInt {
         public byte channel;
-        public Int16 value;
+        public short value;
     }
 
     public struct CommValueBool {

@@ -235,7 +235,7 @@ namespace AquaPic.UserInterface
 
                 try {
                     if (((SettingComboBox)settings ["Pump Outlet"]).combo.Active == -1) {
-                        MessageBox.Show ("Please Select an input channel");
+                        MessageBox.Show ("Please select power outlet for the pump");
                         return false;
                     }
 
@@ -284,8 +284,13 @@ namespace AquaPic.UserInterface
             jo ["AutoTopOff"] ["analogOnSetpoint"]= WaterLevel.atoAnalogOnSetpoint.ToString ();
             jo ["AutoTopOff"] ["analogOffSetpoint"]= WaterLevel.atoAnalogOffSetpoint.ToString ();
             jo ["AutoTopOff"] ["useFloatSwitch"]= WaterLevel.atoUseFloatSwitch.ToString ();
-            jo ["AutoTopOff"] ["powerStrip"] = Power.GetPowerStripName (WaterLevel.atoPumpOutlet.Group);
-            jo ["AutoTopOff"] ["outlet"]= WaterLevel.atoPumpOutlet.Individual.ToString ();
+            if (WaterLevel.atoPumpOutlet.IsNotEmpty ()) {
+                jo ["AutoTopOff"] ["powerStrip"] = Power.GetPowerStripName (WaterLevel.atoPumpOutlet.Group);
+                jo ["AutoTopOff"] ["outlet"] = WaterLevel.atoPumpOutlet.Individual.ToString ();
+            } else {
+                jo ["AutoTopOff"] ["powerStrip"] = string.Empty;
+                jo ["AutoTopOff"] ["outlet"] = string.Empty;
+            }
             jo ["AutoTopOff"] ["maxPumpOnTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoMaxRuntime / 60000);
             jo ["AutoTopOff"] ["minPumpOffTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoCooldown / 60000);
 

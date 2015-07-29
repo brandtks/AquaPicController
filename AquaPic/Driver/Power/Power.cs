@@ -13,6 +13,12 @@ namespace AquaPic.Drivers
     {
         private static List<PowerStrip> pwrStrips = new List<PowerStrip> ();
 
+        public static int powerStripCount {
+            get {
+                return pwrStrips.Count;
+            }
+        }
+
         static Power () {
             //Everything happens in Init
         }

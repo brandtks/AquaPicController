@@ -33,6 +33,18 @@ namespace AquaPic.Modules
             get { return temperature; }
         }
 
+        public static int heaterCount {
+            get {
+                return heaters.Count;
+            }
+        }
+
+        public static int temperatureProbeCount {
+            get {
+                return probes.Count;
+            }
+        }
+
         static Temperature () {
             heaters = new List<Heater> ();
             probes = new List<TemperatureProbe> ();
@@ -150,10 +162,6 @@ namespace AquaPic.Modules
             throw new ArgumentOutOfRangeException ("heaterId");
         }
 
-        public static int GetHeaterCount () {
-            return heaters.Count;
-        }
-
         public static string[] GetAllHeaterNames () {
             string[] names = new string[heaters.Count];
             for (int i = 0; i < heaters.Count; ++i)
@@ -229,10 +237,6 @@ namespace AquaPic.Modules
             } catch {
                 return true;
             }
-        }
-
-        public static int GetTemperatureProbeCount () {
-            return probes.Count;
         }
 
         public static string[] GetAllTemperatureProbeNames () {

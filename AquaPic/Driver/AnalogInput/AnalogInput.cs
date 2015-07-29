@@ -9,6 +9,12 @@ namespace AquaPic.Drivers
     {
         private static List<AnalogInputCard> cards = new List<AnalogInputCard> ();
 
+        public static int cardCount {
+            get {
+                return cards.Count;
+            }
+        }
+
         static AnalogInput () {
             TaskManager.AddCyclicInterrupt ("Analog Input", 1000, Run);
         }

@@ -91,7 +91,7 @@ namespace AquaPic.UserInterface
             settingsBtn.text = "Settings";
             settingsBtn.SetSizeRequest (100, 30);
             settingsBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new LevelSettings ();
+                var s = new AnalogSensorSettings ();
                 s.Run ();
                 s.Destroy ();
             };
@@ -103,7 +103,10 @@ namespace AquaPic.UserInterface
             b.SetSizeRequest (100, 30);
             Put (b, 515, 188);
 
-            switchId = 0;
+            if (WaterLevel.floatSwitchCount == 0)
+                switchId = -1;
+            else
+                switchId = 0;
 
             label = new TouchLabel ();
             label.text = "Probes";
@@ -134,17 +137,39 @@ namespace AquaPic.UserInterface
             switchSetupBtn.text = "Probe Setup";
             switchSetupBtn.SetSizeRequest (100, 30);
             switchSetupBtn.ButtonReleaseEvent += (o, args) => {
-                string name = WaterLevel.GetFloatSwitchName (switchId);
-                var s = new SwitchSettings (name, switchId, true);
-                s.Run ();
-                s.Destroy ();
+                if (switchId != -1) {
+                    string name = WaterLevel.GetFloatSwitchName (switchId);
+                    var s = new SwitchSettings (name, switchId, true);
+                    s.Run ();
+                    s.Destroy ();
 
-                try {
-                    WaterLevel.GetFloatSwitchIndex (name);
-                } catch (ArgumentException) {
-                    switchCombo.List.Remove (name);
-                    switchId = 0;
-                    switchCombo.Active = switchId;
+                    try {
+                        WaterLevel.GetFloatSwitchIndex (name);
+                    } catch (ArgumentException) {
+                        switchCombo.List.Remove (name);
+                        switchId = 0;
+                        switchCombo.Active = switchId;
+                    }
+                } else {
+                    int switchCount = WaterLevel.floatSwitchCount;
+
+                    var s = new SwitchSettings ("New switch", -1, false);
+                    s.Run ();
+                    s.Destroy ();
+
+                    if (WaterLevel.floatSwitchCount > switchCount) {
+                        switchId = WaterLevel.floatSwitchCount - 1;
+                        int listIdx = switchCombo.List.IndexOf ("New switch...");
+                        switchCombo.List.Insert (listIdx, WaterLevel.GetFloatSwitchName (switchId));
+                        switchCombo.Active = listIdx;
+                        switchCombo.QueueDraw ();
+                        GetSwitchData ();
+                    } else {
+                        if (switchId != -1)
+                            switchCombo.Active = switchId;
+                        else
+                            switchCombo.Active = 0;
+                    }
                 }
 
                 switchCombo.QueueDraw ();
@@ -154,7 +179,10 @@ namespace AquaPic.UserInterface
 
             string[] sNames = WaterLevel.GetAllFloatSwitches ();
             switchCombo = new TouchComboBox (sNames);
-            switchCombo.Active = switchId;
+            if (switchId != -1)
+                switchCombo.Active = switchId;
+            else
+                switchCombo.Active = 0;
             switchCombo.WidthRequest = 235;
             switchCombo.List.Add ("New switch...");
             switchCombo.ChangedEvent += OnSwitchComboChanged;
@@ -175,40 +203,46 @@ namespace AquaPic.UserInterface
         }
 
         public bool OnUpdateTimer () {
-            analogLevelTextBox.text = WaterLevel.analogWaterLevel.ToString ("F2");
-            analogLevelTextBox.QueueDraw ();
-
-            bool state = DigitalInput.GetState (WaterLevel.GetFloatSwitchIndividualControl (switchId));
-            if (state) {
-                switchStateTextBox.text = "Closed";
-                switchStateTextBox.bkgndColor = "pri";
-            } else {
-                switchStateTextBox.text = "Open";
-                switchStateTextBox.bkgndColor = "seca";
+            if (WaterLevel.analogSensorEnabled) {
+                analogLevelTextBox.text = WaterLevel.analogWaterLevel.ToString ("F2");
+                analogLevelTextBox.QueueDraw ();
             }
 
-
+            if (switchId != -1) {
+                bool state = DigitalInput.GetState (WaterLevel.GetFloatSwitchIndividualControl (switchId));
+                if (state) {
+                    switchStateTextBox.text = "Closed";
+                    switchStateTextBox.bkgndColor = "pri";
+                } else {
+                    switchStateTextBox.text = "Open";
+                    switchStateTextBox.bkgndColor = "seca";
+                }
+            }
 
             return true;
         }
 
         protected void OnSwitchComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.ActiveText == "New switch...") {
-                int switchCount = WaterLevel.GetFloatSwitchCount ();
+                int switchCount = WaterLevel.floatSwitchCount;
 
                 var s = new SwitchSettings ("New switch", -1, false);
                 s.Run ();
                 s.Destroy ();
 
-                if (WaterLevel.GetFloatSwitchCount () > switchCount) {
-                    switchId = WaterLevel.GetFloatSwitchCount () - 1;
+                if (WaterLevel.floatSwitchCount > switchCount) {
+                    switchId = WaterLevel.floatSwitchCount - 1;
                     int listIdx = switchCombo.List.IndexOf ("New switch...");
                     switchCombo.List.Insert (listIdx, WaterLevel.GetFloatSwitchName (switchId));
                     switchCombo.Active = listIdx;
                     switchCombo.QueueDraw ();
                     GetSwitchData ();
-                } else
-                    switchCombo.Active = switchId;
+                } else {
+                    if (switchId != -1)
+                        switchCombo.Active = switchId;
+                    else
+                        switchCombo.Active = 0;
+                }
             } else {
                 try {
                     int id = WaterLevel.GetFloatSwitchIndex (e.ActiveText);
@@ -221,18 +255,20 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetSwitchData () {
-            bool state = DigitalInput.GetState (WaterLevel.GetFloatSwitchIndividualControl (switchId));
+            if (switchId != -1) {
+                bool state = DigitalInput.GetState (WaterLevel.GetFloatSwitchIndividualControl (switchId));
 
-            if (state) {
-                switchStateTextBox.text = "Closed";
-                switchStateTextBox.bkgndColor = "pri";
-            } else {
-                switchStateTextBox.text = "Open";
-                switchStateTextBox.bkgndColor = "seca";
+                if (state) {
+                    switchStateTextBox.text = "Closed";
+                    switchStateTextBox.bkgndColor = "pri";
+                } else {
+                    switchStateTextBox.text = "Open";
+                    switchStateTextBox.bkgndColor = "seca";
+                }
+
+                SwitchType type = WaterLevel.GetFloatSwitchType (switchId);
+                switchTypeLabel.text = Utilites.Utils.GetDescription (type);
             }
-
-            SwitchType type = WaterLevel.GetFloatSwitchType (switchId);
-            switchTypeLabel.text = Utilites.Utils.GetDescription (type);
         }
     }
 }

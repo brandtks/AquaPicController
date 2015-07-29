@@ -15,11 +15,27 @@ namespace AquaPic.UserInterface
         uint timerId;
 
         public AnalogOutputWindow (params object[] options) : base () {
-            cardId = 0;
-
             MyBox box1 = new MyBox (780, 395);
             Put (box1, 10, 30);
             box1.Show ();
+
+            if (AnalogOutput.cardCount == 0) {
+                cardId = -1;
+
+                var l = new TouchLabel ();
+                l.text = "No Analog Output Cards Added";
+                l.textColor = "pri";
+                l.textAlignment = MyAlignment.Center;
+                l.WidthRequest = 780;
+                Put (l, 10, 32);
+                l.Show ();
+
+                Show ();
+
+                return;
+            }
+
+            cardId = 0;
 
             displays = new AnalogChannelDisplay[4];
             for (int i = 0; i < 4; ++i) {

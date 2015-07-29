@@ -186,6 +186,12 @@ namespace AquaPic.Modules
             }
         }
 
+        public static int floatSwitchCount {
+            get {
+                return floatSwitches.Count;
+            }
+        }
+
         static WaterLevel () {
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
@@ -554,10 +560,6 @@ namespace AquaPic.Modules
                 throw new ArgumentOutOfRangeException ("switchId");
 
             floatSwitches [switchId].odt.timerInterval = timeOffset;
-        }
-
-        public static int GetFloatSwitchCount () {
-            return floatSwitches.Count;
         }
     }
 }

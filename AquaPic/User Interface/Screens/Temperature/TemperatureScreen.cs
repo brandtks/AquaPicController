@@ -80,7 +80,10 @@ namespace AquaPic.UserInterface
             Put (tempDeadband, 190, 140);
             tempDeadband.Show ();
 
-            heaterId = 0;
+            if (Temperature.heaterCount == 0)
+                heaterId = -1;
+            else
+                heaterId = 0;
 
             label = new TouchLabel ();
             label.text = "Heaters";
@@ -126,18 +129,40 @@ namespace AquaPic.UserInterface
             heaterSetupBtn.text = "Heater Setup";
             heaterSetupBtn.SetSizeRequest (100, 30);
             heaterSetupBtn.ButtonReleaseEvent += (o, args) => {
-                string name = Temperature.GetHeaterName (heaterId);
-                var s = new HeaterSettings (name, heaterId, true);
-                s.Run ();
-                s.Destroy ();
+                if (heaterId != -1) {
+                    string name = Temperature.GetHeaterName (heaterId);
+                    var s = new HeaterSettings (name, heaterId, true);
+                    s.Run ();
+                    s.Destroy ();
 
-                try {
-                    Temperature.GetHeaterIndex (name);
-                } catch (ArgumentException) {
-                    heaterCombo.List.Remove (name);
-                    heaterId = 0;
-                    heaterCombo.Active = heaterId;
-                    GetHeaterData ();
+                    try {
+                        Temperature.GetHeaterIndex (name);
+                    } catch (ArgumentException) {
+                        heaterCombo.List.Remove (name);
+                        heaterId = 0;
+                        heaterCombo.Active = heaterId;
+                        GetHeaterData ();
+                    }
+                } else {
+                    int heaterCount = Temperature.heaterCount;
+
+                    var s = new HeaterSettings ("New Heater", -1, false);
+                    s.Run ();
+                    s.Destroy ();
+
+                    if (Temperature.heaterCount > heaterCount) { // a heater was added
+                        heaterId = Temperature.heaterCount - 1;
+                        int listIdx = heaterCombo.List.IndexOf ("New heater...");
+                        heaterCombo.List.Insert (listIdx, Temperature.GetHeaterName (heaterId));
+                        heaterCombo.Active = listIdx;
+                        heaterCombo.QueueDraw ();
+                        GetHeaterData ();
+                    } else {
+                        if (heaterId != -1)
+                            heaterCombo.Active = heaterId;
+                        else
+                            heaterCombo.Active = 0;
+                    }
                 }
 
                 heaterCombo.QueueDraw ();
@@ -145,7 +170,10 @@ namespace AquaPic.UserInterface
             Put (heaterSetupBtn, 410, 188);
             heaterSetupBtn.Show ();
 
-            probeId = 0;
+            if (Temperature.temperatureProbeCount == 0)
+                probeId = -1;
+            else
+                probeId = 0;
 
             label = new TouchLabel ();
             label.text = "Probes";
@@ -158,18 +186,40 @@ namespace AquaPic.UserInterface
             probeSetupBtn.text = "Probe Setup";
             probeSetupBtn.SetSizeRequest (100, 30);
             probeSetupBtn.ButtonReleaseEvent += (o, args) => {
-                string name = Temperature.GetTemperatureProbeName (probeId);
-                var s = new ProbeSettings (name, probeId, true);
-                s.Run ();
-                s.Destroy ();
+                if (probeId != -1) {
+                    string name = Temperature.GetTemperatureProbeName (probeId);
+                    var s = new ProbeSettings (name, probeId, true);
+                    s.Run ();
+                    s.Destroy ();
 
-                try {
-                    Temperature.GetTemperatureProbeIndex (name);
-                } catch (ArgumentException) {
-                    probeCombo.List.Remove (name);
-                    probeId = 0;
-                    probeCombo.Active = probeId;
-                    GetProbeData ();
+                    try {
+                        Temperature.GetTemperatureProbeIndex (name);
+                    } catch (ArgumentException) {
+                        probeCombo.List.Remove (name);
+                        probeId = 0;
+                        probeCombo.Active = probeId;
+                        GetProbeData ();
+                    }
+                } else {
+                    int probeCount = Temperature.temperatureProbeCount;
+
+                    var s = new ProbeSettings ("New probe", -1, false);
+                    s.Run ();
+                    s.Destroy ();
+
+                    if (Temperature.temperatureProbeCount > probeCount) {
+                        probeId = Temperature.temperatureProbeCount - 1;
+                        int listIdx = probeCombo.List.IndexOf ("New probe...");
+                        probeCombo.List.Insert (listIdx, Temperature.GetTemperatureProbeName (probeId));
+                        probeCombo.Active = listIdx;
+                        probeCombo.QueueDraw ();
+                        GetProbeData ();
+                    } else {
+                        if (probeId != -1)
+                            probeCombo.Active = probeId;
+                        else
+                            probeCombo.Active = 0;
+                    }
                 }
 
                 probeCombo.QueueDraw ();
@@ -191,7 +241,10 @@ namespace AquaPic.UserInterface
 
             string[] hNames = Temperature.GetAllHeaterNames ();
             heaterCombo = new TouchComboBox (hNames);
-            heaterCombo.Active = heaterId;
+            if (heaterId != -1)
+                heaterCombo.Active = heaterId;
+            else
+                heaterCombo.Active = 0;
             heaterCombo.WidthRequest = 235;
             heaterCombo.List.Add ("New heater...");
             heaterCombo.ChangedEvent += OnHeaterComboChanged;
@@ -200,7 +253,10 @@ namespace AquaPic.UserInterface
 
             string[] pNames = Temperature.GetAllTemperatureProbeNames ();
             probeCombo = new TouchComboBox (pNames);
-            probeCombo.Active = probeId;
+            if (probeId != -1)
+                probeCombo.Active = probeId;
+            else
+                probeCombo.Active = 0;
             probeCombo.WidthRequest = 235;
             probeCombo.List.Add ("New probe...");
             probeCombo.ChangedEvent += OnProbeComboChanged;
@@ -223,21 +279,25 @@ namespace AquaPic.UserInterface
 
         protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.ActiveText == "New heater...") {
-                int heaterCount = Temperature.GetHeaterCount ();
+                int heaterCount = Temperature.heaterCount;
 
                 var s = new HeaterSettings ("New Heater", -1, false);
                 s.Run ();
                 s.Destroy ();
 
-                if (Temperature.GetHeaterCount () > heaterCount) { // a heater was added
-                    heaterId = Temperature.GetHeaterCount () - 1;
+                if (Temperature.heaterCount > heaterCount) { // a heater was added
+                    heaterId = Temperature.heaterCount - 1;
                     int listIdx = heaterCombo.List.IndexOf ("New heater...");
                     heaterCombo.List.Insert (listIdx, Temperature.GetHeaterName (heaterId));
                     heaterCombo.Active = listIdx;
                     heaterCombo.QueueDraw ();
                     GetHeaterData ();
-                } else
-                    heaterCombo.Active = heaterId;
+                } else {
+                    if (heaterId != -1)
+                        heaterCombo.Active = heaterId;
+                    else
+                        heaterCombo.Active = 0;
+                }
             } else {
                 try {
                     int id = Temperature.GetHeaterIndex (e.ActiveText);
@@ -251,21 +311,25 @@ namespace AquaPic.UserInterface
 
         protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.ActiveText == "New probe...") {
-                int probeCount = Temperature.GetTemperatureProbeCount ();
+                int probeCount = Temperature.temperatureProbeCount;
 
                 var s = new ProbeSettings ("New probe", -1, false);
                 s.Run ();
                 s.Destroy ();
 
-                if (Temperature.GetTemperatureProbeCount () > probeCount) {
-                    probeId = Temperature.GetTemperatureProbeCount () - 1;
+                if (Temperature.temperatureProbeCount > probeCount) {
+                    probeId = Temperature.temperatureProbeCount - 1;
                     int listIdx = probeCombo.List.IndexOf ("New probe...");
                     probeCombo.List.Insert (listIdx, Temperature.GetTemperatureProbeName (probeId));
                     probeCombo.Active = listIdx;
                     probeCombo.QueueDraw ();
                     GetProbeData ();
-                } else
-                    probeCombo.Active = probeId;
+                } else {
+                    if (probeId != -1)
+                        probeCombo.Active = probeId;
+                    else
+                        probeCombo.Active = 0;
+                }
             } else {
                 try {
                     int id = Temperature.GetTemperatureProbeIndex (e.ActiveText);
@@ -278,6 +342,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetHeaterData () {
+            if (heaterId != -1) {
 //            if (Temperature.ControlsTemperature (heaterId)) {
                 heaterLabel.text = string.Format ("{0} control based upon global setpoints", Temperature.GetHeaterName (heaterId));
 //                setpoint.Visible = false;
@@ -291,14 +356,17 @@ namespace AquaPic.UserInterface
 //                deadband.textBox.text = Temperature.GetHeaterDeadband (heaterId).ToString ("F1");
 //            }
 
-            heaterLabel.QueueDraw ();
+                heaterLabel.QueueDraw ();
 //            setpoint.QueueDraw ();
 //            deadband.QueueDraw ();
+            }
         }
 
         protected void GetProbeData () {
-            probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeId).ToString ("F2");
-            probeTempTextbox.QueueDraw ();
+            if (probeId != -1) {
+                probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeId).ToString ("F2");
+                probeTempTextbox.QueueDraw ();
+            }
         }
 
         protected bool OnTimer () {

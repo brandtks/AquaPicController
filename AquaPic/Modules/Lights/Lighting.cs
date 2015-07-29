@@ -50,6 +50,12 @@ namespace AquaPic.Modules
             }
         }
 
+        public static int lightsCount {
+            get {
+                return fixtures.Count;
+            }
+        }
+
         static Lighting () {
             fixtures = new List<LightingFixture> ();
 

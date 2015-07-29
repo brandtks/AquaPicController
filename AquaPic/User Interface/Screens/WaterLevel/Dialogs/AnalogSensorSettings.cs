@@ -12,9 +12,9 @@ using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
-    public class LevelSettings : TouchSettingsDialog
+    public class AnalogSensorSettings : TouchSettingsDialog
     {
-        public LevelSettings () : base ("Water Level") {
+        public AnalogSensorSettings () : base ("Analog Water Sensor") {
             SaveEvent += OnSave;
 
             var s = new SettingSelectorSwitch ();
@@ -182,8 +182,13 @@ namespace AquaPic.UserInterface
             jo ["enableAnalogSensor"] = WaterLevel.analogSensorEnabled.ToString ();
             jo ["highAnalogLevelAlarmSetpoint"] = WaterLevel.highAnalogLevelAlarmSetpoint.ToString ();
             jo ["lowAnalogLevelAlarmSetpoint"] = WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ();
-            jo ["inputCard"] = AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group);
-            jo ["channel"] = WaterLevel.analogSensorChannel.Individual.ToString ();
+            if (WaterLevel.analogSensorChannel.IsNotEmpty ()) {
+                jo ["inputCard"] = AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group);
+                jo ["channel"] = WaterLevel.analogSensorChannel.Individual.ToString ();
+            } else {
+                jo ["inputCard"] = string.Empty;
+                jo ["channel"] = string.Empty;
+            }
 
             File.WriteAllText (path, jo.ToString ());
 
