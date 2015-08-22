@@ -56,18 +56,6 @@ namespace AquaPic.UserInterface
             Put (fixtureLabel, 413, 40);
             fixtureLabel.Show ();
 
-            TouchLabel onTimeLabel = new TouchLabel ();
-            onTimeLabel.text = "On Time";
-            onTimeLabel.textColor = "grey4"; 
-            Put (onTimeLabel, 415, 75);
-            onTimeLabel.Show ();
-
-            TouchLabel offTimeLabel = new TouchLabel ();
-            offTimeLabel.text = "Off Time";
-            offTimeLabel.textColor = "grey4"; 
-            Put (offTimeLabel, 415, 130);
-            offTimeLabel.Show ();
-
             TouchLabel genInfoLabel = new TouchLabel ();
             genInfoLabel.text = "General Lighting Information";
             genInfoLabel.WidthRequest = 370;
@@ -124,7 +112,6 @@ namespace AquaPic.UserInterface
             Put (sunSetTomorrow, 190, 175);
             sunSetTomorrow.Show ();
             #endregion
-
 
             //<TODO> this is a stupid fix for when there are no lights add
             //will be changed after I implement adding and removing lights during runtime
@@ -184,7 +171,7 @@ namespace AquaPic.UserInterface
                         newLevel = 100.0f;
                     Lighting.SetDimmingLevel (fixtureID, newLevel);
                 } catch (Exception ex) {
-                    MessageBox.Show (ex.ToString ());
+                    TouchMessageBox.Show (ex.ToString ());
                 }
             };
             Put (requestTextBox, 633, 231);
@@ -216,10 +203,22 @@ namespace AquaPic.UserInterface
             Put (autoLabel, 596, 389);
             autoLabel.Show ();
 
+            var onTimeLabel = new TouchLabel ();
+            onTimeLabel.text = "On Time";
+            onTimeLabel.textColor = "grey4"; 
+            Put (onTimeLabel, 415, 75);
+            onTimeLabel.Show ();
+
             onTimeTextBox = new TouchTextBox ();
             onTimeTextBox.WidthRequest = 195;
             Put (onTimeTextBox, 415, 95);
             onTimeTextBox.Show ();
+
+            var offTimeLabel = new TouchLabel ();
+            offTimeLabel.text = "Off Time";
+            offTimeLabel.textColor = "grey4"; 
+            Put (offTimeLabel, 415, 130);
+            offTimeLabel.Show ();
 
             offTimeTextBox = new TouchTextBox ();
             offTimeTextBox.WidthRequest = 195;

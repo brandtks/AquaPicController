@@ -29,10 +29,11 @@ namespace AquaPic.UserInterface
 
             string jstring = File.ReadAllText (path);
             JArray ja = (JArray)JToken.Parse (jstring);
+            JObject jo = null;
 
             string code = "These are not the scripts you're looking for";
             foreach (var jt in ja) {
-                JObject jo = jt as JObject;
+                jo = jt as JObject;
                 string n = (string)jo ["name"];
                 if (n == name) {
                     StringBuilder sb = new StringBuilder ();
@@ -53,6 +54,35 @@ namespace AquaPic.UserInterface
             tv.Show ();
             fix.Put (sw, 5, 160);
             sw.Show ();
+
+            var t = new SettingTextBox ();
+            t.text = "Name";
+            if (includeDelete)
+                t.textBox.text = Power.GetOutletName (ic);
+            else
+                t.textBox.text = "Enter name";
+            t.textBox.TextChangedEvent += (sender, args) => {
+                if (string.IsNullOrWhiteSpace (args.text))
+                    args.keepText = false;
+                else if (!Power.OutletNameOk (args.text)) {
+                    TouchMessageBox.Show ("Heater name already exists");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
+
+            var s = new SettingSelectorSwitch ("On", "Off");
+            s.text = "Fallback";
+            if (includeDelete) {
+                if (Power.GetOutletFallback (ic) == MyState.On)
+                    s.selectorSwitch.CurrentSelected = 0;
+                else
+                    s.selectorSwitch.CurrentSelected = 1;
+            } else
+                s.selectorSwitch.CurrentSelected = 1;
+            AddSetting (s);
+
+            DrawSettings ();
         }
 
 //        protected bool OnSave (object sender) {

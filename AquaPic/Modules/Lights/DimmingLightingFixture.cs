@@ -55,15 +55,14 @@ namespace AquaPic.Modules
                 valueControl = AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this.type, name);
                 valueControl.ValueGetter = SetDimmingLevel;
 
-                // if the Plug is manually turned on or off set dimming to manual
-                Power.AddHandlerOnManual (
+                Power.AddHandlerOnModeChange (
                     plug,
-                    (sender, args) => dimmingMode = Mode.Manual);
-
-                // if the plug is returned to auto set dimming to auto
-                Power.AddHandlerOnAuto (
-                    plug,
-                    (sender, args) => dimmingMode = Mode.Auto);
+                    (sender, args) => {
+                        if (args.mode == Mode.Auto)
+                            dimmingMode = Mode.Auto;
+                        else
+                            dimmingMode = Mode.Manual;
+                    });
 
                 MainWindowWidgets.barPlots.Add (name, new BarPlotData (() => {return new DimmingLightBarPlot (name, () => {return currentDimmingLevel;});}));
             }

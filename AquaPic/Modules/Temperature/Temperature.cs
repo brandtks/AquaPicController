@@ -82,13 +82,6 @@ namespace AquaPic.Modules
             highTempAlarmIdx = Alarm.Subscribe ("High temperature");
             lowTempAlarmIdx = Alarm.Subscribe ("Low temperature");
 
-            Alarm.AddPostHandler (
-                highTempAlarmIdx, 
-                (sender) => {
-                    foreach (var heater in heaters)
-                        Power.AlarmShutdownOutlet (heater.plug);
-                });
-
             temperature = 32.0f;
 
             TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);

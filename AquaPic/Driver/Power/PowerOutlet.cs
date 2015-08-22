@@ -22,8 +22,7 @@ namespace AquaPic.Drivers
             public string owner;
 
             public event StateChangeHandler StateChangeEvent;
-            public event ModeChangedHandler AutoEvent;
-            public event ModeChangedHandler ManualEvent;
+            public event ModeChangedHandler ModeChangeEvent;
 
             public OutletData (string name, OutputHandler outputTrue, OutputHandler outputFalse) {
                 this.name = name;
@@ -56,14 +55,9 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public void OnModeChangedAuto (ModeChangeEventArgs args) {
-                if (AutoEvent != null)
-                    AutoEvent (this, args);
-            }
-
-            public void OnModeChangedManual (ModeChangeEventArgs args) {
-                if (ManualEvent != null)
-                    ManualEvent (this, args);
+            public void OnModeChange (ModeChangeEventArgs args) {
+                if (ModeChangeEvent != null)
+                    ModeChangeEvent (this, args);
             }
         }
     }

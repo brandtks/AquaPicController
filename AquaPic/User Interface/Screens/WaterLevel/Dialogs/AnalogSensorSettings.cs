@@ -44,7 +44,7 @@ namespace AquaPic.UserInterface
                     float highAlarmStpnt = Convert.ToSingle (args.text);
 
                     if (highAlarmStpnt < 0.0f) {
-                        MessageBox.Show ("High alarm setpoint can't be negative");
+                        TouchMessageBox.Show ("High alarm setpoint can't be negative");
                         args.keepText = false;
                         return;
                     }
@@ -52,12 +52,12 @@ namespace AquaPic.UserInterface
                     float lowAlarmStpnt = Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text);
 
                     if (lowAlarmStpnt >= highAlarmStpnt) {
-                        MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
+                        TouchMessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
                         args.keepText = false;
                         return;
                     }
                 } catch {
-                    MessageBox.Show ("Improper high alarm setpoint format");
+                    TouchMessageBox.Show ("Improper high alarm setpoint format");
                     args.keepText = false;
                 }
             };
@@ -71,7 +71,7 @@ namespace AquaPic.UserInterface
                     float lowAlarmStpnt = Convert.ToSingle (args.text);
 
                     if (lowAlarmStpnt < 0.0f) {
-                        MessageBox.Show ("Low alarm setpoint can't be negative");
+                        TouchMessageBox.Show ("Low alarm setpoint can't be negative");
                         args.keepText = false;
                         return;
                     }
@@ -79,12 +79,12 @@ namespace AquaPic.UserInterface
                     float highAlarmStpnt = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
 
                     if (lowAlarmStpnt >= highAlarmStpnt) {
-                        MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
+                        TouchMessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
                         args.keepText = false;
                         return;
                     }
                 } catch {
-                    MessageBox.Show ("Improper low alarm setpoint format");
+                    TouchMessageBox.Show ("Improper low alarm setpoint format");
                     args.keepText = false;
                 }
             };
@@ -130,19 +130,19 @@ namespace AquaPic.UserInterface
                 float lowAlarmStpnt = Convert.ToSingle (Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text));
 
                 if (lowAlarmStpnt < 0.0f) {
-                    MessageBox.Show ("Low alarm setpoint can't be negative");
+                    TouchMessageBox.Show ("Low alarm setpoint can't be negative");
                     return false;
                 }
 
                 float highAlarmStpnt = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
 
                 if (highAlarmStpnt < 0.0f) {
-                    MessageBox.Show ("Low alarm setpoint can't be negative");
+                    TouchMessageBox.Show ("Low alarm setpoint can't be negative");
                     return false;
                 }
 
                 if (lowAlarmStpnt >= highAlarmStpnt) {
-                    MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
+                    TouchMessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
                     return false;
                 }
 
@@ -151,7 +151,7 @@ namespace AquaPic.UserInterface
 
                 try {
                     if (((SettingComboBox)settings ["Sensor Channel"]).combo.Active == -1) {
-                        MessageBox.Show ("Please Select an input channel");
+                        TouchMessageBox.Show ("Please Select an input channel");
                         return false;
                     }
 
@@ -170,7 +170,7 @@ namespace AquaPic.UserInterface
                     }
                 } catch (Exception ex) {
                     Logger.AddError (ex.ToString ());
-                    MessageBox.Show ("Something went wrong, check logger");
+                    TouchMessageBox.Show ("Something went wrong, check logger");
                     return false;
                 }
 

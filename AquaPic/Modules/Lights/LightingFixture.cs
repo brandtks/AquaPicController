@@ -54,11 +54,6 @@ namespace AquaPic.Modules
                 plugControl = Power.AddOutlet (plug, this.name, MyState.Off, "Lighting");
                 plugControl.ConditionChecker = PlugControlHandler;
                 Power.AddHandlerOnStateChange (plug, LightingPlugStateChange);
-
-                if (this.highTempLockout) {
-                    int alarmIdx = Temperature.HighTemperatureAlarmIndex;
-                    Alarm.AddPostHandler (alarmIdx, sender => Power.AlarmShutdownOutlet (plug));
-                }
             }
 
             protected bool PlugControlHandler () {

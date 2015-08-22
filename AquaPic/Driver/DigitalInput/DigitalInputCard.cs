@@ -33,8 +33,14 @@ namespace AquaPic.Drivers
             }
 
             protected void OnSlaveStatusUpdate (object sender) {
-                if ((slave.Status != AquaPicBusStatus.communicationSuccess) || (slave.Status != AquaPicBusStatus.communicationStart))
+                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
+                    (slave.Status != AquaPicBusStatus.communicationStart) ||
+                    (slave.Status != AquaPicBusStatus.open))
                     Alarm.Post (communicationAlarmIndex);
+                else {
+                    if (Alarm.CheckAlarming (communicationAlarmIndex))
+                        Alarm.Clear (communicationAlarmIndex);
+                }
             }
 
             public unsafe void GetInputs () {

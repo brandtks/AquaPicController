@@ -92,12 +92,6 @@ namespace MyWidgetLibrary
             }
 
             } else {
-                //<TODO> cheesy work around to get somewhat vertical text. Gravity attribute does not seem to work
-                //l.SetMarkup ("<span gravity=\"east\" color=\"" + font.color.ToHTML () + "\">" + text + "</span>");
-//                l.Wrap = Pango.WrapMode.Char;
-//                l.Width = Pango.Units.FromPixels (5);
-//                l.Spacing = Pango.Units.FromPixels (0);
-
                 var matrix = Pango.Matrix.Identity;
                 matrix.Rotate(270);
                 l.Context.Matrix = matrix;

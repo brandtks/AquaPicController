@@ -87,6 +87,7 @@ namespace AquaPic.UserInterface
 
             settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
+            settingsButton.text = Convert.ToChar (0x2699).ToString ();
             settingsButton.ButtonReleaseEvent += OnSettingButtonRelease;
             Put (settingsButton, 145, 5);
             settingsButton.Show ();
@@ -124,7 +125,7 @@ namespace AquaPic.UserInterface
                 os.Run ();
                 os.Destroy ();
             } else {
-                MessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
+                TouchMessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
             }
         }
     }

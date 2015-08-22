@@ -108,25 +108,14 @@ namespace AquaPic.Drivers
                 }
 
                 outlets [message.outletID].SetAmpCurrent (message.current);
-
             }
 
             public void SetOutletState (byte outletID, MyState state, bool modeOverride) {
                 const int messageLength = 2;
 
-//                if (plugs [plugID].mode == Mode.Manual && !modeOverride) {
-//                    plugs [plugID].requestedState = state;
-//                    return;
-//                }
-//
-//                if (plugs [plugID].mode == Mode.Auto)
-//                    plugs [plugID].requestedState = state;
-
-                // plugs [plugID].currentState = state;
                 outlets [outletID].manualState = state;
 
                 byte[] message = new byte[messageLength];
-
                 message [0] = outletID;
 
                 if (state == MyState.On)
@@ -141,26 +130,29 @@ namespace AquaPic.Drivers
                             ptr, 
                             sizeof(byte) * messageLength, 
                             0, 
-                            (CallbackArgs args) =>outlets [outletID].OnChangeState (
-                                new StateChangeEventArgs (outletID, powerID, state, outlets [outletID].mode)));
+                            (args) => 
+                                outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state)));
                     }
                 }
 
-                // <TEST> this is here only because the slave never responds so the callback never happens
-                outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state, outlets [outletID].mode));
+                //<TEST> this is here only because the slave never responds so the callback never happens
+                outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state));
             }
 
             public void SetPlugMode (byte outletID, Mode mode) {
                 outlets [outletID].mode = mode;
-                if (outlets [outletID].mode == Mode.Auto)
-                    outlets [outletID].OnModeChangedAuto (new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
-                else
-                    outlets [outletID].OnModeChangedManual (new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
+                outlets [outletID].OnModeChange (new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
             }
 
             protected void OnSlaveStatusUpdate (object sender) {
-                if ((slave.Status != AquaPicBusStatus.communicationSuccess) || (slave.Status != AquaPicBusStatus.communicationStart))
+                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
+                    (slave.Status != AquaPicBusStatus.communicationStart) ||
+                    (slave.Status != AquaPicBusStatus.open))
                     Alarm.Post (commsAlarmIdx);
+                else {
+                    if (Alarm.CheckAlarming (commsAlarmIdx))
+                        Alarm.Clear (commsAlarmIdx);
+                }
             }
     	}
     }

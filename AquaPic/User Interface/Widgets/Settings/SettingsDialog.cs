@@ -70,12 +70,7 @@ namespace MyWidgetLibrary
                 deleteButton.text = "Delete";
                 deleteButton.buttonColor = "compl";
                 deleteButton.ButtonReleaseEvent += (obj, args) => {
-                    var ms = new MessageDialog (
-                        null,
-                        DialogFlags.DestroyWithParent,
-                        MessageType.Question,
-                        ButtonsType.YesNo,
-                        "Are you sure you with to delete " + name);
+                    var ms = new TouchMessageDialog ("Are you sure you with to delete " + name);
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {
@@ -85,7 +80,7 @@ namespace MyWidgetLibrary
                                 success = DeleteButtonEvent (this);
 
                             if (!success)
-                                MessageBox.Show ("Error while deleting " + name);
+                                TouchMessageBox.Show ("Error while deleting " + name);
                         }
 
                         Destroy ();

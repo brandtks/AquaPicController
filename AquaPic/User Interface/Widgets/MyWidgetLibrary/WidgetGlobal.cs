@@ -31,16 +31,16 @@ namespace MyWidgetLibrary
         }
     }
 
-    public class MessageBox {
-        public static void Show (string msg) {
-            var ms = new MessageDialog (
-                null,
-                DialogFlags.DestroyWithParent,
-                MessageType.Other,
-                ButtonsType.Ok,
-                msg);
-            ms.Run ();
-            ms.Destroy ();
-        }
-    }
+//    public class MessageBox {
+//        public static void Show (string msg) {
+//            var ms = new MessageDialog (
+//                null,
+//                DialogFlags.DestroyWithParent,
+//                MessageType.Info,
+//                ButtonsType.Ok,
+//                msg);
+//            ms.Run ();
+//            ms.Destroy ();
+//        }
+//    }
 }

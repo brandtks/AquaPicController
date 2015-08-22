@@ -109,11 +109,11 @@ namespace AquaPic.Drivers
         }
 
         public static Coil AddOutlet (int powerID, int outletID, string name, MyState fallback, string owner) {
-            if (powerID == -1)
-                throw new Exception ("Power strip ID does not exist");
+            if ((powerID < 0) && (powerID >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("powerId");
 
             if ((outletID < 0) || (outletID >= pwrStrips [powerID].outlets.Length))
-                throw new Exception ("Outlet ID out of range");
+                throw new ArgumentOutOfRangeException ("outletID");
 
             string s = string.Format ("{0}.p{1}", pwrStrips [powerID].name, outletID);
             if (pwrStrips [powerID].outlets [outletID].name != s)
@@ -135,11 +135,11 @@ namespace AquaPic.Drivers
         }
 
         public static void RemoveOutlet (int powerID, int outletID) {
-            if (powerID == -1)
-                throw new Exception ("Power strip ID does not exist");
+            if ((powerID < 0) && (powerID >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("powerId");
 
             if ((outletID < 0) || (outletID >= pwrStrips [powerID].outlets.Length))
-                throw new Exception ("Outlet ID out of range");
+                throw new ArgumentOutOfRangeException ("outletID");
 
             string s = string.Format ("{0}.p{1}", pwrStrips [powerID].name, outletID);
             pwrStrips [powerID].outlets [outletID].name = s;
@@ -157,22 +157,39 @@ namespace AquaPic.Drivers
         }
 
         public static void SetManualOutletState (IndividualControl outlet, MyState state) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
             pwrStrips [outlet.Group].outlets [outlet.Individual].manualState = state;
         }
 
-        public static void AlarmShutdownOutlet (IndividualControl outlet) {
-            pwrStrips [outlet.Group].SetOutletState ((byte)outlet.Individual, MyState.Off, true);
-        }
-
         public static void SetOutletMode (IndividualControl outlet, Mode mode) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
             pwrStrips [outlet.Group].SetPlugMode ((byte)outlet.Individual, mode);
         }
 
         public static MyState GetOutletState (IndividualControl outlet) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
             return pwrStrips [outlet.Group].outlets [outlet.Individual].currentState;
         }
 
         public static MyState[] GetAllStates (int powerID) {
+            if ((powerID < 0) && (powerID >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("powerId");
+
             MyState[] states = new MyState[8];
             for (int i = 0; i < states.Length; ++i)
                 states [i] = pwrStrips [powerID].outlets [i].currentState;
@@ -180,10 +197,19 @@ namespace AquaPic.Drivers
         }
 
         public static Mode GetOutletMode (IndividualControl outlet) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
             return pwrStrips [outlet.Group].outlets [outlet.Individual].mode;
         }
 
         public static Mode[] GetAllModes (int powerID) {
+            if ((powerID < 0) && (powerID >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("powerId");
+
             Mode[] modes = new Mode[8];
             for (int i = 0; i < modes.Length; ++i)
                 modes [i] = pwrStrips [powerID].outlets [i].mode;
@@ -191,6 +217,9 @@ namespace AquaPic.Drivers
         }
 
         public static string[] GetAllOutletNames (int powerID) {
+            if ((powerID < 0) && (powerID >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("powerId");
+
             string[] names = new string[8];
             for (int i = 0; i < names.Length; ++i)
                 names [i] = pwrStrips [powerID].outlets [i].name;
@@ -206,10 +235,10 @@ namespace AquaPic.Drivers
         }
 
         public static string GetPowerStripName (int powerID) {
-            if ((powerID >= 0) && (powerID < pwrStrips.Count))
-                return pwrStrips [powerID].name;
-
-            throw new ArgumentOutOfRangeException ("powerID");
+            if ((powerID < 0) && (powerID >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("powerId");
+            
+            return pwrStrips [powerID].name;
         }
 
         public static int GetPowerStripIndex (string name) {
@@ -229,6 +258,25 @@ namespace AquaPic.Drivers
                 throw new ArgumentOutOfRangeException ("outlet.Individual");
 
             return pwrStrips[outlet.Group].outlets[outlet.Individual].name;
+        }
+
+        public static MyState GetOutletFallback (IndividualControl outlet) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            return pwrStrips[outlet.Group].outlets[outlet.Individual].fallback;
+        }
+
+        public static bool OutletNameOk (string name) {
+            try {
+                GetOutletIndividualControl (name);
+                return false;
+            } catch {
+                return true;
+            }
         }
 
         public static IndividualControl GetOutletIndividualControl (string name) {
@@ -282,20 +330,12 @@ namespace AquaPic.Drivers
             return owners;
         }
 
-        public static void AddHandlerOnAuto (IndividualControl outlet, ModeChangedHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].AutoEvent += handler;
+        public static void AddHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
+            pwrStrips [outlet.Group].outlets [outlet.Individual].ModeChangeEvent += handler;
         }
 
-        public static void RemoveHandlerOnAuto (IndividualControl outlet, ModeChangedHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].AutoEvent -= handler;
-        }
-
-        public static void AddHandlerOnManual (IndividualControl outlet, ModeChangedHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].ManualEvent += handler;
-        }
-
-        public static void RemoveHandlerOnManual (IndividualControl outlet, ModeChangedHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].ManualEvent -= handler;
+        public static void RemoveHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
+            pwrStrips [outlet.Group].outlets [outlet.Individual].ModeChangeEvent -= handler;
         }
 
         public static void AddHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {

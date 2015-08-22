@@ -91,17 +91,20 @@ namespace AquaPic.UserInterface
             var b = new TouchButton ();
             b.SetSizeRequest (100, 30);
             b.text = "Open";
-            b.ButtonReleaseEvent += (o, args) => {
-                if (c.Active != -1)
-                    AquaPicBus.Bus1.Open (c.activeText);
-                else
-                    MessageBox.Show ("No communication port selected");
-            };
+            if (AquaPicBus.Bus1.isOpen)
+                b.buttonColor = "grey3";
+            else
+                b.ButtonReleaseEvent += OnOpenButtonRelease;
             Put (b, 685, 35);
             b.Show ();
 
-            string[] portNames = SerialPort.GetPortNames ();
-            c = new TouchComboBox (portNames);
+            if (!AquaPicBus.Bus1.isOpen) {
+                string[] portNames = SerialPort.GetPortNames ();
+                c = new TouchComboBox (portNames);
+            } else {
+                c = new TouchComboBox ();
+                c.List.Add (AquaPicBus.Bus1.portName);
+            }
             c.NonActiveMessage = "Select Port";
             c.WidthRequest = 300;
             Put (c, 380, 35);
@@ -144,6 +147,22 @@ namespace AquaPic.UserInterface
             GetSlaveData ();
 
             return true;
+        }
+
+        protected void OnOpenButtonRelease (object sender, ButtonReleaseEventArgs args) {
+            TouchButton b = sender as TouchButton;
+
+            if (b != null) { 
+                if (c.Active != -1) {
+                    AquaPicBus.Bus1.Open (c.activeText);
+                    if (AquaPicBus.Bus1.isOpen) {
+                        b.buttonColor = "grey3";
+                        b.ButtonReleaseEvent -= OnOpenButtonRelease;
+                        b.QueueDraw ();
+                    }
+                } else
+                    TouchMessageBox.Show ("No communication port selected");
+            }
         }
     }
 }

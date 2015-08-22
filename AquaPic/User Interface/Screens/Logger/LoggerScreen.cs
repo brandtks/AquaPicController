@@ -69,24 +69,16 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnClearButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            var ms = new MessageDialog (
-                null,
-                DialogFlags.DestroyWithParent,
-                MessageType.Question,
-                ButtonsType.YesNo,
-                "Save events before clearing");
+            var ms = new TouchMessageDialog ("Save events before clearing");
 
             ms.Response += (o, a) => {
                 if (a.ResponseId == ResponseType.Yes) {
                     SaveEvents ();
                     Logger.buffer.Clear ();
                 } else if (a.ResponseId == ResponseType.No) {
-                    var d = new MessageDialog (
-                        null,
-                        DialogFlags.DestroyWithParent,
-                        MessageType.Question,
-                        ButtonsType.YesNo,
-                        "Are you sure you want to clear all the contents of the event logger");
+                    ms.Destroy ();
+
+                    var d = new TouchMessageDialog ("Are you sure you want to clear all the contents of the event logger");
 
                     d.Response += (obj, arg) => {
                         if (arg.ResponseId == ResponseType.Yes)

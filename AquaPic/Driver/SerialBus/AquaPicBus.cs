@@ -87,6 +87,24 @@ namespace AquaPic.SerialBus
             }
         }
 
+        public bool isOpen {
+            get {
+                if (uart != null)
+                    return uart.IsOpen;
+                else
+                    return false;
+            }
+        }
+
+        public string portName {
+            get {
+                if (uart != null)
+                    return uart.PortName;
+                else
+                    return string.Empty;
+            }
+        }
+
         private AquaPicBus (int retryCount, int responseTimeout) {
             this.messageBuffer = new Queue ();
             this.txRxThread = new Thread (this.txRx);

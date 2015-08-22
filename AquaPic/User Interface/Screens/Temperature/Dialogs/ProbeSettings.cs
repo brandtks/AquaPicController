@@ -30,7 +30,7 @@ namespace AquaPic.UserInterface
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
                 else if (!Temperature.TemperatureProbeNameOk (args.text)) {
-                    MessageBox.Show ("Probe name already exists");
+                    TouchMessageBox.Show ("Probe name already exists");
                     args.keepText = false;
                 }
             };
@@ -46,7 +46,7 @@ namespace AquaPic.UserInterface
 //                if (string.IsNullOrWhiteSpace (args.text))
 //                    args.keepText = false;
 //                else if (!Temperature.TemperatureProbeNameOk (args.text)) {
-//                    MessageBox.Show ("Probe name already exists");
+//                    TouchMessageBox.Show ("Probe name already exists");
 //                    args.keepText = false;
 //                }
 //            };
@@ -82,7 +82,7 @@ namespace AquaPic.UserInterface
                 if (((SettingComboBox)settings ["Input Channel"]).combo.Active != -1) {
                     string name = ((SettingTextBox)settings ["Name"]).textBox.text;
                     if (name == "Enter name") {
-                        MessageBox.Show ("Invalid probe name");
+                        TouchMessageBox.Show ("Invalid probe name");
                         return false;
                     }
 
@@ -145,7 +145,7 @@ namespace AquaPic.UserInterface
                     File.WriteAllText (path, text);
 
                 } else {
-                    MessageBox.Show ("Please select an channel");
+                    TouchMessageBox.Show ("Please select an channel");
                     return false;
                 }
             } else if (!str.StartsWith ("Current:")) {

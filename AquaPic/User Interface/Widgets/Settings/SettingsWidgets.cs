@@ -89,7 +89,7 @@ namespace MyWidgetLibrary
         public TouchSelectorSwitch selectorSwitch;
         public string[] labels;
 
-        public SettingSelectorSwitch () : base () {
+        public SettingSelectorSwitch (string label1, string label2) : base () {
             selectorSwitch = new TouchSelectorSwitch ();
             selectorSwitch.SelectionCount = 2;
             selectorSwitch.CurrentSelected = 0;
@@ -103,9 +103,11 @@ namespace MyWidgetLibrary
             selectorSwitch.Show ();
 
             labels = new string[2];
-            labels [0] = "True";
-            labels [1] = "False";
+            labels [0] = label1;
+            labels [1] = label2;
         }
+
+        public SettingSelectorSwitch () : this ("True", "False") { }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
             TouchSelectorSwitch ss = sender as TouchSelectorSwitch;

@@ -63,7 +63,7 @@ namespace AquaPic.UserInterface
                             DisplayErrors (script);
                             tv.QueueDraw ();
                         } else {
-                            MessageBox.Show ("Script is already running.\nCannot recomile and load");
+                            TouchMessageBox.Show ("Script is already running.\nCannot recomile and load");
                         }
                     };
                     Put (b, 685, 380);

@@ -42,28 +42,28 @@ namespace AquaPic.UserInterface
             try {
                 Temperature.temperatureSetpoint = Convert.ToSingle (((SettingTextBox)settings ["Setpoint"]).textBox.text);
             } catch {
-                MessageBox.Show ("Improper setpoint format");
+                TouchMessageBox.Show ("Improper setpoint format");
                 return false;
             }
 
             try {
                 Temperature.temperatureDeadband = Convert.ToSingle (((SettingTextBox)settings ["Deadband"]).textBox.text) / 2;
             } catch {
-                MessageBox.Show ("Improper deadband format");
+                TouchMessageBox.Show ("Improper deadband format");
                 return false;
             }
 
             try {
                 Temperature.highTempAlarmSetpoint = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
             } catch {
-                MessageBox.Show ("Improper high alarm setpoint format");
+                TouchMessageBox.Show ("Improper high alarm setpoint format");
                 return false;
             }
 
             try {
                 Temperature.lowTempAlarmSetpoint = Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text);
             } catch {
-                MessageBox.Show ("Improper low alarm setpoint format");
+                TouchMessageBox.Show ("Improper low alarm setpoint format");
                 return false;
             }
 

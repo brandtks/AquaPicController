@@ -22,9 +22,8 @@ namespace AquaPic.Drivers
         public byte outletID;
         public byte powerID;
         public MyState state;
-        public Mode mode;
 
-        public StateChangeEventArgs (int plugID, byte powerID, MyState state, Mode mode) {
+        public StateChangeEventArgs (int plugID, byte powerID, MyState state) {
             this.outletID = (byte)plugID;
             this.powerID = powerID;
             this.state = state;
