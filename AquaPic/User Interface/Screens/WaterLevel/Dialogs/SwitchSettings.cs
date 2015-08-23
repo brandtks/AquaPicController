@@ -232,8 +232,6 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("timeOffset", string.Format ("00:{0:D2}:{1:D2}", WaterLevel.GetFloatSwitchTimeOffset (switchId) / 1000, WaterLevel.GetFloatSwitchTimeOffset (switchId) % 1000)));
 
                 ((JArray)jo ["floatSwitches"]).Add (jobj);
-
-                File.WriteAllText (path, jo.ToString ());
             } else {
                 string oldName = WaterLevel.GetFloatSwitchName (switchId);
 
@@ -290,9 +288,9 @@ namespace AquaPic.UserInterface
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["switchType"] = WaterLevel.GetFloatSwitchType (switchId).ToString ();
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["switchFuntion"] = WaterLevel.GetFloatSwitchFunction (switchId).ToString ();
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["timeOffset"] = string.Format ("00:{0:D2}:{1:D2}", WaterLevel.GetFloatSwitchTimeOffset (switchId) / 1000, WaterLevel.GetFloatSwitchTimeOffset (switchId) % 1000);
-
-                File.WriteAllText (path, jo.ToString ());
             }
+
+            File.WriteAllText (path, jo.ToString ());
 
             return true;
         }

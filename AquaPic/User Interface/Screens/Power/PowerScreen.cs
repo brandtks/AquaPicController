@@ -44,8 +44,28 @@ namespace AquaPic.UserInterface
             selectors = new PowerOutletSlider[8];
             for (int i = 0; i < 8; ++i) {
                 selectors [i] = new PowerOutletSlider (i);
-
                 selectors [i].ss.SelectorChangedEvent += OnSelectorChanged;
+
+                int idx = i;
+                selectors [i].UpdateScreen = () => {
+                    IndividualControl indCont;
+                    indCont.Group = powerID;
+                    indCont.Individual = idx;
+                    selectors [idx].OutletName.text = Power.GetOutletName (indCont);
+                    Mode mode = Power.GetOutletMode (indCont);
+                    MyState state = Power.GetOutletState (indCont);
+                    if (mode  == Mode.Auto) {
+                        selectors [idx].ss.CurrentSelected = 1;
+                    } else { // mode is manual
+                        if (state == MyState.On) {
+                            selectors [idx].ss.CurrentSelected = 2;
+                        } else {
+                            selectors [idx].ss.CurrentSelected = 0;
+                        }
+                    }
+
+                    selectors [idx].QueueDraw ();
+                };
 
                 if (i < 4) {
                     x = (i * 190) + 25;

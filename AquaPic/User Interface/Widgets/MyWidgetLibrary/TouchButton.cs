@@ -17,6 +17,7 @@ namespace MyWidgetLibrary
         public string text;
         public MyColor textColor;
         public int textSize;
+        public string textFont;
         public ButtonClickAction clickAction;
 
         public TouchButton () {
@@ -27,6 +28,7 @@ namespace MyWidgetLibrary
             this.text = "";
             this.textColor = "black";
             textSize = 11;
+            textFont = "Sans";
             this.HeightRequest = 45;
             this.WidthRequest = 45;
             this.clickAction = ButtonClickAction.Darken;
@@ -62,6 +64,7 @@ namespace MyWidgetLibrary
 
                 MyText t = text;
                 t.font.color = textColor;
+                t.font.fontName = textFont;
                 t.textWrap = MyTextWrap.WordWrap;
                 t.font.size = textSize;
                 t.alignment = MyAlignment.Center;

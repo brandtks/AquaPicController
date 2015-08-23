@@ -7,8 +7,12 @@ using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
+    public delegate void UpdateScreenHandler ();
+
     public class PowerOutletSlider : Fixed
     {
+        public UpdateScreenHandler UpdateScreen;
+
         private string[] labels;
         public TouchLabel OutletName;
         public TouchLabel Status;
@@ -88,6 +92,7 @@ namespace AquaPic.UserInterface
             settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
             settingsButton.text = Convert.ToChar (0x2699).ToString ();
+            //settingsButton.textFont = "Unicode Medium";
             settingsButton.ButtonReleaseEvent += OnSettingButtonRelease;
             Put (settingsButton, 145, 5);
             settingsButton.Show ();
@@ -124,6 +129,9 @@ namespace AquaPic.UserInterface
 
                 os.Run ();
                 os.Destroy ();
+
+                if (UpdateScreen != null)
+                    UpdateScreen ();
             } else {
                 TouchMessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
             }

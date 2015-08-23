@@ -12,6 +12,16 @@ namespace AquaPic.Runtime
     public class Script
     {
         public static IOutletScript CompileOutletConditionCheck (string[] conditions) {
+            try {
+                return CompileNoThrowOutletConditionCheck (conditions);
+            } catch (Exception ex) {
+                Logger.AddError (ex.ToString ());
+            }
+
+            return null;
+        }
+
+        public static IOutletScript CompileNoThrowOutletConditionCheck (string[] conditions) {
             StringBuilder sb = new StringBuilder ();
             sb.AppendLine ("using AquaPic.Runtime;");
             sb.AppendLine ("using AquaPic.Modules;");
@@ -28,14 +38,8 @@ namespace AquaPic.Runtime
 
             string code = sb.ToString ();
 
-            try {
-                IOutletScript outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
-                return outletScript;
-            } catch (Exception ex) {
-                Logger.AddError (ex.ToString ());
-            }
-
-            return null;
+            IOutletScript outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
+            return outletScript;
         }
     }
 }

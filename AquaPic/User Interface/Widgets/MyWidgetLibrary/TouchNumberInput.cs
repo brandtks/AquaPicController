@@ -22,6 +22,7 @@ namespace MyWidgetLibrary
             WindowPosition = (Gtk.WindowPosition)4;
             DefaultWidth = 205;
             DefaultHeight = 290;
+            //Decorated = false;
 
             fix = new Fixed ();
             fix.WidthRequest = 205;
@@ -136,7 +137,7 @@ namespace MyWidgetLibrary
                 semi = new KeyButton (":", OnButtonRelease);
             else {
                 semi = new KeyButton (":", null);
-                semi.buttonColor = "grey3";
+                semi.buttonColor = "grey1";
             }
             fix.Put (semi, 5, 240);
 
@@ -163,7 +164,7 @@ namespace MyWidgetLibrary
                     }
                 };
             } else
-                pm.buttonColor = "grey3";
+                pm.buttonColor = "grey1";
             fix.Put (pm, 55, 240);
 
             KeyButton am = new KeyButton ("AM", null);
@@ -189,7 +190,7 @@ namespace MyWidgetLibrary
                     }
                 };
             } else
-                am.buttonColor = "grey3";
+                am.buttonColor = "grey1";
             fix.Put (am, 105, 240);
 
             KeyButton cancel = new KeyButton ("Cancel", null);
@@ -237,6 +238,12 @@ namespace MyWidgetLibrary
         }
 
         private class VirtualKeyboard : Fixed {
+            enum ShiftKeyState {
+                Lower,
+                Shifted,
+                Caps
+            };
+
             static char[] qwerty1Lower = {'q','w','e','r','t','y','u','i','o','p'};
             static char[] qwerty2Lower = {'a','s','d','f','g','h','j','k','l'};
             static char[] qwerty3Lower = {'z','x','c','v','b','n','m'};
@@ -249,7 +256,7 @@ namespace MyWidgetLibrary
             KeyButton[] row2;
             KeyButton[] row3;
 
-            bool shifted;
+            ShiftKeyState shiftState;
 
             public VirtualKeyboard (Entry e, ButtonReleaseEventHandler handler) {
                 SetSizeRequest (505, 205);
@@ -276,22 +283,26 @@ namespace MyWidgetLibrary
                     row3 [i].Show ();
                 }
 
-                shifted = false;
+                shiftState = ShiftKeyState.Lower;
                 var shiftKey = new TouchButton ();
                 shiftKey.SetSizeRequest (70, 45);
                 shiftKey.text = Convert.ToChar (0x21E7).ToString ();
                 shiftKey.buttonColor = "grey3";
                 shiftKey.ButtonReleaseEvent += (o, args) => {
-                    if (shifted) {
-                        ToLower ();
-                        shiftKey.buttonColor = "grey3";
-                        shiftKey.QueueDraw ();
-                        shifted = false;
-                    } else {
+                    if (shiftState == ShiftKeyState.Lower) {
                         ToUpper ();
                         shiftKey.buttonColor = "pri";
                         shiftKey.QueueDraw ();
-                        shifted = true;
+                        shiftState = ShiftKeyState.Shifted;
+                    } else if (shiftState == ShiftKeyState.Shifted) {
+                        shiftKey.buttonColor = "seca";
+                        shiftKey.QueueDraw ();
+                        shiftState = ShiftKeyState.Caps;
+                    } else { // Caps
+                        ToLower ();
+                        shiftKey.buttonColor = "grey3";
+                        shiftKey.QueueDraw ();
+                        shiftState = ShiftKeyState.Lower;
                     }
                 };
                 Put (shiftKey, 5, 105);
@@ -320,11 +331,11 @@ namespace MyWidgetLibrary
                 space.Show ();
 
                 e.TextInserted += (o, args) => {
-                    if (shifted) {
+                    if (shiftState == ShiftKeyState.Shifted) {
                         ToLower ();
                         shiftKey.buttonColor = "grey3";
                         shiftKey.QueueDraw ();
-                        shifted = false;
+                        shiftState = ShiftKeyState.Lower;
                     }
                 };
 

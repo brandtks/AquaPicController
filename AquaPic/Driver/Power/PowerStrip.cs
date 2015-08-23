@@ -43,8 +43,8 @@ namespace AquaPic.Drivers
                         
                     this.outlets [plugID] = new OutletData (
                         plugName,
-                        () => SetOutletState ((byte)plugID, MyState.On, false),
-                        () => SetOutletState ((byte)plugID, MyState.Off, false));
+                        () => SetOutletState ((byte)plugID, MyState.On),
+                        () => SetOutletState ((byte)plugID, MyState.Off));
                 }
             }
 
@@ -110,7 +110,7 @@ namespace AquaPic.Drivers
                 outlets [message.outletID].SetAmpCurrent (message.current);
             }
 
-            public void SetOutletState (byte outletID, MyState state, bool modeOverride) {
+            public void SetOutletState (byte outletID, MyState state) {
                 const int messageLength = 2;
 
                 outlets [outletID].manualState = state;

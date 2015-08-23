@@ -71,8 +71,8 @@ namespace AquaPic.Drivers
                 foreach (var outlet in strip.outlets) { // could, probably should use a for loop but its just extra words
                     if (outlet.mode == Mode.Manual) {
                         if (outlet.manualState != outlet.currentState)
-                            strip.SetOutletState ((byte)i, outlet.manualState, false);
-                        
+                            strip.SetOutletState ((byte)i, outlet.manualState);
+
                     } else
                         outlet.OutletControl.Execute ();
 
@@ -146,6 +146,7 @@ namespace AquaPic.Drivers
             pwrStrips [powerID].outlets [outletID].fallback = MyState.Off;
             pwrStrips [powerID].outlets [outletID].mode = Mode.Manual;
             pwrStrips [powerID].outlets [outletID].owner = "Power";
+            pwrStrips [powerID].outlets [outletID].manualState = MyState.Off;
 
             pwrStrips [powerID].outlets [outletID].OutletControl.ConditionChecker = () => {
                 return false;
@@ -154,6 +155,7 @@ namespace AquaPic.Drivers
             pwrStrips [powerID].SetupOutlet (
                 (byte)outletID,
                 pwrStrips [powerID].outlets [outletID].fallback);
+            pwrStrips [powerID].SetOutletState ((byte)outletID, MyState.Off);
         }
 
         public static void SetManualOutletState (IndividualControl outlet, MyState state) {
@@ -237,7 +239,7 @@ namespace AquaPic.Drivers
         public static string GetPowerStripName (int powerID) {
             if ((powerID < 0) && (powerID >= pwrStrips.Count))
                 throw new ArgumentOutOfRangeException ("powerId");
-            
+
             return pwrStrips [powerID].name;
         }
 
@@ -260,16 +262,6 @@ namespace AquaPic.Drivers
             return pwrStrips[outlet.Group].outlets[outlet.Individual].name;
         }
 
-        public static MyState GetOutletFallback (IndividualControl outlet) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
-
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
-
-            return pwrStrips[outlet.Group].outlets[outlet.Individual].fallback;
-        }
-
         public static bool OutletNameOk (string name) {
             try {
                 GetOutletIndividualControl (name);
@@ -277,6 +269,52 @@ namespace AquaPic.Drivers
             } catch {
                 return true;
             }
+        }
+
+        public static void SetOutletName (IndividualControl outlet, string name) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            if (OutletNameOk (name))
+                pwrStrips [outlet.Group].outlets [outlet.Individual].name = name;
+            else
+                throw new Exception (string.Format ("Outlet: {0} already exists", name));
+        }
+
+        public static MyState GetOutletFallback (IndividualControl outlet) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            return pwrStrips [outlet.Group].outlets [outlet.Individual].fallback;
+        }
+
+        public static void SetOutletFallback (IndividualControl outlet, MyState fallback) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            pwrStrips [outlet.Group].outlets [outlet.Individual].fallback = fallback;
+            pwrStrips [outlet.Group].SetupOutlet (
+                (byte)outlet.Individual,
+                pwrStrips [outlet.Group].outlets [outlet.Individual].fallback);
+        }
+
+        public static void SetOutletConditionCheck (IndividualControl outlet, IOutletScript script) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+                
+            pwrStrips [outlet.Group].outlets [outlet.Individual].OutletControl.ConditionChecker = script.OutletConditionCheck;
         }
 
         public static IndividualControl GetOutletIndividualControl (string name) {
