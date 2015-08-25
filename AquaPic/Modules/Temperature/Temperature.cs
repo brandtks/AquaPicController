@@ -174,6 +174,7 @@ namespace AquaPic.Modules
             if ((heaterId >= 0) && (heaterId < heaters.Count)) {
                 if (HeaterNameOk (name)) {
                     heaters [heaterId].name = name;
+                    Power.SetOutletName (heaters [heaterId].plug, heaters [heaterId].name);
                     return;
                 } else
                     throw new Exception (string.Format ("Heater: {0} already exists", name));
@@ -203,8 +204,13 @@ namespace AquaPic.Modules
             if ((heaterId >= 0) && (heaterId < heaters.Count)) {
                 Power.RemoveOutlet (heaters [heaterId].plug);
                 heaters [heaterId].plug = ic;
-                Power.AddOutlet (heaters [heaterId].plug, heaters [heaterId].name, MyState.On, "Heater");
+                var coil = Power.AddOutlet (heaters [heaterId].plug, heaters [heaterId].name, MyState.On, "Temperature");
+                coil.ConditionChecker = heaters [heaterId].OnPlugControl;
+
+                return;
             }
+
+            throw new ArgumentOutOfRangeException ("heaterId");
         }
 
         public static void AddTemperatureProbe (string name, int cardID, int channelID) {

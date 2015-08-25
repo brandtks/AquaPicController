@@ -47,7 +47,7 @@ namespace AquaPic.UserInterface
             t.textBox.text = Lighting.defaultSunRise.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
-                    Time time = ToTime (args.text);
+                    Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
                     TouchMessageBox.Show ("Improper time format, ##:##");
@@ -62,7 +62,7 @@ namespace AquaPic.UserInterface
             t.textBox.text = Lighting.defaultSunSet.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
-                    Time time = ToTime (args.text);
+                    Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
                     TouchMessageBox.Show ("Improper time format, ##:##");
@@ -77,7 +77,7 @@ namespace AquaPic.UserInterface
             t.textBox.text = Lighting.minSunRise.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
-                    Time time = ToTime (args.text);
+                    Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
                     TouchMessageBox.Show ("Improper time format, ##:##");
@@ -92,7 +92,7 @@ namespace AquaPic.UserInterface
             t.textBox.text = Lighting.maxSunRise.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
-                    Time time = ToTime (args.text);
+                    Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
                     TouchMessageBox.Show ("Improper time format, ##:##");
@@ -107,7 +107,7 @@ namespace AquaPic.UserInterface
             t.textBox.text = Lighting.minSunSet.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
-                    Time time = ToTime (args.text);
+                    Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
                     TouchMessageBox.Show ("Improper time format, ##:##");
@@ -122,7 +122,7 @@ namespace AquaPic.UserInterface
             t.textBox.text = Lighting.maxSunSet.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
-                    Time time = ToTime (args.text);
+                    Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
                     TouchMessageBox.Show ("Improper time format, ##:##");
@@ -137,12 +137,12 @@ namespace AquaPic.UserInterface
         protected bool OnSave (object sender) {
             Lighting.latitude = Convert.ToDouble (((SettingTextBox)settings ["Latitude"]).textBox.text);
             Lighting.longitude = Convert.ToDouble (((SettingTextBox)settings ["Longitude"]).textBox.text);
-            Lighting.defaultSunRise = ToTime (((SettingTextBox)settings ["Default Sunrise"]).textBox.text);
-            Lighting.defaultSunSet = ToTime (((SettingTextBox)settings ["Default Sunset"]).textBox.text);
-            Lighting.minSunRise = ToTime (((SettingTextBox)settings ["Min Sunrise"]).textBox.text);
-            Lighting.maxSunRise = ToTime (((SettingTextBox)settings ["Max Sunrise"]).textBox.text);
-            Lighting.minSunSet = ToTime (((SettingTextBox)settings ["Min Sunset"]).textBox.text);
-            Lighting.maxSunSet = ToTime (((SettingTextBox)settings ["Max Sunset"]).textBox.text);
+            Lighting.defaultSunRise = Time.Parse (((SettingTextBox)settings ["Default Sunrise"]).textBox.text);
+            Lighting.defaultSunSet = Time.Parse (((SettingTextBox)settings ["Default Sunset"]).textBox.text);
+            Lighting.minSunRise = Time.Parse (((SettingTextBox)settings ["Min Sunrise"]).textBox.text);
+            Lighting.maxSunRise = Time.Parse (((SettingTextBox)settings ["Max Sunrise"]).textBox.text);
+            Lighting.minSunSet = Time.Parse (((SettingTextBox)settings ["Min Sunset"]).textBox.text);
+            Lighting.maxSunSet = Time.Parse (((SettingTextBox)settings ["Max Sunset"]).textBox.text);
 
             JObject jo = new JObject ();
 
@@ -188,36 +188,6 @@ namespace AquaPic.UserInterface
             Lighting.UpdateRiseSetTimes ();
 
             return true;
-        }
-
-        protected Time ToTime (string value) {
-            int pos = value.IndexOf (":");
-
-            if ((pos != 1) && (pos != 2))
-                throw new Exception ();
-
-            string hourString = value.Substring (0, pos);
-            int hour = Convert.ToInt32 (hourString);
-
-            if ((hour < 0) || (hour > 23))
-                throw new Exception ();
-            
-            string minString = value.Substring (pos + 1, 2);
-            int min = Convert.ToInt32 (minString);
-
-            if ((min < 0) || (min > 59))
-                throw new Exception ();
-
-            pos = value.Length;
-            if (pos > 3) {
-                string last = value.Substring (pos - 2);
-                if (last == "pm") {
-                    if ((hour >= 1) && (hour <= 12))
-                        hour = (hour + 12) % 24;
-                }
-            }
-
-            return new Time ((byte)hour, (byte)min);
         }
     }
 }

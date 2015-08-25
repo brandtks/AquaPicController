@@ -19,7 +19,7 @@ namespace AquaPic.Modules
             public MyState lightingOn;
             public bool highTempLockout;
             public IndividualControl plug;
-            public Coil plugControl;
+            //public Coil plugControl;
             public Mode mode;
 
             public LightingFixture (
@@ -51,12 +51,12 @@ namespace AquaPic.Modules
 
                 lightingOn = MyState.Off;
 
-                plugControl = Power.AddOutlet (plug, this.name, MyState.Off, "Lighting");
-                plugControl.ConditionChecker = PlugControlHandler;
-                Power.AddHandlerOnStateChange (plug, LightingPlugStateChange);
+                var plugControl = Power.AddOutlet (plug, this.name, MyState.Off, "Lighting");
+                plugControl.ConditionChecker = OnPlugControl;
+                Power.AddHandlerOnStateChange (plug, OnLightingPlugStateChange);
             }
 
-            protected bool PlugControlHandler () {
+            public bool OnPlugControl () {
                 if (highTempLockout && Alarm.CheckAlarming (Temperature.HighTemperatureAlarmIndex))
                     return false;
 
@@ -83,7 +83,7 @@ namespace AquaPic.Modules
                 }
             }
 
-            public void LightingPlugStateChange (object sender, StateChangeEventArgs args) {
+            public void OnLightingPlugStateChange (object sender, StateChangeEventArgs args) {
                 lightingOn = args.state;
             }
 

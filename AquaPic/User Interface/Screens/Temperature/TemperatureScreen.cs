@@ -139,8 +139,14 @@ namespace AquaPic.UserInterface
                         Temperature.GetHeaterIndex (name);
                     } catch (ArgumentException) {
                         heaterCombo.List.Remove (name);
-                        heaterId = 0;
-                        heaterCombo.Active = heaterId;
+                        if (Temperature.heaterCount != 0) {
+                            heaterId = 0;
+                            heaterCombo.Active = heaterId;
+                        } else {
+                            heaterId = -1;
+                            heaterCombo.Active = 0;
+                        }
+
                         GetHeaterData ();
                     }
                 } else {
@@ -196,8 +202,14 @@ namespace AquaPic.UserInterface
                         Temperature.GetTemperatureProbeIndex (name);
                     } catch (ArgumentException) {
                         probeCombo.List.Remove (name);
-                        probeId = 0;
-                        probeCombo.Active = probeId;
+                        if (Temperature.temperatureProbeCount != 0) {
+                            probeId = 0;
+                            probeCombo.Active = probeId;
+                        } else {
+                            probeId = -1;
+                            probeCombo.Active = 0;
+                        }
+
                         GetProbeData ();
                     }
                 } else {
@@ -356,17 +368,24 @@ namespace AquaPic.UserInterface
 //                deadband.textBox.text = Temperature.GetHeaterDeadband (heaterId).ToString ("F1");
 //            }
 
-                heaterLabel.QueueDraw ();
+
 //            setpoint.QueueDraw ();
 //            deadband.QueueDraw ();
+            } else {
+                heaterLabel.text = string.Empty;
             }
+
+            heaterLabel.QueueDraw ();
         }
 
         protected void GetProbeData () {
             if (probeId != -1) {
                 probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeId).ToString ("F2");
-                probeTempTextbox.QueueDraw ();
+            } else {
+                probeTempTextbox.text = "0.0";
             }
+
+            probeTempTextbox.QueueDraw ();
         }
 
         protected bool OnTimer () {

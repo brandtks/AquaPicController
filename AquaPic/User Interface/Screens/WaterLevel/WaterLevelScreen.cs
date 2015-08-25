@@ -147,8 +147,15 @@ namespace AquaPic.UserInterface
                         WaterLevel.GetFloatSwitchIndex (name);
                     } catch (ArgumentException) {
                         switchCombo.List.Remove (name);
-                        switchId = 0;
-                        switchCombo.Active = switchId;
+                        if (WaterLevel.floatSwitchCount != 0) {
+                            switchId = 0;
+                            switchCombo.Active = switchId;
+                        } else {
+                            switchId = -1;
+                            switchCombo.Active = 0;
+                        }
+
+                        GetSwitchData ();
                     }
                 } else {
                     int switchCount = WaterLevel.floatSwitchCount;
@@ -268,7 +275,14 @@ namespace AquaPic.UserInterface
 
                 SwitchType type = WaterLevel.GetFloatSwitchType (switchId);
                 switchTypeLabel.text = Utilites.Utils.GetDescription (type);
+            } else {
+                switchTypeLabel.Visible = false;
+                switchStateTextBox.text = string.Empty;
+                switchStateTextBox.bkgndColor = "grey4";
             }
+
+            switchTypeLabel.QueueDraw ();
+            switchStateTextBox.QueueDraw ();
         }
     }
 }

@@ -63,6 +63,25 @@ namespace AquaPic.Drivers
             return cards [cardID].channels [channelID].ValueControl;
         }
 
+        public static void RemoveChannel (IndividualControl channel) {
+            RemoveChannel (channel.Group, channel.Individual);
+        }
+
+        public static void RemoveChannel (int cardID, int channelID) {
+            if ((cardID < 0) && (cardID >= cards.Count))
+                throw new ArgumentOutOfRangeException ("cardID");
+
+            if ((channelID < 0) || (channelID >= cards [cardID].channels.Length))
+                throw new ArgumentOutOfRangeException ("channelID");
+
+            string s = string.Format ("{0}.q{1}", cards [cardID].name, channelID);
+            cards [cardID].channels [channelID].name = s;
+            cards [cardID].channels [channelID].mode = Mode.Auto;
+            cards [cardID].channels [channelID].value = 0;
+            cards [cardID].channels [channelID].type = AnalogType.ZeroTen;
+            cards [cardID].channels [channelID].ValueControl.ValueGetter = () => { return 0; };
+        }
+
         public static int GetCardIndex (string name) {
             for (int i = 0; i < cards.Count; ++i) {
                 if (string.Equals (cards [i].name, name, StringComparison.InvariantCultureIgnoreCase))
@@ -89,6 +108,13 @@ namespace AquaPic.Drivers
                 names [i] = cards [i].name;
 
             return names;
+        }
+
+        public static string GetCardName (int cardId) {
+            if ((cardId < 0) || (cardId >= cards.Count))
+                throw new ArgumentOutOfRangeException ("cardId");
+
+            return cards [cardId].name;
         }
 
         public static string[] GetAllChannelNames (int cardId) {
@@ -187,6 +213,19 @@ namespace AquaPic.Drivers
             }
 
             return Mode.Manual;
+        }
+
+        public static string[] GetAllAvaiableChannels () {
+            List<string> availCh = new List<string> ();
+            foreach (var card in cards) {
+                for (int i = 0; i < card.channels.Length; ++i) {
+                    string s = string.Format ("{0}.q{1}", card.name, i);
+                    if (s == card.channels [i].name)
+                        availCh.Add (s);
+                }
+            }
+
+            return availCh.ToArray ();
         }
     }
 }

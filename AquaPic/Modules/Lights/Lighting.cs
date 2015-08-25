@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
 using AquaPic.Utilites;
 using AquaPic.Drivers;
+using AquaPic.UserInterface;
 
 namespace AquaPic.Modules
 {
@@ -50,7 +51,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static int lightsCount {
+        public static int fixtureCount {
             get {
                 return fixtures.Count;
             }
@@ -165,6 +166,20 @@ namespace AquaPic.Modules
         }
 
         public static int AddLight (
+            string name, 
+            IndividualControl outlet, 
+            LightingTime lightingTime = LightingTime.Daytime,
+            bool highTempLockout = true)
+        {
+            return AddLight (
+                name, 
+                outlet.Group, 
+                outlet.Individual, 
+                lightingTime,
+                highTempLockout);
+        }
+
+        public static int AddLight (
             string name,
             int powerID,
             int plugID,
@@ -191,6 +206,29 @@ namespace AquaPic.Modules
                 highTempLockout));
             
             return fixtures.Count - 1;
+        }
+
+        public static int AddLight (
+            string name, 
+            IndividualControl outlet, 
+            IndividualControl channel, 
+            float minDimmingOutput = 0.0f,
+            float maxDimmingOutput = 100.0f,
+            AnalogType type = AnalogType.ZeroTen,
+            LightingTime lightingTime = LightingTime.Daytime,
+            bool highTempLockout = true)
+        {
+            return AddLight (
+                name, 
+                outlet.Group, 
+                outlet.Individual, 
+                channel.Group, 
+                channel.Individual, 
+                minDimmingOutput,
+                maxDimmingOutput,
+                type,
+                lightingTime,
+                highTempLockout);
         }
 
         public static int AddLight (
@@ -229,7 +267,24 @@ namespace AquaPic.Modules
                 lightingTime,
                 highTempLockout));
 
-            return GetLightingFixtureIndex (name);
+            return GetFixtureIndex (name);
+        }
+
+        public static void RemoveLight (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            LightingFixture l = fixtures [fixtureID];
+            DimmingLightingFixture dl = l as DimmingLightingFixture;
+            Power.RemoveHandlerOnStateChange (l.plug, l.OnLightingPlugStateChange);
+            if (dl != null) {
+                Power.RemoveHandlerOnModeChange (dl.plug, dl.OnLightingPlugModeChange);
+                AnalogOutput.RemoveChannel (dl.dimCh);
+                MainWindowWidgets.barPlots.Remove (dl.name);
+            }
+
+            Power.RemoveOutlet (l.plug);
+            fixtures.Remove (l);
         }
 
         public static void SetupAutoOnOffTime (
@@ -299,12 +354,16 @@ namespace AquaPic.Modules
                 sunSetTomorrow.SetTime (maxSunSet);
         }
 
-        public static int GetLightingFixtureIndex (string name) {
+        /**************************************************************************************************************/
+        /* Name                                                                                                       */
+        /**************************************************************************************************************/
+        public static int GetFixtureIndex (string name) {
             for (int i = 0; i < fixtures.Count; ++i) {
-                if (fixtures [i].name == name)
+                if (string.Equals (name, fixtures [i].name, StringComparison.InvariantCultureIgnoreCase))
                     return i;
             }
-            return -1;
+
+            throw new ArgumentException (name + " does not exists");
         }
 
         public static string[] GetAllFixtureNames () {
@@ -314,84 +373,338 @@ namespace AquaPic.Modules
             return names;
         }
 
-        public static float GetCurrentDimmingLevel (int fixtureID) {
-            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
-                if (fixtures [fixtureID] is DimmingLightingFixture) {
-                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                    return fixture.currentDimmingLevel;
-                }
+        public static string GetFixtureName (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID].name;
+        }
+
+        public static void SetFixtureName (int fixtureID, string name) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            if (FixtureNameOk (name)) {
+                fixtures [fixtureID].name = name;
+                Power.SetOutletName (fixtures [fixtureID].plug, name);
+            } else
+                throw new Exception (string.Format ("Lighting Fixture: {0} already exists", name));
+        }
+
+        public static bool FixtureNameOk (string name) {
+            try {
+                GetFixtureIndex (name);
+                return false;
+            } catch {
+                return true;
             }
-            return 0.0f;
+        }
+
+        /**************************************************************************************************************/
+        /* Individual Control                                                                                         */
+        /**************************************************************************************************************/
+        public static IndividualControl GetFixtureOutletIndividualControl (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID].plug;
+        }
+
+        public static void SetFixtureOutletIndividualControl (int fixtureID, IndividualControl ic) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            Power.RemoveHandlerOnStateChange (fixtures [fixtureID].plug, fixtures [fixtureID].OnLightingPlugStateChange);
+
+            DimmingLightingFixture dFix = fixtures [fixtureID] as DimmingLightingFixture;
+            if (dFix != null)
+                Power.RemoveHandlerOnModeChange (dFix.plug, dFix.OnLightingPlugModeChange);
+
+            Power.RemoveOutlet (fixtures [fixtureID].plug);
+
+            fixtures [fixtureID].plug = ic;
+            var coil = Power.AddOutlet (fixtures [fixtureID].plug, fixtures [fixtureID].name, MyState.On, "Heater");
+            coil.ConditionChecker = fixtures [fixtureID].OnPlugControl;
+            Power.AddHandlerOnStateChange (fixtures [fixtureID].plug, fixtures [fixtureID].OnLightingPlugStateChange);
+            if (dFix != null)
+                Power.AddHandlerOnModeChange (dFix.plug, dFix.OnLightingPlugModeChange);
+        }
+
+        public static IndividualControl GetDimmingChannelIndividualControl (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null)
+                return fixture.dimCh;
+
+            throw new ArgumentException ("fixtureID not Dimming");
+        }
+
+        public static void SetDimmingChannelIndividualControl (int fixtureID, IndividualControl ic) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null) {
+                AnalogOutput.RemoveChannel (fixture.dimCh);
+                fixture.dimCh = ic;
+                var value = AnalogOutput.AddChannel (fixture.dimCh, fixture.type, fixture.name);
+                value.ValueGetter = fixture.OnSetDimmingLevel;
+                return;
+            }
+
+            throw new ArgumentException ("fixtureID not Dimming");
+        }
+
+        /**************************************************************************************************************/
+        /* Lighting Time                                                                                              */
+        /**************************************************************************************************************/
+        public static LightingTime GetFixtureLightingTime (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID].lightingTime;
+        }
+
+        public static void SetFixtureLightingTime (int fixtureID, LightingTime lightingTime) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            fixtures [fixtureID].lightingTime = lightingTime;
+
+            if (fixtures [fixtureID].lightingTime == LightingTime.Daytime) {
+                fixtures [fixtureID].SetOnTime (new TimeDate (defaultSunRise));
+                fixtures [fixtureID].SetOffTime (new TimeDate (defaultSunSet));
+            } else {
+                fixtures [fixtureID].SetOnTime (new TimeDate (defaultSunSet));
+                TimeDate defRiseTom = new TimeDate (defaultSunRise);
+                defRiseTom.AddDay (1);
+                fixtures [fixtureID].SetOffTime (defRiseTom);
+            }
+        }
+
+        /**************************************************************************************************************/
+        /* High Temperature Lockout                                                                                   */
+        /**************************************************************************************************************/
+        public static bool GetFixtureTemperatureLockout (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID].highTempLockout;
+        }
+
+        public static void SetFixtureTemperatureLockout (int fixtureID, bool highTempLockout) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            fixtures [fixtureID].highTempLockout = highTempLockout;
+        }
+
+        /**************************************************************************************************************/
+        /* Check Dimming Fixture                                                                                      */
+        /**************************************************************************************************************/
+        public static bool IsDimmingFixture (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID] is DimmingLightingFixture;
+        }
+
+        /**************************************************************************************************************/
+        /* Dimming levels                                                                                             */
+        /**************************************************************************************************************/
+        public static float GetCurrentDimmingLevel (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null)
+                return fixture.currentDimmingLevel;
+
+            throw new ArgumentException ("fixtureID not Dimming");
         }
 
         public static float GetAutoDimmingLevel (int fixtureID) {
-            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
-                if (fixtures [fixtureID] is DimmingLightingFixture) {
-                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                    return fixture.autoDimmingLevel;
-                }
-            }
-            return 0.0f;
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null)
+                return fixture.autoDimmingLevel;
+            
+            throw new ArgumentException ("fixtureID not Dimming");
         }
 
         public static float GetRequestedDimmingLevel (int fixtureID) {
-            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
-                if (fixtures [fixtureID] is DimmingLightingFixture) {
-                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                    return fixture.requestedDimmingLevel;
-                }
-            }
-            return 0.0f;
-        }
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
 
-        public static Mode GetDimmingMode (int fixtureID) {
-            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
-                if (fixtures [fixtureID] is DimmingLightingFixture) {
-                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                    return fixture.dimmingMode;
-                }
-            }
-            return Mode.Manual;
-        }
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null)
+                return fixture.requestedDimmingLevel;
 
-        public static bool IsDimmingFixture (int fixtureID) {
-            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
-                return fixtures [fixtureID] is DimmingLightingFixture;
-            }
-            return false;
-        }
-
-        public static void SetMode (int fixtureID, Mode mode) {
-            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
-                if (fixtures [fixtureID] is DimmingLightingFixture) {
-                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                    fixture.dimmingMode = mode;
-                }
-            }
+            throw new ArgumentException ("fixtureID not Dimming");
         }
 
         public static void SetDimmingLevel (int fixtureID, float level) {
-            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
-                if (fixtures [fixtureID] is DimmingLightingFixture) {
-                    var fixture = fixtures [fixtureID] as DimmingLightingFixture;
-                    if (fixture.dimmingMode == Mode.Manual)
-                        fixture.requestedDimmingLevel = level;
-                }
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null) {
+                if (fixture.dimmingMode == Mode.Manual)
+                    fixture.requestedDimmingLevel = level;
+                return;
             }
+
+            throw new ArgumentException ("fixtureID not Dimming");
         }
 
-        public static TimeDate GetOnTime (int fixtureID) {
-            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
-                return fixtures [fixtureID].onTime;
-            }
-            return TimeDate.Zero;
+        public static float GetMaxDimmingLevel (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null)
+                return fixture.maxDimmingOutput;
+
+            throw new ArgumentException ("fixtureID not Dimming");
         }
 
-        public static TimeDate GetOffTime (int fixtureID) {
-            if ((fixtureID >= 0) && (fixtureID < fixtures.Count)) {
-                return fixtures [fixtureID].offTime;
+        public static void SetMaxDimmingLevel (int fixtureID, float maxDimmingLevel) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null) {
+                fixture.maxDimmingOutput = maxDimmingLevel;
+                return;
             }
-            return TimeDate.Zero;
+
+            throw new ArgumentException ("fixtureID not Dimming");
+        }
+
+        public static float GetMinDimmingLevel (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null)
+                return fixture.minDimmingOutput;
+
+            throw new ArgumentException ("fixtureID not Dimming");
+        }
+
+        public static void SetMinDimmingLevel (int fixtureID, float minDimmingLevel) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null) {
+                fixture.minDimmingOutput = minDimmingLevel;
+                return;
+            }
+
+            throw new ArgumentException ("fixtureID not Dimming");
+        }
+
+        /**************************************************************************************************************/
+        /* Dimming Modes                                                                                              */
+        /**************************************************************************************************************/
+        public static Mode GetDimmingMode (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null)
+                return fixture.dimmingMode;
+
+            throw new ArgumentException ("fixtureID not Dimming");
+        }
+
+        public static void SetDimmingMode (int fixtureID, Mode mode) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null) {
+                fixture.dimmingMode = mode;
+                return;
+            }
+
+            throw new ArgumentException ("fixtureID not Dimming");
+        }
+
+        /**************************************************************************************************************/
+        /* Auto Update Time / Mode                                                                                    */
+        /**************************************************************************************************************/
+        public static Mode GetFixtureMode(int fixtureID) {
+            if ((fixtureID < 0) && (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID].mode;
+        }
+
+        /**************************************************************************************************************/
+        /* Auto Time Offsets                                                                                          */
+        /**************************************************************************************************************/
+        public static int GetFixtureOnTimeOffset (int fixtureID) {
+            if ((fixtureID < 0) && (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID].onTimeOffset;
+        }
+
+        public static int GetFixtureOffTimeOffset (int fixtureID) {
+            if ((fixtureID < 0) && (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID].offTimeOffset;
+        }
+
+        /**************************************************************************************************************/
+        /* Dimming Types                                                                                              */
+        /**************************************************************************************************************/
+        public static AnalogType GetDimmingType (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null)
+                return fixture.type;
+
+            throw new ArgumentException ("fixtureID not Dimming");
+        }
+
+        public static void SetDimmingType (int fixtureID, AnalogType analogType) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            var fixture = fixtures [fixtureID] as DimmingLightingFixture;
+            if (fixture != null) {
+                fixture.type = analogType;
+                return;
+            }
+
+            throw new ArgumentException ("fixtureID not Dimming");
+        }
+
+        /**************************************************************************************************************/
+        /* On/Off Times                                                                                               */
+        /**************************************************************************************************************/
+        public static TimeDate GetFixtureOnTime (int fixtureID) {
+            if ((fixtureID < 0) && (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID].onTime;
+        }
+
+        public static TimeDate GetFixtureOffTime (int fixtureID) {
+            if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            return fixtures [fixtureID].offTime;
         }
     }
 }

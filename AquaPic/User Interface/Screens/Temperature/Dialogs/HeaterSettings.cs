@@ -63,156 +63,107 @@ namespace AquaPic.UserInterface
         protected bool OnSave (object sender) {
             string str = ((SettingComboBox)settings ["Outlet"]).combo.activeText;
 
+            string name = ((SettingTextBox)settings ["Name"]).textBox.text;
+
+            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = System.IO.Path.Combine (path, "Settings");
+            path = System.IO.Path.Combine (path, "tempProperties.json");
+
+            string json = File.ReadAllText (path);
+            JObject jo = (JObject)JToken.Parse (json);
+
             if (heaterIdx == -1) {
-                if (((SettingComboBox)settings ["Outlet"]).combo.Active != -1) {
-                    string name = ((SettingTextBox)settings ["Name"]).textBox.text;
-                    if (name == "Enter name") {
-                        TouchMessageBox.Show ("Invalid heater name");
-                        return false;
-                    }
+                if (name == "Enter name") {
+                    TouchMessageBox.Show ("Invalid heater name");
+                    return false;
+                }
 
-                    IndividualControl ic = new IndividualControl ();
-                    ParseOutlet (str, ref ic.Group, ref ic.Individual);
-
-                    Temperature.AddHeater (name, ic.Group, ic.Individual);
-                    heaterIdx = Temperature.GetHeaterIndex (name);
-
-                    JObject jo = new JObject ();
-
-                    jo.Add (new JProperty ("name", Temperature.GetHeaterName (heaterIdx)));
-                    jo.Add (new JProperty ("powerStrip", Power.GetPowerStripName (ic.Group)));
-                    jo.Add (new JProperty ("outlet", ic.Individual.ToString ()));
-
-                    string joText = jo.ToString ();
-
-                    //format, aka proper indexing, of joText
-                    string nl = Environment.NewLine;
-                    int lineEnd = joText.IndexOf (nl);
-                    string insert = "    ";
-                    int insertIdx = 0;
-                    while (lineEnd != -1) {
-                        joText = joText.Insert (insertIdx, insert);
-
-                        insertIdx += (lineEnd + insert.Length + nl.Length);
-
-                        string formatter = joText.Substring (insertIdx);
-                        lineEnd = formatter.IndexOf (nl);
-                    }
-                    insertIdx = joText.LastIndexOf ('}');
-                    joText = joText.Insert (insertIdx, insert);
-
-                    string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
-                    path = System.IO.Path.Combine (path, "Settings");
-                    path = System.IO.Path.Combine (path, "tempProperties.json");
-
-                    string text = File.ReadAllText (path);
-
-                    string heaterText = "heaters";
-                    int start = text.IndexOf (heaterText) + heaterText.Length + 1;
-                    string temp = text.Substring (start);
-
-                    // this '}' is the very last curly bracket and we want the second to last
-                    int end = temp.LastIndexOf ('}');
-                    temp = temp.Substring (0, end);
-                    //this will the the second to last curly bracket
-                    end = temp.LastIndexOf ('}');
-
-                    if (end != -1) { // there are other heaters saved in heaters array
-                        joText = joText.Insert (0, ",\n");
-                        text = text.Insert (end + start + 1, joText);
-                    } else { // first heater to be saved
-                        start += (temp.IndexOf ('[') + 1);
-                        joText = joText.Insert (0, "\n");
-                        end = heaterText.IndexOf ('[');
-                        text = text.Insert (end + start + 1, joText);
-                    }
-
-                    File.WriteAllText (path, text);
-                } else {
+                if (((SettingComboBox)settings ["Outlet"]).combo.Active == -1) {
                     TouchMessageBox.Show ("Please select an outlet");
                     return false;
                 }
-            } else if (!str.StartsWith ("Current:")) {
-                string name = ((SettingTextBox)settings ["Name"]).textBox.text;
-                Temperature.SetHeaterName (heaterIdx, name);
 
-                IndividualControl ic = Temperature.GetHeaterIndividualControl (heaterIdx);
-                int previousOutletId = ic.Individual;
-
+                IndividualControl ic = IndividualControl.Empty;
                 ParseOutlet (str, ref ic.Group, ref ic.Individual);
 
-                Temperature.SetHeaterIndividualControl (heaterIdx, ic);
+                Temperature.AddHeater (name, ic.Group, ic.Individual);
+                heaterIdx = Temperature.GetHeaterIndex (name);
 
-                JObject jo = new JObject ();
+                JObject jobj = new JObject ();
 
-                jo.Add (new JProperty ("name", Temperature.GetHeaterName (heaterIdx)));
-                jo.Add (new JProperty ("powerStrip", Power.GetPowerStripName (ic.Group)));
-                jo.Add (new JProperty ("outlet", ic.Individual.ToString ()));
+                jobj.Add (new JProperty ("name", Temperature.GetHeaterName (heaterIdx)));
+                jobj.Add (new JProperty ("powerStrip", Power.GetPowerStripName (ic.Group)));
+                jobj.Add (new JProperty ("outlet", ic.Individual.ToString ()));
 
-                string joText = jo.ToString ();
-                int jStart = joText.IndexOf ('"');
-                int jEnd = joText.LastIndexOf ('"');
-                joText = joText.Substring (jStart, jEnd - jStart + 1);
+                ((JArray)jo ["heaters"]).Add (jobj);
+            } else {
+                string oldName = Temperature.GetHeaterName (heaterIdx);
+                if (oldName != name)
+                    Temperature.SetHeaterName (heaterIdx, name);
+                
+                IndividualControl ic = IndividualControl.Empty;
+                if (!str.StartsWith ("Current:")) {
+                    ParseOutlet (str, ref ic.Group, ref ic.Individual);
+                    Temperature.SetHeaterIndividualControl (heaterIdx, ic);
+                }
 
-                string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
-                path = System.IO.Path.Combine (path, "Settings");
-                path = System.IO.Path.Combine (path, "tempProperties.json");
+                ic = Temperature.GetHeaterIndividualControl (heaterIdx);
 
-                string text = File.ReadAllText (path);
+                JArray ja = jo ["heaters"] as JArray;
 
-                int start = text.IndexOf (string.Format ("\"name\": \"{0}\"", Temperature.GetHeaterName (heaterIdx)));
-                string endSearch = string.Format ("\"outlet\": \"{0}\"", previousOutletId);
-                int endLength = endSearch.Length;
-                int end = text.IndexOf (endSearch) + endLength;
-                string globSet = text.Substring (start, end - start);
+                int arrIdx = -1;
+                for (int i = 0; i < ja.Count; ++i) {
+                    string n = (string)ja [i] ["name"];
+                    if (oldName == n) {
+                        arrIdx = i;
+                        break;
+                    }
+                }
 
-                text = text.Replace (globSet, joText);
+                if (arrIdx == -1) {
+                    TouchMessageBox.Show ("Something went wrong");
+                    return false;
+                }
 
-                File.WriteAllText (path, text);
+                ((JArray)jo ["heaters"]) [arrIdx] ["name"] = name;
+                ((JArray)jo ["heaters"]) [arrIdx] ["powerStrip"] = Power.GetPowerStripName (ic.Group);
+                ((JArray)jo ["heaters"]) [arrIdx] ["outlet"] = ic.Individual.ToString ();
             }
+
+            File.WriteAllText (path, jo.ToString ());
 
             return true;
         }
 
         protected bool OnDelete (object sender) {
+            string name = Temperature.GetHeaterName (heaterIdx);
+
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
-            string text = File.ReadAllText (path);
+            string json = File.ReadAllText (path);
+            JObject jo = (JObject)JToken.Parse (json);
 
-            string startSearch = string.Format ("\"name\": \"{0}\"", Temperature.GetHeaterName (heaterIdx));
-            int start = text.IndexOf (startSearch);
+            JArray ja = jo ["heaters"] as JArray;
 
-            string endSearch = string.Format ("\"outlet\": \"{0}\"", Temperature.GetHeaterIndividualControl (heaterIdx).Individual);
-            int endLength = endSearch.Length;
-            int objectEnd = text.IndexOf (endSearch, start) + endLength - 1;
-
-            //finds the open curly backet that starts the next heater's object
-            int end = text.IndexOf ('{', objectEnd);
-            if (end == -1) { //this heater object is the last in the array
-                end = text.IndexOf ('}', objectEnd);
-                //grabs all the text before this heater's object
-                string temp = text.Substring (0, start);
-                //finds the last common which seperates this heater from the previous
-                start = temp.LastIndexOf (',');
-
-                //makes sure this isn't the last heater we are deleting
-                int lastObjectCheck = temp.LastIndexOf ('[');
-                if (start < lastObjectCheck)
-                    start = lastObjectCheck + 1;
-            } else {
-                //subtact one from the index since it currently points to the curly bracket for the next heater object
-                --end;
-                //removes all other heater objects so we can find the opening curly bracket
-                string deleteText = text.Substring (0, end);
-                //the last opening curly bracket will be the beginning of this heater's object
-                start = deleteText.LastIndexOf ('{');
+            int arrIdx = -1;
+            for (int i = 0; i < ja.Count; ++i) {
+                string n = (string)ja [i] ["name"];
+                if (name == n) {
+                    arrIdx = i;
+                    break;
+                }
             }
 
-            text = text.Remove (start, end - start + 1);
+            if (arrIdx == -1) {
+                TouchMessageBox.Show ("Something went wrong");
+                return false;
+            }
 
-            File.WriteAllText (path, text);
+            ((JArray)jo ["heaters"]).RemoveAt (arrIdx);
+
+            File.WriteAllText (path, jo.ToString ());
 
             Temperature.RemoveHeater (heaterIdx);
 

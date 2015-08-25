@@ -191,45 +191,34 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
+            string name = Temperature.GetTemperatureProbeName (probeIdx);
+
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
             string text = File.ReadAllText (path);
+            JObject jo = (JObject)JToken.Parse (text);
 
-            string startSearch = string.Format ("\"name\": \"{0}\"", Temperature.GetTemperatureProbeName (probeIdx));
-            int start = text.IndexOf (startSearch);
+            JArray ja = jo ["temperatureProbes"] as JArray;
 
-            string endSearch = string.Format ("\"channel\": \"{0}\"", Temperature.GetTemperatureProbeIndividualControl (probeIdx).Individual);
-            int endLength = endSearch.Length;
-            int objectEnd = text.IndexOf (endSearch, start) + endLength - 1;
-
-            //finds the open curly backet that starts the next probe's object
-            int end = text.IndexOf ('{', objectEnd);
-            int endCheck = text.IndexOf (']', objectEnd);
-            if (end > endCheck) { //this probe object is the last in the array
-                end = text.IndexOf ('}', objectEnd);
-                //grabs all the text before this probe's object
-                string temp = text.Substring (0, start);
-                //finds the last common which seperates this heater from the previous
-                start = temp.LastIndexOf (',');
-
-                //makes sure this isn't the last probe we are deleting
-                int lastObjectCheck = temp.LastIndexOf ('[');
-                if (start < lastObjectCheck)
-                    start = lastObjectCheck + 1;
-            } else {
-                //subtact one from the index since it currently points to the curly bracket for the next probe object
-                --end;
-                //removes all other probe objects so we can find the opening curly bracket
-                string deleteText = text.Substring (0, end);
-                //the last opening curly bracket will be the beginning of this probe's object
-                start = deleteText.LastIndexOf ('{');
+            int arrIdx = -1;
+            for (int i = 0; i < ja.Count; ++i) {
+                string n = (string)ja [i] ["name"];
+                if (name == n) {
+                    arrIdx = i;
+                    break;
+                }
             }
 
-            text = text.Remove (start, end - start + 1);
+            if (arrIdx == -1) {
+                TouchMessageBox.Show ("Something went wrong");
+                return false;
+            }
 
-            File.WriteAllText (path, text);
+            ((JArray)jo ["temperatureProbes"]).RemoveAt (arrIdx);
+
+            File.WriteAllText (path, jo.ToString ());
 
             Temperature.RemoveTemperatureProbe (probeIdx);
 

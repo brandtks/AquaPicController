@@ -17,7 +17,7 @@ namespace AquaPic.Modules
             public float maxDimmingOutput;
             public IndividualControl dimCh;
             public AnalogType type;
-            public Value valueControl;
+            //public Value valueControl;
             public Mode dimmingMode;
             public RateOfChangeLimiter rocl;
 
@@ -52,22 +52,17 @@ namespace AquaPic.Modules
                 this.minDimmingOutput = minDimmingOutput;
                 this.maxDimmingOutput = maxDimmingOutput;
                 dimmingMode = Mode.Auto;
-                valueControl = AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this.type, name);
-                valueControl.ValueGetter = SetDimmingLevel;
+                var valueControl = AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this.type, name);
+                valueControl.ValueGetter = OnSetDimmingLevel;
 
                 Power.AddHandlerOnModeChange (
                     plug,
-                    (sender, args) => {
-                        if (args.mode == Mode.Auto)
-                            dimmingMode = Mode.Auto;
-                        else
-                            dimmingMode = Mode.Manual;
-                    });
+                    OnLightingPlugModeChange);
 
                 MainWindowWidgets.barPlots.Add (name, new BarPlotData (() => {return new DimmingLightBarPlot (name, () => {return currentDimmingLevel;});}));
             }
 
-            public float SetDimmingLevel () {
+            public float OnSetDimmingLevel () {
                 if (lightingOn == MyState.On) {
                     TimeDate now = TimeDate.Now;
 
@@ -94,6 +89,13 @@ namespace AquaPic.Modules
                 rocl.Reset ();
 
                 return currentDimmingLevel;
+            }
+
+            public void OnLightingPlugModeChange (object sender, ModeChangeEventArgs args) {
+                if (args.mode == Mode.Auto)
+                    dimmingMode = Mode.Auto;
+                else
+                    dimmingMode = Mode.Manual;
             }
         }
     }

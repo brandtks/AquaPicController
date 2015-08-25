@@ -100,6 +100,36 @@ namespace AquaPic.Utilites
             }
             return string.Format ("{0}:{1:00} {2}", h, min, t);
 		}
+
+        public static Time Parse (string value) {
+            int pos = value.IndexOf (":");
+
+            if ((pos != 1) && (pos != 2))
+                throw new Exception ();
+
+            string hourString = value.Substring (0, pos);
+            int hour = Convert.ToInt32 (hourString);
+
+            if ((hour < 0) || (hour > 23))
+                throw new Exception ();
+
+            string minString = value.Substring (pos + 1, 2);
+            int min = Convert.ToInt32 (minString);
+
+            if ((min < 0) || (min > 59))
+                throw new Exception ();
+
+            pos = value.Length;
+            if (pos > 3) {
+                string last = value.Substring (pos - 2);
+                if (last == "pm") {
+                    if ((hour >= 1) && (hour <= 12))
+                        hour = (hour + 12) % 24;
+                }
+            }
+
+            return new Time ((byte)hour, (byte)min);
+        }
     }
 }
 

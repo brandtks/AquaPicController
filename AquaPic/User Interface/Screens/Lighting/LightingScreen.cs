@@ -23,7 +23,9 @@ namespace AquaPic.UserInterface
         private TouchLabel autoLabel;
         private TouchTextBox requestTextBox;
         private TouchLabel requestLabel;
+        private TouchLabel onTimeLabel;
         private TouchTextBox onTimeTextBox;
+        private TouchLabel offTimeLabel;
         private TouchTextBox offTimeTextBox;
         private uint timerId;
         private bool isDimmingFixture;
@@ -115,9 +117,21 @@ namespace AquaPic.UserInterface
 
             //<TODO> this is a stupid fix for when there are no lights add
             //will be changed after I implement adding and removing lights during runtime
-            if (Lighting.lightsCount == 0) {
+
+
+
+            if (Lighting.fixtureCount == 0) {
                 fixtureID = -1;
                 fixtureLabel.text = "No lighing fixtures added";
+
+                combo = new TouchComboBox ();
+                combo.Active = 0;
+                combo.WidthRequest = 185;
+                combo.List.Add ("New fixture...");
+                combo.ChangedEvent += OnComboChanged;
+                Put (combo, 600, 35);
+                combo.Show ();
+
                 Show ();
                 return;
             }
@@ -203,7 +217,7 @@ namespace AquaPic.UserInterface
             Put (autoLabel, 596, 389);
             autoLabel.Show ();
 
-            var onTimeLabel = new TouchLabel ();
+            onTimeLabel = new TouchLabel ();
             onTimeLabel.text = "On Time";
             onTimeLabel.textColor = "grey4"; 
             Put (onTimeLabel, 415, 75);
@@ -214,7 +228,7 @@ namespace AquaPic.UserInterface
             Put (onTimeTextBox, 415, 95);
             onTimeTextBox.Show ();
 
-            var offTimeLabel = new TouchLabel ();
+            offTimeLabel = new TouchLabel ();
             offTimeLabel.text = "Off Time";
             offTimeLabel.textColor = "grey4"; 
             Put (offTimeLabel, 415, 130);
@@ -227,8 +241,9 @@ namespace AquaPic.UserInterface
 
             string[] names = Lighting.GetAllFixtureNames ();
             combo = new TouchComboBox (names);
-            combo.Active = fixtureID;
+            combo.Active = 0;
             combo.WidthRequest = 185;
+            combo.List.Add ("New fixture...");
             combo.ChangedEvent += OnComboChanged;
             Put (combo, 600, 35);
             combo.Show ();
@@ -248,6 +263,74 @@ namespace AquaPic.UserInterface
             };
             Put (settingsBtn, 15, 390);
             settingsBtn.Show ();
+
+            var fixtureSettingBtn = new TouchButton ();
+            fixtureSettingBtn.text = "Fixture Setup";
+            fixtureSettingBtn.SetSizeRequest (100, 30);
+            fixtureSettingBtn.ButtonReleaseEvent += (o, args) => {
+                if (fixtureID != -1) {
+                    string name = Lighting.GetFixtureName (fixtureID);
+                    var s = new FixtureSettings (name, fixtureID, true);
+                    s.Run ();
+                    s.Destroy ();
+
+                    try {
+                        Lighting.GetFixtureIndex (name);
+                    } catch (ArgumentException) {
+                        combo.List.Remove (name);
+                        if (Lighting.fixtureCount != 0) {
+                            fixtureID = 0;
+                            combo.Active = fixtureID;
+                            GetFixtureData ();
+                        } else {
+                            fixtureID = -1;
+                            combo.Active = 0;
+
+                            fixtureLabel.text = "No lighing fixtures added";
+                            fixtureLabel.QueueDraw ();
+
+                            onTimeLabel.Visible = false;
+                            onTimeTextBox.Visible = false;
+                            offTimeLabel.Visible = false;
+                            offTimeTextBox.Visible = false;
+                            dimmingHeader.Visible = false;
+
+                            modeSelector.Visible = false;
+                            dimmingProgressBar.Visible = false;
+                            dimmingTextBox.Visible = false;
+                            dimmingLabel.Visible = false;
+                            autoTextBox.Visible = false;
+                            autoLabel.Visible = false;
+                            requestTextBox.Visible = false;
+                            requestLabel.Visible = false;
+                        }
+                    }
+                } else {
+                    int fixtureCount = Lighting.fixtureCount;
+
+                    var s = new FixtureSettings ("New fixture", -1, false);
+                    s.Run ();
+                    s.Destroy ();
+
+                    if (Lighting.fixtureCount > fixtureCount) { // a fixture was added
+                        fixtureID = Lighting.fixtureCount - 1;
+                        int listIdx = combo.List.IndexOf ("New fixture...");
+                        combo.List.Insert (listIdx, Lighting.GetFixtureName (fixtureID));
+                        combo.Active = listIdx;
+                        combo.QueueDraw ();
+                        GetFixtureData ();
+                    } else {
+                        if (fixtureID != -1)
+                            combo.Active = fixtureID;
+                        else
+                            combo.Active = 0;
+                    }
+                }
+
+                combo.QueueDraw ();
+            };
+            Put (fixtureSettingBtn, 415, 385);
+            fixtureSettingBtn.Show ();
 
             GetFixtureData ();
 
@@ -317,36 +400,71 @@ namespace AquaPic.UserInterface
                 requestLabel.Visible = false;
             }
 
-            onTimeTextBox.text = Lighting.GetOnTime (fixtureID).ToString ();
-            offTimeTextBox.text = Lighting.GetOffTime (fixtureID).ToString ();
+            onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureID).ToString ();
+            offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureID).ToString ();
 
             QueueDraw ();
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            int id = Lighting.GetLightingFixtureIndex (e.ActiveText);
-            if (id != -1) {
-                fixtureID = id;
-                GetFixtureData ();
+            if (e.ActiveText == "New fixture...") {
+                int fixtureCount = Lighting.fixtureCount;
+
+                var s = new FixtureSettings ("New fixture", -1, false);
+                s.Run ();
+                s.Destroy ();
+
+                if (Lighting.fixtureCount > fixtureCount) { // a fixture was added
+                    fixtureID = Lighting.fixtureCount - 1;
+                    int listIdx = combo.List.IndexOf ("New fixture...");
+                    combo.List.Insert (listIdx, Lighting.GetFixtureName (fixtureID));
+                    combo.Active = listIdx;
+                    combo.QueueDraw ();
+
+                    onTimeLabel.Visible = true;
+                    onTimeTextBox.Visible = true;
+                    offTimeLabel.Visible = true;
+                    offTimeTextBox.Visible = true;
+                    dimmingHeader.Visible = true;
+
+                    GetFixtureData ();
+                } else {
+                    if (fixtureID != -1)
+                        combo.Active = fixtureID;
+                    else
+                        combo.Active = 0;
+                }
+            } else {
+                try {
+                    int id = Lighting.GetFixtureIndex (e.ActiveText);
+                    if (id != -1) {
+                        fixtureID = id;
+                        GetFixtureData ();
+                    }
+                } catch {
+                    ;
+                }
             }
         }
 
         protected bool OnTimer () {
-            float level = Lighting.GetCurrentDimmingLevel (fixtureID);
-            dimmingProgressBar.currentProgressSecondary = level / 100.0f;
-            dimmingTextBox.text = string.Format ("{0:N2}", level);
+            if (isDimmingFixture) {
+                float level = Lighting.GetCurrentDimmingLevel (fixtureID);
+                dimmingProgressBar.currentProgressSecondary = level / 100.0f;
+                dimmingTextBox.text = string.Format ("{0:N2}", level);
 
-            level = Lighting.GetRequestedDimmingLevel (fixtureID);
-            dimmingProgressBar.currentProgress = level / 100.0f;
-            requestTextBox.text = string.Format ("{0:N2}", level);
+                level = Lighting.GetRequestedDimmingLevel (fixtureID);
+                dimmingProgressBar.currentProgress = level / 100.0f;
+                requestTextBox.text = string.Format ("{0:N2}", level);
 
-            dimmingTextBox.QueueDraw ();
-            requestTextBox.QueueDraw ();
-            dimmingProgressBar.QueueDraw ();
+                dimmingTextBox.QueueDraw ();
+                requestTextBox.QueueDraw ();
+                dimmingProgressBar.QueueDraw ();
 
-            if (dimmingIsManual) {
-                autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
-                autoTextBox.QueueDraw ();
+                if (dimmingIsManual) {
+                    autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
+                    autoTextBox.QueueDraw ();
+                }
             }
 
             return isDimmingFixture;
@@ -354,7 +472,7 @@ namespace AquaPic.UserInterface
 
         protected void OnSelectorChanged (object sender, SelectorChangedEventArgs args) {
             if (args.currentSelectedIndex == 0) {
-                Lighting.SetMode (fixtureID, Mode.Manual);
+                Lighting.SetDimmingMode (fixtureID, Mode.Manual);
                 dimmingProgressBar.enableTouch = true;
                 requestTextBox.enableTouch = true;
                 autoTextBox.Visible = true;
@@ -362,7 +480,7 @@ namespace AquaPic.UserInterface
                 dimmingIsManual = true;
                 autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
             } else {
-                Lighting.SetMode (fixtureID, Mode.Auto);
+                Lighting.SetDimmingMode (fixtureID, Mode.Auto);
                 dimmingProgressBar.enableTouch = false;
                 requestTextBox.enableTouch = false;
                 autoTextBox.Visible = false;

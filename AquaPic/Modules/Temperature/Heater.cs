@@ -14,7 +14,7 @@ namespace AquaPic.Modules
             //public float setpoint;
             //public float deadband;
             public string name;
-            public Coil plugControl;
+            //public Coil plugControl;
 
 //            public Heater (string name, byte powerID, byte plugID, bool controlTemp, float setpoint, float bandwidth) {
 //                this.plug.Group = powerID;
@@ -31,18 +31,18 @@ namespace AquaPic.Modules
                 this.plug.Group = powerID;
                 this.plug.Individual = plugID;
                 this.name = name;
-                plugControl = Power.AddOutlet (this.plug, name, MyState.On, "Heater");
+                var plugControl = Power.AddOutlet (this.plug, name, MyState.On, "Temperature");
                 plugControl.ConditionChecker = OnPlugControl;
             }
 
-            protected bool OnPlugControl () {
+            public bool OnPlugControl () {
                 bool cond = true;
                 cond &= !Alarm.CheckAlarming (HighTemperatureAlarmIndex);
                 cond &= CheckTemperature ();
                 return cond;
             }
 
-            protected bool CheckTemperature () {
+            public bool CheckTemperature () {
 //                if (controlWaterTemperature) {
                     if (temperature >= (temperatureSetpoint + temperatureDeadband))
                         return false;
