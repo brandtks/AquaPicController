@@ -30,6 +30,10 @@ namespace MyWidgetLibrary
             WindowPosition = (Gtk.WindowPosition)4;
             SetSizeRequest (600, height);
 
+            #if RPI_BUILD
+            Decorated = false;
+            #endif
+
             ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
 
             foreach (Widget w in this.Children) {

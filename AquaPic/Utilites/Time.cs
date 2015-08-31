@@ -122,7 +122,7 @@ namespace AquaPic.Utilites
             pos = value.Length;
             if (pos > 3) {
                 string last = value.Substring (pos - 2);
-                if (last == "pm") {
+                if (string.Equals (last, "pm", StringComparison.InvariantCultureIgnoreCase)) {
                     if ((hour >= 1) && (hour <= 12))
                         hour = (hour + 12) % 24;
                 }

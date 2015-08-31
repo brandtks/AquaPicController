@@ -48,7 +48,7 @@ namespace MyWidgetLibrary
             this.SelectionCount = selectionCount;
             this.CurrentSelected = currentSelectedIndex;
             this.Orientation = orientation;
-            this.SliderSize = MySliderSize.Small;
+            this.SliderSize = MySliderSize.Large;
 
             this.BkgndColorOptions = new MyColor[this.SelectionCount];
             for (int i = 0; i < BkgndColorOptions.Length; ++i)

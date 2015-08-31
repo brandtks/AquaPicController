@@ -152,6 +152,17 @@ namespace AquaPic.Drivers
             throw new ArgumentOutOfRangeException ("ic");
         }
 
+        public static void SetAnalogType (IndividualControl ic, AnalogType type) {
+            if ((ic.Group < 0) || (ic.Group >= cards.Count))
+                throw new ArgumentOutOfRangeException ("ic.Group");
+
+            if ((ic.Individual < 0) || (ic.Individual >= cards [ic.Group].channels.Length))
+                throw new ArgumentOutOfRangeException ("ic.Individual");
+
+            cards [ic.Group].channels [ic.Individual].type = type;
+            cards [ic.Group].SetChannelType (ic.Individual, type);
+        }
+
         public static float[] GetAllValues (int cardId) {
             if ((cardId >= 0) && (cardId < cards.Count)) {
                 float[] types = new float[cards [cardId].channels.Length];

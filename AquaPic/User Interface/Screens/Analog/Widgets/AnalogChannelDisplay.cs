@@ -12,12 +12,14 @@ namespace AquaPic.UserInterface
     {
         public event ButtonReleaseEventHandler ForceButtonReleaseEvent;
         public event ValueChangedHandler ValueChangedEvent;
+        public event SelectorChangedEventHandler TypeSelectorChangedEvent;
 
         public TouchLabel label;
         public TouchTextBox textBox;
         public TouchProgressBar progressBar;
         public TouchLabel typeLabel;
         public TouchButton button;
+        public TouchSelectorSwitch ss;
 
         public int divisionSteps;
 
@@ -31,10 +33,10 @@ namespace AquaPic.UserInterface
         }
 
         public AnalogChannelDisplay () {
-            SetSizeRequest (760, 50);
+            SetSizeRequest (760, 65);
 
             label = new TouchLabel ();
-            Put (label, 5, 0);
+            Put (label, 5, 15);
             label.Show ();
 
             textBox = new TouchTextBox ();
@@ -47,7 +49,7 @@ namespace AquaPic.UserInterface
                     ;
                 }
             };
-            Put (textBox, 0, 20);
+            Put (textBox, 0, 35);
             textBox.Show ();
 
             progressBar = new TouchProgressBar (MyOrientation.Horizontal);
@@ -56,22 +58,31 @@ namespace AquaPic.UserInterface
                 currentValue = args.currentProgress * (float)divisionSteps;
                 ValueChanged ();
             };
-            Put (progressBar, 210, 20);
+            Put (progressBar, 210, 35);
             progressBar.Show ();
 
             typeLabel = new TouchLabel ();
             typeLabel.Visible = false;
             typeLabel.WidthRequest = 200;
             typeLabel.textAlignment = MyAlignment.Right;
-            Put (typeLabel, 550, 0);
+            Put (typeLabel, 550, 15);
 
             button = new TouchButton ();
             button.SetSizeRequest (100, 30);
             button.buttonColor = "grey3";
             button.text = "Force";
             button.ButtonReleaseEvent += OnForceReleased;
-            Put (button, 660, 20);
+            Put (button, 660, 35);
             button.Show ();
+
+            ss = new TouchSelectorSwitch ();
+            ss.SetSizeRequest (100, 30);
+            ss.SliderColorOptions [0] = "pri";
+            ss.SliderColorOptions [1] = "seca";
+            ss.SelectorChangedEvent += OnSelectorSwitchChanged;
+            ss.ExposeEvent += OnExpose;
+            ss.Visible = false;
+            Put (ss, 660, 0);
 
             Show ();
         }
@@ -88,6 +99,32 @@ namespace AquaPic.UserInterface
                 ValueChangedEvent (this, progressBar.currentProgress * (float)divisionSteps);
             else
                 throw new NotImplementedException ("Value changed not implemented");
+        }
+
+        protected void OnSelectorSwitchChanged (object sender, SelectorChangedEventArgs args) {
+            if (TypeSelectorChangedEvent != null)
+                TypeSelectorChangedEvent (this, args);
+            else
+                throw new NotImplementedException ("Type selector not impletemented");
+        }
+
+        protected void OnExpose (object sender, ExposeEventArgs args) {
+            TouchSelectorSwitch ss = sender as TouchSelectorSwitch;
+            int seperation = ss.Allocation.Width / ss.SelectionCount;
+            int x = ss.Allocation.Left;
+
+            MyText render = new MyText ();
+            render.textWrap = MyTextWrap.Shrink;
+            render.alignment = MyAlignment.Center;
+            render.font.color = "white";
+
+            string[] labels = {"0-10V", "PWM"};
+
+            foreach (var l in labels) {
+                render.text = l;
+                render.Render (ss, x, ss.Allocation.Top, seperation, ss.Allocation.Height);
+                x += seperation;
+            }
         }
     }
 }

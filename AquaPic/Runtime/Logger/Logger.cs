@@ -16,7 +16,8 @@ namespace AquaPic.Runtime
             buffer = new TextBuffer (ttt);
         }
 
-        public static void Add (string message) {
+        public static void Add (string message, params object[] args) {
+            message = string.Format (message, args);
             AppendTime ();
 
             var ti = buffer.EndIter;
@@ -30,7 +31,8 @@ namespace AquaPic.Runtime
                 EventAddedEvent ();
         }
 
-        public static void AddInfo (string message) {
+        public static void AddInfo (string message, params object[] args) {
+            message = string.Format (message, args);
             AppendTime ();
 
             var tag = new TextTag (null);
@@ -48,7 +50,8 @@ namespace AquaPic.Runtime
                 EventAddedEvent ();
         }
 
-        public static void AddError (string message) {
+        public static void AddError (string message, params object[] args) {
+            message = string.Format (message, args);
             AppendTime ();
 
             var tag = new TextTag (null);
@@ -66,7 +69,8 @@ namespace AquaPic.Runtime
                 EventAddedEvent ();
         }
 
-        public static void AddWarning (string message) {
+        public static void AddWarning (string message, params object[] args) {
+            message = string.Format (message, args);
             AppendTime ();
 
             var tag = new TextTag (null);

@@ -32,7 +32,6 @@ namespace AquaPic
 //            Gtk.Rc.Parse (resourceFile);
 
             AquaPicGUI win = new AquaPicGUI ();
-
             win.Show ();
             Application.Run ();
 		}

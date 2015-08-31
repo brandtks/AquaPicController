@@ -9,6 +9,10 @@ namespace MyWidgetLibrary
         public static void Show (string msg) {
             var ms = new Dialog (string.Empty, null, DialogFlags.DestroyWithParent);
 
+            #if RPI_BUILD
+            Decorated = false;
+            #endif
+
             ms.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
 
             var btn = new TouchButton ();
@@ -37,6 +41,10 @@ namespace MyWidgetLibrary
             : base (string.Empty, null, DialogFlags.DestroyWithParent)
         {
             this.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+
+            #if RPI_BUILD
+            Decorated = false;
+            #endif
 
             var btn = new TouchButton ();
             btn.text = "Yes";

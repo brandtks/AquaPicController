@@ -16,7 +16,7 @@ namespace AquaPic.Modules
             public float minDimmingOutput;
             public float maxDimmingOutput;
             public IndividualControl dimCh;
-            public AnalogType type;
+            //public AnalogType type;
             //public Value valueControl;
             public Mode dimmingMode;
             public RateOfChangeLimiter rocl;
@@ -48,11 +48,11 @@ namespace AquaPic.Modules
                 rocl = new RateOfChangeLimiter (1.0f);
                 this.dimCh.Group = cardID;
                 this.dimCh.Individual = channelID;
-                this.type = type;
+                //this.type = type;
                 this.minDimmingOutput = minDimmingOutput;
                 this.maxDimmingOutput = maxDimmingOutput;
                 dimmingMode = Mode.Auto;
-                var valueControl = AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, this.type, name);
+                var valueControl = AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, type, name);
                 valueControl.ValueGetter = OnSetDimmingLevel;
 
                 Power.AddHandlerOnModeChange (

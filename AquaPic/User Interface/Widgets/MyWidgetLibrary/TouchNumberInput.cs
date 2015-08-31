@@ -22,7 +22,10 @@ namespace MyWidgetLibrary
             WindowPosition = (Gtk.WindowPosition)4;
             DefaultWidth = 205;
             DefaultHeight = 290;
-            //Decorated = false;
+
+            #if RPI_BUILD
+            Decorated = false;
+            #endif
 
             fix = new Fixed ();
             fix.WidthRequest = 205;

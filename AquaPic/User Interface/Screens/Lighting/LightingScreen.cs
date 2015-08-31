@@ -225,17 +225,55 @@ namespace AquaPic.UserInterface
 
             onTimeTextBox = new TouchTextBox ();
             onTimeTextBox.WidthRequest = 195;
+            onTimeTextBox.enableTouch = true;
+            onTimeTextBox.includeTimeFunctions = true;
+            onTimeTextBox.TextChangedEvent += (sender, args) => {
+                try {
+                    var t = Time.Parse (args.text);
+
+                    if (t.CompareToTime (new Time ()) == 1) {
+                        var td = Lighting.GetFixtureOnTime (fixtureID);
+                        td.SetTime (t);
+                        args.text = td.ToString ();
+                    } else {
+                        TouchMessageBox.Show ("Can modify time to before current time");
+                        args.keepText = false;
+                    }
+                } catch {
+                    TouchMessageBox.Show ("Incorrect time format");
+                    args.keepText = false;
+                }
+            };
             Put (onTimeTextBox, 415, 95);
             onTimeTextBox.Show ();
 
             offTimeLabel = new TouchLabel ();
             offTimeLabel.text = "Off Time";
-            offTimeLabel.textColor = "grey4"; 
+            offTimeLabel.textColor = "grey4";
             Put (offTimeLabel, 415, 130);
             offTimeLabel.Show ();
 
             offTimeTextBox = new TouchTextBox ();
             offTimeTextBox.WidthRequest = 195;
+            offTimeTextBox.enableTouch = true;
+            offTimeTextBox.includeTimeFunctions = true;
+            offTimeTextBox.TextChangedEvent += (sender, args) => {
+                try {
+                    var t = Time.Parse (args.text);
+
+                    if (t.CompareToTime (new Time ()) == 1) {
+                        var td = Lighting.GetFixtureOffTime (fixtureID);
+                        td.SetTime (t);
+                        args.text = td.ToString ();
+                    } else {
+                        TouchMessageBox.Show ("Can modify time to before current time");
+                        args.keepText = false;
+                    }
+                } catch {
+                    TouchMessageBox.Show ("Incorrect time format");
+                    args.keepText = false;
+                }
+            };
             Put (offTimeTextBox, 415, 150);
             offTimeTextBox.Show ();
 
@@ -401,7 +439,9 @@ namespace AquaPic.UserInterface
             }
 
             onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureID).ToString ();
+            onTimeTextBox.QueueDraw ();
             offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureID).ToString ();
+            offTimeTextBox.QueueDraw ();
 
             QueueDraw ();
         }

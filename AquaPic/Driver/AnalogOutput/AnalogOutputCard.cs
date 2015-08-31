@@ -49,8 +49,8 @@ namespace AquaPic.Drivers
             }
 
             public void AddChannel (int ch, AnalogType type, string name) {
-                channels [ch].type = type;
                 channels [ch].name = name;
+                channels [ch].type = type;
 
                 byte[] arr = new byte[2];
                 arr [0] = (byte)ch;
@@ -60,6 +60,25 @@ namespace AquaPic.Drivers
                 unsafe {
                     fixed (byte* ptr = &arr [0]) {
                         slave.Write (2, ptr, sizeof(byte) * 2);
+                    }
+                }
+
+                SetChannelType (ch, type);
+            }
+
+            public void SetChannelType (int ch, AnalogType type) {
+                if (type != channels [ch].type) {
+                    channels [ch].type = type;
+
+                    byte[] arr = new byte[2];
+                    arr [0] = (byte)ch;
+                    //<NOTE> CHANGE PWM to be 255 and 0-10 to be 0
+                    arr [1] = (byte)channels [ch].type;
+
+                    unsafe {
+                        fixed (byte* ptr = &arr [0]) {
+                            slave.Write (2, ptr, sizeof(byte) * 2);
+                        }
                     }
                 }
             }

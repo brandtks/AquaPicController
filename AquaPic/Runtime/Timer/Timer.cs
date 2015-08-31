@@ -54,8 +54,9 @@ namespace AquaPic.Runtime
         }
 
         protected bool OnTimeout () {
-            if (_enabled)
+            if (_enabled) {
                 CallElapsedEvents ();
+            }
             return _enabled & autoReset;
         }
 

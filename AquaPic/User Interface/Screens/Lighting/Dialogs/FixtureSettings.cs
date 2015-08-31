@@ -410,8 +410,8 @@ namespace AquaPic.UserInterface
                     ((JArray)jo ["lightingFixtures"]) [arrIdx] ["offTimeOffset"] = offOffset.ToString ();
 
                     if (dimmingFixture) {
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["dimmingCard"] = offOffset.ToString ();
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["channel"] = offOffset.ToString ();
+                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["dimmingCard"] = AnalogOutput.GetCardName (chIc.Group);
+                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["channel"] = chIc.Individual.ToString ();
                         ((JArray)jo ["lightingFixtures"]) [arrIdx] ["minDimmingOutput"] = minDimming.ToString ();
                         ((JArray)jo ["lightingFixtures"]) [arrIdx] ["maxDimmingOutput"] = maxDimming.ToString ();
                         ((JArray)jo ["lightingFixtures"]) [arrIdx] ["analogType"] = aType.ToString ();

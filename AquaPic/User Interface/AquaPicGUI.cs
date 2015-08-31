@@ -23,6 +23,11 @@ namespace AquaPic.UserInterface
             this.Resizable = false;
             this.AllowGrow = false;
 
+            #if RPI_BUILD
+            this.Fullscreen ();
+            this.Decorated = false;
+            #endif
+
             GLib.ExceptionManager.UnhandledException += (args) => {
                 Exception ex = args.ExceptionObject as Exception;
                 Logger.AddError (ex.ToString ());

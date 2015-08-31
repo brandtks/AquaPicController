@@ -447,9 +447,10 @@ namespace AquaPic.Modules
 
             var fixture = fixtures [fixtureID] as DimmingLightingFixture;
             if (fixture != null) {
+                AnalogType type = AnalogOutput.GetAnalogType (fixture.dimCh);
                 AnalogOutput.RemoveChannel (fixture.dimCh);
                 fixture.dimCh = ic;
-                var value = AnalogOutput.AddChannel (fixture.dimCh, fixture.type, fixture.name);
+                var value = AnalogOutput.AddChannel (fixture.dimCh, type, fixture.name);
                 value.ValueGetter = fixture.OnSetDimmingLevel;
                 return;
             }
@@ -672,7 +673,7 @@ namespace AquaPic.Modules
 
             var fixture = fixtures [fixtureID] as DimmingLightingFixture;
             if (fixture != null)
-                return fixture.type;
+                return AnalogOutput.GetAnalogType (fixture.dimCh);
 
             throw new ArgumentException ("fixtureID not Dimming");
         }
@@ -683,7 +684,7 @@ namespace AquaPic.Modules
 
             var fixture = fixtures [fixtureID] as DimmingLightingFixture;
             if (fixture != null) {
-                fixture.type = analogType;
+                AnalogOutput.SetAnalogType (fixture.dimCh, analogType);
                 return;
             }
 
@@ -700,11 +701,25 @@ namespace AquaPic.Modules
             return fixtures [fixtureID].onTime;
         }
 
+        public static void SetFixtureOnTime (int fixtureID, TimeDate newOnTime) {
+            if ((fixtureID < 0) && (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            fixtures [fixtureID].SetOnTime (newOnTime);
+        }
+
         public static TimeDate GetFixtureOffTime (int fixtureID) {
             if ((fixtureID < 0) || (fixtureID >= fixtures.Count))
                 throw new ArgumentOutOfRangeException ("fixtureID");
 
             return fixtures [fixtureID].offTime;
+        }
+
+        public static void SetFixtureOffTime (int fixtureID, TimeDate newOffTime) {
+            if ((fixtureID < 0) && (fixtureID >= fixtures.Count))
+                throw new ArgumentOutOfRangeException ("fixtureID");
+
+            fixtures [fixtureID].SetOffTime (newOffTime);
         }
     }
 }
