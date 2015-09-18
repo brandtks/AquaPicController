@@ -69,7 +69,13 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnClearButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            var ms = new TouchMessageDialog ("Save events before clearing");
+            var parent = this.Toplevel as Gtk.Window;
+            if (parent != null) {
+                if (!parent.IsTopLevel)
+                    parent = null;
+            }
+
+            var ms = new TouchMessageDialog ("Save events before clearing", parent);
 
             ms.Response += (o, a) => {
                 if (a.ResponseId == ResponseType.Yes) {
@@ -78,7 +84,12 @@ namespace AquaPic.UserInterface
                 } else if (a.ResponseId == ResponseType.No) {
                     ms.Destroy ();
 
-                    var d = new TouchMessageDialog ("Are you sure you want to clear all the contents of the event logger");
+                    var parent2 = this.Toplevel as Gtk.Window;
+                    if (parent != null) {
+                        if (!parent.IsTopLevel)
+                            parent = null;
+                    }
+                    var d = new TouchMessageDialog ("Are you sure you want to clear all the contents of the event logger", parent2);
 
                     d.Response += (obj, arg) => {
                         if (arg.ResponseId == ResponseType.Yes)

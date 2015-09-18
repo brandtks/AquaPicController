@@ -3,19 +3,31 @@ using Gtk;
 using Cairo;
 using MyWidgetLibrary;
 using AquaPic.Runtime;
-using CSScriptLibrary;
 
 namespace AquaPic.UserInterface
 {
     public class SettingsWindow : WindowBase
     {
-        public SettingsWindow (params object[] options) : base () {
-            TouchCurvedProgressBar c = new TouchCurvedProgressBar ();
-            c.currentProgress = 0.85f;
-            Put (c, 300, 150);
-            c.Show ();
+        private AquaPicGUI tw;
 
-            ShowAll ();
+        public SettingsWindow (params object[] options) : base () {
+            if (options.Length > 0) {
+                tw = options [0] as AquaPicGUI;
+                if (tw != null) {
+                    if (tw.IsTopLevel)
+                        tw.ShowDecoration ();
+                }
+            }
+
+            Show ();
+        }
+
+        public override void Dispose () {
+            if (tw != null) {
+                if (tw.IsTopLevel)
+                    tw.HideDecoration ();
+            }
+            base.Dispose ();
         }
     }
 }

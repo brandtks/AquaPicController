@@ -16,12 +16,13 @@ namespace MyWidgetLibrary
         private Fixed fix;
         private VirtualKeyboard vkb;
 
-        public TouchNumberInput (bool timeInput = false) {
+        public TouchNumberInput (bool timeInput = false, Gtk.Window parent = null) : base ("Input", parent, DialogFlags.DestroyWithParent) {
             Name = "AquaPic.Keyboard.Input";
             Title = "Input";
             WindowPosition = (Gtk.WindowPosition)4;
             DefaultWidth = 205;
             DefaultHeight = 290;
+            KeepAbove = true;
 
             #if RPI_BUILD
             Decorated = false;
@@ -31,10 +32,20 @@ namespace MyWidgetLibrary
             fix.WidthRequest = 205;
             fix.HeightRequest = 290;
 
-            MyBox bkgnd = new MyBox (710, 290);
-            bkgnd.color = "grey0";
-            bkgnd.transparency = 1.0f;
-            fix.Put (bkgnd, 0, 0);
+            this.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+
+            ExposeEvent += (o, args) => {
+                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                    cr.MoveTo (Allocation.Left, Allocation.Top);
+                    cr.LineTo (Allocation.Right, Allocation.Top);
+                    cr.LineTo (Allocation.Right, Allocation.Bottom);
+                    cr.LineTo (Allocation.Left, Allocation.Bottom);
+                    cr.ClosePath ();
+                    cr.LineWidth = 1.8;
+                    MyColor.SetSource (cr, "grey4");
+                    cr.Stroke ();
+                }
+            };
 
             entry = new Entry ();
             entry.WidthRequest = 145;

@@ -74,7 +74,13 @@ namespace MyWidgetLibrary
                 deleteButton.text = "Delete";
                 deleteButton.buttonColor = "compl";
                 deleteButton.ButtonReleaseEvent += (obj, args) => {
-                    var ms = new TouchMessageDialog ("Are you sure you with to delete " + name);
+                    var parent = this.Toplevel as Gtk.Window;
+                    if (parent != null) {
+                        if (!parent.IsTopLevel)
+                            parent = null;
+                    }
+
+                    var ms = new TouchMessageDialog ("Are you sure you with to delete " + name, parent);
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {

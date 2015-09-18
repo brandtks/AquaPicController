@@ -39,9 +39,11 @@ namespace AquaPic.UserInterface
         protected void onExpose (object sender, ExposeEventArgs args) {
             var area = sender as EventBox;
             using (Context cr = Gdk.CairoHelper.Create (area.GdkWindow)) {
+                int width = Allocation.Width;
+
                 cr.MoveTo (0, 0);
-                cr.LineTo (800, 0);
-                cr.LineTo (800, 17);
+                cr.LineTo (width, 0);
+                cr.LineTo (width, 17);
                 cr.LineTo (0, 17);
                 cr.MoveTo (0, 0);
                 cr.ClosePath ();
@@ -49,13 +51,13 @@ namespace AquaPic.UserInterface
                 cr.Fill ();
 
                 cr.MoveTo (0, 17);
-                cr.LineTo (800, 17);
-                cr.LineTo (800, 19);
+                cr.LineTo (width, 17);
+                cr.LineTo (width, 19);
                 cr.LineTo (0, 19);
                 cr.LineTo (0, 17);
                 cr.ClosePath ();
 
-                Gradient pat = new LinearGradient (0, 19, 800, 19);
+                Gradient pat = new LinearGradient (0, 19, width, 19);
                 pat.AddColorStop (0.0, MyColor.NewCairoColor ("grey2", 0.35));
                 pat.AddColorStop (0.5, MyColor.NewCairoColor ("pri"));
                 pat.AddColorStop (1.0, MyColor.NewCairoColor ("grey2", 0.35));
@@ -71,7 +73,7 @@ namespace AquaPic.UserInterface
                 l.SetMarkup ("<span color=\"white\">" 
                     + DateTime.Now.ToLongTimeString () 
                     + "</span>");
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), 680, 0, l);
+                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), width - 120, 0, l);
 
                 string fontColor;
                 if (alarmName == "No Alarms")

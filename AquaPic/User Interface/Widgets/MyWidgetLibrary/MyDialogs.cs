@@ -8,9 +8,10 @@ namespace MyWidgetLibrary
     {
         public static void Show (string msg) {
             var ms = new Dialog (string.Empty, null, DialogFlags.DestroyWithParent);
+            ms.KeepAbove = true;
 
             #if RPI_BUILD
-            Decorated = false;
+            ms.Decorated = false;
             #endif
 
             ms.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
@@ -30,6 +31,19 @@ namespace MyWidgetLibrary
             ms.VBox.Add (label);
             label.Show ();
 
+            ms.ExposeEvent += (o, args) => {
+                using (Context cr = Gdk.CairoHelper.Create (ms.GdkWindow)) {
+                    cr.MoveTo (ms.Allocation.Left, ms.Allocation.Top);
+                    cr.LineTo (ms.Allocation.Right, ms.Allocation.Top);
+                    cr.LineTo (ms.Allocation.Right, ms.Allocation.Bottom);
+                    cr.LineTo (ms.Allocation.Left, ms.Allocation.Bottom);
+                    cr.ClosePath ();
+                    cr.LineWidth = 1.8;
+                    MyColor.SetSource (cr, "grey4");
+                    cr.Stroke ();
+                }
+            };
+
             ms.Run ();
             ms.Destroy ();
         }
@@ -37,10 +51,12 @@ namespace MyWidgetLibrary
 
     public class TouchMessageDialog : Gtk.Dialog
     {
-        public TouchMessageDialog (string msg) 
-            : base (string.Empty, null, DialogFlags.DestroyWithParent)
+        public TouchMessageDialog (string msg, Gtk.Window parent) 
+            : base (string.Empty, parent, DialogFlags.DestroyWithParent)
         {
             this.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+
+            this.KeepAbove = true;
 
             #if RPI_BUILD
             Decorated = false;
@@ -67,6 +83,19 @@ namespace MyWidgetLibrary
             label.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             this.VBox.Add (label);
             label.Show ();
+
+            ExposeEvent += (o, args) => {
+                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                    cr.MoveTo (Allocation.Left, Allocation.Top);
+                    cr.LineTo (Allocation.Right, Allocation.Top);
+                    cr.LineTo (Allocation.Right, Allocation.Bottom);
+                    cr.LineTo (Allocation.Left, Allocation.Bottom);
+                    cr.ClosePath ();
+                    cr.LineWidth = 1.8;
+                    MyColor.SetSource (cr, "grey4");
+                    cr.Stroke ();
+                }
+            };
         }
     }
 }

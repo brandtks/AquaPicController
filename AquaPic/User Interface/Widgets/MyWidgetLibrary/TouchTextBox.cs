@@ -94,7 +94,16 @@ namespace MyWidgetLibrary
 
         protected void OnTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
             if (enableTouch) {
-                TouchNumberInput t = new TouchNumberInput (includeTimeFunctions);
+                TouchNumberInput t;
+
+                var parent = this.Toplevel as Gtk.Window;
+                if (parent != null) {
+                    if (parent.IsTopLevel)
+                        t = new TouchNumberInput (includeTimeFunctions, parent);
+                    else
+                        t = new TouchNumberInput (includeTimeFunctions);
+                } else
+                    t = new TouchNumberInput (includeTimeFunctions);
 
                 if (!string.IsNullOrWhiteSpace (name))
                     t.Title = name;

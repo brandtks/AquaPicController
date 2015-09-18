@@ -248,7 +248,7 @@ namespace AquaPic.UserInterface
             conditions = lConditions.ToArray ();
 
             try {
-                script = Script.CompileNoThrowOutletConditionCheck (conditions);
+                script = Script.CompileOutletConditionCheckNoCatch (conditions);
                 script.OutletConditionCheck ();
             } catch (Exception ex) {
                 TouchMessageBox.Show (ex.Message);

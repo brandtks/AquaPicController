@@ -43,7 +43,12 @@ namespace AquaPic.UserInterface
 
         protected void OnButtonClick (object sender, ButtonReleaseEventArgs args) {
             TouchButton b = sender as TouchButton;
-            GuiGlobal.ChangeScreens (b.text);
+
+            if (b.text == "Settings") {
+                var tl = this.Toplevel;
+                GuiGlobal.ChangeScreens (b.text, tl);
+            } else
+                GuiGlobal.ChangeScreens (b.text);
         }
     }
 }

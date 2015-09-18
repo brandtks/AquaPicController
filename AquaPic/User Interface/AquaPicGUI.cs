@@ -24,8 +24,8 @@ namespace AquaPic.UserInterface
             this.AllowGrow = false;
 
             #if RPI_BUILD
-            this.Fullscreen ();
             this.Decorated = false;
+            //this.Fullscreen ();
             #endif
 
             GLib.ExceptionManager.UnhandledException += (args) => {
@@ -97,6 +97,20 @@ namespace AquaPic.UserInterface
                 cr.Fill ();
                 pat.Dispose ();
             }
+        }
+
+        public void ShowDecoration () {
+            f.Move (menu, 0, 380);
+            SetSizeRequest (800, 425);
+            Decorated = true;
+        }
+
+        public void HideDecoration () {
+            f.Move (menu, 0, 435);
+            SetSizeRequest (800, 480);
+            #if RPI_BUILD
+            Decorated = false;
+            #endif
         }
     }
 }

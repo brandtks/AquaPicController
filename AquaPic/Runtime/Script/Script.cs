@@ -4,8 +4,7 @@ using CSScriptLibrary;
 
 namespace AquaPic.Runtime
 {
-    public interface IOutletScript
-    {
+    public interface IOutletScript {
         bool OutletConditionCheck ();
     }
 
@@ -13,7 +12,7 @@ namespace AquaPic.Runtime
     {
         public static IOutletScript CompileOutletConditionCheck (string[] conditions) {
             try {
-                return CompileNoThrowOutletConditionCheck (conditions);
+                return CompileOutletConditionCheckNoCatch (conditions);
             } catch (Exception ex) {
                 Logger.AddError (ex.ToString ());
             }
@@ -21,7 +20,7 @@ namespace AquaPic.Runtime
             return null;
         }
 
-        public static IOutletScript CompileNoThrowOutletConditionCheck (string[] conditions) {
+        public static IOutletScript CompileOutletConditionCheckNoCatch (string[] conditions) {
             StringBuilder sb = new StringBuilder ();
             sb.AppendLine ("using AquaPic.Runtime;");
             sb.AppendLine ("using AquaPic.Modules;");

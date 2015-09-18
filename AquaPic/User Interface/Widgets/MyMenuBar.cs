@@ -32,15 +32,17 @@ namespace AquaPic.UserInterface
 
         protected void onExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                int bottom = Allocation.Bottom + 1;
+
                 int x = 0;
                 int width = 134;
 
                 foreach (var screen in GuiGlobal.menuWindows) {
                     ScreenData s = GuiGlobal.allWindows [screen];
                     if ((GuiGlobal.currentScreen == s.name) || (menuTouched && (highlightedScreen == s.name))) {
-                        cr.Rectangle (x, 435, width, 45);
+                        cr.Rectangle (x, bottom - 45, width, 45);
                     } else
-                        cr.Rectangle (x, 472, width, 8);
+                        cr.Rectangle (x, bottom - 8, width, 8);
 
                     MyColor.SetSource (cr, GuiGlobal.menuColors [GuiGlobal.menuWindows.IndexOf (screen)]);
                     cr.Fill ();
