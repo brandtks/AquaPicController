@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
 using AquaPic.Utilites;
+using AquaPic.Modules;
 
 namespace AquaPic.UserInterface
 {
@@ -88,6 +89,23 @@ namespace AquaPic.UserInterface
 //            b3.text = "Test Alarm";
 //            testAlarmIndex = Alarm.Subscribe ("Test Alarm", true);
 //            Put (b3, 459, 330);
+
+            var names = Lighting.GetAllFixtureNames ();
+            foreach (var name in names) {
+                int fixtureId = Lighting.GetFixtureIndex (name);
+                if (Lighting.IsDimmingFixture (fixtureId)) {
+                    if (!MainWindowWidgets.barPlots.ContainsKey (name))
+                        MainWindowWidgets.barPlots.Add (
+                            name, 
+                            new BarPlotData (() => {
+                                return new DimmingLightBarPlot (
+                                    name, 
+                                    () => {return Lighting.GetCurrentDimmingLevel (fixtureId);}
+                                );}
+                            )
+                        );
+                }
+            }
 
             linePlots = new List<LinePlotWidget> ();
             barPlots = new List<BarPlotWidget> ();

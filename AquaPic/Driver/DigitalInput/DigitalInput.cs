@@ -128,6 +128,22 @@ namespace AquaPic.Drivers
             return null;
         }
 
+        public static IndividualControl GetInputIndividualControl (string name) {
+            IndividualControl input;
+
+            for (int i = 0; i < cards.Count; ++i) {
+                for (int j = 0; j < cards [i].inputs.Length; ++j) {
+                    if (string.Equals (cards [i].inputs [j].name, name, StringComparison.InvariantCultureIgnoreCase)) {
+                        input.Group = i;
+                        input.Individual = j;
+                        return input;
+                    }
+                }
+            }
+
+            throw new ArgumentException (name + " does not exists");
+        }
+
         public static bool[] GetAllStates (int cardId) {
             if ((cardId >= 0) && (cardId < cards.Count)) {
                 bool[] types = new bool[cards [cardId].inputs.Length];

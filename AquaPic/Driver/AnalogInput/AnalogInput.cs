@@ -182,14 +182,14 @@ namespace AquaPic.Drivers
         }
 
         public static IndividualControl GetChannelIndividualControl (string name) {
-            IndividualControl outlet;
+            IndividualControl channel;
 
             for (int i = 0; i < cards.Count; ++i) {
                 for (int j = 0; j < cards [i].channels.Length; ++j) {
                     if (string.Equals (cards [i].channels [j].name, name, StringComparison.InvariantCultureIgnoreCase)) {
-                        outlet.Group = (byte)i;
-                        outlet.Individual = (byte)j;
-                        return outlet;
+                        channel.Group = (byte)i;
+                        channel.Individual = (byte)j;
+                        return channel;
                     }
                 }
             }

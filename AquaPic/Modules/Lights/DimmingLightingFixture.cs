@@ -2,7 +2,6 @@
 using AquaPic.Drivers;
 using AquaPic.Utilites;
 using AquaPic.Runtime;
-using AquaPic.UserInterface;
 
 namespace AquaPic.Modules
 {
@@ -58,8 +57,6 @@ namespace AquaPic.Modules
                 Power.AddHandlerOnModeChange (
                     plug,
                     OnLightingPlugModeChange);
-
-                MainWindowWidgets.barPlots.Add (name, new BarPlotData (() => {return new DimmingLightBarPlot (name, () => {return currentDimmingLevel;});}));
             }
 
             public float OnSetDimmingLevel () {
