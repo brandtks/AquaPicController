@@ -224,6 +224,13 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
+            List<string> code = new List<string> ();
+            JArray ja2 = (JArray)ja [arrIdx] ["conditions"];
+            foreach (var jt2 in ja2)
+                code.Add ((string)jt2);
+
+            Script.UndoPreprocessor (code);
+
             ja.RemoveAt (arrIdx);
 
             File.WriteAllText (path, ja.ToString ());
@@ -240,14 +247,12 @@ namespace AquaPic.UserInterface
             }
 
             conditions = tv.Buffer.Text.Split (new string[] {Environment.NewLine, "\n"}, StringSplitOptions.None);
-            List<string> lConditions = new List<string> ();
-            foreach (var cond in conditions) {
-                if (!string.IsNullOrWhiteSpace (cond))
-                    lConditions.Add (cond);
-            }
-            conditions = lConditions.ToArray ();
+//            List<string> cond = new List<string> ();
+//            foreach (var c in conditions)
+//                cond.Add (c);
 
             try {
+                Script.UndoPreprocessor (conditions);
                 script = Script.CompileOutletConditionCheckNoCatch (conditions);
                 script.OutletConditionCheck ();
             } catch (Exception ex) {

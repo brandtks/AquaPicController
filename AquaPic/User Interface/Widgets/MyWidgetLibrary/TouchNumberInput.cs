@@ -26,13 +26,6 @@ namespace MyWidgetLibrary
 
             #if RPI_BUILD
             Decorated = false;
-            #endif
-
-            fix = new Fixed ();
-            fix.WidthRequest = 205;
-            fix.HeightRequest = 290;
-
-            this.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
 
             ExposeEvent += (o, args) => {
                 using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
@@ -46,6 +39,15 @@ namespace MyWidgetLibrary
                     cr.Stroke ();
                 }
             };
+            #endif
+
+            fix = new Fixed ();
+            fix.WidthRequest = 205;
+            fix.HeightRequest = 290;
+
+            this.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+
+
 
             entry = new Entry ();
             entry.WidthRequest = 145;

@@ -14,7 +14,7 @@ namespace AquaPic.Runtime
 
     public class Script
     {
-        public static IOutletScript CompileOutletConditionCheck (string[] conditions) {
+        public static IOutletScript CompileOutletConditionCheck (IEnumerable<string> conditions) {
             try {
                 return CompileOutletConditionCheckNoCatch (conditions);
             } catch (Exception ex) {
@@ -24,7 +24,7 @@ namespace AquaPic.Runtime
             return null;
         }
 
-        public static IOutletScript CompileOutletConditionCheckNoCatch (string[] conditions) {
+        public static IOutletScript CompileOutletConditionCheckNoCatch (IEnumerable<string> conditions) {
             List<string> cond = conditions.ToList<string> ();
             List<string> preprocess = new List<string> ();
 
@@ -37,8 +37,6 @@ namespace AquaPic.Runtime
             foreach (var rm in preprocess)
                 cond.Remove (rm);
 
-            conditions = cond.ToArray ();
-
             StringBuilder sb = new StringBuilder ();
             sb.AppendLine ("using AquaPic.Runtime;");
             sb.AppendLine ("using AquaPic.Modules;");
@@ -47,7 +45,7 @@ namespace AquaPic.Runtime
             sb.AppendLine ("using AquaPic.SerialBus;");
             sb.AppendLine ("public class MyOutletScipt : IOutletScript {");
             sb.AppendLine ("public bool OutletConditionCheck () {");
-            foreach (var s in conditions) {
+            foreach (var s in cond) {
                 sb.AppendLine (s);
             }
             sb.AppendLine ("}");
@@ -59,23 +57,54 @@ namespace AquaPic.Runtime
 
             //"preprocessor" conditions are ran after the code is compiled because these add actual real world stuff
             if (outletScript != null) {
-                foreach (var pre in preprocess) {
-                    string line = pre;
-                    int idx = line.IndexOf (' ') + 1;
-                    line = line.Substring (idx);
-                    idx = line.IndexOf (' ');
-                    string eq = line.Substring (0, idx);
-                    line = line.Substring (idx + 1);
-                    if (string.Equals (eq, "DigitalInput", StringComparison.InvariantCultureIgnoreCase)) {
-                        var args = line.Split (',');
-                        int cardId = DigitalInput.GetCardIndex (args [0]);
-                        int inputId = Convert.ToInt32 (args [1]);
-                        DigitalInput.AddInput (cardId, inputId, args [2]);
-                    }
-                }
+                EvaluatePreprocessor (preprocess);
             }
 
             return outletScript;
+        }
+
+        protected static void EvaluatePreprocessor (IEnumerable<string> preprocess) {
+            foreach (var pre in preprocess) {
+                string line = pre;
+                int idx = line.IndexOf (' ') + 1;
+                line = line.Substring (idx);
+                idx = line.IndexOf (' ');
+                string eq = line.Substring (0, idx);
+                line = line.Substring (idx + 1);
+
+                if (string.Equals (eq, "DigitalInput", StringComparison.InvariantCultureIgnoreCase)) {
+                    var args = line.Split (',');
+                    int cardId = DigitalInput.GetCardIndex (args [0]);
+                    int inputId = Convert.ToInt32 (args [1]);
+                    DigitalInput.AddInput (cardId, inputId, args [2]);
+                }
+            }
+        }
+
+        public static void UndoPreprocessor (IEnumerable<string> conditions) {
+            List<string> preprocess = new List<string> ();
+
+            foreach (var l in conditions) {
+                string line = l.Trim ();
+                if (line.StartsWith ("#hardware"))
+                    preprocess.Add (line);
+            }
+
+            foreach (var pre in preprocess) {
+                string line = pre;
+                int idx = line.IndexOf (' ') + 1;
+                line = line.Substring (idx);
+                idx = line.IndexOf (' ');
+                string eq = line.Substring (0, idx);
+                line = line.Substring (idx + 1);
+
+                if (string.Equals (eq, "DigitalInput", StringComparison.InvariantCultureIgnoreCase)) {
+                    var args = line.Split (',');
+                    int cardId = DigitalInput.GetCardIndex (args [0]);
+                    int inputId = Convert.ToInt32 (args [1]);
+                    DigitalInput.RemoveInput (cardId, inputId);
+                }
+            }
         }
     }
 }

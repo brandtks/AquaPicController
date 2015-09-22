@@ -23,6 +23,8 @@ namespace AquaPic.UserInterface
             this.Resizable = false;
             this.AllowGrow = false;
 
+            this.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+
             #if RPI_BUILD
             this.Decorated = false;
             //this.Fullscreen ();
@@ -42,13 +44,13 @@ namespace AquaPic.UserInterface
             f = new Fixed ();
             f.SetSizeRequest (800, 480);
 
-            var background = new EventBox ();
-            background.Visible = true;
-            background.VisibleWindow = false;
-            background.SetSizeRequest (800, 480);
-            background.ExposeEvent += OnBackGroundExpose;
-            f.Put (background, 0, 0);
-            background.Show ();
+//            var background = new EventBox ();
+//            background.Visible = true;
+//            background.VisibleWindow = false;
+//            background.SetSizeRequest (800, 480);
+//            background.ExposeEvent += OnBackGroundExpose;
+//            f.Put (background, 0, 0);
+//            background.Show ();
 
             var notification = new MyNotificationBar ();
             f.Put (notification, 0, 0);

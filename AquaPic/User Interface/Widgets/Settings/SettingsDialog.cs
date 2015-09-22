@@ -32,6 +32,19 @@ namespace MyWidgetLibrary
 
             #if RPI_BUILD
             Decorated = false;
+
+            ExposeEvent += (o, args) => {
+                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                    cr.MoveTo (Allocation.Left, Allocation.Top);
+                    cr.LineTo (Allocation.Right, Allocation.Top);
+                    cr.LineTo (Allocation.Right, Allocation.Bottom);
+                    cr.LineTo (Allocation.Left, Allocation.Bottom);
+                    cr.ClosePath ();
+                    cr.LineWidth = 1.8;
+                    MyColor.SetSource (cr, "grey4");
+                    cr.Stroke ();
+                }
+            };
             #endif
 
             ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));

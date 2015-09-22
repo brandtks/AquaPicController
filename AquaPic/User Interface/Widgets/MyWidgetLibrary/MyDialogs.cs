@@ -12,6 +12,19 @@ namespace MyWidgetLibrary
 
             #if RPI_BUILD
             ms.Decorated = false;
+
+            ms.ExposeEvent += (o, args) => {
+                using (Context cr = Gdk.CairoHelper.Create (ms.GdkWindow)) {
+                    cr.MoveTo (ms.Allocation.Left, ms.Allocation.Top);
+                    cr.LineTo (ms.Allocation.Right, ms.Allocation.Top);
+                    cr.LineTo (ms.Allocation.Right, ms.Allocation.Bottom);
+                    cr.LineTo (ms.Allocation.Left, ms.Allocation.Bottom);
+                    cr.ClosePath ();
+                    cr.LineWidth = 1.8;
+                    MyColor.SetSource (cr, "grey4");
+                    cr.Stroke ();
+                }
+            };
             #endif
 
             ms.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
@@ -31,19 +44,6 @@ namespace MyWidgetLibrary
             ms.VBox.Add (label);
             label.Show ();
 
-            ms.ExposeEvent += (o, args) => {
-                using (Context cr = Gdk.CairoHelper.Create (ms.GdkWindow)) {
-                    cr.MoveTo (ms.Allocation.Left, ms.Allocation.Top);
-                    cr.LineTo (ms.Allocation.Right, ms.Allocation.Top);
-                    cr.LineTo (ms.Allocation.Right, ms.Allocation.Bottom);
-                    cr.LineTo (ms.Allocation.Left, ms.Allocation.Bottom);
-                    cr.ClosePath ();
-                    cr.LineWidth = 1.8;
-                    MyColor.SetSource (cr, "grey4");
-                    cr.Stroke ();
-                }
-            };
-
             ms.Run ();
             ms.Destroy ();
         }
@@ -60,6 +60,19 @@ namespace MyWidgetLibrary
 
             #if RPI_BUILD
             Decorated = false;
+
+            ExposeEvent += (o, args) => {
+                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                    cr.MoveTo (Allocation.Left, Allocation.Top);
+                    cr.LineTo (Allocation.Right, Allocation.Top);
+                    cr.LineTo (Allocation.Right, Allocation.Bottom);
+                    cr.LineTo (Allocation.Left, Allocation.Bottom);
+                    cr.ClosePath ();
+                    cr.LineWidth = 1.8;
+                    MyColor.SetSource (cr, "grey4");
+                    cr.Stroke ();
+                }
+            };
             #endif
 
             var btn = new TouchButton ();
@@ -83,19 +96,6 @@ namespace MyWidgetLibrary
             label.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             this.VBox.Add (label);
             label.Show ();
-
-            ExposeEvent += (o, args) => {
-                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
-                    cr.MoveTo (Allocation.Left, Allocation.Top);
-                    cr.LineTo (Allocation.Right, Allocation.Top);
-                    cr.LineTo (Allocation.Right, Allocation.Bottom);
-                    cr.LineTo (Allocation.Left, Allocation.Bottom);
-                    cr.ClosePath ();
-                    cr.LineWidth = 1.8;
-                    MyColor.SetSource (cr, "grey4");
-                    cr.Stroke ();
-                }
-            };
         }
     }
 }
