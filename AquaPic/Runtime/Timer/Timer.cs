@@ -53,16 +53,12 @@ namespace AquaPic.Runtime
             GLib.Source.Remove (timerId);
         }
 
-        protected bool OnTimeout () {
+        protected virtual bool OnTimeout () {
             if (_enabled) {
-                CallElapsedEvents ();
+                if (TimerElapsedEvent != null)
+                    TimerElapsedEvent (this, new TimerElapsedEventArgs ());
             }
             return _enabled & autoReset;
-        }
-
-        protected void CallElapsedEvents () {
-            if (TimerElapsedEvent != null)
-                TimerElapsedEvent (this, new TimerElapsedEventArgs ());
         }
     }
 }

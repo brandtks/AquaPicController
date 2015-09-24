@@ -101,7 +101,7 @@ namespace AquaPic.UserInterface
             Put (seconds, 125, 32);
 
             secUpDown = new UpDownButtons ();
-            secUpDown.up.ButtonPressEvent += (o, args) => {
+            secUpDown.up.ButtonReleaseEvent += (o, args) => {
                 if (!timers[t].enabled) {
                     uint time = Convert.ToUInt32 (minutes.text) * 60;
                     time += Convert.ToUInt32 (seconds.text);
@@ -109,7 +109,7 @@ namespace AquaPic.UserInterface
                     UpdateTime (time);
                 }
             };
-            secUpDown.down.ButtonPressEvent += (o, args) => {
+            secUpDown.down.ButtonReleaseEvent += (o, args) => {
                 if (!timers[t].enabled) {
                     uint time = Convert.ToUInt32 (minutes.text) * 60;
                     time += Convert.ToUInt32 (seconds.text);
@@ -185,8 +185,8 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnResetButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            if (timers [t].enabled) {
-                timers [t].Stop ();
+            if (timers [t].state != DeluxeTimerState.Waiting) {
+                timers [t].Reset ();
             }
 
             if (timers [t].secondsRemaining != timers [t].totalSeconds)
@@ -230,7 +230,7 @@ namespace AquaPic.UserInterface
                 tabs [i].QueueDraw ();
             }
 
-            if ((timers [t].secondsRemaining == timers [t].totalSeconds) && !timers [t].enabled)
+            if (timers [t].state == DeluxeTimerState.Waiting)
                 resetButton.buttonColor = "grey2";
             else
                 resetButton.buttonColor = "pri";
