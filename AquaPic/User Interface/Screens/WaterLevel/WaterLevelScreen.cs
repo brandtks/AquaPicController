@@ -119,6 +119,10 @@ namespace AquaPic.UserInterface
                         (float)aa.fullScaleValue);
                 };
 
+                cal.calArgs.zeroValue = WaterLevel.analogSensorZeroCalibrationValue;
+                cal.calArgs.fullScaleActual = WaterLevel.analogSensorFullScaleCalibrationActual;
+                cal.calArgs.fullScaleValue = WaterLevel.analogSensorFullScaleCalibrationValue;
+
                 cal.Run ();
                 cal.Destroy ();
             };

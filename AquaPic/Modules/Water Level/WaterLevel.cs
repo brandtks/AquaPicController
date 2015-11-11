@@ -43,6 +43,24 @@ namespace AquaPic.Modules
             }
         }
 
+        public static float analogSensorZeroCalibrationValue {
+            get {
+                return analogSensor.zeroValue;
+            }
+        }
+
+        public static float analogSensorFullScaleCalibrationActual {
+            get {
+                return analogSensor.fullScaleActual;
+            }
+        }
+
+        public static float analogSensorFullScaleCalibrationValue {
+            get {
+                return analogSensor.fullScaleValue;
+            }
+        }
+
         public static IndividualControl analogSensorChannel {
             get {
                 return analogSensor.sensorChannel;

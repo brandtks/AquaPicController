@@ -29,13 +29,13 @@ namespace MyWidgetLibrary
     public class CalibrationDialog : Gtk.Dialog
     {
         private TextView tv;
-        private CalibrationArguments calArgs;
         private TouchTextBox valTb;
-        private TouchButton actionBtn;
+        private TouchButton actionBtn, skipBtn;
         private uint timerId;
-        private bool forced;
+        private bool forced, init;
+        private CalibrationState calState;
 
-        public Fixed fix;
+        protected Fixed fix;
 
         public string zeroValueInstructions;
         public string fullScaleActualInstructions;
@@ -44,7 +44,7 @@ namespace MyWidgetLibrary
         public GetCalibrationValueHandler GetCalibrationValue;
         public event CalibrationCompleteHandler CalibrationCompleteEvent;
 
-        public CalibrationState calState;
+        public CalibrationArguments calArgs;
 
         public CalibrationDialog (string name, GetCalibrationValueHandler GetCalibrationValue) {
             Name = "AquaPic.Calibration." + name;
@@ -76,20 +76,33 @@ namespace MyWidgetLibrary
                 w.Dispose ();
             }
 
-            Realized += (sender, e) => {
-                TextBuffer tb = tv.Buffer;
-                if (!string.IsNullOrWhiteSpace (zeroValueInstructions))
-                    tb.Text = zeroValueInstructions;
-                else
-                    tb.Text = "Please the instrument in its zero state.\n" +
-                        "Once value has settled, press the button";
-                tv.QueueDraw ();
+            ExposeEvent += (sender, e) => {
+                if (!init) {
+                    TextBuffer tb = tv.Buffer;
+                    if (!string.IsNullOrWhiteSpace (zeroValueInstructions))
+                        tb.Text = zeroValueInstructions;
+                    else
+                        tb.Text = "Please the instrument in its zero state.\n" +
+                            "Once value has settled, press the button.\n\n";
+
+                    var tag = new TextTag (null);
+                    tag.ForegroundGdk = MyColor.NewGtkColor ("seca");
+                    tb.TagTable.Add (tag);
+
+                    var ti = tb.EndIter;
+                    tb.InsertWithTags (ref ti, string.Format ("Previous zero actual: {0:F2}", calArgs.zeroValue), tag);
+
+                    tv.QueueDraw ();
+
+                    init = true;
+                }
             };
 
             this.GetCalibrationValue = GetCalibrationValue;
             calState = CalibrationState.ZeroValue;
             calArgs = new CalibrationArguments ();
             forced = false;
+            init = false;
 
             fix = new Fixed ();
             fix.SetSizeRequest (600, 300);
@@ -102,31 +115,31 @@ namespace MyWidgetLibrary
             tv.Editable = false;
 
             ScrolledWindow sw = new ScrolledWindow ();
-            sw.SetSizeRequest (580, 240);
+            sw.SetSizeRequest (580, 225);
             sw.Add (tv);
             tv.Show ();
-            fix.Put (sw, 10, 10);
+            fix.Put (sw, 10, 25);
             sw.Show ();
 
             var l = new TouchLabel ();
-            l.SetSizeRequest (90, 30);
-            l.text = "Current Value";
-            l.textAlignment = MyAlignment.Right;
-            l.textHorizontallyCentered = true;
-            fix.Put (l, 10, 260);
+            l.text = name;
+            l.WidthRequest = 600;
+            l.textAlignment = MyAlignment.Center;
+            fix.Put (l, 0, 3);
             l.Show ();
 
             valTb = new TouchTextBox ();
-            valTb.SetSizeRequest (120, 30);
+            valTb.SetSizeRequest (110, 30);
+            valTb.textAlignment = MyAlignment.Center;
             valTb.text = GetCalibrationValue ().ToString ("F2");
-            fix.Put (valTb, 105, 260);
+            fix.Put (valTb, 10, 260);
             valTb.Show ();
 
             actionBtn = new TouchButton ();
             actionBtn.SetSizeRequest (150, 30);
             actionBtn.text = "Zero";
             actionBtn.ButtonReleaseEvent += OnActionButtonReleaseEvent;
-            fix.Put (actionBtn, 335, 260);
+            fix.Put (actionBtn, 440, 260);
             actionBtn.Show ();
 
             var cancelBtn = new TouchButton ();
@@ -134,15 +147,23 @@ namespace MyWidgetLibrary
             cancelBtn.text = "Cancel";
             cancelBtn.buttonColor = "compl";
             cancelBtn.ButtonReleaseEvent += (o, args) => Destroy ();
-            fix.Put (cancelBtn, 490, 260);
+            fix.Put (cancelBtn, 335, 260);
             cancelBtn.Show ();
+
+            skipBtn = new TouchButton ();
+            skipBtn.SetSizeRequest (100, 30);
+            skipBtn.text = "Skip";
+            skipBtn.buttonColor = "seca";
+            skipBtn.ButtonReleaseEvent += OnSkipButtonReleaseEvent;
+            fix.Put (skipBtn, 230, 260);
+            skipBtn.Show ();
 
             var forceBtn = new TouchButton ();
             forceBtn.SetSizeRequest (100, 30);
             forceBtn.text = "Force";
             forceBtn.buttonColor = "grey3";
             forceBtn.ButtonReleaseEvent += OnForceButtonReleaseEvent;
-            fix.Put (forceBtn, 230, 260);
+            fix.Put (forceBtn, 125, 260);
             forceBtn.Show ();
 
             Add (fix);
@@ -173,8 +194,6 @@ namespace MyWidgetLibrary
         }
 
         protected void OnActionButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
-            TextBuffer tb;
-
             switch (calState) {
             case CalibrationState.ZeroValue:
                 if (!forced)
@@ -182,6 +201,44 @@ namespace MyWidgetLibrary
                 else
                     calArgs.zeroValue = Convert.ToDouble (valTb.text);
 
+                MoveToNextState ();
+                break;
+            case CalibrationState.FullScaleActual:
+                if (valTb.text == "Actual")
+                    TouchMessageBox.Show ("Please enter the full scale actual value");
+                else {
+                    calArgs.fullScaleActual = Convert.ToDouble (valTb.text);
+                    MoveToNextState ();
+                }
+                
+                break;
+            case CalibrationState.FullScaleValue:
+                if (!forced)
+                    calArgs.fullScaleValue = GetCalibrationValue ();
+                else
+                    calArgs.fullScaleValue = Convert.ToDouble (valTb.text);
+
+                if (CalibrationCompleteEvent != null)
+                    CalibrationCompleteEvent (calArgs);
+                
+                Destroy ();
+                break;
+            default:
+                break;
+            }
+        }
+
+        protected void OnSkipButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
+            MoveToNextState ();
+        }
+
+        protected void MoveToNextState () {
+            TextBuffer tb;
+            TextTag tag;
+            TextIter ti;
+
+            switch (calState) {
+            case CalibrationState.ZeroValue:
                 if (!forced) {
                     valTb.enableTouch = true;
                     valTb.TextChangedEvent += OnValueTextBoxTextChanged;
@@ -197,17 +254,20 @@ namespace MyWidgetLibrary
                     tb.Text = fullScaleActualInstructions;
                 else
                     tb.Text = "Please enter the full scale actual value.\n" +
-                        "Once the full scale value is entered press the button";
+                        "Once the full scale value is entered press the button.\n\n";
+
+                tag = new TextTag (null);
+                tag.ForegroundGdk = MyColor.NewGtkColor ("seca");
+                tb.TagTable.Add (tag);
+
+                ti = tb.EndIter;
+                tb.InsertWithTags (ref ti, string.Format ("Previous full scale actual: {0:F2}", calArgs.fullScaleActual), tag);
+
                 tv.QueueDraw ();
 
                 calState = CalibrationState.FullScaleActual;
                 break;
             case CalibrationState.FullScaleActual:
-                if (valTb.text == "Actual")
-                    TouchMessageBox.Show ("Please enter the full scale actual value");
-                else
-                    calArgs.fullScaleActual = Convert.ToDouble (valTb.text);
-
                 if (!forced) {
                     valTb.enableTouch = false;
                     valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
@@ -224,21 +284,21 @@ namespace MyWidgetLibrary
                     tb.Text = fullScaleValueInstructions;
                 else
                     tb.Text = "Please the instrument in its full scale state.\n" +
-                        "Once value has settled, press the button";
+                    "Once value has settled, press the button.\n\n";
+
+                tag = new TextTag (null);
+                tag.ForegroundGdk = MyColor.NewGtkColor ("seca");
+                tb.TagTable.Add (tag);
+
+                ti = tb.EndIter;
+                tb.InsertWithTags (ref ti, string.Format ("Previous full scale value: {0:F2}", calArgs.fullScaleValue), tag);
+
                 tv.QueueDraw ();
 
-                calState = CalibrationState.FullScaleValue;
-                break;
-            case CalibrationState.FullScaleValue:
-                if (!forced)
-                    calArgs.fullScaleValue = GetCalibrationValue ();
-                else
-                    calArgs.fullScaleValue = Convert.ToDouble (valTb.text);
+                skipBtn.buttonColor = "grey3";
+                skipBtn.ButtonReleaseEvent -= OnSkipButtonReleaseEvent;
 
-                if (CalibrationCompleteEvent != null)
-                    CalibrationCompleteEvent (calArgs);
-                
-                Destroy ();
+                calState = CalibrationState.FullScaleValue;
                 break;
             default:
                 break;
