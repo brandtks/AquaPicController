@@ -236,6 +236,39 @@ namespace AquaPic.Modules
 
                 analogSensor = new AnalogSensor (enable, highAlarmSetpoint, lowAlarmSetpoint, ic);
 
+                text = (string)jo ["ZeroCalibrationValue"];
+                if (string.IsNullOrWhiteSpace (text))
+                    analogSensor.zeroValue = 819.2f;
+                else {
+                    try {
+                        analogSensor.zeroValue = Convert.ToSingle (text);
+                    } catch {
+                        analogSensor.zeroValue = 819.2f;
+                    }
+                }
+
+                text = (string)jo ["FullScaleCalibrationActual"];
+                if (string.IsNullOrWhiteSpace (text))
+                    analogSensor.fullScaleActual = 15.0f;
+                else {
+                    try {
+                        analogSensor.fullScaleActual = Convert.ToSingle (text);
+                    } catch {
+                        analogSensor.fullScaleActual = 15.0f;
+                    }
+                }
+
+                text = (string)jo ["FullScaleCalibrationValue"];
+                if (string.IsNullOrWhiteSpace (text))
+                    analogSensor.fullScaleValue = 4096.0f;
+                else {
+                    try {
+                        analogSensor.fullScaleValue = Convert.ToSingle (text);
+                    } catch {
+                        analogSensor.fullScaleValue = 4096.0f;
+                    }
+                }
+
                 //Float Switches
                 floatSwitches = new List<FloatSwitch> ();
                 JArray ja = (JArray)jo ["floatSwitches"];
@@ -388,6 +421,37 @@ namespace AquaPic.Modules
             }
 
             ato.Run ();
+        }
+
+        /**************************************************************************************************************/
+        /* Analog Sensor                                                                                              */
+        /**************************************************************************************************************/
+        public static void SetCalibrationData (float zeroValue, float fullScaleActual, float fullScaleValue) {
+            if (fullScaleValue <= zeroValue)
+                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
+
+            if (fullScaleActual < 0.0f)
+                throw new ArgumentException ("Full scale actual can't be less than zero");
+
+            if (fullScaleActual > 15.0f)
+                throw new ArgumentException ("Full scale actual can't be greater than 15");
+
+            analogSensor.zeroValue = zeroValue;
+            analogSensor.fullScaleActual = fullScaleActual;
+            analogSensor.fullScaleValue = fullScaleValue;
+
+            string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = Path.Combine (path, "Settings");
+            path = Path.Combine (path, "waterLevelProperties.json");
+
+            string jstring = File.ReadAllText (path);
+            JObject jo = (JObject)JToken.Parse (jstring);
+
+            jo ["ZeroCalibrationValue"] = analogSensor.zeroValue.ToString ();
+            jo ["FullScaleCalibrationActual"] = analogSensor.fullScaleActual.ToString ();
+            jo ["FullScaleCalibrationValue"] = analogSensor.fullScaleValue.ToString ();
+
+            File.WriteAllText (path, jo.ToString ());
         }
 
         /**************************************************************************************************************/

@@ -5,15 +5,52 @@ using Gtk;
 
 namespace MyWidgetLibrary
 {
+    public class CalibrationArguments {
+        public double zeroValue;
+        public double fullScaleActual;
+        public double fullScaleValue;
+
+        public CalibrationArguments () {
+            this.zeroValue = 0;
+            this.fullScaleActual = 0;
+            this.fullScaleValue = 0;
+        }
+    }
+
+    public delegate void CalibrationCompleteHandler (CalibrationArguments args);
+    public delegate double GetCalibrationValueHandler ();
+
+    public enum CalibrationState {
+        ZeroValue,
+        FullScaleActual,
+        FullScaleValue
+    }
+
     public class CalibrationDialog : Gtk.Dialog
     {
+        private TextView tv;
+        private CalibrationArguments calArgs;
+        private TouchTextBox valTb;
+        private TouchButton actionBtn;
+        private uint timerId;
+        private bool forced;
+
         public Fixed fix;
 
-        public CalibrationDialog (string name) {
+        public string zeroValueInstructions;
+        public string fullScaleActualInstructions;
+        public string fullScaleValueInstructions;
+
+        public GetCalibrationValueHandler GetCalibrationValue;
+        public event CalibrationCompleteHandler CalibrationCompleteEvent;
+
+        public CalibrationState calState;
+
+        public CalibrationDialog (string name, GetCalibrationValueHandler GetCalibrationValue) {
             Name = "AquaPic.Calibration." + name;
             Title = name + " Calibration";
             WindowPosition = (Gtk.WindowPosition)4;
-            SetSizeRequest (600, 400);
+            SetSizeRequest (600, 300);
 
             #if RPI_BUILD
             Decorated = false;
@@ -34,15 +71,214 @@ namespace MyWidgetLibrary
 
             ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
 
-            foreach (Widget w in this.Children) {
+            foreach (var w in Children) {
                 Remove (w);
                 w.Dispose ();
             }
 
+            Realized += (sender, e) => {
+                TextBuffer tb = tv.Buffer;
+                if (!string.IsNullOrWhiteSpace (zeroValueInstructions))
+                    tb.Text = zeroValueInstructions;
+                else
+                    tb.Text = "Please the instrument in its zero state.\n" +
+                        "Once value has settled, press the button";
+                tv.QueueDraw ();
+            };
+
+            this.GetCalibrationValue = GetCalibrationValue;
+            calState = CalibrationState.ZeroValue;
+            calArgs = new CalibrationArguments ();
+            forced = false;
+
             fix = new Fixed ();
-            fix.SetSizeRequest (600, 400);
+            fix.SetSizeRequest (600, 300);
+
+            tv = new TextView ();
+            tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
+            tv.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
+            tv.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
+            tv.CanFocus = false;
+            tv.Editable = false;
+
+            ScrolledWindow sw = new ScrolledWindow ();
+            sw.SetSizeRequest (580, 240);
+            sw.Add (tv);
+            tv.Show ();
+            fix.Put (sw, 10, 10);
+            sw.Show ();
+
+            var l = new TouchLabel ();
+            l.SetSizeRequest (90, 30);
+            l.text = "Current Value";
+            l.textAlignment = MyAlignment.Right;
+            l.textHorizontallyCentered = true;
+            fix.Put (l, 10, 260);
+            l.Show ();
+
+            valTb = new TouchTextBox ();
+            valTb.SetSizeRequest (120, 30);
+            valTb.text = GetCalibrationValue ().ToString ("F2");
+            fix.Put (valTb, 105, 260);
+            valTb.Show ();
+
+            actionBtn = new TouchButton ();
+            actionBtn.SetSizeRequest (150, 30);
+            actionBtn.text = "Zero";
+            actionBtn.ButtonReleaseEvent += OnActionButtonReleaseEvent;
+            fix.Put (actionBtn, 335, 260);
+            actionBtn.Show ();
+
+            var cancelBtn = new TouchButton ();
+            cancelBtn.SetSizeRequest (100, 30);
+            cancelBtn.text = "Cancel";
+            cancelBtn.buttonColor = "compl";
+            cancelBtn.ButtonReleaseEvent += (o, args) => Destroy ();
+            fix.Put (cancelBtn, 490, 260);
+            cancelBtn.Show ();
+
+            var forceBtn = new TouchButton ();
+            forceBtn.SetSizeRequest (100, 30);
+            forceBtn.text = "Force";
+            forceBtn.buttonColor = "grey3";
+            forceBtn.ButtonReleaseEvent += OnForceButtonReleaseEvent;
+            fix.Put (forceBtn, 230, 260);
+            forceBtn.Show ();
+
+            Add (fix);
+            fix.Show ();
+
+            timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
 
             Show ();
+        }
+
+        public override void Dispose () {
+            GLib.Source.Remove (timerId);
+            base.Dispose ();
+        }
+
+        public override void Destroy () {
+            base.Destroy ();
+            Dispose ();
+        }
+
+        protected bool OnUpdateTimer () {
+            if ((calState != CalibrationState.FullScaleActual) && (!forced)) {
+                valTb.text = GetCalibrationValue ().ToString ("F2");
+                valTb.QueueDraw ();
+            }
+
+            return true;
+        }
+
+        protected void OnActionButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
+            TextBuffer tb;
+
+            switch (calState) {
+            case CalibrationState.ZeroValue:
+                if (!forced)
+                    calArgs.zeroValue = GetCalibrationValue ();
+                else
+                    calArgs.zeroValue = Convert.ToDouble (valTb.text);
+
+                if (!forced) {
+                    valTb.enableTouch = true;
+                    valTb.TextChangedEvent += OnValueTextBoxTextChanged;
+                }
+                valTb.text = "Actual";
+                valTb.QueueDraw ();
+
+                actionBtn.text = "Full Scale Actual";
+                actionBtn.QueueDraw ();
+
+                tb = tv.Buffer;
+                if (!string.IsNullOrWhiteSpace (fullScaleActualInstructions))
+                    tb.Text = fullScaleActualInstructions;
+                else
+                    tb.Text = "Please enter the full scale actual value.\n" +
+                        "Once the full scale value is entered press the button";
+                tv.QueueDraw ();
+
+                calState = CalibrationState.FullScaleActual;
+                break;
+            case CalibrationState.FullScaleActual:
+                if (valTb.text == "Actual")
+                    TouchMessageBox.Show ("Please enter the full scale actual value");
+                else
+                    calArgs.fullScaleActual = Convert.ToDouble (valTb.text);
+
+                if (!forced) {
+                    valTb.enableTouch = false;
+                    valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
+
+                }
+                valTb.text = GetCalibrationValue ().ToString ("F2");
+                valTb.QueueDraw ();
+
+                actionBtn.text = "Full Scale Value";
+                actionBtn.QueueDraw ();
+
+                tb = tv.Buffer;
+                if (!string.IsNullOrWhiteSpace (fullScaleValueInstructions))
+                    tb.Text = fullScaleValueInstructions;
+                else
+                    tb.Text = "Please the instrument in its full scale state.\n" +
+                        "Once value has settled, press the button";
+                tv.QueueDraw ();
+
+                calState = CalibrationState.FullScaleValue;
+                break;
+            case CalibrationState.FullScaleValue:
+                if (!forced)
+                    calArgs.fullScaleValue = GetCalibrationValue ();
+                else
+                    calArgs.fullScaleValue = Convert.ToDouble (valTb.text);
+
+                if (CalibrationCompleteEvent != null)
+                    CalibrationCompleteEvent (calArgs);
+                
+                Destroy ();
+                break;
+            default:
+                break;
+            }
+        }
+
+        protected void OnForceButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
+            var btn = sender as TouchButton;
+            if (btn != null) {
+                if (!forced) {
+                    btn.buttonColor = "pri";
+                    btn.QueueDraw ();
+
+                    valTb.enableTouch = true;
+                    valTb.TextChangedEvent += OnValueTextBoxTextChanged;
+                    valTb.QueueDraw ();
+
+                    forced = true;
+                } else {
+                    btn.buttonColor = "grey3";
+                    btn.QueueDraw ();
+
+                    if (calState != CalibrationState.FullScaleActual) {
+                        valTb.enableTouch = false;
+                        valTb.text = GetCalibrationValue ().ToString ("F2");
+                        valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
+                        valTb.QueueDraw ();
+                    }
+
+                    forced = false;
+                }
+            }
+        }
+
+        protected void OnValueTextBoxTextChanged (object sender, TextChangedEventArgs args) {
+            try {
+                double val = Convert.ToDouble (args.text);
+            } catch {
+                args.keepText = false;
+            }
         }
     }
 }

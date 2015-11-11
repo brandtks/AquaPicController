@@ -83,7 +83,11 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             analogLevelTextBox = new TouchTextBox ();
-            analogLevelTextBox.text = WaterLevel.analogWaterLevel.ToString ("F2");
+            float wl = WaterLevel.analogWaterLevel;
+            if (wl < 0.0f)
+                analogLevelTextBox.text = "Probe Disconnected";
+            else
+                analogLevelTextBox.text = wl.ToString ("F2");
             analogLevelTextBox.WidthRequest = 200;
             Put (analogLevelTextBox, 585, 70);
 
@@ -101,7 +105,25 @@ namespace AquaPic.UserInterface
             var b = new TouchButton ();
             b.text = "Calibrate";
             b.SetSizeRequest (100, 30);
+            b.ButtonReleaseEvent += (o, args) => {
+                var cal = new CalibrationDialog (
+                    "Water Level Sensor", 
+                    () => {
+                        return AnalogInput.GetValue (WaterLevel.analogSensorChannel);
+                    });
+
+                cal.CalibrationCompleteEvent += (aa) => {
+                    WaterLevel.SetCalibrationData (
+                        (float)aa.zeroValue, 
+                        (float)aa.fullScaleActual, 
+                        (float)aa.fullScaleValue);
+                };
+
+                cal.Run ();
+                cal.Destroy ();
+            };
             Put (b, 515, 188);
+            b.Show ();
 
             if (WaterLevel.floatSwitchCount == 0)
                 switchId = -1;
@@ -205,13 +227,16 @@ namespace AquaPic.UserInterface
 
         public override void Dispose () {
             GLib.Source.Remove (timerId);
-
             base.Dispose ();
         }
 
         public bool OnUpdateTimer () {
             if (WaterLevel.analogSensorEnabled) {
-                analogLevelTextBox.text = WaterLevel.analogWaterLevel.ToString ("F2");
+                float wl = WaterLevel.analogWaterLevel;
+                if (wl < 0.0f)
+                    analogLevelTextBox.text = "Probe Disconnected";
+                else
+                    analogLevelTextBox.text = wl.ToString ("F2");
                 analogLevelTextBox.QueueDraw ();
             }
 
@@ -283,6 +308,10 @@ namespace AquaPic.UserInterface
 
             switchTypeLabel.QueueDraw ();
             switchStateTextBox.QueueDraw ();
+        }
+
+        protected double GetCalibrationValue () {
+            return AnalogInput.GetValue (WaterLevel.analogSensorChannel);
         }
     }
 }

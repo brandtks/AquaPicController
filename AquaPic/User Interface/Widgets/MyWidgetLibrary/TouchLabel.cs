@@ -44,11 +44,22 @@ namespace MyWidgetLibrary
             }
         }
 
+        private bool _centered;
+        public bool textHorizontallyCentered {
+            get {
+                return _centered;
+            }
+            set {
+                _centered = value;
+            }
+        }
+
         public TouchLabel () {
             this.Visible = true;
             this.VisibleWindow = false;
 
             render = new MyText (string.Empty);
+            _centered = false;
 
             HeightRequest = 30;
             WidthRequest = 200;
@@ -57,7 +68,10 @@ namespace MyWidgetLibrary
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            render.Render (this, Allocation.Left, Allocation.Top, Allocation.Width);
+            if (!_centered)
+                render.Render (this, Allocation.Left, Allocation.Top, Allocation.Width);
+            else 
+                render.Render (this, Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
         }
     }
 }

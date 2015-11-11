@@ -46,6 +46,7 @@ namespace MyWidgetLibrary
 
             ms.Run ();
             ms.Destroy ();
+            ms.Dispose ();
         }
     }
 
@@ -96,6 +97,11 @@ namespace MyWidgetLibrary
             label.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             this.VBox.Add (label);
             label.Show ();
+        }
+
+        public override void Destroy () {
+            base.Destroy ();
+            Dispose ();
         }
     }
 }

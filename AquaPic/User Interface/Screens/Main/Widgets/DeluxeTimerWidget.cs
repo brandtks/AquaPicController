@@ -13,8 +13,8 @@ namespace AquaPic.UserInterface
         private int t;
         private TouchTextBox minutes;
         private TouchTextBox seconds;
-        private UpDownButtons minUpDown;
-        private UpDownButtons secUpDown;
+        private TouchUpDownButtons minUpDown;
+        private TouchUpDownButtons secUpDown;
         private TouchButton startStopButton;
         private TouchButton resetButton;
 
@@ -61,7 +61,7 @@ namespace AquaPic.UserInterface
             };
             Put (minutes, 3, 32);
 
-            minUpDown = new UpDownButtons ();
+            minUpDown = new TouchUpDownButtons ();
             minUpDown.up.ButtonReleaseEvent += (o, args) => {
                 if (!timers[t].enabled) {
                     uint time = (Convert.ToUInt32 (minutes.text) + 1) * 60;
@@ -100,7 +100,7 @@ namespace AquaPic.UserInterface
             };
             Put (seconds, 125, 32);
 
-            secUpDown = new UpDownButtons ();
+            secUpDown = new TouchUpDownButtons ();
             secUpDown.up.ButtonReleaseEvent += (o, args) => {
                 if (!timers[t].enabled) {
                     uint time = Convert.ToUInt32 (minutes.text) * 60;
@@ -258,26 +258,6 @@ namespace AquaPic.UserInterface
 
             resetButton.QueueDraw ();
             startStopButton.QueueDraw ();
-        }
-
-        private class UpDownButtons : Fixed
-        {
-            public TouchButton up;
-            public TouchButton down;
-
-            public UpDownButtons () {
-                SetSizeRequest (44, 61);
-
-                up = new TouchButton ();
-                up.SetSizeRequest (44, 30);
-                up.text = Convert.ToChar (0x22C0).ToString (); // 2191
-                Put (up, 0, 0);
-
-                down = new TouchButton ();
-                down.SetSizeRequest (44, 30);
-                down.text = Convert.ToChar (0x22C1).ToString (); // 2193
-                Put (down, 0, 31);
-            }
         }
 
         private class TouchTab : EventBox

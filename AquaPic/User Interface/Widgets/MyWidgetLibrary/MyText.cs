@@ -40,56 +40,55 @@ namespace MyWidgetLibrary
             if (orientation == MyOrientation.Horizontal) {
 //                l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
-            if (textWrap == MyTextWrap.WordWrap) {
-                l.Wrap = Pango.WrapMode.Word;
-                l.Width = Pango.Units.FromPixels (width);
-            }
-
-            if (alignment == MyAlignment.Left)
-                l.Alignment = Pango.Alignment.Left;
-            else if (alignment == MyAlignment.Right)
-                l.Alignment = Pango.Alignment.Right;
-            else // center
-                l.Alignment = Pango.Alignment.Center;
-
-            string displayedText = text;
-            if ((l.LineCount > 1) && (textWrap == MyTextWrap.None)) {
-                Pango.LayoutLine[] ll = l.Lines;
-                displayedText = text.Substring (0, ll [1].StartIndex - 1);
-                int lastSpace = displayedText.LastIndexOf (' ');
-                if (lastSpace != -1)
-                    displayedText = displayedText.Substring (0, lastSpace);
-                displayedText = displayedText + "...";
-                l.SetText (displayedText);
-            }
-
-            int w, h;
-            l.GetPixelSize (out w, out h);
-
-            if (w > width) {
-                if (textWrap == MyTextWrap.None) {
-                    while (w > width) {
-                        displayedText = displayedText.Remove (displayedText.Length - 1);
-                        l.SetText (displayedText);
-                        l.GetPixelSize (out w, out h);
-                    }
-                } else if (textWrap == MyTextWrap.Shrink) {
-                    int K = l.FontDescription.Size / font.size;
-                    int fs = font.size;
-                    while ((w > width) && (fs > 0)) {
-                        --fs;
-                        l.FontDescription.Size = fs * K;
-                        l.SetText (displayedText);
-                        l.GetPixelSize (out w, out h);
-                    }
+                if (textWrap == MyTextWrap.WordWrap) {
+                    l.Wrap = Pango.WrapMode.Word;
+                    l.Width = Pango.Units.FromPixels (width);
                 }
-            } else {
-                l.Width = Pango.Units.FromPixels (width);
-            }
 
-            if (height != -1) {
-                y = (y + (height / 2)) - (h / 2);
-            }
+                if (alignment == MyAlignment.Left)
+                    l.Alignment = Pango.Alignment.Left;
+                else if (alignment == MyAlignment.Right)
+                    l.Alignment = Pango.Alignment.Right;
+                else // center
+                    l.Alignment = Pango.Alignment.Center;
+
+                string displayedText = text;
+                if ((l.LineCount > 1) && (textWrap == MyTextWrap.None)) {
+                    Pango.LayoutLine[] ll = l.Lines;
+                    displayedText = text.Substring (0, ll [1].StartIndex - 1);
+                    int lastSpace = displayedText.LastIndexOf (' ');
+                    if (lastSpace != -1)
+                        displayedText = displayedText.Substring (0, lastSpace);
+                    displayedText = displayedText + "...";
+                    l.SetText (displayedText);
+                }
+
+                int w, h;
+                l.GetPixelSize (out w, out h);
+
+                if (w > width) {
+                    if (textWrap == MyTextWrap.None) {
+                        while (w > width) {
+                            displayedText = displayedText.Remove (displayedText.Length - 1);
+                            l.SetText (displayedText);
+                            l.GetPixelSize (out w, out h);
+                        }
+                    } else if (textWrap == MyTextWrap.Shrink) {
+                        int K = l.FontDescription.Size / font.size;
+                        int fs = font.size;
+                        while ((w > width) && (fs > 0)) {
+                            --fs;
+                            l.FontDescription.Size = fs * K;
+                            l.SetText (displayedText);
+                            l.GetPixelSize (out w, out h);
+                        }
+                    }
+                } else {
+                    l.Width = Pango.Units.FromPixels (width);
+                }
+
+                if (height != -1)
+                    y = (y + (height / 2)) - (h / 2);
 
             } else {
                 var matrix = Pango.Matrix.Identity;

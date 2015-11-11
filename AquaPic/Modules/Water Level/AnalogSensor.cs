@@ -15,6 +15,10 @@ namespace AquaPic.Modules
             public bool enable;
             public float waterLevel;
 
+            public float zeroValue;
+            public float fullScaleActual;
+            public float fullScaleValue;
+
             public int sensorAlarmIndex;
             public int lowAnalogAlarmIndex;
             public int highAnalogAlarmIndex;
@@ -24,8 +28,12 @@ namespace AquaPic.Modules
             public IndividualControl sensorChannel;
 
             public AnalogSensor (bool enable, float highAlarmSetpoint, float lowAlarmSetPoint, IndividualControl ic) {
-                waterLevel = 0.0f;
                 this.enable = enable;
+                waterLevel = 0.0f;
+
+                zeroValue = 819.2f;
+                fullScaleActual = 15.0f;
+                fullScaleValue = 4096.0f;
 
                 if (this.enable) 
                     SubscribeToAlarms ();
@@ -44,7 +52,7 @@ namespace AquaPic.Modules
             public void Run () {
                 if (enable) {
                     waterLevel = AnalogInput.GetValue (sensorChannel);
-                    waterLevel = waterLevel.Map (819.2f, 4096, 0.0f, 15.0f);
+                    waterLevel = waterLevel.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
 
                     if (waterLevel <= -1.0f)
                         Alarm.Post (sensorAlarmIndex);

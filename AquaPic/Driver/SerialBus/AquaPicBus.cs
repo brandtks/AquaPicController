@@ -139,8 +139,7 @@ namespace AquaPic.SerialBus
                 txRxThread.Start ();
                 responseThread.Start ();
             } catch (Exception ex) {
-                Console.WriteLine (ex.ToString ());
-                Console.WriteLine (ex.Message);
+                Logger.AddError (ex.ToString ());
             }
         }
 
@@ -216,7 +215,9 @@ namespace AquaPic.SerialBus
                                             Gtk.Application.Invoke ((sender, e) => m.callback (new CallbackArgs (m.readBuffer)));
                                         }
 
+                                        #if DEBUG
                                         Console.WriteLine ("Message ok");
+                                        #endif
 
                                         m.slave.updateStatus (AquaPicBusStatus.communicationSuccess, (int)stopwatch.ElapsedMilliseconds);
                                         break;
@@ -225,12 +226,14 @@ namespace AquaPic.SerialBus
                                     }
                                 } catch (TimeoutException) {
                                     m.slave.updateStatus (AquaPicBusStatus.timeout, readTimeout);
+                                    #if DEBUG
                                     Console.WriteLine ("Timed out");
+                                    #endif
                                 }
                             }
                         } catch (Exception ex) {
-                            Console.WriteLine (ex.ToString ());
                             m.slave.updateStatus (AquaPicBusStatus.exception, 0);
+                            Logger.AddError (ex.ToString ());
                         }
                     } else {
                         m.slave.updateStatus (AquaPicBusStatus.notOpen, 0);

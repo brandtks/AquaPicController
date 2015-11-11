@@ -13,12 +13,18 @@ namespace AquaPic
         public static void Main (string[] args) {
             Application.Init ();
 
-            Equipment.AddFromJson ();
+            Logger.AddInfo ("Executing operating system is {0}", Utils.GetDescription (Utils.GetRunningPlatform ()));
 
-            Temperature.Init ();
-            Lighting.Init ();
-            WaterLevel.Init ();
-            Power.Init ();
+            try {
+                Equipment.AddFromJson ();
+
+                Temperature.Init ();
+                Lighting.Init ();
+                WaterLevel.Init ();
+                Power.Init ();
+            } catch (Exception ex) {
+                Logger.AddError (ex.ToString ());
+            }
 
 //            Commented out because I can't figure out themes on RPI
 //            string resourceFile;

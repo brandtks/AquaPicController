@@ -91,9 +91,10 @@ namespace AquaPic.UserInterface
 
             settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
-            settingsButton.text = Convert.ToChar (0x26ED).ToString (); //0x2699
-            settingsButton.textFont = "Unifont";
-            settingsButton.textSize = 20;
+            //settingsButton.text = Convert.ToChar (0x26ED).ToString (); //0x2699
+            //settingsButton.textFont = "Unifont";
+            //settingsButton.textSize = 20;
+            settingsButton.text = "S";
             settingsButton.ButtonReleaseEvent += OnSettingButtonRelease;
             Put (settingsButton, 145, 5);
             settingsButton.Show ();

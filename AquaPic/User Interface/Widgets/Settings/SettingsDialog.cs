@@ -126,6 +126,11 @@ namespace MyWidgetLibrary
             Show ();
         }
 
+        public override void Destroy () {
+            base.Destroy ();
+            Dispose ();
+        }
+
         protected void DrawSettings () {
             int x = 5;
             int y = 5;

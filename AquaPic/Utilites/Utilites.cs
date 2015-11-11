@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 
 namespace AquaPic.Utilites
@@ -11,8 +12,35 @@ namespace AquaPic.Utilites
 		}
 	}
 
+    public enum Platform {
+        Windows,
+        Linux,
+        Mac
+    }
+
 	public static class Utils
 	{
+        public static Platform GetRunningPlatform () {
+            switch (Environment.OSVersion.Platform) {
+            case PlatformID.Unix:
+                // Well, there are chances MacOSX is reported as Unix instead of MacOSX.
+                // Instead of platform check, we'll do a feature checks (Mac specific root folders)
+                if (Directory.Exists("/Applications")
+                    & Directory.Exists("/System")
+                    & Directory.Exists("/Users")
+                    & Directory.Exists("/Volumes"))
+                    return Platform.Mac;
+                else
+                    return Platform.Linux;
+
+            case PlatformID.MacOSX:
+                return Platform.Mac;
+
+            default:
+                return Platform.Windows;
+            }
+        }
+
 		public static string GetDescription (Enum en) {
 			Type type = en.GetType ();
 			MemberInfo[] memInfo = type.GetMember (en.ToString());

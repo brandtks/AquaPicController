@@ -27,7 +27,7 @@ namespace AquaPic.UserInterface
 
             #if RPI_BUILD
             this.Decorated = false;
-            //this.Fullscreen ();
+            this.Fullscreen ();
             #endif
 
             GLib.ExceptionManager.UnhandledException += (args) => {
