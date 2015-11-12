@@ -79,7 +79,7 @@ namespace AquaPic.Modules
                                 bool usedAnalog = false;
 
                                 if ((analogSensor.enable) && (useAnalogSensor)) {
-                                    if (!Alarm.CheckAlarming (analogSensor.sensorDisconnectedAlarmIndex)) {
+                                    if (analogSensor.connected) {
                                         usedAnalog = true;
 
                                         if (analogSensor.waterLevel < analogOnSetpoint)
@@ -97,6 +97,7 @@ namespace AquaPic.Modules
                                 if (pumpOnRequest) {
                                     state = AutoTopOffState.Filling;
                                     Logger.Add ("Starting auto top off");
+                                    pumpTimer.Reset ();
                                     pumpTimer.totalSeconds = maxPumpOnTime;
                                     pumpTimer.Start ();
                                 }

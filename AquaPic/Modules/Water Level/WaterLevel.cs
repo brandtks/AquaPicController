@@ -17,7 +17,7 @@ namespace AquaPic.Modules
 
         private static int highSwitchAlarmIndex;
         private static int lowSwitchAlarmIndex;
-        private static int switchAnalogMismatchAlarmIndex;
+//        private static int switchAnalogMismatchAlarmIndex;
 
         /**************************************************************************************************************/
         /* Analog water sensor                                                                                        */
@@ -105,7 +105,7 @@ namespace AquaPic.Modules
         }
             
         /**************************************************************************************************************/
-        /* Auto Topoff                                                                                                */
+        /* Auto Top-off                                                                                               */
         /**************************************************************************************************************/
         public static bool atoEnabled {
             get {
@@ -399,7 +399,7 @@ namespace AquaPic.Modules
 
             lowSwitchAlarmIndex = Alarm.Subscribe ("Low Water Level, Float Switch");
             highSwitchAlarmIndex = Alarm.Subscribe ("High Water Level, Float Switch");
-            switchAnalogMismatchAlarmIndex = Alarm.Subscribe ("Float switch and analog water sensor mismatch");
+//            switchAnalogMismatchAlarmIndex = Alarm.Subscribe ("Float switch and analog water sensor mismatch");
 
             TaskManager.AddCyclicInterrupt ("Water Level", 1000, Run);
         }
@@ -411,7 +411,7 @@ namespace AquaPic.Modules
         public static void Run () {
             analogSensor.Run ();
 
-            bool mismatch = false;
+//            bool mismatch = false;
             ato.useFloatSwitch = false; //set use float switch to false, if no ATO float switch in found it remains false
             foreach (var s in floatSwitches) {
                 bool state = DigitalInput.GetState (s.channel);
@@ -424,12 +424,19 @@ namespace AquaPic.Modules
                 if (activated) // once timer has finished, toggle switch activation
                     s.activated = !s.activated;
 
-                if ((s.activated) && (analogSensor.enable)) {
-                    if (analogSensor.waterLevel > (s.physicalLevel + 1))
-                        mismatch = true;
-                    else if (analogSensor.waterLevel < (s.physicalLevel - 1))
-                        mismatch = true;
-                }
+//                if ((s.activated) && (analogSensor.enable) && (analogSensor.connected)) {
+//                    if (s.type == SwitchType.NormallyClosed) {
+//                        if (analogSensor.waterLevel > (s.physicalLevel + 1.0f)) {
+//                            mismatch = true;
+//                            Logger.AddInfo ("Float switch {0} is reporting a mismatch with analog sensor", s.name);
+//                        }
+//                    } else {
+//                        if (analogSensor.waterLevel < (s.physicalLevel - 1.0f)) {
+//                            mismatch = true;
+//                            Logger.AddInfo ("Float switch {0} is reporting a mismatch with analog sensor", s.name);
+//                        }
+//                    }
+//                }
 
                 if (s.function == SwitchFunction.HighLevel) {
                     if (s.activated)
@@ -451,12 +458,12 @@ namespace AquaPic.Modules
                 }
             }
 
-            if (mismatch)
-                Alarm.Post (switchAnalogMismatchAlarmIndex);
-            else {
-                if (Alarm.CheckAlarming (switchAnalogMismatchAlarmIndex))
-                    Alarm.Clear (switchAnalogMismatchAlarmIndex);
-            }
+//            if (mismatch)
+//                Alarm.Post (switchAnalogMismatchAlarmIndex);
+//            else {
+//                if (Alarm.CheckAlarming (switchAnalogMismatchAlarmIndex))
+//                    Alarm.Clear (switchAnalogMismatchAlarmIndex);
+//            }
 
             ato.Run ();
         }

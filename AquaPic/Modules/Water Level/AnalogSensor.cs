@@ -13,6 +13,11 @@ namespace AquaPic.Modules
         private class AnalogSensor
         {
             public bool enable;
+            public bool connected {
+                get {
+                    return !Alarm.CheckAlarming (sensorDisconnectedAlarmIndex);
+                }
+            }
             public float waterLevel;
 
             public float zeroValue;
@@ -57,7 +62,7 @@ namespace AquaPic.Modules
                     waterLevel = AnalogInput.GetValue (sensorChannel);
                     waterLevel = waterLevel.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
 
-                    if (waterLevel <= -1.0f)
+                    if (waterLevel < 0.0f)
                         Alarm.Post (sensorDisconnectedAlarmIndex);
                     else {
                         if (Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
@@ -65,7 +70,7 @@ namespace AquaPic.Modules
                         }
                     }
 
-                    if ((waterLevel <= lowAlarmStpnt) && (!Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)))
+                    if ((waterLevel <= lowAlarmStpnt) && (connected))
                         Alarm.Post (lowAnalogAlarmIndex);
                     else {
                         if (Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
