@@ -52,9 +52,11 @@ namespace AquaPic.Runtime
     {
         private class AlarmType : AlarmData
         {
-            public event AlarmHandler postEvent;
-            public event AlarmHandler acknowledgeEvent;
-            public event AlarmHandler clearEvent;
+            //public event AlarmHandler postEvent;
+            //public event AlarmHandler acknowledgeEvent;
+            //public event AlarmHandler clearEvent;
+
+            public event AlarmEventHandler AlarmEvent;
 
             public AlarmType (string name, bool audible, bool clearOnAck) {
                 _alarming = false;
@@ -70,16 +72,16 @@ namespace AquaPic.Runtime
                     _acknowledged = false;
                     _postTime = DateTime.Now;
 
-                    if (postEvent != null)
-                        postEvent (this);
+                    if (AlarmEvent != null)
+                        AlarmEvent (this, new AlarmEventArgs (AlarmEventType.Posted, _name));
                 }
             }
 
             public void AcknowledgeAlarm () {
                 _acknowledged = true;
 
-                if (acknowledgeEvent != null)
-                    acknowledgeEvent (this);
+                if (AlarmEvent != null)
+                    AlarmEvent (this, new AlarmEventArgs (AlarmEventType.Acknowledged, _name));
                 
                 if (_clearOnAck || !_alarming)
                     ClearAlarm ();
@@ -89,8 +91,8 @@ namespace AquaPic.Runtime
                 _alarming = false;
 
                 if (_acknowledged) {
-                    if (clearEvent != null)
-                        clearEvent (this);
+                    if (AlarmEvent != null)
+                        AlarmEvent (this, new AlarmEventArgs (AlarmEventType.Cleared, _name));
                 }
             }
         }

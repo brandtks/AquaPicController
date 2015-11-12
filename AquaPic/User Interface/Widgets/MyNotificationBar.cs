@@ -122,7 +122,7 @@ namespace AquaPic.UserInterface
                 GuiGlobal.ChangeScreens ("Alarms");
         }
 
-        protected void OnAllAlarmsUpdated (object sender) {
+        protected void OnAllAlarmsUpdated (object sender, AlarmEventArgs args) {
             UpdateAlarmText ();
             QueueDraw ();
         }

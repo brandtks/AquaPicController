@@ -7,7 +7,7 @@ namespace AquaPic.Runtime
     {
         private static List<AlarmType> alarms = new List<AlarmType> ();
 
-        public static event AlarmHandler AlarmsUpdatedEvent;
+        public static event AlarmEventHandler AlarmsUpdatedEvent;
 
         public static int totalAlarms {
             get {
@@ -33,7 +33,7 @@ namespace AquaPic.Runtime
                     Logger.AddError (string.Format ("{0} posted", alarms [index].name));
 
                     if (AlarmsUpdatedEvent != null)
-                        AlarmsUpdatedEvent (null);
+                        AlarmsUpdatedEvent (null, new AlarmEventArgs (AlarmEventType.Posted, alarms [index].name));
                 }
             }
         }
@@ -45,7 +45,7 @@ namespace AquaPic.Runtime
                 Logger.AddInfo (string.Format ("{0} cleared", alarms [index].name));
 
                 if (AlarmsUpdatedEvent != null)
-                    AlarmsUpdatedEvent (null);
+                    AlarmsUpdatedEvent (null, new AlarmEventArgs (AlarmEventType.Cleared, alarms [index].name));
             }
         }
 
@@ -56,7 +56,7 @@ namespace AquaPic.Runtime
             Logger.Add ("All alarms acknowledged");
 
             if (AlarmsUpdatedEvent != null)
-                AlarmsUpdatedEvent (null);
+                AlarmsUpdatedEvent (null, new AlarmEventArgs (AlarmEventType.Acknowledged, "All alarms"));
         }
 
         public static bool CheckAlarming (int index) {
@@ -81,19 +81,33 @@ namespace AquaPic.Runtime
             return CheckAcknowledged (index);
         }
 
-        public static void AddPostHandler (int index, AlarmHandler handler) {
-            if ((index >= 0) && (index <= (alarms.Count - 1)))
-                alarms [index].postEvent += handler;
+//        public static void AddPostHandler (int index, AlarmHandler handler) {
+//            if ((index >= 0) && (index <= (alarms.Count - 1)))
+//                alarms [index].postEvent += handler;
+//        }
+//
+//        public static void AddAcknowledgeHandler (int index, AlarmHandler handler) {
+//            if ((index >= 0) && (index <= (alarms.Count - 1)))
+//                alarms [index].acknowledgeEvent += handler;
+//        }
+//
+//        public static void AddClearHandler (int index, AlarmHandler handler) {
+//            if ((index >= 0) && (index <= (alarms.Count - 1)))
+//                alarms [index].clearEvent += handler;
+//        }
+
+        public static void AddAlarmHandler (int index, AlarmEventHandler handler) {
+            if ((index < 0) || (index >= alarms.Count))
+                throw new ArgumentException ("index");
+
+            alarms [index].AlarmEvent += handler;
         }
 
-        public static void AddAcknowledgeHandler (int index, AlarmHandler handler) {
-            if ((index >= 0) && (index <= (alarms.Count - 1)))
-                alarms [index].acknowledgeEvent += handler;
-        }
+        public static void RemoveAlarmHandler (int index, AlarmEventHandler handler) {
+            if ((index < 0) || (index >= alarms.Count))
+                throw new ArgumentException ("index");
 
-        public static void AddClearHandler (int index, AlarmHandler handler) {
-            if ((index >= 0) && (index <= (alarms.Count - 1)))
-                alarms [index].clearEvent += handler;
+            alarms [index].AlarmEvent -= handler;
         }
 
         public static bool ListContains (string name) {

@@ -19,6 +19,9 @@ namespace AquaPic.Modules
         private static int lowSwitchAlarmIndex;
         private static int switchAnalogMismatchAlarmIndex;
 
+        /**************************************************************************************************************/
+        /* Analog water sensor                                                                                        */
+        /**************************************************************************************************************/
         public static float highAnalogLevelAlarmSetpoint {
             get {
                 return analogSensor.highAlarmStpnt;
@@ -95,12 +98,15 @@ namespace AquaPic.Modules
                     if (Alarm.CheckAlarming (analogSensor.lowAnalogAlarmIndex))
                         Alarm.Clear (analogSensor.lowAnalogAlarmIndex);
 
-                    if (Alarm.CheckAlarming (analogSensor.sensorAlarmIndex))
-                        Alarm.Clear (analogSensor.sensorAlarmIndex);
+                    if (Alarm.CheckAlarming (analogSensor.sensorDisconnectedAlarmIndex))
+                        Alarm.Clear (analogSensor.sensorDisconnectedAlarmIndex);
                 }
             }
         }
-
+            
+        /**************************************************************************************************************/
+        /* Auto Topoff                                                                                                */
+        /**************************************************************************************************************/
         public static bool atoEnabled {
             get {
                 return ato.enable;
@@ -151,7 +157,12 @@ namespace AquaPic.Modules
 
         public static uint atoTime {
             get {
-                return ato.pumpTimer.secondsRemaining;
+                if (atoState == AutoTopOffState.Filling)
+                    return ato.maxPumpOnTime - ato.pumpTimer.secondsRemaining;
+                else if (atoState == AutoTopOffState.Cooldown)
+                    return ato.pumpTimer.secondsRemaining;
+                else
+                    return 0;
             }
         }
 
@@ -204,6 +215,15 @@ namespace AquaPic.Modules
             }
         }
 
+        public static int atoFailedAlarmIndex {
+            get {
+                return ato.atoFailAlarmIndex;
+            }
+        }
+
+        /**************************************************************************************************************/
+        /* Float Switches                                                                                             */
+        /**************************************************************************************************************/
         public static int floatSwitchCount {
             get {
                 return floatSwitches.Count;
@@ -364,7 +384,7 @@ namespace AquaPic.Modules
                     maxPumpOnTime = 0U;
                     enable = false;
                 } else
-                    maxPumpOnTime = Timer.ParseTime (text);
+                    maxPumpOnTime = Timer.ParseTime (text) / 1000;
 
                 uint minPumpOffTime;
                 text = (string)joAto ["minPumpOffTime"];
@@ -372,7 +392,7 @@ namespace AquaPic.Modules
                     minPumpOffTime = uint.MaxValue;
                     enable = false;
                 } else
-                    minPumpOffTime = Timer.ParseTime (text);
+                    minPumpOffTime = Timer.ParseTime (text) / 1000;
 
                 ato = new AutoTopOff (enable, useAnalogSensor, analogOnSetpoint, analogOffSetpoint, useFloatSwitch, ic, maxPumpOnTime, minPumpOffTime);
             }
@@ -439,6 +459,21 @@ namespace AquaPic.Modules
             }
 
             ato.Run ();
+        }
+
+        /**************************************************************************************************************/
+        /* Auto Topoff                                                                                                */
+        /**************************************************************************************************************/
+        public static bool ClearAtoAlarm () {
+            if (ato.state == AutoTopOffState.Error) {
+                if (Alarm.CheckAcknowledged (atoFailedAlarmIndex)) {
+                    Alarm.Clear (atoFailedAlarmIndex);
+                    ato.state = AutoTopOffState.Standby;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /**************************************************************************************************************/
@@ -642,6 +677,13 @@ namespace AquaPic.Modules
                 throw new ArgumentOutOfRangeException ("switchId");
 
             floatSwitches [switchId].odt.timerInterval = timeOffset;
+        }
+
+        public static bool GetFloatSwitchState (int switchId) {
+            if ((switchId < 0) || (switchId >= floatSwitches.Count))
+                throw new ArgumentOutOfRangeException ("switchId");
+
+            return floatSwitches [switchId].activated;
         }
     }
 }

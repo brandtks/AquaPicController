@@ -79,7 +79,7 @@ namespace AquaPic.Modules
                                 bool usedAnalog = false;
 
                                 if ((analogSensor.enable) && (useAnalogSensor)) {
-                                    if (!Alarm.CheckAlarming (analogSensor.sensorAlarmIndex)) {
+                                    if (!Alarm.CheckAlarming (analogSensor.sensorDisconnectedAlarmIndex)) {
                                         usedAnalog = true;
 
                                         if (analogSensor.waterLevel < analogOnSetpoint)
@@ -89,7 +89,7 @@ namespace AquaPic.Modules
 
                                 if (useFloatSwitch) {
                                     if (usedAnalog)
-                                        pumpOnRequest &= floatSwitchActivated;
+                                        pumpOnRequest &= floatSwitchActivated; // set during water level run function
                                     else
                                         pumpOnRequest = floatSwitchActivated;
                                 }
@@ -107,8 +107,10 @@ namespace AquaPic.Modules
                             pumpOnRequest = true;
 
                             if ((analogSensor.enable) && (useAnalogSensor)) {
-                                if (analogSensor.waterLevel > analogOffSetpoint)
-                                    pumpOnRequest = false;
+                                if (!Alarm.CheckAlarming (analogSensor.sensorDisconnectedAlarmIndex)) { 
+                                    if (analogSensor.waterLevel > analogOffSetpoint)
+                                        pumpOnRequest = false;
+                                }
                             }
 
                             if ((useFloatSwitch) && (!floatSwitchActivated))
@@ -116,7 +118,7 @@ namespace AquaPic.Modules
 
                             if (!pumpOnRequest) {
                                 state = AutoTopOffState.Cooldown;
-                                pumpTimer.Stop ();
+                                pumpTimer.Reset ();
                                 Logger.Add (string.Format ("Stopping auto top off. Runtime: {0} secs", pumpTimer.totalSeconds - pumpTimer.secondsRemaining));
                                 pumpTimer.totalSeconds = minPumpOffTime;
                                 pumpTimer.Start ();

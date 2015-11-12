@@ -19,7 +19,7 @@ namespace AquaPic.Modules
             public float fullScaleActual;
             public float fullScaleValue;
 
-            public int sensorAlarmIndex;
+            public int sensorDisconnectedAlarmIndex;
             public int lowAnalogAlarmIndex;
             public int highAnalogAlarmIndex;
 
@@ -37,8 +37,11 @@ namespace AquaPic.Modules
 
                 if (this.enable) 
                     SubscribeToAlarms ();
-                else 
-                    sensorAlarmIndex = -1;
+                else {
+                    sensorDisconnectedAlarmIndex = -1;
+                    lowAnalogAlarmIndex = -1;
+                    highAnalogAlarmIndex = -1;
+                }
 
                 this.highAlarmStpnt = highAlarmSetpoint;
                 this.lowAlarmStpnt = lowAlarmSetPoint;
@@ -55,14 +58,14 @@ namespace AquaPic.Modules
                     waterLevel = waterLevel.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
 
                     if (waterLevel <= -1.0f)
-                        Alarm.Post (sensorAlarmIndex);
+                        Alarm.Post (sensorDisconnectedAlarmIndex);
                     else {
-                        if (Alarm.CheckAlarming (sensorAlarmIndex)) {
-                            Alarm.Clear (sensorAlarmIndex);
+                        if (Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
+                            Alarm.Clear (sensorDisconnectedAlarmIndex);
                         }
                     }
 
-                    if ((waterLevel <= lowAlarmStpnt) && (waterLevel > -1.0f))
+                    if ((waterLevel <= lowAlarmStpnt) && (!Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)))
                         Alarm.Post (lowAnalogAlarmIndex);
                     else {
                         if (Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
@@ -83,7 +86,7 @@ namespace AquaPic.Modules
             public void SubscribeToAlarms () {
                 lowAnalogAlarmIndex = Alarm.Subscribe ("Low Water Level, Analog Sensor");
                 highAnalogAlarmIndex = Alarm.Subscribe ("High Water Level, Analog Sensor");
-                sensorAlarmIndex = Alarm.Subscribe ("Analog water level probe disconnected");
+                sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog water level probe disconnected");
             }
         }
     }

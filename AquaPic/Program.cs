@@ -13,7 +13,7 @@ namespace AquaPic
         public static void Main (string[] args) {
             Application.Init ();
 
-            Logger.AddInfo ("Executing operating system is {0}", Utils.GetDescription (Utils.GetRunningPlatform ()));
+            Logger.Add ("Executing operating system is {0}", Utils.GetDescription (Utils.GetRunningPlatform ()));
 
             try {
                 Equipment.AddFromJson ();

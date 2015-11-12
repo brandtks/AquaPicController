@@ -4,6 +4,7 @@ using MyWidgetLibrary;
 using AquaPic.Runtime;
 using AquaPic.Modules;
 using AquaPic.Drivers;
+using AquaPic.Utilites;
 
 namespace AquaPic.UserInterface
 {
@@ -14,12 +15,13 @@ namespace AquaPic.UserInterface
         TouchTextBox switchStateTextBox;
         TouchLabel switchTypeLabel;
         TouchComboBox switchCombo;
+        TouchButton atoClearFailBtn;
         int switchId;
 
         TouchTextBox atoStateTextBox;
 
         public WaterLevelWindow (params object[] options) : base () {
-            MyBox box1 = new MyBox (385, 395);
+            MyBox box1 = new MyBox (385, 193);
             Put (box1, 10, 30);
             box1.Show ();
 
@@ -51,7 +53,9 @@ namespace AquaPic.UserInterface
 
             atoStateTextBox = new TouchTextBox ();
             atoStateTextBox.WidthRequest = 200;
-            atoStateTextBox.text = WaterLevel.atoState.ToString ();
+            atoStateTextBox.text = string.Format ("{0} : {1}", 
+                WaterLevel.atoState, 
+                WaterLevel.atoTime.SecondsToString ());
             Put (atoStateTextBox, 190, 70);
             atoStateTextBox.Show ();
 
@@ -63,8 +67,25 @@ namespace AquaPic.UserInterface
                 s.Run ();
                 s.Destroy ();
             };
-            Put (atoSettingsBtn, 15, 390);
+            Put (atoSettingsBtn, 15, 188);
             atoSettingsBtn.Show ();
+
+            atoClearFailBtn = new TouchButton ();
+            atoClearFailBtn.SetSizeRequest (100, 30);
+            atoClearFailBtn.text = "Reset ATO";
+            atoClearFailBtn.buttonColor = "compl";
+            atoClearFailBtn.ButtonReleaseEvent += (o, args) => {
+                if (!WaterLevel.ClearAtoAlarm ())
+                    TouchMessageBox.Show ("Please acknowledge alarms first");
+            };
+            Put (atoClearFailBtn, 290, 188);
+            if (Alarm.CheckAlarming (WaterLevel.atoFailedAlarmIndex)) {
+                atoClearFailBtn.Visible = true;
+                atoClearFailBtn.Show ();
+            } else
+                atoClearFailBtn.Visible = false;
+
+            Alarm.AddAlarmHandler (WaterLevel.atoFailedAlarmIndex, OnAtoFailedAlarmEvent);
 
             /**************************************************************************************************************/
             /* Analog water sensor                                                                                        */
@@ -129,6 +150,9 @@ namespace AquaPic.UserInterface
             Put (b, 515, 188);
             b.Show ();
 
+            /**************************************************************************************************************/
+            /* Float Switches                                                                                             */
+            /**************************************************************************************************************/
             if (WaterLevel.floatSwitchCount == 0)
                 switchId = -1;
             else
@@ -226,10 +250,11 @@ namespace AquaPic.UserInterface
 
             timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
 
-            ShowAll ();
+            Show ();
         }
 
         public override void Dispose () {
+            Alarm.RemoveAlarmHandler (WaterLevel.atoFailedAlarmIndex, OnAtoFailedAlarmEvent);
             GLib.Source.Remove (timerId);
             base.Dispose ();
         }
@@ -245,15 +270,21 @@ namespace AquaPic.UserInterface
             }
 
             if (switchId != -1) {
-                bool state = DigitalInput.GetState (WaterLevel.GetFloatSwitchIndividualControl (switchId));
+                bool state = WaterLevel.GetFloatSwitchState (switchId);
                 if (state) {
-                    switchStateTextBox.text = "Closed";
+                    switchStateTextBox.text = "Activated";
                     switchStateTextBox.bkgndColor = "pri";
                 } else {
-                    switchStateTextBox.text = "Open";
+                    switchStateTextBox.text = "Normal";
                     switchStateTextBox.bkgndColor = "seca";
                 }
+                switchStateTextBox.QueueDraw ();
             }
+                
+            atoStateTextBox.text = string.Format ("{0} : {1}", 
+                WaterLevel.atoState, 
+                WaterLevel.atoTime.SecondsToString ());
+            atoStateTextBox.QueueDraw ();
 
             return true;
         }
@@ -295,10 +326,10 @@ namespace AquaPic.UserInterface
                 bool state = DigitalInput.GetState (WaterLevel.GetFloatSwitchIndividualControl (switchId));
 
                 if (state) {
-                    switchStateTextBox.text = "Closed";
+                    switchStateTextBox.text = "Activated";
                     switchStateTextBox.bkgndColor = "pri";
                 } else {
-                    switchStateTextBox.text = "Open";
+                    switchStateTextBox.text = "Normal";
                     switchStateTextBox.bkgndColor = "seca";
                 }
 
@@ -316,6 +347,19 @@ namespace AquaPic.UserInterface
 
         protected double GetCalibrationValue () {
             return AnalogInput.GetValue (WaterLevel.analogSensorChannel);
+        }
+
+        protected void OnAtoFailedAlarmEvent (object sender, AlarmEventArgs args) {
+            Console.WriteLine ("Ato failed alarm event handler called");
+
+            if (args.type == AlarmEventType.Cleared)
+                atoClearFailBtn.Visible = false;
+            else if (args.type == AlarmEventType.Posted)
+                atoClearFailBtn.Visible = true;
+            else
+                return;
+
+            atoClearFailBtn.QueueDraw ();
         }
     }
 }

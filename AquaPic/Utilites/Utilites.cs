@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace AquaPic.Utilites
 {
@@ -135,6 +136,35 @@ namespace AquaPic.Utilites
                 int m = ~(int)Math.Pow (2, shift);
                 mask &= (byte) m;
             }
+        }
+
+        public static string SecondsToString (this uint time) {
+            StringBuilder sb = new StringBuilder ();
+            TimeSpan t = TimeSpan.FromSeconds (time);
+
+            if (t.Hours != 0)
+                sb.Append (string.Format ("{0}h", t.Hours));
+
+            if (t.Minutes != 0) {
+                if (sb.Length != 0) // there are hours
+                    sb.Append (":");
+
+                sb.Append (string.Format ("{0}m", t.Minutes));
+            }
+
+            if (t.Seconds != 0) {
+                if (sb.Length != 0) // there are either hours or mins
+                    sb.Append (":");
+
+                sb.Append (string.Format ("{0}s", t.Seconds));
+            }
+
+            string ts = sb.ToString ();
+
+            if (string.IsNullOrWhiteSpace (ts))
+                ts = "0s";
+
+            return ts;
         }
 	}
 }
