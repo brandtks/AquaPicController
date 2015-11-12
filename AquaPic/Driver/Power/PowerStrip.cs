@@ -130,18 +130,24 @@ namespace AquaPic.Drivers
                             ptr, 
                             sizeof(byte) * messageLength, 
                             0, 
-                            (args) => 
-                                outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state)));
+                            (args) => {
+                                //outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state)));
+                                outlets [outletID].currentState = state;
+                                OnStateChange (outlets [outletID], new StateChangeEventArgs (outletID, powerID, state));
+                            });
                     }
                 }
 
                 //<TEST> this is here only because the slave never responds so the callback never happens
-                outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state));
+                //outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state));
+                outlets [outletID].currentState = state;
+                OnStateChange (outlets [outletID], new StateChangeEventArgs (outletID, powerID, state));
             }
 
             public void SetPlugMode (byte outletID, Mode mode) {
+                //outlets [outletID].OnModeChange (new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
                 outlets [outletID].mode = mode;
-                outlets [outletID].OnModeChange (new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
+                OnModeChange (outlets [outletID], new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
             }
 
             protected void OnSlaveStatusUpdate (object sender) {

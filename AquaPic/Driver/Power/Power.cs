@@ -12,6 +12,8 @@ namespace AquaPic.Drivers
     public partial class Power
     {
         private static List<PowerStrip> pwrStrips = new List<PowerStrip> ();
+        private static Dictionary<string, ModeChangedObj> modeChangedHandlers = new Dictionary<string, ModeChangedObj> ();
+        private static Dictionary<string, StateChangedObj> stateChangedHandlers = new Dictionary<string, StateChangedObj> ();
 
         public static int powerStripCount {
             get {
@@ -368,20 +370,88 @@ namespace AquaPic.Drivers
             return owners;
         }
 
+//        public static void AddHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
+//            pwrStrips [outlet.Group].outlets [outlet.Individual].ModeChangeEvent += handler;
+//        }
+//
+//        public static void RemoveHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
+//            pwrStrips [outlet.Group].outlets [outlet.Individual].ModeChangeEvent -= handler;
+//        }
+//
+//        public static void AddHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
+//            pwrStrips [outlet.Group].outlets [outlet.Individual].StateChangeEvent += handler;
+//        }
+//
+//        public static void RemoveHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
+//            pwrStrips [outlet.Group].outlets [outlet.Individual].StateChangeEvent -= handler;
+//        }
+
         public static void AddHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].ModeChangeEvent += handler;
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            string name = GetOutletName (outlet);
+
+            if (!modeChangedHandlers.ContainsKey (name))
+                modeChangedHandlers.Add (name, new ModeChangedObj ());
+
+            modeChangedHandlers [name].ModeChangedEvent += handler;
         }
 
         public static void RemoveHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].ModeChangeEvent -= handler;
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            string name = GetOutletName (outlet);
+
+            if (modeChangedHandlers.ContainsKey (name))
+                modeChangedHandlers [name].ModeChangedEvent -= handler;
+        }
+
+        private static void OnModeChange (OutletData outlet, ModeChangeEventArgs args) {
+            if (modeChangedHandlers.ContainsKey (outlet.name)) {
+                modeChangedHandlers [outlet.name].CallEvent (outlet, args);
+            }
         }
 
         public static void AddHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].StateChangeEvent += handler;
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            string name = GetOutletName (outlet);
+
+            if (!stateChangedHandlers.ContainsKey (name))
+                stateChangedHandlers.Add (name, new StateChangedObj ());
+
+            stateChangedHandlers [name].StateChangedEvent += handler;
         }
 
         public static void RemoveHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-            pwrStrips [outlet.Group].outlets [outlet.Individual].StateChangeEvent -= handler;
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            string name = GetOutletName (outlet);
+
+            if (stateChangedHandlers.ContainsKey (name))
+                stateChangedHandlers [name].StateChangedEvent -= handler;
+        }
+
+        private static void OnStateChange (OutletData outlet, StateChangeEventArgs args) {
+            if (stateChangedHandlers.ContainsKey (outlet.name)) {
+                stateChangedHandlers [outlet.name].CallEvent (outlet, args);
+            }
         }
     }
 }

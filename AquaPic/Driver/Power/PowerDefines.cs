@@ -30,6 +30,30 @@ namespace AquaPic.Drivers
         }
     }
 
+    public class ModeChangedObj {
+        public event ModeChangedHandler ModeChangedEvent;
+
+        public ModeChangedObj () {
+        }
+
+        public void CallEvent (object sender, ModeChangeEventArgs args) {
+            if (ModeChangedEvent != null)
+                ModeChangedEvent (sender, args);
+        }
+    }
+
+    public class StateChangedObj {
+        public event StateChangeHandler StateChangedEvent;
+
+        public StateChangedObj () {
+        }
+
+        public void CallEvent (object sender, StateChangeEventArgs args) {
+            if (StateChangedEvent != null)
+                StateChangedEvent (sender, args);
+        }
+    }
+
     // AquaPicBus communication struct
     public struct PlugComms {
         public byte outletID;
