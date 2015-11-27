@@ -11,21 +11,16 @@ namespace AquaPic.Drivers
         {
             public AquaPicBus.Slave slave;
             public byte cardID;
-            public int communicationAlarmIndex;
+            //public int communicationAlarmIndex;
             public AnalogOutputChannel[] channels;
             public string name;
 
             public AnalogOutputCard (byte address, byte cardID, string name) {
-                try {
-                    slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Analog Output)");
-                    slave.OnStatusUpdate += OnSlaveStatusUpdate;
-                } catch (Exception ex) {
-                    Console.WriteLine (ex.ToString ());
-                    Console.WriteLine (ex.Message);
-                }
+                slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Analog Output)");
+                //slave.OnStatusUpdate += OnSlaveStatusUpdate;
                 this.cardID = cardID;
                 this.name = name;
-                communicationAlarmIndex = Alarm.Subscribe(address.ToString () + " communication fault");
+                //communicationAlarmIndex = Alarm.Subscribe(address.ToString () + " communication fault");
                 channels = new AnalogOutputChannel[4];
                 for (int i = 0; i < channels.Length; ++i) {
                     int chId = i;
@@ -37,16 +32,17 @@ namespace AquaPic.Drivers
                 }
             }
 
-            protected void OnSlaveStatusUpdate (object sender) {
-                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
-                    (slave.Status != AquaPicBusStatus.communicationStart) ||
-                    (slave.Status != AquaPicBusStatus.open))
-                    Alarm.Post (communicationAlarmIndex);
-                else {
-                    if (Alarm.CheckAlarming (communicationAlarmIndex))
-                        Alarm.Clear (communicationAlarmIndex);
-                }
-            }
+//            commented out because alarm handling is done in the serial slave object
+//            protected void OnSlaveStatusUpdate (object sender) {
+//                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
+//                    (slave.Status != AquaPicBusStatus.communicationStart) ||
+//                    (slave.Status != AquaPicBusStatus.open))
+//                    Alarm.Post (communicationAlarmIndex);
+//                else {
+//                    if (Alarm.CheckAlarming (communicationAlarmIndex))
+//                        Alarm.Clear (communicationAlarmIndex);
+//                }
+//            }
 
             public void AddChannel (int ch, AnalogType type, string name) {
                 channels [ch].name = name;
@@ -67,7 +63,8 @@ namespace AquaPic.Drivers
             }
 
             public void SetChannelType (int ch, AnalogType type) {
-                if (type != channels [ch].type) {
+                //if (type != channels [ch].type) {
+
                     channels [ch].type = type;
 
                     byte[] arr = new byte[2];
@@ -80,7 +77,7 @@ namespace AquaPic.Drivers
                             slave.Write (2, ptr, sizeof(byte) * 2);
                         }
                     }
-                }
+                //}
             }
 
             public void SetAnalogValue (byte channelID, int value) {

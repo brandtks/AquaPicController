@@ -12,7 +12,7 @@ namespace AquaPic.Drivers
         private class PowerStrip {
             public AquaPicBus.Slave slave;
             public byte powerID;
-            public int commsAlarmIdx;
+            //public int commsAlarmIdx;
             public int powerLossAlarmIndex;
             public bool AcPowerAvailable;
             public string name;
@@ -20,12 +20,11 @@ namespace AquaPic.Drivers
 
             public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) {
                 this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Power Strip)");
-                this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
+                //this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
 
                 this.powerID = powerID;
 
-                this.commsAlarmIdx = Alarm.Subscribe (
-                    this.slave.Address.ToString () + " communication fault");
+                //this.commsAlarmIdx = Alarm.Subscribe (this.slave.Address.ToString () + " communication fault");
 
                 if (alarmOnLossOfPower && (powerLossAlarmIndex == -1))
                     this.powerLossAlarmIndex = Alarm.Subscribe (
@@ -140,8 +139,8 @@ namespace AquaPic.Drivers
 
                 //<TEST> this is here only because the slave never responds so the callback never happens
                 //outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state));
-                outlets [outletID].currentState = state;
-                OnStateChange (outlets [outletID], new StateChangeEventArgs (outletID, powerID, state));
+                //outlets [outletID].currentState = state;
+                //OnStateChange (outlets [outletID], new StateChangeEventArgs (outletID, powerID, state));
             }
 
             public void SetPlugMode (byte outletID, Mode mode) {
@@ -150,16 +149,17 @@ namespace AquaPic.Drivers
                 OnModeChange (outlets [outletID], new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
             }
 
-            protected void OnSlaveStatusUpdate (object sender) {
-                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
-                    (slave.Status != AquaPicBusStatus.communicationStart) ||
-                    (slave.Status != AquaPicBusStatus.open))
-                    Alarm.Post (commsAlarmIdx);
-                else {
-                    if (Alarm.CheckAlarming (commsAlarmIdx))
-                        Alarm.Clear (commsAlarmIdx);
-                }
-            }
+//            commented out because alarm handling is done in the serial slave object
+//            protected void OnSlaveStatusUpdate (object sender) {
+//                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
+//                    (slave.Status != AquaPicBusStatus.communicationStart) ||
+//                    (slave.Status != AquaPicBusStatus.open))
+//                    Alarm.Post (commsAlarmIdx);
+//                else {
+//                    if (Alarm.CheckAlarming (commsAlarmIdx))
+//                        Alarm.Clear (commsAlarmIdx);
+//                }
+//            }
     	}
     }
 }

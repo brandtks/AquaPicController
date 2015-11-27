@@ -27,6 +27,7 @@ namespace AquaPic.UserInterface
         private TouchTextBox onTimeTextBox;
         private TouchLabel offTimeLabel;
         private TouchTextBox offTimeTextBox;
+        private TouchButton fixtureSettingBtn;
         private uint timerId;
         private bool isDimmingFixture;
         private bool dimmingIsManual;
@@ -117,27 +118,21 @@ namespace AquaPic.UserInterface
 
             //<TODO> this is a stupid fix for when there are no lights add
             //will be changed after I implement adding and removing lights during runtime
-
-
-
             if (Lighting.fixtureCount == 0) {
                 fixtureID = -1;
                 fixtureLabel.text = "No lighing fixtures added";
 
-                combo = new TouchComboBox ();
-                combo.Active = 0;
-                combo.WidthRequest = 185;
-                combo.List.Add ("New fixture...");
-                combo.ChangedEvent += OnComboChanged;
-                Put (combo, 600, 35);
-                combo.Show ();
-
-                Show ();
-                return;
+                //combo = new TouchComboBox ();
+                //combo.Active = 0;
+                //combo.WidthRequest = 185;
+                //combo.List.Add ("New fixture...");
+                //combo.ChangedEvent += OnComboChanged;
+                //Put (combo, 600, 35);
+                //combo.Show ();
+            } else {
+                dimmingIsManual = false;
+                fixtureID = 0;
             }
-
-            dimmingIsManual = false;
-            fixtureID = 0;
 
             dimmingHeader = new TouchLabel ();
             dimmingHeader.textAlignment = MyAlignment.Center;
@@ -302,7 +297,7 @@ namespace AquaPic.UserInterface
             Put (settingsBtn, 15, 390);
             settingsBtn.Show ();
 
-            var fixtureSettingBtn = new TouchButton ();
+            fixtureSettingBtn = new TouchButton ();
             fixtureSettingBtn.text = "Fixture Setup";
             fixtureSettingBtn.SetSizeRequest (100, 30);
             fixtureSettingBtn.ButtonReleaseEvent += (o, args) => {
@@ -382,54 +377,79 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetFixtureData () {
-            isDimmingFixture = Lighting.IsDimmingFixture (fixtureID);
-            if (isDimmingFixture) {
-                dimmingHeader.text = "Dimming Control";
+            if (fixtureID != -1) {
+                isDimmingFixture = Lighting.IsDimmingFixture (fixtureID);
+                if (isDimmingFixture) {
+                    dimmingHeader.text = "Dimming Control";
 
-                modeSelector.Visible = true;
-                dimmingProgressBar.Visible = true;
-                dimmingTextBox.Visible = true;
-                dimmingLabel.Visible = true;
-                requestTextBox.Visible = true;
-                requestLabel.Visible = true;
+                    modeSelector.Visible = true;
+                    dimmingProgressBar.Visible = true;
+                    dimmingTextBox.Visible = true;
+                    dimmingLabel.Visible = true;
+                    requestTextBox.Visible = true;
+                    requestLabel.Visible = true;
 
-                Mode m = Lighting.GetDimmingMode (fixtureID);
-                dimmingIsManual = m == Mode.Manual;
-                if (!dimmingIsManual) {
-                    modeSelector.CurrentSelected = 1;
+                    Mode m = Lighting.GetDimmingMode (fixtureID);
+                    dimmingIsManual = m == Mode.Manual;
+                    if (!dimmingIsManual) {
+                        modeSelector.CurrentSelected = 1;
+                        dimmingProgressBar.enableTouch = false;
+                        requestTextBox.enableTouch = false;
+                        autoTextBox.Visible = false;
+                        autoLabel.Visible = false;
+                    } else {
+                        modeSelector.CurrentSelected = 0;
+                        dimmingProgressBar.enableTouch = true;
+                        requestTextBox.enableTouch = true;
+                        autoTextBox.Visible = true;
+                        autoLabel.Visible = true;
+                        autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
+                    }
+
+                    float level = Lighting.GetCurrentDimmingLevel (fixtureID);
+                    dimmingProgressBar.currentProgressSecondary = level / 100.0f;
+                    dimmingTextBox.text = string.Format ("{0:N2}", level);
+
+                    level = Lighting.GetRequestedDimmingLevel (fixtureID);
+                    dimmingProgressBar.currentProgress = level / 100.0f;
+                    requestTextBox.text = string.Format ("{0:N2}", level);
+
+                    // bastardized way of getting the combobox in front of other widgets
+                    // I think there's another way to do this but I can't remember what it is or if it ever works
+                    combo.Visible = false;
+                    combo.Visible = true;
+
+                    timerId = GLib.Timeout.Add (1000, OnTimer);
+                } else {
+                    dimmingHeader.text = "Dimming not available";
+                    dimmingIsManual = false;
+                    modeSelector.Visible = false;
+                    dimmingProgressBar.Visible = false;
                     dimmingProgressBar.enableTouch = false;
-                    requestTextBox.enableTouch = false;
+                    dimmingTextBox.Visible = false;
+                    dimmingLabel.Visible = false;
                     autoTextBox.Visible = false;
                     autoLabel.Visible = false;
-                } else {
-                    modeSelector.CurrentSelected = 0;
-                    dimmingProgressBar.enableTouch = true;
-                    requestTextBox.enableTouch = true;
-                    autoTextBox.Visible = true;
-                    autoLabel.Visible = true;
-                    autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
+                    requestTextBox.Visible = false;
+                    requestLabel.Visible = false;
                 }
 
-                float level = Lighting.GetCurrentDimmingLevel (fixtureID);
-                dimmingProgressBar.currentProgressSecondary = level / 100.0f;
-                dimmingTextBox.text = string.Format ("{0:N2}", level);
+                onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureID).ToString ();
+                onTimeTextBox.QueueDraw ();
+                offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureID).ToString ();
+                offTimeTextBox.QueueDraw ();
 
-                level = Lighting.GetRequestedDimmingLevel (fixtureID);
-                dimmingProgressBar.currentProgress = level / 100.0f;
-                requestTextBox.text = string.Format ("{0:N2}", level);
-
-                // bastardized way of getting the combobox in front of other widgets
-                // I think there's another way to do this but I can't remember what it is or if it ever works
-                combo.Visible = false;
-                combo.Visible = true;
-
-                timerId = GLib.Timeout.Add (1000, OnTimer);
+                QueueDraw ();
             } else {
-                dimmingHeader.text = "Dimming not available";
-                dimmingIsManual = false;
+                onTimeLabel.Visible = false;
+                onTimeTextBox.Visible = false;
+                offTimeLabel.Visible = false;
+                offTimeTextBox.Visible = false;
+                dimmingHeader.Visible = false;
+                fixtureSettingBtn.Visible = false;
+
                 modeSelector.Visible = false;
                 dimmingProgressBar.Visible = false;
-                dimmingProgressBar.enableTouch = false;
                 dimmingTextBox.Visible = false;
                 dimmingLabel.Visible = false;
                 autoTextBox.Visible = false;
@@ -437,13 +457,6 @@ namespace AquaPic.UserInterface
                 requestTextBox.Visible = false;
                 requestLabel.Visible = false;
             }
-
-            onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureID).ToString ();
-            onTimeTextBox.QueueDraw ();
-            offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureID).ToString ();
-            offTimeTextBox.QueueDraw ();
-
-            QueueDraw ();
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
@@ -466,6 +479,7 @@ namespace AquaPic.UserInterface
                     offTimeLabel.Visible = true;
                     offTimeTextBox.Visible = true;
                     dimmingHeader.Visible = true;
+                    fixtureSettingBtn.Visible = true;
 
                     GetFixtureData ();
                 } else {

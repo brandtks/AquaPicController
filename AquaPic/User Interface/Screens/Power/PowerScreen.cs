@@ -67,11 +67,11 @@ namespace AquaPic.UserInterface
                     selectors [idx].QueueDraw ();
                 };
 
-                if (i < 4) {
-                    x = (i * 190) + 25;
+                if ((i % 2) == 0) { // even number top row
+                    x = ((i - (i / 2)) * 190) + 25;
                     y = 80;
                 } else {
-                    x = ((i - 4) * 190) + 25;
+                    x = (((i - (i / 2)) - 1) * 190) + 25;
                     y = 250;
                 }
                 Put (selectors [i], x, y);

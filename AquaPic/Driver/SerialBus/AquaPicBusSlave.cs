@@ -1,5 +1,6 @@
 ﻿using System;
 using Gtk; // for Application.Invoke
+using AquaPic.Runtime;
 
 namespace AquaPic.SerialBus
 {
@@ -15,6 +16,7 @@ namespace AquaPic.SerialBus
             private int[] timeQue;
             private int queIdx;
             private AquaPicBusStatus status;
+            private int _alarmIdx;
 
             public AquaPicBusStatus Status { 
                 get { return status; }
@@ -26,6 +28,9 @@ namespace AquaPic.SerialBus
                 get { return responeTime; }
             }
             public string Name { get; set; }
+            public int alarmIdx {
+                get { return _alarmIdx; }
+            }
 
             public Slave (AquaPicBus bus, byte address, string name) {
                 if (!bus.IsAddressOk (address))
@@ -40,6 +45,8 @@ namespace AquaPic.SerialBus
                 this.Name = name;
 
                 this.bus.slaves.Add (this);
+
+                _alarmIdx = Alarm.Subscribe (address.ToString () + " communication fault");
             }
 
             public unsafe void Read (byte func, int readSize, ResponseCallback callback) {

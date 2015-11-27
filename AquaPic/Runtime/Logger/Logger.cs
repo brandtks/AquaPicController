@@ -24,7 +24,7 @@ namespace AquaPic.Runtime
             buffer.Insert (ref ti, string.Format ("{0}\n", message));
 
             #if DEBUG
-            Console.WriteLine ("{0:MM/dd hh:mm:ss}: {1}", DateTime.Now, message);
+            Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
             #endif
 
             if (EventAddedEvent != null)
@@ -43,7 +43,7 @@ namespace AquaPic.Runtime
             buffer.InsertWithTags (ref ti, string.Format ("{0}\n", message), tag);
 
             #if DEBUG
-            Console.WriteLine ("{0:MM/dd hh:mm:ss}: {1}", DateTime.Now, message);
+            Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
             #endif
 
             if (EventAddedEvent != null)
@@ -62,7 +62,7 @@ namespace AquaPic.Runtime
             buffer.InsertWithTags (ref ti, string.Format ("{0}\n", message), tag);
 
             #if DEBUG
-            Console.WriteLine ("{0:MM/dd hh:mm:ss}: {1}", DateTime.Now, message);
+            Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
             #endif
 
             if (EventAddedEvent != null)
@@ -74,14 +74,14 @@ namespace AquaPic.Runtime
             AppendTime ();
 
             var tag = new TextTag (null);
-            tag.ForegroundGdk = MyColor.NewGtkColor ("secc");
+            tag.ForegroundGdk = MyColor.NewGtkColor ("secb");
             buffer.TagTable.Add (tag);
 
             var ti = buffer.EndIter;
             buffer.InsertWithTags (ref ti, string.Format ("{0}\n", message), tag);
 
             #if DEBUG
-            Console.WriteLine ("{0:MM/dd hh:mm:ss}: {1}", DateTime.Now, message);
+            Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
             #endif
 
             if (EventAddedEvent != null)
@@ -94,7 +94,7 @@ namespace AquaPic.Runtime
             buffer.TagTable.Add (tag);
 
             var ti = buffer.EndIter;
-            buffer.InsertWithTags (ref ti, string.Format ("{0:MM/dd hh:mm:ss}: ", DateTime.Now), tag);
+            buffer.InsertWithTags (ref ti, string.Format ("{0:MM/dd HH:mm:ss}: ", DateTime.Now), tag);
         }
     }
 }

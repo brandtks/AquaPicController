@@ -12,7 +12,7 @@ namespace AquaPic.Drivers
             public AquaPicBus.Slave slave;
             public byte cardID;
             public string name;
-            public int communicationAlarmIndex;
+//            public int communicationAlarmIndex;
             public AnalogInputChannel[] channels;
             public bool updating;
 
@@ -29,11 +29,11 @@ namespace AquaPic.Drivers
 
             public AnalogInputCard (byte address, byte cardID, string name) {
                 this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Analog Input)");
-                this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
+//                this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
 
                 this.cardID = cardID;
                 this.name = name;
-                this.communicationAlarmIndex = Alarm.Subscribe (address.ToString () + " communication fault");
+//                this.communicationAlarmIndex = Alarm.Subscribe (address.ToString () + " communication fault");
                 this.channels = new AnalogInputChannel[4];
                 for (int i = 0; i < this.channels.Length; ++i) {
                     this.channels [i] = new AnalogInputChannel (this.name + ".i" + i.ToString ()); 
@@ -41,16 +41,17 @@ namespace AquaPic.Drivers
                 this.updating = false;
             }
 
-            protected void OnSlaveStatusUpdate (object sender) {
-                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
-                    (slave.Status != AquaPicBusStatus.communicationStart) ||
-                    (slave.Status != AquaPicBusStatus.open))
-                    Alarm.Post (communicationAlarmIndex);
-                else {
-                    if (Alarm.CheckAlarming (communicationAlarmIndex))
-                        Alarm.Clear (communicationAlarmIndex);
-                }
-            }
+//            commented out because alarm handling is done in the serial slave object
+//            protected void OnSlaveStatusUpdate (object sender) {
+//                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
+//                    (slave.Status != AquaPicBusStatus.communicationStart) ||
+//                    (slave.Status != AquaPicBusStatus.open))
+//                    Alarm.Post (communicationAlarmIndex);
+//                else {
+//                    if (Alarm.CheckAlarming (communicationAlarmIndex))
+//                        Alarm.Clear (communicationAlarmIndex);
+//                }
+//            }
 
             public void AddChannel (int ch, string name) {
                 channels [ch].name = name;
