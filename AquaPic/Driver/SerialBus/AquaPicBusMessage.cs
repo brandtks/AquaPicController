@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AquaPic.SerialBus
 {
     public partial class AquaPicBus
     {
-        private class Message
+        private class InternalMessage
         {
             public Slave slave;
             public byte[] writeBuffer;
@@ -12,7 +13,7 @@ namespace AquaPic.SerialBus
             public int responseLength;
             public ResponseCallback callback;
 
-            public unsafe Message (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
+            public unsafe InternalMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
                 byte[] crc = new byte[2];
 
                 this.slave = slave;
@@ -36,6 +37,41 @@ namespace AquaPic.SerialBus
                 this.writeBuffer [this.writeBuffer.Length - 1] = crc [1];
             }
         }
+
+        /*
+        public class WriteBuffer
+        {
+            private List<byte> _buffer;
+
+            public byte[] buffer {
+                get {
+                    return _buffer.ToArray ();
+                }
+            }
+
+            public int size {
+                get {
+                    return _buffer.Count;
+                }
+            }
+
+            public WriteBuffer () {
+                _buffer = new List<byte> ();
+            }
+
+            public void Add<T> (T data) {
+                int size = sizeof(T);
+                byte[] d = new byte[size];
+                unsafe {
+                    fixed (byte* ptr = d) {
+                        Utilities.MemoryCopy (&data, ptr, size);
+                    }
+                }
+
+                _buffer.AddRange (d);
+            }
+        }
+        */
     }
 }
 

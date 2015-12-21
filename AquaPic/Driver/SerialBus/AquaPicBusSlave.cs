@@ -57,9 +57,29 @@ namespace AquaPic.SerialBus
                 bus.queueMessage (this, func, writeData, writeSize, 0, null);
             }
 
+            /*
+            public void Write (int func, WriteBuffer writeData) {
+                unsafe {
+                    fixed (byte* ptr = &(writeData.buffer)) {
+                        bus.queueMessage (this, (byte)func, ptr, writeData.size, 0, null);
+                    }
+                }
+            }
+            */
+
             public unsafe void ReadWrite (byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
                 bus.queueMessage (this, func, writeData, writeSize, readSize, callback);
             }
+
+            /*
+            public void ReadWrite (int func, WriteBuffer buffer, int writeSize, int readSize, ResponseCallback callback) {
+                unsafe {
+                    fixed (byte* ptr = &(buffer.buffer)) {
+                        bus.queueMessage (this, (byte)func, ptr, buffer.size, readSize, callback);
+                    }
+                }
+            }
+            */
 
             public void updateStatus (AquaPicBusStatus stat, int time) {
                 if (time != 0) {

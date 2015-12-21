@@ -8,7 +8,7 @@ namespace AquaPic.UserInterface
 {
     public class WindowBase : Fixed
     {
-//        private Image background;
+        //private Image background;
 
         public WindowBase () {
             SetSizeRequest (800, 416);
@@ -27,7 +27,6 @@ namespace AquaPic.UserInterface
 //            this.Put (background, 0, 0);
 //            this.background.Show ();
 //            pic.Dispose ();
-
         }
 
         public override void Dispose () {

@@ -12,12 +12,13 @@ namespace AquaPic
 	class MainClass
 	{
         public static void Main (string[] args) {
-            if (Utils.GetRunningPlatform () == Platform.Windows)
+            //Call the Gtk library hack because Windows sucks at everything
+            if (Utils.RunningPlatform == Platform.Windows)
                 CheckWindowsGtk ();
 
             Application.Init ();
 
-            Logger.Add ("Executing operating system is {0}", Utils.GetDescription (Utils.GetRunningPlatform ()));
+            Logger.Add ("Executing operating system is {0}", Utils.GetDescription (Utils.RunningPlatform));
 
             try {
                 Equipment.AddFromJson ();
@@ -29,17 +30,6 @@ namespace AquaPic
             } catch (Exception ex) {
                 Logger.AddError (ex.ToString ());
             }
-
-//            Commented out because I can't figure out themes on RPI
-//            string resourceFile;
-//            string proc = Environment.GetEnvironmentVariable ("PROCESSOR_ARCHITECTURE", EnvironmentVariableTarget.Machine);
-//            if (proc == "x86")
-//                resourceFile = @"C:\Program Files\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
-//            else
-//                resourceFile = @"C:\Program Files (x86)\Mono\share\themes\Nodoka-Midnight\gtk-2.0\gtkrc";
-//            
-//            Gtk.Rc.AddDefaultFile (resourceFile);
-//            Gtk.Rc.Parse (resourceFile);
 
             AquaPicGUI win = new AquaPicGUI ();
             win.Show ();
@@ -53,6 +43,7 @@ namespace AquaPic
             Application.Run ();
 		}
 
+        //Gtk library hack because Windows
         [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
         [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
         static extern bool SetDllDirectory (string lpPathName);
@@ -90,7 +81,7 @@ namespace AquaPic
             }
 
             // this shouldn't happen unless something is weird in Windows
-            Console.WriteLine ("Unable to set GTK+ dll directory");
+            Console.WriteLine ("Unable to set GTK# dll directory");
             return true;
         }
     }

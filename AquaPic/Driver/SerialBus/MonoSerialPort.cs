@@ -64,7 +64,7 @@ namespace AquaPic.SerialBus
         public new void Open () {
             base.Open();
 
-            if (Utils.GetRunningPlatform () != Platform.Windows) {
+            if (Utils.RunningPlatform != Platform.Windows) {
                 Logger.Add ("Linux runtime: implementing work around for AquaPicBus");
 
                 FieldInfo fieldInfo = BaseStream.GetType().GetField("fd", BindingFlags.Instance | BindingFlags.NonPublic);

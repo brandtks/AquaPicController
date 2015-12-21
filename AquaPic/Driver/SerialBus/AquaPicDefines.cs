@@ -42,4 +42,18 @@ namespace AquaPic.SerialBus
                 *d++ = readBuffer [3 + i];
         }
     }
+
+    public partial class AquaPicBus
+    {
+        private class Utilities
+        {
+            public static unsafe void MemoryCopy (void* fromData, void* toData, int size) {
+                byte* f = (byte*)fromData;
+                byte* t = (byte*)toData;
+
+                while (size-- != 0)
+                    *t++ = *f++;
+            }
+        }
+    }
 }

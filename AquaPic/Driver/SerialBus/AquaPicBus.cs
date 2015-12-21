@@ -126,7 +126,7 @@ namespace AquaPic.SerialBus
         //57600
         public void Open (string port, int baudRate = 57600) {
             try {
-                if (Utils.GetRunningPlatform () == Platform.Windows)
+                if (Utils.RunningPlatform == Platform.Windows)
                     uart = new SerialPort (port, baudRate, Parity.Space, 8);
                 else
                     uart = new MonoSerialPort (port, baudRate, Parity.Space, 8);
@@ -136,7 +136,7 @@ namespace AquaPic.SerialBus
                 uart.ReadTimeout = 1000;
                 uart.DataReceived += new SerialDataReceivedEventHandler (uartDataReceived);
 
-                if (Utils.GetRunningPlatform () == Platform.Windows)
+                if (Utils.RunningPlatform == Platform.Windows)
                     uart.Open ();
                 else {
                     MonoSerialPort msp = uart as MonoSerialPort;
@@ -178,7 +178,7 @@ namespace AquaPic.SerialBus
         private unsafe void queueMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
             // <TEST> if uart is null the port isn't open so don't queue the message
             if (uart != null)
-                messageBuffer.Enqueue (new Message (slave, func, writeData, writeSize, readSize, callback));
+                messageBuffer.Enqueue (new InternalMessage (slave, func, writeData, writeSize, readSize, callback));
         }
 
         // background thread to dequeue any messages and send to slave
@@ -194,10 +194,10 @@ namespace AquaPic.SerialBus
                     if (count > 8)
                         Logger.AddWarning (string.Format ("Message queue count is {0}", count));
 
-                    Message m;
+                    InternalMessage m;
 
                     lock (messageBuffer.SyncRoot) {
-                        m = (Message)messageBuffer.Dequeue ();
+                        m = (InternalMessage)messageBuffer.Dequeue ();
                     }
 
                     if (uart.IsOpen) {
@@ -214,26 +214,26 @@ namespace AquaPic.SerialBus
                                     receiveBuffer.buffer.Clear ();
                                 }
 
-                                // Mark/Space parity not implemented in Mono
-                                //uart.Parity = Parity.Mark;
-                                //uart.Write (m.writeBuffer, 0, 1);
-                                //uart.Parity = Parity.Space;
-
-                                WriteWithParity (m.writeBuffer [0], Parity.Mark);
-
                                 #if DEBUG_SERIAL
                                 Console.WriteLine ();
                                 Console.WriteLine ("Start Message");
-                                foreach (var w in m.writeBuffer) {
+                                foreach (var w in m.writeBuffer)
                                     Console.WriteLine ("{0:X}", w);
-                                }
                                 #endif
 
-                                for (int index = 1; index < m.writeBuffer.Length; ++index) {
-                                    WriteWithParity (m.writeBuffer [index]);
-                                }
+                                if (Utils.RunningPlatform == Platform.Windows) {
+                                    uart.Parity = Parity.Mark;
+                                    uart.Write (m.writeBuffer, 0, 1);
+                                    uart.Parity = Parity.Space;
 
-                                //uart.Write (m.writeBuffer, 1, m.writeBuffer.Length - 1);
+                                    uart.Write (m.writeBuffer, 1, m.writeBuffer.Length - 1);
+                                } else {
+                                    WriteWithParity (m.writeBuffer [0], Parity.Mark);
+
+                                    for (int index = 1; index < m.writeBuffer.Length; ++index) {
+                                        WriteWithParity (m.writeBuffer [index]);
+                                    }
+                                }
 
                                 stopwatch.Restart (); // resets stopwatch for response time, getResponse(ref byte[]) stops it
 
@@ -306,11 +306,11 @@ namespace AquaPic.SerialBus
                 byte[] b = new byte[size];
                 uart.Read (b, 0, size);
 
-                //#if DEBUG
-                //Console.WriteLine ("BytesToRead: {0}. Response...", size);
-                //foreach (var bb in b)
-                //    Console.WriteLine ("{0:X}", bb);
-                //#endif
+                #if DEBUG_SERIAL
+                Console.WriteLine ("BytesToRead: {0}. Response...", size);
+                foreach (var bb in b)
+                    Console.WriteLine ("{0:X}", bb);
+                #endif
 
                 receiveBuffer.buffer.AddRange (b);
 
