@@ -23,11 +23,6 @@ namespace AquaPic.Utilites
         }
     }
 
-//    public struct CommValueFloat {
-//        public byte channel;
-//        public float value;
-//    }
-
     #if UNSAFE_COMMS
     public struct CommValueInt {
         public byte channel;
@@ -38,30 +33,11 @@ namespace AquaPic.Utilites
         public byte channel;
         public bool value;
     }
+
+    public struct CommValueFloat {
+        public byte channel;
+        public float value;
+    }
     #endif
-
-
-    // Can't use managed because you can't use a pointer to it
-//    public struct ValueGetter<T> {
-//        public byte channel;
-//        public T value;
-//
-//        public int GetSize () {
-//            int size = sizeof(byte);
-//            size += sizeof(T);
-//            return size;
-//        }
-//    }
-//
-//    public struct ValueSetter<T> {
-//        public byte channel;
-//        public T value;
-//
-//        public int GetSize () {
-//            int size = sizeof(byte);
-//            size += sizeof(T);
-//            return size;
-//        }
-//    }
 }
 
