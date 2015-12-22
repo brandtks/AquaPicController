@@ -12,28 +12,14 @@ namespace AquaPic.Drivers
             public AquaPicBus.Slave slave;
             public byte cardID;
             public string name;
-//            public int communicationAlarmIndex;
             public AnalogInputChannel[] channels;
             public bool updating;
 
-            /* <FUTURE>
-            public analogInputCard (byte address, byte cardID, AnalogType[] types, string[] names) {
-                this._cardID = cardID;
-                this._alarmIdx = alarm.subscribe ("APB communication error", "Temperature channel at address " + this._address.ToString ());
-                this.channels = new analogInputChannel[4];
-                for (int i = 0; i < channels.Length; ++i) {
-                    channels [i] = new analogInputChannel (types [i], names [i]); 
-                }
-            }
-            */
-
             public AnalogInputCard (byte address, byte cardID, string name) {
                 this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Analog Input)");
-//                this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
 
                 this.cardID = cardID;
                 this.name = name;
-//                this.communicationAlarmIndex = Alarm.Subscribe (address.ToString () + " communication fault");
                 this.channels = new AnalogInputChannel[4];
                 for (int i = 0; i < this.channels.Length; ++i) {
                     this.channels [i] = new AnalogInputChannel (this.name + ".i" + i.ToString ()); 
@@ -41,45 +27,35 @@ namespace AquaPic.Drivers
                 this.updating = false;
             }
 
-//            commented out because alarm handling is done in the serial slave object
-//            protected void OnSlaveStatusUpdate (object sender) {
-//                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
-//                    (slave.Status != AquaPicBusStatus.communicationStart) ||
-//                    (slave.Status != AquaPicBusStatus.open))
-//                    Alarm.Post (communicationAlarmIndex);
-//                else {
-//                    if (Alarm.CheckAlarming (communicationAlarmIndex))
-//                        Alarm.Clear (communicationAlarmIndex);
-//                }
-//            }
-
             public void AddChannel (int ch, string name) {
                 channels [ch].name = name;
-
-//                byte[] arr = new byte[2];
-//                arr [0] = (byte)ch;
-//                arr [1] = (byte)channels [ch].type;
-//
-//                unsafe {
-//                    fixed (byte* ptr = &arr [0]) {
-//                        slave.Write (2, ptr, sizeof(byte) * 2);
-//                    }
-//                }
             }
 
-            public unsafe void GetValues () {
+            public void GetValues () {
                 updating = true;
-                slave.Read (20, sizeof(Int16) * 4, GetValuesCallback); 
+                #if UNSAFE_COMMS
+                unsafe {
+                    slave.Read (20, sizeof(Int16) * 4, GetValuesCallback);
+                }
+                #else
+                slave.Read (20, sizeof(short) * 4, GetValuesCallback);
+                #endif
             }
 
             protected void GetValuesCallback (CallbackArgs args) {
-                Int16[] values = new Int16[4];
+                short[] values = new short[4];
 
+                #if UNSAFE_COMMS
                 unsafe {
-                    fixed (Int16* ptr = values) {
-                        args.copyBuffer (ptr, sizeof(Int16) * 4);
+                    fixed (short* ptr = values) {
+                        args.CopyBuffer (ptr, sizeof(short) * 4);
                     }
                 }
+                #else
+                for (int i = 0; i < values.Length; ++i) {
+                    values [i] = args.GetDataFromReadBuffer<short> (i * 2);
+                }
+                #endif
 
                 for (int i = 0; i < channels.Length; ++i) {
                     if (channels [i].mode == Mode.Auto)
@@ -89,22 +65,35 @@ namespace AquaPic.Drivers
                 updating = false;
             }
 
-            public unsafe void GetValue (byte ch) {
+            public void GetValue (byte ch) {
                 if (channels [ch].mode == Mode.Auto) {
-                    byte message = ch;
                     updating = true;
-                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueInt), GetValueCallback);
+                    #if UNSAFE_COMMS
+                    byte message = ch;
+                    unsafe {
+                        slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueInt), GetValueCallback);
+                    }
+                    #else
+                    slave.ReadWrite (10, ch, 3, GetValuesCallback);
+                    #endif
                 }
             }
 
             protected void GetValueCallback (CallbackArgs args) {
+                #if UNSAFE_COMMS
                 CommValueInt vg;
 
                 unsafe {
-                    args.copyBuffer (&vg, sizeof(CommValueInt));
+                    args.CopyBuffer (&vg, sizeof(CommValueInt));
                 }
                    
                 channels [vg.channel].value = (float)vg.value;
+                #else
+                byte ch = args.GetDataFromReadBuffer<byte> (0);
+                short value = args.GetDataFromReadBuffer<short> (1);
+                channels [ch].value = (float)value;
+                #endif
+
                 updating = false;
             }
         }

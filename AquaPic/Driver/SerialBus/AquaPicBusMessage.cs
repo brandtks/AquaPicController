@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace AquaPic.SerialBus
 {
@@ -13,6 +12,7 @@ namespace AquaPic.SerialBus
             public int responseLength;
             public ResponseCallback callback;
 
+            #if UNSAFE_COMMS
             public unsafe InternalMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
                 byte[] crc = new byte[2];
 
@@ -36,42 +36,28 @@ namespace AquaPic.SerialBus
                 this.writeBuffer [this.writeBuffer.Length - 2] = crc [0];
                 this.writeBuffer [this.writeBuffer.Length - 1] = crc [1];
             }
-        }
+            #endif
 
-        /*
-        public class WriteBuffer
-        {
-            private List<byte> _buffer;
+            public InternalMessage (Slave slave, byte func, byte[] writeBuffer, int writeSize, int readSize, ResponseCallback callback) {
+                byte[] crc = new byte[2];
 
-            public byte[] buffer {
-                get {
-                    return _buffer.ToArray ();
-                }
-            }
+                this.slave = slave;
+                this.writeBuffer = new byte[5 + writeSize];
+                this.responseLength = 5 + readSize;
+                this.readBuffer = new byte[responseLength];
+                this.callback = callback;
 
-            public int size {
-                get {
-                    return _buffer.Count;
-                }
-            }
+                this.writeBuffer [0] = slave.Address;
+                this.writeBuffer [1] = func;
+                this.writeBuffer [2] = (byte)this.writeBuffer.Length;
 
-            public WriteBuffer () {
-                _buffer = new List<byte> ();
-            }
+                Array.Copy (writeBuffer, 0, writeBuffer, 3, writeSize);
 
-            public void Add<T> (T data) {
-                int size = sizeof(T);
-                byte[] d = new byte[size];
-                unsafe {
-                    fixed (byte* ptr = d) {
-                        Utilities.MemoryCopy (&data, ptr, size);
-                    }
-                }
-
-                _buffer.AddRange (d);
+                crc16 (ref writeBuffer, ref crc);
+                this.writeBuffer [this.writeBuffer.Length - 2] = crc [0];
+                this.writeBuffer [this.writeBuffer.Length - 1] = crc [1];
             }
         }
-        */
     }
 }
 

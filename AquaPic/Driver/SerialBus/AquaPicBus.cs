@@ -148,7 +148,7 @@ namespace AquaPic.SerialBus
 
                 if (uart.IsOpen) {
                     for (int i = 0; i < slaves.Count; ++i)
-                        slaves [i].updateStatus (AquaPicBusStatus.open, 0);
+                        slaves [i].UpdateStatus (AquaPicBusStatus.open, 0);
                 }
 
                 txRxThread.Start ();
@@ -175,11 +175,19 @@ namespace AquaPic.SerialBus
             return true;
         }
 
-        private unsafe void queueMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
+        #if UNSAFE_COMMS
+        private unsafe void QueueMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
             // <TEST> if uart is null the port isn't open so don't queue the message
             if (uart != null)
                 messageBuffer.Enqueue (new InternalMessage (slave, func, writeData, writeSize, readSize, callback));
         }
+        #else
+        private void QueueMessage (Slave slave, byte func, byte[] writeData, int writeSize, int readSize, ResponseCallback callback) {
+            // <TEST> if uart is null the port isn't open so don't queue the message
+            if (uart != null)
+                messageBuffer.Enqueue (new InternalMessage (slave, func, writeData, writeSize, readSize, callback));
+        }
+        #endif
 
         // background thread to dequeue any messages and send to slave
         // waits for response and calls callback if required
@@ -201,7 +209,7 @@ namespace AquaPic.SerialBus
                     }
 
                     if (uart.IsOpen) {
-                        m.slave.updateStatus (AquaPicBusStatus.communicationStart, 0);
+                        m.slave.UpdateStatus (AquaPicBusStatus.communicationStart, 0);
                         //uart.ReceivedBytesThreshold = m.responseLength;
 
                         try {
@@ -252,25 +260,25 @@ namespace AquaPic.SerialBus
                                         if (Alarm.CheckAlarming (m.slave.alarmIdx))
                                             Alarm.Clear (m.slave.alarmIdx);
 
-                                        m.slave.updateStatus (AquaPicBusStatus.communicationSuccess, (int)stopwatch.ElapsedMilliseconds);
+                                        m.slave.UpdateStatus (AquaPicBusStatus.communicationSuccess, (int)stopwatch.ElapsedMilliseconds);
                                         break;
                                     } else {
-                                        m.slave.updateStatus (AquaPicBusStatus.crcError, 1000);
+                                        m.slave.UpdateStatus (AquaPicBusStatus.crcError, 1000);
                                         Logger.AddWarning ("APB {0} crc error", m.slave.Address);
                                         Alarm.Post (m.slave.alarmIdx);
                                     }
                                 } catch (TimeoutException) {
-                                    m.slave.updateStatus (AquaPicBusStatus.timeout, readTimeout);
+                                    m.slave.UpdateStatus (AquaPicBusStatus.timeout, readTimeout);
                                     Logger.AddWarning ("APB {0} timeout", m.slave.Address);
                                 }
                             }
                         } catch (Exception ex) {
-                            m.slave.updateStatus (AquaPicBusStatus.exception, 1000);
+                            m.slave.UpdateStatus (AquaPicBusStatus.exception, 1000);
                             Logger.AddError (ex.ToString ());
                             Alarm.Post (m.slave.alarmIdx);
                         }
                     } else {
-                        m.slave.updateStatus (AquaPicBusStatus.notOpen, 0);
+                        m.slave.UpdateStatus (AquaPicBusStatus.notOpen, 0);
                     }
                 }
             }

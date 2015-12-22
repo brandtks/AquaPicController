@@ -49,39 +49,53 @@ namespace AquaPic.SerialBus
                 _alarmIdx = Alarm.Subscribe (address.ToString () + " communication fault");
             }
 
+            #if UNSAFE_COMMS
             public unsafe void Read (byte func, int readSize, ResponseCallback callback) {
-                bus.queueMessage (this, func, null, 0, readSize, callback);
+                bus.QueueMessage (this, func, null, 0, readSize, callback);
             }
+            #else
+            public void Read (byte func, int readSize, ResponseCallback callback) {
+                bus.QueueMessage (this, func, null, 0, readSize, callback);
+            }
+            #endif
 
+            #if UNSAFE_COMMS
             public unsafe void Write (byte func, void* writeData, int writeSize) {
                 bus.queueMessage (this, func, writeData, writeSize, 0, null);
             }
-
-            /*
-            public void Write (int func, WriteBuffer writeData) {
-                unsafe {
-                    fixed (byte* ptr = &(writeData.buffer)) {
-                        bus.queueMessage (this, (byte)func, ptr, writeData.size, 0, null);
-                    }
-                }
+            #else
+            public void Write (int func, WriteBuffer writeBuffer) {
+                Write (func, writeBuffer.buffer);
             }
-            */
 
+            public void Write (int func, byte[] writeBuffer) {
+                bus.QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, 0, null);
+            }
+
+            public void Write (int func, byte writeBuffer) {
+                Write (func, new byte[] { writeBuffer });
+            }
+            #endif
+
+            #if UNSAFE_COMMS
             public unsafe void ReadWrite (byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
                 bus.queueMessage (this, func, writeData, writeSize, readSize, callback);
             }
-
-            /*
-            public void ReadWrite (int func, WriteBuffer buffer, int writeSize, int readSize, ResponseCallback callback) {
-                unsafe {
-                    fixed (byte* ptr = &(buffer.buffer)) {
-                        bus.queueMessage (this, (byte)func, ptr, buffer.size, readSize, callback);
-                    }
-                }
+            #else
+            public void ReadWrite (int func, WriteBuffer writeBuffer, int readSize, ResponseCallback callback) {
+                ReadWrite (func, writeBuffer.buffer, readSize, callback);
             }
-            */
 
-            public void updateStatus (AquaPicBusStatus stat, int time) {
+            public void ReadWrite (int func, byte[] writeBuffer, int readSize, ResponseCallback callback) {
+                bus.QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, readSize, callback);
+            }
+
+            public void ReadWrite (int func, byte writeBuffer, int readSize, ResponseCallback callback) {
+                ReadWrite (func, new byte[] { writeBuffer }, readSize, callback);
+            }
+            #endif
+
+            public void UpdateStatus (AquaPicBusStatus stat, int time) {
                 if (time != 0) {
                     long sum = 0;
                     int sumCount = 0;

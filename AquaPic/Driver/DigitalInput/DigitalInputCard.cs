@@ -43,32 +43,50 @@ namespace AquaPic.Drivers
 //                }
 //            }
 
-            public unsafe void GetInputs () {
+            public void GetInputs () {
+                #if UNSAFE_COMMS
+                unsafe {
+                    slave.Read (20, sizeof(byte), GetInputsCallback);
+                }
+                #else
                 slave.Read (20, sizeof(byte), GetInputsCallback);
+                #endif
             }
 
             protected void GetInputsCallback (CallbackArgs args) {
                 byte stateMask;
 
+                #if UNSAFE_COMMS
                 unsafe {
-                    args.copyBuffer (&stateMask, sizeof(byte));
+                    args.CopyBuffer (&stateMask, sizeof(byte));
                 }
+                #else
+                stateMask = args.GetDataFromReadBuffer<byte> (0);
+                #endif
 
                 for (int i = 0; i < inputs.Length; ++i)
                     inputs [i].state = Utils.mtob (stateMask, i);
             }
 
-            public unsafe void GetInput (byte input) {
-                byte message = input;
+            public void GetInput (int ch) {
                 updating = true;
-                slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueBool), GetInputCallback);
+                #if UNSAFE_COMMS
+                byte message = ch;
+
+                unsafe {
+                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueBool), GetInputCallback);
+                }
+                #else
+                slave.ReadWrite (10, (byte)ch, 2, GetInputCallback);
+                #endif
             }
 
             protected void GetInputCallback (CallbackArgs args) {
+                #if UNSAFE_COMMS
                 CommValueBool vg;
 
                 unsafe {
-                    args.copyBuffer (&vg, sizeof(CommValueBool));
+                    args.CopyBuffer (&vg, sizeof(CommValueBool));
                 }
 
                 if (inputs [vg.channel].state != vg.value) {
@@ -76,6 +94,17 @@ namespace AquaPic.Drivers
                 }
 
                 inputs [vg.channel].state = vg.value;
+                #else
+                byte ch = args.GetDataFromReadBuffer<byte> (0);
+                bool value = args.GetDataFromReadBuffer<bool> (1);
+
+                if (inputs [ch].state != value) {
+                    //do event
+                }
+
+                inputs [ch].state = value;
+                #endif
+
                 updating = false;
             }
         }

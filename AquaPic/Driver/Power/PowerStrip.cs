@@ -12,7 +12,6 @@ namespace AquaPic.Drivers
         private class PowerStrip {
             public AquaPicBus.Slave slave;
             public byte powerID;
-            //public int commsAlarmIdx;
             public int powerLossAlarmIndex;
             public bool AcPowerAvailable;
             public string name;
@@ -20,17 +19,13 @@ namespace AquaPic.Drivers
 
             public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) {
                 this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Power Strip)");
-                //this.slave.OnStatusUpdate += OnSlaveStatusUpdate;
-
                 this.powerID = powerID;
 
-                //this.commsAlarmIdx = Alarm.Subscribe (this.slave.Address.ToString () + " communication fault");
-
-                if (alarmOnLossOfPower && (powerLossAlarmIndex == -1))
-                    this.powerLossAlarmIndex = Alarm.Subscribe (
-                        "Loss of power");
-                else
+                if (alarmOnLossOfPower && (powerLossAlarmIndex == -1)) {
+                    this.powerLossAlarmIndex = Alarm.Subscribe ("Loss of power");
+                } else {
                     this.powerLossAlarmIndex = powerLossAlarmIndex;
+                }
 
                 this.name = name;
                 this.AcPowerAvailable = false;
@@ -47,37 +42,48 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public unsafe void SetupOutlet (byte outletID, MyState fallback) {
+            public void SetupOutlet (int outletId, MyState fallback) {
                 const int messageLength = 2; 
-
                 byte[] message = new byte[messageLength];
 
-                message [0] = outletID;
+                message [0] = (byte)outletId;
 
                 if (fallback == MyState.On)
                     message [1] = 0xFF;
                 else
                     message [1] = 0x00;
 
+                #if UNSAFE_COMMS
                 unsafe {
                     fixed (byte* ptr = message) {
                         slave.Write (2, ptr, sizeof(byte) * messageLength);
                     }
                 }
+                #else
+                slave.Write (2, message);
+                #endif
             }
 
-            public unsafe void GetStatus () {
-                slave.Read (20, sizeof(PowerComms), GetStatusCallback);
+
+            public void GetStatus () {
+                #if UNSAFE_COMMS
+                unsafe {
+                    slave.Read (20, sizeof(PowerComms), GetStatusCallback);
+                }
+                #else
+                slave.Read (20, 2, GetStatusCallback);
+                #endif
             }
 
             protected void GetStatusCallback (CallbackArgs callArgs) {
                 if (slave.Status != AquaPicBusStatus.communicationSuccess)
                     return;
 
+                #if UNSAFE_COMMS
                 PowerComms status = new PowerComms ();
 
                 unsafe {
-                    callArgs.copyBuffer (&status, sizeof(PowerComms));
+                    callArgs.CopyBuffer (&status, sizeof(PowerComms));
                 }
 
                 AcPowerAvailable = status.acPowerAvailable;
@@ -88,40 +94,62 @@ namespace AquaPic.Drivers
                     if (Utils.mtob (status.currentAvailableMask, i))
                         ReadOutletCurrent ((byte)i);
                 }
+                #else
+                AcPowerAvailable = callArgs.GetDataFromReadBuffer<bool> (0);
+
+                if (!AcPowerAvailable)
+                    Alarm.Post (powerLossAlarmIndex);
+
+                byte currentMask = callArgs.GetDataFromReadBuffer<byte> (1);
+                for (int i = 0; i < outlets.Length; ++i) {
+                    if (Utils.mtob (currentMask, i))
+                        ReadOutletCurrent ((byte)i);
+                }
+                #endif
             }
 
-            public void ReadOutletCurrent (byte outletID) {
+            public void ReadOutletCurrent (byte outletId) {
+                #if UNSAFE_COMMS
                 unsafe {
-                    slave.ReadWrite (10, &outletID, sizeof (byte), sizeof (AmpComms), ReadOutletCurrentCallback);
+                    slave.ReadWrite (10, &outletId, sizeof (byte), sizeof (AmpComms), ReadOutletCurrentCallback);
                 }
+                #else
+                slave.ReadWrite (10, outletId, 5, ReadOutletCurrentCallback);
+                #endif
             }
 
             protected void ReadOutletCurrentCallback (CallbackArgs callArgs) {
                 if (slave.Status != AquaPicBusStatus.communicationSuccess)
                     return;
 
+                #if UNSAFE_COMMS
                 AmpComms message;
 
                 unsafe {
-                    callArgs.copyBuffer (&message, sizeof(AmpComms));
+                    callArgs.CopyBuffer (&message, sizeof(AmpComms));
                 }
 
                 outlets [message.outletID].SetAmpCurrent (message.current);
+                #else
+                int outletId = callArgs.GetDataFromReadBuffer<byte> (0);
+                outlets [outletId].SetAmpCurrent (callArgs.GetDataFromReadBuffer<float> (1));
+                #endif
             }
 
-            public void SetOutletState (byte outletID, MyState state) {
+            public void SetOutletState (byte outletId, MyState state) {
                 const int messageLength = 2;
 
-                outlets [outletID].manualState = state;
+                outlets [outletId].manualState = state;
 
                 byte[] message = new byte[messageLength];
-                message [0] = outletID;
+                message [0] = outletId;
 
                 if (state == MyState.On)
                     message [1] = 0xFF;
                 else
                     message [1] = 0x00;
 
+                #if UNSAFE_COMMS
                 unsafe {
                     fixed (byte* ptr = message) {
                         slave.ReadWrite (
@@ -130,12 +158,22 @@ namespace AquaPic.Drivers
                             sizeof(byte) * messageLength, 
                             0, 
                             (args) => {
-                                //outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state)));
-                                outlets [outletID].currentState = state;
-                                OnStateChange (outlets [outletID], new StateChangeEventArgs (outletID, powerID, state));
+                                //outlets [outletId].OnChangeState (new StateChangeEventArgs (outletId, powerID, state)));
+                                outlets [outletId].currentState = state;
+                                OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
                             });
                     }
                 }
+                #else
+                slave.ReadWrite (
+                    30,
+                    message,
+                    0, // this just returns the default response so there is no data, ie 0
+                    (args) => {
+                        outlets [outletId].currentState = state;
+                        OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
+                    });
+                #endif
 
                 //<TEST> this is here only because the slave never responds so the callback never happens
                 //outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state));
@@ -143,23 +181,11 @@ namespace AquaPic.Drivers
                 //OnStateChange (outlets [outletID], new StateChangeEventArgs (outletID, powerID, state));
             }
 
-            public void SetPlugMode (byte outletID, Mode mode) {
-                //outlets [outletID].OnModeChange (new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
-                outlets [outletID].mode = mode;
-                OnModeChange (outlets [outletID], new ModeChangeEventArgs (outletID, powerID, outlets [outletID].mode));
+            public void SetPlugMode (byte outletId, Mode mode) {
+                //outlets [outletId].OnModeChange (new ModeChangeEventArgs (outletId, powerID, outlets [outletId].mode));
+                outlets [outletId].mode = mode;
+                OnModeChange (outlets [outletId], new ModeChangeEventArgs (outletId, powerID, outlets [outletId].mode));
             }
-
-//            commented out because alarm handling is done in the serial slave object
-//            protected void OnSlaveStatusUpdate (object sender) {
-//                if ((slave.Status != AquaPicBusStatus.communicationSuccess) ||
-//                    (slave.Status != AquaPicBusStatus.communicationStart) ||
-//                    (slave.Status != AquaPicBusStatus.open))
-//                    Alarm.Post (commsAlarmIdx);
-//                else {
-//                    if (Alarm.CheckAlarming (commsAlarmIdx))
-//                        Alarm.Clear (commsAlarmIdx);
-//                }
-//            }
     	}
     }
 }

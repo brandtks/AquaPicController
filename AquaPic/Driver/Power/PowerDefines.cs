@@ -54,7 +54,9 @@ namespace AquaPic.Drivers
         }
     }
 
-    // AquaPicBus communication struct
+   
+    #if UNSAFE_COMMS
+    // AquaPicBus communication structs
     public struct PlugComms {
         public byte outletID;
         public bool state;
@@ -69,5 +71,6 @@ namespace AquaPic.Drivers
         public byte outletID;
         public float current;
     }
+    #endif
 }
 

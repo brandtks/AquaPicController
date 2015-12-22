@@ -28,6 +28,7 @@ namespace AquaPic.Utilites
 //        public float value;
 //    }
 
+    #if UNSAFE_COMMS
     public struct CommValueInt {
         public byte channel;
         public short value;
@@ -37,6 +38,7 @@ namespace AquaPic.Utilites
         public byte channel;
         public bool value;
     }
+    #endif
 
 
     // Can't use managed because you can't use a pointer to it
