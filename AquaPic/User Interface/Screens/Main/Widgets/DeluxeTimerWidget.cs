@@ -163,7 +163,7 @@ namespace AquaPic.UserInterface
             if (t == tIdx)
                 UpdateTime (timers [t].totalSeconds);
 
-            TouchMessageBox.Show (timer.name);
+            MessageBox.Show (timer.name);
         }
 
         protected void OnTimerStartStop (object sender) {

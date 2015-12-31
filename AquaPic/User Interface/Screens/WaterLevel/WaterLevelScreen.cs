@@ -80,7 +80,7 @@ namespace AquaPic.UserInterface
             atoClearFailBtn.buttonColor = "compl";
             atoClearFailBtn.ButtonReleaseEvent += (o, args) => {
                 if (!WaterLevel.ClearAtoAlarm ())
-                    TouchMessageBox.Show ("Please acknowledge alarms first");
+                    MessageBox.Show ("Please acknowledge alarms first");
             };
             Put (atoClearFailBtn, 290, 188);
             if (Alarm.CheckAlarming (WaterLevel.atoFailedAlarmIndex)) {

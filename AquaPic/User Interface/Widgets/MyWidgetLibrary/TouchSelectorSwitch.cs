@@ -89,11 +89,11 @@ namespace MyWidgetLibrary
         public TouchSelectorSwitch (int id) : this (id, 2, 0, MyOrientation.Horizontal) { }
 
         public void AddSelectedColorOption (int selectionIndex, string newColor) {
-            BkgndColorOptions [selectionIndex].ChangeColor (newColor);
+            BkgndColorOptions [selectionIndex] = newColor;
         }
 
         public void AddSelectedColorOption (int selectionIndex, double R, double G, double B) {
-            BkgndColorOptions [selectionIndex].ChangeColor (R, G, B);
+            BkgndColorOptions [selectionIndex] = new MyColor (R, G, B);
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {

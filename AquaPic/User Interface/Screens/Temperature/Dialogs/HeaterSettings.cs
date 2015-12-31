@@ -31,7 +31,7 @@ namespace AquaPic.UserInterface
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
                 else if (!Temperature.HeaterNameOk (args.text)) {
-                    TouchMessageBox.Show ("Heater name already exists");
+                    MessageBox.Show ("Heater name already exists");
                     args.keepText = false;
                 }
             };
@@ -74,12 +74,12 @@ namespace AquaPic.UserInterface
 
             if (heaterIdx == -1) {
                 if (name == "Enter name") {
-                    TouchMessageBox.Show ("Invalid heater name");
+                    MessageBox.Show ("Invalid heater name");
                     return false;
                 }
 
                 if (((SettingComboBox)settings ["Outlet"]).combo.Active == -1) {
-                    TouchMessageBox.Show ("Please select an outlet");
+                    MessageBox.Show ("Please select an outlet");
                     return false;
                 }
 
@@ -121,7 +121,7 @@ namespace AquaPic.UserInterface
                 }
 
                 if (arrIdx == -1) {
-                    TouchMessageBox.Show ("Something went wrong");
+                    MessageBox.Show ("Something went wrong");
                     return false;
                 }
 
@@ -157,7 +157,7 @@ namespace AquaPic.UserInterface
             }
 
             if (arrIdx == -1) {
-                TouchMessageBox.Show ("Something went wrong");
+                MessageBox.Show ("Something went wrong");
                 return false;
             }
 

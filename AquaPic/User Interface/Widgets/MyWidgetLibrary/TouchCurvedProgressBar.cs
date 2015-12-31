@@ -6,23 +6,23 @@ namespace MyWidgetLibrary
 {
     public class TouchCurvedProgressBar : EventBox
     {
-        private float _currentProgress;
-        public float currentProgress {
+        private float _progress;
+        public float progress {
             get {
-                return _currentProgress;
+                return _progress;
             }
             set {
                 if (value < 0.0f)
-                    _currentProgress = 0.0f;
+                    _progress = 0.0f;
                 else if (value > 1.0f)
-                    _currentProgress = 1.0f;
+                    _progress = 1.0f;
                 else
-                    _currentProgress = value;
+                    _progress = value;
             }
         }
 
-        public MyColor colorBackground;
-        public MyColor colorProgress;
+        public MyColor backgroundColor;
+        public MyColor progressColor;
 
         public TouchCurvedProgressBar (
             MyColor colorBackground, 
@@ -32,9 +32,9 @@ namespace MyWidgetLibrary
             this.Visible = true;
             this.VisibleWindow = false;
 
-            this.colorBackground = colorBackground;
-            this.colorProgress = colorProgress;
-            this._currentProgress = currentProgress;
+            this.backgroundColor = colorBackground;
+            this.progressColor = colorProgress;
+            this._progress = currentProgress;
 
             SetSizeRequest (160, 80);
 
@@ -63,10 +63,10 @@ namespace MyWidgetLibrary
                 cr.ArcNegative (originX, originY, height - barWidth, CalcRadians (0.0), CalcRadians (180.0));
                 cr.LineTo (x, originY);
                 cr.ClosePath ();
-                colorBackground.SetSource (cr);
+                backgroundColor.SetSource (cr);
                 cr.Fill ();
 
-                double r = CalcRadians ((1 - _currentProgress) * -180.0);
+                double r = CalcRadians ((1 - _progress) * -180.0);
                 double x2 = CalcX (originX, height - barWidth, r);
                 double y2 = CalcY (originY, height - barWidth, r);
 
@@ -76,7 +76,7 @@ namespace MyWidgetLibrary
                 cr.ArcNegative (originX, originY, height - barWidth, r, CalcRadians (180.0));
                 cr.LineTo (x, originY);
                 cr.ClosePath ();
-                colorProgress.SetSource (cr);
+                progressColor.SetSource (cr);
                 cr.Fill ();
             }
         }

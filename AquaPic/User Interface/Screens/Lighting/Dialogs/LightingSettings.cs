@@ -22,7 +22,7 @@ namespace AquaPic.UserInterface
                 try {
                     Convert.ToDouble (args.text);
                 } catch {
-                    TouchMessageBox.Show ("Improper latitude format");
+                    MessageBox.Show ("Improper latitude format");
                     args.keepText = false;
                 }
             };
@@ -35,7 +35,7 @@ namespace AquaPic.UserInterface
                 try {
                     Convert.ToDouble (args.text);
                 } catch {
-                    TouchMessageBox.Show ("Improper Longitude format");
+                    MessageBox.Show ("Improper Longitude format");
                     args.keepText = false;
                 }
             };
@@ -50,7 +50,7 @@ namespace AquaPic.UserInterface
                     Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
-                    TouchMessageBox.Show ("Improper time format, ##:##");
+                    MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
                 }
             };
@@ -65,7 +65,7 @@ namespace AquaPic.UserInterface
                     Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
-                    TouchMessageBox.Show ("Improper time format, ##:##");
+                    MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
                 }
             };
@@ -80,7 +80,7 @@ namespace AquaPic.UserInterface
                     Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
-                    TouchMessageBox.Show ("Improper time format, ##:##");
+                    MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
                 }
             };
@@ -95,7 +95,7 @@ namespace AquaPic.UserInterface
                     Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
-                    TouchMessageBox.Show ("Improper time format, ##:##");
+                    MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
                 }
             };
@@ -110,7 +110,7 @@ namespace AquaPic.UserInterface
                     Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
-                    TouchMessageBox.Show ("Improper time format, ##:##");
+                    MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
                 }
             };
@@ -125,7 +125,7 @@ namespace AquaPic.UserInterface
                     Time time = Time.Parse (args.text);
                     args.text = time.TimeToString ();
                 } catch {
-                    TouchMessageBox.Show ("Improper time format, ##:##");
+                    MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
                 }
             };

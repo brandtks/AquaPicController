@@ -52,7 +52,7 @@ namespace AquaPic.UserInterface
                     float onStpnt = Convert.ToSingle (args.text);
 
                     if (onStpnt < 0.0f) {
-                        TouchMessageBox.Show ("Analog on setpoint can't be negative");
+                        MessageBox.Show ("Analog on setpoint can't be negative");
                         args.keepText = false;
                         return;
                     }
@@ -60,12 +60,12 @@ namespace AquaPic.UserInterface
                     float offStpnt = Convert.ToSingle (((SettingTextBox)settings ["Analog Off"]).textBox.text);
 
                     if (onStpnt >= offStpnt) {
-                        TouchMessageBox.Show ("Analog on setpoint can't be greater than or equal to off setpoint");
+                        MessageBox.Show ("Analog on setpoint can't be greater than or equal to off setpoint");
                         args.keepText = false;
                         return;
                     }
                 } catch {
-                    TouchMessageBox.Show ("Improper analog on setpoint format");
+                    MessageBox.Show ("Improper analog on setpoint format");
                     args.keepText = false;
                 }
             };
@@ -79,7 +79,7 @@ namespace AquaPic.UserInterface
                     float offStpnt = Convert.ToSingle (args.text);
 
                     if (offStpnt < 0.0f) {
-                        TouchMessageBox.Show ("Analog on setpoint can't be negative");
+                        MessageBox.Show ("Analog on setpoint can't be negative");
                         args.keepText = false;
                         return;
                     }
@@ -87,12 +87,12 @@ namespace AquaPic.UserInterface
                     float onStpnt = Convert.ToSingle (((SettingTextBox)settings ["Analog On"]).textBox.text);
 
                     if (onStpnt >= offStpnt) {
-                        TouchMessageBox.Show ("Analog on setpoint can't be greater than or equal to off setpoint");
+                        MessageBox.Show ("Analog on setpoint can't be greater than or equal to off setpoint");
                         args.keepText = false;
                         return;
                     }
                 } catch {
-                    TouchMessageBox.Show ("Improper analog off setpoint format");
+                    MessageBox.Show ("Improper analog off setpoint format");
                     args.keepText = false;
                 }
             };
@@ -139,7 +139,7 @@ namespace AquaPic.UserInterface
 
                     args.text = string.Format ("{0} mins", time);
                 } catch {
-                    TouchMessageBox.Show ("Improper format");
+                    MessageBox.Show ("Improper format");
                     args.keepText = false;
                 }
             };
@@ -164,7 +164,7 @@ namespace AquaPic.UserInterface
 
                     args.text = string.Format ("{0} mins", time);
                 } catch {
-                    TouchMessageBox.Show ("Improper format");
+                    MessageBox.Show ("Improper format");
                     args.keepText = false;
                 }
             };
@@ -205,19 +205,19 @@ namespace AquaPic.UserInterface
                 float analogOnStpnt = Convert.ToSingle (Convert.ToSingle (((SettingTextBox)settings ["Analog On"]).textBox.text));
 
                 if (analogOnStpnt < 0.0f) {
-                    TouchMessageBox.Show ("Analog on setpoint can't be negative");
+                    MessageBox.Show ("Analog on setpoint can't be negative");
                     return false;
                 }
 
                 float analogOffStpnt = Convert.ToSingle (((SettingTextBox)settings ["Analog Off"]).textBox.text);
 
                 if (analogOffStpnt < 0.0f) {
-                    TouchMessageBox.Show ("Analog off setpoint can't be negative");
+                    MessageBox.Show ("Analog off setpoint can't be negative");
                     return false;
                 }
 
                 if (analogOnStpnt >= analogOffStpnt) {
-                    TouchMessageBox.Show ("Analog on setpoint can't be greater than or equal to analog off setpoint");
+                    MessageBox.Show ("Analog on setpoint can't be greater than or equal to analog off setpoint");
                     return false;
                 }
 
@@ -235,7 +235,7 @@ namespace AquaPic.UserInterface
 
                 try {
                     if (((SettingComboBox)settings ["Pump Outlet"]).combo.Active == -1) {
-                        TouchMessageBox.Show ("Please select power outlet for the pump");
+                        MessageBox.Show ("Please select power outlet for the pump");
                         return false;
                     }
 
@@ -254,7 +254,7 @@ namespace AquaPic.UserInterface
                     }
                 } catch (Exception ex) {
                     Logger.AddError (ex.ToString ());
-                    TouchMessageBox.Show ("Something went wrong, check logger");
+                    MessageBox.Show ("Something went wrong, check logger");
                     return false;
                 }
 

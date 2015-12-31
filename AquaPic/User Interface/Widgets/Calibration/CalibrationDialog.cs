@@ -205,7 +205,7 @@ namespace MyWidgetLibrary
                 break;
             case CalibrationState.FullScaleActual:
                 if (valTb.text == "Actual")
-                    TouchMessageBox.Show ("Please enter the full scale actual value");
+                    MessageBox.Show ("Please enter the full scale actual value");
                 else {
                     calArgs.fullScaleActual = Convert.ToDouble (valTb.text);
                     MoveToNextState ();

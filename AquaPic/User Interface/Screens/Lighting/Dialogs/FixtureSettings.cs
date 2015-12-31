@@ -31,7 +31,7 @@ namespace AquaPic.UserInterface
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
                 else if (!Lighting.FixtureNameOk (args.text)) {
-                    TouchMessageBox.Show ("Heater name already exists");
+                    MessageBox.Show ("Heater name already exists");
                     args.keepText = false;
                 }
             };
@@ -94,7 +94,7 @@ namespace AquaPic.UserInterface
                 try {
                     Convert.ToInt32 (args.text);
                 } catch {
-                    TouchMessageBox.Show ("Improper integer format");
+                    MessageBox.Show ("Improper integer format");
                     args.keepText = false;
                 }
             };
@@ -111,7 +111,7 @@ namespace AquaPic.UserInterface
                 try {
                     Convert.ToInt32 (args.text);
                 } catch {
-                    TouchMessageBox.Show ("Improper integer format");
+                    MessageBox.Show ("Improper integer format");
                     args.keepText = false;
                 }
             };
@@ -167,11 +167,11 @@ namespace AquaPic.UserInterface
                     float min = Convert.ToSingle (((SettingTextBox)settings ["Min Dimming"]).textBox.text);
 
                     if (max < min) {
-                        TouchMessageBox.Show ("Maximum cannot be less than minimum");
+                        MessageBox.Show ("Maximum cannot be less than minimum");
                         args.keepText = false;
                     }
                 } catch {
-                    TouchMessageBox.Show ("Improper float format");
+                    MessageBox.Show ("Improper float format");
                     args.keepText = false;
                 }
             };
@@ -189,11 +189,11 @@ namespace AquaPic.UserInterface
                     float max = Convert.ToSingle (((SettingTextBox)settings ["Max Dimming"]).textBox.text);
 
                     if (min > max) {
-                        TouchMessageBox.Show ("Minimum cannot be greater than maximum");
+                        MessageBox.Show ("Minimum cannot be greater than maximum");
                         args.keepText = false;
                     }
                 } catch {
-                    TouchMessageBox.Show ("Improper float format");
+                    MessageBox.Show ("Improper float format");
                     args.keepText = false;
                 }
             };
@@ -296,12 +296,12 @@ namespace AquaPic.UserInterface
 
             if (fixtureIdx == -1) {
                 if (name == "Enter name") {
-                    TouchMessageBox.Show ("Invalid probe name");
+                    MessageBox.Show ("Invalid probe name");
                     return false;
                 }
 
                 if (((SettingComboBox)settings ["Outlet"]).combo.Active == -1) {
-                    TouchMessageBox.Show ("Please select an outlet");
+                    MessageBox.Show ("Please select an outlet");
                     return false;
                 }
 
@@ -309,7 +309,7 @@ namespace AquaPic.UserInterface
 
                 if (dimmingFixture) {
                     if (((SettingComboBox)settings ["Dimming Channel"]).combo.Active == -1) {
-                        TouchMessageBox.Show ("Please select a dimming channel");
+                        MessageBox.Show ("Please select a dimming channel");
                         return false;
                     }
 
@@ -393,7 +393,7 @@ namespace AquaPic.UserInterface
                     }
 
                     if (arrIdx == -1) {
-                        TouchMessageBox.Show ("Something went wrong");
+                        MessageBox.Show ("Something went wrong");
                         return false;
                     }
 
@@ -417,7 +417,7 @@ namespace AquaPic.UserInterface
                         ((JArray)jo ["lightingFixtures"]) [arrIdx] ["analogType"] = aType.ToString ();
                     }
                 } else {
-                    TouchMessageBox.Show ("Can't change dimmablility");
+                    MessageBox.Show ("Can't change dimmablility");
                     return false;
                 }
             }
@@ -449,7 +449,7 @@ namespace AquaPic.UserInterface
             }
 
             if (arrIdx == -1) {
-                TouchMessageBox.Show ("Something went wrong");
+                MessageBox.Show ("Something went wrong");
                 return false;
             }
 

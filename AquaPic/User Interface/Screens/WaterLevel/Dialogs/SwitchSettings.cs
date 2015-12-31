@@ -31,7 +31,7 @@ namespace AquaPic.UserInterface
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
                 else if (!WaterLevel.FloatSwitchNameOk (args.text)) {
-                    TouchMessageBox.Show ("Switch name already exists");
+                    MessageBox.Show ("Switch name already exists");
                     args.keepText = false;
                 }
             };
@@ -61,12 +61,12 @@ namespace AquaPic.UserInterface
                     float physicalLevel = Convert.ToSingle (args.text);
 
                     if (physicalLevel <= 0.0f) {
-                        TouchMessageBox.Show ("Physical level can not be less than or equal to 0");
+                        MessageBox.Show ("Physical level can not be less than or equal to 0");
                         args.keepText = false;
                     }
 
                 } catch {
-                    TouchMessageBox.Show ("Improper high alarm setpoint format");
+                    MessageBox.Show ("Improper high alarm setpoint format");
                     args.keepText = false;
                 }
             };
@@ -128,7 +128,7 @@ namespace AquaPic.UserInterface
 
                     args.text = string.Format ("{0} secs", time);
                 } catch {
-                    TouchMessageBox.Show ("Improper format");
+                    MessageBox.Show ("Improper format");
                     args.keepText = false;
                 }
             };
@@ -177,45 +177,45 @@ namespace AquaPic.UserInterface
 
             if (switchId == -1) {
                 if (name == "Enter name") {
-                    TouchMessageBox.Show ("Invalid probe name");
+                    MessageBox.Show ("Invalid probe name");
                     return false;
                 }
 
                 if (((SettingComboBox)settings ["Input"]).combo.Active == -1) {
-                    TouchMessageBox.Show ("Please select an channel");
+                    MessageBox.Show ("Please select an channel");
                     return false;
                 }
 
                 ParseChannnel (chName, ref ic.Group, ref ic.Individual);
 
                 if (physicalLevel <= 0.0f) {
-                    TouchMessageBox.Show ("Physical level can not be less than or equal to 0");
+                    MessageBox.Show ("Physical level can not be less than or equal to 0");
                     return false;
                 }
 
                 if (!string.IsNullOrWhiteSpace (typeString))
                     type = (SwitchType)Enum.Parse (typeof(SwitchType), typeString);
                 else {
-                    TouchMessageBox.Show ("Please select switch type");
+                    MessageBox.Show ("Please select switch type");
                     return false;
                 }
 
                 if (!string.IsNullOrWhiteSpace (functionString))
                     function = (SwitchFunction)Enum.Parse (typeof(SwitchFunction), functionString);
                 else {
-                    TouchMessageBox.Show ("Please select switch function");
+                    MessageBox.Show ("Please select switch function");
                     return false;
                 }
 
                 if (timeOffsetString == "Enter time") {
-                    TouchMessageBox.Show ("Please enter delay time for float switch");
+                    MessageBox.Show ("Please enter delay time for float switch");
                     return false;
                 }
 
                 try {
                     WaterLevel.AddFloatSwitch (name, ic, physicalLevel, type, function, timeOffset);
                 } catch (Exception ex) {
-                    TouchMessageBox.Show (ex.Message);
+                    MessageBox.Show (ex.Message);
                     return false;
                 }
 
@@ -253,7 +253,7 @@ namespace AquaPic.UserInterface
                     if (function != WaterLevel.GetFloatSwitchFunction (switchId))
                         WaterLevel.SetFloatSwitchFunction (switchId, function);
                 } catch {
-                    TouchMessageBox.Show ("Function already exists");
+                    MessageBox.Show ("Function already exists");
                     return false;
                 }
 
@@ -276,7 +276,7 @@ namespace AquaPic.UserInterface
                 }
 
                 if (arrIdx == -1) {
-                    TouchMessageBox.Show ("Something went wrong");
+                    MessageBox.Show ("Something went wrong");
                     return false;
                 }
 
@@ -317,7 +317,7 @@ namespace AquaPic.UserInterface
             }
 
             if (arrIdx == -1) {
-                TouchMessageBox.Show ("Something went wrong");
+                MessageBox.Show ("Something went wrong");
                 return false;
             }
 

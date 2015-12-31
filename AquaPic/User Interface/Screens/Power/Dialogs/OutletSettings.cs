@@ -73,7 +73,7 @@ namespace AquaPic.UserInterface
             verifyBtn.SetSizeRequest (100, 30);
             verifyBtn.ButtonReleaseEvent += (o, args) => {
                 if (CheckCode ())
-                    TouchMessageBox.Show ("Code Ok");
+                    MessageBox.Show ("Code Ok");
             };
             fix.Put (verifyBtn, 275, 365);
 
@@ -87,7 +87,7 @@ namespace AquaPic.UserInterface
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
                 else if (!Power.OutletNameOk (args.text)) {
-                    TouchMessageBox.Show ("Heater name already exists");
+                    MessageBox.Show ("Heater name already exists");
                     args.keepText = false;
                 }
             };
@@ -163,7 +163,7 @@ namespace AquaPic.UserInterface
                 }
 
                 if (arrIdx == -1) {
-                    TouchMessageBox.Show ("Something went wrong");
+                    MessageBox.Show ("Something went wrong");
                     return false;
                 }
 
@@ -172,7 +172,7 @@ namespace AquaPic.UserInterface
                 ja [arrIdx] ["conditions"] = jcond;
             } else {
                 if (name == "Enter name") {
-                    TouchMessageBox.Show ("Invalid outlet name");
+                    MessageBox.Show ("Invalid outlet name");
                     return false;
                 }
 
@@ -220,7 +220,7 @@ namespace AquaPic.UserInterface
             }
 
             if (arrIdx == -1) {
-                TouchMessageBox.Show ("Something went wrong");
+                MessageBox.Show ("Something went wrong");
                 return false;
             }
 
@@ -240,7 +240,7 @@ namespace AquaPic.UserInterface
 
         protected bool CheckCode (out IOutletScript script, out string[] conditions) {
             if (tv.Buffer.Text == "These are not the scripts you're looking for") {
-                TouchMessageBox.Show ("Invalid script");
+                MessageBox.Show ("Invalid script");
                 script = null;
                 conditions = null;
                 return false;
@@ -256,7 +256,7 @@ namespace AquaPic.UserInterface
                 script = Script.CompileOutletConditionCheckNoCatch (conditions);
                 script.OutletConditionCheck ();
             } catch (Exception ex) {
-                TouchMessageBox.Show (ex.Message);
+                MessageBox.Show (ex.Message);
                 script = null;
                 conditions = null;
                 return false;

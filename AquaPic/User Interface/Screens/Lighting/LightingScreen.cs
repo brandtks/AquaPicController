@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Gtk;
 using Cairo;
 using MyWidgetLibrary;
@@ -180,7 +180,7 @@ namespace AquaPic.UserInterface
                         newLevel = 100.0f;
                     Lighting.SetDimmingLevel (fixtureID, newLevel);
                 } catch (Exception ex) {
-                    TouchMessageBox.Show (ex.ToString ());
+                    MessageBox.Show (ex.ToString ());
                 }
             };
             Put (requestTextBox, 633, 231);
@@ -231,11 +231,11 @@ namespace AquaPic.UserInterface
                         td.SetTime (t);
                         args.text = td.ToString ();
                     } else {
-                        TouchMessageBox.Show ("Can modify time to before current time");
+                        MessageBox.Show ("Can modify time to before current time");
                         args.keepText = false;
                     }
                 } catch {
-                    TouchMessageBox.Show ("Incorrect time format");
+                    MessageBox.Show ("Incorrect time format");
                     args.keepText = false;
                 }
             };
@@ -261,11 +261,11 @@ namespace AquaPic.UserInterface
                         td.SetTime (t);
                         args.text = td.ToString ();
                     } else {
-                        TouchMessageBox.Show ("Can modify time to before current time");
+                        MessageBox.Show ("Can modify time to before current time");
                         args.keepText = false;
                     }
                 } catch {
-                    TouchMessageBox.Show ("Incorrect time format");
+                    MessageBox.Show ("Incorrect time format");
                     args.keepText = false;
                 }
             };
@@ -560,4 +560,3 @@ namespace AquaPic.UserInterface
         }
     }
 }
-

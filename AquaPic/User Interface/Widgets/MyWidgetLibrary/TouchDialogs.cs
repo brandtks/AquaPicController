@@ -4,7 +4,7 @@ using Gtk;
 
 namespace MyWidgetLibrary
 {
-    public class TouchMessageBox
+    public class MessageBox
     {
         public static void Show (string msg) {
             var ms = new Dialog (string.Empty, null, DialogFlags.DestroyWithParent);

@@ -99,48 +99,6 @@ namespace MyWidgetLibrary
             return new MyColor (name);
         }
 
-        public void ChangeColor (string color, double a = 1.0) {
-            storedR = R;
-            storedG = G;
-            storedB = B;
-            storedColorName = colorName;
-
-            bool colorFound;
-            try {
-                colorName = color.ToLower ();
-                R = colorLookup [colorName] [0];
-                G = colorLookup [colorName] [1];
-                B = colorLookup [colorName] [2];
-                colorFound = true;
-            } catch {
-                colorFound = false;
-            }
-
-            if (!colorFound) {
-                Gdk.Color c = new Gdk.Color ();
-                colorFound = Gdk.Color.Parse (color, ref c);
-                if (colorFound) {
-                    R = (float)(c.Red / 255);
-                    G = (float)(c.Green / 255);
-                    B = (float)(c.Blue / 255);
-                } else
-                    throw new Exception ("No color could be found matching that description");
-            }
-                
-            A = (float)a;
-        }
-
-        public void ChangeColor (double r, double g, double b, double a = 1.0) {
-            storedR = R;
-            storedG = G;
-            storedB = B;
-
-            R = (float)r;
-            G = (float)g;
-            B = (float)b;
-            A = (float)a;
-        }
-
         public void ModifyAlpha (double a) {
             storedA = A;
             A = (float)a;
@@ -170,6 +128,13 @@ namespace MyWidgetLibrary
             R = storedR;
             G = storedG;
             B = storedB;
+        }
+
+        public MyColor Blend (MyColor otherColor, float amount) {
+            float red = (R * (1 - amount)) + (otherColor.R * amount);
+            float green = (G * (1 - amount)) + (otherColor.G * amount);
+            float blue = (B * (1 - amount)) + (otherColor.B * amount);
+            return new MyColor (red, green, blue);
         }
 
         public string ToHTML () {

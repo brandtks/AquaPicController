@@ -32,7 +32,7 @@ namespace AquaPic.UserInterface
                     v = value;
 
                 ampText.text = v.ToString ("F1");
-                ampBar.currentProgress = v / 10.0f;
+                ampBar.progress = v / 10.0f;
             }
         }
 
@@ -51,7 +51,7 @@ namespace AquaPic.UserInterface
             ampText.SetSizeRequest( 76, 20);
             ampText.textSize = 10;
             ampText.textAlignment = MyAlignment.Center;
-            ampText.text = (ampBar.currentProgress * 10.0f).ToString ("F1");
+            ampText.text = (ampBar.progress * 10.0f).ToString ("F1");
             Put (ampText, 52, 75);
             ampText.Show ();
 
@@ -135,7 +135,7 @@ namespace AquaPic.UserInterface
                 if (UpdateScreen != null)
                     UpdateScreen ();
             } else {
-                TouchMessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
+                MessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
             }
         }
     }

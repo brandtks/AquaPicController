@@ -23,7 +23,8 @@ namespace AquaPic.UserInterface
             { "Analog Input", new ScreenData ("Analog Input", true, (options) => {return new AnalogInputWindow (options);}) },
             { "Digital Input", new ScreenData ("Digital Input", true, (options) => {return new DigitalInputWindow (options);}) },
             { "Water Level", new ScreenData ("Water Level", true, (options) => {return new WaterLevelWindow (options);}) },
-            { "Serial Bus", new ScreenData ("Serial Bus", true, (options) => {return new SerialBusWindow (options);}) }
+            { "Serial Bus", new ScreenData ("Serial Bus", true, (options) => {return new SerialBusWindow (options);}) },
+            { "Chemistry", new ScreenData ("Chemistry", true, (options) => {return new ChemistryWindow (options);}) }
         };
 
         public static string currentScreen;

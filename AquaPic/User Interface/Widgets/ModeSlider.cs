@@ -13,8 +13,8 @@ namespace AquaPic.UserInterface
             SliderSize = MySliderSize.Large;
             WidthRequest = 135;
             HeightRequest = 30;
-            SliderColorOptions [0].ChangeColor ("grey2");
-            SliderColorOptions [1].ChangeColor ("pri");
+            SliderColorOptions [0] = "grey2";
+            SliderColorOptions [1] = "pri";
 
             labels = new string[2];
             labels [0] = "Manual";

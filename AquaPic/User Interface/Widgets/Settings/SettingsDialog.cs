@@ -103,7 +103,7 @@ namespace MyWidgetLibrary
                                 success = DeleteButtonEvent (this);
 
                             if (!success)
-                                TouchMessageBox.Show ("Error while deleting " + name);
+                                MessageBox.Show ("Error while deleting " + name);
                         }
 
                         Destroy ();

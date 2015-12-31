@@ -161,7 +161,7 @@ namespace AquaPic.UserInterface
                         b.QueueDraw ();
                     }
                 } else
-                    TouchMessageBox.Show ("No communication port selected");
+                    MessageBox.Show ("No communication port selected");
             }
         }
     }

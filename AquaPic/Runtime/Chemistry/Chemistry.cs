@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AquaPic.Modules
+namespace AquaPic.Runtime
 {
     public class Chemistry
     {
-        private static List<string> testProcedures;
-
         static Chemistry () {
-            testProcedures = new List<string> ();
-
+            
         }
-
-
     }
 }
 
