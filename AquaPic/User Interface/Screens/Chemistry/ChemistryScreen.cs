@@ -168,7 +168,9 @@ namespace AquaPic.UserInterface
             if (done) {
                 stepButton.text = "Done";
                 stepButton.buttonColor = "compl";
-                stepLabel.text = String.Format ("{0:f2} {1}", tests [testIdx].CalculateResults (), tests [testIdx].unit);
+                string result = String.Format ("{0:f2} {1}", tests [testIdx].CalculateResults (), tests [testIdx].unit);
+                stepLabel.text = result;
+                Logger.Add ("Tested {0}, result is {1}", tests [testIdx].name, result);
             }
 
             stepLabel.QueueDraw ();
