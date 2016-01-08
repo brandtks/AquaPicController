@@ -71,16 +71,16 @@ namespace AquaPic.Runtime
 
                 slope = (y2 - y1) / (x2 - x1);
                 intercept = y1 - slope * x1;
+
+                _unit = (string)jo ["Units"];
+
+                JArray ja = (JArray)jo ["Procedure"];
+                procedure = new string[ja.Count];
+                for (int i = 0; i < ja.Count; ++i) {
+                    procedure [i] = (string)ja [i];
+                }
             } catch {
                 throw new Exception ("Error while parsing json");
-            }
-
-            _unit = (string)jo ["Units"];
-
-            JArray ja = (JArray)jo ["Procedure"];
-            procedure = new string[ja.Count];
-            for (int i = 0; i < ja.Count; ++i) {
-                procedure [i] = (string)ja [i];
             }
 
             _currentStep = -1;

@@ -295,10 +295,13 @@ namespace MyWidgetLibrary
 
                 tv.QueueDraw ();
 
-                skipBtn.buttonColor = "grey3";
-                skipBtn.ButtonReleaseEvent -= OnSkipButtonReleaseEvent;
-
                 calState = CalibrationState.FullScaleValue;
+                break;
+            case CalibrationState.FullScaleValue:
+                if (CalibrationCompleteEvent != null)
+                    CalibrationCompleteEvent (calArgs);
+
+                Destroy ();
                 break;
             default:
                 break;
@@ -313,6 +316,7 @@ namespace MyWidgetLibrary
                     btn.QueueDraw ();
 
                     valTb.enableTouch = true;
+                    valTb.bkgndColor = "seca";
                     valTb.TextChangedEvent += OnValueTextBoxTextChanged;
                     valTb.QueueDraw ();
 
@@ -323,6 +327,7 @@ namespace MyWidgetLibrary
 
                     if (calState != CalibrationState.FullScaleActual) {
                         valTb.enableTouch = false;
+                        valTb.bkgndColor = "grey4";
                         valTb.text = GetCalibrationValue ().ToString ("F2");
                         valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
                         valTb.QueueDraw ();
