@@ -65,7 +65,8 @@ namespace AquaPic.SerialBus
             }
             #else
             public void Write (int func, WriteBuffer writeBuffer) {
-                Write (func, writeBuffer.buffer);
+                byte[] array = writeBuffer.buffer;
+                Write (func, array);
             }
 
             public void Write (int func, byte[] writeBuffer) {
@@ -83,7 +84,8 @@ namespace AquaPic.SerialBus
             }
             #else
             public void ReadWrite (int func, WriteBuffer writeBuffer, int readSize, ResponseCallback callback) {
-                ReadWrite (func, writeBuffer.buffer, readSize, callback);
+                byte[] array = writeBuffer.buffer;
+                ReadWrite (func, array, readSize, callback);
             }
 
             public void ReadWrite (int func, byte[] writeBuffer, int readSize, ResponseCallback callback) {
