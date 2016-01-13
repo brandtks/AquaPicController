@@ -21,13 +21,9 @@ namespace AquaPic.UserInterface
         TouchTextBox atoStateTextBox;
 
         public WaterLevelWindow (params object[] options) : base () {
-            var box1 = new MyBox (385, 193);
+            var box1 = new MyBox (385, 395);
             Put (box1, 10, 30);
             box1.Show ();
-
-            var box4 = new MyBox (385, 192);
-            Put (box4, 10, 233);
-            box4.Show ();
 
             var box2 = new MyBox (385, 193);
             Put (box2, 405, 30);
@@ -71,7 +67,7 @@ namespace AquaPic.UserInterface
                 s.Run ();
                 s.Destroy ();
             };
-            Put (atoSettingsBtn, 15, 188);
+            Put (atoSettingsBtn, 15, 390);
             atoSettingsBtn.Show ();
 
             atoClearFailBtn = new TouchButton ();

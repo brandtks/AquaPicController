@@ -1,4 +1,7 @@
-Mostly here for version control
--------------------------------------
-Looking a little better these days
-Actually has some basic functionality
+AquaPic Main Control
+
+Handles all functionality for the AquaPic aquarium controller. Also provides a graphical user interface.
+
+Required DLLs:
+CS-Script - Oleg Shilo http://www.csscript.net/
+Json.NET - Newtonsoft http://www.newtonsoft.com/json
