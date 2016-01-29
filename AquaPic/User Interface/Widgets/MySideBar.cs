@@ -1,7 +1,7 @@
 ﻿using System;
 using Cairo;
 using Gtk;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Utilites;
 
 namespace AquaPic
@@ -32,7 +32,7 @@ namespace AquaPic
 
                 if (expanded) {
                     cr.Rectangle (left, top, width, height);
-                    MyColor.SetSource (cr, "grey0", 0.80);
+                    TouchColor.SetSource (cr, "grey0", 0.80);
                     cr.Fill ();
 
                     cr.MoveTo (left, top);
@@ -42,7 +42,7 @@ namespace AquaPic
                     cr.LineTo (left, top + height);
                     cr.LineTo (left, top);
                     cr.ClosePath ();
-                    MyColor.SetSource (cr, "grey3", 0.80);
+                    TouchColor.SetSource (cr, "grey3", 0.80);
                     cr.Fill ();
                 }
             }

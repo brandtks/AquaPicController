@@ -2,7 +2,7 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
     public delegate void SelectorChangedEventHandler (object sender, SelectorChangedEventArgs args);
 
@@ -30,17 +30,17 @@ namespace MyWidgetLibrary
 
         public int SelectionCount;
         public int CurrentSelected;
-        public MyOrientation Orientation;
+        public TouchOrientation Orientation;
         public MySliderSize SliderSize;
-        public MyColor[] BkgndColorOptions;
+        public TouchColor[] BkgndColorOptions;
 //        public MyColor[] TextColorOptions;
-        public MyColor[] SliderColorOptions;
+        public TouchColor[] SliderColorOptions;
 //        public string[] TextOptions;
         public byte Id;
 
         public event SelectorChangedEventHandler SelectorChangedEvent;
 
-        public TouchSelectorSwitch (int id, int selectionCount, int currentSelectedIndex, MyOrientation orientation) {
+        public TouchSelectorSwitch (int id, int selectionCount, int currentSelectedIndex, TouchOrientation orientation) {
             this.Visible = true;
             this.VisibleWindow = false;
 
@@ -50,17 +50,17 @@ namespace MyWidgetLibrary
             this.Orientation = orientation;
             this.SliderSize = MySliderSize.Large;
 
-            this.BkgndColorOptions = new MyColor[this.SelectionCount];
+            this.BkgndColorOptions = new TouchColor[this.SelectionCount];
             for (int i = 0; i < BkgndColorOptions.Length; ++i)
-                this.BkgndColorOptions [i] = new MyColor ("grey0");
+                this.BkgndColorOptions [i] = new TouchColor ("grey0");
 
 //            this.TextColorOptions = new MyColor[this.SelectionCount];
 //            for (int i = 0; i < BkgndColorOptions.Length; ++i)
 //                this.TextColorOptions [i] = new MyColor ("black");
 
-            this.SliderColorOptions = new MyColor[this.SelectionCount];
+            this.SliderColorOptions = new TouchColor[this.SelectionCount];
             for (int i = 0; i < SliderColorOptions.Length; ++i)
-                this.SliderColorOptions [i] = new MyColor ("grey4");
+                this.SliderColorOptions [i] = new TouchColor ("grey4");
 
 //            this.TextOptions = new string[this.SelectionCount];
 //            for (int i = 0; i < TextOptions.Length; ++i)
@@ -71,7 +71,7 @@ namespace MyWidgetLibrary
             this.click1 = 0;
             this.click2 = 0;
 
-            if (this.Orientation == MyOrientation.Horizontal) {
+            if (this.Orientation == TouchOrientation.Horizontal) {
                 this.WidthRequest = 80;
                 this.HeightRequest = 20;
             } else {
@@ -84,16 +84,16 @@ namespace MyWidgetLibrary
             this.ButtonReleaseEvent += OnSelectorRelease;
         }
 
-        public TouchSelectorSwitch () : this (0, 2, 0, MyOrientation.Horizontal) { }
+        public TouchSelectorSwitch () : this (0, 2, 0, TouchOrientation.Horizontal) { }
 
-        public TouchSelectorSwitch (int id) : this (id, 2, 0, MyOrientation.Horizontal) { }
+        public TouchSelectorSwitch (int id) : this (id, 2, 0, TouchOrientation.Horizontal) { }
 
         public void AddSelectedColorOption (int selectionIndex, string newColor) {
             BkgndColorOptions [selectionIndex] = newColor;
         }
 
         public void AddSelectedColorOption (int selectionIndex, double R, double G, double B) {
-            BkgndColorOptions [selectionIndex] = new MyColor (R, G, B);
+            BkgndColorOptions [selectionIndex] = new TouchColor (R, G, B);
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
@@ -105,7 +105,7 @@ namespace MyWidgetLibrary
 
                 int seperation, sliderSize, sliderLength, sliderMax, x, y;
 
-                if (Orientation == MyOrientation.Horizontal) {  
+                if (Orientation == TouchOrientation.Horizontal) {  
                     if (SliderSize == MySliderSize.Small)
                         sliderSize = height;
                     else {
@@ -157,10 +157,10 @@ namespace MyWidgetLibrary
 
                 // Background 
                 //cr.Rectangle (left, top, width, height);
-                if (Orientation == MyOrientation.Horizontal)
-                    WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, height / 2);
+                if (Orientation == TouchOrientation.Horizontal)
+                    TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, height / 2);
                 else
-                    WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
+                    TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
                 //cr.SetSourceRGB (BkgndColorOptions [CurrentSelected].R, BkgndColorOptions [CurrentSelected].G, BkgndColorOptions [CurrentSelected].B);
                 BkgndColorOptions [CurrentSelected].SetSource (cr);
                 cr.FillPreserve ();
@@ -170,10 +170,10 @@ namespace MyWidgetLibrary
 
                 // Slider
                 //cr.Rectangle (x, y, sliderSize, sliderSize);
-                if (Orientation == MyOrientation.Horizontal)
-                    WidgetGlobal.DrawRoundedRectangle (cr, x, y, sliderSize, height, height / 2);
+                if (Orientation == TouchOrientation.Horizontal)
+                    TouchGlobal.DrawRoundedRectangle (cr, x, y, sliderSize, height, height / 2);
                 else
-                    WidgetGlobal.DrawRoundedRectangle (cr, x, y, width, sliderSize, width / 2);
+                    TouchGlobal.DrawRoundedRectangle (cr, x, y, width, sliderSize, width / 2);
                 //cr.SetSourceRGB (SliderColorOptions [CurrentSelected].R, SliderColorOptions [CurrentSelected].G, SliderColorOptions [CurrentSelected].B);
                 SliderColorOptions [CurrentSelected].SetSource (cr);
                 cr.FillPreserve ();
@@ -206,7 +206,7 @@ namespace MyWidgetLibrary
             clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
             clicked = true;
 
-            if (Orientation == MyOrientation.Horizontal)
+            if (Orientation == TouchOrientation.Horizontal)
                 click1 = (int)args.Event.X;
             else
                 click1 = (int)args.Event.Y;
@@ -215,7 +215,7 @@ namespace MyWidgetLibrary
         protected void OnSelectorRelease (object o, ButtonReleaseEventArgs args) {
             clicked = false;
 
-            if (Orientation == MyOrientation.Horizontal) {
+            if (Orientation == TouchOrientation.Horizontal) {
                 int x = (int)args.Event.X;
                 int sliderLength = Allocation.Width;
                 int seperation = sliderLength / SelectionCount;
@@ -267,7 +267,7 @@ namespace MyWidgetLibrary
             if (clicked) {
                 int x, y;
                 GetPointer (out x, out y);
-                if (Orientation == MyOrientation.Horizontal)
+                if (Orientation == TouchOrientation.Horizontal)
                     click2 = x;
                 else
                     click2 = y;

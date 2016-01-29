@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
     public class MenuWindow : WindowBase
     {
         public MenuWindow (params object[] options) : base () {
-            var box = new MyBox (780, 395);
+            var box = new TouchGraphicalBox (780, 395);
             Put (box, 10, 30);
 
             List<string> screenNames = new List<string> ();
-            foreach (var screen in GuiGlobal.allWindows.Keys)
+            foreach (var screen in AquaPicGUI.allWindows.Keys)
                 screenNames.Add (screen);
 
             screenNames.Sort ();
@@ -21,7 +21,7 @@ namespace AquaPic.UserInterface
             int x = 15;
             int y = 35;
             foreach (var name in screenNames) {
-                ScreenData screen = GuiGlobal.allWindows [name];
+                ScreenData screen = AquaPicGUI.allWindows [name];
                 if (screen.showInMenu) {
                     var b = new TouchButton ();
                     b.SetSizeRequest (250, 30);
@@ -46,9 +46,9 @@ namespace AquaPic.UserInterface
 
             if (b.text == "Settings") {
                 var tl = this.Toplevel;
-                GuiGlobal.ChangeScreens (b.text, tl);
+                AquaPicGUI.ChangeScreens (b.text, tl);
             } else
-                GuiGlobal.ChangeScreens (b.text);
+                AquaPicGUI.ChangeScreens (b.text);
         }
     }
 }

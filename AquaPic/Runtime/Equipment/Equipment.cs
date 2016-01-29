@@ -66,7 +66,7 @@ namespace AquaPic.Runtime
                 string port = (string)jobj ["aquaPicBusPort"];
                 if (!string.IsNullOrWhiteSpace (port)) {
                     Logger.Add ("Starting AquaPicBus on port " + port);
-                    AquaPic.SerialBus.AquaPicBus.Bus1.Open (port);
+                    AquaPic.SerialBus.AquaPicBus.Open (port);
                 }
             }
         }

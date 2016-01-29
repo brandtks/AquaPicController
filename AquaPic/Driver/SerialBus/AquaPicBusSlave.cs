@@ -10,7 +10,7 @@ namespace AquaPic.SerialBus
         {
             public event StatusUpdateHandler OnStatusUpdate;
 
-            private AquaPicBus bus;
+            //private AquaPicBus bus;
             private byte address;
             private int responeTime;
             private int[] timeQue;
@@ -32,11 +32,12 @@ namespace AquaPic.SerialBus
                 get { return _alarmIdx; }
             }
 
-            public Slave (AquaPicBus bus, byte address, string name) {
-                if (!bus.IsAddressOk (address))
+            //public Slave (AquaPicBus bus, byte address, string name) {
+            public Slave (byte address, string name) {
+                if (!IsAddressOk (address))
                     throw new Exception ("Address already in use");
 
-                this.bus = bus;
+                //this.bus = bus;
                 this.address = address;
                 this.responeTime = 0;
                 this.timeQue = new int[10];
@@ -44,7 +45,7 @@ namespace AquaPic.SerialBus
                 this.status = AquaPicBusStatus.notOpen;
                 this.Name = name;
 
-                this.bus.slaves.Add (this);
+                slaves.Add (this);
 
                 _alarmIdx = Alarm.Subscribe (address.ToString () + " communication fault");
             }
@@ -55,7 +56,7 @@ namespace AquaPic.SerialBus
             }
             #else
             public void Read (byte func, int readSize, ResponseCallback callback) {
-                bus.QueueMessage (this, func, null, 0, readSize, callback);
+                QueueMessage (this, func, null, 0, readSize, callback);
             }
             #endif
 
@@ -70,7 +71,7 @@ namespace AquaPic.SerialBus
             }
 
             public void Write (int func, byte[] writeBuffer) {
-                bus.QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, 0, null);
+                QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, 0, null);
             }
 
             public void Write (int func, byte writeBuffer) {
@@ -89,7 +90,7 @@ namespace AquaPic.SerialBus
             }
 
             public void ReadWrite (int func, byte[] writeBuffer, int readSize, ResponseCallback callback) {
-                bus.QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, readSize, callback);
+                QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, readSize, callback);
             }
 
             public void ReadWrite (int func, byte writeBuffer, int readSize, ResponseCallback callback) {

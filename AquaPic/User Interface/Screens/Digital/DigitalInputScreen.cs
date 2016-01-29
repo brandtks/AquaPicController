@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Drivers;
 using AquaPic.Utilites;
 
@@ -16,7 +16,7 @@ namespace AquaPic.UserInterface
         DigitalDisplay[] displays;
 
         public DigitalInputWindow (params object[] options) : base () {
-            MyBox box1 = new MyBox (780, 395);
+            TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
             Put (box1, 10, 30);
             box1.Show ();
 
@@ -26,7 +26,7 @@ namespace AquaPic.UserInterface
                 var l = new TouchLabel ();
                 l.text = "No Digital Input Cards Added";
                 l.textColor = "pri";
-                l.textAlignment = MyAlignment.Center;
+                l.textAlignment = TouchAlignment.Center;
                 l.WidthRequest = 780;
                 Put (l, 10, 32);
                 l.Show ();

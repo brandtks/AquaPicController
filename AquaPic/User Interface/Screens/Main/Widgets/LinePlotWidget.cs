@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
@@ -46,7 +46,7 @@ namespace AquaPic.UserInterface
         public LinePlotWidget () {
             SetSizeRequest (447, 95);
 
-            var box1 = new MyBox (447, 95);
+            var box1 = new TouchGraphicalBox (447, 95);
             Put (box1, 0, 0);
 
             displayLabel = new TouchLabel ();
@@ -55,7 +55,7 @@ namespace AquaPic.UserInterface
             displayLabel.textColor = "pri";
             Put (displayLabel, 4, 2);
 
-            var box2 = new MyBox (328, 89);
+            var box2 = new TouchGraphicalBox (328, 89);
             box2.color = "grey4";
             box2.transparency = 0.85f;
             Put (box2, 116, 3);
@@ -72,7 +72,7 @@ namespace AquaPic.UserInterface
             textBox.HeightRequest = 35;
             textBox.textSize = 14;
             textBox.text = "0.0";
-            textBox.textAlignment = MyAlignment.Center;
+            textBox.textAlignment = TouchAlignment.Center;
             Put (textBox, 18, 30);
 
             ShowAll ();

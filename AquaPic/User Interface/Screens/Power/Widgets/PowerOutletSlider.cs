@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Utilites;
 using AquaPic.Drivers;
 
@@ -39,7 +39,7 @@ namespace AquaPic.UserInterface
         public PowerOutletSlider (int id) {
             SetSizeRequest (180, 145);
 
-            var box = new MyBox (180, 145);
+            var box = new TouchGraphicalBox (180, 145);
             box.color = "grey3";
             Put (box, 0, 0);
 
@@ -50,12 +50,12 @@ namespace AquaPic.UserInterface
             ampText = new TouchTextBox ();
             ampText.SetSizeRequest( 76, 20);
             ampText.textSize = 10;
-            ampText.textAlignment = MyAlignment.Center;
+            ampText.textAlignment = TouchAlignment.Center;
             ampText.text = (ampBar.progress * 10.0f).ToString ("F1");
             Put (ampText, 52, 75);
             ampText.Show ();
 
-            ss = new TouchSelectorSwitch (id, 3, 0, MyOrientation.Horizontal);
+            ss = new TouchSelectorSwitch (id, 3, 0, TouchOrientation.Horizontal);
             ss.SliderSize = MySliderSize.Large;
             ss.WidthRequest = 170;
             ss.HeightRequest = 30;
@@ -76,7 +76,7 @@ namespace AquaPic.UserInterface
             OutletName = new TouchLabel ();
             OutletName.textColor = "grey4";
             OutletName.WidthRequest = 150;
-            OutletName.render.textWrap = MyTextWrap.Shrink;
+            OutletName.render.textWrap = TouchTextWrap.Shrink;
             Put (OutletName, 5, 2);
             OutletName.Show ();
 
@@ -85,7 +85,7 @@ namespace AquaPic.UserInterface
             Status.textSize = 12;
             Status.textColor = "grey4";
             Status.WidthRequest = 66;
-            Status.textAlignment = MyAlignment.Center;
+            Status.textAlignment = TouchAlignment.Center;
             Put (Status, 57, 55);
             Status.Show ();
 
@@ -107,9 +107,9 @@ namespace AquaPic.UserInterface
             int seperation = tss.Allocation.Width / tss.SelectionCount;
             int x = tss.Allocation.Left;
 
-            MyText render = new MyText ();
-            render.textWrap = MyTextWrap.Shrink;
-            render.alignment = MyAlignment.Center;
+            TouchText render = new TouchText ();
+            render.textWrap = TouchTextWrap.Shrink;
+            render.alignment = TouchAlignment.Center;
             render.font.color = "white";
 
             foreach (var l in labels) {

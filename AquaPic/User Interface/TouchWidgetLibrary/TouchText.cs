@@ -2,28 +2,28 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
-    public class MyText
+    public class TouchText
     {
         public MyFont font;
-        public MyAlignment alignment;
-        public MyOrientation orientation;
-        public MyTextWrap textWrap;
+        public TouchAlignment alignment;
+        public TouchOrientation orientation;
+        public TouchTextWrap textWrap;
         public string text;
 
-        public MyText (string text) {
+        public TouchText (string text) {
             this.text = text;
             font = new MyFont ();
-            alignment = MyAlignment.Left;
-            orientation = MyOrientation.Horizontal;
-            textWrap = MyTextWrap.WordWrap;
+            alignment = TouchAlignment.Left;
+            orientation = TouchOrientation.Horizontal;
+            textWrap = TouchTextWrap.WordWrap;
         }
 
-        public MyText () : this (string.Empty) { }
+        public TouchText () : this (string.Empty) { }
 
-        public static implicit operator MyText (string name) {
-            return new MyText (name);
+        public static implicit operator TouchText (string name) {
+            return new TouchText (name);
         }
 
         public void Render (object sender, int x, int y, int width) {
@@ -37,23 +37,23 @@ namespace MyWidgetLibrary
             l.FontDescription = Pango.FontDescription.FromString (font.fontName + " " + font.size.ToString ());
             l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
-            if (orientation == MyOrientation.Horizontal) {
+            if (orientation == TouchOrientation.Horizontal) {
 //                l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
-                if (textWrap == MyTextWrap.WordWrap) {
+                if (textWrap == TouchTextWrap.WordWrap) {
                     l.Wrap = Pango.WrapMode.Word;
                     l.Width = Pango.Units.FromPixels (width);
                 }
 
-                if (alignment == MyAlignment.Left)
+                if (alignment == TouchAlignment.Left)
                     l.Alignment = Pango.Alignment.Left;
-                else if (alignment == MyAlignment.Right)
+                else if (alignment == TouchAlignment.Right)
                     l.Alignment = Pango.Alignment.Right;
                 else // center
                     l.Alignment = Pango.Alignment.Center;
 
                 string displayedText = text;
-                if ((l.LineCount > 1) && (textWrap == MyTextWrap.None)) {
+                if ((l.LineCount > 1) && (textWrap == TouchTextWrap.None)) {
                     Pango.LayoutLine[] ll = l.Lines;
                     displayedText = text.Substring (0, ll [1].StartIndex - 1);
                     int lastSpace = displayedText.LastIndexOf (' ');
@@ -67,13 +67,13 @@ namespace MyWidgetLibrary
                 l.GetPixelSize (out w, out h);
 
                 if (w > width) {
-                    if (textWrap == MyTextWrap.None) {
+                    if (textWrap == TouchTextWrap.None) {
                         while (w > width) {
                             displayedText = displayedText.Remove (displayedText.Length - 1);
                             l.SetText (displayedText);
                             l.GetPixelSize (out w, out h);
                         }
-                    } else if (textWrap == MyTextWrap.Shrink) {
+                    } else if (textWrap == TouchTextWrap.Shrink) {
                         int K = l.FontDescription.Size / font.size;
                         int fs = font.size;
                         while ((w > width) && (fs > 0)) {
@@ -103,7 +103,7 @@ namespace MyWidgetLibrary
 
     public class MyFont
     {
-        public MyColor color;
+        public TouchColor color;
         public int size;
         public string fontName;
 
@@ -112,18 +112,6 @@ namespace MyWidgetLibrary
             size = 11;
             fontName = "Sans";
         }
-    }
-
-    public enum MyAlignment : byte {
-        Right = 1,
-        Left,
-        Center
-    }
-
-    public enum MyTextWrap : byte {
-        None = 1,
-        WordWrap,
-        Shrink
     }
 }
 

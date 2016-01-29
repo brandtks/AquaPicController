@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using Cairo;
 using Gtk;
+using TouchWidgetLibrary;
 
-namespace MyWidgetLibrary
+namespace AquaPic.UserInterface
 {
     public delegate bool SaveHandler (object sender);
 
@@ -47,7 +48,7 @@ namespace MyWidgetLibrary
             };
             #endif
 
-            ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+            ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
             foreach (Widget w in this.Children) {
                 Remove (w);
@@ -93,7 +94,7 @@ namespace MyWidgetLibrary
                             parent = null;
                     }
 
-                    var ms = new TouchMessageDialog ("Are you sure you with to delete " + name, parent);
+                    var ms = new TouchDialog ("Are you sure you with to delete " + name, parent);
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {

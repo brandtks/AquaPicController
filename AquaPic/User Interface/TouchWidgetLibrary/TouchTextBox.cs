@@ -3,7 +3,7 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
     public delegate void TextChangedHandler (object sender, TextChangedEventArgs args);
 
@@ -21,10 +21,10 @@ namespace MyWidgetLibrary
     {
         public string text;
         public string name;
-        public MyColor textColor;
+        public TouchColor textColor;
         public int textSize;
-        public MyAlignment textAlignment;
-        public MyColor bkgndColor;
+        public TouchAlignment textAlignment;
+        public TouchColor bkgndColor;
         public bool enableTouch;
         public bool includeTimeFunctions;
         public event TextChangedHandler TextChangedEvent;
@@ -38,9 +38,9 @@ namespace MyWidgetLibrary
 
             this.text = string.Empty;
             name = string.Empty;
-            this.textColor = new MyColor ("black");
+            this.textColor = new TouchColor ("black");
             this.textSize = 11;
-            this.textAlignment = MyAlignment.Left;
+            this.textAlignment = TouchAlignment.Left;
 
             bkgndColor = "grey4";
 
@@ -58,7 +58,7 @@ namespace MyWidgetLibrary
                 int width = Allocation.Width;
                 int height = Allocation.Height;
 
-                WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, 3);
+                TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, 3);
                 bkgndColor.SetSource (cr);
                 cr.FillPreserve ();
                 cr.SetSourceRGB (0.0, 0.0, 0.0);
@@ -83,11 +83,11 @@ namespace MyWidgetLibrary
 //                GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left, top + 6, l);
 //                l.Dispose ();
 
-                MyText t = text;
+                TouchText t = text;
                 t.font.color = textColor;
                 t.font.size = textSize;
                 t.alignment = textAlignment;
-                t.textWrap = MyTextWrap.Shrink;
+                t.textWrap = TouchTextWrap.Shrink;
                 t.Render (this, left + 3, top, width - 6, height);
             }
         }

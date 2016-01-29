@@ -2,7 +2,7 @@
 using Cairo;
 using Gtk;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
     public class MessageBox
     {
@@ -27,7 +27,7 @@ namespace MyWidgetLibrary
             };
             #endif
 
-            ms.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+            ms.ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
             var btn = new TouchButton ();
             btn.text = "Ok";
@@ -39,7 +39,7 @@ namespace MyWidgetLibrary
             var label = new Label ();
             label.LineWrap = true;
             label.Text = msg;
-            label.ModifyFg (StateType.Normal, MyColor.NewGtkColor ("white"));
+            label.ModifyFg (StateType.Normal, TouchColor.NewGtkColor ("white"));
             label.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             ms.VBox.Add (label);
             label.Show ();
@@ -50,12 +50,12 @@ namespace MyWidgetLibrary
         }
     }
 
-    public class TouchMessageDialog : Gtk.Dialog
+    public class TouchDialog : Gtk.Dialog
     {
-        public TouchMessageDialog (string msg, Gtk.Window parent) 
+        public TouchDialog (string msg, Gtk.Window parent) 
             : base (string.Empty, parent, DialogFlags.DestroyWithParent)
         {
-            this.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+            this.ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
             this.KeepAbove = true;
 
@@ -93,7 +93,7 @@ namespace MyWidgetLibrary
             var label = new Label ();
             label.LineWrap = true;
             label.Text = msg;
-            label.ModifyFg (StateType.Normal, MyColor.NewGtkColor ("white"));
+            label.ModifyFg (StateType.Normal, TouchColor.NewGtkColor ("white"));
             label.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             this.VBox.Add (label);
             label.Show ();

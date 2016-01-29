@@ -2,7 +2,7 @@
 using System.IO;
 using Cairo;
 using Gtk;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {

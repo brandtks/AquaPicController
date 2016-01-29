@@ -16,7 +16,7 @@ namespace AquaPic.Drivers
             public bool updating;
 
             public DigitalInputCard (byte address, byte cardID, string name) {
-                this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Digital Input)");
+                this.slave = new AquaPicBus.Slave (address, name + " (Digital Input)");
 
                 this.cardID = cardID;
                 this.name = name;

@@ -2,7 +2,7 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary  
+namespace TouchWidgetLibrary  
 {
     public class TouchUpDownButtons : Fixed
     {

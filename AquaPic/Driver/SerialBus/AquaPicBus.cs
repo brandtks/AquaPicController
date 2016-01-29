@@ -30,26 +30,26 @@ namespace AquaPic.SerialBus
 {
     public partial class AquaPicBus
     {
-        public static AquaPicBus Bus1 = new AquaPicBus (2, 1000);
+        //public static AquaPicBus Bus1 = new AquaPicBus (2, 1000);
 
-        private SerialPort uart;
-        private Queue messageBuffer;
-        private Thread txRxThread;
-        private Thread responseThread;
-        private AutoResetEvent getInput, gotInput;
-        private bool responseReceived;
-        private Stopwatch stopwatch;
-        private List<Slave> slaves;
-        private ReceiveBuffer receiveBuffer;
-        public int retryCount, readTimeout;
+        private static SerialPort uart;
+        private static Queue messageBuffer;
+        private static Thread txRxThread;
+        private static Thread responseThread;
+        private static AutoResetEvent getInput, gotInput;
+        private static bool responseReceived;
+        private static Stopwatch stopwatch;
+        private static List<Slave> slaves;
+        private static ReceiveBuffer receiveBuffer;
+        public static int retryCount, readTimeout;
 
-        public int slaveCount {
+        public static int slaveCount {
             get {
                 return slaves.Count;
             }
         }
 
-        public string[] slaveNames {
+        public static string[] slaveNames {
             get {
                 string[] names = new string[slaves.Count];
                 int i = 0;
@@ -59,7 +59,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        public int[] slaveAdresses {
+        public static int[] slaveAdresses {
             get {
                 int[] address = new int[slaves.Count];
                 int i = 0;
@@ -69,7 +69,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        public AquaPicBusStatus[] slaveStatus {
+        public static AquaPicBusStatus[] slaveStatus {
             get {
                 AquaPicBusStatus[] status = new AquaPicBusStatus[slaves.Count];
                 int i = 0;
@@ -79,7 +79,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        public int[] slaveResponseTimes {
+        public static int[] slaveResponseTimes {
             get {
                 int[] time = new int[slaves.Count];
                 int i = 0;
@@ -89,7 +89,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        public bool isOpen {
+        public static bool isOpen {
             get {
                 if (uart != null)
                     return uart.IsOpen;
@@ -98,7 +98,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        public string portName {
+        public static string portName {
             get {
                 if (uart != null)
                     return uart.PortName;
@@ -107,24 +107,27 @@ namespace AquaPic.SerialBus
             }
         }
 
-        private AquaPicBus (int retryCount, int responseTimeout) {
-            this.messageBuffer = new Queue ();
-            this.txRxThread = new Thread (this.txRx);
-            this.txRxThread.IsBackground = true;
-            this.responseThread = new Thread (this.responseTimeout);
-            this.responseThread.IsBackground = true;
-            this.getInput = new AutoResetEvent (false);
-            this.gotInput = new AutoResetEvent (false);
-            this.responseReceived = false;
-            this.stopwatch = new Stopwatch ();
-            this.slaves = new List<Slave> ();
-            this.retryCount = retryCount;
-            this.readTimeout = responseTimeout;
+        //private AquaPicBus (int retryCount, int responseTimeout) {
+        static AquaPicBus () {
+            messageBuffer = new Queue ();
+            txRxThread = new Thread (txRx);
+            txRxThread.IsBackground = true;
+            responseThread = new Thread (responseTimeout);
+            responseThread.IsBackground = true;
+            getInput = new AutoResetEvent (false);
+            gotInput = new AutoResetEvent (false);
+            responseReceived = false;
+            stopwatch = new Stopwatch ();
+            slaves = new List<Slave> ();
+            //this.retryCount = retryCount;
+            //this.readTimeout = responseTimeout;
+            retryCount = 2;
+            readTimeout = 1000;
             receiveBuffer = new ReceiveBuffer ();
         }
 
         //57600
-        public void Open (string port, int baudRate = 57600) {
+        public static void Open (string port, int baudRate = 57600) {
             try {
                 if (Utils.RunningPlatform == Platform.Windows)
                     uart = new SerialPort (port, baudRate, Parity.Space, 8);
@@ -158,7 +161,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        public void Close () {
+        public static void Close () {
             if (uart.IsOpen) {
                 txRxThread.Abort ();
                 responseThread.Abort ();
@@ -167,7 +170,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        private bool IsAddressOk (byte a) {
+        private static bool IsAddressOk (byte a) {
             for (int i = 0; i < slaves.Count; ++i) {
                 if (slaves [i].Address == a)
                     return false;
@@ -176,7 +179,7 @@ namespace AquaPic.SerialBus
         }
 
         #if UNSAFE_COMMS
-        private unsafe void QueueMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
+        private unsafe static void QueueMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
             // <TEST> if uart is null the port isn't open so don't queue the message
             if (uart != null) {
                 lock (messageBuffer.SyncRoot) {
@@ -185,7 +188,7 @@ namespace AquaPic.SerialBus
             }
         }
         #else
-        private void QueueMessage (Slave slave, byte func, byte[] writeData, int writeSize, int readSize, ResponseCallback callback) {
+        private static void QueueMessage (Slave slave, byte func, byte[] writeData, int writeSize, int readSize, ResponseCallback callback) {
             // <TEST> if uart is null the port isn't open so don't queue the message
             if (uart != null) {
                 lock (messageBuffer.SyncRoot) {
@@ -197,7 +200,7 @@ namespace AquaPic.SerialBus
 
         // background thread to dequeue any messages and send to slave
         // waits for response and calls callback if required
-        private void txRx () {
+        private static void txRx () {
             while (true) {
                 int count;
                 lock (messageBuffer.SyncRoot) {
@@ -290,7 +293,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        private void responseTimeout () {
+        private static void responseTimeout () {
             while (true) {
                 getInput.WaitOne (); // never returns until getInput.Set() is called 
                 while (!responseReceived) // waits until responseReceived is true, set by SerialPort Received Event
@@ -299,7 +302,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        private void getResponse (ref byte[] response) {
+        private static void getResponse (ref byte[] response) {
             responseReceived = false;
             getInput.Set ();
             // waits readTimeout for respone and returns true if gotInput.Set() was called or false if not
@@ -313,7 +316,7 @@ namespace AquaPic.SerialBus
                 throw new TimeoutException("UART response timeout");
         }
 
-        private void uartDataReceived (object sender, SerialDataReceivedEventArgs e) {
+        private static void uartDataReceived (object sender, SerialDataReceivedEventArgs e) {
             lock (receiveBuffer.SyncLock) {
                 int size = uart.BytesToRead;
 
@@ -333,7 +336,7 @@ namespace AquaPic.SerialBus
             }
         }
 
-        private void WriteWithParity (byte data, Parity p = Parity.Space) {
+        private static void WriteWithParity (byte data, Parity p = Parity.Space) {
             int count = 0;
 
             for (int i = 0; i < 8; ++i) {

@@ -1,7 +1,7 @@
 using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Drivers;
 using AquaPic.Modules;
 using AquaPic.Runtime;
@@ -34,20 +34,20 @@ namespace AquaPic.UserInterface
 
         public LightingWindow (params object[] options) : base () {
             #region base level screen stuff that doesn't change after draw
-            MyBox box1 = new MyBox (385, 395);
+            TouchGraphicalBox box1 = new TouchGraphicalBox (385, 395);
             Put (box1, 10, 30);
             box1.Show ();
 
-            MyBox box2 = new MyBox (385, 395);
+            TouchGraphicalBox box2 = new TouchGraphicalBox (385, 395);
             Put (box2, 405, 30);
             box2.Show ();
 
-            MyBox box3 = new MyBox (205, 350);
+            TouchGraphicalBox box3 = new TouchGraphicalBox (205, 350);
             box3.color = "grey3";
             Put (box3, 410, 70);
             box3.Show ();
 
-            MyBox box4 = new MyBox (165, 350);
+            TouchGraphicalBox box4 = new TouchGraphicalBox (165, 350);
             box4.color = "grey3";
             Put (box4, 620, 70);
             box4.Show ();
@@ -135,7 +135,7 @@ namespace AquaPic.UserInterface
             }
 
             dimmingHeader = new TouchLabel ();
-            dimmingHeader.textAlignment = MyAlignment.Center;
+            dimmingHeader.textAlignment = TouchAlignment.Center;
             dimmingHeader.WidthRequest = 165;
             dimmingHeader.textColor = "secb";
             Put (dimmingHeader, 615, 77);
@@ -157,7 +157,7 @@ namespace AquaPic.UserInterface
             dimmingProgressBar.Show ();
 
             dimmingTextBox = new TouchTextBox ();
-            dimmingTextBox.textAlignment = MyAlignment.Center;
+            dimmingTextBox.textAlignment = TouchAlignment.Center;
             Put (dimmingTextBox, 633, 168);
             dimmingTextBox.Show ();
 
@@ -165,12 +165,12 @@ namespace AquaPic.UserInterface
             dimmingLabel.text = "Current";
             dimmingLabel.textColor = "pri";
             dimmingLabel.WidthRequest = 125;
-            dimmingLabel.textAlignment = MyAlignment.Right;
+            dimmingLabel.textAlignment = TouchAlignment.Right;
             Put (dimmingLabel, 608, 147);
             dimmingLabel.Show ();
 
             requestTextBox = new TouchTextBox ();
-            requestTextBox.textAlignment = MyAlignment.Center;
+            requestTextBox.textAlignment = TouchAlignment.Center;
             requestTextBox.TextChangedEvent += (sender, args) => {
                 try {
                     float newLevel = Convert.ToSingle (args.text);
@@ -191,14 +191,14 @@ namespace AquaPic.UserInterface
             requestLabel.textColor = "seca";
             requestLabel.textColor.ModifyColor (1.45);
             requestLabel.WidthRequest = 125;
-            requestLabel.textAlignment = MyAlignment.Right;
+            requestLabel.textAlignment = TouchAlignment.Right;
             requestLabel.WidthRequest = 125;
             requestLabel.HeightRequest = 25;
             Put (requestLabel, 608, 210);
             requestLabel.Show ();
 
             autoTextBox = new TouchTextBox ();
-            autoTextBox.textAlignment = MyAlignment.Center;
+            autoTextBox.textAlignment = TouchAlignment.Center;
             autoTextBox.Visible = false;
             Put (autoTextBox, 680, 385);
             autoTextBox.Show ();
@@ -206,7 +206,7 @@ namespace AquaPic.UserInterface
             autoLabel = new TouchLabel ();
             autoLabel.text = "Auto";
             autoLabel.textColor = "grey4";
-            autoLabel.textAlignment = MyAlignment.Right;
+            autoLabel.textAlignment = TouchAlignment.Right;
             autoLabel.SetSizeRequest (75, 20);
             autoLabel.Visible = false;
             Put (autoLabel, 596, 389);

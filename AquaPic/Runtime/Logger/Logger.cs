@@ -1,6 +1,6 @@
 ﻿using System;
 using Gtk;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.Runtime
 {
@@ -36,7 +36,7 @@ namespace AquaPic.Runtime
             AppendTime ();
 
             var tag = new TextTag (null);
-            tag.ForegroundGdk = MyColor.NewGtkColor ("pri");
+            tag.ForegroundGdk = TouchColor.NewGtkColor ("pri");
             buffer.TagTable.Add (tag);
 
             var ti = buffer.EndIter;
@@ -55,7 +55,7 @@ namespace AquaPic.Runtime
             AppendTime ();
 
             var tag = new TextTag (null);
-            tag.ForegroundGdk = MyColor.NewGtkColor ("compl");
+            tag.ForegroundGdk = TouchColor.NewGtkColor ("compl");
             buffer.TagTable.Add (tag);
 
             var ti = buffer.EndIter;
@@ -74,7 +74,7 @@ namespace AquaPic.Runtime
             AppendTime ();
 
             var tag = new TextTag (null);
-            tag.ForegroundGdk = MyColor.NewGtkColor ("secb");
+            tag.ForegroundGdk = TouchColor.NewGtkColor ("secb");
             buffer.TagTable.Add (tag);
 
             var ti = buffer.EndIter;
@@ -90,7 +90,7 @@ namespace AquaPic.Runtime
 
         protected static void AppendTime () {
             var tag = new TextTag (null);
-            tag.ForegroundGdk = MyColor.NewGtkColor ("seca");
+            tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
             buffer.TagTable.Add (tag);
 
             var ti = buffer.EndIter;

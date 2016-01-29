@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.SerialBus;
 using AquaPic.Utilites;
 
@@ -47,7 +47,7 @@ namespace AquaPic.UserInterface
 
             addressTextBox = new TouchTextBox ();
             addressTextBox.WidthRequest = 75;
-            addressTextBox.textAlignment = MyAlignment.Center;
+            addressTextBox.textAlignment = TouchAlignment.Center;
             Put (addressTextBox, 255, 0);
 
             statusTextBox = new TouchTextBox ();

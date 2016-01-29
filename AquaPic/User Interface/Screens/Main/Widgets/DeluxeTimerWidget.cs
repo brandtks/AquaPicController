@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
@@ -32,7 +32,7 @@ namespace AquaPic.UserInterface
                 timers [i].TimerStopEvent += OnTimerStartStop;
             }
 
-            var box2 = new MyBox (333, 66);
+            var box2 = new TouchGraphicalBox (333, 66);
             box2.color = "grey2";
             Put (box2, 0, 29);
 
@@ -49,7 +49,7 @@ namespace AquaPic.UserInterface
             minutes.SetSizeRequest (75, 61);
             minutes.enableTouch = true;
             minutes.textSize = 16;
-            minutes.textAlignment = MyAlignment.Center;
+            minutes.textAlignment = TouchAlignment.Center;
             minutes.TextChangedEvent += (sender, args) => {
                 try {
                     uint time = Convert.ToUInt32 (args.text) * 60;
@@ -84,7 +84,7 @@ namespace AquaPic.UserInterface
             seconds = new TouchTextBox ();
             seconds.SetSizeRequest (75, 61);
             seconds.enableTouch = true;
-            seconds.textAlignment = MyAlignment.Center;
+            seconds.textAlignment = TouchAlignment.Center;
             seconds.textSize = 16;
             seconds.TextChangedEvent += (sender, args) => {
                 try {
@@ -262,7 +262,7 @@ namespace AquaPic.UserInterface
 
         private class TouchTab : EventBox
         {
-            public MyColor color;
+            public TouchColor color;
             public string text;
 
             public TouchTab () {
@@ -299,7 +299,7 @@ namespace AquaPic.UserInterface
                     cr.FillPreserve ();
 
                     cr.LineWidth = 0.5;
-                    MyColor.SetSource (cr, "black");
+                    TouchColor.SetSource (cr, "black");
                     cr.Stroke ();
 
                     Pango.Layout l = new Pango.Layout (eb.PangoContext);

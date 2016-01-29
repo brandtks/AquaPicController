@@ -2,14 +2,14 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
-    public class MyBox : EventBox
+    public class TouchGraphicalBox : EventBox
     {
         public string color;
         public float transparency;
 
-        public MyBox (int width, int height) {
+        public TouchGraphicalBox (int width, int height) {
             Visible = true;
             VisibleWindow = false;
 
@@ -24,7 +24,7 @@ namespace MyWidgetLibrary
         protected void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 cr.Rectangle (Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
-                MyColor.SetSource (cr, color, transparency);
+                TouchColor.SetSource (cr, color, transparency);
                 cr.Fill ();
             }
         }

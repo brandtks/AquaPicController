@@ -2,7 +2,7 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
     public delegate void ProgressChangeEventHandler (object sender, ProgressChangeEventArgs args);
 
@@ -17,7 +17,7 @@ namespace MyWidgetLibrary
 
     public class TouchProgressBar : EventBox
     {
-        protected MyOrientation _orient;
+        protected TouchOrientation _orient;
         private float _currentProgress;
         public float currentProgress {
             get {
@@ -33,8 +33,8 @@ namespace MyWidgetLibrary
             }
         }
 
-        public MyColor colorBackground;
-        public MyColor colorProgress;
+        public TouchColor colorBackground;
+        public TouchColor colorProgress;
         public bool enableTouch;
 
         public event ProgressChangeEventHandler ProgressChangedEvent;
@@ -44,11 +44,11 @@ namespace MyWidgetLibrary
         private bool clicked;
 
         public TouchProgressBar (
-            MyColor colorBackground, 
-            MyColor colorProgress,
+            TouchColor colorBackground, 
+            TouchColor colorProgress,
             float currentProgress, 
             bool enableTouch, 
-            MyOrientation orientation
+            TouchOrientation orientation
         ) {
             this.Visible = true;
             this.VisibleWindow = false;
@@ -61,7 +61,7 @@ namespace MyWidgetLibrary
             this.timerId = 0;
             this.clicked = false;
 
-            if (_orient == MyOrientation.Vertical) {
+            if (_orient == TouchOrientation.Vertical) {
                 this.WidthRequest = 30;
                 this.HeightRequest = 200;
             } else {
@@ -75,11 +75,11 @@ namespace MyWidgetLibrary
         }
 
         public TouchProgressBar () 
-            : this (new MyColor ("grey4"), new MyColor ("pri"), 0.0f, false, MyOrientation.Vertical) { 
+            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f, false, TouchOrientation.Vertical) { 
         }
 
-        public TouchProgressBar (MyOrientation orientation)
-            : this (new MyColor ("grey4"), new MyColor ("pri"), 0.0f, false, orientation) {
+        public TouchProgressBar (TouchOrientation orientation)
+            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f, false, orientation) {
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
@@ -90,7 +90,7 @@ namespace MyWidgetLibrary
                 int height = Allocation.Height;
                 int difference;
 
-                if (_orient == MyOrientation.Vertical) {
+                if (_orient == TouchOrientation.Vertical) {
                     cr.Rectangle (left, top, width, height);
                     colorBackground.SetSource (cr);
                     cr.Fill ();
@@ -131,7 +131,7 @@ namespace MyWidgetLibrary
             if (clicked) {
                 int x, y;
                 GetPointer (out x, out y);
-                if (_orient == MyOrientation.Vertical)
+                if (_orient == TouchOrientation.Vertical)
                     _currentProgress = (float)(Allocation.Height - y) / (float)Allocation.Height;
                 else
                     _currentProgress = (float)x / (float)Allocation.Width;

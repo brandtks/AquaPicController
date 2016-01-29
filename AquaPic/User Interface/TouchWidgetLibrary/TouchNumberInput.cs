@@ -4,7 +4,7 @@ using System.Text;
 using Cairo;
 using Gtk;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
     public delegate void NumberSetEventHandler (string value);
 
@@ -45,7 +45,7 @@ namespace MyWidgetLibrary
             fix.WidthRequest = 205;
             fix.HeightRequest = 290;
 
-            this.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+            this.ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
 
 
@@ -54,8 +54,8 @@ namespace MyWidgetLibrary
             entry.HeightRequest = 30;
             entry.CanFocus = true;
             entry.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
-            entry.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
-            entry.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
+            entry.ModifyBase (StateType.Normal, TouchColor.NewGtkColor ("grey4"));
+            entry.ModifyText (StateType.Normal, TouchColor.NewGtkColor ("black"));
             entry.Activated += (sender, e) => {
                 if (NumberSetEvent != null)
                     NumberSetEvent (entry.Text);

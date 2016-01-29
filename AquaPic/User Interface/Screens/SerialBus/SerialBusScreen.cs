@@ -2,7 +2,7 @@
 using System.IO.Ports; // for SerialPort
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Drivers;
 using AquaPic.Modules;
 using AquaPic.Runtime;
@@ -18,16 +18,16 @@ namespace AquaPic.UserInterface
         uint timerId;
 
         public SerialBusWindow (params object[] options) : base () {
-            slaves = new SerialBusSlaveWidget[AquaPicBus.Bus1.slaveCount];
+            slaves = new SerialBusSlaveWidget[AquaPicBus.slaveCount];
 
-            var box = new MyBox (780, 395);
+            var box = new TouchGraphicalBox (780, 395);
             Put (box, 10, 30);
 
 //            int height = (slaves.Length * 35) + 27;
             var f = new Fixed ();
             f.SetSizeRequest (760, 350);
 
-            var eb = new MyBox (770, 350);
+            var eb = new TouchGraphicalBox (770, 350);
             eb.color = "grey3";
 //            eb.SetSizeRequest (750, height);
 //            eb.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey3"));
@@ -41,7 +41,7 @@ namespace AquaPic.UserInterface
             var l = new TouchLabel ();
             l.text = "Name";
             l.textColor = "black";
-            l.textAlignment = MyAlignment.Center;
+            l.textAlignment = TouchAlignment.Center;
             l.WidthRequest = 250;
             f.Put (l, 0, 1);
             l.Show ();
@@ -49,7 +49,7 @@ namespace AquaPic.UserInterface
             l = new TouchLabel ();
             l.text = "Address";
             l.textColor = "black";
-            l.textAlignment = MyAlignment.Center;
+            l.textAlignment = TouchAlignment.Center;
             l.WidthRequest = 75;
             f.Put (l, 258, 1);
             l.Show ();
@@ -57,7 +57,7 @@ namespace AquaPic.UserInterface
             l = new TouchLabel ();
             l.text = "Status";
             l.textColor = "black";
-            l.textAlignment = MyAlignment.Center;
+            l.textAlignment = TouchAlignment.Center;
             l.WidthRequest = 325;
             f.Put (l, 335, 1);
             l.Show ();
@@ -65,13 +65,13 @@ namespace AquaPic.UserInterface
             l = new TouchLabel ();
             l.text = "Response Time";
             l.textColor = "black";
-            l.textAlignment = MyAlignment.Right;
+            l.textAlignment = TouchAlignment.Right;
             l.WidthRequest = 170;
             f.Put (l, 595, 1);
             l.Show ();
 
-            string[] names = AquaPicBus.Bus1.slaveNames;
-            int[] addresses = AquaPicBus.Bus1.slaveAdresses;
+            string[] names = AquaPicBus.slaveNames;
+            int[] addresses = AquaPicBus.slaveAdresses;
 
             for (int i = 0; i < slaves.Length; ++i) {
                 slaves [i] = new SerialBusSlaveWidget ();
@@ -91,19 +91,19 @@ namespace AquaPic.UserInterface
             var b = new TouchButton ();
             b.SetSizeRequest (100, 30);
             b.text = "Open";
-            if (AquaPicBus.Bus1.isOpen)
+            if (AquaPicBus.isOpen)
                 b.buttonColor = "grey3";
             else
                 b.ButtonReleaseEvent += OnOpenButtonRelease;
             Put (b, 685, 35);
             b.Show ();
 
-            if (!AquaPicBus.Bus1.isOpen) {
+            if (!AquaPicBus.isOpen) {
                 string[] portNames = SerialPort.GetPortNames ();
                 c = new TouchComboBox (portNames);
             } else {
                 c = new TouchComboBox ();
-                c.List.Add (AquaPicBus.Bus1.portName);
+                c.List.Add (AquaPicBus.portName);
             }
             c.NonActiveMessage = "Select Port";
             c.WidthRequest = 300;
@@ -133,8 +133,8 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetSlaveData () {
-            AquaPicBusStatus[] status = AquaPicBus.Bus1.slaveStatus;
-            int[] times = AquaPicBus.Bus1.slaveResponseTimes;
+            AquaPicBusStatus[] status = AquaPicBus.slaveStatus;
+            int[] times = AquaPicBus.slaveResponseTimes;
 
             for (int i = 0; i < slaves.Length; ++i) {
                 slaves [i].status = status [i];
@@ -154,8 +154,8 @@ namespace AquaPic.UserInterface
 
             if (b != null) { 
                 if (c.Active != -1) {
-                    AquaPicBus.Bus1.Open (c.activeText);
-                    if (AquaPicBus.Bus1.isOpen) {
+                    AquaPicBus.Open (c.activeText);
+                    if (AquaPicBus.isOpen) {
                         b.buttonColor = "grey3";
                         b.ButtonReleaseEvent -= OnOpenButtonRelease;
                         b.QueueDraw ();

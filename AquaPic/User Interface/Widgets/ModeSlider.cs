@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
@@ -9,7 +9,7 @@ namespace AquaPic.UserInterface
     {
         public string[] labels;
 
-        public ModeSelector () : base (0, 2, 0, MyOrientation.Horizontal) {
+        public ModeSelector () : base (0, 2, 0, TouchOrientation.Horizontal) {
             SliderSize = MySliderSize.Large;
             WidthRequest = 135;
             HeightRequest = 30;
@@ -27,9 +27,9 @@ namespace AquaPic.UserInterface
             int seperation = Allocation.Width / SelectionCount;
             int x = Allocation.Left;
 
-            MyText render = new MyText ();
-            render.textWrap = MyTextWrap.Shrink;
-            render.alignment = MyAlignment.Center;
+            TouchText render = new TouchText ();
+            render.textWrap = TouchTextWrap.Shrink;
+            render.alignment = TouchAlignment.Center;
             render.font.color = "white";
 
             foreach (var l in labels) {

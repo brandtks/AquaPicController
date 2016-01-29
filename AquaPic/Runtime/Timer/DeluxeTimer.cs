@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.Runtime
 {

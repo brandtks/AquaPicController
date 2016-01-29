@@ -18,7 +18,7 @@ namespace AquaPic.Drivers
             public OutletData[] outlets;
 
             public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) {
-                this.slave = new AquaPicBus.Slave (AquaPicBus.Bus1, address, name + " (Power Strip)");
+                this.slave = new AquaPicBus.Slave (address, name + " (Power Strip)");
                 this.powerID = powerID;
 
                 if (alarmOnLossOfPower && (powerLossAlarmIndex == -1)) {

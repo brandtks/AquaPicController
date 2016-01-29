@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
     public delegate void ComboBoxChangedEventHandler (object sender, ComboBoxChangedEventArgs args);
 
@@ -97,7 +97,7 @@ namespace MyWidgetLibrary
                     if (highlighted != -1) {
                         int y = top + height + (height * highlighted);
                         cr.Rectangle (left + 1, y + 1, width - 2, height - 2);
-                        MyColor.SetSource (cr, "pri");
+                        TouchColor.SetSource (cr, "pri");
                         cr.Fill ();
                     }
 
@@ -115,7 +115,7 @@ namespace MyWidgetLibrary
                 } else {
                     this.HeightRequest = 30;
 
-                    WidgetGlobal.DrawRoundedRectangle (cr, left, top, width - 2, height, height / 2);
+                    TouchGlobal.DrawRoundedRectangle (cr, left, top, width - 2, height, height / 2);
                     cr.SetSourceRGB (0.85, 0.85, 0.85);
                     cr.FillPreserve ();
                     cr.LineWidth = 0.85;
@@ -143,8 +143,8 @@ namespace MyWidgetLibrary
 //                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, top + 6, l);
 //                    l.Dispose ();
 
-                    MyText t = new MyText (text);
-                    t.textWrap = MyTextWrap.Shrink;
+                    TouchText t = new TouchText (text);
+                    t.textWrap = TouchTextWrap.Shrink;
                     t.font.color = "black";
                     int w = width - height - 10;
                     t.Render (this, left + 10, top, w, height);
@@ -166,9 +166,9 @@ namespace MyWidgetLibrary
             cr.ClosePath ();
 
             if (listDropdown)
-                MyColor.SetSource (cr, "grey2");
+                TouchColor.SetSource (cr, "grey2");
             else
-                MyColor.SetSource (cr, "grey1");
+                TouchColor.SetSource (cr, "grey1");
             cr.FillPreserve ();
             cr.LineWidth = 0.85;
             cr.SetSourceRGB (0.0, 0.0, 0.0);
@@ -182,7 +182,7 @@ namespace MyWidgetLibrary
             cr.LineTo (x + triSize, y);
             cr.LineTo (x + triSize / 2, y + triSize);
             cr.ClosePath ();
-            MyColor.SetSource (cr, "seca");
+            TouchColor.SetSource (cr, "seca");
             cr.Fill ();
         }
 

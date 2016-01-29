@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
@@ -50,7 +50,7 @@ namespace AquaPic.UserInterface
         public BarPlotWidget () {
             SetSizeRequest (108, 195);
 
-            var box = new MyBox (108, 195);
+            var box = new TouchGraphicalBox (108, 195);
             Put (box, 0, 0);
 
             label = new TouchLabel ();
@@ -58,9 +58,9 @@ namespace AquaPic.UserInterface
             label.textColor = "pri";
             label.textSize = 12;
             label.WidthRequest = 100;
-            label.textAlignment = MyAlignment.Center;
-            label.render.textWrap = MyTextWrap.Shrink;
-            label.render.orientation = MyOrientation.Vertical;
+            label.textAlignment = TouchAlignment.Center;
+            label.render.textWrap = TouchTextWrap.Shrink;
+            label.render.orientation = TouchOrientation.Vertical;
             Put (label, 3, 38);
 
             bar = new TouchProgressBar ();
@@ -75,7 +75,7 @@ namespace AquaPic.UserInterface
             textBox.HeightRequest = 30;
             textBox.textSize = 14;
             textBox.text = "0.0";
-            textBox.textAlignment = MyAlignment.Center;
+            textBox.textAlignment = TouchAlignment.Center;
             Put (textBox, 3, 3);
         }
 

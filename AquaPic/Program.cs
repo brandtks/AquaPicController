@@ -35,8 +35,8 @@ namespace AquaPic
             win.Show ();
 
             win.DestroyEvent += (o, a) => {
-                if (AquaPic.SerialBus.AquaPicBus.Bus1.isOpen) {
-                    AquaPic.SerialBus.AquaPicBus.Bus1.Close ();
+                if (AquaPic.SerialBus.AquaPicBus.isOpen) {
+                    AquaPic.SerialBus.AquaPicBus.Close ();
                 }
             };
 

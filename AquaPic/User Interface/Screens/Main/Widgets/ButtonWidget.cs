@@ -1,6 +1,6 @@
 ﻿using System;
 using Gtk;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface

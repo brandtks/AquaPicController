@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Cairo;
 using Gtk;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
@@ -26,8 +26,8 @@ namespace AquaPic.UserInterface
         }
 
         public void UpdateScreens () {
-            currentMenu = GuiGlobal.currentSelectedMenu;
-            highlightedScreen = GuiGlobal.currentSelectedMenu;
+            currentMenu = AquaPicGUI.currentSelectedMenu;
+            highlightedScreen = AquaPicGUI.currentSelectedMenu;
         }
 
         protected void onExpose (object sender, ExposeEventArgs args) {
@@ -37,14 +37,14 @@ namespace AquaPic.UserInterface
                 int x = 0;
                 int width = 134;
 
-                foreach (var screen in GuiGlobal.menuWindows) {
-                    ScreenData s = GuiGlobal.allWindows [screen];
-                    if ((GuiGlobal.currentScreen == s.name) || (menuTouched && (highlightedScreen == s.name))) {
+                foreach (var screen in AquaPicGUI.menuWindows) {
+                    ScreenData s = AquaPicGUI.allWindows [screen];
+                    if ((AquaPicGUI.currentScreen == s.name) || (menuTouched && (highlightedScreen == s.name))) {
                         cr.Rectangle (x, bottom - 45, width, 45);
                     } else
                         cr.Rectangle (x, bottom - 8, width, 8);
 
-                    MyColor.SetSource (cr, GuiGlobal.menuColors [GuiGlobal.menuWindows.IndexOf (screen)]);
+                    TouchColor.SetSource (cr, AquaPicGUI.menuColors [AquaPicGUI.menuWindows.IndexOf (screen)]);
                     cr.Fill ();
 
                     x += width;
@@ -56,18 +56,18 @@ namespace AquaPic.UserInterface
                 l.Alignment = Pango.Alignment.Center;
                 l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
 
-                if (currentMenu == GuiGlobal.currentScreen) {
-                    x = (GuiGlobal.menuWindows.IndexOf (currentMenu) * width) + 1;
+                if (currentMenu == AquaPicGUI.currentScreen) {
+                    x = (AquaPicGUI.menuWindows.IndexOf (currentMenu) * width) + 1;
                     l.SetMarkup ("<span color=\"black\">"
-                    + GuiGlobal.allWindows [currentMenu].name
+                    + AquaPicGUI.allWindows [currentMenu].name
                     + "</span>");
                     GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), x, Allocation.Top + 14, l);
                 }
 
-                if ((menuTouched) && (GuiGlobal.currentScreen != highlightedScreen)) {
-                    x = (GuiGlobal.menuWindows.IndexOf (highlightedScreen) * width) + 1;
+                if ((menuTouched) && (AquaPicGUI.currentScreen != highlightedScreen)) {
+                    x = (AquaPicGUI.menuWindows.IndexOf (highlightedScreen) * width) + 1;
                     l.SetMarkup ("<span color=\"black\">"
-                        + GuiGlobal.allWindows [highlightedScreen].name 
+                        + AquaPicGUI.allWindows [highlightedScreen].name 
                         + "</span>");
                     GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), x, Allocation.Top + 14, l);
                 }
@@ -92,15 +92,15 @@ namespace AquaPic.UserInterface
                 int left = 0;
                 int width;
 
-                for (int i = 0; i < GuiGlobal.menuWindows.Count; ++i) {
-                    if ((x == 0) || (x == (GuiGlobal.menuWindows.Count - 1)))
+                for (int i = 0; i < AquaPicGUI.menuWindows.Count; ++i) {
+                    if ((x == 0) || (x == (AquaPicGUI.menuWindows.Count - 1)))
                         width = 134;
                     else
                         width = 133;
 
                     if ((x >= left) && (x <= (left + width))) {
-                        foreach (var screen in GuiGlobal.menuWindows) {
-                            int menuPosition = GuiGlobal.menuWindows.IndexOf (screen);
+                        foreach (var screen in AquaPicGUI.menuWindows) {
+                            int menuPosition = AquaPicGUI.menuWindows.IndexOf (screen);
                             if (menuPosition == i) {
                                 highlightedScreen = screen;
                                 break;
@@ -114,7 +114,7 @@ namespace AquaPic.UserInterface
                 }
             }
 
-            GuiGlobal.ChangeScreens (highlightedScreen);
+            AquaPicGUI.ChangeScreens (highlightedScreen);
         }
 
         protected bool OnTimerEvent () {
@@ -126,15 +126,15 @@ namespace AquaPic.UserInterface
                     int left = 0;
                     int width;
 
-                    for (int i = 0; i < GuiGlobal.menuWindows.Count; ++i) {
-                        if ((x == 0) || (x == (GuiGlobal.menuWindows.Count - 1)))
+                    for (int i = 0; i < AquaPicGUI.menuWindows.Count; ++i) {
+                        if ((x == 0) || (x == (AquaPicGUI.menuWindows.Count - 1)))
                             width = 134;
                         else
                             width = 133;
 
                         if ((x >= left) && (x <= (left + width))) {
-                            foreach (var screen in GuiGlobal.menuWindows) {
-                                int menuPosition = GuiGlobal.menuWindows.IndexOf (screen);
+                            foreach (var screen in AquaPicGUI.menuWindows) {
+                                int menuPosition = AquaPicGUI.menuWindows.IndexOf (screen);
                                 if (menuPosition == i) {
                                     highlightedScreen = screen;
                                     break;

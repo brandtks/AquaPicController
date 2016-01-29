@@ -6,7 +6,7 @@ namespace AquaPic.UserInterface
 {
     public delegate void ChangeScreenHandler (ScreenData screen, params object[] options);
 
-    public static class GuiGlobal
+    public partial class AquaPicGUI
     {
         public static Dictionary<string, ScreenData> allWindows = new Dictionary<string, ScreenData> () {
             { "Main", new ScreenData ("Main", true, (options) => {return new MainWindow (options);}) },
@@ -34,9 +34,6 @@ namespace AquaPic.UserInterface
         public static string currentSelectedMenu;
 
         public static event ChangeScreenHandler ChangeScreenEvent;
-
-        static GuiGlobal () {
-        }
 
         public static void ChangeScreens (string name, params object[] options) {
             if (!allWindows.ContainsKey (name))

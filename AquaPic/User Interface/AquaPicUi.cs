@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Cairo;
 using Gtk;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
@@ -25,7 +25,7 @@ namespace AquaPic.UserInterface
             this.Resizable = false;
             this.AllowGrow = false;
 
-            this.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey0"));
+            this.ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
             #if RPI_BUILD
             this.Decorated = false;
@@ -38,10 +38,10 @@ namespace AquaPic.UserInterface
                 args.ExitApplication = false;
             };
 
-            GuiGlobal.ChangeScreenEvent += ScreenChange;
+            ChangeScreenEvent += ScreenChange;
 
-            GuiGlobal.currentSelectedMenu = GuiGlobal.menuWindows [0];
-            GuiGlobal.currentScreen = GuiGlobal.currentSelectedMenu;
+            currentSelectedMenu = menuWindows [0];
+            currentScreen = currentSelectedMenu;
 
             f = new Fixed ();
             f.SetSizeRequest (800, 480);
@@ -62,7 +62,7 @@ namespace AquaPic.UserInterface
             f.Put (menu, 0, 435);
             menu.Show ();
 
-            current = GuiGlobal.allWindows [GuiGlobal.currentScreen].CreateInstance ();
+            current = allWindows [currentScreen].CreateInstance ();
             f.Put (current, 0, 0);
             current.Show ();
 
@@ -106,9 +106,9 @@ namespace AquaPic.UserInterface
                 cr.Rectangle (0, 0, 800, 480);
 
                 Gradient pat = new LinearGradient (400, 0, 400, 480);
-                pat.AddColorStop (0.0, MyColor.NewCairoColor ("grey0"));
-                pat.AddColorStop (0.5, MyColor.NewCairoColor ("grey1"));
-                pat.AddColorStop (1.0, MyColor.NewCairoColor ("grey0"));
+                pat.AddColorStop (0.0, TouchColor.NewCairoColor ("grey0"));
+                pat.AddColorStop (0.5, TouchColor.NewCairoColor ("grey1"));
+                pat.AddColorStop (1.0, TouchColor.NewCairoColor ("grey0"));
                 cr.SetSource (pat);
 
                 cr.Fill ();

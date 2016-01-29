@@ -2,11 +2,11 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
     public class TouchLabel : EventBox
     {
-        public MyText render;
+        public TouchText render;
 
         public string text {
             get {
@@ -17,7 +17,7 @@ namespace MyWidgetLibrary
             }
         }
 
-        public MyColor textColor {
+        public TouchColor textColor {
             get {
                 return render.font.color;
             }
@@ -35,7 +35,7 @@ namespace MyWidgetLibrary
             }
         }
 
-        public MyAlignment textAlignment {
+        public TouchAlignment textAlignment {
             get {
                 return render.alignment;
             }
@@ -58,7 +58,7 @@ namespace MyWidgetLibrary
             this.Visible = true;
             this.VisibleWindow = false;
 
-            render = new MyText (string.Empty);
+            render = new TouchText (string.Empty);
             _centered = false;
 
             HeightRequest = 30;

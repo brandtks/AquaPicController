@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Modules;
 
 namespace AquaPic.UserInterface
@@ -21,15 +21,15 @@ namespace AquaPic.UserInterface
 //        SettingTextBox deadband;
 
         public TemperatureWindow (params object[] options) : base () {
-            MyBox box1 = new MyBox (385, 395);
+            TouchGraphicalBox box1 = new TouchGraphicalBox (385, 395);
             Put (box1, 10, 30);
             box1.Show ();
 
-            MyBox box2 = new MyBox (385, 193);
+            TouchGraphicalBox box2 = new TouchGraphicalBox (385, 193);
             Put (box2, 405, 30);
             box2.Show ();
 
-            MyBox box3 = new MyBox (385, 192);
+            TouchGraphicalBox box3 = new TouchGraphicalBox (385, 192);
             Put (box3, 405, 233);
             box3.Show ();
 
@@ -93,7 +93,7 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             heaterLabel = new TouchLabel ();
-            heaterLabel.textAlignment = MyAlignment.Center;
+            heaterLabel.textAlignment = TouchAlignment.Center;
             heaterLabel.WidthRequest = 375;
             heaterLabel.textColor = "secb";
             Put (heaterLabel, 410, 77);
@@ -241,7 +241,7 @@ namespace AquaPic.UserInterface
 
             var tLabel = new TouchLabel ();
             tLabel.text = "Temperature";
-            tLabel.textAlignment = MyAlignment.Right;
+            tLabel.textAlignment = TouchAlignment.Right;
             tLabel.WidthRequest = 100;
             Put (tLabel, 410, 282);
             tLabel.Show ();

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;

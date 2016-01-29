@@ -1,5 +1,5 @@
 ﻿using System;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {

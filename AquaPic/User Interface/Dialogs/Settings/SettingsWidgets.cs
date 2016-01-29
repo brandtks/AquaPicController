@@ -2,8 +2,9 @@
 using System.Diagnostics;
 using Cairo;
 using Gtk;
+using TouchWidgetLibrary;
 
-namespace MyWidgetLibrary
+namespace AquaPic.UserInterface
 {
     public class SettingsWidget : Fixed
     {
@@ -27,9 +28,9 @@ namespace MyWidgetLibrary
             label = new TouchLabel ();
             label = new TouchLabel ();
             label.WidthRequest = 115;
-            label.textAlignment = MyAlignment.Right;
+            label.textAlignment = TouchAlignment.Right;
             label.textColor = "white";
-            label.render.textWrap = MyTextWrap.Shrink;
+            label.render.textWrap = TouchTextWrap.Shrink;
             label.text = "Error: No Title";
             Put (label, 0, 4);
             label.Show ();
@@ -114,9 +115,9 @@ namespace MyWidgetLibrary
             int seperation = ss.Allocation.Width / ss.SelectionCount;
             int x = ss.Allocation.Left;
 
-            MyText render = new MyText ();
-            render.textWrap = MyTextWrap.Shrink;
-            render.alignment = MyAlignment.Center;
+            TouchText render = new TouchText ();
+            render.textWrap = TouchTextWrap.Shrink;
+            render.alignment = TouchAlignment.Center;
             render.font.color = "white";
 
             foreach (var l in labels) {

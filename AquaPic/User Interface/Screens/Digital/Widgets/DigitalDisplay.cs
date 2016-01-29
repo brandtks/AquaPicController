@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
@@ -20,14 +20,14 @@ namespace AquaPic.UserInterface
 
             label = new TouchLabel ();
             label.WidthRequest = 120;
-            label.textAlignment = MyAlignment.Center;
-            label.render.textWrap = MyTextWrap.Shrink;
+            label.textAlignment = TouchAlignment.Center;
+            label.render.textWrap = TouchTextWrap.Shrink;
             Put (label, 0, 0);
 
             textBox = new TouchTextBox ();
             textBox.text = "Open";
             textBox.bkgndColor = "seca";
-            textBox.textAlignment = MyAlignment.Center;
+            textBox.textAlignment = TouchAlignment.Center;
             textBox.SetSizeRequest (120, 30);
             Put (textBox, 0, 20);
 

@@ -4,7 +4,7 @@ using Cairo;
 using Gtk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Modules;
 using AquaPic.Utilites;
 using AquaPic.Drivers;

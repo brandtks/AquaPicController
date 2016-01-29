@@ -6,7 +6,7 @@ using Gtk;
 using Cairo;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
@@ -28,8 +28,8 @@ namespace AquaPic.UserInterface
 
             tv = new TextView ();
             tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
-            tv.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
-            tv.ModifyText (StateType.Normal, MyColor.NewGtkColor ("black"));
+            tv.ModifyBase (StateType.Normal, TouchColor.NewGtkColor ("grey4"));
+            tv.ModifyText (StateType.Normal, TouchColor.NewGtkColor ("black"));
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");

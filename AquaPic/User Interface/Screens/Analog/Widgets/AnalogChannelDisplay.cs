@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Utilites;
 
 namespace AquaPic.UserInterface
@@ -52,7 +52,7 @@ namespace AquaPic.UserInterface
             Put (textBox, 0, 35);
             textBox.Show ();
 
-            progressBar = new TouchProgressBar (MyOrientation.Horizontal);
+            progressBar = new TouchProgressBar (TouchOrientation.Horizontal);
             progressBar.WidthRequest = 440;
             progressBar.ProgressChangedEvent += (sender, args) => {
                 currentValue = args.currentProgress * (float)divisionSteps;
@@ -64,7 +64,7 @@ namespace AquaPic.UserInterface
             typeLabel = new TouchLabel ();
             typeLabel.Visible = false;
             typeLabel.WidthRequest = 200;
-            typeLabel.textAlignment = MyAlignment.Right;
+            typeLabel.textAlignment = TouchAlignment.Right;
             Put (typeLabel, 550, 15);
 
             button = new TouchButton ();
@@ -113,9 +113,9 @@ namespace AquaPic.UserInterface
             int seperation = ss.Allocation.Width / ss.SelectionCount;
             int x = ss.Allocation.Left;
 
-            MyText render = new MyText ();
-            render.textWrap = MyTextWrap.Shrink;
-            render.alignment = MyAlignment.Center;
+            TouchText render = new TouchText ();
+            render.textWrap = TouchTextWrap.Shrink;
+            render.alignment = TouchAlignment.Center;
             render.font.color = "white";
 
             string[] labels = {"0-10V", "PWM"};

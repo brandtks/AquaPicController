@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 using AquaPic.Runtime;
 
@@ -29,7 +29,7 @@ namespace AquaPic.UserInterface
         bool timerRunning;
 
         public ChemistryWindow (params object[] options) : base () {
-            MyBox box1 = new MyBox (780, 395);
+            TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
             Put (box1, 10, 30);
             box1.Show ();
 
@@ -50,8 +50,8 @@ namespace AquaPic.UserInterface
             }
 
             timerProgress = new TouchCurvedProgressBar (
-                new MyColor ("pri"),
-                new MyColor ("grey4"),
+                new TouchColor ("pri"),
+                new TouchColor ("grey4"),
                 0.0f);
             timerProgress.SetSizeRequest (250, 120);
             Put (timerProgress, 275, 100);
@@ -59,7 +59,7 @@ namespace AquaPic.UserInterface
 
             timerLabel = new TouchLabel ();
             timerLabel.WidthRequest = 100;
-            timerLabel.textAlignment = MyAlignment.Center;
+            timerLabel.textAlignment = TouchAlignment.Center;
             Put (timerLabel, 350, 170);
             timerLabel.Visible = false;
 
@@ -90,20 +90,20 @@ namespace AquaPic.UserInterface
             nameLabel.WidthRequest = 300;
             nameLabel.textSize = 13;
             nameLabel.textColor = "pri";
-            nameLabel.textAlignment = MyAlignment.Center;
+            nameLabel.textAlignment = TouchAlignment.Center;
             Put (nameLabel, 250, 40);
             nameLabel.Show ();
 
             stepLabel = new TouchTextBox ();
             stepLabel.SetSizeRequest (620, 75);
-            stepLabel.textAlignment = MyAlignment.Center;
+            stepLabel.textAlignment = TouchAlignment.Center;
             stepLabel.text = "Please select a test procedure";
             Put (stepLabel, 90, 250);
             stepLabel.Show ();
 
             actionLabel = new TouchLabel ();
             actionLabel.WidthRequest = 200;
-            actionLabel.textAlignment = MyAlignment.Left;
+            actionLabel.textAlignment = TouchAlignment.Left;
             Put (actionLabel, 20, 385);
             actionLabel.Show ();
 
@@ -203,7 +203,7 @@ namespace AquaPic.UserInterface
             --currentTime;
 
             timerProgress.progress = 1.0f - ((float)currentTime / (float)actionOption);
-            timerProgress.backgroundColor = new MyColor ("pri").Blend(new MyColor ("compl"), timerProgress.progress);
+            timerProgress.backgroundColor = new TouchColor ("pri").Blend(new TouchColor ("compl"), timerProgress.progress);
 
             if ((currentTime % 5) == 0) {
                 timerLabel.text = string.Format ("{0:D} secs", currentTime / 5);
@@ -244,7 +244,7 @@ namespace AquaPic.UserInterface
                             parent = null;
                     }
 
-                    var ms = new TouchMessageDialog (
+                    var ms = new TouchDialog (
                          "Are you sure you want to quit in the middle of a procedure", 
                          parent);
 
@@ -368,7 +368,7 @@ namespace AquaPic.UserInterface
                             parent = null;
                     }
 
-                    var ms = new TouchMessageDialog (
+                    var ms = new TouchDialog (
                         "Are you sure you want to quit in the middle of a procedure", 
                         parent);
 

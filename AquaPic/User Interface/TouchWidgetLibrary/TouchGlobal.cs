@@ -2,14 +2,26 @@
 using Cairo;
 using Gtk;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
-    public enum MyOrientation : byte {
+    public enum TouchOrientation : byte {
         Vertical = 1,
         Horizontal
     }
 
-    public static class WidgetGlobal
+    public enum TouchAlignment : byte {
+        Right = 1,
+        Left,
+        Center
+    }
+
+    public enum TouchTextWrap : byte {
+        None = 1,
+        WordWrap,
+        Shrink
+    }
+
+    public static class TouchGlobal
     {
         public static void DrawRoundedRectangle (Cairo.Context cr, double x, double y, double width, double height, double radius) {
             cr.Save ();
@@ -30,17 +42,4 @@ namespace MyWidgetLibrary
             cr.Restore ();
         }
     }
-
-//    public class MessageBox {
-//        public static void Show (string msg) {
-//            var ms = new MessageDialog (
-//                null,
-//                DialogFlags.DestroyWithParent,
-//                MessageType.Info,
-//                ButtonsType.Ok,
-//                msg);
-//            ms.Run ();
-//            ms.Destroy ();
-//        }
-//    }
 }

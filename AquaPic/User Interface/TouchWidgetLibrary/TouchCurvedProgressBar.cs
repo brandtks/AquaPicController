@@ -2,7 +2,7 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
     public class TouchCurvedProgressBar : EventBox
     {
@@ -21,12 +21,12 @@ namespace MyWidgetLibrary
             }
         }
 
-        public MyColor backgroundColor;
-        public MyColor progressColor;
+        public TouchColor backgroundColor;
+        public TouchColor progressColor;
 
         public TouchCurvedProgressBar (
-            MyColor colorBackground, 
-            MyColor colorProgress,
+            TouchColor colorBackground, 
+            TouchColor colorProgress,
             float currentProgress
         ) {
             this.Visible = true;
@@ -42,7 +42,7 @@ namespace MyWidgetLibrary
         }
 
         public TouchCurvedProgressBar () 
-            : this (new MyColor ("grey4"), new MyColor ("pri"), 0.0f) { 
+            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f) { 
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {

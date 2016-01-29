@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
-    public class MyColor
+    public class TouchColor
     {
         public float R { get; set; }
         public float G { get; set; }
@@ -32,7 +32,7 @@ namespace MyWidgetLibrary
             { "grey4", new float [3] { 0.85f, 0.85f, 0.85f} }
         };
 
-        public MyColor (string color, double A = 1.0) {
+        public TouchColor (string color, double A = 1.0) {
             bool colorFound;
 
             try {
@@ -69,7 +69,7 @@ namespace MyWidgetLibrary
             storedColorName = colorName;
         }
 
-        public MyColor (double R, double G, double B, double A = 1.0) {
+        public TouchColor (double R, double G, double B, double A = 1.0) {
             colorName = string.Empty;
             this.R = (float)R;
             this.G = (float)G;
@@ -82,7 +82,7 @@ namespace MyWidgetLibrary
             storedColorName = colorName;
         }
 
-        public MyColor (byte R, byte G, byte B, double A = 1.0) {
+        public TouchColor (byte R, byte G, byte B, double A = 1.0) {
             colorName = string.Empty;
             this.R = (float)(R/255);
             this.G = (float)(G/255);
@@ -95,8 +95,8 @@ namespace MyWidgetLibrary
             storedColorName = colorName;
         }
 
-        public static implicit operator MyColor (string name) {
-            return new MyColor (name);
+        public static implicit operator TouchColor (string name) {
+            return new TouchColor (name);
         }
 
         public void ModifyAlpha (double a) {
@@ -130,11 +130,11 @@ namespace MyWidgetLibrary
             B = storedB;
         }
 
-        public MyColor Blend (MyColor otherColor, float amount) {
+        public TouchColor Blend (TouchColor otherColor, float amount) {
             float red = (R * (1 - amount)) + (otherColor.R * amount);
             float green = (G * (1 - amount)) + (otherColor.G * amount);
             float blue = (B * (1 - amount)) + (otherColor.B * amount);
-            return new MyColor (red, green, blue);
+            return new TouchColor (red, green, blue);
         }
 
         public string ToHTML () {
@@ -149,7 +149,7 @@ namespace MyWidgetLibrary
             byte r, g, b;
 
             try {
-                MyColor c = new MyColor (color);
+                TouchColor c = new TouchColor (color);
                 r = (byte)(c.R * 255);
                 g = (byte)(c.G * 255);
                 b = (byte)(c.B * 255);
@@ -168,10 +168,10 @@ namespace MyWidgetLibrary
         }
 
         public static void SetSource (Context cr, string color, double a = 1.0) {
-            MyColor c;
+            TouchColor c;
 
             try {
-                c = new MyColor (color);
+                c = new TouchColor (color);
                 cr.SetSourceRGBA (c.R, c.G, c.B, a);
             } catch {
                 cr.SetSourceRGBA (0.0, 0.0, 0.0, a);
@@ -179,10 +179,10 @@ namespace MyWidgetLibrary
         }
 
         public static Color NewCairoColor (string color, double a = 1.0) {
-            MyColor c;
+            TouchColor c;
 
             try {
-                c = new MyColor (color);
+                c = new TouchColor (color);
                 return new Color (c.R, c.G, c.B, a);
             } catch {
                 return new Color (0.0, 0.0, 0.0);
@@ -194,10 +194,10 @@ namespace MyWidgetLibrary
         }
 
         public static Gdk.Color NewGtkColor (string color) {
-            MyColor c;
+            TouchColor c;
 
             try {
-                c = new MyColor (color);
+                c = new TouchColor (color);
                 return new Gdk.Color ((byte)(c.R * 255), (byte)(c.G * 255), (byte)(c.B * 255));
             } catch {
                 return new Gdk.Color ();

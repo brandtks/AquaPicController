@@ -2,21 +2,21 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary
+namespace TouchWidgetLibrary
 {
     public class TouchLayeredProgressBar : TouchProgressBar
     {
-        public MyColor colorProgressSecondary;
+        public TouchColor colorProgressSecondary;
         public float currentProgressSecondary;
         public bool drawPrimaryWhenEqual;
 
         public TouchLayeredProgressBar (
-            MyColor colorBackground, 
-            MyColor colorProgress,
+            TouchColor colorBackground, 
+            TouchColor colorProgress,
             float currentProgress, 
             bool enableTouch, 
-            MyOrientation orientation,
-            MyColor colorProgressSecondary, 
+            TouchOrientation orientation,
+            TouchColor colorProgressSecondary, 
             float currentProgressSecondary,
             bool drawPrimaryWhenEqual)
             : base (
@@ -35,8 +35,8 @@ namespace MyWidgetLibrary
         }
 
         public TouchLayeredProgressBar ()
-            : base (new MyColor ("grey4"), new MyColor ("pri"), 0.0f, false, MyOrientation.Vertical) {
-            colorProgressSecondary = new MyColor ("seca");
+            : base (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f, false, TouchOrientation.Vertical) {
+            colorProgressSecondary = new TouchColor ("seca");
             currentProgressSecondary = 0.0f;
             drawPrimaryWhenEqual = true;
 
@@ -51,7 +51,7 @@ namespace MyWidgetLibrary
                 int width = Allocation.Width;
                 int height = Allocation.Height;
 
-                if (_orient == MyOrientation.Vertical) {
+                if (_orient == TouchOrientation.Vertical) {
                     cr.Rectangle (left, top, width, height);
                     colorBackground.SetSource (cr);
                     cr.Fill ();
@@ -73,7 +73,7 @@ namespace MyWidgetLibrary
         }
 
         protected void DrawPrimary (Context cr) {
-            if (_orient == MyOrientation.Vertical) {
+            if (_orient == TouchOrientation.Vertical) {
                 int height = Allocation.Height;
                 int difference = (int)(height * currentProgress);
                 int top = Allocation.Top;
@@ -85,7 +85,7 @@ namespace MyWidgetLibrary
         }
 
         protected void DrawSecondary (Context cr) {
-            if (_orient == MyOrientation.Vertical) {
+            if (_orient == TouchOrientation.Vertical) {
                 int height = Allocation.Height;
                 int difference = (int)(height * currentProgressSecondary);
                 int top = Allocation.Top;

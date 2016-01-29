@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
@@ -14,7 +14,7 @@ namespace AquaPic.UserInterface
         private uint timerId;
 
         public AlarmWindow (params object[] options) : base () {
-            var box = new MyBox (780, 395);
+            var box = new TouchGraphicalBox (780, 395);
             Put (box, 10, 30);
 
             var label = new TouchLabel ();
@@ -22,7 +22,7 @@ namespace AquaPic.UserInterface
             label.textSize = 13;
             label.textColor = "pri";
             label.WidthRequest = 780;
-            label.textAlignment = MyAlignment.Center;
+            label.textAlignment = TouchAlignment.Center;
             Put (label, 10, 35);
 
             var b = new TouchButton ();
@@ -36,7 +36,7 @@ namespace AquaPic.UserInterface
 
             tv = new TextView ();
             tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
-            tv.ModifyBase (StateType.Normal, MyColor.NewGtkColor ("grey4"));
+            tv.ModifyBase (StateType.Normal, TouchColor.NewGtkColor ("grey4"));
             tv.CanFocus = false;
 
             ScrolledWindow sw = new ScrolledWindow ();
@@ -66,9 +66,9 @@ namespace AquaPic.UserInterface
             foreach (var a in alarming) {
                 var tag = new TextTag (null);
                 if (a.acknowledged)
-                    tag.ForegroundGdk = MyColor.NewGtkColor ("seca");
+                    tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
                 else
-                    tag.ForegroundGdk = MyColor.NewGtkColor ("compl");
+                    tag.ForegroundGdk = TouchColor.NewGtkColor ("compl");
                 TextTagTable ttt = tb.TagTable;
                 ttt.Add (tag);
 

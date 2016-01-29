@@ -2,7 +2,7 @@
 using Gtk;
 using Cairo;
 
-namespace MyWidgetLibrary  
+namespace TouchWidgetLibrary  
 {
     public enum ButtonClickAction : byte {
         None = 0,
@@ -13,9 +13,9 @@ namespace MyWidgetLibrary
 
     public class TouchButton : EventBox
     {
-        public MyColor buttonColor;
+        public TouchColor buttonColor;
         public string text;
-        public MyColor textColor;
+        public TouchColor textColor;
         public int textSize;
         public string textFont;
         public ButtonClickAction clickAction;
@@ -45,7 +45,7 @@ namespace MyWidgetLibrary
                 int top = Allocation.Top;
                 int left = Allocation.Left;
 
-                WidgetGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
+                TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
                 buttonColor.SetSource (cr);
                 cr.Fill ();
 
@@ -62,12 +62,12 @@ namespace MyWidgetLibrary
 //                //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
 //                l.Dispose ();
 
-                MyText t = text;
+                TouchText t = text;
                 t.font.color = textColor;
                 t.font.fontName = textFont;
-                t.textWrap = MyTextWrap.WordWrap;
+                t.textWrap = TouchTextWrap.WordWrap;
                 t.font.size = textSize;
-                t.alignment = MyAlignment.Center;
+                t.alignment = TouchAlignment.Center;
                 t.Render (this, left + 3, top, width - 6, height);
             }
         }

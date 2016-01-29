@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cairo;
 using Gtk;
 using AquaPic.Runtime;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
@@ -14,7 +14,7 @@ namespace AquaPic.UserInterface
         private int updateAlarm;
         private string alarmName;
 
-        private string currentscreen = GuiGlobal.currentScreen;
+        private string currentscreen = AquaPicGUI.currentScreen;
 
         public MyNotificationBar () {
             Visible = true;
@@ -58,9 +58,9 @@ namespace AquaPic.UserInterface
                 cr.ClosePath ();
 
                 Gradient pat = new LinearGradient (0, 19, width, 19);
-                pat.AddColorStop (0.0, MyColor.NewCairoColor ("grey2", 0.35));
-                pat.AddColorStop (0.5, MyColor.NewCairoColor ("pri"));
-                pat.AddColorStop (1.0, MyColor.NewCairoColor ("grey2", 0.35));
+                pat.AddColorStop (0.0, TouchColor.NewCairoColor ("grey2", 0.35));
+                pat.AddColorStop (0.5, TouchColor.NewCairoColor ("pri"));
+                pat.AddColorStop (1.0, TouchColor.NewCairoColor ("grey2", 0.35));
                 cr.SetSource (pat);
                 cr.Fill ();
                 pat.Dispose ();
@@ -79,7 +79,7 @@ namespace AquaPic.UserInterface
                 if (alarmName == "No Alarms")
                     fontColor = "white";
                 else
-                    fontColor = MyColor.ToHTML ("compl");
+                    fontColor = TouchColor.ToHTML ("compl");
                 l.Alignment = Pango.Alignment.Left;
                 l.Width = Pango.Units.FromPixels (500);
                 l.SetMarkup ("<span color=\""
@@ -119,7 +119,7 @@ namespace AquaPic.UserInterface
 
         protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
             if ((args.Event.X >= 0.0) && (args.Event.X <= 250.0))
-                GuiGlobal.ChangeScreens ("Alarms");
+                AquaPicGUI.ChangeScreens ("Alarms");
         }
 
         protected void OnAllAlarmsUpdated (object sender, AlarmEventArgs args) {

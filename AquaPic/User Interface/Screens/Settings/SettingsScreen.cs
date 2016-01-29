@@ -1,7 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
@@ -11,7 +11,7 @@ namespace AquaPic.UserInterface
         private AquaPicGUI tw;
 
         public SettingsWindow (params object[] options) : base () {
-            var box = new MyBox (110, 395);
+            var box = new TouchGraphicalBox (110, 395);
             Put (box, 680, 30);
             box.Show ();
 
@@ -34,7 +34,7 @@ namespace AquaPic.UserInterface
                         b = new TouchButton ();
                         b.SetSizeRequest (100, 30);
                         b.text = "Back";
-                        b.ButtonReleaseEvent += (o, args) => GuiGlobal.ChangeScreens ("Main");
+                        b.ButtonReleaseEvent += (o, args) => AquaPicGUI.ChangeScreens ("Main");
                         Put (b, 685, 105);
                         b.Show ();
                     } else
@@ -71,7 +71,7 @@ namespace AquaPic.UserInterface
                     parent = null;
             }
 
-            var ms = new TouchMessageDialog ("Are you sure?\nClosing application ends all controller functionality!", parent);
+            var ms = new TouchDialog ("Are you sure?\nClosing application ends all controller functionality!", parent);
 
             ms.Response += (o, a) => {
                 if (a.ResponseId == ResponseType.Yes)

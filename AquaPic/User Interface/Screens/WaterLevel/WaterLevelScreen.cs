@@ -1,6 +1,6 @@
 ﻿using System;
 using Gtk;
-using MyWidgetLibrary;
+using TouchWidgetLibrary;
 using AquaPic.Runtime;
 using AquaPic.Modules;
 using AquaPic.Drivers;
@@ -21,15 +21,15 @@ namespace AquaPic.UserInterface
         TouchTextBox atoStateTextBox;
 
         public WaterLevelWindow (params object[] options) : base () {
-            var box1 = new MyBox (385, 395);
+            var box1 = new TouchGraphicalBox (385, 395);
             Put (box1, 10, 30);
             box1.Show ();
 
-            var box2 = new MyBox (385, 193);
+            var box2 = new TouchGraphicalBox (385, 193);
             Put (box2, 405, 30);
             box2.Show ();
 
-            var box3 = new MyBox (385, 192);
+            var box3 = new TouchGraphicalBox (385, 192);
             Put (box3, 405, 233);
             box3.Show ();
 
@@ -179,7 +179,7 @@ namespace AquaPic.UserInterface
             //Type
             switchTypeLabel = new TouchLabel ();
             switchTypeLabel.WidthRequest = 198;
-            switchTypeLabel.textAlignment = MyAlignment.Right;
+            switchTypeLabel.textAlignment = TouchAlignment.Right;
             Put (switchTypeLabel, 585, 308);
             switchTypeLabel.Show ();
 
