@@ -178,14 +178,20 @@ namespace AquaPic.SerialBus
         #if UNSAFE_COMMS
         private unsafe void QueueMessage (Slave slave, byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
             // <TEST> if uart is null the port isn't open so don't queue the message
-            if (uart != null)
-                messageBuffer.Enqueue (new InternalMessage (slave, func, writeData, writeSize, readSize, callback));
+            if (uart != null) {
+                lock (messageBuffer.SyncRoot) {
+                    messageBuffer.Enqueue (new InternalMessage (slave, func, writeData, writeSize, readSize, callback));
+                }
+            }
         }
         #else
         private void QueueMessage (Slave slave, byte func, byte[] writeData, int writeSize, int readSize, ResponseCallback callback) {
             // <TEST> if uart is null the port isn't open so don't queue the message
-            if (uart != null)
-                messageBuffer.Enqueue (new InternalMessage (slave, func, writeData, writeSize, readSize, callback));
+            if (uart != null) {
+                lock (messageBuffer.SyncRoot) {
+                    messageBuffer.Enqueue (new InternalMessage (slave, func, writeData, writeSize, readSize, callback));
+                }
+            }
         }
         #endif
 

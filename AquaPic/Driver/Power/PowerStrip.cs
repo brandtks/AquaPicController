@@ -175,14 +175,15 @@ namespace AquaPic.Drivers
                     });
                 #endif
 
+
+                #if !RPI_BUILD
                 //<TEST> this is here only because the slave never responds so the callback never happens
-                //outlets [outletID].OnChangeState (new StateChangeEventArgs (outletID, powerID, state));
-                //outlets [outletID].currentState = state;
-                //OnStateChange (outlets [outletID], new StateChangeEventArgs (outletID, powerID, state));
+                outlets [outletId].currentState = state;
+                OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
+                #endif
             }
 
             public void SetPlugMode (byte outletId, Mode mode) {
-                //outlets [outletId].OnModeChange (new ModeChangeEventArgs (outletId, powerID, outlets [outletId].mode));
                 outlets [outletId].mode = mode;
                 OnModeChange (outlets [outletId], new ModeChangeEventArgs (outletId, powerID, outlets [outletId].mode));
             }

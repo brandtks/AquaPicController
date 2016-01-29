@@ -24,7 +24,6 @@ namespace AquaPic
         }
 
         protected void onExpose (object sender, ExposeEventArgs args) {
-            GdkWindow.KeepAbove = true;
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 int left = Allocation.Left;
                 int top = Allocation.Top;

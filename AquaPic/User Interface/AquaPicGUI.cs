@@ -12,14 +12,16 @@ namespace AquaPic.UserInterface
         WindowBase current;
         Fixed f;
         MyMenuBar menu;
+        MySideBar side;
 
         public AquaPicGUI () : base (Gtk.WindowType.Toplevel) {
             this.Name = "AquaPic.GUI";
             this.Title = global::Mono.Unix.Catalog.GetString ("AquaPic Controller Version 1");
-            this.WindowPosition = ((global::Gtk.WindowPosition)(4));
+            //this.WindowPosition = ((global::Gtk.WindowPosition)(4));
+            this.WindowPosition = WindowPosition.Center;
             this.DefaultWidth = 800;
             this.DefaultHeight = 480;
-            this.DeleteEvent += new global::Gtk.DeleteEventHandler (this.OnDeleteEvent);
+            this.DeleteEvent += new Gtk.DeleteEventHandler (this.OnDeleteEvent);
             this.Resizable = false;
             this.AllowGrow = false;
 
@@ -64,10 +66,14 @@ namespace AquaPic.UserInterface
             f.Put (current, 0, 0);
             current.Show ();
 
+            side = new MySideBar ();
+            f.Put (side, 0, 20);
+            side.Show ();
+
             Add (f);
             f.Show ();
 
-            this.Show ();
+            Show ();
         }
 
         protected void OnDeleteEvent (object sender, DeleteEventArgs a) {
@@ -81,7 +87,16 @@ namespace AquaPic.UserInterface
             current.Dispose ();
             current = screen.CreateInstance (options);
             f.Put (current, 0, 0);
+
             menu.UpdateScreens ();
+
+            f.Remove (side);
+            side.Destroy ();
+            side.Dispose ();
+            side = new MySideBar ();
+            f.Put (side, 0, 20);
+            side.Show ();
+
             QueueDraw ();
         }
 
