@@ -13,24 +13,57 @@ namespace TouchWidgetLibrary
 
     public class TouchButton : EventBox
     {
+        public TouchText render;
         public TouchColor buttonColor;
-        public string text;
-        public TouchColor textColor;
-        public int textSize;
-        public string textFont;
         public ButtonClickAction clickAction;
+
+        public string text {
+            get {
+                return render.text;
+            }
+            set {
+                render.text = value;
+            }
+        }
+
+        public TouchColor textColor {
+            get {
+                return render.font.color;
+            }
+            set {
+                render.font.color = value;
+            }
+        }
+
+        public int textSize {
+            get {
+                return render.font.size;
+            }
+            set {
+                render.font.size = value;
+            }
+        }
+
+        public TouchAlignment textAlignment {
+            get {
+                return render.alignment;
+            }
+            set {
+                render.alignment = value;
+            }
+        }
 
         public TouchButton () {
             this.Visible = true;
             this.VisibleWindow = false;
 
+            render = new TouchText ();
             this.buttonColor = "pri";
             this.text = "";
             this.textColor = "black";
-            textSize = 11;
-            textFont = "Sans";
             this.HeightRequest = 45;
             this.WidthRequest = 45;
+            this.textAlignment = TouchAlignment.Center;
             this.clickAction = ButtonClickAction.Darken;
 
             this.ExposeEvent += onExpose;
@@ -49,26 +82,7 @@ namespace TouchWidgetLibrary
                 buttonColor.SetSource (cr);
                 cr.Fill ();
 
-//                Pango.Layout l = new Pango.Layout (this.PangoContext);
-//                l.Width = Pango.Units.FromPixels (width - 2);
-//                l.Wrap = Pango.WrapMode.Word;
-//                l.Alignment = Pango.Alignment.Center;
-//                //l.SetText (ButtonLabel);
-//                l.SetMarkup ("<span color=" + (char)34 + textColor.ToHTML () + (char)34 + ">" + text + "</span>"); 
-//                l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
-//                int y = (top + (height / 2)) - 8;
-//                y -= ((l.LineCount - 1) * 9);
-//                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 1, y, l);
-//                //GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left, top + height, l);
-//                l.Dispose ();
-
-                TouchText t = text;
-                t.font.color = textColor;
-                t.font.fontName = textFont;
-                t.textWrap = TouchTextWrap.WordWrap;
-                t.font.size = textSize;
-                t.alignment = TouchAlignment.Center;
-                t.Render (this, left + 3, top, width - 6, height);
+                render.Render (this, left + 3, top, width - 6, height);
             }
         }
 

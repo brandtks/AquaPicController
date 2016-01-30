@@ -11,7 +11,7 @@ namespace AquaPic.UserInterface
 {
     public class LoggerWindow : WindowBase
     {
-        private TextView tv;
+        public TextView tv;
 
         public LoggerWindow (params object[] options) : base () {
             var box = new TouchGraphicalBox (780, 395);
@@ -37,35 +37,32 @@ namespace AquaPic.UserInterface
             b.ButtonReleaseEvent += (o, args) => SaveEvents ();
             Put (b, 575, 380);
 
-            tv = new TextView ();
+            tv = new TextView (Logger.buffer);
             tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             tv.ModifyBase (StateType.Normal, TouchColor.NewGtkColor ("grey4"));
             tv.ModifyText (StateType.Normal, TouchColor.NewGtkColor ("black"));
             tv.CanFocus = false;
             tv.Editable = false;
-            tv.Buffer = Logger.buffer;
 
             ScrolledWindow sw = new ScrolledWindow ();
             sw.SetSizeRequest (770, 315);
             sw.Add (tv);
-            tv.Show ();
             Put (sw, 15, 60);
             sw.Show ();
+            tv.Show ();
 
             Logger.EventAddedEvent += OnEventAdded;
-
             Show ();
         }
 
         public override void Dispose () {
             Logger.EventAddedEvent -= OnEventAdded;
-
             base.Dispose ();
         }
 
         protected void OnEventAdded () {
             tv.Buffer = Logger.buffer;
-            tv.Show ();
+            tv.QueueDraw ();
         }
 
         protected void OnClearButtonRelease (object sender, ButtonReleaseEventArgs args) {

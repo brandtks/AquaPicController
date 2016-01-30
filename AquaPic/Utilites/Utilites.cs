@@ -121,6 +121,14 @@ namespace AquaPic.Utilites
             return (int)Math.Floor (value + 0.5);
         }
 
+        public static bool WithinRange (this double value, double setpoint, double deadband) {
+            return ((value <= (setpoint + deadband)) && (value >= (setpoint - deadband)));
+        }
+
+        public static bool WithinRange (this int value, int setpoint, int deadband) {
+            return ((value <= (setpoint + deadband)) && (value >= (setpoint - deadband)));
+        }
+
         public static bool mtob (byte mask, int shift) {
             byte b = mask;
             byte _shift = (byte)shift;

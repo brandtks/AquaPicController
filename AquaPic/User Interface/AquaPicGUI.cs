@@ -13,11 +13,11 @@ namespace AquaPic.UserInterface
         Fixed f;
         MyMenuBar menu;
         MySideBar side;
+        MyNotificationBar notification;
 
         public AquaPicGUI () : base (Gtk.WindowType.Toplevel) {
-            this.Name = "AquaPic.GUI";
-            this.Title = global::Mono.Unix.Catalog.GetString ("AquaPic Controller Version 1");
-            //this.WindowPosition = ((global::Gtk.WindowPosition)(4));
+            this.Name = "AquaPicGUI";
+            this.Title = "AquaPic Controller Version 1";
             this.WindowPosition = WindowPosition.Center;
             this.DefaultWidth = 800;
             this.DefaultHeight = 480;
@@ -54,10 +54,6 @@ namespace AquaPic.UserInterface
 //            f.Put (background, 0, 0);
 //            background.Show ();
 
-            var notification = new MyNotificationBar ();
-            f.Put (notification, 0, 0);
-            notification.Show ();
-
             menu = new MyMenuBar ();
             f.Put (menu, 0, 435);
             menu.Show ();
@@ -69,6 +65,10 @@ namespace AquaPic.UserInterface
             side = new MySideBar ();
             f.Put (side, 0, 20);
             side.Show ();
+
+            notification = new MyNotificationBar ();
+            f.Put (notification, 0, 0);
+            notification.Show ();
 
             Add (f);
             f.Show ();
@@ -96,6 +96,42 @@ namespace AquaPic.UserInterface
             side = new MySideBar ();
             f.Put (side, 0, 20);
             side.Show ();
+
+            if (currentScreen == "Logger") {
+                var logScreen = current as LoggerWindow;
+                if (logScreen != null) {
+                    side.ExpandEvent += (sender, e) => {
+                        logScreen.tv.Visible = false;
+                        logScreen.tv.QueueDraw ();
+                    };
+
+                    side.CollapseEvent += (sender, e) => {
+                        logScreen.tv.Visible = true;
+                        logScreen.tv.QueueDraw ();
+                    };
+                }
+            } else if (currentScreen == "Alarms") {
+                var alarmScreen = current as AlarmWindow;
+                if (alarmScreen != null) {
+                    side.ExpandEvent += (sender, e) => {
+                        alarmScreen.tv.Visible = false;
+                        alarmScreen.tv.QueueDraw ();
+                    };
+
+                    side.CollapseEvent += (sender, e) => {
+                        alarmScreen.tv.Visible = true;
+                        alarmScreen.tv.QueueDraw ();
+                    };
+                }
+
+            }
+
+            f.Remove (notification);
+            notification.Destroy ();
+            notification.Dispose ();
+            notification = new MyNotificationBar ();
+            f.Put (notification, 0, 0);
+            notification.Show ();
 
             QueueDraw ();
         }

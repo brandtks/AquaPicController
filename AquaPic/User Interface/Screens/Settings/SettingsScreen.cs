@@ -15,7 +15,7 @@ namespace AquaPic.UserInterface
             Put (box, 680, 30);
             box.Show ();
 
-            if (options.Length > 0) {
+            if (options.Length >= 1) {
                 tw = options [0] as AquaPicGUI;
                 if (tw != null) {
                     if (tw.IsTopLevel) {

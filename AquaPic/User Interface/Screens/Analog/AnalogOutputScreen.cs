@@ -65,7 +65,9 @@ namespace AquaPic.UserInterface
         }
 
         public override void Dispose () {
-            GLib.Source.Remove (timerId);
+            if (cardId != -1) {
+                GLib.Source.Remove (timerId);
+            }
             base.Dispose ();
         }
 

@@ -128,7 +128,6 @@ namespace AquaPic.UserInterface
 
         public override void Dispose () {
             GLib.Source.Remove (timerId);
-
             base.Dispose ();
         }
 

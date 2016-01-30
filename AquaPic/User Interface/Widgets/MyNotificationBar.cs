@@ -33,6 +33,7 @@ namespace AquaPic.UserInterface
 
         public override void Dispose () {
             GLib.Source.Remove (timerId);
+            Alarm.AlarmsUpdatedEvent -= OnAllAlarmsUpdated;
             base.Dispose ();
         }
 

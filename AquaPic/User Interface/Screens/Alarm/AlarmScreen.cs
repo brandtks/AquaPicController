@@ -10,7 +10,7 @@ namespace AquaPic.UserInterface
 {
     public class AlarmWindow : WindowBase
     {
-        private TextView tv;
+        public TextView tv;
         private uint timerId;
 
         public AlarmWindow (params object[] options) : base () {

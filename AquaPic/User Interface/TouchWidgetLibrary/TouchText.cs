@@ -38,8 +38,6 @@ namespace TouchWidgetLibrary
             l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
 
             if (orientation == TouchOrientation.Horizontal) {
-//                l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
-
                 if (textWrap == TouchTextWrap.WordWrap) {
                     l.Wrap = Pango.WrapMode.Word;
                     l.Width = Pango.Units.FromPixels (width);

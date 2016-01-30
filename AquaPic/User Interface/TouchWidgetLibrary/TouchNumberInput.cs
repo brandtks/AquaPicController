@@ -35,7 +35,7 @@ namespace TouchWidgetLibrary
                     cr.LineTo (Allocation.Left, Allocation.Bottom);
                     cr.ClosePath ();
                     cr.LineWidth = 1.8;
-                    MyColor.SetSource (cr, "grey4");
+                    TouchColor.SetSource (cr, "grey4");
                     cr.Stroke ();
                 }
             };
