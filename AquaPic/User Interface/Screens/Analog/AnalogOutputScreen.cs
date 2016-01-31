@@ -15,23 +15,25 @@ namespace AquaPic.UserInterface
         uint timerId;
 
         public AnalogOutputWindow (params object[] options) : base () {
-            TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
-            Put (box1, 10, 30);
-            box1.Show ();
+            //TouchGraphicalBox box1 = new TouchGraphicalBox (730, 440);
+            //Put (box1, 60, 30);
+            //box1.Show ();
+
+            //var l = new TouchLabel ();
+            //l.text = "Analog Output Cards";
+            //l.textColor = "pri";
+            //l.textSize = 14;
+            //l.textAlignment = TouchAlignment.Center;
+            //l.WidthRequest = 780;
+            //Put (l, 10, 36);
+            //l.Show ();
+
+            screenTitle = "Analog Output Cards";
 
             if (AnalogOutput.cardCount == 0) {
                 cardId = -1;
-
-                var l = new TouchLabel ();
-                l.text = "No Analog Output Cards Added";
-                l.textColor = "pri";
-                l.textAlignment = TouchAlignment.Center;
-                l.WidthRequest = 780;
-                Put (l, 10, 32);
-                l.Show ();
-
+                screenTitle = "No Analog Output Cards Added";
                 Show ();
-
                 return;
             }
 
@@ -45,7 +47,7 @@ namespace AquaPic.UserInterface
                 displays [i].TypeSelectorChangedEvent += OnSelectorSwitchChanged;
                 displays [i].ForceButtonReleaseEvent += OnForceRelease;
                 displays [i].ValueChangedEvent += OnValueChanged;
-                Put (displays [i], 20, 75 + (i * 75));
+                Put (displays [i], 70, 90 + (i * 75));
                 displays [i].Show ();
             }
 
@@ -108,12 +110,14 @@ namespace AquaPic.UserInterface
                 d.textBox.enableTouch = true;
                 d.button.buttonColor = "pri";
                 d.ss.Visible = true;
+                d.typeLabel.Visible = false;
             } else {
                 AnalogOutput.SetMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;
                 d.textBox.enableTouch = false;
                 d.button.buttonColor = "grey4";
                 d.ss.Visible = false;
+                d.typeLabel.Visible = true;
             }
 
             d.QueueDraw ();

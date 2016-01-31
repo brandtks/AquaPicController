@@ -29,9 +29,11 @@ namespace AquaPic.UserInterface
         bool timerRunning;
 
         public ChemistryWindow (params object[] options) : base () {
-            TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
-            Put (box1, 10, 30);
-            box1.Show ();
+            //TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
+            //Put (box1, 10, 30);
+            //box1.Show ();
+
+            screenTitle = "Chemistry";
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "TestProcedures");
@@ -87,11 +89,11 @@ namespace AquaPic.UserInterface
             skipBtn.Visible = false;
 
             nameLabel = new TouchLabel ();
-            nameLabel.WidthRequest = 300;
-            nameLabel.textSize = 13;
-            nameLabel.textColor = "pri";
+            nameLabel.WidthRequest = 700;
+            nameLabel.textSize = 14;
+            nameLabel.textColor = "seca";
             nameLabel.textAlignment = TouchAlignment.Center;
-            Put (nameLabel, 250, 40);
+            Put (nameLabel, 50, 65);
             nameLabel.Show ();
 
             stepLabel = new TouchTextBox ();
@@ -103,8 +105,8 @@ namespace AquaPic.UserInterface
 
             actionLabel = new TouchLabel ();
             actionLabel.WidthRequest = 200;
-            actionLabel.textAlignment = TouchAlignment.Left;
-            Put (actionLabel, 20, 385);
+            actionLabel.textAlignment = TouchAlignment.Right;
+            Put (actionLabel, 510, 420);
             actionLabel.Show ();
 
             combo = new TouchComboBox ();

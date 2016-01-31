@@ -9,22 +9,22 @@ namespace AquaPic.UserInterface
     public partial class AquaPicGUI
     {
         public static Dictionary<string, ScreenData> allWindows = new Dictionary<string, ScreenData> () {
-            { "Main", new ScreenData ("Main", true, (options) => {return new MainWindow (options);}) },
             { "Power", new ScreenData ("Power", true, (options) => {return new PowerWindow (options);}) },
             { "Lighting", new ScreenData ("Lighting", true, (options) => {return new LightingWindow (options);}) },
             { "Temperature", new ScreenData ("Temperature", true, (options) => {return new TemperatureWindow (options);}) },
-            //{ "Plugins", new ScreenData ("Plugins", true, (options) => {return new PluginWindow (options);}) },
-            { "Settings", new ScreenData ("Settings", true, (options) => {return new SettingsWindow (options);}) },
-            { "Menu", new ScreenData ("Menu", false, (options) => {return new MenuWindow (options);}) },
-            //{ "Edit Plugin", new ScreenData ("Edit Plugin", false, (options) => {return new EditPluginWindow (options);}) },
-            { "Alarms", new ScreenData ("Alarms", true, (options) => {return new AlarmWindow (options);}) },
-            { "Logger", new ScreenData ("Logger", true, (options) => {return new LoggerWindow (options);}) },
+            { "Water Level", new ScreenData ("Water Level", true, (options) => {return new WaterLevelWindow (options);}) },
+            { "Chemistry", new ScreenData ("Chemistry", true, (options) => {return new ChemistryWindow (options);}) },
             { "Analog Output", new ScreenData ("Analog Output", true, (options) => {return new AnalogOutputWindow (options);}) },
             { "Analog Input", new ScreenData ("Analog Input", true, (options) => {return new AnalogInputWindow (options);}) },
             { "Digital Input", new ScreenData ("Digital Input", true, (options) => {return new DigitalInputWindow (options);}) },
-            { "Water Level", new ScreenData ("Water Level", true, (options) => {return new WaterLevelWindow (options);}) },
             { "Serial Bus", new ScreenData ("Serial Bus", true, (options) => {return new SerialBusWindow (options);}) },
-            { "Chemistry", new ScreenData ("Chemistry", true, (options) => {return new ChemistryWindow (options);}) }
+            { "Alarms", new ScreenData ("Alarms", true, (options) => {return new AlarmWindow (options);}) },
+            { "Logger", new ScreenData ("Logger", true, (options) => {return new LoggerWindow (options);}) },
+            { "Settings", new ScreenData ("Settings", true, (options) => {return new SettingsWindow (options);}) },
+            { "Menu", new ScreenData ("Menu", false, (options) => {return new MenuWindow (options);}) },
+            { "Main", new ScreenData ("Main", true, (options) => {return new MainWindow (options);}) }//,
+            //{ "Plugins", new ScreenData ("Plugins", true, (options) => {return new PluginWindow (options);}) },
+            //{ "Edit Plugin", new ScreenData ("Edit Plugin", false, (options) => {return new EditPluginWindow (options);}) }
         };
 
         public static string currentScreen;

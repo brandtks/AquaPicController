@@ -14,25 +14,29 @@ namespace AquaPic.UserInterface
         private uint timerId;
 
         public AlarmWindow (params object[] options) : base () {
-            var box = new TouchGraphicalBox (780, 395);
-            Put (box, 10, 30);
+            //var box = new TouchGraphicalBox (730, 440);
+            //Put (box, 60, 30);
 
-            var label = new TouchLabel ();
-            label.text = "Current Alarms";
-            label.textSize = 13;
-            label.textColor = "pri";
-            label.WidthRequest = 780;
-            label.textAlignment = TouchAlignment.Center;
-            Put (label, 10, 35);
+            //var label = new TouchLabel ();
+            //label.text = "Current Alarms";
+            //label.textSize = 14;
+            //label.textColor = "pri";
+            //label.WidthRequest = 780;
+            //label.textAlignment = TouchAlignment.Center;
+            //Put (label, 10, 35);
+            //label.Show ();
+
+            screenTitle = "Current Alarms";
 
             var b = new TouchButton ();
-            b.SetSizeRequest (100, 40);
+            b.SetSizeRequest (100, 60);
             b.text = "Acknowledge Alarms";
             b.ButtonReleaseEvent += (o, args) => {
                 Alarm.Acknowledge ();
                 OnTimer ();
             };
-            Put (b, 685, 380);
+            Put (b, 685, 405);
+            b.Show ();
 
             tv = new TextView ();
             tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
@@ -40,10 +44,12 @@ namespace AquaPic.UserInterface
             tv.CanFocus = false;
 
             ScrolledWindow sw = new ScrolledWindow ();
-            sw.SetSizeRequest (770, 315);
+            sw.SetSizeRequest (720, 340);
+            sw.VScrollbar.WidthRequest = 30;
+            sw.HScrollbar.HeightRequest = 30;
             sw.Add (tv);
             tv.Show ();
-            Put (sw, 15, 60);
+            Put (sw, 65, 60);
             sw.Show ();
 
             OnTimer ();

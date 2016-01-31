@@ -9,9 +9,37 @@ namespace AquaPic.UserInterface
     public class WindowBase : Fixed
     {
         //private Image background;
+        private TouchLabel label;
+
+        public string screenTitle {
+            get {
+                return label.text;
+            }
+            set {
+                label.text = value;
+            }
+        }
+
+        public bool showTitle {
+            get {
+                return label.Visible;
+            }
+            set {
+                label.Visible = value;
+            }
+        }
 
         public WindowBase () {
             SetSizeRequest (800, 416);
+
+            label = new TouchLabel ();
+            label.text = "NO TITLE";
+            label.textSize = 14;
+            label.textColor = "pri";
+            label.WidthRequest = 700;
+            label.textAlignment = TouchAlignment.Center;
+            Put (label, 50, 37);
+            label.Show ();
 
 //            Gdk.Pixbuf display = new Gdk.Pixbuf("images/background2.jpg");
 //            string bpath = "temp", tempname = "temp";

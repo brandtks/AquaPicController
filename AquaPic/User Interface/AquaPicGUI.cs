@@ -11,7 +11,7 @@ namespace AquaPic.UserInterface
     {
         WindowBase current;
         Fixed f;
-        MyMenuBar menu;
+        //MyMenuBar menu;
         MySideBar side;
         MyNotificationBar notification;
 
@@ -54,9 +54,9 @@ namespace AquaPic.UserInterface
 //            f.Put (background, 0, 0);
 //            background.Show ();
 
-            menu = new MyMenuBar ();
-            f.Put (menu, 0, 435);
-            menu.Show ();
+            //menu = new MyMenuBar ();
+            //f.Put (menu, 0, 435);
+            //menu.Show ();
 
             current = allWindows [currentScreen].CreateInstance ();
             f.Put (current, 0, 0);
@@ -88,7 +88,7 @@ namespace AquaPic.UserInterface
             current = screen.CreateInstance (options);
             f.Put (current, 0, 0);
 
-            menu.UpdateScreens ();
+            //menu.UpdateScreens ();
 
             f.Remove (side);
             side.Destroy ();
@@ -153,13 +153,13 @@ namespace AquaPic.UserInterface
         }
 
         public void ShowDecoration () {
-            f.Move (menu, 0, 380);
+            //f.Move (menu, 0, 380);
             SetSizeRequest (800, 425);
             Decorated = true;
         }
 
         public void HideDecoration () {
-            f.Move (menu, 0, 435);
+            //f.Move (menu, 0, 435);
             SetSizeRequest (800, 480);
             #if RPI_BUILD
             Decorated = false;

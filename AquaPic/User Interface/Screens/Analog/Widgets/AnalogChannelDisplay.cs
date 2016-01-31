@@ -33,14 +33,14 @@ namespace AquaPic.UserInterface
         }
 
         public AnalogChannelDisplay () {
-            SetSizeRequest (760, 65);
+            SetSizeRequest (710, 65);
 
             label = new TouchLabel ();
             Put (label, 5, 15);
             label.Show ();
 
             textBox = new TouchTextBox ();
-            textBox.WidthRequest = 200; 
+            textBox.WidthRequest = 175; 
             textBox.TextChangedEvent += (sender, args) => {
                 try {
                     currentValue = Convert.ToSingle (args.text);
@@ -53,26 +53,26 @@ namespace AquaPic.UserInterface
             textBox.Show ();
 
             progressBar = new TouchProgressBar (TouchOrientation.Horizontal);
-            progressBar.WidthRequest = 440;
+            progressBar.WidthRequest = 415;
             progressBar.ProgressChangedEvent += (sender, args) => {
                 currentValue = args.currentProgress * (float)divisionSteps;
                 ValueChanged ();
             };
-            Put (progressBar, 210, 35);
+            Put (progressBar, 185, 35);
             progressBar.Show ();
 
             typeLabel = new TouchLabel ();
             typeLabel.Visible = false;
             typeLabel.WidthRequest = 200;
             typeLabel.textAlignment = TouchAlignment.Right;
-            Put (typeLabel, 550, 15);
+            Put (typeLabel, 500, 15);
 
             button = new TouchButton ();
             button.SetSizeRequest (100, 30);
             button.buttonColor = "grey3";
             button.text = "Force";
             button.ButtonReleaseEvent += OnForceReleased;
-            Put (button, 660, 35);
+            Put (button, 610, 35);
             button.Show ();
 
             ss = new TouchSelectorSwitch ();
@@ -82,7 +82,7 @@ namespace AquaPic.UserInterface
             ss.SelectorChangedEvent += OnSelectorSwitchChanged;
             ss.ExposeEvent += OnExpose;
             ss.Visible = false;
-            Put (ss, 660, 0);
+            Put (ss, 610, 0);
 
             Show ();
         }

@@ -22,7 +22,7 @@ namespace AquaPic.UserInterface
             Visible = true;
             VisibleWindow = false;
 
-            SetSizeRequest (25, 460);
+            SetSizeRequest (50, 460);
 
             ExposeEvent += onExpose;
             ButtonPressEvent += OnButtonPress;
@@ -39,17 +39,17 @@ namespace AquaPic.UserInterface
         }
 
         protected void onExpose (object sender, ExposeEventArgs args) {
-            if (expanded) {
-                using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
-                    int left = Allocation.Left;
-                    int top = Allocation.Top;
-                    int width = Allocation.Width;
-                    int height = Allocation.Height;
+            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                int left = Allocation.Left;
+                int top = Allocation.Top;
+                int width = Allocation.Width;
+                int height = Allocation.Height;
 
-                    double originY = (double)top + ((double)height / 2);
-                    double originX = -850.105;
-                    double radius = 1075.105;
+                double originY = (double)top + ((double)height / 2);
+                double originX = -850.105;
+                double radius = 1075.105;
 
+                if (expanded) {
                     cr.Rectangle (left, top, width, height);
                     TouchColor.SetSource (cr, "grey0", 0.80);
                     cr.Fill ();
@@ -64,7 +64,7 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey3", 0.80);
                     cr.Fill ();
 
-                    cr.Rectangle (left - 5, (height / 2) - 30 + top, 255, 60);
+                    TouchGlobal.DrawRoundedRectangle (cr, left - 50, (height / 2) - 30 + top, 300, 60, 20);
                     TouchColor.SetSource (cr, "pri");
                     cr.LineWidth = 4;
                     cr.StrokePreserve ();
@@ -122,8 +122,23 @@ namespace AquaPic.UserInterface
                             textWidth.ToInt (),
                             50);
                     }
+                } else {
+                    cr.MoveTo (10, originY + 40);
+                    cr.ArcNegative (10, originY, 40, Math.PI / 2, -Math.PI / 2);
+                    cr.LineTo (10, top + 30);
+                    cr.LineTo (left - 5, top + 30);
+                    cr.LineTo (left - 5, top + height - 30);
+                    cr.LineTo (10, top + height - 30);
+                    cr.ClosePath ();
+
+                    TouchColor.SetSource (cr, "pri", 0.75);
+                    cr.LineWidth = 0.75;
+                    cr.StrokePreserve ();
+
+                    TouchColor.SetSource (cr, "grey3", 0.25);
+                    cr.Fill ();
                 }
-            }
+            } 
         }
 
         protected double CalcX (double radius, double radians) {
@@ -185,6 +200,7 @@ namespace AquaPic.UserInterface
                         }
                     } else {
                         expanded = false;
+                        highlighedScreenIndex = Array.IndexOf (windows, AquaPicGUI.currentScreen);
                         SetSizeRequest (25, 460);
                         QueueDraw ();
 
@@ -212,6 +228,7 @@ namespace AquaPic.UserInterface
 
                 int oldDeltaPercentageFloor = Math.Floor (yDeltaPercentageOld).ToInt ();
                 int deltaPercentageFloor = Math.Floor (yDeltaPercentage).ToInt ();
+            
 
                 if (deltaPercentageFloor != oldDeltaPercentageFloor) {
                     int increment = deltaPercentageFloor - oldDeltaPercentageFloor;

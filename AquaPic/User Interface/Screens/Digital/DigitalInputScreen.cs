@@ -16,9 +16,11 @@ namespace AquaPic.UserInterface
         DigitalDisplay[] displays;
 
         public DigitalInputWindow (params object[] options) : base () {
-            TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
-            Put (box1, 10, 30);
-            box1.Show ();
+            //TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
+            //Put (box1, 10, 30);
+            //box1.Show ();
+
+            screenTitle = "Digital Input Cards";
 
             if (DigitalInput.cardCount == 0) {
                 cardId = -1;
@@ -44,8 +46,15 @@ namespace AquaPic.UserInterface
                 displays [i] = new DigitalDisplay ();
                 displays [i].ForceButtonReleaseEvent += OnForceRelease;
                 displays [i].StateSelectedChangedEvent += OnSelectorChanged;
-                int x = (i * 130) + 15;
-                Put (displays [i], x, 95);
+                int x, y;
+                if (i < 3) {
+                    x = (i * 150) + 175;
+                    y = 125;
+                } else {
+                    x = ((i - 3) * 150) + 175;
+                    y = 275;
+                }
+                Put (displays [i], x, y);
                 displays [i].Show ();
             }
 

@@ -15,23 +15,25 @@ namespace AquaPic.UserInterface
         uint timerId;
 
         public AnalogInputWindow (params object[] options) : base () {
-            TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
-            Put (box1, 10, 30);
-            box1.Show ();
+            //TouchGraphicalBox box1 = new TouchGraphicalBox (730, 440);
+            //Put (box1, 60, 30);
+            //box1.Show ();
+
+            //var l = new TouchLabel ();
+            //l.text = "Analog Input Cards";
+            //l.textColor = "pri";
+            //l.textSize = 14;
+            //l.textAlignment = TouchAlignment.Center;
+            //l.WidthRequest = 780;
+            //Put (l, 10, 36);
+            //l.Show ();
+
+            screenTitle = "Analog Inputs Cards";
 
             if (AnalogInput.cardCount == 0) {
                 cardId = -1;
-
-                var l = new TouchLabel ();
-                l.text = "No Analog Input Cards Added";
-                l.textColor = "pri";
-                l.textAlignment = TouchAlignment.Center;
-                l.WidthRequest = 780;
-                Put (l, 10, 32);
-                l.Show ();
-
+                screenTitle = "No Analog Input Cards Added";
                 Show ();
-
                 return;
             }
 
@@ -43,7 +45,7 @@ namespace AquaPic.UserInterface
                 displays [i].divisionSteps = 4096;
                 displays [i].ForceButtonReleaseEvent += OnForceRelease;
                 displays [i].ValueChangedEvent += OnValueChanged;
-                Put (displays [i], 20, 75 + (i * 60));
+                Put (displays [i], 70, 90 + (i * 75));
             }
 
             string[] names = AnalogInput.GetAllCardNames ();
