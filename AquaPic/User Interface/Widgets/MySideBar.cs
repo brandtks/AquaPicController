@@ -123,6 +123,7 @@ namespace AquaPic.UserInterface
                             50);
                     }
                 } else {
+                    /*
                     cr.MoveTo (10, originY + 40);
                     cr.ArcNegative (10, originY, 40, Math.PI / 2, -Math.PI / 2);
                     cr.LineTo (10, top + 30);
@@ -136,6 +137,24 @@ namespace AquaPic.UserInterface
                     cr.StrokePreserve ();
 
                     TouchColor.SetSource (cr, "grey3", 0.25);
+                    cr.Fill ();
+                    */
+
+                    cr.Arc (originX - 210, originY, radius, 0, 2 * Math.PI);
+                    cr.ClosePath ();
+
+                    TouchColor.SetSource (cr, "grey3", 0.75);
+                    cr.LineWidth = 0.75;
+                    cr.StrokePreserve ();
+
+                    TouchColor.SetSource (cr, "grey2", 0.25);
+                    cr.Fill ();
+
+                    TouchGlobal.DrawRoundedRectangle (cr, left - 50, (height / 2) - 30 + top, 95, 60, 20);
+                    TouchColor.SetSource (cr, "pri");
+                    cr.LineWidth = 0.75;
+                    cr.StrokePreserve ();
+                    TouchColor.SetSource (cr, "grey3");
                     cr.Fill ();
                 }
             } 
@@ -159,7 +178,6 @@ namespace AquaPic.UserInterface
             clicked = false;
             if (!expanded) {
                 expanded = true;
-                yDeltaPercentage = 0.0;
                 offset = 0.0;
                 SetSizeRequest (800, 460);
                 QueueDraw ();
@@ -190,9 +208,9 @@ namespace AquaPic.UserInterface
                             highlighedScreenIndex += increment;
 
                             if (highlighedScreenIndex >= windows.Length) {
-                                highlighedScreenIndex = 0;
+                                highlighedScreenIndex = 0 + (highlighedScreenIndex - windows.Length);
                             } else if (highlighedScreenIndex < 0) {
-                                highlighedScreenIndex = windows.Length - 1;
+                                highlighedScreenIndex = windows.Length + highlighedScreenIndex;
                             }
 
                             offset = 0.0;

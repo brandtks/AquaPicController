@@ -11,16 +11,18 @@ namespace AquaPic.UserInterface
         private AquaPicGUI tw;
 
         public SettingsWindow (params object[] options) : base () {
-            var box = new TouchGraphicalBox (110, 395);
-            Put (box, 680, 30);
-            box.Show ();
+            //var box = new TouchGraphicalBox (110, 395);
+            //Put (box, 680, 30);
+            //box.Show ();
+
+            screenTitle = "Settings";
 
             if (options.Length >= 1) {
                 tw = options [0] as AquaPicGUI;
                 if (tw != null) {
                     if (tw.IsTopLevel) {
                         var b = new TouchButton ();
-                        b.SetSizeRequest (100, 30);
+                        b.SetSizeRequest (100, 60);
                         b.text = "Unfullscreen";
                         b.ButtonReleaseEvent += (o, args) => {
                             tw.ShowDecoration ();
@@ -28,14 +30,14 @@ namespace AquaPic.UserInterface
                             tw.Unfullscreen ();
                             #endif
                         };
-                        Put (b, 685, 70);
+                        Put (b, 685, 140);
                         b.Show ();
 
                         b = new TouchButton ();
-                        b.SetSizeRequest (100, 30);
+                        b.SetSizeRequest (100, 60);
                         b.text = "Back";
                         b.ButtonReleaseEvent += (o, args) => AquaPicGUI.ChangeScreens ("Main");
-                        Put (b, 685, 105);
+                        Put (b, 685, 210);
                         b.Show ();
                     } else
                         tw = null;
@@ -43,10 +45,10 @@ namespace AquaPic.UserInterface
             }
 
             var btn = new TouchButton ();
-            btn.SetSizeRequest (100, 30);
+            btn.SetSizeRequest (100, 60);
             btn.text = "Close";
             btn.ButtonReleaseEvent += OnCloseButtonRelease;
-            Put (btn, 685, 35);
+            Put (btn, 685, 70);
             btn.Show ();
 
             Show ();

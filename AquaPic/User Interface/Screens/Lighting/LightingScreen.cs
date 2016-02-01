@@ -34,86 +34,101 @@ namespace AquaPic.UserInterface
 
         public LightingWindow (params object[] options) : base () {
             #region base level screen stuff that doesn't change after draw
-            TouchGraphicalBox box1 = new TouchGraphicalBox (385, 395);
-            Put (box1, 10, 30);
-            box1.Show ();
+            //TouchGraphicalBox box1 = new TouchGraphicalBox (385, 395);
+            //Put (box1, 10, 30);
+            //box1.Show ();
 
-            TouchGraphicalBox box2 = new TouchGraphicalBox (385, 395);
-            Put (box2, 405, 30);
-            box2.Show ();
+            //TouchGraphicalBox box2 = new TouchGraphicalBox (385, 395);
+            //Put (box2, 405, 30);
+            //box2.Show ();
 
-            TouchGraphicalBox box3 = new TouchGraphicalBox (205, 350);
-            box3.color = "grey3";
-            Put (box3, 410, 70);
-            box3.Show ();
+            //TouchGraphicalBox box3 = new TouchGraphicalBox (205, 350);
+            //box3.color = "grey3";
+            //Put (box3, 410, 70);
+            //box3.Show ();
 
-            TouchGraphicalBox box4 = new TouchGraphicalBox (165, 350);
-            box4.color = "grey3";
-            Put (box4, 620, 70);
-            box4.Show ();
+            //TouchGraphicalBox box4 = new TouchGraphicalBox (165, 350);
+            //box4.color = "grey3";
+            //Put (box4, 620, 70);
+            //box4.Show ();
+
+            screenTitle = "Lighting";
 
             TouchLabel fixtureLabel = new TouchLabel ();
             fixtureLabel.text = "Lighting Fixtures";
-            fixtureLabel.textColor = "pri";
+            fixtureLabel.textColor = "seca";
             fixtureLabel.textSize = 12;
-            Put (fixtureLabel, 413, 40);
+            Put (fixtureLabel, 415, 80);
             fixtureLabel.Show ();
 
             TouchLabel genInfoLabel = new TouchLabel ();
             genInfoLabel.text = "General Lighting Information";
-            genInfoLabel.WidthRequest = 370;
-            genInfoLabel.textColor = "pri";
+            genInfoLabel.textAlignment = TouchAlignment.Center;
+            genInfoLabel.WidthRequest = 342;
+            genInfoLabel.textColor = "seca";
             genInfoLabel.textSize = 12;
-            Put (genInfoLabel, 15, 40);
+            Put (genInfoLabel, 60, 80);
             genInfoLabel.Show ();
 
             TouchLabel sunRiseLabel = new TouchLabel ();
             sunRiseLabel.text = "Sunrise Today";
             sunRiseLabel.textColor = "grey4"; 
-            Put (sunRiseLabel, 15, 74);
+            Put (sunRiseLabel, 60, 124);
             sunRiseLabel.Show ();
 
             TouchTextBox sunRise = new TouchTextBox ();
-            sunRise.WidthRequest = 200;
+            sunRise.WidthRequest = 155;
             sunRise.text = Lighting.sunRiseToday.ToString ();
-            Put (sunRise, 190, 70);
+            Put (sunRise, 235, 120);
             sunRise.Show ();
 
             TouchLabel sunSetLabel = new TouchLabel ();
             sunSetLabel.text = "Sunset Today";
             sunSetLabel.textColor = "grey4"; 
-            Put (sunSetLabel, 15, 109);
+            Put (sunSetLabel, 60, 159);
             sunSetLabel.Show ();
 
             TouchTextBox sunSet = new TouchTextBox ();
-            sunSet.WidthRequest = 200;
+            sunSet.WidthRequest = 155;
             sunSet.text = Lighting.sunSetToday.ToString ();
-            Put (sunSet, 190, 105);
+            Put (sunSet, 235, 155);
             sunSet.Show ();
 
             TouchLabel sunRiseTomorrowLabel = new TouchLabel ();
             sunRiseTomorrowLabel.text = "Sunrise Tomorrow";
             sunRiseTomorrowLabel.textColor = "grey4"; 
-            Put (sunRiseTomorrowLabel, 15, 144);
+            Put (sunRiseTomorrowLabel, 60, 194);
             sunRiseTomorrowLabel.Show ();
 
             TouchTextBox sunRiseTomorrow = new TouchTextBox ();
-            sunRiseTomorrow.WidthRequest = 200;
+            sunRiseTomorrow.WidthRequest = 155;
             sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToString ();
-            Put (sunRiseTomorrow, 190, 140);
+            Put (sunRiseTomorrow, 235, 190);
             sunRiseTomorrow.Show ();
 
             TouchLabel sunSetTomorrowLabel = new TouchLabel ();
             sunSetTomorrowLabel.text = "Sunset Tomorrow";
             sunSetTomorrowLabel.textColor = "grey4"; 
-            Put (sunSetTomorrowLabel, 15, 179);
+            Put (sunSetTomorrowLabel, 60, 229);
             sunSetTomorrowLabel.Show ();
 
             TouchTextBox sunSetTomorrow = new TouchTextBox ();
-            sunSetTomorrow.WidthRequest = 200;
+            sunSetTomorrow.WidthRequest = 155;
             sunSetTomorrow.text = Lighting.sunSetTomorrow.ToString ();
-            Put (sunSetTomorrow, 190, 175);
+            Put (sunSetTomorrow, 235, 225);
             sunSetTomorrow.Show ();
+
+            ExposeEvent += (o, args) => {
+                using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                    cr.MoveTo (402.5, 70);
+                    cr.LineTo (402.5, 460);
+                    cr.ClosePath ();
+                    cr.LineWidth = 3;
+                    TouchColor.SetSource (cr, "grey3", 0.75);
+                    cr.Stroke ();
+                }
+            };
+
             #endregion
 
             //<TODO> this is a stupid fix for when there are no lights add
@@ -121,14 +136,6 @@ namespace AquaPic.UserInterface
             if (Lighting.fixtureCount == 0) {
                 fixtureID = -1;
                 fixtureLabel.text = "No lighing fixtures added";
-
-                //combo = new TouchComboBox ();
-                //combo.Active = 0;
-                //combo.WidthRequest = 185;
-                //combo.List.Add ("New fixture...");
-                //combo.ChangedEvent += OnComboChanged;
-                //Put (combo, 600, 35);
-                //combo.Show ();
             } else {
                 dimmingIsManual = false;
                 fixtureID = 0;
@@ -138,27 +145,28 @@ namespace AquaPic.UserInterface
             dimmingHeader.textAlignment = TouchAlignment.Center;
             dimmingHeader.WidthRequest = 165;
             dimmingHeader.textColor = "secb";
-            Put (dimmingHeader, 615, 77);
+            Put (dimmingHeader, 615, 117);
             dimmingHeader.Show ();
 
             modeSelector = new ModeSelector ();
             modeSelector.SelectorChangedEvent += OnSelectorChanged;
-            Put (modeSelector, 630, 105);
+            Put (modeSelector, 630, 145);
             modeSelector.Show ();
 
             dimmingProgressBar = new TouchLayeredProgressBar ();
-            //dimmingLevel = new TouchProgressBar ();
             dimmingProgressBar.colorProgress = "seca";
             dimmingProgressBar.colorProgressSecondary = "pri";
             dimmingProgressBar.drawPrimaryWhenEqual = false;
             dimmingProgressBar.ProgressChangedEvent += OnProgressChanged;
             dimmingProgressBar.ProgressChangingEvent += OnProgressChanging;
-            Put (dimmingProgressBar, 745, 145);
+            dimmingProgressBar.HeightRequest = 260;
+            Put (dimmingProgressBar, 745, 185);
             dimmingProgressBar.Show ();
 
             dimmingTextBox = new TouchTextBox ();
             dimmingTextBox.textAlignment = TouchAlignment.Center;
-            Put (dimmingTextBox, 633, 168);
+            dimmingTextBox.WidthRequest = 110;
+            Put (dimmingTextBox, 623, 208);
             dimmingTextBox.Show ();
 
             dimmingLabel = new TouchLabel ();
@@ -166,11 +174,12 @@ namespace AquaPic.UserInterface
             dimmingLabel.textColor = "pri";
             dimmingLabel.WidthRequest = 125;
             dimmingLabel.textAlignment = TouchAlignment.Right;
-            Put (dimmingLabel, 608, 147);
+            Put (dimmingLabel, 608, 187);
             dimmingLabel.Show ();
 
             requestTextBox = new TouchTextBox ();
             requestTextBox.textAlignment = TouchAlignment.Center;
+            requestTextBox.WidthRequest = 110;
             requestTextBox.TextChangedEvent += (sender, args) => {
                 try {
                     float newLevel = Convert.ToSingle (args.text);
@@ -183,7 +192,7 @@ namespace AquaPic.UserInterface
                     MessageBox.Show (ex.ToString ());
                 }
             };
-            Put (requestTextBox, 633, 231);
+            Put (requestTextBox, 623, 271);
             requestTextBox.Show ();
 
             requestLabel = new TouchLabel ();
@@ -194,32 +203,34 @@ namespace AquaPic.UserInterface
             requestLabel.textAlignment = TouchAlignment.Right;
             requestLabel.WidthRequest = 125;
             requestLabel.HeightRequest = 25;
-            Put (requestLabel, 608, 210);
+            Put (requestLabel, 608, 250);
             requestLabel.Show ();
 
             autoTextBox = new TouchTextBox ();
             autoTextBox.textAlignment = TouchAlignment.Center;
             autoTextBox.Visible = false;
-            Put (autoTextBox, 680, 385);
+            autoTextBox.WidthRequest = 110;
+            Put (autoTextBox, 623, 334);
             autoTextBox.Show ();
 
             autoLabel = new TouchLabel ();
             autoLabel.text = "Auto";
             autoLabel.textColor = "grey4";
             autoLabel.textAlignment = TouchAlignment.Right;
-            autoLabel.SetSizeRequest (75, 20);
+            autoLabel.WidthRequest = 125;
+            autoLabel.HeightRequest = 25;
             autoLabel.Visible = false;
-            Put (autoLabel, 596, 389);
+            Put (autoLabel, 608, 313);
             autoLabel.Show ();
 
             onTimeLabel = new TouchLabel ();
             onTimeLabel.text = "On Time";
             onTimeLabel.textColor = "grey4"; 
-            Put (onTimeLabel, 415, 75);
+            Put (onTimeLabel, 415, 120);
             onTimeLabel.Show ();
 
             onTimeTextBox = new TouchTextBox ();
-            onTimeTextBox.WidthRequest = 195;
+            onTimeTextBox.WidthRequest = 185;
             onTimeTextBox.enableTouch = true;
             onTimeTextBox.includeTimeFunctions = true;
             onTimeTextBox.TextChangedEvent += (sender, args) => {
@@ -239,17 +250,17 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (onTimeTextBox, 415, 95);
+            Put (onTimeTextBox, 415, 141);
             onTimeTextBox.Show ();
 
             offTimeLabel = new TouchLabel ();
             offTimeLabel.text = "Off Time";
             offTimeLabel.textColor = "grey4";
-            Put (offTimeLabel, 415, 130);
+            Put (offTimeLabel, 415, 183);
             offTimeLabel.Show ();
 
             offTimeTextBox = new TouchTextBox ();
-            offTimeTextBox.WidthRequest = 195;
+            offTimeTextBox.WidthRequest = 185;
             offTimeTextBox.enableTouch = true;
             offTimeTextBox.includeTimeFunctions = true;
             offTimeTextBox.TextChangedEvent += (sender, args) => {
@@ -269,21 +280,21 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (offTimeTextBox, 415, 150);
+            Put (offTimeTextBox, 415, 204);
             offTimeTextBox.Show ();
 
             string[] names = Lighting.GetAllFixtureNames ();
             combo = new TouchComboBox (names);
             combo.Active = 0;
-            combo.WidthRequest = 185;
+            combo.WidthRequest = 235;
             combo.List.Add ("New fixture...");
             combo.ChangedEvent += OnComboChanged;
-            Put (combo, 600, 35);
+            Put (combo, 550, 77);
             combo.Show ();
 
             var settingsBtn = new TouchButton ();
             settingsBtn.text = "Settings";
-            settingsBtn.SetSizeRequest (100, 30);
+            settingsBtn.SetSizeRequest (100, 60);
             settingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new LightingSettings ();
                 s.Run ();
@@ -294,12 +305,12 @@ namespace AquaPic.UserInterface
                 sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToString ();
                 sunSetTomorrow.text = Lighting.sunSetTomorrow.ToString ();
             };
-            Put (settingsBtn, 15, 390);
+            Put (settingsBtn, 290, 405);
             settingsBtn.Show ();
 
             fixtureSettingBtn = new TouchButton ();
             fixtureSettingBtn.text = "Fixture Setup";
-            fixtureSettingBtn.SetSizeRequest (100, 30);
+            fixtureSettingBtn.SetSizeRequest (100, 60);
             fixtureSettingBtn.ButtonReleaseEvent += (o, args) => {
                 if (fixtureID != -1) {
                     string name = Lighting.GetFixtureName (fixtureID);
@@ -362,7 +373,7 @@ namespace AquaPic.UserInterface
 
                 combo.QueueDraw ();
             };
-            Put (fixtureSettingBtn, 415, 385);
+            Put (fixtureSettingBtn, 415, 405);
             fixtureSettingBtn.Show ();
 
             GetFixtureData ();

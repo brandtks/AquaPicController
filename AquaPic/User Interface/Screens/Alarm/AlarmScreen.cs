@@ -48,9 +48,9 @@ namespace AquaPic.UserInterface
             sw.VScrollbar.WidthRequest = 30;
             sw.HScrollbar.HeightRequest = 30;
             sw.Add (tv);
-            tv.Show ();
             Put (sw, 65, 60);
             sw.Show ();
+            tv.Show ();
 
             OnTimer ();
 

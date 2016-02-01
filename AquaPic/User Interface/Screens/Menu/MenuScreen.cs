@@ -9,8 +9,10 @@ namespace AquaPic.UserInterface
     public class MenuWindow : WindowBase
     {
         public MenuWindow (params object[] options) : base () {
-            var box = new TouchGraphicalBox (780, 395);
-            Put (box, 10, 30);
+            //var box = new TouchGraphicalBox (780, 395);
+            //Put (box, 10, 30);
+
+            screenTitle = "Menu";
 
             List<string> screenNames = new List<string> ();
             foreach (var screen in AquaPicGUI.allWindows.Keys)
@@ -18,22 +20,22 @@ namespace AquaPic.UserInterface
 
             screenNames.Sort ();
 
-            int x = 15;
-            int y = 35;
+            int x = 60;
+            int y = 80;
             foreach (var name in screenNames) {
                 ScreenData screen = AquaPicGUI.allWindows [name];
                 if (screen.showInMenu) {
                     var b = new TouchButton ();
-                    b.SetSizeRequest (250, 30);
+                    b.SetSizeRequest (220, 50);
                     b.text = screen.name;
                     b.textColor = "black";
                     b.ButtonReleaseEvent += OnButtonClick;
                     Put (b, x, y);
 
-                    x += 260;  
-                    if (x >= 795) {
-                        x = 15;
-                        y += 40;
+                    x += 230;  
+                    if (x >= 690) {
+                        x = 60;
+                        y += 60;
                     }
                 }
             }
@@ -44,11 +46,8 @@ namespace AquaPic.UserInterface
         protected void OnButtonClick (object sender, ButtonReleaseEventArgs args) {
             TouchButton b = sender as TouchButton;
 
-            if (b.text == "Settings") {
-                var tl = this.Toplevel;
-                AquaPicGUI.ChangeScreens (b.text, tl);
-            } else
-                AquaPicGUI.ChangeScreens (b.text);
+            var tl = this.Toplevel;
+            AquaPicGUI.ChangeScreens (b.text, tl);
         }
     }
 }

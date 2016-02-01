@@ -39,24 +39,25 @@ namespace AquaPic.UserInterface
         public TouchTextBox responseTimeTextBox;
 
         public SerialBusSlaveWidget () {
-            SetSizeRequest (760, 30);
+            SetSizeRequest (715, 30);
 
             nameTextBox = new TouchTextBox ();
-            nameTextBox.WidthRequest = 250;
+            nameTextBox.WidthRequest = 235;
             Put (nameTextBox, 0, 0);
 
             addressTextBox = new TouchTextBox ();
             addressTextBox.WidthRequest = 75;
             addressTextBox.textAlignment = TouchAlignment.Center;
-            Put (addressTextBox, 255, 0);
+            Put (addressTextBox, 240, 0);
 
             statusTextBox = new TouchTextBox ();
-            statusTextBox.WidthRequest = 325;
-            Put (statusTextBox, 335, 0);
+            statusTextBox.WidthRequest = 295;
+            Put (statusTextBox, 320, 0);
 
             responseTimeTextBox = new TouchTextBox ();
             responseTimeTextBox.WidthRequest = 95;
-            Put (responseTimeTextBox, 665, 0);
+            responseTimeTextBox.textAlignment = TouchAlignment.Center;
+            Put (responseTimeTextBox, 620, 0);
         }
     }
 }

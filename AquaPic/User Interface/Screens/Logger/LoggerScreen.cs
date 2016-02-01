@@ -14,28 +14,30 @@ namespace AquaPic.UserInterface
         public TextView tv;
 
         public LoggerWindow (params object[] options) : base () {
-            var box = new TouchGraphicalBox (780, 395);
-            Put (box, 10, 30);
+            //var box = new TouchGraphicalBox (780, 395);
+            //Put (box, 10, 30);
 
-            var label = new TouchLabel ();
-            label.text = "Logger";
-            label.textSize = 13;
-            label.textColor = "pri";
-            label.WidthRequest = 780;
-            label.textAlignment = TouchAlignment.Center;
-            Put (label, 10, 35);
+            //var label = new TouchLabel ();
+            //label.text = "Logger";
+            //label.textSize = 13;
+            //label.textColor = "pri";
+            //label.WidthRequest = 780;
+            //label.textAlignment = TouchAlignment.Center;
+            //Put (label, 10, 35);
+
+            screenTitle = "Logger";
 
             var b = new TouchButton ();
-            b.SetSizeRequest (100, 40);
+            b.SetSizeRequest (100, 60);
             b.text = "Clear Logger";
             b.ButtonReleaseEvent += OnClearButtonRelease;
-            Put (b, 685, 380);
+            Put (b, 685, 405);
 
             b = new TouchButton ();
-            b.SetSizeRequest (100, 40);
+            b.SetSizeRequest (100, 60);
             b.text = "Save Logger";
             b.ButtonReleaseEvent += (o, args) => SaveEvents ();
-            Put (b, 575, 380);
+            Put (b, 575, 405);
 
             tv = new TextView (Logger.buffer);
             tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
@@ -45,9 +47,11 @@ namespace AquaPic.UserInterface
             tv.Editable = false;
 
             ScrolledWindow sw = new ScrolledWindow ();
-            sw.SetSizeRequest (770, 315);
+            sw.SetSizeRequest (720, 340);
+            sw.VScrollbar.WidthRequest = 30;
+            sw.HScrollbar.HeightRequest = 30;
             sw.Add (tv);
-            Put (sw, 15, 60);
+            Put (sw, 65, 60);
             sw.Show ();
             tv.Show ();
 

@@ -18,58 +18,47 @@ namespace AquaPic.UserInterface
         uint timerId;
 
         public SerialBusWindow (params object[] options) : base () {
-            slaves = new SerialBusSlaveWidget[AquaPicBus.slaveCount];
+            screenTitle = "AquaPic Bus";
 
-            var box = new TouchGraphicalBox (780, 395);
-            Put (box, 10, 30);
+            //var box = new TouchGraphicalBox (780, 395);
+            //Put (box, 10, 30);
 
-//            int height = (slaves.Length * 35) + 27;
+            //int height = (slaves.Length * 35) + 27;
             var f = new Fixed ();
-            f.SetSizeRequest (760, 350);
+            f.SetSizeRequest (715, 360);
 
-            var eb = new TouchGraphicalBox (770, 350);
-            eb.color = "grey3";
-//            eb.SetSizeRequest (750, height);
-//            eb.ModifyBg (StateType.Normal, MyColor.NewGtkColor ("grey3"));
-//            eb.Add (f);
-            Put (eb, 15, 70);
-            eb.Show ();
-
-            Put (f, 15, 75);
+            Put (f, 60, 120);
             f.Show ();
 
             var l = new TouchLabel ();
             l.text = "Name";
-            l.textColor = "black";
             l.textAlignment = TouchAlignment.Center;
-            l.WidthRequest = 250;
+            l.WidthRequest = 235;
             f.Put (l, 0, 1);
             l.Show ();
 
             l = new TouchLabel ();
             l.text = "Address";
-            l.textColor = "black";
             l.textAlignment = TouchAlignment.Center;
             l.WidthRequest = 75;
-            f.Put (l, 258, 1);
+            f.Put (l, 243, 1);
             l.Show ();
 
             l = new TouchLabel ();
             l.text = "Status";
-            l.textColor = "black";
             l.textAlignment = TouchAlignment.Center;
-            l.WidthRequest = 325;
-            f.Put (l, 335, 1);
+            l.WidthRequest = 295;
+            f.Put (l, 320, 1);
             l.Show ();
 
             l = new TouchLabel ();
             l.text = "Response Time";
-            l.textColor = "black";
             l.textAlignment = TouchAlignment.Right;
             l.WidthRequest = 170;
-            f.Put (l, 595, 1);
+            f.Put (l, 545, 1);
             l.Show ();
 
+            slaves = new SerialBusSlaveWidget[AquaPicBus.slaveCount];
             string[] names = AquaPicBus.slaveNames;
             int[] addresses = AquaPicBus.slaveAdresses;
 
@@ -95,7 +84,7 @@ namespace AquaPic.UserInterface
                 b.buttonColor = "grey3";
             else
                 b.ButtonReleaseEvent += OnOpenButtonRelease;
-            Put (b, 685, 35);
+            Put (b, 685, 70);
             b.Show ();
 
             if (!AquaPicBus.isOpen) {
@@ -107,7 +96,7 @@ namespace AquaPic.UserInterface
             }
             c.NonActiveMessage = "Select Port";
             c.WidthRequest = 300;
-            Put (c, 380, 35);
+            Put (c, 380, 70);
             c.Show ();
 
 //            eb = new EventBox ();

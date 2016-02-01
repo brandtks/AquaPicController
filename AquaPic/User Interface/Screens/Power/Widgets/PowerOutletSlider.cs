@@ -39,9 +39,9 @@ namespace AquaPic.UserInterface
         public PowerOutletSlider (int id) {
             SetSizeRequest (180, 145);
 
-            var box = new TouchGraphicalBox (180, 145);
-            box.color = "grey3";
-            Put (box, 0, 0);
+            //var box = new TouchGraphicalBox (180, 145);
+            //box.color = "grey3";
+            //Put (box, 0, 0);
 
             ampBar = new TouchCurvedProgressBar ();
             Put (ampBar, 10, 22);
@@ -117,6 +117,26 @@ namespace AquaPic.UserInterface
                 render.Render (tss, x, tss.Allocation.Top + 6, seperation);
                 x += seperation;
             }
+
+            /*
+            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                //cr.Rectangle (Allocation.Left - 2, Allocation.Top - 2, Allocation.Width + 4, Allocation.Height + 4);
+                TouchGlobal.DrawRoundedRectangle (
+                    cr, 
+                    Allocation.Left + 1, 
+                    Allocation.Top + 1, 
+                    Allocation.Width - 2, 
+                    Allocation.Height - 2, 
+                    6);
+                if (Status.text == "On") {
+                    TouchColor.SetSource (cr, "seca");
+                } else {
+                    TouchColor.SetSource (cr, "grey2");
+                }
+                cr.LineWidth = 4;
+                cr.Stroke ();
+            }
+            */
         }
         protected void OnSettingButtonRelease (object sender, ButtonReleaseEventArgs args) {
             IndividualControl ic = Power.GetOutletIndividualControl (OutletName.text);

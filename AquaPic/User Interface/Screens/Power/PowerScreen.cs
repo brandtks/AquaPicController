@@ -16,20 +16,16 @@ namespace AquaPic.UserInterface
         private TouchComboBox combo;
 
         public PowerWindow (params object[] options) : base () {
-            TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
-            Put (box1, 10, 30);
-            box1.Show ();
+            //TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
+            //Put (box1, 10, 30);
+            //box1.Show ();
+
+            screenTitle = "Power Strip";
 
             if (Power.powerStripCount == 0) {
                 powerID = -1;
 
-                var l = new TouchLabel ();
-                l.text = "No Power Strips Added";
-                l.textColor = "pri";
-                l.textAlignment = TouchAlignment.Center;
-                l.WidthRequest = 780;
-                Put (l, 10, 32);
-                l.Show ();
+                screenTitle = "No Power Strips Added";
 
                 Show ();
 
@@ -68,11 +64,11 @@ namespace AquaPic.UserInterface
                 };
 
                 if ((i % 2) == 0) { // even number top row
-                    x = ((i - (i / 2)) * 190) + 25;
-                    y = 80;
+                    x = ((i - (i / 2)) * 185) + 50;
+                    y = 105;
                 } else {
-                    x = (((i - (i / 2)) - 1) * 190) + 25;
-                    y = 250;
+                    x = (((i - (i / 2)) - 1) * 185) + 50;
+                    y = 255;
                 }
                 Put (selectors [i], x, y);
 
@@ -88,6 +84,35 @@ namespace AquaPic.UserInterface
             combo.ChangedEvent += OnComboChanged;
             Put (combo, 610, 35);
             combo.Show ();
+
+            ExposeEvent += (o, args) => {
+                using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                    TouchColor.SetSource (cr, "grey3", 0.75);
+
+                    for (int i = 0; i < 3; ++i) {
+                        cr.MoveTo (60 + (i * 185), 252.5);
+                        cr.LineTo (220 + (i * 185), 252.5);
+                        cr.ClosePath ();
+                        cr.Stroke ();
+
+                        cr.MoveTo (232.5+ (i * 185), 115);
+                        //cr.LineTo (232.5 + (i * 185), 240);
+                        cr.LineTo (232.5 + (i * 185), 385);
+                        cr.ClosePath ();
+                        cr.Stroke ();
+
+                        //cr.MoveTo (232.5+ (i * 185), 265);
+                        //cr.LineTo (232.5 + (i * 185), 385);
+                        //cr.ClosePath ();
+                        //cr.Stroke ();
+                    }
+
+                    cr.MoveTo (615, 252.5);
+                    cr.LineTo (775, 252.5);
+                    cr.ClosePath ();
+                    cr.Stroke ();
+                }
+            };
 
             GetPowerData ();
 

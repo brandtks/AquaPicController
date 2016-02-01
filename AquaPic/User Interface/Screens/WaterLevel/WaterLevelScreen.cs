@@ -1,5 +1,6 @@
 ﻿using System;
 using Gtk;
+using Cairo;
 using TouchWidgetLibrary;
 using AquaPic.Runtime;
 using AquaPic.Modules;
@@ -21,69 +22,90 @@ namespace AquaPic.UserInterface
         TouchTextBox atoStateTextBox;
 
         public WaterLevelWindow (params object[] options) : base () {
-            var box1 = new TouchGraphicalBox (385, 395);
-            Put (box1, 10, 30);
-            box1.Show ();
+            //var box1 = new TouchGraphicalBox (385, 395);
+            //Put (box1, 10, 30);
+            //box1.Show ();
 
-            var box2 = new TouchGraphicalBox (385, 193);
-            Put (box2, 405, 30);
-            box2.Show ();
+            //var box2 = new TouchGraphicalBox (385, 193);
+            //Put (box2, 405, 30);
+            //box2.Show ();
 
-            var box3 = new TouchGraphicalBox (385, 192);
-            Put (box3, 405, 233);
-            box3.Show ();
+            //var box3 = new TouchGraphicalBox (385, 192);
+            //Put (box3, 405, 233);
+            //box3.Show ();
+
+            screenTitle = "Water Level";
+
+            ExposeEvent += (o, args) => {
+                using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                    TouchColor.SetSource (cr, "grey3", 0.75);
+                    cr.LineWidth = 3;
+
+                    cr.MoveTo (402.5, 70);
+                    cr.LineTo (402.5, 460);
+                    cr.ClosePath ();
+                    cr.Stroke ();
+
+                    cr.MoveTo (417.5, 267.5);
+                    cr.LineTo (780, 267.5);
+                    cr.ClosePath ();
+                    cr.Stroke ();
+                }
+            };
 
             /**************************************************************************************************************/
             /* ATO                                                                                                        */
             /**************************************************************************************************************/
             var label = new TouchLabel ();
             label.text = "Auto Top Off";
-            label.WidthRequest = 370;
-            label.textColor = "pri";
+            label.textAlignment = TouchAlignment.Center;
+            label.WidthRequest = 342;
+            label.textColor = "seca";
             label.textSize = 12;
-            Put (label, 15, 40);
+            Put (label, 60, 80);
             label.Show ();
 
             var stateLabel = new TouchLabel ();
             stateLabel.text = "ATO State";
             stateLabel.textColor = "grey4"; 
             stateLabel.WidthRequest = 170;
-            Put (stateLabel, 15, 74);
+            Put (stateLabel, 60, 124);
             stateLabel.Show ();
 
             atoStateTextBox = new TouchTextBox ();
-            atoStateTextBox.WidthRequest = 200;
+            atoStateTextBox.WidthRequest = 155;
             atoStateTextBox.text = string.Format ("{0} : {1}", 
                 WaterLevel.atoState, 
                 WaterLevel.atoTime.SecondsToString ());
-            Put (atoStateTextBox, 190, 70);
+            Put (atoStateTextBox, 235, 120);
             atoStateTextBox.Show ();
 
             var atoSettingsBtn = new TouchButton ();
             atoSettingsBtn.text = "Settings";
-            atoSettingsBtn.SetSizeRequest (100, 30);
+            atoSettingsBtn.SetSizeRequest (100, 60);
             atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new AtoSettings ();
                 s.Run ();
                 s.Destroy ();
             };
-            Put (atoSettingsBtn, 15, 390);
+            Put (atoSettingsBtn, 290, 405);
             atoSettingsBtn.Show ();
 
             atoClearFailBtn = new TouchButton ();
-            atoClearFailBtn.SetSizeRequest (100, 30);
+            atoClearFailBtn.SetSizeRequest (100, 60);
             atoClearFailBtn.text = "Reset ATO";
             atoClearFailBtn.buttonColor = "compl";
             atoClearFailBtn.ButtonReleaseEvent += (o, args) => {
                 if (!WaterLevel.ClearAtoAlarm ())
                     MessageBox.Show ("Please acknowledge alarms first");
             };
-            Put (atoClearFailBtn, 290, 188);
+            Put (atoClearFailBtn, 180, 405);
             if (Alarm.CheckAlarming (WaterLevel.atoFailedAlarmIndex)) {
                 atoClearFailBtn.Visible = true;
                 atoClearFailBtn.Show ();
-            } else
+            } else {
                 atoClearFailBtn.Visible = false;
+            }
 
             Alarm.AddAlarmHandler (WaterLevel.atoFailedAlarmIndex, OnAtoFailedAlarmEvent);
 
@@ -92,15 +114,15 @@ namespace AquaPic.UserInterface
             /**************************************************************************************************************/
             label = new TouchLabel ();
             label.text = "Water Level Sensor";
-            label.textColor = "pri";
+            label.textColor = "seca";
             label.textSize = 12;
-            Put (label, 413, 40);
+            Put (label, 415, 80);
             label.Show ();
 
             label = new TouchLabel ();
             label.text = "Water Level";
             label.textColor = "grey4"; 
-            Put (label, 410, 74);
+            Put (label, 415, 124);
             label.Show ();
 
             analogLevelTextBox = new TouchTextBox ();
@@ -110,22 +132,22 @@ namespace AquaPic.UserInterface
             else
                 analogLevelTextBox.text = wl.ToString ("F2");
             analogLevelTextBox.WidthRequest = 200;
-            Put (analogLevelTextBox, 585, 70);
+            Put (analogLevelTextBox, 585, 120);
 
             var settingsBtn = new TouchButton ();
             settingsBtn.text = "Settings";
-            settingsBtn.SetSizeRequest (100, 30);
+            settingsBtn.SetSizeRequest (100, 60);
             settingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new AnalogSensorSettings ();
                 s.Run ();
                 s.Destroy ();
             };
-            Put (settingsBtn, 410, 188);
+            Put (settingsBtn, 415, 195);
             settingsBtn.Show ();
 
             var b = new TouchButton ();
             b.text = "Calibrate";
-            b.SetSizeRequest (100, 30);
+            b.SetSizeRequest (100, 60);
             b.ButtonReleaseEvent += (o, args) => {
                 var cal = new CalibrationDialog (
                     "Water Level Sensor", 
@@ -147,7 +169,7 @@ namespace AquaPic.UserInterface
                 cal.Run ();
                 cal.Destroy ();
             };
-            Put (b, 515, 188);
+            Put (b, 525, 195);
             b.Show ();
 
             /**************************************************************************************************************/
@@ -160,32 +182,32 @@ namespace AquaPic.UserInterface
 
             label = new TouchLabel ();
             label.text = "Probes";
-            label.textColor = "pri";
+            label.textColor = "seca";
             label.textSize = 12;
-            Put (label, 413, 243);
+            Put (label, 415, 280);
             label.Show ();
 
             var sLabel = new TouchLabel ();
             sLabel.text = "Current State";
-            sLabel.WidthRequest = 200;
-            Put (sLabel, 410, 282);
+            sLabel.WidthRequest = 150;
+            Put (sLabel, 415, 324);
             sLabel.Show ();
 
             switchStateTextBox = new TouchTextBox ();
-            switchStateTextBox.WidthRequest = 200;
-            Put (switchStateTextBox, 585, 278);
+            switchStateTextBox.WidthRequest = 215;
+            Put (switchStateTextBox, 560, 320);
             switchStateTextBox.Show ();
 
             //Type
             switchTypeLabel = new TouchLabel ();
-            switchTypeLabel.WidthRequest = 198;
+            switchTypeLabel.WidthRequest = 212;
             switchTypeLabel.textAlignment = TouchAlignment.Right;
-            Put (switchTypeLabel, 585, 308);
+            Put (switchTypeLabel, 560, 354);
             switchTypeLabel.Show ();
 
             var switchSetupBtn = new TouchButton ();
             switchSetupBtn.text = "Probe Setup";
-            switchSetupBtn.SetSizeRequest (100, 30);
+            switchSetupBtn.SetSizeRequest (100, 60);
             switchSetupBtn.ButtonReleaseEvent += (o, args) => {
                 if (switchId != -1) {
                     string name = WaterLevel.GetFloatSwitchName (switchId);
@@ -231,7 +253,7 @@ namespace AquaPic.UserInterface
 
                 switchCombo.QueueDraw ();
             };
-            Put (switchSetupBtn, 410, 390);
+            Put (switchSetupBtn, 415, 405);
             switchSetupBtn.Show ();
 
             string[] sNames = WaterLevel.GetAllFloatSwitches ();
@@ -243,7 +265,7 @@ namespace AquaPic.UserInterface
             switchCombo.WidthRequest = 235;
             switchCombo.List.Add ("New switch...");
             switchCombo.ChangedEvent += OnSwitchComboChanged;
-            Put (switchCombo, 550, 238);
+            Put (switchCombo, 550, 277);
             switchCombo.Show ();
 
             GetSwitchData ();
