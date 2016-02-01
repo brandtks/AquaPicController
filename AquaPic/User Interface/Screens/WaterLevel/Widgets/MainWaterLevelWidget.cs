@@ -17,8 +17,8 @@ namespace AquaPic.UserInterface
             label.textColor = "compl";
             label.text = "Probe Dis-\nconnected";
             label.textSize = 13;
-            label.WidthRequest = 102;
-            Put (label, 3, 147);
+            label.WidthRequest = 94;
+            Put (label, 3, 121);
             label.Show ();
 
             fullScale = 15.0f;

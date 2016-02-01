@@ -90,6 +90,8 @@ namespace AquaPic.UserInterface
 //            testAlarmIndex = Alarm.Subscribe ("Test Alarm", true);
 //            Put (b3, 459, 330);
 
+            showTitle = false;
+
             var names = Lighting.GetAllFixtureNames ();
             foreach (var name in names) {
                 int fixtureId = Lighting.GetFixtureIndex (name);
@@ -120,8 +122,8 @@ namespace AquaPic.UserInterface
                 foreach (var jt in ja) {
                     var jo = jt as JObject;
 
-                    int x = (Convert.ToInt32 (jo ["column"]) - 1) * 113 + 7;
-                    int y = (Convert.ToInt32 (jo ["row"]) - 1) * 100 + 30;
+                    int x = (Convert.ToInt32 (jo ["column"]) - 1) * 105 + 50;
+                    int y = (Convert.ToInt32 (jo ["row"]) - 1) * 87 + 32;
 
                     string type = (string)jo ["type"];
                     switch (type) {

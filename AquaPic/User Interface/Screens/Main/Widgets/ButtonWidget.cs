@@ -25,7 +25,7 @@ namespace AquaPic.UserInterface
     public class ButtonWidget : TouchButton
     {
         public ButtonWidget (string name) : base () {
-            SetSizeRequest (108, 95);
+            SetSizeRequest (100, 82);
 
             text = name;
             bool s1 = Bit.Check (text);

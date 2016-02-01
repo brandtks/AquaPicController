@@ -11,7 +11,7 @@ namespace TouchWidgetLibrary
         private bool buttonsPlaced;
 
         public TouchUpDownButtons () {
-            SetSizeRequest (44, 61);
+            SetSizeRequest (98, 60);
             up = new TouchButton ();
             down = new TouchButton ();
             buttonsPlaced = false;
@@ -23,8 +23,8 @@ namespace TouchWidgetLibrary
         }
 
         void PlaceButtons () {
-            int width = Allocation.Width;
-            int height = (Allocation.Height - 1) / 2;
+            int width = (Allocation.Width - 1) / 2;
+            int height = Allocation.Height;
 
             up.SetSizeRequest (width, height);
             up.text = Convert.ToChar (0x22C0).ToString (); // 2191
@@ -33,7 +33,7 @@ namespace TouchWidgetLibrary
 
             down.SetSizeRequest (width, height);
             down.text = Convert.ToChar (0x22C1).ToString (); // 2193
-            Put (down, 0, height + 1);
+            Put (down, width + 1, 0);
             down.QueueDraw ();
 
             buttonsPlaced = true;

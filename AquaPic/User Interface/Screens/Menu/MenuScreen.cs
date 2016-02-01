@@ -47,7 +47,7 @@ namespace AquaPic.UserInterface
             TouchButton b = sender as TouchButton;
 
             var tl = this.Toplevel;
-            AquaPicGUI.ChangeScreens (b.text, tl);
+            AquaPicGUI.ChangeScreens (b.text, tl, AquaPicGUI.currentScreen);
         }
     }
 }

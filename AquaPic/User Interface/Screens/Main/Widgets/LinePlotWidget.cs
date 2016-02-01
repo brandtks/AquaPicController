@@ -44,9 +44,9 @@ namespace AquaPic.UserInterface
         private TouchTextBox textBox;
 
         public LinePlotWidget () {
-            SetSizeRequest (447, 95);
+            SetSizeRequest (415, 82);
 
-            var box1 = new TouchGraphicalBox (447, 95);
+            var box1 = new TouchGraphicalBox (415, 82);
             Put (box1, 0, 0);
 
             displayLabel = new TouchLabel ();
@@ -55,7 +55,7 @@ namespace AquaPic.UserInterface
             displayLabel.textColor = "pri";
             Put (displayLabel, 4, 2);
 
-            var box2 = new TouchGraphicalBox (328, 89);
+            var box2 = new TouchGraphicalBox (296, 76);
             box2.color = "grey4";
             box2.transparency = 0.85f;
             Put (box2, 116, 3);

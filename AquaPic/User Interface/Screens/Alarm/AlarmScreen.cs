@@ -52,6 +52,22 @@ namespace AquaPic.UserInterface
             sw.Show ();
             tv.Show ();
 
+            if (options.Length >= 2) {
+                var lastScreen = options [1] as string;
+                if (lastScreen != null) {
+                    b = new TouchButton ();
+                    b.SetSizeRequest (100, 60);
+                    b.text = "Back\n" + lastScreen;
+                    b.buttonColor = "compl";
+                    b.ButtonPressEvent += (o, args) => {
+                        var tl = this.Toplevel;
+                        AquaPicGUI.ChangeScreens (lastScreen, tl, AquaPicGUI.currentScreen);
+                    };
+                    Put (b, 575, 405);
+                    b.Show ();
+                }
+            }
+
             OnTimer ();
 
             timerId = GLib.Timeout.Add (1000, OnTimer);

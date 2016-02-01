@@ -140,7 +140,7 @@ namespace AquaPic.UserInterface
                     cr.Fill ();
                     */
 
-                    cr.Arc (originX - 210, originY, radius, 0, 2 * Math.PI);
+                    cr.Arc (originX - 208, originY, radius, 0, 2 * Math.PI);
                     cr.ClosePath ();
 
                     TouchColor.SetSource (cr, "grey3", 0.75);
@@ -189,15 +189,14 @@ namespace AquaPic.UserInterface
                 int x, y;
                 GetPointer (out x, out y);
 
-                if (y.WithinRange (clickY, 15)) {
+                if (y.WithinRange (clickY, 25)) {
                     if (x <= 250) {
-                        if (y.WithinRange (Allocation.Height / 2 + Allocation.Top, 30)) {
+                        if (y.WithinRange (Allocation.Height / 2 + Allocation.Top, 25)) {
                             if (windows [highlighedScreenIndex] != AquaPicGUI.currentScreen) {
                                 var topWidget = this.Toplevel;
-                                AquaPicGUI.ChangeScreens (windows [highlighedScreenIndex], topWidget);
+                                AquaPicGUI.ChangeScreens (windows [highlighedScreenIndex], topWidget, AquaPicGUI.currentScreen);
                             } else {
-                                offset = 0.0;
-                                QueueDraw ();
+                                CollapseMenu ();
                             }
                         } else {
                             double yDelta = y - ((Allocation.Height / 2) + Allocation.Top);
@@ -213,24 +212,32 @@ namespace AquaPic.UserInterface
                                 highlighedScreenIndex = windows.Length + highlighedScreenIndex;
                             }
 
-                            offset = 0.0;
-                            QueueDraw ();
+                            if (windows [highlighedScreenIndex] != AquaPicGUI.currentScreen) {
+                                var topWidget = this.Toplevel;
+                                AquaPicGUI.ChangeScreens (windows [highlighedScreenIndex], topWidget, AquaPicGUI.currentScreen);
+                            } else {
+                                CollapseMenu ();
+                            }
                         }
                     } else {
-                        expanded = false;
-                        highlighedScreenIndex = Array.IndexOf (windows, AquaPicGUI.currentScreen);
-                        SetSizeRequest (25, 460);
-                        QueueDraw ();
-
-                        if (CollapseEvent != null) {
-                            CollapseEvent (this, new EventArgs ());
-                        }
+                        CollapseMenu ();
                     }
                 } else {
                     //Timer handles all menu movement so do a little cleanup and draw
                     offset = 0.0;
                     QueueDraw ();
                 }
+            }
+        }
+
+        protected void CollapseMenu () {
+            expanded = false;
+            highlighedScreenIndex = Array.IndexOf (windows, AquaPicGUI.currentScreen);
+            SetSizeRequest (50, 460);
+            QueueDraw ();
+
+            if (CollapseEvent != null) {
+                CollapseEvent (this, new EventArgs ());
             }
         }
 

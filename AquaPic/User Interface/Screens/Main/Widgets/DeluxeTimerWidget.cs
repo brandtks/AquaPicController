@@ -21,7 +21,7 @@ namespace AquaPic.UserInterface
         public DeluxeTimerWidget (string name) {
             t = 0;
 
-            SetSizeRequest (334, 95);
+            SetSizeRequest (310, 169);
 
             timers = new DeluxeTimer[3];
             for (int i = 0; i < timers.Length; ++i) {
@@ -32,21 +32,21 @@ namespace AquaPic.UserInterface
                 timers [i].TimerStopEvent += OnTimerStartStop;
             }
 
-            var box2 = new TouchGraphicalBox (333, 66);
+            var box2 = new TouchGraphicalBox (310, 129);
             box2.color = "grey2";
-            Put (box2, 0, 29);
+            Put (box2, 0, 40);
 
             tabs = new TouchTab[3];
             for (int i = 0; i < tabs.Length; ++i) {
                 tabs [i] = new TouchTab ();
                 tabs [i].text = "Timer " + (i + 1).ToString ();
                 tabs [i].ButtonReleaseEvent += OnTabButtonRelease;
-                Put (tabs [i], 0 + (111 * i), 0);
+                Put (tabs [i], 0 + (103 * i), 0);
                 tabs [i].Show ();
             }
 
             minutes = new TouchTextBox ();
-            minutes.SetSizeRequest (75, 61);
+            minutes.SetSizeRequest (99, 60);
             minutes.enableTouch = true;
             minutes.textSize = 16;
             minutes.textAlignment = TouchAlignment.Center;
@@ -59,7 +59,7 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (minutes, 3, 32);
+            Put (minutes, 3, 43);
 
             minUpDown = new TouchUpDownButtons ();
             minUpDown.up.ButtonReleaseEvent += (o, args) => {
@@ -78,11 +78,11 @@ namespace AquaPic.UserInterface
                     }
                 }
             };
-            Put (minUpDown, 79, 32);
+            Put (minUpDown, 3, 106);
             minUpDown.Show ();
 
             seconds = new TouchTextBox ();
-            seconds.SetSizeRequest (75, 61);
+            seconds.SetSizeRequest (98, 60);
             seconds.enableTouch = true;
             seconds.textAlignment = TouchAlignment.Center;
             seconds.textSize = 16;
@@ -98,7 +98,7 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (seconds, 125, 32);
+            Put (seconds, 106, 43);
 
             secUpDown = new TouchUpDownButtons ();
             secUpDown.up.ButtonReleaseEvent += (o, args) => {
@@ -119,19 +119,19 @@ namespace AquaPic.UserInterface
                     }
                 }
             };
-            Put (secUpDown, 201, 32);
+            Put (secUpDown, 106, 106);
             secUpDown.Show ();
 
             startStopButton = new TouchButton ();
-            startStopButton.SetSizeRequest (83, 30);
+            startStopButton.SetSizeRequest (98, 60);
             startStopButton.ButtonReleaseEvent += OnStartStopButtonRelease;
-            Put (startStopButton, 248, 32);
+            Put (startStopButton, 209, 43);
 
             resetButton = new TouchButton ();
-            resetButton.SetSizeRequest (83, 30);
+            resetButton.SetSizeRequest (98, 60);
             resetButton.text = "Reset";
             resetButton.ButtonReleaseEvent += OnResetButtonRelease;
-            Put (resetButton, 248, 63);
+            Put (resetButton, 209, 106);
 
             if (timers [t].enabled)
                 UpdateTime (timers [t].secondsRemaining, false);
@@ -266,7 +266,7 @@ namespace AquaPic.UserInterface
             public string text;
 
             public TouchTab () {
-                SetSizeRequest (111, 29);
+                SetSizeRequest (103, 40);
 
                 VisibleWindow = false;
                 ExposeEvent += OnEventBoxExpose;

@@ -48,9 +48,9 @@ namespace AquaPic.UserInterface
         private TouchLabel label;
 
         public BarPlotWidget () {
-            SetSizeRequest (108, 195);
+            SetSizeRequest (100, 169);
 
-            var box = new TouchGraphicalBox (108, 195);
+            var box = new TouchGraphicalBox (100, 169);
             Put (box, 0, 0);
 
             label = new TouchLabel ();
@@ -61,17 +61,17 @@ namespace AquaPic.UserInterface
             label.textAlignment = TouchAlignment.Center;
             label.render.textWrap = TouchTextWrap.Shrink;
             label.render.orientation = TouchOrientation.Vertical;
-            Put (label, 3, 38);
+            Put (label, 0, 38);
 
             bar = new TouchProgressBar ();
-            bar.HeightRequest = 156;
-            bar.WidthRequest = 30;
-            Put (bar, 75, 36);
+            bar.HeightRequest = 130;
+            bar.WidthRequest = 26;
+            Put (bar, 71, 36);
 
             fullScale = 100.0f;
 
             textBox = new TouchTextBox ();
-            textBox.WidthRequest = 102;
+            textBox.WidthRequest = 94;
             textBox.HeightRequest = 30;
             textBox.textSize = 14;
             textBox.text = "0.0";
