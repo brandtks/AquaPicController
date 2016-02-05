@@ -37,8 +37,14 @@ namespace AquaPic.Drivers
                         
                     this.outlets [plugID] = new OutletData (
                         plugName,
-                        () => SetOutletState ((byte)plugID, MyState.On),
-                        () => SetOutletState ((byte)plugID, MyState.Off));
+                        () => {
+                            if (outlets [plugID].currentState != MyState.On)
+                                SetOutletState ((byte)plugID, MyState.On);
+                        },
+                        () => {
+                            if (outlets [plugID].currentState != MyState.Off)
+                                SetOutletState ((byte)plugID, MyState.Off);
+                        });
                 }
             }
 
@@ -100,12 +106,14 @@ namespace AquaPic.Drivers
                 if (!AcPowerAvailable)
                     Alarm.Post (powerLossAlarmIndex);
 
+                #if INCLUDE_POWER_STRIP_CURRENT
                 byte currentMask = callArgs.GetDataFromReadBuffer<byte> (1);
                 for (int i = 0; i < outlets.Length; ++i) {
                     if (Utils.mtob (currentMask, i))
                         ReadOutletCurrent ((byte)i);
                 }
-                #endif
+                #endif //INCLUDE_POWER_STRIP_CURRENT
+                #endif //UNSAFE_COMMS
             }
 
             public void ReadOutletCurrent (byte outletId) {

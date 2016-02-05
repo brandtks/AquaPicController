@@ -11,22 +11,22 @@ namespace AquaPic.Runtime
         public ConditionCheckHandler ConditionChecker;
         public OutputHandler OutputTrue;
         public OutputHandler OutputFalse;
-        public bool State;
+        public bool state;
 
         public Coil () {
-            this.State = false;
+            state = false;
         }
 
         public void Execute () {
             if (ConditionChecker != null)       // do we have a condition check method
-                State = ConditionChecker ();    // yes, lets run it to find out the new state
+                state = ConditionChecker ();    // yes, lets run it to find out the new state
 
-            if (State) {                        // if state is true
+            if (state) {                        // if state is true
                 if (OutputTrue != null)         // do we have a method to run if the state is true     
-                    OutputTrue ();              // yes, lets run it
+                OutputTrue ();              // yes, lets run it
             } else {
                 if (OutputFalse != null)        // do we have a method to run if the state is false
-                    OutputFalse ();             // yes, lets run it
+                OutputFalse ();             // yes, lets run it
             }
         }
     }

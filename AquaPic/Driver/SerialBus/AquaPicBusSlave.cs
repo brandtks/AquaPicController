@@ -10,7 +10,6 @@ namespace AquaPic.SerialBus
         {
             public event StatusUpdateHandler OnStatusUpdate;
 
-            //private AquaPicBus bus;
             private byte address;
             private int responeTime;
             private int[] timeQue;
@@ -32,12 +31,10 @@ namespace AquaPic.SerialBus
                 get { return _alarmIdx; }
             }
 
-            //public Slave (AquaPicBus bus, byte address, string name) {
             public Slave (byte address, string name) {
                 if (!IsAddressOk (address))
                     throw new Exception ("Address already in use");
 
-                //this.bus = bus;
                 this.address = address;
                 this.responeTime = 0;
                 this.timeQue = new int[10];

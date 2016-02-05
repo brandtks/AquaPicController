@@ -30,18 +30,21 @@ namespace AquaPic.SerialBus
 {
     public partial class AquaPicBus
     {
-        //public static AquaPicBus Bus1 = new AquaPicBus (2, 1000);
-
         private static SerialPort uart;
         private static Queue messageBuffer;
         private static Thread txRxThread;
         private static Thread responseThread;
+        private static bool enableTxRx;
+        private static bool enableResponse;
         private static AutoResetEvent getInput, gotInput;
-        private static bool responseReceived;
         private static Stopwatch stopwatch;
         private static List<Slave> slaves;
         private static ReceiveBuffer receiveBuffer;
         public static int retryCount, readTimeout;
+
+        #if USE_SERIAL_RECEIVE_EVENT
+        private static bool responseReceived;
+        #endif
 
         public static int slaveCount {
             get {
@@ -107,40 +110,56 @@ namespace AquaPic.SerialBus
             }
         }
 
-        //private AquaPicBus (int retryCount, int responseTimeout) {
         static AquaPicBus () {
             messageBuffer = new Queue ();
+
             txRxThread = new Thread (txRx);
             txRxThread.IsBackground = true;
+            enableTxRx = false;
+
             responseThread = new Thread (responseTimeout);
             responseThread.IsBackground = true;
+            enableResponse = false;
+
             getInput = new AutoResetEvent (false);
             gotInput = new AutoResetEvent (false);
+
+            #if USE_SERIAL_RECEIVE_EVENT
             responseReceived = false;
+            #endif
+
             stopwatch = new Stopwatch ();
             slaves = new List<Slave> ();
-            //this.retryCount = retryCount;
-            //this.readTimeout = responseTimeout;
+
             retryCount = 2;
             readTimeout = 1000;
+
             receiveBuffer = new ReceiveBuffer ();
         }
 
         //57600
         public static void Open (string port, int baudRate = 57600) {
             try {
+                #if USE_SERIAL_RECEIVE_EVENT
                 if (Utils.RunningPlatform == Platform.Windows)
+                #endif
                     uart = new SerialPort (port, baudRate, Parity.Space, 8);
+                #if USE_SERIAL_RECEIVE_EVENT
                 else
                     uart = new MonoSerialPort (port, baudRate, Parity.Space, 8);
+                #endif
 
                 uart.StopBits = StopBits.One;
                 uart.Handshake = Handshake.None;
-                uart.ReadTimeout = 1000;
+                //uart.ReadTimeout = readTimeout;
+
+                #if USE_SERIAL_RECEIVE_EVENT
                 uart.DataReceived += new SerialDataReceivedEventHandler (uartDataReceived);
 
                 if (Utils.RunningPlatform == Platform.Windows)
+                #endif
                     uart.Open ();
+                #if USE_SERIAL_RECEIVE_EVENT
                 else {
                     MonoSerialPort msp = uart as MonoSerialPort;
                     if (msp != null)
@@ -148,13 +167,16 @@ namespace AquaPic.SerialBus
                     else
                         throw new Exception ("Mono serial port not initialized correctly");
                 }
+                #endif
 
                 if (uart.IsOpen) {
                     for (int i = 0; i < slaves.Count; ++i)
                         slaves [i].UpdateStatus (AquaPicBusStatus.open, 0);
                 }
 
+                enableTxRx = true;
                 txRxThread.Start ();
+                enableResponse = true;
                 responseThread.Start ();
             } catch (Exception ex) {
                 Logger.AddError (ex.ToString ());
@@ -163,8 +185,10 @@ namespace AquaPic.SerialBus
 
         public static void Close () {
             if (uart.IsOpen) {
-                txRxThread.Abort ();
-                responseThread.Abort ();
+                enableTxRx = false;
+                txRxThread.Join (1000);
+                enableResponse = false;
+                responseThread.Join (1000);
                 uart.Close ();
                 uart.Dispose ();
             }
@@ -201,15 +225,18 @@ namespace AquaPic.SerialBus
         // background thread to dequeue any messages and send to slave
         // waits for response and calls callback if required
         private static void txRx () {
-            while (true) {
+            while (enableTxRx) {
                 int count;
                 lock (messageBuffer.SyncRoot) {
                     count = messageBuffer.Count;
                 }
 
                 if (count > 0) {
-                    if (count > 8)
-                        Logger.AddWarning (string.Format ("Message queue count is {0}", count));
+                    if (count > 8) {
+                        Gtk.Application.Invoke ((sender, e) => {
+                            Logger.AddWarning (string.Format ("Message queue count is {0}", count));
+                        });
+                    }
 
                     InternalMessage m;
 
@@ -223,13 +250,8 @@ namespace AquaPic.SerialBus
 
                         try {
                             for (int i = 0; i < retryCount; ++i) {
-                                uart.DiscardInBuffer ();
                                 uart.DiscardOutBuffer ();
-
-                                lock (receiveBuffer.SyncLock) {
-                                    receiveBuffer.length = m.responseLength;
-                                    receiveBuffer.buffer.Clear ();
-                                }
+                                uart.DiscardInBuffer ();
 
                                 #if DEBUG_SERIAL
                                 Console.WriteLine ();
@@ -255,36 +277,54 @@ namespace AquaPic.SerialBus
                                 stopwatch.Restart (); // resets stopwatch for response time, getResponse(ref byte[]) stops it
 
                                 try {
+                                    lock (receiveBuffer.SyncLock) {
+                                        receiveBuffer.responseLength = m.responseLength;
+                                        receiveBuffer.buffer.Clear ();
+                                    }
+
                                     getResponse (ref m.readBuffer);
 
-                                    if (checkResponse (ref m.readBuffer)) {
-                                        if (m.callback != null) {
-                                            Gtk.Application.Invoke ((sender, e) => m.callback (new CallbackArgs (m.readBuffer)));
+                                    if (m.readBuffer.Length >= m.responseLength) {
+                                        if (checkResponse (ref m.readBuffer)) {
+                                            if (m.callback != null) {
+                                                Gtk.Application.Invoke ((sender, e) => m.callback (new CallbackArgs (m.readBuffer)));
+                                            }
+
+                                            #if DEBUG_SERIAL
+                                            Console.WriteLine ("Message ok");
+                                            #endif
+
+                                            if (Alarm.CheckAlarming (m.slave.alarmIdx))
+                                                Alarm.Clear (m.slave.alarmIdx);
+
+                                            m.slave.UpdateStatus (AquaPicBusStatus.communicationSuccess, (int)stopwatch.ElapsedMilliseconds);
+                                            break;
+                                        } else {
+                                            m.slave.UpdateStatus (AquaPicBusStatus.crcError, 1000);
+                                            Gtk.Application.Invoke ((sender, e) => {
+                                                Logger.AddWarning ("APB {0} crc error on function number {1}", m.slave.Address, m.writeBuffer [1]);
+                                                Alarm.Post (m.slave.alarmIdx);
+                                            });
                                         }
-
-                                        #if DEBUG_SERIAL
-                                        Console.WriteLine ("Message ok");
-                                        #endif
-
-                                        if (Alarm.CheckAlarming (m.slave.alarmIdx))
-                                            Alarm.Clear (m.slave.alarmIdx);
-
-                                        m.slave.UpdateStatus (AquaPicBusStatus.communicationSuccess, (int)stopwatch.ElapsedMilliseconds);
-                                        break;
                                     } else {
                                         m.slave.UpdateStatus (AquaPicBusStatus.crcError, 1000);
-                                        Logger.AddWarning ("APB {0} crc error", m.slave.Address);
-                                        Alarm.Post (m.slave.alarmIdx);
+                                        Gtk.Application.Invoke ((sender, e) => {
+                                            Logger.AddWarning ("APB {0} response length error on function number {1}", m.slave.Address, m.writeBuffer [1]);
+                                        });
                                     }
                                 } catch (TimeoutException) {
                                     m.slave.UpdateStatus (AquaPicBusStatus.timeout, readTimeout);
-                                    Logger.AddWarning ("APB {0} timeout", m.slave.Address);
+                                    Gtk.Application.Invoke ((sender, e) => {
+                                        Logger.AddWarning ("APB {0} timeout on function number {1}", m.slave.Address, m.writeBuffer [1]);
+                                    });
                                 }
                             }
                         } catch (Exception ex) {
                             m.slave.UpdateStatus (AquaPicBusStatus.exception, 1000);
-                            Logger.AddError (ex.ToString ());
-                            Alarm.Post (m.slave.alarmIdx);
+                            Gtk.Application.Invoke ((sender, e) => {
+                                Logger.AddError (ex.ToString ());
+                                Alarm.Post (m.slave.alarmIdx);
+                            });
                         }
                     } else {
                         m.slave.UpdateStatus (AquaPicBusStatus.notOpen, 0);
@@ -293,17 +333,54 @@ namespace AquaPic.SerialBus
             }
         }
 
+        #if USE_SERIAL_RECEIVE_EVENT
         private static void responseTimeout () {
-            while (true) {
+            while (enableResponse) {
                 getInput.WaitOne (); // never returns until getInput.Set() is called 
                 while (!responseReceived) // waits until responseReceived is true, set by SerialPort Received Event
                     continue;
                 gotInput.Set (); // sets gotInput Event if response
             }
         }
+        #else
+        private static void responseTimeout () {
+            bool loopResponse;
+
+            while (enableResponse) {
+                getInput.WaitOne (); // never returns until getInput.Set() is called 
+
+                lock (receiveBuffer.SyncLock) {
+                    loopResponse = receiveBuffer.waitForResponse;
+                }
+
+                while (loopResponse) {
+                    int size = uart.BytesToRead;
+
+                    lock (receiveBuffer.SyncLock) {
+                        if (size == receiveBuffer.responseLength) {
+                            byte[] b = new byte[size];
+                            uart.Read (b, 0, size);
+                            receiveBuffer.buffer.AddRange (b);
+                            receiveBuffer.waitForResponse = false;
+                        }
+
+                        loopResponse = receiveBuffer.waitForResponse;
+                    }
+                }
+
+                gotInput.Set (); // sets gotInput Event if response
+            }
+        }
+        #endif
 
         private static void getResponse (ref byte[] response) {
+            #if USE_SERIAL_RECEIVE_EVENT
             responseReceived = false;
+            #else
+            lock (receiveBuffer.SyncLock) {
+                receiveBuffer.waitForResponse = true;
+            }
+            #endif
             getInput.Set ();
             // waits readTimeout for respone and returns true if gotInput.Set() was called or false if not
             bool success = gotInput.WaitOne (readTimeout);
@@ -312,10 +389,17 @@ namespace AquaPic.SerialBus
                 lock (receiveBuffer.SyncLock) {
                     response = receiveBuffer.buffer.ToArray ();
                 }
-            } else
-                throw new TimeoutException("UART response timeout");
+            } else {
+                #if !USE_SERIAL_RECEIVE_EVENT
+                lock (receiveBuffer.SyncLock) {
+                    receiveBuffer.waitForResponse = false;
+                }
+                #endif
+                throw new TimeoutException ("UART response timeout");
+            }
         }
 
+        #if USE_SERIAL_RECEIVE_EVENT
         private static void uartDataReceived (object sender, SerialDataReceivedEventArgs e) {
             lock (receiveBuffer.SyncLock) {
                 int size = uart.BytesToRead;
@@ -331,10 +415,11 @@ namespace AquaPic.SerialBus
 
                 receiveBuffer.buffer.AddRange (b);
 
-                if (receiveBuffer.buffer.Count == receiveBuffer.length)
+                if (receiveBuffer.buffer.Count == receiveBuffer.responseLength)
                     responseReceived = true;
             }
         }
+        #endif
 
         private static void WriteWithParity (byte data, Parity p = Parity.Space) {
             int count = 0;
@@ -392,13 +477,15 @@ namespace AquaPic.SerialBus
 
         private class ReceiveBuffer {
             public object SyncLock;
-            public int length;
+            public int responseLength;
             public List<byte> buffer;
+            public bool waitForResponse;
 
             public ReceiveBuffer () {
                 SyncLock = new object ();
                 buffer = new List<byte> ();
-                length = 0;
+                responseLength = 0;
+                waitForResponse = false;
             }
         }
     }
