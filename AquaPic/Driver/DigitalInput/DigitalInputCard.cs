@@ -29,25 +29,13 @@ namespace AquaPic.Drivers
             }
 
             public void GetInputs () {
-                #if UNSAFE_COMMS
-                unsafe {
-                    slave.Read (20, sizeof(byte), GetInputsCallback);
-                }
-                #else
                 slave.Read (20, sizeof(byte), GetInputsCallback);
-                #endif
             }
 
             protected void GetInputsCallback (CallbackArgs args) {
                 byte stateMask;
 
-                #if UNSAFE_COMMS
-                unsafe {
-                    args.CopyBuffer (&stateMask, sizeof(byte));
-                }
-                #else
                 stateMask = args.GetDataFromReadBuffer<byte> (0);
-                #endif
 
                 for (int i = 0; i < inputs.Length; ++i)
                     inputs [i].state = Utils.mtob (stateMask, i);
@@ -55,31 +43,10 @@ namespace AquaPic.Drivers
 
             public void GetInput (int ch) {
                 updating = true;
-                #if UNSAFE_COMMS
-                byte message = ch;
-
-                unsafe {
-                    slave.ReadWrite (10, &message, sizeof(byte), sizeof(CommValueBool), GetInputCallback);
-                }
-                #else
                 slave.ReadWrite (10, (byte)ch, 2, GetInputCallback);
-                #endif
             }
 
             protected void GetInputCallback (CallbackArgs args) {
-                #if UNSAFE_COMMS
-                CommValueBool vg;
-
-                unsafe {
-                    args.CopyBuffer (&vg, sizeof(CommValueBool));
-                }
-
-                if (inputs [vg.channel].state != vg.value) {
-                    //do event
-                }
-
-                inputs [vg.channel].state = vg.value;
-                #else
                 byte ch = args.GetDataFromReadBuffer<byte> (0);
                 bool value = args.GetDataFromReadBuffer<bool> (1);
 
@@ -88,7 +55,6 @@ namespace AquaPic.Drivers
                 }
 
                 inputs [ch].state = value;
-                #endif
 
                 updating = false;
             }

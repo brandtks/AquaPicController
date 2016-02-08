@@ -7,25 +7,28 @@ namespace AquaPic.SerialBus
 {
     public enum AquaPicBusStatus {
         [Description("AquaPic bus port not open")]
-        notOpen = 1,
+        NotOpen = 1,
 
         [Description("AquaPic bus port is open")]
-        open,
+        Open,
 
         [Description("Starting Communication")]
-        communicationStart,
+        CommunicationStart,
 
         [Description("Read/Write was successful")]
-        communicationSuccess,
+        CommunicationSuccess,
 
         [Description("An exception error has occurred")]
-        exception = 101,
+        Exception = 101,
 
         [Description("Response timed out from slave")]
-        timeout,
+        Rimeout,
 
         [Description("Cyclic reducency check error")]
-        crcError
+        CrcError,
+
+        [Description("Message length error")]
+        LengthError
     }
 
     public delegate void ResponseCallback (CallbackArgs args);
@@ -37,14 +40,6 @@ namespace AquaPic.SerialBus
         public CallbackArgs (byte[] readBuffer) {
             this.readBuffer = readBuffer;
         }
-
-        #if UNSAFE_COMMS
-        public unsafe void CopyBuffer (void* data, int size) {
-            byte* d = (byte*)data;
-            for (int i = 0; i < size; ++i)
-                *d++ = readBuffer [3 + i];
-        }
-        #endif
 
         public T GetDataFromReadBuffer<T> (int offset) {
             GCHandle handle = GCHandle.Alloc (readBuffer, GCHandleType.Pinned);
@@ -91,20 +86,4 @@ namespace AquaPic.SerialBus
             }
         }
     }
-
-    #if UNSAFE_COMMS
-    public partial class AquaPicBus
-    {
-        private class Utilities
-        {
-            public static unsafe void MemoryCopy (void* fromData, void* toData, int size) {
-                byte* f = (byte*)fromData;
-                byte* t = (byte*)toData;
-
-                while (size-- != 0)
-                    *t++ = *f++;
-            }
-        }
-    }
-    #endif
 }

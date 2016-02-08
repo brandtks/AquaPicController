@@ -39,7 +39,7 @@ namespace AquaPic.SerialBus
                 this.responeTime = 0;
                 this.timeQue = new int[10];
                 this.queIdx = 0;
-                this.status = AquaPicBusStatus.notOpen;
+                this.status = AquaPicBusStatus.NotOpen;
                 this.Name = name;
 
                 slaves.Add (this);
@@ -47,53 +47,35 @@ namespace AquaPic.SerialBus
                 _alarmIdx = Alarm.Subscribe (address.ToString () + " communication fault");
             }
 
-            #if UNSAFE_COMMS
-            public unsafe void Read (byte func, int readSize, ResponseCallback callback) {
-                bus.QueueMessage (this, func, null, 0, readSize, callback);
+            public void Read (byte func, int readSize, ResponseCallback callback, bool queueDuringPortClosed = false) {
+                QueueMessage (this, func, null, 0, readSize, callback, queueDuringPortClosed);
             }
-            #else
-            public void Read (byte func, int readSize, ResponseCallback callback) {
-                QueueMessage (this, func, null, 0, readSize, callback);
-            }
-            #endif
 
-            #if UNSAFE_COMMS
-            public unsafe void Write (byte func, void* writeData, int writeSize) {
-                bus.queueMessage (this, func, writeData, writeSize, 0, null);
-            }
-            #else
-            public void Write (int func, WriteBuffer writeBuffer) {
+            public void Write (int func, WriteBuffer writeBuffer, bool queueDuringPortClosed = false) {
                 byte[] array = writeBuffer.buffer;
-                Write (func, array);
+                Write (func, array, queueDuringPortClosed);
             }
 
-            public void Write (int func, byte[] writeBuffer) {
-                QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, 0, null);
+            public void Write (int func, byte[] writeBuffer, bool queueDuringPortClosed = false) {
+                QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, 0, null, queueDuringPortClosed);
             }
 
-            public void Write (int func, byte writeBuffer) {
-                Write (func, new byte[] { writeBuffer });
+            public void Write (int func, byte writeBuffer, bool queueDuringPortClosed = false) {
+                Write (func, new byte[] { writeBuffer }, queueDuringPortClosed);
             }
-            #endif
 
-            #if UNSAFE_COMMS
-            public unsafe void ReadWrite (byte func, void* writeData, int writeSize, int readSize, ResponseCallback callback) {
-                bus.queueMessage (this, func, writeData, writeSize, readSize, callback);
-            }
-            #else
-            public void ReadWrite (int func, WriteBuffer writeBuffer, int readSize, ResponseCallback callback) {
+            public void ReadWrite (int func, WriteBuffer writeBuffer, int readSize, ResponseCallback callback, bool queueDuringPortClosed = false) {
                 byte[] array = writeBuffer.buffer;
-                ReadWrite (func, array, readSize, callback);
+                ReadWrite (func, array, readSize, callback, queueDuringPortClosed);
             }
 
-            public void ReadWrite (int func, byte[] writeBuffer, int readSize, ResponseCallback callback) {
-                QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, readSize, callback);
+            public void ReadWrite (int func, byte[] writeBuffer, int readSize, ResponseCallback callback, bool queueDuringPortClosed = false) {
+                QueueMessage (this, (byte)func, writeBuffer, writeBuffer.Length, readSize, callback, queueDuringPortClosed);
             }
 
-            public void ReadWrite (int func, byte writeBuffer, int readSize, ResponseCallback callback) {
-                ReadWrite (func, new byte[] { writeBuffer }, readSize, callback);
+            public void ReadWrite (int func, byte writeBuffer, int readSize, ResponseCallback callback, bool queueDuringPortClosed = false) {
+                ReadWrite (func, new byte[] { writeBuffer }, readSize, callback, queueDuringPortClosed);
             }
-            #endif
 
             public void UpdateStatus (AquaPicBusStatus stat, int time) {
                 if (time != 0) {

@@ -59,48 +59,17 @@ namespace AquaPic.Drivers
                 else
                     message [1] = 0x00;
 
-                #if UNSAFE_COMMS
-                unsafe {
-                    fixed (byte* ptr = message) {
-                        slave.Write (2, ptr, sizeof(byte) * messageLength);
-                    }
-                }
-                #else
-                slave.Write (2, message);
-                #endif
+                slave.Write (2, message, true);
             }
 
-
             public void GetStatus () {
-                #if UNSAFE_COMMS
-                unsafe {
-                    slave.Read (20, sizeof(PowerComms), GetStatusCallback);
-                }
-                #else
                 slave.Read (20, 2, GetStatusCallback);
-                #endif
             }
 
             protected void GetStatusCallback (CallbackArgs callArgs) {
-                if (slave.Status != AquaPicBusStatus.communicationSuccess)
+                if (slave.Status != AquaPicBusStatus.CommunicationSuccess)
                     return;
 
-                #if UNSAFE_COMMS
-                PowerComms status = new PowerComms ();
-
-                unsafe {
-                    callArgs.CopyBuffer (&status, sizeof(PowerComms));
-                }
-
-                AcPowerAvailable = status.acPowerAvailable;
-                if (!AcPowerAvailable)
-                    Alarm.Post (powerLossAlarmIndex);
-
-                for (int i = 0; i < outlets.Length; ++i) {
-                    if (Utils.mtob (status.currentAvailableMask, i))
-                        ReadOutletCurrent ((byte)i);
-                }
-                #else
                 AcPowerAvailable = callArgs.GetDataFromReadBuffer<bool> (0);
 
                 if (!AcPowerAvailable)
@@ -112,36 +81,19 @@ namespace AquaPic.Drivers
                     if (Utils.mtob (currentMask, i))
                         ReadOutletCurrent ((byte)i);
                 }
-                #endif //INCLUDE_POWER_STRIP_CURRENT
-                #endif //UNSAFE_COMMS
+                #endif
             }
 
             public void ReadOutletCurrent (byte outletId) {
-                #if UNSAFE_COMMS
-                unsafe {
-                    slave.ReadWrite (10, &outletId, sizeof (byte), sizeof (AmpComms), ReadOutletCurrentCallback);
-                }
-                #else
                 slave.ReadWrite (10, outletId, 5, ReadOutletCurrentCallback);
-                #endif
             }
 
             protected void ReadOutletCurrentCallback (CallbackArgs callArgs) {
-                if (slave.Status != AquaPicBusStatus.communicationSuccess)
+                if (slave.Status != AquaPicBusStatus.CommunicationSuccess)
                     return;
 
-                #if UNSAFE_COMMS
-                AmpComms message;
-
-                unsafe {
-                    callArgs.CopyBuffer (&message, sizeof(AmpComms));
-                }
-
-                outlets [message.outletID].SetAmpCurrent (message.current);
-                #else
                 int outletId = callArgs.GetDataFromReadBuffer<byte> (0);
                 outlets [outletId].SetAmpCurrent (callArgs.GetDataFromReadBuffer<float> (1));
-                #endif
             }
 
             public void SetOutletState (byte outletId, MyState state) {
@@ -157,22 +109,6 @@ namespace AquaPic.Drivers
                 else
                     message [1] = 0x00;
 
-                #if UNSAFE_COMMS
-                unsafe {
-                    fixed (byte* ptr = message) {
-                        slave.ReadWrite (
-                            30, 
-                            ptr, 
-                            sizeof(byte) * messageLength, 
-                            0, 
-                            (args) => {
-                                //outlets [outletId].OnChangeState (new StateChangeEventArgs (outletId, powerID, state)));
-                                outlets [outletId].currentState = state;
-                                OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
-                            });
-                    }
-                }
-                #else
                 slave.ReadWrite (
                     30,
                     message,
@@ -181,7 +117,6 @@ namespace AquaPic.Drivers
                         outlets [outletId].currentState = state;
                         OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
                     });
-                #endif
 
 
                 #if !RPI_BUILD
