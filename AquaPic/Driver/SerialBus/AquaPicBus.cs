@@ -16,14 +16,12 @@
  * */
 
 using System;
-using System.IO.Ports; // for SerialPort
-using System.Threading; // for Thread, AutoResetEvent
-using System.Diagnostics; // for Stopwatch
-using System.Collections; // for Queue
-using System.Collections.Generic; // for List
-using Gtk; // for Application.Invoke
-using AquaPic.Runtime;
-using AquaPic.Utilites;
+using System.Threading;             // for Thread, AutoResetEvent
+using System.Diagnostics;           // for Stopwatch
+using System.Collections;           // for Queue
+using System.Collections.Generic;   // for List
+using Gtk;                          // for Application.Invoke
+using AquaPic.Runtime;              // for Logger, Alarm
 
 namespace AquaPic.SerialBus
 {
@@ -129,6 +127,7 @@ namespace AquaPic.SerialBus
         }
 
         //57600
+        //RPi gpio uart port is /dev/ttyAMA0
         public static void Open (string port, int baudRate = 57600) {
             try {
                 apbPort.Open (port, baudRate);
@@ -166,16 +165,20 @@ namespace AquaPic.SerialBus
             return true;
         }
 
-        private static void QueueMessage (Slave slave, byte func, byte[] writeData, int writeSize, int readSize, ResponseCallback callback) {
-            #if !RPI_BUILD
-            if (apbPort.uart != null) {
-            #endif
+        private static void QueueMessage (
+            Slave slave, 
+            byte func, 
+            byte[] writeData, 
+            int writeSize, 
+            int readSize, 
+            ResponseCallback callback, 
+            bool queueDuringPortClosed) 
+        {
+            if (isOpen || queueDuringPortClosed) {
                 lock (messageBuffer.SyncRoot) {
                     messageBuffer.Enqueue (new InternalMessage (slave, func, writeData, writeSize, readSize, callback));
                 }
-            #if !RPI_BUILD
             }
-            #endif
         }
 
         // background thread to dequeue any messages and send to slave
