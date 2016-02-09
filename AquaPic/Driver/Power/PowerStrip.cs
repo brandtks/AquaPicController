@@ -17,6 +17,12 @@ namespace AquaPic.Drivers
             public string name;
             public OutletData[] outlets;
 
+            public bool AquaPicBusCommunicationOk {
+                get {
+                    return ((slave.Status == AquaPicBusStatus.CommunicationStart) || (slave.Status == AquaPicBusStatus.CommunicationSuccess));
+                }
+            }
+
             public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) {
                 this.slave = new AquaPicBus.Slave (address, name + " (Power Strip)");
                 this.powerID = powerID;
@@ -63,7 +69,7 @@ namespace AquaPic.Drivers
             }
 
             public void GetStatus () {
-                slave.Read (20, 2, GetStatusCallback);
+                slave.Read (20, 3, GetStatusCallback);
             }
 
             protected void GetStatusCallback (CallbackArgs callArgs) {
@@ -75,10 +81,19 @@ namespace AquaPic.Drivers
                 if (!AcPowerAvailable)
                     Alarm.Post (powerLossAlarmIndex);
 
-                #if INCLUDE_POWER_STRIP_CURRENT
-                byte currentMask = callArgs.GetDataFromReadBuffer<byte> (1);
+                byte stateMask = callArgs.GetDataFromReadBuffer<byte> (1);
                 for (int i = 0; i < outlets.Length; ++i) {
-                    if (Utils.mtob (currentMask, i))
+                    if (Utils.MaskToBoolean (stateMask, i)) {
+                        outlets [i].currentState = MyState.On;
+                    } else {
+                        outlets [i].currentState = MyState.Off;
+                    }
+                }
+
+                #if INCLUDE_POWER_STRIP_CURRENT
+                byte currentMask = callArgs.GetDataFromReadBuffer<byte> (2);
+                for (int i = 0; i < outlets.Length; ++i) {
+                    if (Utils.MaskToBoolean (currentMask, i))
                         ReadOutletCurrent ((byte)i);
                 }
                 #endif
@@ -121,8 +136,8 @@ namespace AquaPic.Drivers
 
                 #if !RPI_BUILD
                 //<TEST> this is here only because the slave never responds so the callback never happens
-                outlets [outletId].currentState = state;
-                OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
+                //outlets [outletId].currentState = state;
+                //OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
                 #endif
             }
 

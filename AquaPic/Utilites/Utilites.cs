@@ -129,7 +129,7 @@ namespace AquaPic.Utilites
             return ((value <= (setpoint + deadband)) && (value >= (setpoint - deadband)));
         }
 
-        public static bool mtob (byte mask, int shift) {
+        public static bool MaskToBoolean (byte mask, int shift) {
             byte b = mask;
             byte _shift = (byte)shift;
             b >>= _shift;
@@ -139,7 +139,7 @@ namespace AquaPic.Utilites
                 return false;
         }
 
-        public static void btom (ref byte mask, bool b, int shift) {
+        public static void BooleanToMask (ref byte mask, bool b, int shift) {
             if (b)
                 mask |= (byte)Math.Pow (2, shift);
             else {

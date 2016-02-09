@@ -453,6 +453,19 @@ namespace AquaPic.Drivers
                 stateChangedHandlers [outlet.name].CallEvent (outlet, args);
             }
         }
+
+        public static bool AquaPicBusCommunicationOk (int powerId) {
+            return pwrStrips [powerId].AquaPicBusCommunicationOk;
+        }
+
+        public static bool AquaPicBusCommunicationOk (IndividualControl ic) {
+            return pwrStrips [ic.Group].AquaPicBusCommunicationOk;
+        }
+
+        public static bool AquaPicBusCommunicationOk (string name) {
+            int powerId = GetPowerStripIndex (name);
+            return pwrStrips [powerId].AquaPicBusCommunicationOk;
+        }
     }
 }
 

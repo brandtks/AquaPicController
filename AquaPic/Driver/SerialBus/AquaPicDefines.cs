@@ -43,7 +43,7 @@ namespace AquaPic.SerialBus
 
         public T GetDataFromReadBuffer<T> (int offset) {
             GCHandle handle = GCHandle.Alloc (readBuffer, GCHandleType.Pinned);
-            IntPtr ptr = new IntPtr (handle.AddrOfPinnedObject ().ToInt64 () + offset);
+            IntPtr ptr = new IntPtr (handle.AddrOfPinnedObject ().ToInt64 () + offset + 3);
             T data = (T)Marshal.PtrToStructure (ptr, typeof(T));
             handle.Free ();
             return data;

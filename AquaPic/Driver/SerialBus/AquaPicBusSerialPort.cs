@@ -8,14 +8,14 @@ namespace AquaPic.SerialBus
     public class AquaPicBusSerialPort
     {
         public SerialPort uart;
-        private GPIOPinDriver txRxSelectPin;
+        //private GPIOPinDriver txRxSelectPin;
 
         public AquaPicBusSerialPort () {
             if (Utils.RunningPlatform == Platform.Linux) {
-                txRxSelectPin = new GPIOPinDriver (
-                    GPIOPinDriver.Pin.GPIO18, 
-                    GPIOPinDriver.GPIODirection.Out,
-                    GPIOPinDriver.GPIOState.Low);
+                //txRxSelectPin = new GPIOPinDriver (
+                //    GPIOPinDriver.Pin.GPIO18, 
+                //    GPIOPinDriver.GPIODirection.Out,
+                //    GPIOPinDriver.GPIOState.Low);
             }
         }
 
@@ -38,17 +38,16 @@ namespace AquaPic.SerialBus
             uart.Parity = Parity.Mark;
             uart.Write (message, 0, 1);
             uart.Parity = Parity.Space;
-
             uart.Write (message, 1, message.Length - 1);
         }
 
         protected void LinuxWrite (byte[] message) {
-            txRxSelectPin.State = GPIOPinDriver.GPIOState.High;     //enable transmit
+            //txRxSelectPin.State = GPIOPinDriver.GPIOState.High;     //enable transmit
             WriteWithParity (message [0], Parity.Mark);             //send address
             for (int i = 1; i < message.Length; ++i) {              //send message
                 WriteWithParity (message [i]);
             }
-            txRxSelectPin.State = GPIOPinDriver.GPIOState.Low;      //enable receive
+            //txRxSelectPin.State = GPIOPinDriver.GPIOState.Low;      //enable receive
         }
 
         protected void WriteWithParity (byte data, Parity p = Parity.Space) {

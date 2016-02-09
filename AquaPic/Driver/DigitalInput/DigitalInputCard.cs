@@ -38,7 +38,7 @@ namespace AquaPic.Drivers
                 stateMask = args.GetDataFromReadBuffer<byte> (0);
 
                 for (int i = 0; i < inputs.Length; ++i)
-                    inputs [i].state = Utils.mtob (stateMask, i);
+                    inputs [i].state = Utils.MaskToBoolean (stateMask, i);
             }
 
             public void GetInput (int ch) {
