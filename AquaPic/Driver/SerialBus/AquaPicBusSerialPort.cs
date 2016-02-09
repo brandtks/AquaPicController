@@ -11,9 +11,9 @@ namespace AquaPic.SerialBus
         public SerialPort uart;
 
         public AquaPicBusSerialPort () {
-            if (Utils.RunningPlatform == Platform.Linux) {
-                LibGpio.Gpio.SetupChannel (BroadcomPinNumber.Eighteen, Direction.Output);
-            }
+            //if (Utils.RunningPlatform == Platform.Linux) {
+            //    LibGpio.Gpio.SetupChannel (BroadcomPinNumber.Eighteen, Direction.Output);
+            //}
         }
 
         public void Open (string port, int baudRate) {
@@ -39,12 +39,12 @@ namespace AquaPic.SerialBus
         }
 
         protected void LinuxWrite (byte[] message) {
-            LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, true);     //enable transmit
+            //LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, true);     //enable transmit
             WriteWithParity (message [0], Parity.Mark);                     //send address
             for (int i = 1; i < message.Length; ++i) {                      //send message
                 WriteWithParity (message [i]);
             }
-            LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, false);    //enable receive
+            //LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, false);    //enable receive
         }
 
         protected void WriteWithParity (byte data, Parity p = Parity.Space) {

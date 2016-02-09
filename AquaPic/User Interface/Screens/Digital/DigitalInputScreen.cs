@@ -24,17 +24,8 @@ namespace AquaPic.UserInterface
 
             if (DigitalInput.cardCount == 0) {
                 cardId = -1;
-
-                var l = new TouchLabel ();
-                l.text = "No Digital Input Cards Added";
-                l.textColor = "pri";
-                l.textAlignment = TouchAlignment.Center;
-                l.WidthRequest = 780;
-                Put (l, 10, 32);
-                l.Show ();
-
+                screenTitle = "No Digital Input Cards Added";
                 Show ();
-
                 return;
             }
 
