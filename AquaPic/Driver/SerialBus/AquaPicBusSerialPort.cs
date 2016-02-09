@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
-using RaspberryGPIOManager;
+using PiSharp.LibGpio;
+using PiSharp.LibGpio.Entities;
 using AquaPic.Utilites;
 
 namespace AquaPic.SerialBus
@@ -8,14 +9,10 @@ namespace AquaPic.SerialBus
     public class AquaPicBusSerialPort
     {
         public SerialPort uart;
-        //private GPIOPinDriver txRxSelectPin;
 
         public AquaPicBusSerialPort () {
             if (Utils.RunningPlatform == Platform.Linux) {
-                //txRxSelectPin = new GPIOPinDriver (
-                //    GPIOPinDriver.Pin.GPIO18, 
-                //    GPIOPinDriver.GPIODirection.Out,
-                //    GPIOPinDriver.GPIOState.Low);
+                LibGpio.Gpio.SetupChannel (BroadcomPinNumber.Eighteen, Direction.Output);
             }
         }
 
@@ -42,12 +39,12 @@ namespace AquaPic.SerialBus
         }
 
         protected void LinuxWrite (byte[] message) {
-            //txRxSelectPin.State = GPIOPinDriver.GPIOState.High;     //enable transmit
-            WriteWithParity (message [0], Parity.Mark);             //send address
-            for (int i = 1; i < message.Length; ++i) {              //send message
+            LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, true);     //enable transmit
+            WriteWithParity (message [0], Parity.Mark);                     //send address
+            for (int i = 1; i < message.Length; ++i) {                      //send message
                 WriteWithParity (message [i]);
             }
-            //txRxSelectPin.State = GPIOPinDriver.GPIOState.Low;      //enable receive
+            LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, false);    //enable receive
         }
 
         protected void WriteWithParity (byte data, Parity p = Parity.Space) {
