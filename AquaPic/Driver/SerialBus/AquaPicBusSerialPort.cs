@@ -1,7 +1,12 @@
-﻿using System;
+﻿#define TEST_PARITY_ON_WINDOWS
+//#define USE_TRANSMIT_RECIEVE_PIN
+
+using System;
 using System.IO.Ports;
+#if USE_TRANSMIT_RECIEVE_PIN
 using PiSharp.LibGpio;
 using PiSharp.LibGpio.Entities;
+#endif
 using AquaPic.Utilites;
 
 namespace AquaPic.SerialBus
@@ -11,9 +16,11 @@ namespace AquaPic.SerialBus
         public SerialPort uart;
 
         public AquaPicBusSerialPort () {
-            //if (Utils.RunningPlatform == Platform.Linux) {
-            //    LibGpio.Gpio.SetupChannel (BroadcomPinNumber.Eighteen, Direction.Output);
-            //}
+            #if USE_TRANSMIT_RECIEVE_PIN
+            if (Utils.RunningPlatform == Platform.Linux) {
+                LibGpio.Gpio.SetupChannel (BroadcomPinNumber.Eighteen, Direction.Output);
+            }
+            #endif
         }
 
         public void Open (string port, int baudRate) {
@@ -32,19 +39,30 @@ namespace AquaPic.SerialBus
         }
 
         protected void WindowsWrite (byte[] message) {
-            uart.Parity = Parity.Mark;
-            uart.Write (message, 0, 1);
-            uart.Parity = Parity.Space;
-            uart.Write (message, 1, message.Length - 1);
-        }
-
-        protected void LinuxWrite (byte[] message) {
-            //LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, true);     //enable transmit
+            #if TEST_PARITY_ON_WINDOWS
             WriteWithParity (message [0], Parity.Mark);                     //send address
             for (int i = 1; i < message.Length; ++i) {                      //send message
                 WriteWithParity (message [i]);
             }
-            //LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, false);    //enable receive
+            #else
+            uart.Parity = Parity.Mark;
+            uart.Write (message, 0, 1);
+            uart.Parity = Parity.Space;
+            uart.Write (message, 1, message.Length - 1);
+            #endif
+        }
+
+        protected void LinuxWrite (byte[] message) {
+            #if USE_TRANSMIT_RECIEVE_PIN
+            LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, true);     //enable transmit
+            #endif
+            WriteWithParity (message [0], Parity.Mark);                     //send address
+            for (int i = 1; i < message.Length; ++i) {                      //send message
+                WriteWithParity (message [i]);
+            }
+            #if USE_TRANSMIT_RECIEVE_PIN
+            LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, false);    //enable receive
+            #endif
         }
 
         protected void WriteWithParity (byte data, Parity p = Parity.Space) {
@@ -55,16 +73,10 @@ namespace AquaPic.SerialBus
                     ++count;
             }
 
-            if ((count % 2) == 0) { // even number
-                if (p == Parity.Mark)
-                    uart.Parity = Parity.Even;
-                else
-                    uart.Parity = Parity.Odd;
-            } else { // odd number
-                if (p == Parity.Space)
-                    uart.Parity = Parity.Odd;
-                else
-                    uart.Parity = Parity.Even;
+            if (p == Parity.Mark) {
+                uart.Parity = ((count % 2) == 0) ? Parity.Odd : Parity.Even;
+            } else {
+                uart.Parity = ((count % 2) == 0) ? Parity.Even : Parity.Odd;
             }
 
             uart.Write (new byte[] { data }, 0, 1);

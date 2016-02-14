@@ -1,4 +1,4 @@
-﻿//#define DEBUG_SERIAL
+﻿#define DEBUG_SERIAL
 
 /* Message Structure
  * 
@@ -276,7 +276,7 @@ namespace AquaPic.SerialBus
                                         #endif
                                     }
                                 } catch (TimeoutException) {
-                                    m.slave.UpdateStatus (AquaPicBusStatus.Rimeout, readTimeout);
+                                    m.slave.UpdateStatus (AquaPicBusStatus.Timeout, readTimeout);
                                     Gtk.Application.Invoke ((sender, e) => {
                                         Logger.AddWarning ("APB {0} timeout on function number {1}", m.slave.Address, m.writeBuffer [1]);
                                     });
@@ -294,7 +294,7 @@ namespace AquaPic.SerialBus
                             }
 
                             //all retry attempts have failed, post alarm
-                            if ((m.slave.Status == AquaPicBusStatus.CrcError) || (m.slave.Status == AquaPicBusStatus.LengthError)) {
+                            if ((m.slave.Status == AquaPicBusStatus.CrcError) || (m.slave.Status == AquaPicBusStatus.LengthError) || (m.slave.Status == AquaPicBusStatus.Timeout)) {
                                 Gtk.Application.Invoke ((sender, e) => {
                                     Alarm.Post (m.slave.alarmIdx);
                                 });

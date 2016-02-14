@@ -22,7 +22,7 @@ namespace AquaPic.SerialBus
         Exception = 101,
 
         [Description("Response timed out from slave")]
-        Rimeout,
+        Timeout,
 
         [Description("Cyclic reducency check error")]
         CrcError,
