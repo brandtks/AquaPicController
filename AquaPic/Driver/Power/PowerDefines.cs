@@ -53,24 +53,5 @@ namespace AquaPic.Drivers
                 StateChangedEvent (sender, args);
         }
     }
-
-   
-    #if UNSAFE_COMMS
-    // AquaPicBus communication structs
-    public struct PlugComms {
-        public byte outletID;
-        public bool state;
-    }
-
-    public struct PowerComms {
-        public bool acPowerAvailable;
-        public byte currentAvailableMask;
-    }
-
-    public struct AmpComms {
-        public byte outletID;
-        public float current;
-    }
-    #endif
 }
 

@@ -4,22 +4,17 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogOutput
+    public partial class AnalogOutputBase
     {
-        private class AnalogOutputChannel
+        protected class AnalogOutputChannel<T> : GenericChannel<T>
         {
             public AnalogType type;
-            public string name { get; set; }
-            public int value { get; set; }
             public Value ValueControl;
-            public Mode mode;
 
-            public AnalogOutputChannel (string name, ValueSetterHandler valueSetter) {
-                this.type = AnalogType.ZeroTen;
-                this.name = name;
-                this.value = 0;
-                mode = Mode.Auto;
-
+            public AnalogOutputChannel (string name, ValueSetterHandler valueSetter)
+                : base (name, (T)(object)0) 
+            {
+                type = AnalogType.ZeroTen;
                 ValueControl = new Value ();
                 ValueControl.ValueSetter = valueSetter;
             }

@@ -135,9 +135,8 @@ namespace AquaPic.Drivers
 
 
                 #if !RPI_BUILD
-                //<TEST> this is here only because the slave never responds so the callback never happens
-                //outlets [outletId].currentState = state;
-                //OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
+                outlets [outletId].currentState = state;
+                OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
                 #endif
             }
 

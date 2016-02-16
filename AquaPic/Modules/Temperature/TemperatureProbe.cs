@@ -16,12 +16,12 @@ namespace AquaPic.Modules
                 this.name = name;
                 channel.Group = (byte)cardId;
                 channel.Individual = (byte)channelId;
-                AnalogInput.AddChannel (channel, this.name);
+                AquaPicDrivers.AnalogInput.AddChannel (channel, this.name);
                 temperature = 0.0f;
             }
 
             public float GetTemperature () {
-                temperature = AnalogInput.GetValue (channel);
+                temperature = AquaPicDrivers.AnalogInput.GetChannelValue (channel);
                 temperature = temperature.Map (0, 4096, 32.0f, 100.0f);
                 return temperature;
             }

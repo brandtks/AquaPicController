@@ -69,10 +69,11 @@ namespace AquaPic.Modules
                 return analogSensor.sensorChannel;
             }
             set {
-                if (analogSensor.sensorChannel.IsNotEmpty ())
-                    AnalogInput.RemoveChannel (analogSensor.sensorChannel);
+                if (analogSensor.sensorChannel.IsNotEmpty ()) {
+                    AquaPicDrivers.AnalogInput.RemoveChannel (analogSensor.sensorChannel);
+                }
                 analogSensor.sensorChannel = value;
-                AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
+                AquaPicDrivers.AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
                     
             }
         }
@@ -87,7 +88,7 @@ namespace AquaPic.Modules
                     analogSensor.SubscribeToAlarms ();
                 
                     try {
-                        AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
+                        AquaPicDrivers.AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
                     } catch (Exception) {
                         ; //channel already added
                     }
@@ -263,7 +264,7 @@ namespace AquaPic.Modules
                     ic = IndividualControl.Empty;
                     enable = false;
                 } else
-                    ic.Group = AnalogInput.GetCardIndex (text);
+                    ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
 
                 text = (string)jo ["channel"];
                 if (string.IsNullOrWhiteSpace (text)) {

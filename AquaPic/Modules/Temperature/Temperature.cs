@@ -64,7 +64,7 @@ namespace AquaPic.Modules
                 foreach (var jt in ja) {
                     JObject obj = jt as JObject;
                     string name = (string)obj ["name"];
-                    int cardId = AnalogInput.GetCardIndex ((string)obj ["inputCard"]);
+                    int cardId = AquaPicDrivers.AnalogInput.GetCardIndex ((string)obj ["inputCard"]);
                     int channelId = Convert.ToInt32 (obj ["channel"]);
                     AddTemperatureProbe (name, cardId, channelId);
                 }
@@ -223,7 +223,7 @@ namespace AquaPic.Modules
         public static void RemoveTemperatureProbe (int probeId) {
             if ((probeId >= 0) && (probeId < probes.Count)) {
                 TemperatureProbe p = probes [probeId];
-                AnalogInput.RemoveChannel (p.channel);
+                AquaPicDrivers.AnalogInput.RemoveChannel (p.channel);
                 probes.Remove (p);
             } else 
                 throw new ArgumentOutOfRangeException ("probeId");
@@ -283,9 +283,9 @@ namespace AquaPic.Modules
 
         public static void SetTemperatureProbeIndividualControl (int probeId, IndividualControl ic) {
             if ((probeId >= 0) && (probeId < probes.Count)) {
-                AnalogInput.RemoveChannel (probes [probeId].channel);
+                AquaPicDrivers.AnalogInput.RemoveChannel (probes [probeId].channel);
                 probes [probeId].channel = ic;
-                AnalogInput.AddChannel (probes [probeId].channel, probes [probeId].name);
+                AquaPicDrivers.AnalogInput.AddChannel (probes [probeId].channel, probes [probeId].name);
             }
         }
 

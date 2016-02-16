@@ -56,13 +56,13 @@ namespace AquaPic.UserInterface
             c.label.text = "Input Channel";
             if (this.probeIdx != -1) {
                 IndividualControl ic = Temperature.GetTemperatureProbeIndividualControl (probeIdx);
-                string cardName = AnalogInput.GetCardName (ic.Group);
+                string cardName = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
                 c.combo.List.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
                 c.combo.Active = 0;
             } else {
                 c.combo.NonActiveMessage = "Please select channel";
             }
-            c.combo.List.AddRange (AnalogInput.GetAllAvaiableChannels ());
+            c.combo.List.AddRange (AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ());
             AddSetting (c);
 
             DrawSettings ();
@@ -71,7 +71,7 @@ namespace AquaPic.UserInterface
         protected void ParseChannnel (string s, ref int g, ref int i) {
             int idx = s.IndexOf ('.');
             string cardName = s.Substring (0, idx);
-            g = AnalogInput.GetCardIndex (cardName);
+            g = AquaPicDrivers.AnalogInput.GetCardIndex (cardName);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
@@ -95,7 +95,7 @@ namespace AquaPic.UserInterface
                     JObject jo = new JObject ();
 
                     jo.Add (new JProperty ("name", Temperature.GetTemperatureProbeName (probeIdx)));
-                    jo.Add (new JProperty ("inputCard", AnalogInput.GetCardName (ic.Group))); 
+                    jo.Add (new JProperty ("inputCard", AquaPicDrivers.AnalogInput.GetCardName (ic.Group))); 
                     jo.Add (new JProperty ("channel", ic.Individual.ToString ()));
 
                     string joText = jo.ToString ();
@@ -162,7 +162,7 @@ namespace AquaPic.UserInterface
                 JObject jo = new JObject ();
 
                 jo.Add (new JProperty ("name", Temperature.GetTemperatureProbeName (probeIdx)));
-                jo.Add (new JProperty ("inputCard", AnalogInput.GetCardName (ic.Group))); 
+                jo.Add (new JProperty ("inputCard", AquaPicDrivers.AnalogInput.GetCardName (ic.Group))); 
                 jo.Add (new JProperty ("channel", ic.Individual.ToString ()));
 
                 string joText = jo.ToString ();

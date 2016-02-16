@@ -146,13 +146,13 @@ namespace AquaPic.UserInterface
             c.label.text = "Dimming Channel";
             if ((fixtureIdx != -1) && (isDimming)) {
                 IndividualControl ic = Lighting.GetDimmingChannelIndividualControl (fixtureIdx);
-                string cardName = AnalogOutput.GetCardName (ic.Group);
+                string cardName = AquaPicDrivers.AnalogOutput.GetCardName (ic.Group);
                 c.combo.List.Add (string.Format ("Current: {0}.q{1}", cardName, ic.Individual));
                 c.combo.Active = 0;
             } else {
                 c.combo.NonActiveMessage = "Select outlet";
             }
-            c.combo.List.AddRange (AnalogOutput.GetAllAvaiableChannels ());
+            c.combo.List.AddRange (AquaPicDrivers.AnalogOutput.GetAllAvaiableChannels ());
             AddOptionalSetting (c);
 
             t = new SettingTextBox ();
@@ -223,7 +223,7 @@ namespace AquaPic.UserInterface
         protected void ParseChannnel (string s, ref int g, ref int i) {
             int idx = s.IndexOf ('.');
             string cardName = s.Substring (0, idx);
-            g = AnalogOutput.GetCardIndex (cardName);
+            g = AquaPicDrivers.AnalogOutput.GetCardIndex (cardName);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
@@ -337,7 +337,7 @@ namespace AquaPic.UserInterface
                     jobj.Add (new JProperty ("lightingTime", "night"));
                 jobj.Add (new JProperty ("highTempLockout", highTempLockout.ToString ()));
                 if (dimmingFixture) {
-                    jobj.Add (new JProperty ("dimmingCard", AnalogOutput.GetCardName (chIc.Group)));
+                    jobj.Add (new JProperty ("dimmingCard", AquaPicDrivers.AnalogOutput.GetCardName (chIc.Group)));
                     jobj.Add (new JProperty ("channel", chIc.Individual.ToString ()));
                     jobj.Add (new JProperty ("minDimmingOutput", minDimming.ToString ()));
                     jobj.Add (new JProperty ("maxDimmingOutput", maxDimming.ToString ()));
@@ -410,7 +410,7 @@ namespace AquaPic.UserInterface
                     ((JArray)jo ["lightingFixtures"]) [arrIdx] ["offTimeOffset"] = offOffset.ToString ();
 
                     if (dimmingFixture) {
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["dimmingCard"] = AnalogOutput.GetCardName (chIc.Group);
+                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["dimmingCard"] = AquaPicDrivers.AnalogOutput.GetCardName (chIc.Group);
                         ((JArray)jo ["lightingFixtures"]) [arrIdx] ["channel"] = chIc.Individual.ToString ();
                         ((JArray)jo ["lightingFixtures"]) [arrIdx] ["minDimmingOutput"] = minDimming.ToString ();
                         ((JArray)jo ["lightingFixtures"]) [arrIdx] ["maxDimmingOutput"] = maxDimming.ToString ();

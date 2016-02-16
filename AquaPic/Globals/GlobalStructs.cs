@@ -22,22 +22,5 @@ namespace AquaPic.Utilites
             return check;
         }
     }
-
-    #if UNSAFE_COMMS
-    public struct CommValueInt {
-        public byte channel;
-        public short value;
-    }
-
-    public struct CommValueBool {
-        public byte channel;
-        public bool value;
-    }
-
-    public struct CommValueFloat {
-        public byte channel;
-        public float value;
-    }
-    #endif
 }
 

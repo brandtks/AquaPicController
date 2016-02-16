@@ -1,6 +1,4 @@
-﻿#define DEBUG_SERIAL
-
-/* Message Structure
+﻿/* Message Structure
  * 
  * SENDING FROM MASTER
  *   0      : Address
@@ -16,6 +14,8 @@
  *   3-n    : Message - if Any
  *   last 2 : CRC
  * */
+
+//#define DEBUG_SERIAL
 
 using System;
 using System.Threading;             // for Thread, AutoResetEvent

@@ -54,12 +54,12 @@ namespace AquaPic.Modules
                 sensorChannel = ic;
 
                 if (this.enable)
-                    AnalogInput.AddChannel (sensorChannel, "Water Level");
+                    AquaPicDrivers.AnalogInput.AddChannel (sensorChannel, "Water Level");
             }
 
             public void Run () {
                 if (enable) {
-                    waterLevel = AnalogInput.GetValue (sensorChannel);
+                    waterLevel = AquaPicDrivers.AnalogInput.GetChannelValue (sensorChannel);
                     waterLevel = waterLevel.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
 
                     if (waterLevel < 0.0f)

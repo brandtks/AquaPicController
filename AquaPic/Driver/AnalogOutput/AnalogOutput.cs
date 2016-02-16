@@ -5,239 +5,92 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogOutput
+    public partial class AnalogOutputBase : GenericBase<int>
     {
-        private static List<AnalogOutputCard> cards = new List<AnalogOutputCard> ();
+        public static AnalogOutputBase SharedAnalogOutputInstance = new AnalogOutputBase ();
 
-        public static int cardCount {
-            get {
-                return cards.Count;
-            }
-        }
+        protected AnalogOutputBase () 
+            : base ("Analog Output") { }
 
-        static AnalogOutput () {
-            TaskManager.AddCyclicInterrupt ("Analog Output", 1000, Run);
-        }
-
-        public static void Run () {
+        protected override void Run () {
             foreach (var card in cards) {
-                byte chId = 0;
+                byte channelId = 0;
 
                 short[] values = new short[4];
 
-                foreach (var channel in card.channels) {
+                foreach (var genericChannel in card.channels) {
+                    var channel = genericChannel as AnalogOutputChannel<int>;
+
                     if (channel.mode == Mode.Auto)
                         channel.ValueControl.Execute ();
 
-                    values [chId] = (short)channel.value;
+                    values [channelId] = Convert.ToInt16 (channel.value);
 
-                    ++chId;
+                    ++channelId;
                 }
 
-                card.SetAllAnalogValues (values);
+                card.SetAllValuesCommunication<short> (values);
             }
         }
 
-        public static int AddCard (int address, string name) {
-            int count = cards.Count;
-            cards.Add (new AnalogOutputCard ((byte)address, (byte)count, name));
-            return count;
+        protected override GenericCard<int> CardCreater (string cardName, int cardId, int address) {
+            return new AnalogOutputCard<int> (cardName, cardId, address);
         }
 
-        public static Value AddChannel (IndividualControl channel, AnalogType type, string name) {
-            return AddChannel (channel.Group, channel.Individual, type, name);
+        public AnalogType GetChannelType (string channelName) {
+            IndividualControl channel = GetChannelIndividualControl (channelName);
+            return GetChannelType (channel.Group, channel.Individual);
         }
 
-        public static Value AddChannel (int cardID, int channelID, AnalogType type, string name) {
-            if ((cardID < 0) && (cardID >= cards.Count))
-                throw new Exception ("Card does not exist");
-
-            if ((channelID < 0) || (channelID >= cards [cardID].channels.Length))
-                throw new ArgumentOutOfRangeException ("Input ID out of range");
-
-            string s = string.Format ("{0}.q{1}", cards [cardID].name, channelID);
-            if (cards [cardID].channels [channelID].name != s)
-                throw new Exception (string.Format ("Channel already taken by {0}", cards [cardID].channels [channelID].name));
-            
-            cards [cardID].AddChannel (channelID, type, name);
-            return cards [cardID].channels [channelID].ValueControl;
+        public AnalogType GetChannelType (IndividualControl channel) {
+            return GetChannelType (channel.Group, channel.Individual);
         }
 
-        public static void RemoveChannel (IndividualControl channel) {
-            RemoveChannel (channel.Group, channel.Individual);
+        public AnalogType GetChannelType (int card, int channel) {
+            CheckCardRange (card);
+            var analogOutputCard = cards [card] as AnalogOutputCard<int>;
+            return analogOutputCard.GetChannelType (channel);
         }
 
-        public static void RemoveChannel (int cardID, int channelID) {
-            if ((cardID < 0) && (cardID >= cards.Count))
-                throw new ArgumentOutOfRangeException ("cardID");
-
-            if ((channelID < 0) || (channelID >= cards [cardID].channels.Length))
-                throw new ArgumentOutOfRangeException ("channelID");
-
-            string s = string.Format ("{0}.q{1}", cards [cardID].name, channelID);
-            cards [cardID].channels [channelID].name = s;
-            cards [cardID].channels [channelID].mode = Mode.Auto;
-            cards [cardID].channels [channelID].value = 0;
-            cards [cardID].channels [channelID].type = AnalogType.ZeroTen;
-            cards [cardID].channels [channelID].ValueControl.ValueGetter = () => { return 0; };
+        public AnalogType[] GetAllChannelTypes (string cardName) {
+            int card = GetCardIndex (cardName);
+            return GetAllChannelTypes (card);
         }
 
-        public static int GetCardIndex (string name) {
-            for (int i = 0; i < cards.Count; ++i) {
-                if (string.Equals (cards [i].name, name, StringComparison.InvariantCultureIgnoreCase))
-                    return i;
-            }
-            return -1;
+        public AnalogType[] GetAllChannelTypes (int card) {
+            CheckCardRange (card);
+            var analogOutputCard = cards [card] as AnalogOutputCard<int>;
+            return analogOutputCard.GetAllChannelTypes ();
         }
 
-        public static int GetChannelIndex (int cardId, string name) {
-            if ((cardId >= 0) && (cardId < cards.Count)) {
-                for (int i = 0; i < cards [cardId].channels.Length; ++i) {
-                    if (string.Equals (cards [cardId].channels [i].name, name, StringComparison.InvariantCultureIgnoreCase))
-                        return i;
-                }
-            }
-
-            return -1;
+        public void SetChannelType (string channelName, AnalogType type) {
+            IndividualControl channel = GetChannelIndividualControl (channelName);
+            SetChannelType (channel.Group, channel.Individual, type);
         }
 
-        public static string[] GetAllCardNames () {
-            string[] names = new string[cards.Count];
-
-            for (int i = 0; i < cards.Count; ++i)
-                names [i] = cards [i].name;
-
-            return names;
+        public void SetChannelType (IndividualControl channel, AnalogType type) {
+            SetChannelType (channel.Group, channel.Individual, type);
         }
 
-        public static string GetCardName (int cardId) {
-            if ((cardId < 0) || (cardId >= cards.Count))
-                throw new ArgumentOutOfRangeException ("cardId");
-
-            return cards [cardId].name;
+        public void SetChannelType (int card, int channel, AnalogType type) {
+            CheckCardRange (card);
+            var analogOutputCard = cards [card] as AnalogOutputCard<int>;
+            analogOutputCard.SetChannelType (channel, type);
         }
 
-        public static string[] GetAllChannelNames (int cardId) {
-            if ((cardId >= 0) && (cardId < cards.Count)) {
-                string[] names = new string[cards [cardId].channels.Length];
-
-                for (int i = 0; i < names.Length; ++i)
-                    names [i] = cards [cardId].channels [i].name;
-
-                return names;
-            }
-
-            return null;
+        public Value GetChannelValueControl (string channelName) {
+            IndividualControl channel = GetChannelIndividualControl (channelName);
+            return GetChannelValueControl (channel.Group, channel.Individual);
         }
 
-        public static AnalogType[] GetAllAnalogTypes (int cardId) {
-            if ((cardId >= 0) && (cardId < cards.Count)) {
-                AnalogType[] types = new AnalogType[cards [cardId].channels.Length];
-
-                for (int i = 0; i < types.Length; ++i)
-                    types [i] = cards [cardId].channels [i].type;
-
-                return types;
-            }
-
-            return null;
+        public Value GetChannelValueControl (IndividualControl channel) {
+            return GetChannelValueControl (channel.Group, channel.Individual);
         }
 
-        public static AnalogType GetAnalogType (IndividualControl ic) {
-            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
-                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length))
-                    return cards [ic.Group].channels [ic.Individual].type;
-            }
-
-            throw new ArgumentOutOfRangeException ("ic");
-        }
-
-        public static void SetAnalogType (IndividualControl ic, AnalogType type) {
-            if ((ic.Group < 0) || (ic.Group >= cards.Count))
-                throw new ArgumentOutOfRangeException ("ic.Group");
-
-            if ((ic.Individual < 0) || (ic.Individual >= cards [ic.Group].channels.Length))
-                throw new ArgumentOutOfRangeException ("ic.Individual");
-
-            cards [ic.Group].channels [ic.Individual].type = type;
-            cards [ic.Group].SetChannelType (ic.Individual, type);
-        }
-
-        public static float[] GetAllValues (int cardId) {
-            if ((cardId >= 0) && (cardId < cards.Count)) {
-                float[] types = new float[cards [cardId].channels.Length];
-
-                for (int i = 0; i < types.Length; ++i)
-                    //types [i] = cards [cardId].channels [i].ValueControl.value;
-                    types [i] = cards [cardId].channels [i].value;
-
-                return types;
-            }
-
-            return null;
-        }
-
-        public static float GetValue (IndividualControl ic) {
-            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
-                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length))
-                    return cards [ic.Group].channels [ic.Individual].ValueControl.value;
-            }
-
-            return 0.0f;
-        }
-
-        public static void SetValue (IndividualControl ic, float value) {
-            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
-                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length)) {
-                    if (cards [ic.Group].channels [ic.Individual].mode == Mode.Manual)
-                        cards [ic.Group].channels [ic.Individual].value = value.ToInt ();
-                    else
-                        throw new Exception ("Can only modify analong output value with channel forced");
-                }
-            }
-        }
-
-        public static void SetMode (IndividualControl ic, Mode mode) {
-            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
-                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length))
-                    cards [ic.Group].channels [ic.Individual].mode = mode;
-            }
-        }
-
-        public static Mode[] GetAllModes (int cardId) {
-            if ((cardId >= 0) && (cardId < cards.Count)) {
-                Mode[] modes = new Mode[cards [cardId].channels.Length];
-
-                for (int i = 0; i < modes.Length; ++i)
-                    modes [i] = cards [cardId].channels [i].mode;
-
-                return modes;
-            }
-
-            return null;
-        }
-
-        public static Mode GetMode (IndividualControl ic) {
-            if ((ic.Group >= 0) && (ic.Group < cards.Count)) {
-                if ((ic.Individual >= 0) && (ic.Individual < cards [ic.Group].channels.Length))
-                    return cards [ic.Group].channels [ic.Individual].mode;
-            }
-
-            return Mode.Manual;
-        }
-
-        public static string[] GetAllAvaiableChannels () {
-            List<string> availCh = new List<string> ();
-            foreach (var card in cards) {
-                for (int i = 0; i < card.channels.Length; ++i) {
-                    string s = string.Format ("{0}.q{1}", card.name, i);
-                    if (s == card.channels [i].name)
-                        availCh.Add (s);
-                }
-            }
-
-            return availCh.ToArray ();
+        public Value GetChannelValueControl (int card, int channel) {
+            CheckCardRange (card);
+            var analogOutputCard = cards [card] as AnalogOutputCard<int>;
+            return analogOutputCard.GetChannelValueControl (channel);
         }
     }
 }
-

@@ -5,42 +5,105 @@ using AquaPic.SerialBus;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogOutput
+    public partial class AnalogOutputBase
     {
-        private class AnalogOutputCard
+        protected class AnalogOutputCard<T> : GenericCard<T>
         {
-            public AquaPicBus.Slave slave;
-            public byte cardID;
-            public AnalogOutputChannel[] channels;
-            public string name;
+            public AnalogOutputCard (string name, int cardId, int address)
+                : base (name, 
+                    CardType.AnalogOutputCard, 
+                    cardId,
+                    address,
+                    4) { }
 
-            public AnalogOutputCard (byte address, byte cardID, string name) {
-                slave = new AquaPicBus.Slave (address, name + " (Analog Output)");
-                this.cardID = cardID;
-                this.name = name;
-                channels = new AnalogOutputChannel[4];
-                for (int i = 0; i < channels.Length; ++i) {
-                    int chId = i;
-                    this.channels [chId] = new AnalogOutputChannel (
-                        this.name + ".q" + i.ToString (),
-                        //(float value) => SetAnalogValue ((byte)chId, value.ToInt ())
-                        (float value) => channels [chId].value = value.ToInt ()
-                    );
+            protected override GenericChannel<T> ChannelCreater (int index) {
+                return new AnalogOutputChannel<T> (GetDefualtName (index),
+                    (value) => {
+                        CheckChannelRange (index);
+                        channels [index].SetValue (value);
+                    });
+            }
+
+            public override void SetChannelValue (int channel, T value) {
+                CheckChannelRange (channel);
+                channels [channel].SetValue (value);
+            }
+
+            public override void SetAllChannelValues (T[] values) {
+                if (values.Length < channelCount)
+                    throw new ArgumentOutOfRangeException ("values length");
+
+                for (int i = 0; i < 4; ++i) {
+                    channels [i].SetValue (values [i]);
                 }
             }
 
-            public void AddChannel (int ch, AnalogType type, string name) {
-                channels [ch].name = name;
-                SetChannelType (ch, type);
+            public override void GetValueCommunication (int channel) {
+                CheckChannelRange (channel);
+                slave.ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback); // byte channel id and int16 value, 3 bytes
             }
 
-            public void SetChannelType (int ch, AnalogType type) {
+            protected void GetValueCommunicationCallback (CallbackArgs args) {
+                byte ch = args.GetDataFromReadBuffer<byte> (0);
+                short value = args.GetDataFromReadBuffer<short> (1);
+                channels [ch].SetValue (value);
+            }
+
+            public override void SetValueCommunication<CommunicationType> (int channel, CommunicationType value) {
+                CheckChannelRange (channel);
+
+                channels [channel].SetValue (value);
+
+                short valueToSend = Convert.ToInt16 (value);
+                WriteBuffer buf = new WriteBuffer ();
+                buf.Add ((byte)channel, sizeof(byte));
+                buf.Add ((short)valueToSend, sizeof(short));
+
+                slave.Write (31, buf);
+            }
+
+            public override void SetAllValuesCommunication<CommunicationType> (CommunicationType[] values) {
+                if (values.Length < channelCount)
+                    throw new ArgumentOutOfRangeException ("values length");
+
+                short[] valuesToSend = new short[channelCount];
+                for (int i = 0; i < 4; ++i) {
+                    channels [i].SetValue (values [i]);
+                    valuesToSend [i] = Convert.ToInt16 (values [i]);
+                }
+
+                WriteBuffer buf = new WriteBuffer ();
+                foreach (var val in valuesToSend) {
+                    buf.Add (val, sizeof(short));
+                }
+                slave.Write (30, buf);
+            }
+
+            public override void GetAllValuesCommunication () {
+                slave.Read (20, sizeof(short) * 4, GetAllValuesCommunicationCallback);
+            }
+
+            protected void GetAllValuesCommunicationCallback (CallbackArgs args) {
+                short[] values = new short[4];
+
+                for (int i = 0; i < values.Length; ++i) {
+                    values [i] = args.GetDataFromReadBuffer<short> (i * 2);
+                }
+
+                for (int i = 0; i < channels.Length; ++i) {
+                    channels [i].SetValue (values [i]);
+                }
+            }
+
+            public void SetChannelType (int channel, AnalogType type) {
+                CheckChannelRange (channel);
+
                 if (type != AnalogType.ZeroTen)
                     throw new Exception ("Dimming card only does 0-10V");
 
+                #if MULTI_TYPE_AO_CARD
                 channels [ch].type = type;
 
-                #if MULTI_TYPE_AO_CARD
                 byte[] arr = new byte[2];
                 arr [0] = (byte)ch;
                 //<NOTE> CHANGE PWM to be 255 and 0-10 to be 0
@@ -50,55 +113,25 @@ namespace AquaPic.Drivers
                 #endif //MULTI_TYPE_AO_CARD
             }
 
-            public void SetAnalogValue (int channelId, int value) {
-                channels [channelId].value = value;
-
-                WriteBuffer buf = new WriteBuffer ();
-                buf.Add ((byte)channelId, sizeof(byte));
-                buf.Add ((short)value, sizeof(short));
-
-                slave.Write (31, buf);
+            public AnalogType GetChannelType (int channel) {
+                CheckChannelRange (channel);
+                var analogOutputChannel = channels [channel] as AnalogOutputChannel<T>;
+                return analogOutputChannel.type;
             }
 
-            public void SetAllAnalogValues (short[] values) {
-                if (values.Length < 4)
-                    return;
-
-                for (int i = 0; i < 4; ++i) {
-                    channels [i].value = values [i];
+            public AnalogType[] GetAllChannelTypes () {
+                AnalogType[] types = new AnalogType[channelCount];
+                for (int i = 0; i < channelCount; ++i) {
+                    var analogOutputChannel = channels [i] as AnalogOutputChannel<T>;
+                    types [i] = analogOutputChannel.type;
                 }
-                    
-                WriteBuffer buf = new WriteBuffer ();
-                foreach (var val in values) {
-                    buf.Add (val, sizeof(short));
-                }
-                slave.Write (30, buf);
+                return types;
             }
 
-            public void GetValues () {
-                slave.Read (20, sizeof(short) * 4, GetValuesCallback);
-            }
-
-            protected void GetValuesCallback (CallbackArgs args) {
-                short[] values = new short[4];
-
-                for (int i = 0; i < values.Length; ++i) {
-                    values [i] = args.GetDataFromReadBuffer<short> (i * 2);
-                }
-
-                for (int i = 0; i < channels.Length; ++i) {
-                    channels [i].value = values [i];
-                }
-            }
-
-            public void GetValue (byte ch) {
-                slave.ReadWrite (10, ch, 3, GetValueCallback); // byte channel id and int16 value, 3 bytes
-            }
-
-            protected void GetValueCallback (CallbackArgs args) {
-                byte ch = args.GetDataFromReadBuffer<byte> (0);
-                short value = args.GetDataFromReadBuffer<short> (1);
-                channels [ch].value = value;
+            public Value GetChannelValueControl (int channel) {
+                CheckChannelRange (channel);
+                var analogOutputChannel = channels [channel] as AnalogOutputChannel<T>;
+                return analogOutputChannel.ValueControl;
             }
         }
     }

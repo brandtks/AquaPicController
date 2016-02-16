@@ -21,9 +21,6 @@ namespace AquaPic.Drivers
             public Coil OutletControl;
             public string owner;
 
-//            public event StateChangeHandler StateChangeEvent;
-//            public event ModeChangedHandler ModeChangeEvent;
-
             public OutletData (string name, OutputHandler outputTrue, OutputHandler outputFalse) {
                 this.name = name;
                 this.currentState = MyState.Off;
@@ -46,19 +43,6 @@ namespace AquaPic.Drivers
                 ampCurrent = c;
                 wattPower = ampCurrent * Voltage * powerFactor;
             }
-
-//            public void OnModeChange (ModeChangeEventArgs args) {
-////                if (ModeChangeEvent != null)
-////                    ModeChangeEvent (this, args);
-//            }
-
-//            public void OnChangeState (StateChangeEventArgs args) {
-//                currentState = args.state;
-//
-////                if (StateChangeEvent != null) {
-////                    StateChangeEvent (this, args);
-////                }
-//            }
         }
     }
 }

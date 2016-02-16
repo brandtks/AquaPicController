@@ -92,10 +92,10 @@ namespace AquaPic.UserInterface
 
             var c = new SettingComboBox ();
             c.text = "Sensor Channel";
-            string[] availCh = AnalogInput.GetAllAvaiableChannels ();
+            string[] availCh = AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ();
             if ((WaterLevel.analogSensorEnabled) || (WaterLevel.analogSensorChannel.IsNotEmpty ())) {
                 IndividualControl ic = WaterLevel.analogSensorChannel;
-                string chName = AnalogInput.GetCardName (ic.Group);
+                string chName = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
                 chName = string.Format ("{0}.i{1}", chName, ic.Individual);
                 c.combo.List.Add (string.Format ("Current: {0}", chName));
                 c.combo.Active = 0;
@@ -160,7 +160,7 @@ namespace AquaPic.UserInterface
                     if (!s.StartsWith ("Current:")) {
                         int idx = s.IndexOf ('.');
                         string cardName = s.Substring (0, idx);
-                        int cardId = AnalogInput.GetCardIndex (cardName);
+                        int cardId = AquaPicDrivers.AnalogInput.GetCardIndex (cardName);
                         int channelId = Convert.ToInt32 (s.Substring (idx + 2));
 
                         IndividualControl ic;
@@ -183,7 +183,7 @@ namespace AquaPic.UserInterface
             jo ["highAnalogLevelAlarmSetpoint"] = WaterLevel.highAnalogLevelAlarmSetpoint.ToString ();
             jo ["lowAnalogLevelAlarmSetpoint"] = WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ();
             if (WaterLevel.analogSensorChannel.IsNotEmpty ()) {
-                jo ["inputCard"] = AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group);
+                jo ["inputCard"] = AquaPicDrivers.AnalogInput.GetCardName (WaterLevel.analogSensorChannel.Group);
                 jo ["channel"] = WaterLevel.analogSensorChannel.Individual.ToString ();
             } else {
                 jo ["inputCard"] = string.Empty;

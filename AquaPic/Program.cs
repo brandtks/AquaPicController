@@ -20,12 +20,20 @@ namespace AquaPic
 
             Logger.Add ("Executing operating system is {0}", Utils.GetDescription (Utils.RunningPlatform));
 
-            Equipment.AddFromJson ();
+            #if DEBUG
+            try {
+            #endif
+                Equipment.AddFromJson ();
 
-            Temperature.Init ();
-            Lighting.Init ();
-            WaterLevel.Init ();
-            Power.Init ();
+                Temperature.Init ();
+                Lighting.Init ();
+                WaterLevel.Init ();
+                Power.Init ();
+            #if DEBUG
+            } catch (Exception ex) {
+                Logger.AddError (ex.ToString ());
+            }
+            #endif
 
             AquaPicGUI win = new AquaPicGUI ();
             win.Show ();

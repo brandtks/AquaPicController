@@ -14,14 +14,16 @@ namespace AquaPic.Runtime
         public void Execute () {
             float newValue = 0.0f;
 
-            if (ValueGetter != null)
+            if (ValueGetter != null) {
                 newValue = ValueGetter ();
+            }
 
             if (value != newValue) {
                 value = newValue;
 
-                if (ValueSetter != null)
+                if (ValueSetter != null) {
                     ValueSetter (value);
+                }
             }
         }
     }

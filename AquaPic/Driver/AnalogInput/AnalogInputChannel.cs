@@ -3,19 +3,12 @@ using AquaPic.Utilites;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogInput
+    public partial class AnalogInputBase
     {
-        private class AnalogInputChannel
+        protected class AnalogInputChannel<T> : GenericChannel<T>
         {
-            public string name;
-            public float value;
-            public Mode mode;
-
-            public AnalogInputChannel (string name) {
-                this.name = name;
-                this.value = 0.0f;
-                mode = Mode.Auto;
-            }
+            public AnalogInputChannel (string name) 
+                : base (name, (T)(object)0.0f) { }
         }
     }
 }

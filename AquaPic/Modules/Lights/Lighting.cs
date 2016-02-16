@@ -115,7 +115,7 @@ namespace AquaPic.Modules
 
                     int lightingId;
                     if (string.Equals (type, "dimming", StringComparison.InvariantCultureIgnoreCase)) {
-                        int cardId = AnalogOutput.GetCardIndex ((string)obj ["dimmingCard"]);
+                        int cardId = AquaPicDrivers.AnalogOutput.GetCardIndex ((string)obj ["dimmingCard"]);
                         int channelId = Convert.ToInt32 (obj ["channel"]);
                         float minDimmingOutput = Convert.ToSingle (obj ["minDimmingOutput"]);
                         float maxDimmingOutput = Convert.ToSingle (obj ["maxDimmingOutput"]);
@@ -279,7 +279,7 @@ namespace AquaPic.Modules
             Power.RemoveHandlerOnStateChange (l.plug, l.OnLightingPlugStateChange);
             if (dl != null) {
                 Power.RemoveHandlerOnModeChange (dl.plug, dl.OnLightingPlugModeChange);
-                AnalogOutput.RemoveChannel (dl.dimCh);
+                AquaPicDrivers.AnalogOutput.RemoveChannel (dl.dimCh);
                 MainWindowWidgets.barPlots.Remove (dl.name);
             }
 
@@ -447,11 +447,13 @@ namespace AquaPic.Modules
 
             var fixture = fixtures [fixtureID] as DimmingLightingFixture;
             if (fixture != null) {
-                AnalogType type = AnalogOutput.GetAnalogType (fixture.dimCh);
-                AnalogOutput.RemoveChannel (fixture.dimCh);
+                AnalogType type = AquaPicDrivers.AnalogOutput.GetChannelType (fixture.dimCh);
+                AquaPicDrivers.AnalogOutput.RemoveChannel (fixture.dimCh);
                 fixture.dimCh = ic;
-                var value = AnalogOutput.AddChannel (fixture.dimCh, type, fixture.name);
-                value.ValueGetter = fixture.OnSetDimmingLevel;
+                AquaPicDrivers.AnalogOutput.AddChannel (fixture.dimCh, fixture.name);
+                AquaPicDrivers.AnalogOutput.SetChannelType (fixture.name, type);
+                var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (fixture.dimCh);
+                valueControl.ValueGetter = fixture.OnSetDimmingLevel;
                 return;
             }
 
@@ -673,7 +675,7 @@ namespace AquaPic.Modules
 
             var fixture = fixtures [fixtureID] as DimmingLightingFixture;
             if (fixture != null)
-                return AnalogOutput.GetAnalogType (fixture.dimCh);
+                return AquaPicDrivers.AnalogOutput.GetChannelType (fixture.dimCh);
 
             throw new ArgumentException ("fixtureID not Dimming");
         }
@@ -684,7 +686,7 @@ namespace AquaPic.Modules
 
             var fixture = fixtures [fixtureID] as DimmingLightingFixture;
             if (fixture != null) {
-                AnalogOutput.SetAnalogType (fixture.dimCh, analogType);
+                AquaPicDrivers.AnalogOutput.SetChannelType (fixture.dimCh, analogType);
                 return;
             }
 

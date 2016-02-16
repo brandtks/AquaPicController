@@ -31,13 +31,13 @@ namespace AquaPic.Runtime
                         break;
                     case "analogInput":
                         Logger.Add ("Adding analog input card");
-                        AnalogInput.AddCard (
+                        AquaPicDrivers.AnalogInput.AddCard (
                             Convert.ToInt32 ((string)jo ["options"] [0], 16),
                             (string)jo ["options"] [1]);
                         break;
                     case "analogOutput":
                         Logger.Add ("Adding analog output card");
-                        AnalogOutput.AddCard (
+                        AquaPicDrivers.AnalogOutput.AddCard (
                             Convert.ToInt32 ((string)jo ["options"] [0], 16),
                             (string)jo ["options"] [1]);
                         break;

@@ -5,38 +5,40 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogInput
+    public partial class AnalogInputBase
     {
-        private class AnalogInputCard
+        protected class AnalogInputCard<T> : GenericCard<T>
         {
-            public AquaPicBus.Slave slave;
-            public byte cardID;
-            public string name;
-            public AnalogInputChannel[] channels;
-            public bool updating;
+            public AnalogInputCard (string name, int cardId, int address)
+                : base (name, 
+                    CardType.AnalogInputCard, 
+                    cardId,
+                    address,
+                    4) { }
 
-            public AnalogInputCard (byte address, byte cardID, string name) {
-                this.slave = new AquaPicBus.Slave (address, name + " (Analog Input)");
+            protected override GenericChannel<T> ChannelCreater (int index) {
+                return new AnalogInputChannel<T> (GetDefualtName (index));
+            }
 
-                this.cardID = cardID;
-                this.name = name;
-                this.channels = new AnalogInputChannel[4];
-                for (int i = 0; i < this.channels.Length; ++i) {
-                    this.channels [i] = new AnalogInputChannel (this.name + ".i" + i.ToString ()); 
+            public override void GetValueCommunication (int channel) {
+                CheckChannelRange (channel);
+
+                if (channels [channel].mode == Mode.Auto) {
+                    slave.ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback);
                 }
-                this.updating = false;
             }
 
-            public void AddChannel (int ch, string name) {
-                channels [ch].name = name;
+            protected void GetValueCommunicationCallback (CallbackArgs args) {
+                byte ch = args.GetDataFromReadBuffer<byte> (0);
+                short value = args.GetDataFromReadBuffer<short> (1);
+                channels [ch].SetValue (value);
             }
 
-            public void GetValues () {
-                updating = true;
-                slave.Read (20, sizeof(short) * 4, GetValuesCallback);
+            public override void GetAllValuesCommunication () {
+                slave.Read (20, sizeof(short) * 4, GetAllValuesCommunicationCallback);
             }
 
-            protected void GetValuesCallback (CallbackArgs args) {
+            protected void GetAllValuesCommunicationCallback (CallbackArgs args) {
                 short[] values = new short[4];
 
                 for (int i = 0; i < values.Length; ++i) {
@@ -45,25 +47,29 @@ namespace AquaPic.Drivers
 
                 for (int i = 0; i < channels.Length; ++i) {
                     if (channels [i].mode == Mode.Auto)
-                        channels [i].value = (float)values [i];
-                }
-
-                updating = false;
-            }
-
-            public void GetValue (byte ch) {
-                if (channels [ch].mode == Mode.Auto) {
-                    updating = true;
-                    slave.ReadWrite (10, ch, 3, GetValuesCallback);
+                        channels [i].SetValue (values [i]);
                 }
             }
 
-            protected void GetValueCallback (CallbackArgs args) {
-                byte ch = args.GetDataFromReadBuffer<byte> (0);
-                short value = args.GetDataFromReadBuffer<short> (1);
-                channels [ch].value = (float)value;
+            public override void SetChannelValue (int channel, T value) {
+                CheckChannelRange (channel);
 
-                updating = false;
+                if (channels [channel].mode == Mode.Manual) {
+                    channels [channel].SetValue (value);
+                } else {
+                    throw new Exception ("Can only modify analong input value with channel forced");
+                }
+            }
+
+            public override void SetAllChannelValues (T[] values) {
+                if (values.Length != channels.Length)
+                    throw new ArgumentOutOfRangeException ("values length");
+
+                for (int i = 0; i < channels.Length; ++i) {
+                    if (channels [i].mode == Mode.Manual) {
+                        channels [i].SetValue (values [i]);
+                    }
+                }
             }
         }
     }

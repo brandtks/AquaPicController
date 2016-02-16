@@ -152,7 +152,7 @@ namespace AquaPic.UserInterface
                 var cal = new CalibrationDialog (
                     "Water Level Sensor", 
                     () => {
-                        return AnalogInput.GetValue (WaterLevel.analogSensorChannel);
+                        return AquaPicDrivers.AnalogInput.GetChannelValue (WaterLevel.analogSensorChannel);
                     });
 
                 cal.CalibrationCompleteEvent += (aa) => {
@@ -368,7 +368,7 @@ namespace AquaPic.UserInterface
         }
 
         protected double GetCalibrationValue () {
-            return AnalogInput.GetValue (WaterLevel.analogSensorChannel);
+            return AquaPicDrivers.AnalogInput.GetChannelValue (WaterLevel.analogSensorChannel);
         }
 
         protected void OnAtoFailedAlarmEvent (object sender, AlarmEventArgs args) {

@@ -51,7 +51,9 @@ namespace AquaPic.Modules
                 this.minDimmingOutput = minDimmingOutput;
                 this.maxDimmingOutput = maxDimmingOutput;
                 dimmingMode = Mode.Auto;
-                var valueControl = AnalogOutput.AddChannel (this.dimCh.Group, this.dimCh.Individual, type, name);
+                AquaPicDrivers.AnalogOutput.AddChannel (dimCh, name);
+                AquaPicDrivers.AnalogOutput.SetChannelType (dimCh, type);
+                var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (dimCh);
                 valueControl.ValueGetter = OnSetDimmingLevel;
 
                 Power.AddHandlerOnModeChange (

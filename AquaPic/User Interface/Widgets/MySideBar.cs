@@ -246,7 +246,7 @@ namespace AquaPic.UserInterface
                 int x, y;
                 GetPointer (out x, out y);
 
-                double yDelta = y - clickY;
+                double yDelta = clickY - y;
                 double yDeltaPercentageOld = yDeltaPercentage;
                 yDeltaPercentage = yDelta / 35.0;
                 offset = yDeltaPercentage - Math.Floor (yDeltaPercentage);
@@ -254,7 +254,6 @@ namespace AquaPic.UserInterface
                 int oldDeltaPercentageFloor = Math.Floor (yDeltaPercentageOld).ToInt ();
                 int deltaPercentageFloor = Math.Floor (yDeltaPercentage).ToInt ();
             
-
                 if (deltaPercentageFloor != oldDeltaPercentageFloor) {
                     int increment = deltaPercentageFloor - oldDeltaPercentageFloor;
 

@@ -31,11 +31,11 @@ namespace AquaPic.SerialBus
                 get { return _alarmIdx; }
             }
 
-            public Slave (byte address, string name) {
-                if (!IsAddressOk (address))
+            public Slave (int address, string name) {
+                if (!IsAddressOk ((byte)address))
                     throw new Exception ("Address already in use");
 
-                this.address = address;
+                this.address = (byte)address;
                 this.responeTime = 0;
                 this.timeQue = new int[10];
                 this.queIdx = 0;
