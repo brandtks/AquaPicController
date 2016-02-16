@@ -73,6 +73,20 @@ namespace AquaPic.Drivers
             return true;
         }
 
+        public bool AquaPicBusCommunicationOk (string name) {
+            int card = GetCardIndex (name);
+            return AquaPicBusCommunicationOk (card);
+        }
+
+        public bool AquaPicBusCommunicationOk (IndividualControl ic) {
+            return AquaPicBusCommunicationOk (ic.Group);
+        }
+
+        public bool AquaPicBusCommunicationOk (int card) {
+            CheckCardRange (card);
+            return cards [card].AquaPicBusCommunicationOk;
+        }
+
         /**************************************************************************************************************/
         /* Channels                                                                                                   */
         /**************************************************************************************************************/

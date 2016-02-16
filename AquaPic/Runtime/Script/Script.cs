@@ -74,9 +74,9 @@ namespace AquaPic.Runtime
 
                 if (string.Equals (eq, "DigitalInput", StringComparison.InvariantCultureIgnoreCase)) {
                     var args = line.Split (',');
-                    int cardId = DigitalInput.GetCardIndex (args [0]);
+                    int cardId = AquaPicDrivers.DigitalInput.GetCardIndex (args [0]);
                     int inputId = Convert.ToInt32 (args [1]);
-                    DigitalInput.AddInput (cardId, inputId, args [2]);
+                    AquaPicDrivers.DigitalInput.AddChannel (cardId, inputId, args [2]);
                 }
             }
         }
@@ -100,9 +100,9 @@ namespace AquaPic.Runtime
 
                 if (string.Equals (eq, "DigitalInput", StringComparison.InvariantCultureIgnoreCase)) {
                     var args = line.Split (',');
-                    int cardId = DigitalInput.GetCardIndex (args [0]);
+                    int cardId = AquaPicDrivers.DigitalInput.GetCardIndex (args [0]);
                     int inputId = Convert.ToInt32 (args [1]);
-                    DigitalInput.RemoveInput (cardId, inputId);
+                    AquaPicDrivers.DigitalInput.RemoveChannel (cardId, inputId);
                 }
             }
         }

@@ -21,10 +21,6 @@ namespace AquaPic.Drivers
             }
         }
 
-        static Power () {
-            //Everything happens in Init
-        }
-
         public static void Init () {
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
@@ -369,22 +365,6 @@ namespace AquaPic.Drivers
 
             return owners;
         }
-
-//        public static void AddHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
-//            pwrStrips [outlet.Group].outlets [outlet.Individual].ModeChangeEvent += handler;
-//        }
-//
-//        public static void RemoveHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
-//            pwrStrips [outlet.Group].outlets [outlet.Individual].ModeChangeEvent -= handler;
-//        }
-//
-//        public static void AddHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-//            pwrStrips [outlet.Group].outlets [outlet.Individual].StateChangeEvent += handler;
-//        }
-//
-//        public static void RemoveHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-//            pwrStrips [outlet.Group].outlets [outlet.Individual].StateChangeEvent -= handler;
-//        }
 
         public static void AddHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
             if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))

@@ -1,8 +1,11 @@
-﻿#define TEST_PARITY_ON_WINDOWS
+﻿#define HACK_PARITY_ON_WINDOWS
+#define HACK_PARITY_ON_LINUX
 //#define USE_TRANSMIT_RECIEVE_PIN
 
 using System;
 using System.IO.Ports;
+using System.Reflection;
+using System.Runtime.InteropServices;
 #if USE_TRANSMIT_RECIEVE_PIN
 using PiSharp.LibGpio;
 using PiSharp.LibGpio.Entities;
@@ -14,6 +17,10 @@ namespace AquaPic.SerialBus
     public class AquaPicBusSerialPort
     {
         public SerialPort uart;
+
+        #if !HACK_PARITY_ON_LINUX
+        int fd; // termios fd for setting parity of linux
+        #endif
 
         public AquaPicBusSerialPort () {
             #if USE_TRANSMIT_RECIEVE_PIN
@@ -28,6 +35,13 @@ namespace AquaPic.SerialBus
             uart.StopBits = StopBits.One;
             uart.Handshake = Handshake.None;
             uart.Open ();
+
+            #if !HACK_PARITY_ON_LINUX
+            if (Utils.RunningPlatform == Platform.Linux) {
+                FieldInfo fieldInfo = uart.GetType().GetField("fd", BindingFlags.Instance | BindingFlags.NonPublic);
+                fd = (int)fieldInfo.GetValue(uart);
+            }
+            #endif
         }
 
         public void Write (byte[] message) {
@@ -39,10 +53,10 @@ namespace AquaPic.SerialBus
         }
 
         protected void WindowsWrite (byte[] message) {
-            #if TEST_PARITY_ON_WINDOWS
-            WriteWithParity (message [0], Parity.Mark);                     //send address
+            #if HACK_PARITY_ON_WINDOWS
+            WriteWithHackParity (message [0], Parity.Mark);                     //send address
             for (int i = 1; i < message.Length; ++i) {                      //send message
-                WriteWithParity (message [i]);
+                WriteWithHackParity (message [i]);
             }
             #else
             uart.Parity = Parity.Mark;
@@ -52,20 +66,36 @@ namespace AquaPic.SerialBus
             #endif
         }
 
+        #if !HACK_PARITY_ON_LINUX
+        [DllImport ("LinuxParity", SetLastError = true)]
+        static extern int SetLinuxParity (int fd, Parity parity);
+        #endif
+
         protected void LinuxWrite (byte[] message) {
             #if USE_TRANSMIT_RECIEVE_PIN
             LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, true);     //enable transmit
             #endif
-            WriteWithParity (message [0], Parity.Mark);                     //send address
+            #if HACK_PARITY_ON_LINUX
+            WriteWithHackParity (message [0], Parity.Mark);                     //send address
             for (int i = 1; i < message.Length; ++i) {                      //send message
-                WriteWithParity (message [i]);
+                WriteWithHackParity (message [i]);
             }
+            #else
+            if (SetLinuxParity (fd, Parity.Mark) == 0) {
+                throw new ExternalException ("SetLinuxParity");
+            }
+            uart.Write (message, 0, 1);
+            if (SetLinuxParity (fd, Parity.Space) == 0) {
+                throw new ExternalException ("SetLinuxParity");
+            }
+            uart.Write (message, 1, message.Length - 1);
+            #endif
             #if USE_TRANSMIT_RECIEVE_PIN
             LibGpio.Gpio.OutputValue(BroadcomPinNumber.Eighteen, false);    //enable receive
             #endif
         }
 
-        protected void WriteWithParity (byte data, Parity p = Parity.Space) {
+        protected void WriteWithHackParity (byte data, Parity p = Parity.Space) {
             int count = 0;
 
             for (int i = 0; i < 8; ++i) {

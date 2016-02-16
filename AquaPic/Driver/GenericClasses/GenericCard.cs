@@ -110,11 +110,17 @@ namespace AquaPic.Drivers
         }
 
         public virtual void SetChannelValue (int channel, T value) {
-            throw new NotImplementedException ();
+            CheckChannelRange (channel);
+            channels [channel].SetValue (value);
         }
 
         public virtual void SetAllChannelValues (T[] values) {
-            throw new NotImplementedException ();
+            if (values.Length < channelCount)
+                throw new ArgumentOutOfRangeException ("values length");
+
+            for (int i = 0; i < channelCount; ++i) {
+                channels [i].SetValue (values [i]);
+            }
         }
 
         /**************************************************************************************************************/

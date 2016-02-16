@@ -315,7 +315,7 @@ namespace AquaPic.Modules
                     JObject obj = jt as JObject;
 
                     string name = (string)obj ["name"];
-                    ic.Group = DigitalInput.GetCardIndex ((string)obj ["inputCard"]);
+                    ic.Group = AquaPicDrivers.DigitalInput.GetCardIndex ((string)obj ["inputCard"]);
                     ic.Individual = Convert.ToInt32 (obj ["channel"]);
                     float physicalLevel = Convert.ToSingle (obj ["physicalLevel"]);
                     SwitchType type = (SwitchType)Enum.Parse (typeof (SwitchType), (string)obj ["switchType"]);
@@ -415,7 +415,7 @@ namespace AquaPic.Modules
 //            bool mismatch = false;
             ato.useFloatSwitch = false; //set use float switch to false, if no ATO float switch in found it remains false
             foreach (var s in floatSwitches) {
-                bool state = DigitalInput.GetState (s.channel);
+                bool state = AquaPicDrivers.DigitalInput.GetChannelValue (s.channel);
                 bool activated;
 
                 if (s.type == SwitchType.NormallyClosed)
@@ -535,7 +535,7 @@ namespace AquaPic.Modules
                     fs.type = type;
                     fs.function = function;
 
-                    DigitalInput.AddInput (fs.channel, name);
+                    AquaPicDrivers.DigitalInput.AddChannel (fs.channel, name);
 
                     floatSwitches.Add (fs);
                 } else
@@ -547,7 +547,7 @@ namespace AquaPic.Modules
         public static void RemoveFloatSwitch (int floatSwitchId) {
             if ((floatSwitchId >= 0) && (floatSwitchId < floatSwitches.Count)) {
                 FloatSwitch fs = floatSwitches [floatSwitchId];
-                DigitalInput.RemoveInput (fs.channel);
+                AquaPicDrivers.DigitalInput.RemoveChannel (fs.channel);
                 floatSwitches.Remove (fs);
                 return;
             }
@@ -620,9 +620,9 @@ namespace AquaPic.Modules
             if ((switchId < 0) || (switchId >= floatSwitches.Count))
                 throw new ArgumentOutOfRangeException ("switchId");
 
-            DigitalInput.RemoveInput (ic);
+            AquaPicDrivers.DigitalInput.RemoveChannel (ic);
             floatSwitches [switchId].channel = ic;
-            DigitalInput.AddInput (floatSwitches [switchId].channel, floatSwitches [switchId].name);
+            AquaPicDrivers.DigitalInput.AddChannel (floatSwitches [switchId].channel, floatSwitches [switchId].name);
         }
 
         public static float GetFloatSwitchPhysicalLevel (int switchId) {

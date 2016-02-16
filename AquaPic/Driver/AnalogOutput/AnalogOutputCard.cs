@@ -17,25 +17,7 @@ namespace AquaPic.Drivers
                     4) { }
 
             protected override GenericChannel<T> ChannelCreater (int index) {
-                return new AnalogOutputChannel<T> (GetDefualtName (index),
-                    (value) => {
-                        CheckChannelRange (index);
-                        channels [index].SetValue (value);
-                    });
-            }
-
-            public override void SetChannelValue (int channel, T value) {
-                CheckChannelRange (channel);
-                channels [channel].SetValue (value);
-            }
-
-            public override void SetAllChannelValues (T[] values) {
-                if (values.Length < channelCount)
-                    throw new ArgumentOutOfRangeException ("values length");
-
-                for (int i = 0; i < 4; ++i) {
-                    channels [i].SetValue (values [i]);
-                }
+                return new AnalogOutputChannel<T> (GetDefualtName (index));
             }
 
             public override void GetValueCommunication (int channel) {

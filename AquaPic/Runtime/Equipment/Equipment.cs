@@ -43,7 +43,7 @@ namespace AquaPic.Runtime
                         break;
                     case "digitalInput":
                         Logger.Add ("Adding digital input card");
-                        DigitalInput.AddCard (
+                        AquaPicDrivers.DigitalInput.AddCard (
                             Convert.ToInt32 ((string)jo ["options"] [0], 16),
                             (string)jo ["options"] [1]);
                         break;

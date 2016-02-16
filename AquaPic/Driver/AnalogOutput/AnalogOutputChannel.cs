@@ -11,12 +11,12 @@ namespace AquaPic.Drivers
             public AnalogType type;
             public Value ValueControl;
 
-            public AnalogOutputChannel (string name, ValueSetterHandler valueSetter)
+            public AnalogOutputChannel (string name)
                 : base (name, (T)(object)0) 
             {
                 type = AnalogType.ZeroTen;
                 ValueControl = new Value ();
-                ValueControl.ValueSetter = valueSetter;
+                ValueControl.ValueSetter = (value) => SetValue (value);
             }
         }
     }

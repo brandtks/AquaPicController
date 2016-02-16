@@ -22,7 +22,7 @@ namespace AquaPic.UserInterface
 
             screenTitle = "Digital Input Cards";
 
-            if (DigitalInput.cardCount == 0) {
+            if (AquaPicDrivers.DigitalInput.cardCount == 0) {
                 cardId = -1;
                 screenTitle = "No Digital Input Cards Added";
                 Show ();
@@ -49,7 +49,7 @@ namespace AquaPic.UserInterface
                 displays [i].Show ();
             }
 
-            string[] names = DigitalInput.GetAllCardNames ();
+            string[] names = AquaPicDrivers.DigitalInput.GetAllCardNames ();
             combo = new TouchComboBox (names);
             combo.Active = cardId;
             combo.WidthRequest = 235;
@@ -70,7 +70,7 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnUpdateTimer () {
-            bool[] states = DigitalInput.GetAllStates (cardId);
+            bool[] states = AquaPicDrivers.DigitalInput.GetAllChannelValues (cardId);
 
             for (int i = 0; i < states.Length; ++i) {
                 if (states [i]) {
@@ -88,7 +88,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            int id = DigitalInput.GetCardIndex (e.ActiveText);
+            int id = AquaPicDrivers.DigitalInput.GetCardIndex (e.ActiveText);
             if (id != -1) {
                 cardId = id;
                 GetCardData ();
@@ -100,16 +100,16 @@ namespace AquaPic.UserInterface
 
             IndividualControl ic;
             ic.Group = (byte)cardId;
-            ic.Individual = DigitalInput.GetInputIndex (cardId, d.label.text);
+            ic.Individual = AquaPicDrivers.DigitalInput.GetChannelIndex (cardId, d.label.text);
 
-            Mode m = DigitalInput.GetMode (ic);
+            Mode m = AquaPicDrivers.DigitalInput.GetChannelMode (ic);
 
             if (m == Mode.Auto) {
-                DigitalInput.SetMode (ic, Mode.Manual);
+                AquaPicDrivers.DigitalInput.SetChannelMode (ic, Mode.Manual);
                 d.selector.Visible = true;
                 d.button.buttonColor = "pri";
             } else {
-                DigitalInput.SetMode (ic, Mode.Auto);
+                AquaPicDrivers.DigitalInput.SetChannelMode (ic, Mode.Auto);
                 d.selector.Visible = false;
                 d.button.buttonColor = "grey4";
             }
@@ -122,16 +122,16 @@ namespace AquaPic.UserInterface
 
             IndividualControl ic;
             ic.Group = (byte)cardId;
-            ic.Individual = DigitalInput.GetInputIndex (cardId, d.label.text);
+            ic.Individual = AquaPicDrivers.DigitalInput.GetChannelIndex (cardId, d.label.text);
 
-            bool s = DigitalInput.GetState (ic);
+            bool s = AquaPicDrivers.DigitalInput.GetChannelValue (ic);
 
             if (s) {
-                DigitalInput.SetState (ic, false);
+                AquaPicDrivers.DigitalInput.SetChannelValue (ic, false);
                 d.textBox.bkgndColor = "pri";
                 d.textBox.text = "Closed";
             } else {
-                DigitalInput.SetState (ic, true);
+                AquaPicDrivers.DigitalInput.SetChannelValue (ic, true);
                 d.textBox.bkgndColor = "seca";
                 d.textBox.text = "Open";
             }
@@ -140,9 +140,9 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetCardData () {
-            bool[] states = DigitalInput.GetAllStates (cardId);
-            Mode[] modes = DigitalInput.GetAllModes (cardId);
-            string[] names = DigitalInput.GetAllInputNames (cardId);
+            bool[] states = AquaPicDrivers.DigitalInput.GetAllChannelValues (cardId);
+            Mode[] modes = AquaPicDrivers.DigitalInput.GetAllChannelModes (cardId);
+            string[] names = AquaPicDrivers.DigitalInput.GetAllChannelNames (cardId);
 
             int i = 0;
             foreach (var d in displays) {

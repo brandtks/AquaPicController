@@ -41,13 +41,13 @@ namespace AquaPic.UserInterface
             c.text = "Input";
             if (this.switchId != -1) {
                 IndividualControl ic = WaterLevel.GetFloatSwitchIndividualControl (switchId);
-                string cardName = DigitalInput.GetCardName (ic.Group);
+                string cardName = AquaPicDrivers.DigitalInput.GetCardName (ic.Group);
                 c.combo.List.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
                 c.combo.Active = 0;
             } else {
                 c.combo.NonActiveMessage = "Please select channel";
             }
-            c.combo.List.AddRange (DigitalInput.GetAllAvaiableInputs ());
+            c.combo.List.AddRange (AquaPicDrivers.DigitalInput.GetAllAvaiableChannels ());
             AddSetting (c);
 
             t = new SettingTextBox ();
@@ -140,7 +140,7 @@ namespace AquaPic.UserInterface
         protected void ParseChannnel (string s, ref int g, ref int i) {
             int idx = s.IndexOf ('.');
             string cardName = s.Substring (0, idx);
-            g = DigitalInput.GetCardIndex (cardName);
+            g = AquaPicDrivers.DigitalInput.GetCardIndex (cardName);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
@@ -224,7 +224,7 @@ namespace AquaPic.UserInterface
                 JObject jobj = new JObject ();
 
                 jobj.Add (new JProperty ("name", WaterLevel.GetFloatSwitchName (switchId)));
-                jobj.Add (new JProperty ("inputCard", DigitalInput.GetCardName (ic.Group))); 
+                jobj.Add (new JProperty ("inputCard", AquaPicDrivers.DigitalInput.GetCardName (ic.Group))); 
                 jobj.Add (new JProperty ("channel", ic.Individual.ToString ()));
                 jobj.Add (new JProperty ("physicalLevel", WaterLevel.GetFloatSwitchPhysicalLevel (switchId).ToString ()));
                 jobj.Add (new JProperty ("switchType", WaterLevel.GetFloatSwitchType (switchId).ToString ())); 
@@ -282,7 +282,7 @@ namespace AquaPic.UserInterface
 
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["name"] = WaterLevel.GetFloatSwitchName (switchId);
                 ic = WaterLevel.GetFloatSwitchIndividualControl (switchId);
-                ((JArray)jo ["floatSwitches"]) [arrIdx] ["inputCard"] = DigitalInput.GetCardName (ic.Group);
+                ((JArray)jo ["floatSwitches"]) [arrIdx] ["inputCard"] = AquaPicDrivers.DigitalInput.GetCardName (ic.Group);
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["channel"] = ic.Individual.ToString ();
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["physicalLevel"] = WaterLevel.GetFloatSwitchPhysicalLevel (switchId).ToString ();
                 ((JArray)jo ["floatSwitches"]) [arrIdx] ["switchType"] = WaterLevel.GetFloatSwitchType (switchId).ToString ();
