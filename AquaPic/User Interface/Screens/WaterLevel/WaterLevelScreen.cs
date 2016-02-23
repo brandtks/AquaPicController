@@ -74,9 +74,13 @@ namespace AquaPic.UserInterface
 
             atoStateTextBox = new TouchTextBox ();
             atoStateTextBox.WidthRequest = 155;
-            atoStateTextBox.text = string.Format ("{0} : {1}", 
-                WaterLevel.atoState, 
-                WaterLevel.atoTime.SecondsToString ());
+            if (WaterLevel.atoEnabled) {
+                atoStateTextBox.text = string.Format ("{0} : {1}", 
+                    WaterLevel.atoState, 
+                    WaterLevel.atoTime.SecondsToString ());
+            } else {
+                atoStateTextBox.text = "ATO Disabled";
+            }
             Put (atoStateTextBox, 235, 120);
             atoStateTextBox.Show ();
 
@@ -126,11 +130,15 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             analogLevelTextBox = new TouchTextBox ();
-            float wl = WaterLevel.analogWaterLevel;
-            if (wl < 0.0f)
-                analogLevelTextBox.text = "Probe Disconnected";
-            else
-                analogLevelTextBox.text = wl.ToString ("F2");
+            if (WaterLevel.analogSensorEnabled) {
+                float wl = WaterLevel.analogWaterLevel;
+                if (wl < 0.0f)
+                    analogLevelTextBox.text = "Probe Disconnected";
+                else
+                    analogLevelTextBox.text = wl.ToString ("F2");
+            } else {
+                analogLevelTextBox.text = "Sensor not available";
+            }
             analogLevelTextBox.WidthRequest = 200;
             Put (analogLevelTextBox, 585, 120);
 
@@ -149,6 +157,7 @@ namespace AquaPic.UserInterface
             b.text = "Calibrate";
             b.SetSizeRequest (100, 60);
             b.ButtonReleaseEvent += (o, args) => {
+                if (WaterLevel.analogSensorEnabled) {
                 var cal = new CalibrationDialog (
                     "Water Level Sensor", 
                     () => {
@@ -168,6 +177,10 @@ namespace AquaPic.UserInterface
 
                 cal.Run ();
                 cal.Destroy ();
+                } else {
+                    MessageBox.Show ("Analog water level sensor is disabled\n" +
+                                    "Can't perfom a calibration");
+                }
             };
             Put (b, 525, 195);
             b.Show ();
@@ -303,9 +316,13 @@ namespace AquaPic.UserInterface
                 switchStateTextBox.QueueDraw ();
             }
                 
-            atoStateTextBox.text = string.Format ("{0} : {1}", 
-                WaterLevel.atoState, 
-                WaterLevel.atoTime.SecondsToString ());
+            if (WaterLevel.atoEnabled) {
+                atoStateTextBox.text = string.Format ("{0} : {1}", 
+                    WaterLevel.atoState, 
+                    WaterLevel.atoTime.SecondsToString ());
+            } else {
+                atoStateTextBox.text = "ATO Disabled";
+            }
             atoStateTextBox.QueueDraw ();
 
             return true;
@@ -359,7 +376,7 @@ namespace AquaPic.UserInterface
                 switchTypeLabel.text = Utilites.Utils.GetDescription (type);
             } else {
                 switchTypeLabel.Visible = false;
-                switchStateTextBox.text = string.Empty;
+                switchStateTextBox.text = "Switch not available";
                 switchStateTextBox.bkgndColor = "grey4";
             }
 

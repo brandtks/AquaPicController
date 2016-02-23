@@ -33,9 +33,9 @@ namespace TouchWidgetLibrary
         public TouchOrientation Orientation;
         public MySliderSize SliderSize;
         public TouchColor[] BkgndColorOptions;
-//        public MyColor[] TextColorOptions;
+        public TouchColor[] TextColorOptions;
         public TouchColor[] SliderColorOptions;
-//        public string[] TextOptions;
+        public string[] TextOptions;
         public byte Id;
 
         public event SelectorChangedEventHandler SelectorChangedEvent;
@@ -54,17 +54,17 @@ namespace TouchWidgetLibrary
             for (int i = 0; i < BkgndColorOptions.Length; ++i)
                 this.BkgndColorOptions [i] = new TouchColor ("grey0");
 
-//            this.TextColorOptions = new MyColor[this.SelectionCount];
-//            for (int i = 0; i < BkgndColorOptions.Length; ++i)
-//                this.TextColorOptions [i] = new MyColor ("black");
+            this.TextColorOptions = new TouchColor[this.SelectionCount];
+            for (int i = 0; i < BkgndColorOptions.Length; ++i)
+                this.TextColorOptions [i] = new TouchColor ("white");
 
             this.SliderColorOptions = new TouchColor[this.SelectionCount];
             for (int i = 0; i < SliderColorOptions.Length; ++i)
                 this.SliderColorOptions [i] = new TouchColor ("grey4");
 
-//            this.TextOptions = new string[this.SelectionCount];
-//            for (int i = 0; i < TextOptions.Length; ++i)
-//                this.TextOptions [i] = string.Empty;
+            this.TextOptions = new string[this.SelectionCount];
+            for (int i = 0; i < TextOptions.Length; ++i)
+                this.TextOptions [i] = string.Empty;
 
             this.clicked = false;
             this.clickTimer = 0;
@@ -156,12 +156,10 @@ namespace TouchWidgetLibrary
                 }
 
                 // Background 
-                //cr.Rectangle (left, top, width, height);
                 if (Orientation == TouchOrientation.Horizontal)
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, height / 2);
                 else
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
-                //cr.SetSourceRGB (BkgndColorOptions [CurrentSelected].R, BkgndColorOptions [CurrentSelected].G, BkgndColorOptions [CurrentSelected].B);
                 BkgndColorOptions [CurrentSelected].SetSource (cr);
                 cr.FillPreserve ();
                 cr.LineWidth = 1;
@@ -169,36 +167,32 @@ namespace TouchWidgetLibrary
                 cr.Stroke ();
 
                 // Slider
-                //cr.Rectangle (x, y, sliderSize, sliderSize);
                 if (Orientation == TouchOrientation.Horizontal)
                     TouchGlobal.DrawRoundedRectangle (cr, x, y, sliderSize, height, height / 2);
                 else
                     TouchGlobal.DrawRoundedRectangle (cr, x, y, width, sliderSize, width / 2);
-                //cr.SetSourceRGB (SliderColorOptions [CurrentSelected].R, SliderColorOptions [CurrentSelected].G, SliderColorOptions [CurrentSelected].B);
                 SliderColorOptions [CurrentSelected].SetSource (cr);
                 cr.FillPreserve ();
                 cr.LineWidth = 1;
                 cr.SetSourceRGB (0.0, 0.0, 0.0);
                 cr.Stroke ();
 
-//                if (!clicked) {
-//                    if ((SelectionCount == 2) && (Orientation == MyOrientation.Horizontal)) {
-//                        if (!string.IsNullOrWhiteSpace (TextOptions [CurrentSelected])) {
-//                            Pango.Layout l = new Pango.Layout (PangoContext);
-//                            l.Width = Pango.Units.FromPixels (sliderLength);
-//                            l.Wrap = Pango.WrapMode.WordChar;
-//                            l.Alignment = Pango.Alignment.Center;
-//                            if (CurrentSelected == 0)
-//                                x += sliderSize;
-//                            else
-//                                x = left;
-//                            l.SetMarkup ("<span color=" + (char)34 + TextColorOptions [CurrentSelected].ToHTML () + (char)34 + ">" + TextOptions [CurrentSelected] + "</span>"); 
-//                            l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
-//                            GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), x, top + 1, l);
-//                            l.Dispose ();
-//                        }
-//                    }
-//                }
+                // Text Labels
+                TouchText render = new TouchText ();
+                render.textWrap = TouchTextWrap.Shrink;
+                render.alignment = TouchAlignment.Center;
+
+                seperation = Allocation.Width / SelectionCount;
+                x = Allocation.Left;
+                for (int i = 0; i < SelectionCount; ++i) {
+                    if (!string.IsNullOrWhiteSpace (TextOptions [i])) {
+                        render.font.color = TextColorOptions [i];
+                        render.text = TextOptions [i];
+                        render.Render (this, x, Allocation.Top + 6, seperation);
+                    }
+
+                    x += seperation;
+                }
             }
         }
 
@@ -278,9 +272,4 @@ namespace TouchWidgetLibrary
             return clicked;
         }
     }
-
-
-
-
 }
-

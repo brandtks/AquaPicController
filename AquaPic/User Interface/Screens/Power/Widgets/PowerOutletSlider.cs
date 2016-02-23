@@ -138,6 +138,7 @@ namespace AquaPic.UserInterface
             }
             */
         }
+
         protected void OnSettingButtonRelease (object sender, ButtonReleaseEventArgs args) {
             IndividualControl ic = Power.GetOutletIndividualControl (OutletName.text);
             string owner = Power.GetOutletOwner (ic);

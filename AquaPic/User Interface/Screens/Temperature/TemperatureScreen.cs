@@ -399,7 +399,7 @@ namespace AquaPic.UserInterface
             if (probeId != -1) {
                 probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeId).ToString ("F2");
             } else {
-                probeTempTextbox.text = "0.0";
+                probeTempTextbox.text = "Probe not available";
             }
 
             probeTempTextbox.QueueDraw ();

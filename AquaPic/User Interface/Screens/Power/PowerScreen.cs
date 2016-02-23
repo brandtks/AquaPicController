@@ -194,10 +194,10 @@ namespace AquaPic.UserInterface
                 Power.SetOutletMode (ic, Mode.Auto);
             else if (ss.CurrentSelected == 0) { // manual and state off
                 Power.SetOutletMode (ic, Mode.Manual);
-                Power.SetManualOutletState (ic, MyState.Off);
+                Power.SetOutletManualState (ic, MyState.Off);
             } else if (ss.CurrentSelected == 2) {// manual and state on
                 Power.SetOutletMode (ic, Mode.Manual);
-                Power.SetManualOutletState (ic, MyState.On);
+                Power.SetOutletManualState (ic, MyState.On);
             }
         }
 

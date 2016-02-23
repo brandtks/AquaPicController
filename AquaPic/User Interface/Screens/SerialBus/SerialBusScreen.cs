@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Ports; // for SerialPort
+using System.Collections.Generic;
 using Gtk;
 using Cairo;
 using TouchWidgetLibrary;
@@ -89,6 +90,15 @@ namespace AquaPic.UserInterface
 
             if (!AquaPicBus.isOpen) {
                 string[] portNames = SerialPort.GetPortNames ();
+                if (Utils.RunningPlatform == Platform.Linux) {
+                    List<string> sortedPortNames = new List<string> ();
+                    foreach (var name in portNames) {
+                        if (name.Contains ("USB")) {
+                            sortedPortNames.Add (name);
+                        }
+                    }
+                    portNames = sortedPortNames.ToArray ();
+                }
                 c = new TouchComboBox (portNames);
             } else {
                 c = new TouchComboBox ();
@@ -98,7 +108,7 @@ namespace AquaPic.UserInterface
             c.WidthRequest = 300;
             Put (c, 380, 70);
             c.Show ();
-
+                
 //            eb = new EventBox ();
 //            eb.SetSizeRequest (300, 380);
 //            eb.VisibleWindow = false;

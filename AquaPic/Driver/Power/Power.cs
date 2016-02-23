@@ -56,8 +56,6 @@ namespace AquaPic.Drivers
                 }
             }
 
-            //<TEST> this doesn't need to be this fast for now
-            //TaskManager.AddCyclicInterrupt ("Power", 250, Run);
             TaskManager.AddCyclicInterrupt ("Power", 1000, Run);
         }
 
@@ -156,7 +154,7 @@ namespace AquaPic.Drivers
             pwrStrips [powerID].SetOutletState ((byte)outletID, MyState.Off);
         }
 
-        public static void SetManualOutletState (IndividualControl outlet, MyState state) {
+        public static void SetOutletManualState (IndividualControl outlet, MyState state) {
             if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
                 throw new ArgumentOutOfRangeException ("outlet.Group");
 
@@ -166,14 +164,14 @@ namespace AquaPic.Drivers
             pwrStrips [outlet.Group].outlets [outlet.Individual].manualState = state;
         }
 
-        public static void SetOutletMode (IndividualControl outlet, Mode mode) {
+        public static MyState GetOutletManualState (IndividualControl outlet) {
             if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
                 throw new ArgumentOutOfRangeException ("outlet.Group");
 
             if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
                 throw new ArgumentOutOfRangeException ("outlet.Individual");
 
-            pwrStrips [outlet.Group].SetPlugMode ((byte)outlet.Individual, mode);
+            return pwrStrips [outlet.Group].outlets [outlet.Individual].manualState;
         }
 
         public static MyState GetOutletState (IndividualControl outlet) {
@@ -196,6 +194,16 @@ namespace AquaPic.Drivers
             return states;
         }
 
+        public static void SetOutletMode (IndividualControl outlet, Mode mode) {
+            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
+                throw new ArgumentOutOfRangeException ("outlet.Group");
+
+            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
+                throw new ArgumentOutOfRangeException ("outlet.Individual");
+
+            pwrStrips [outlet.Group].SetPlugMode ((byte)outlet.Individual, mode);
+        }
+
         public static Mode GetOutletMode (IndividualControl outlet) {
             if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
                 throw new ArgumentOutOfRangeException ("outlet.Group");
@@ -205,7 +213,7 @@ namespace AquaPic.Drivers
 
             return pwrStrips [outlet.Group].outlets [outlet.Individual].mode;
         }
-
+        
         public static Mode[] GetAllModes (int powerID) {
             if ((powerID < 0) && (powerID >= pwrStrips.Count))
                 throw new ArgumentOutOfRangeException ("powerId");

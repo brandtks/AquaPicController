@@ -27,6 +27,9 @@ namespace AquaPic.UserInterface
         private TouchTextBox onTimeTextBox;
         private TouchLabel offTimeLabel;
         private TouchTextBox offTimeTextBox;
+        private TouchLabel outletLabel;
+        private TouchLabel outletStateLabel;
+        private TouchSelectorSwitch outletSelectorSwitch;
         private TouchButton fixtureSettingBtn;
         private uint timerId;
         private bool isDimmingFixture;
@@ -131,8 +134,6 @@ namespace AquaPic.UserInterface
 
             #endregion
 
-            //<TODO> this is a stupid fix for when there are no lights add
-            //will be changed after I implement adding and removing lights during runtime
             if (Lighting.fixtureCount == 0) {
                 fixtureID = -1;
                 fixtureLabel.text = "No lighing fixtures added";
@@ -149,7 +150,7 @@ namespace AquaPic.UserInterface
             dimmingHeader.Show ();
 
             modeSelector = new ModeSelector ();
-            modeSelector.SelectorChangedEvent += OnSelectorChanged;
+            modeSelector.SelectorChangedEvent += OnDimmingModeSelectorChanged;
             Put (modeSelector, 630, 145);
             modeSelector.Show ();
 
@@ -226,7 +227,7 @@ namespace AquaPic.UserInterface
             onTimeLabel = new TouchLabel ();
             onTimeLabel.text = "On Time";
             onTimeLabel.textColor = "grey4"; 
-            Put (onTimeLabel, 415, 120);
+            Put (onTimeLabel, 415, 124);
             onTimeLabel.Show ();
 
             onTimeTextBox = new TouchTextBox ();
@@ -250,13 +251,13 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (onTimeTextBox, 415, 141);
+            Put (onTimeTextBox, 415, 145);
             onTimeTextBox.Show ();
 
             offTimeLabel = new TouchLabel ();
             offTimeLabel.text = "Off Time";
             offTimeLabel.textColor = "grey4";
-            Put (offTimeLabel, 415, 183);
+            Put (offTimeLabel, 415, 187);
             offTimeLabel.Show ();
 
             offTimeTextBox = new TouchTextBox ();
@@ -280,7 +281,7 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (offTimeTextBox, 415, 204);
+            Put (offTimeTextBox, 415, 208);
             offTimeTextBox.Show ();
 
             string[] names = Lighting.GetAllFixtureNames ();
@@ -308,6 +309,28 @@ namespace AquaPic.UserInterface
             Put (settingsBtn, 290, 405);
             settingsBtn.Show ();
 
+            outletLabel = new TouchLabel ();
+            outletLabel.text = "Outlet:";
+            outletLabel.textColor = "grey4";
+            Put (outletLabel, 415, 250);
+            outletLabel.Show ();
+
+            outletStateLabel = new TouchLabel ();
+            Put (outletStateLabel, 463, 250);
+            outletStateLabel.Show ();
+
+            outletSelectorSwitch = new TouchSelectorSwitch (0, 3, 0, TouchOrientation.Horizontal);
+            outletSelectorSwitch.SliderSize = MySliderSize.Large;
+            outletSelectorSwitch.WidthRequest = 185;
+            outletSelectorSwitch.HeightRequest = 30;
+            outletSelectorSwitch.SliderColorOptions [0] = "grey2";
+            outletSelectorSwitch.SliderColorOptions [1] = "pri";
+            outletSelectorSwitch.SliderColorOptions [2] = "seca";
+            outletSelectorSwitch.TextOptions = new string[] {"Off", "Auto", "On"};
+            outletSelectorSwitch.SelectorChangedEvent += OnOutletControlSelectorChanged;
+            Put (outletSelectorSwitch, 415, 271);
+            outletSelectorSwitch.Show ();
+
             fixtureSettingBtn = new TouchButton ();
             fixtureSettingBtn.text = "Fixture Setup";
             fixtureSettingBtn.SetSizeRequest (100, 60);
@@ -333,20 +356,7 @@ namespace AquaPic.UserInterface
                             fixtureLabel.text = "No lighing fixtures added";
                             fixtureLabel.QueueDraw ();
 
-                            onTimeLabel.Visible = false;
-                            onTimeTextBox.Visible = false;
-                            offTimeLabel.Visible = false;
-                            offTimeTextBox.Visible = false;
-                            dimmingHeader.Visible = false;
-
-                            modeSelector.Visible = false;
-                            dimmingProgressBar.Visible = false;
-                            dimmingTextBox.Visible = false;
-                            dimmingLabel.Visible = false;
-                            autoTextBox.Visible = false;
-                            autoLabel.Visible = false;
-                            requestTextBox.Visible = false;
-                            requestLabel.Visible = false;
+                            GetFixtureData ();
                         }
                     }
                 } else {
@@ -382,13 +392,46 @@ namespace AquaPic.UserInterface
         }
 
         public override void Dispose () {
+            Power.RemoveHandlerOnStateChange (Lighting.GetFixtureOutletIndividualControl (fixtureID), OnOutletStateChange);
             GLib.Source.Remove (timerId);
-
             base.Dispose ();
         }
 
         protected void GetFixtureData () {
             if (fixtureID != -1) {
+                onTimeLabel.Visible = true;
+                onTimeTextBox.Visible = true;
+                offTimeLabel.Visible = true;
+                offTimeTextBox.Visible = true;
+                dimmingHeader.Visible = true;
+                outletLabel.Visible = true;
+                outletStateLabel.Visible = true;
+
+                onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureID).ToString ();
+                offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureID).ToString ();
+
+                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureID);
+                Power.AddHandlerOnStateChange (ic, OnOutletStateChange);
+
+                if (Power.GetOutletMode (ic) == Mode.Auto) {
+                    outletSelectorSwitch.CurrentSelected = 1;
+                    outletSelectorSwitch.QueueDraw ();
+                } else {
+                    if (Power.GetOutletManualState (ic) == MyState.Off) {
+                        outletSelectorSwitch.CurrentSelected = 0;
+                    } else {
+                        outletSelectorSwitch.CurrentSelected = 2;
+                    }
+                }
+
+                if (Power.GetOutletState (ic) == MyState.Off) {
+                    outletStateLabel.text = "Off";
+                    outletStateLabel.textColor = "grey4";
+                } else {
+                    outletStateLabel.text = "On";
+                    outletStateLabel.textColor = "secb";
+                }
+
                 isDimmingFixture = Lighting.IsDimmingFixture (fixtureID);
                 if (isDimmingFixture) {
                     dimmingHeader.text = "Dimming Control";
@@ -445,11 +488,6 @@ namespace AquaPic.UserInterface
                     requestLabel.Visible = false;
                 }
 
-                onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureID).ToString ();
-                onTimeTextBox.QueueDraw ();
-                offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureID).ToString ();
-                offTimeTextBox.QueueDraw ();
-
                 QueueDraw ();
             } else {
                 onTimeLabel.Visible = false;
@@ -457,8 +495,6 @@ namespace AquaPic.UserInterface
                 offTimeLabel.Visible = false;
                 offTimeTextBox.Visible = false;
                 dimmingHeader.Visible = false;
-                fixtureSettingBtn.Visible = false;
-
                 modeSelector.Visible = false;
                 dimmingProgressBar.Visible = false;
                 dimmingTextBox.Visible = false;
@@ -467,6 +503,9 @@ namespace AquaPic.UserInterface
                 autoLabel.Visible = false;
                 requestTextBox.Visible = false;
                 requestLabel.Visible = false;
+                outletLabel.Visible = false;
+                outletStateLabel.Visible = false;
+                outletSelectorSwitch.Visible = false;
             }
         }
 
@@ -485,13 +524,6 @@ namespace AquaPic.UserInterface
                     combo.Active = listIdx;
                     combo.QueueDraw ();
 
-                    onTimeLabel.Visible = true;
-                    onTimeTextBox.Visible = true;
-                    offTimeLabel.Visible = true;
-                    offTimeTextBox.Visible = true;
-                    dimmingHeader.Visible = true;
-                    fixtureSettingBtn.Visible = true;
-
                     GetFixtureData ();
                 } else {
                     if (fixtureID != -1)
@@ -503,6 +535,7 @@ namespace AquaPic.UserInterface
                 try {
                     int id = Lighting.GetFixtureIndex (e.ActiveText);
                     if (id != -1) {
+                        Power.RemoveHandlerOnStateChange (Lighting.GetFixtureOutletIndividualControl (fixtureID), OnOutletStateChange);
                         fixtureID = id;
                         GetFixtureData ();
                     }
@@ -513,49 +546,81 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnTimer () {
-            if (isDimmingFixture) {
-                float level = Lighting.GetCurrentDimmingLevel (fixtureID);
-                dimmingProgressBar.currentProgressSecondary = level / 100.0f;
-                dimmingTextBox.text = string.Format ("{0:N2}", level);
+            if (fixtureID != -1) {
+                if (isDimmingFixture) {
+                    float level = Lighting.GetCurrentDimmingLevel (fixtureID);
+                    dimmingProgressBar.currentProgressSecondary = level / 100.0f;
+                    dimmingTextBox.text = string.Format ("{0:N2}", level);
 
-                level = Lighting.GetRequestedDimmingLevel (fixtureID);
-                dimmingProgressBar.currentProgress = level / 100.0f;
-                requestTextBox.text = string.Format ("{0:N2}", level);
+                    level = Lighting.GetRequestedDimmingLevel (fixtureID);
+                    dimmingProgressBar.currentProgress = level / 100.0f;
+                    requestTextBox.text = string.Format ("{0:N2}", level);
 
-                dimmingTextBox.QueueDraw ();
-                requestTextBox.QueueDraw ();
-                dimmingProgressBar.QueueDraw ();
+                    dimmingTextBox.QueueDraw ();
+                    requestTextBox.QueueDraw ();
+                    dimmingProgressBar.QueueDraw ();
 
-                if (dimmingIsManual) {
-                    autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
-                    autoTextBox.QueueDraw ();
+                    if (dimmingIsManual) {
+                        autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
+                        autoTextBox.QueueDraw ();
+                    }
                 }
-            }
 
-            return isDimmingFixture;
+                return isDimmingFixture;
+            } else {
+                return false;
+            }
         }
 
-        protected void OnSelectorChanged (object sender, SelectorChangedEventArgs args) {
+        protected void OnDimmingModeSelectorChanged (object sender, SelectorChangedEventArgs args) {
             if (args.currentSelectedIndex == 0) {
                 Lighting.SetDimmingMode (fixtureID, Mode.Manual);
+                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureID);
+                Power.SetOutletManualState (ic, Power.GetOutletState (ic));
+                Power.SetOutletMode (ic, Mode.Manual);
                 dimmingProgressBar.enableTouch = true;
                 requestTextBox.enableTouch = true;
                 autoTextBox.Visible = true;
                 autoLabel.Visible = true;
                 dimmingIsManual = true;
                 autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
+                if (Power.GetOutletState (ic) == MyState.Off) {
+                    outletSelectorSwitch.CurrentSelected = 0;
+                } else {
+                    outletSelectorSwitch.CurrentSelected = 2;
+                }
+                outletSelectorSwitch.QueueDraw ();
             } else {
                 Lighting.SetDimmingMode (fixtureID, Mode.Auto);
+                Power.SetOutletMode (Lighting.GetFixtureOutletIndividualControl (fixtureID), Mode.Auto);
                 dimmingProgressBar.enableTouch = false;
                 requestTextBox.enableTouch = false;
                 autoTextBox.Visible = false;
                 autoLabel.Visible = false;
                 dimmingIsManual = false;
+                outletSelectorSwitch.CurrentSelected = 1;
+                outletSelectorSwitch.QueueDraw ();
             }
 
             dimmingProgressBar.QueueDraw ();
             autoTextBox.QueueDraw ();
             autoLabel.QueueDraw ();
+        }
+
+        protected void OnOutletControlSelectorChanged (object sender, SelectorChangedEventArgs args) {
+            IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureID);
+
+            if (args.currentSelectedIndex == 0) { // Manual Off
+                Power.SetOutletMode (ic, Mode.Manual);
+                Power.SetOutletManualState (ic, MyState.Off);
+            } else if (args.currentSelectedIndex == 2) { // Manual On
+                Power.SetOutletMode (ic, Mode.Manual);
+                Power.SetOutletManualState (ic, MyState.On);
+            } else if (args.currentSelectedIndex == 1) {
+                Power.SetOutletMode (ic, Mode.Auto);
+            }
+
+            GetFixtureData ();
         }
 
         protected void OnProgressChanged (object sender, ProgressChangeEventArgs args) {
@@ -568,6 +633,18 @@ namespace AquaPic.UserInterface
         protected void OnProgressChanging (object sender, ProgressChangeEventArgs args) {
             requestTextBox.text = string.Format ("{0:N2}", args.currentProgress * 100.0f);
             requestTextBox.QueueDraw ();
+        }
+
+        protected void OnOutletStateChange (object sender, StateChangeEventArgs args) {
+            IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureID);
+            if (args.state == MyState.Off) {
+                outletStateLabel.text = "Off";
+                outletStateLabel.textColor = "grey4";
+            } else {
+                outletStateLabel.text = "On";
+                outletStateLabel.textColor = "secb";
+            }
+            outletStateLabel.QueueDraw ();
         }
     }
 }

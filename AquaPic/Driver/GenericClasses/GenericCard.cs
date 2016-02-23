@@ -34,7 +34,7 @@ namespace AquaPic.Drivers
             this.name = name;
             this.cardType = cardType;
             this.cardId = cardId;
-            slave = new AquaPicBus.Slave (address, this.name + " " + Utils.GetDescription (cardType));
+            slave = new AquaPicBus.Slave (address, string.Format ("{0} ({1})", this.name, Utils.GetDescription (cardType)));
             channels = new GenericChannel<T>[numChannels];
             for (int i = 0; i < channelCount; ++i) {
                 channels [i] = ChannelCreater (i);
