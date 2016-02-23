@@ -90,7 +90,7 @@ namespace AquaPic.UserInterface
 
             if (!AquaPicBus.isOpen) {
                 string[] portNames = SerialPort.GetPortNames ();
-                if (Utils.RunningPlatform == Platform.Linux) {
+                if (Utils.ExecutingOperatingSystem == Platform.Linux) {
                     List<string> sortedPortNames = new List<string> ();
                     foreach (var name in portNames) {
                         if (name.Contains ("USB")) {

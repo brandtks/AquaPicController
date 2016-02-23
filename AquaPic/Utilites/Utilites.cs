@@ -21,7 +21,7 @@ namespace AquaPic.Utilites
 
 	public static class Utils
 	{
-        public static Platform RunningPlatform {
+        public static Platform ExecutingOperatingSystem {
             get {
                 switch (Environment.OSVersion.Platform) {
                 case PlatformID.Unix:

@@ -13,12 +13,12 @@ namespace AquaPic
 	{
         public static void Main (string[] args) {
             //Call the Gtk library hack because Windows sucks at everything
-            if (Utils.RunningPlatform == Platform.Windows)
+            if (Utils.ExecutingOperatingSystem == Platform.Windows)
                 CheckWindowsGtk ();
 
             Application.Init ();
 
-            Logger.Add ("Executing operating system is {0}", Utils.GetDescription (Utils.RunningPlatform));
+            Logger.Add ("Executing operating system is {0}", Utils.GetDescription (Utils.ExecutingOperatingSystem));
 
             #if DEBUG
             try {

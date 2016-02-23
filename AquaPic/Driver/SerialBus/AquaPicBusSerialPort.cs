@@ -37,7 +37,7 @@ namespace AquaPic.SerialBus
             uart.Open ();
 
             #if !HACK_PARITY_ON_LINUX
-            if (Utils.RunningPlatform == Platform.Linux) {
+            if (Utils.ExecutingOperatingSystem == Platform.Linux) {
                 FieldInfo fieldInfo = uart.BaseStream.GetType().GetField("fd", BindingFlags.Instance | BindingFlags.NonPublic);
                 fd = (int)fieldInfo.GetValue(uart.BaseStream);
             }
@@ -45,7 +45,7 @@ namespace AquaPic.SerialBus
         }
 
         public void Write (byte[] message) {
-            if (Utils.RunningPlatform == Platform.Windows) {
+            if (Utils.ExecutingOperatingSystem == Platform.Windows) {
                 WindowsWrite (message);
             } else {
                 LinuxWrite (message);
