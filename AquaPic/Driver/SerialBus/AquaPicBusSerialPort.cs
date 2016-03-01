@@ -61,7 +61,7 @@ namespace AquaPic.SerialBus
 
         #if !HACK_PARITY_ON_LINUX
         [DllImport ("AquaPicParityHelper.so")]
-        protected static extern int SetLinuxParity (int fd, Parity parity);
+        protected static extern bool SetLinuxParity (int fd, Parity parity);
         #endif
 
         protected void LinuxWrite (byte[] message) {
@@ -71,12 +71,13 @@ namespace AquaPic.SerialBus
                 WriteWithHackParity (message [i]);
             }
             #else
-            if (SetLinuxParity (fd, Parity.Mark) == 0) {
+            if (!SetLinuxParity (fd, Parity.Mark)) {
                 throw new ExternalException ("SetLinuxParity");
             }
             uart.Write (message, 0, 1);
             Thread.Sleep (10);
-            if (SetLinuxParity (fd, Parity.Space) == 0) {
+            
+            if (!SetLinuxParity (fd, Parity.Space)) {
                 throw new ExternalException ("SetLinuxParity");
             }
             uart.Write (message, 1, message.Length - 1);
