@@ -101,17 +101,13 @@ namespace TouchWidgetLibrary
                         cr.Fill ();
                     }
 
-                    Pango.Layout l = new Pango.Layout (PangoContext);
-                    l.Width = Pango.Units.FromPixels (width - height);
-                    l.Alignment = Pango.Alignment.Left;
-                    l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
+                    TouchText textRender = new TouchText ();
+                    textRender.font.color = "black";
                     for (int i = 0; i < List.Count; ++i) {
+                        textRender.text = List [i];
                         int y = top + height + 6 + (height * i);
-                        l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + List [i] + "</span>"); 
-                        GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, y, l);
+                        textRender.Render (this, left + 10, y, width - height);
                     }
-                    l.Dispose ();
-
                 } else {
                     this.HeightRequest = 30;
 
@@ -134,14 +130,6 @@ namespace TouchWidgetLibrary
                         text = NonActiveMessage;
                     else
                         text = List [Active];
-
-//                    Pango.Layout l = new Pango.Layout (PangoContext);
-//                    l.Width = Pango.Units.FromPixels (width - height);
-//                    l.Alignment = Pango.Alignment.Left;
-//                    l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
-//                    l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
-//                    GdkWindow.DrawLayout (Style.TextGC (StateType.Normal), left + 10, top + 6, l);
-//                    l.Dispose ();
 
                     TouchText t = new TouchText (text);
                     t.textWrap = TouchTextWrap.Shrink;

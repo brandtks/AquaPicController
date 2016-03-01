@@ -1,4 +1,5 @@
 ﻿using System;
+using Gtk;
 using AquaPic.Modules;
 using TouchWidgetLibrary;
 
@@ -16,10 +17,20 @@ namespace AquaPic.UserInterface
             label = new TouchLabel ();
             label.textColor = "compl";
             label.text = "Probe Dis-\nconnected";
-            label.textSize = 13;
             label.WidthRequest = 94;
-            Put (label, 3, 121);
+            label.textAlignment = TouchAlignment.Right;
+            Put (label, 3, 90);
             label.Show ();
+
+            var eventbox = new EventBox ();
+            eventbox.VisibleWindow = false;
+            eventbox.SetSizeRequest (WidthRequest, HeightRequest);
+            eventbox.ButtonReleaseEvent += (o, args) => {
+                var topWidget = this.Toplevel;
+                AquaPicGUI.ChangeScreens ("Water Level", topWidget, AquaPicGUI.currentScreen);
+            };
+            Put (eventbox, 0, 0);
+            eventbox.Show ();
 
             fullScale = 15.0f;
 

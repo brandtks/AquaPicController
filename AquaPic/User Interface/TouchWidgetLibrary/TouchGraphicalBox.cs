@@ -21,7 +21,7 @@ namespace TouchWidgetLibrary
             ExposeEvent += OnExpose;
         }
 
-        protected void OnExpose (object sender, ExposeEventArgs args) {
+        protected virtual void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 cr.Rectangle (Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
                 TouchColor.SetSource (cr, color, transparency);

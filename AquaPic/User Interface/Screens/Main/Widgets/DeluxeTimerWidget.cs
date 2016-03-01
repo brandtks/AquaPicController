@@ -9,8 +9,8 @@ namespace AquaPic.UserInterface
     public class DeluxeTimerWidget : Fixed
     {
         private DeluxeTimer[] timers;
-        private TouchTab[] tabs;
-        private int t;
+        private TimerTab[] tabs;
+        private int timerIndex;
         private TouchTextBox minutes;
         private TouchTextBox seconds;
         private TouchUpDownButtons minUpDown;
@@ -19,7 +19,7 @@ namespace AquaPic.UserInterface
         private TouchButton resetButton;
 
         public DeluxeTimerWidget (string name) {
-            t = 0;
+            timerIndex = 0;
 
             SetSizeRequest (310, 169);
 
@@ -32,21 +32,29 @@ namespace AquaPic.UserInterface
                 timers [i].TimerStopEvent += OnTimerStartStop;
             }
 
-            var box2 = new TouchGraphicalBox (310, 129);
-            box2.color = "grey2";
+            var box2 = new TimerBackground (310, 129);
+            box2.color = "grey1";
+            box2.transparency = 1.0f;
             Put (box2, 0, 40);
 
-            tabs = new TouchTab[3];
-            for (int i = 0; i < tabs.Length; ++i) {
-                tabs [i] = new TouchTab ();
+            tabs = new TimerTab[3];
+            for (int i = 2; i >= 0; --i) {
+                tabs [i] = new TimerTab (i);
                 tabs [i].text = "Timer " + (i + 1).ToString ();
                 tabs [i].ButtonReleaseEvent += OnTabButtonRelease;
-                Put (tabs [i], 0 + (103 * i), 0);
+                Put (tabs [i], 90 * i, 0);
                 tabs [i].Show ();
             }
 
+            tabs [0].selected = true;
+
+            var minuteLabel = new TouchLabel ();
+            minuteLabel.text = "Minutes";
+            Put (minuteLabel, 5, 47);
+            minuteLabel.Show ();
+
             minutes = new TouchTextBox ();
-            minutes.SetSizeRequest (99, 60);
+            minutes.SetSizeRequest (99, 46);
             minutes.enableTouch = true;
             minutes.textSize = 16;
             minutes.textAlignment = TouchAlignment.Center;
@@ -59,18 +67,18 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (minutes, 3, 43);
+            Put (minutes, 3, 67);
 
             minUpDown = new TouchUpDownButtons ();
             minUpDown.up.ButtonReleaseEvent += (o, args) => {
-                if (!timers[t].enabled) {
+                if (!timers[timerIndex].enabled) {
                     uint time = (Convert.ToUInt32 (minutes.text) + 1) * 60;
                     time += Convert.ToUInt32 (seconds.text);
                     UpdateTime (time);
                 }
             };
             minUpDown.down.ButtonReleaseEvent += (o, args) => {
-                if (!timers[t].enabled) {
+                if (!timers[timerIndex].enabled) {
                     if (minutes.text != "0") {
                         uint time = (Convert.ToUInt32 (minutes.text) - 1) * 60;
                         time += Convert.ToUInt32 (seconds.text);
@@ -78,11 +86,16 @@ namespace AquaPic.UserInterface
                     }
                 }
             };
-            Put (minUpDown, 3, 106);
+            Put (minUpDown, 3, 117);
             minUpDown.Show ();
 
+            var secondsLabel = new TouchLabel ();
+            secondsLabel.text = "Seconds";
+            Put (secondsLabel, 108, 47);
+            secondsLabel.Show ();
+
             seconds = new TouchTextBox ();
-            seconds.SetSizeRequest (98, 60);
+            seconds.SetSizeRequest (98, 46);
             seconds.enableTouch = true;
             seconds.textAlignment = TouchAlignment.Center;
             seconds.textSize = 16;
@@ -98,11 +111,11 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (seconds, 106, 43);
+            Put (seconds, 106, 67);
 
             secUpDown = new TouchUpDownButtons ();
             secUpDown.up.ButtonReleaseEvent += (o, args) => {
-                if (!timers[t].enabled) {
+                if (!timers[timerIndex].enabled) {
                     uint time = Convert.ToUInt32 (minutes.text) * 60;
                     time += Convert.ToUInt32 (seconds.text);
                     ++time;
@@ -110,7 +123,7 @@ namespace AquaPic.UserInterface
                 }
             };
             secUpDown.down.ButtonReleaseEvent += (o, args) => {
-                if (!timers[t].enabled) {
+                if (!timers[timerIndex].enabled) {
                     uint time = Convert.ToUInt32 (minutes.text) * 60;
                     time += Convert.ToUInt32 (seconds.text);
                     if (time != 0) {
@@ -119,24 +132,24 @@ namespace AquaPic.UserInterface
                     }
                 }
             };
-            Put (secUpDown, 106, 106);
+            Put (secUpDown, 106, 117);
             secUpDown.Show ();
 
             startStopButton = new TouchButton ();
-            startStopButton.SetSizeRequest (98, 60);
+            startStopButton.SetSizeRequest (98, 56);
             startStopButton.ButtonReleaseEvent += OnStartStopButtonRelease;
-            Put (startStopButton, 209, 43);
+            Put (startStopButton, 209, 47);
 
             resetButton = new TouchButton ();
-            resetButton.SetSizeRequest (98, 60);
+            resetButton.SetSizeRequest (98, 56);
             resetButton.text = "Reset";
             resetButton.ButtonReleaseEvent += OnResetButtonRelease;
-            Put (resetButton, 209, 106);
+            Put (resetButton, 209, 107);
 
-            if (timers [t].enabled)
-                UpdateTime (timers [t].secondsRemaining, false);
+            if (timers [timerIndex].enabled)
+                UpdateTime (timers [timerIndex].secondsRemaining, false);
             else
-                UpdateTime (timers [t].totalSeconds, false);
+                UpdateTime (timers [timerIndex].totalSeconds, false);
         }
 
         public override void Dispose () {
@@ -153,15 +166,15 @@ namespace AquaPic.UserInterface
         protected void OnTimerInterum (object sender) {
             DeluxeTimer timer = sender as DeluxeTimer;
             int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
-            if (t == tIdx)
+            if (timerIndex == tIdx)
                 UpdateTime (timer.secondsRemaining, false);
         }
 
         protected void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
             DeluxeTimer timer = sender as DeluxeTimer;
             int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
-            if (t == tIdx)
-                UpdateTime (timers [t].totalSeconds);
+            if (timerIndex == tIdx)
+                UpdateTime (timers [timerIndex].totalSeconds);
 
             MessageBox.Show (timer.name);
         }
@@ -169,40 +182,55 @@ namespace AquaPic.UserInterface
         protected void OnTimerStartStop (object sender) {
             DeluxeTimer timer = sender as DeluxeTimer;
             int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
-            if (t == tIdx)
-                UpdateTime (timers [t].secondsRemaining, false);
+            if (timerIndex == tIdx)
+                UpdateTime (timers [timerIndex].secondsRemaining, false);
         }
 
         protected void OnStartStopButtonRelease (object sender, ButtonReleaseEventArgs args) {
             if (startStopButton.text == "Start") {
-                timers[t].SetTime (Convert.ToUInt32 (minutes.text), Convert.ToUInt32 (seconds.text));
-                timers[t].Start ();
+                timers[timerIndex].SetTime (Convert.ToUInt32 (minutes.text), Convert.ToUInt32 (seconds.text));
+                timers[timerIndex].Start ();
             } else {
-                timers[t].Stop ();
+                timers[timerIndex].Stop ();
             }
 
             UpdateScreen ();
         }
 
         protected void OnResetButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            if (timers [t].state != DeluxeTimerState.Waiting) {
-                timers [t].Reset ();
+            if (timers [timerIndex].state != DeluxeTimerState.Waiting) {
+                timers [timerIndex].Reset ();
             }
 
-            if (timers [t].secondsRemaining != timers [t].totalSeconds)
-                UpdateTime (timers [t].totalSeconds);
+            if (timers [timerIndex].secondsRemaining != timers [timerIndex].totalSeconds)
+                UpdateTime (timers [timerIndex].totalSeconds);
 
             UpdateScreen ();
         }
 
         protected void OnTabButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            TouchTab b = sender as TouchTab;
-            t = Convert.ToInt32 ((b.text [b.text.Length - 1]).ToString ()) - 1;
+            TimerTab b = sender as TimerTab;
+            timerIndex = b.position;
 
-            if (timers [t].enabled)
-                UpdateTime (timers [t].secondsRemaining, false);
+            if (timers [timerIndex].enabled)
+                UpdateTime (timers [timerIndex].secondsRemaining, false);
             else
-                UpdateTime (timers [t].totalSeconds, false);
+                UpdateTime (timers [timerIndex].totalSeconds, false);
+
+            foreach (var tab in tabs) {
+                
+                tab.selected = false;
+            }
+
+            Remove (tabs [timerIndex]);
+            tabs [timerIndex].Destroy ();
+            tabs [timerIndex].Dispose ();
+            tabs [timerIndex] = new TimerTab (timerIndex);
+            tabs [timerIndex].text = "Timer " + (timerIndex + 1).ToString ();
+            tabs [timerIndex].ButtonReleaseEvent += OnTabButtonRelease;
+            Put (tabs [timerIndex], 90 * timerIndex, 0);
+            tabs [timerIndex].Show ();
+            tabs [timerIndex].selected = true;
         }
 
         protected void UpdateTime (uint time, bool changeTimerTime = true) {
@@ -212,37 +240,26 @@ namespace AquaPic.UserInterface
             seconds.QueueDraw ();
 
             if (changeTimerTime) {
-                timers [t].totalSeconds = time;
-                //if (!timers [t].enabled)
-                    //timers [t]._secondsRemaining = time;
+                timers [timerIndex].totalSeconds = time;
             }
 
             UpdateScreen ();
         }
 
         protected void UpdateScreen () {
-            for (int i = 0; i < tabs.Length; ++i) {
-                if (i == t)
-                    tabs [i].color = "pri";
-                else
-                    tabs [i].color = "grey3";
-
-                tabs [i].QueueDraw ();
-            }
-
-            if (timers [t].state == DeluxeTimerState.Waiting)
+            if (timers [timerIndex].state == DeluxeTimerState.Waiting)
                 resetButton.buttonColor = "grey2";
             else
                 resetButton.buttonColor = "pri";
 
-            if (timers[t].enabled) {
+            if (timers [timerIndex].enabled) {
                 startStopButton.text = "Stop";
                 startStopButton.buttonColor = "pri";
             } else {
                 startStopButton.text = "Start";
                 startStopButton.buttonColor = "seca";
 
-                if (timers [t].totalSeconds == 0)
+                if (timers [timerIndex].totalSeconds == 0)
                     secUpDown.down.buttonColor = "grey2";
                 else
                     secUpDown.down.buttonColor = "pri";
@@ -260,21 +277,23 @@ namespace AquaPic.UserInterface
             startStopButton.QueueDraw ();
         }
 
-        private class TouchTab : EventBox
+        private class TimerTab : EventBox
         {
             public TouchColor color;
             public string text;
+            public bool selected;
+            public int position;
 
-            public TouchTab () {
-                SetSizeRequest (103, 40);
+            public TimerTab (int position) {
+                SetSizeRequest (130, 40);
 
                 VisibleWindow = false;
                 ExposeEvent += OnEventBoxExpose;
-                ButtonPressEvent += OnEventBoxButtonPress;
-                ButtonReleaseEvent += OnEventBoxButtonRelease;
 
-                color = "pri";
+                color = "grey3";
                 text = string.Empty;
+                selected = false;
+                this.position = position;
             }
 
             protected void OnEventBoxExpose (object sender, ExposeEventArgs args) {
@@ -287,6 +306,13 @@ namespace AquaPic.UserInterface
                     int left = Allocation.Left;
                     int radius = 10;
 
+                    if (!selected) {
+                        width -= 26;
+                        left += position * 13;
+                        top += 10;
+                        height -= 10;
+                    }
+
                     cr.MoveTo (left, top + radius);
                     cr.Arc (left + radius, top + radius, radius, Math.PI, -Math.PI / 2);
                     cr.LineTo (left + width - radius, top);
@@ -295,36 +321,46 @@ namespace AquaPic.UserInterface
                     cr.LineTo (left, top + height);
                     cr.ClosePath ();
 
+                    if (selected) {
+                        color = "pri";
+                    } else {
+                        color = "grey3";
+                    }
                     color.SetSource (cr);
-                    cr.FillPreserve ();
 
-                    cr.LineWidth = 0.5;
-                    TouchColor.SetSource (cr, "black");
+                    if (selected) {
+                        cr.Fill ();
+                    } else {
+                        cr.FillPreserve ();
+                        cr.LineWidth = 0.4;
+                        TouchColor.SetSource (cr, "black");
+                        cr.Stroke ();
+                    }
+
+                    TouchText render = new TouchText (text);
+                    render.alignment = TouchAlignment.Center;
+                    render.font.color = "black";
+                    render.Render (this, left, top, width, height);
+                }
+            }
+        }
+
+        private class TimerBackground : TouchGraphicalBox
+        {
+            public TimerBackground (int width, int height) : base (width, height) { }
+
+            protected override void OnExpose (object sender, ExposeEventArgs args) {
+                using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                    cr.Rectangle (Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
+                    TouchColor.SetSource (cr, color, transparency);
+                    cr.Fill ();
+
+                    cr.MoveTo (Allocation.Left, Allocation.Top - 1);
+                    cr.LineTo (Allocation.Right, Allocation.Top - 1);
+                    TouchColor.SetSource (cr, "pri");
+                    cr.LineWidth = 8.0;
                     cr.Stroke ();
-
-                    Pango.Layout l = new Pango.Layout (eb.PangoContext);
-                    l.Width = Pango.Units.FromPixels (width - 2);
-                    l.Wrap = Pango.WrapMode.Word;
-                    l.Alignment = Pango.Alignment.Center;
-                    l.SetMarkup ("<span color=" + (char)34 + "black" + (char)34 + ">" + text + "</span>"); 
-                    l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
-                    int y = (top + (height / 2)) - 8;
-                    y -= ((l.LineCount - 1) * 9);
-                    GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), left + 1, y, l);
-                    l.Dispose ();
                 }
-            }
-
-            protected void OnEventBoxButtonPress (object o, ButtonPressEventArgs args) {
-                if (args.Event.Type == Gdk.EventType.ButtonPress) {
-                    color.ModifyColor (0.75);
-                    this.QueueDraw ();
-                }
-            }
-
-            protected void OnEventBoxButtonRelease (object o, ButtonReleaseEventArgs args) {
-                color.RestoreColor ();
-                this.QueueDraw ();
             }
         }
     }

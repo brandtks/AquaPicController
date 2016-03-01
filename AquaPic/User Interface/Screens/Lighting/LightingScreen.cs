@@ -293,6 +293,18 @@ namespace AquaPic.UserInterface
             Put (combo, 550, 77);
             combo.Show ();
 
+            if (options.Length >= 3) {
+                string requestedFixture = options [2] as string;
+                if (requestedFixture != null) {
+                    try {
+                        fixtureID = Lighting.GetFixtureIndex (requestedFixture);
+                        combo.Active = fixtureID;
+                    } catch {
+                        ;
+                    }
+                }
+            }
+
             var settingsBtn = new TouchButton ();
             settingsBtn.text = "Settings";
             settingsBtn.SetSizeRequest (100, 60);

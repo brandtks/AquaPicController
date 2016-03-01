@@ -14,82 +14,12 @@ namespace AquaPic.UserInterface
 {
     public class MainWindow : WindowBase
     {
-//        LinePlotWidget phPlot;
-//        LinePlotWidget tempPlot;
-//        BarPlotWidget waterLevel;
-//        BarPlotWidget whiteLedDimming;
-//        BarPlotWidget actinicLedDimming;
-//        int testAlarmIndex;
-
         List<LinePlotWidget> linePlots;
         List<BarPlotWidget> barPlots;
 
         uint timerId;
 
         public MainWindow (params object[] options) : base () {
-//            TouchButton b1 = new TouchButton ();
-//            b1.ButtonReleaseEvent += OnButtonClick;
-//            MyState s1 = Bit.Check ("Clean Skimmer");
-//            if (s1 == MyState.Set)
-//                b1.buttonColor = "pri";
-//            else
-//                b1.buttonColor = "seca";
-//            b1.HeightRequest = 95;
-//            b1.WidthRequest = 108;
-//            b1.text = "Clean Skimmer";
-//            Put (b1, 572, 230);
-//
-//            TouchButton b2 = new TouchButton ();
-//            b2.ButtonReleaseEvent += OnButtonClick;
-//            s1 = Bit.Check ("Water Change");
-//            if (s1 == MyState.Set)
-//                b2.buttonColor = "pri";
-//            else
-//                b2.buttonColor = "seca";
-//            b2.HeightRequest = 95;
-//            b2.WidthRequest = 108;
-//            b2.text = "Water Change";
-//            Put (b2, 685, 230);
-//            phPlot = new LinePlotWidget ();
-//            phPlot.text = "pH";
-//            Put (phPlot, 7, 30);
-//
-//            tempPlot = new LinePlotWidget ();
-//            tempPlot.text = "Temperature";
-//            tempPlot.currentValue = Temperature.WaterTemperature;
-//            Put (tempPlot, 7, 130);
-//
-//            var box3 = new LinePlotWidget ();
-//            box3.text = "thingy 1";
-//            Put (box3, 7, 230);
-//
-//            var box4 = new LinePlotWidget ();
-//            box4.text = "thingy 2";
-//            Put (box4, 7, 330);
-//
-//            waterLevel = new BarPlotWidget ();
-//            waterLevel.text = "Water Level";
-//            Put (waterLevel, 459, 30);
-//
-//            whiteLedDimming = new BarPlotWidget ();
-//            whiteLedDimming.text = "White LED";
-//            Put (whiteLedDimming, 572, 30);
-//
-//            actinicLedDimming = new BarPlotWidget ();
-//            actinicLedDimming.text = "Actinic LED";
-//            Put (actinicLedDimming, 685, 30);
-//
-//            var t = new DeluxeTimerWidget ("Main");
-//            Put (t, 459, 330);
-
-//            var b3 = new TouchButton ();
-//            b3.ButtonReleaseEvent += OnTestButtonClick;
-//            b3.HeightRequest = 95;
-//            b3.WidthRequest = 108;
-//            b3.text = "Test Alarm";
-//            testAlarmIndex = Alarm.Subscribe ("Test Alarm", true);
-//            Put (b3, 459, 330);
-
             showTitle = false;
 
             var names = Lighting.GetAllFixtureNames ();
@@ -168,15 +98,6 @@ namespace AquaPic.UserInterface
                         }
                     case "Button": {
                             string name = (string)jo ["name"];
-
-//                            if (MainWindowWidgets.buttons.ContainsKey (name)) {
-//                                var b = MainWindowWidgets.buttons [name].CreateInstance ();
-//                                Put (b, x, y);
-//                                b.Show ();
-//
-//                            } else {
-//                                Logger.AddWarning (string.Format ("Unknown button for main window: {0}", name));
-//                            }
 
                             var b = new ButtonWidget (name);
                             Put (b, x, y);

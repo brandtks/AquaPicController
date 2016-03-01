@@ -22,14 +22,14 @@ namespace AquaPic.UserInterface
             { "Logger", new ScreenData ("Logger", true, (options) => {return new LoggerWindow (options);}) },
             { "Settings", new ScreenData ("Settings", true, (options) => {return new SettingsWindow (options);}) },
             { "Menu", new ScreenData ("Menu", false, (options) => {return new MenuWindow (options);}) },
-            { "Main", new ScreenData ("Main", true, (options) => {return new MainWindow (options);}) }//,
+            { "Home", new ScreenData ("Home", true, (options) => {return new MainWindow (options);}) }//,
             //{ "Plugins", new ScreenData ("Plugins", true, (options) => {return new PluginWindow (options);}) },
             //{ "Edit Plugin", new ScreenData ("Edit Plugin", false, (options) => {return new EditPluginWindow (options);}) }
         };
 
         public static string currentScreen;
 
-        public static List<string> menuWindows = new List<string> () {"Main", "Power", "Water Level", "Lighting", "Temperature", "Menu"};
+        public static List<string> menuWindows = new List<string> () {"Home", "Power", "Water Level", "Lighting", "Temperature", "Menu"};
         public static string[] menuColors = new string[6] {"pri", "secb", "seca", "secc", "compl", "grey4"};
         public static string currentSelectedMenu;
 

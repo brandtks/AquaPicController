@@ -110,7 +110,7 @@ namespace AquaPic.SerialBus
             messageBuffer = new Queue ();
 
             retryCount = 2;
-            readTimeout = 1000;
+            readTimeout = 500;
 
             txRxThread = new Thread (txRx);
             txRxThread.IsBackground = true;
@@ -256,7 +256,7 @@ namespace AquaPic.SerialBus
                                             m.slave.UpdateStatus (AquaPicBusStatus.CommunicationSuccess, (int)stopwatch.ElapsedMilliseconds);
                                             break;
                                         } else {
-                                            m.slave.UpdateStatus (AquaPicBusStatus.CrcError, 1000);
+                                            m.slave.UpdateStatus (AquaPicBusStatus.CrcError, readTimeout);
                                             Gtk.Application.Invoke ((sender, e) => {
                                                 Logger.AddWarning ("APB {0} crc error on function number {1}", m.slave.Address, m.writeBuffer [1]);
                                             });
@@ -266,7 +266,7 @@ namespace AquaPic.SerialBus
                                             #endif
                                         }
                                     } else {
-                                        m.slave.UpdateStatus (AquaPicBusStatus.LengthError, 1000);
+                                        m.slave.UpdateStatus (AquaPicBusStatus.LengthError, readTimeout);
                                         Gtk.Application.Invoke ((sender, e) => {
                                             Logger.AddWarning ("APB {0} response length error on function number {1}", m.slave.Address, m.writeBuffer [1]);
                                         });

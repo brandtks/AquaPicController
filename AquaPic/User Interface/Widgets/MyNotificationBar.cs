@@ -66,31 +66,17 @@ namespace AquaPic.UserInterface
                 cr.Fill ();
                 pat.Dispose ();
 
-                Pango.Layout l = new Pango.Layout (this.PangoContext);
-                l.Width = Pango.Units.FromPixels (120);
-                l.FontDescription = Pango.FontDescription.FromString ("Sans 11");
+                TouchText textRender = new TouchText (DateTime.Now.ToLongTimeString ());
+                textRender.alignment = TouchAlignment.Right;
+                textRender.Render (this, width - 120, 0, 120, 19);
 
-                l.Alignment = Pango.Alignment.Right;
-                l.SetMarkup ("<span color=\"white\">" 
-                    + DateTime.Now.ToLongTimeString () 
-                    + "</span>");
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), width - 120, 0, l);
-
-                string fontColor;
+                textRender.text = alarmName;
                 if (alarmName == "No Alarms")
-                    fontColor = "white";
+                    textRender.font.color = "white";
                 else
-                    fontColor = TouchColor.ToHTML ("compl");
-                l.Alignment = Pango.Alignment.Left;
-                l.Width = Pango.Units.FromPixels (500);
-                l.SetMarkup ("<span color=\""
-                    + fontColor
-                    + "\">" 
-                    + alarmName
-                    + "</span>");
-                GdkWindow.DrawLayout (Style.TextGC(StateType.Normal), 0, 0, l);
-
-                l.Dispose ();
+                    textRender.font.color = TouchColor.ToHTML ("compl");
+                textRender.alignment = TouchAlignment.Left;
+                textRender.Render (this, 0, 0, 500, 19);
             }
         }
 

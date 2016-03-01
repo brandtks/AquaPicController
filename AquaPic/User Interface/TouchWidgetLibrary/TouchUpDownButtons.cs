@@ -11,7 +11,7 @@ namespace TouchWidgetLibrary
         private bool buttonsPlaced;
 
         public TouchUpDownButtons () {
-            SetSizeRequest (98, 60);
+            SetSizeRequest (98, 46);
             up = new TouchButton ();
             down = new TouchButton ();
             buttonsPlaced = false;

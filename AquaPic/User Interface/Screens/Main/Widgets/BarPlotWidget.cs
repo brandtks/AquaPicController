@@ -56,27 +56,24 @@ namespace AquaPic.UserInterface
             label = new TouchLabel ();
             label.text = "Plot";
             label.textColor = "pri";
-            label.textSize = 12;
             label.WidthRequest = 100;
             label.textAlignment = TouchAlignment.Center;
             label.render.textWrap = TouchTextWrap.Shrink;
             label.render.orientation = TouchOrientation.Vertical;
-            Put (label, 0, 38);
+            Put (label, 29, 3);
 
             bar = new TouchProgressBar ();
-            bar.HeightRequest = 130;
-            bar.WidthRequest = 26;
-            Put (bar, 71, 36);
+            bar.SetSizeRequest (26, 163);
+            Put (bar, 3, 3);
 
             fullScale = 100.0f;
 
             textBox = new TouchTextBox ();
-            textBox.WidthRequest = 94;
-            textBox.HeightRequest = 30;
+            textBox.SetSizeRequest (65, 30);
             textBox.textSize = 14;
             textBox.text = "0.0";
             textBox.textAlignment = TouchAlignment.Center;
-            Put (textBox, 3, 3);
+            Put (textBox, 32, 130);
         }
 
         public virtual void OnUpdate () {

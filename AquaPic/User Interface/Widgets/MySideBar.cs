@@ -122,6 +122,8 @@ namespace AquaPic.UserInterface
                             textWidth.ToInt (),
                             50);
                     }
+
+
                 } else {
                     /*
                     cr.MoveTo (10, originY + 40);
@@ -191,7 +193,7 @@ namespace AquaPic.UserInterface
 
                 if (y.WithinRange (clickY, 25)) {
                     if (x <= 250) {
-                        if (y.WithinRange (Allocation.Height / 2 + Allocation.Top, 25)) {
+                        if (y.WithinRange (Allocation.Height / 2 + Allocation.Top, 15)) {
                             if (windows [highlighedScreenIndex] != AquaPicGUI.currentScreen) {
                                 var topWidget = this.Toplevel;
                                 AquaPicGUI.ChangeScreens (windows [highlighedScreenIndex], topWidget, AquaPicGUI.currentScreen);
@@ -247,17 +249,25 @@ namespace AquaPic.UserInterface
                 GetPointer (out x, out y);
 
                 double yDelta = clickY - y;
-                double yDeltaPercentageOld = yDeltaPercentage;
+                double oldYDeltaPercentage = yDeltaPercentage;
                 yDeltaPercentage = yDelta / 35.0;
-                offset = yDeltaPercentage - Math.Floor (yDeltaPercentage);
+                offset = yDeltaPercentage - Math.Floor (yDeltaPercentage + 0.5);
 
-                int oldDeltaPercentageFloor = Math.Floor (yDeltaPercentageOld).ToInt ();
-                int deltaPercentageFloor = Math.Floor (yDeltaPercentage).ToInt ();
+                int oldDeltaPercentageFloor, deltaPercentageFloor;
+                if (yDeltaPercentage > oldYDeltaPercentage) {
+                    oldDeltaPercentageFloor = Math.Floor (oldYDeltaPercentage - 0.5).ToInt ();
+                    deltaPercentageFloor = Math.Floor (yDeltaPercentage - 0.5).ToInt ();
+                } else {
+                    oldDeltaPercentageFloor = Math.Floor (oldYDeltaPercentage + 0.5).ToInt ();
+                    deltaPercentageFloor = Math.Floor (yDeltaPercentage + 0.5).ToInt ();
+                }
             
+                //Console.WriteLine ("y%: {0:F2}, y%Old: {1:F2}, off {2:F2}, index {3}", yDeltaPercentage, oldYDeltaPercentage, offset, highlighedScreenIndex);
+
                 if (deltaPercentageFloor != oldDeltaPercentageFloor) {
                     int increment = deltaPercentageFloor - oldDeltaPercentageFloor;
 
-                    //Console.Write ("increment: {0}, ", increment);
+                    //Console.WriteLine ("increment: {0}, ", increment);
 
                     highlighedScreenIndex += increment;
 
@@ -267,8 +277,6 @@ namespace AquaPic.UserInterface
                         highlighedScreenIndex = windows.Length - 1;
                     }
                 }
-
-                //Console.WriteLine ("yDelta: {0}, yDeltaPercentage: {1}, offset: {2}", yDelta, yDeltaPercentage, offset);
 
                 QueueDraw ();
             }
