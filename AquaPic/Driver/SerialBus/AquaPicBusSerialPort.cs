@@ -15,7 +15,7 @@ namespace AquaPic.SerialBus
         public SerialPort uart;
 
         #if !HACK_PARITY_ON_LINUX
-        int fd; // termios fd for setting parity of linux
+        int fd; // termios fd for setting parity on linux
         #endif
 
         public AquaPicBusSerialPort () {

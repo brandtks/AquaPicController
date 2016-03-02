@@ -41,7 +41,9 @@ namespace AquaPic.UserInterface
         protected void onExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 int left = Allocation.Left;
+                int right = Allocation.Right;
                 int top = Allocation.Top;
+                int bottom = Allocation.Bottom;
                 int width = Allocation.Width;
                 int height = Allocation.Height;
 
@@ -69,6 +71,22 @@ namespace AquaPic.UserInterface
                     cr.LineWidth = 4;
                     cr.StrokePreserve ();
                     TouchColor.SetSource (cr, "grey4");
+                    cr.Fill ();
+
+                    cr.MoveTo (right + 5, top);
+                    cr.LineTo (right - 120, top);
+                    cr.ArcNegative (right - 80, top, 40, 0, Math.PI / 2);
+                    cr.LineTo (right + 5, top + 40);
+                    cr.ClosePath ();
+                    TouchColor.SetSource (cr, "grey4", 0.80);
+                    cr.Fill ();
+
+                    cr.MoveTo (right + 5, bottom + 5);
+                    cr.LineTo (right - 120, bottom + 5);
+                    cr.Arc (right - 80, bottom, 40, 0, -Math.PI / 2);
+                    cr.LineTo (right + 5, bottom - 40);
+                    cr.ClosePath ();
+                    TouchColor.SetSource (cr, "grey4", 0.80);
                     cr.Fill ();
 
                     var t = new TouchText (windows [highlighedScreenIndex]);
@@ -113,8 +131,6 @@ namespace AquaPic.UserInterface
                         t.text = windows [drawIndex];
                         textY = (height / 2) + top - 75 - (i * 50) - (offset * 50.0).ToInt ();
 
-                        //Console.WriteLine ("{2} radians: {3}, textY: {0}, textWidth {1}", textY, textWidth, t.text, radians);
-
                         t.Render (
                             this, 
                             left, 
@@ -123,7 +139,13 @@ namespace AquaPic.UserInterface
                             50);
                     }
 
+                    t.text = "Home";
+                    t.font.size = 17;
+                    t.alignment = TouchAlignment.Right;
+                    t.Render (this, right - 120, top, 115, 40);
 
+                    t.text = "Menu";
+                    t.Render (this, right - 120, bottom - 40, 115, 40);
                 } else {
                     /*
                     cr.MoveTo (10, originY + 40);
@@ -152,7 +174,7 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey2", 0.25);
                     cr.Fill ();
 
-                    TouchGlobal.DrawRoundedRectangle (cr, left - 50, (height / 2) - 30 + top, 95, 60, 20);
+                    TouchGlobal.DrawRoundedRectangle (cr, left - 50, (height / 2) - 30 + top, 85, 60, 20);
                     TouchColor.SetSource (cr, "pri");
                     cr.LineWidth = 0.75;
                     cr.StrokePreserve ();
@@ -222,7 +244,19 @@ namespace AquaPic.UserInterface
                             }
                         }
                     } else {
-                        CollapseMenu ();
+                        if (x >= 680) {
+                            if (y <= 40) {
+                                var topWidget = this.Toplevel;
+                                AquaPicGUI.ChangeScreens ("Home", topWidget, AquaPicGUI.currentScreen);
+                            } else if (y >= 420) {
+                                var topWidget = this.Toplevel;
+                                AquaPicGUI.ChangeScreens ("Menu", topWidget, AquaPicGUI.currentScreen);
+                            } else {
+                                CollapseMenu ();
+                            }
+                        } else {
+                            CollapseMenu ();
+                        }
                     }
                 } else {
                     //Timer handles all menu movement so do a little cleanup and draw
