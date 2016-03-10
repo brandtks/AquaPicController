@@ -19,15 +19,47 @@ namespace TouchWidgetLibrary
 
     public class TouchTextBox : EventBox
     {
-        public string text;
         public string name;
-        public TouchColor textColor;
-        public int textSize;
-        public TouchAlignment textAlignment;
+        public string text {
+            get {
+                return textRender.text;
+            }
+            set {
+                textRender.text = value;
+            }
+        }
+
+        public TouchColor textColor {
+            get {
+                return textRender.font.color;
+            }
+            set {
+                textRender.font.color = value;
+            }
+        }
+
+        public int textSize {
+            get {
+                return textRender.font.size;
+            }
+            set {
+                textRender.font.size = value;
+            }
+        }
+
+        public TouchAlignment textAlignment {
+            get {
+                return textRender.alignment;
+            }
+            set {
+                textRender.alignment = value;
+            }
+        }
         public TouchColor bkgndColor;
         public bool enableTouch;
         public bool includeTimeFunctions;
         public event TextChangedHandler TextChangedEvent;
+        public TouchText textRender;
 
         public TouchTextBox () {
             this.Visible = true;
@@ -36,10 +68,12 @@ namespace TouchWidgetLibrary
             this.WidthRequest = 100;
             this.HeightRequest = 30;
 
+            textRender = new TouchText ();
+            textRender.textWrap = TouchTextWrap.Shrink;
+
             this.text = string.Empty;
             name = string.Empty;
             this.textColor = new TouchColor ("black");
-            this.textSize = 11;
             this.textAlignment = TouchAlignment.Left;
 
             bkgndColor = "grey4";
@@ -65,12 +99,7 @@ namespace TouchWidgetLibrary
                 cr.LineWidth = 0.75;
                 cr.Stroke ();
 
-                TouchText t = text;
-                t.font.color = textColor;
-                t.font.size = textSize;
-                t.alignment = textAlignment;
-                t.textWrap = TouchTextWrap.Shrink;
-                t.Render (this, left + 3, top, width - 6, height);
+                textRender.Render (this, left + 3, top, width - 6, height);
             }
         }
 

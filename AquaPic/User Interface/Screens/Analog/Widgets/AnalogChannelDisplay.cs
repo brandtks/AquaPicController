@@ -75,7 +75,7 @@ namespace AquaPic.UserInterface
             Put (button, 610, 35);
             button.Show ();
 
-            ss = new TouchSelectorSwitch ();
+            ss = new TouchSelectorSwitch (2);
             ss.SetSizeRequest (100, 30);
             ss.SliderColorOptions [0] = "pri";
             ss.SliderColorOptions [1] = "seca";

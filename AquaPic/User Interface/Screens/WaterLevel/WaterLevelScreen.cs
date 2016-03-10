@@ -12,28 +12,15 @@ namespace AquaPic.UserInterface
     public class WaterLevelWindow : WindowBase
     {
         uint timerId;
-        TouchTextBox analogLevelTextBox;
-        TouchTextBox switchStateTextBox;
+        TouchLabel atoStateTextBox;
+        TouchLabel analogLevelTextBox;
+        TouchLabel switchStateTextBox;
         TouchLabel switchTypeLabel;
         TouchComboBox switchCombo;
         TouchButton atoClearFailBtn;
         int switchId;
 
-        TouchTextBox atoStateTextBox;
-
         public WaterLevelWindow (params object[] options) : base () {
-            //var box1 = new TouchGraphicalBox (385, 395);
-            //Put (box1, 10, 30);
-            //box1.Show ();
-
-            //var box2 = new TouchGraphicalBox (385, 193);
-            //Put (box2, 405, 30);
-            //box2.Show ();
-
-            //var box3 = new TouchGraphicalBox (385, 192);
-            //Put (box3, 405, 233);
-            //box3.Show ();
-
             screenTitle = "Water Level";
 
             ExposeEvent += (o, args) => {
@@ -58,22 +45,23 @@ namespace AquaPic.UserInterface
             /**************************************************************************************************************/
             var label = new TouchLabel ();
             label.text = "Auto Top Off";
-            label.textAlignment = TouchAlignment.Center;
-            label.WidthRequest = 342;
+            label.WidthRequest = 329;
             label.textColor = "seca";
             label.textSize = 12;
+            label.textAlignment = TouchAlignment.Right;
             Put (label, 60, 80);
             label.Show ();
 
             var stateLabel = new TouchLabel ();
             stateLabel.text = "ATO State";
-            stateLabel.textColor = "grey4"; 
-            stateLabel.WidthRequest = 170;
-            Put (stateLabel, 60, 124);
+            stateLabel.textColor = "grey3"; 
+            stateLabel.WidthRequest = 329;
+            stateLabel.textAlignment = TouchAlignment.Center;
+            Put (stateLabel, 60, 155);
             stateLabel.Show ();
 
-            atoStateTextBox = new TouchTextBox ();
-            atoStateTextBox.WidthRequest = 155;
+            atoStateTextBox = new TouchLabel ();
+            atoStateTextBox.WidthRequest = 329;
             if (WaterLevel.atoEnabled) {
                 atoStateTextBox.text = string.Format ("{0} : {1}", 
                     WaterLevel.atoState, 
@@ -81,7 +69,9 @@ namespace AquaPic.UserInterface
             } else {
                 atoStateTextBox.text = "ATO Disabled";
             }
-            Put (atoStateTextBox, 235, 120);
+            atoStateTextBox.textSize = 20;
+            atoStateTextBox.textAlignment = TouchAlignment.Center;
+            Put (atoStateTextBox, 60, 120);
             atoStateTextBox.Show ();
 
             var atoSettingsBtn = new TouchButton ();
@@ -124,23 +114,29 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             label = new TouchLabel ();
+            label.WidthRequest = 370;
             label.text = "Water Level";
-            label.textColor = "grey4"; 
-            Put (label, 415, 124);
+            label.textColor = "grey3";
+            label.textAlignment = TouchAlignment.Center;
+            Put (label, 415, 155);
             label.Show ();
 
-            analogLevelTextBox = new TouchTextBox ();
+            analogLevelTextBox = new TouchLabel ();
+            analogLevelTextBox.WidthRequest = 370;
             if (WaterLevel.analogSensorEnabled) {
                 float wl = WaterLevel.analogWaterLevel;
                 if (wl < 0.0f)
                     analogLevelTextBox.text = "Probe Disconnected";
-                else
+                else {
                     analogLevelTextBox.text = wl.ToString ("F2");
+                    analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
+                }
             } else {
                 analogLevelTextBox.text = "Sensor not available";
             }
-            analogLevelTextBox.WidthRequest = 200;
-            Put (analogLevelTextBox, 585, 120);
+            analogLevelTextBox.textSize = 20;
+            analogLevelTextBox.textAlignment = TouchAlignment.Center;
+            Put (analogLevelTextBox, 415, 120);
 
             var settingsBtn = new TouchButton ();
             settingsBtn.text = "Settings";
@@ -158,25 +154,25 @@ namespace AquaPic.UserInterface
             b.SetSizeRequest (100, 60);
             b.ButtonReleaseEvent += (o, args) => {
                 if (WaterLevel.analogSensorEnabled) {
-                var cal = new CalibrationDialog (
-                    "Water Level Sensor", 
-                    () => {
-                        return AquaPicDrivers.AnalogInput.GetChannelValue (WaterLevel.analogSensorChannel);
-                    });
+                    var cal = new CalibrationDialog (
+                        "Water Level Sensor", 
+                        () => {
+                            return AquaPicDrivers.AnalogInput.GetChannelValue (WaterLevel.analogSensorChannel);
+                        });
 
-                cal.CalibrationCompleteEvent += (aa) => {
-                    WaterLevel.SetCalibrationData (
-                        (float)aa.zeroValue, 
-                        (float)aa.fullScaleActual, 
-                        (float)aa.fullScaleValue);
-                };
+                    cal.CalibrationCompleteEvent += (aa) => {
+                        WaterLevel.SetCalibrationData (
+                            (float)aa.zeroValue, 
+                            (float)aa.fullScaleActual, 
+                            (float)aa.fullScaleValue);
+                    };
 
-                cal.calArgs.zeroValue = WaterLevel.analogSensorZeroCalibrationValue;
-                cal.calArgs.fullScaleActual = WaterLevel.analogSensorFullScaleCalibrationActual;
-                cal.calArgs.fullScaleValue = WaterLevel.analogSensorFullScaleCalibrationValue;
+                    cal.calArgs.zeroValue = WaterLevel.analogSensorZeroCalibrationValue;
+                    cal.calArgs.fullScaleActual = WaterLevel.analogSensorFullScaleCalibrationActual;
+                    cal.calArgs.fullScaleValue = WaterLevel.analogSensorFullScaleCalibrationValue;
 
-                cal.Run ();
-                cal.Destroy ();
+                    cal.Run ();
+                    cal.Destroy ();
                 } else {
                     MessageBox.Show ("Analog water level sensor is disabled\n" +
                                     "Can't perfom a calibration");
@@ -201,21 +197,26 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             var sLabel = new TouchLabel ();
-            sLabel.text = "Current State";
-            sLabel.WidthRequest = 150;
-            Put (sLabel, 415, 324);
+            sLabel.text = "Current Switch State";
+            sLabel.textAlignment = TouchAlignment.Center;
+            sLabel.textColor = "grey3";
+            sLabel.WidthRequest = 370;
+            Put (sLabel, 415, 355);
             sLabel.Show ();
 
-            switchStateTextBox = new TouchTextBox ();
-            switchStateTextBox.WidthRequest = 215;
-            Put (switchStateTextBox, 560, 320);
+            switchStateTextBox = new TouchLabel ();
+            switchStateTextBox.WidthRequest = 370;
+            switchStateTextBox.textSize = 20;
+            switchStateTextBox.textAlignment = TouchAlignment.Center;
+            Put (switchStateTextBox, 415, 320);
             switchStateTextBox.Show ();
 
             //Type
             switchTypeLabel = new TouchLabel ();
-            switchTypeLabel.WidthRequest = 212;
-            switchTypeLabel.textAlignment = TouchAlignment.Right;
-            Put (switchTypeLabel, 560, 354);
+            switchTypeLabel.WidthRequest = 370;
+            switchTypeLabel.textAlignment = TouchAlignment.Center;
+            switchTypeLabel.textColor = "grey3";
+            Put (switchTypeLabel, 415, 370);
             switchTypeLabel.Show ();
 
             var switchSetupBtn = new TouchButton ();
@@ -297,10 +298,13 @@ namespace AquaPic.UserInterface
         public bool OnUpdateTimer () {
             if (WaterLevel.analogSensorEnabled) {
                 float wl = WaterLevel.analogWaterLevel;
-                if (wl < 0.0f)
+                if (wl < 0.0f) {
                     analogLevelTextBox.text = "Probe Disconnected";
-                else
+                    analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
+                } else {
                     analogLevelTextBox.text = wl.ToString ("F2");
+                    analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
+                }
                 analogLevelTextBox.QueueDraw ();
             }
 
@@ -308,10 +312,10 @@ namespace AquaPic.UserInterface
                 bool state = WaterLevel.GetFloatSwitchState (switchId);
                 if (state) {
                     switchStateTextBox.text = "Activated";
-                    switchStateTextBox.bkgndColor = "pri";
+                    switchStateTextBox.textColor = "pri";
                 } else {
                     switchStateTextBox.text = "Normal";
-                    switchStateTextBox.bkgndColor = "seca";
+                    switchStateTextBox.textColor = "seca";
                 }
                 switchStateTextBox.QueueDraw ();
             }
@@ -366,10 +370,10 @@ namespace AquaPic.UserInterface
 
                 if (state) {
                     switchStateTextBox.text = "Activated";
-                    switchStateTextBox.bkgndColor = "pri";
+                    switchStateTextBox.textColor = "pri";
                 } else {
                     switchStateTextBox.text = "Normal";
-                    switchStateTextBox.bkgndColor = "seca";
+                    switchStateTextBox.textColor = "seca";
                 }
 
                 SwitchType type = WaterLevel.GetFloatSwitchType (switchId);
@@ -377,7 +381,7 @@ namespace AquaPic.UserInterface
             } else {
                 switchTypeLabel.Visible = false;
                 switchStateTextBox.text = "Switch not available";
-                switchStateTextBox.bkgndColor = "grey4";
+                switchStateTextBox.textColor = "white";
             }
 
             switchTypeLabel.QueueDraw ();

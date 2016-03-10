@@ -93,12 +93,12 @@ namespace AquaPic.UserInterface
                     t.font.color = "pri";
                     t.alignment = TouchAlignment.Right;
                     if (clicked) {
-                        t.font.size = 17;
+                        t.font.size = 18;
                         double radians = (180 + (offset * 2.75881)).ToRadians ();
                         double textWidth = 210 - CalcX (radius, radians);
                         t.Render (this, left, (height / 2) - 25 + top - (offset * 50.0).ToInt (), textWidth.ToInt (), 50);
                     } else {
-                        t.font.size = 19;
+                        t.font.size = 20;
                         t.Render (this, left, (height / 2) - 25 + top, 245, 50);
                     }
 
@@ -113,7 +113,7 @@ namespace AquaPic.UserInterface
                         double textWidth = 210 - CalcX (radius, radians);
 
                         t.text = windows [drawIndex];
-                        t.font.size = 15 - ((double)i * 0.75).ToInt ();
+                        t.font.size = 16 - ((double)i * 0.75).ToInt ();
                         int textY = (height / 2) + top + 25 + (i * 50) - (offset * 50.0).ToInt ();
 
                         t.Render (
@@ -140,7 +140,7 @@ namespace AquaPic.UserInterface
                     }
 
                     t.text = "Home";
-                    t.font.size = 17;
+                    t.font.size = 18;
                     t.alignment = TouchAlignment.Right;
                     t.Render (this, right - 120, top, 115, 40);
 

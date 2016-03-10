@@ -82,7 +82,7 @@ namespace AquaPic.Modules
             highTempAlarmIdx = Alarm.Subscribe ("High temperature");
             lowTempAlarmIdx = Alarm.Subscribe ("Low temperature");
 
-            temperature = 32.0f;
+            temperature = 0.0f;
 
             TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);
         }
@@ -93,23 +93,26 @@ namespace AquaPic.Modules
 
         public static void Run () {
             temperature = 0.0f;
-            foreach (var ch in probes)
-                temperature += ch.GetTemperature ();
 
-            temperature /= probes.Count;
+            if (probes.Count > 0) {
+                foreach (var ch in probes)
+                    temperature += ch.GetTemperature ();
 
-            if (temperature > highTempAlarmSetpoint)
-                Alarm.Post (highTempAlarmIdx);
-            else {
-                if (Alarm.CheckAlarming (highTempAlarmIdx))
-                    Alarm.Clear (highTempAlarmIdx);
-            }
+                temperature /= probes.Count;
 
-            if (temperature < lowTempAlarmSetpoint)
-                Alarm.Post (lowTempAlarmIdx);
-            else {
-                if (Alarm.CheckAlarming (lowTempAlarmIdx))
-                    Alarm.Clear (lowTempAlarmIdx);
+                if (temperature > highTempAlarmSetpoint)
+                    Alarm.Post (highTempAlarmIdx);
+                else {
+                    if (Alarm.CheckAlarming (highTempAlarmIdx))
+                        Alarm.Clear (highTempAlarmIdx);
+                }
+
+                if (temperature < lowTempAlarmSetpoint)
+                    Alarm.Post (lowTempAlarmIdx);
+                else {
+                    if (Alarm.CheckAlarming (lowTempAlarmIdx))
+                        Alarm.Clear (lowTempAlarmIdx);
+                }
             }
         }
 

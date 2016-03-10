@@ -28,7 +28,12 @@ namespace TouchWidgetLibrary
         private uint clickTimer;
         private int click1, click2;
 
-        public int SelectionCount;
+        private int _selectionCount;
+        public int SelectionCount {
+            get {
+                return _selectionCount;
+            }
+        }
         public int CurrentSelected;
         public TouchOrientation Orientation;
         public MySliderSize SliderSize;
@@ -45,24 +50,24 @@ namespace TouchWidgetLibrary
             this.VisibleWindow = false;
 
             this.Id = (byte)id;
-            this.SelectionCount = selectionCount;
+            _selectionCount = selectionCount;
             this.CurrentSelected = currentSelectedIndex;
             this.Orientation = orientation;
             this.SliderSize = MySliderSize.Large;
 
-            this.BkgndColorOptions = new TouchColor[this.SelectionCount];
+            this.BkgndColorOptions = new TouchColor[_selectionCount];
             for (int i = 0; i < BkgndColorOptions.Length; ++i)
                 this.BkgndColorOptions [i] = new TouchColor ("grey0");
 
-            this.TextColorOptions = new TouchColor[this.SelectionCount];
+            this.TextColorOptions = new TouchColor[_selectionCount];
             for (int i = 0; i < BkgndColorOptions.Length; ++i)
                 this.TextColorOptions [i] = new TouchColor ("white");
 
-            this.SliderColorOptions = new TouchColor[this.SelectionCount];
+            this.SliderColorOptions = new TouchColor[_selectionCount];
             for (int i = 0; i < SliderColorOptions.Length; ++i)
                 this.SliderColorOptions [i] = new TouchColor ("grey4");
 
-            this.TextOptions = new string[this.SelectionCount];
+            this.TextOptions = new string[_selectionCount];
             for (int i = 0; i < TextOptions.Length; ++i)
                 this.TextOptions [i] = string.Empty;
 
@@ -84,9 +89,9 @@ namespace TouchWidgetLibrary
             this.ButtonReleaseEvent += OnSelectorRelease;
         }
 
-        public TouchSelectorSwitch () : this (0, 2, 0, TouchOrientation.Horizontal) { }
+        public TouchSelectorSwitch (int selectionCount) : this (0, selectionCount, 0, TouchOrientation.Horizontal) { }
 
-        public TouchSelectorSwitch (int id) : this (id, 2, 0, TouchOrientation.Horizontal) { }
+        public TouchSelectorSwitch (int id, int selectionCount) : this (id, selectionCount, 0, TouchOrientation.Horizontal) { }
 
         public void AddSelectedColorOption (int selectionIndex, string newColor) {
             BkgndColorOptions [selectionIndex] = newColor;
@@ -109,14 +114,14 @@ namespace TouchWidgetLibrary
                     if (SliderSize == MySliderSize.Small)
                         sliderSize = height;
                     else {
-                        sliderSize = width / SelectionCount;
-                        sliderSize += (SelectionCount - 2) * 8;
+                        sliderSize = width / _selectionCount;
+                        sliderSize += (_selectionCount - 2) * 8;
                     }
 
                     sliderLength = width - sliderSize;
                     sliderMax = left + sliderLength;
 
-                    seperation = sliderLength / (SelectionCount - 1);
+                    seperation = sliderLength / (_selectionCount - 1);
 
                     seperation *= CurrentSelected;
 
@@ -133,14 +138,14 @@ namespace TouchWidgetLibrary
                     if (SliderSize == MySliderSize.Small)
                         sliderSize = width;
                     else {
-                        sliderSize = height / SelectionCount;
-                        sliderSize += (SelectionCount - 2) * 8;
+                        sliderSize = height / _selectionCount;
+                        sliderSize += (_selectionCount - 2) * 8;
                     }
 
                     sliderLength = height - sliderSize;
                     sliderMax = top + sliderLength;
 
-                    seperation = sliderLength / (SelectionCount - 1);
+                    seperation = sliderLength / (_selectionCount - 1);
 
                     seperation *= CurrentSelected;
 
@@ -182,9 +187,9 @@ namespace TouchWidgetLibrary
                 render.textWrap = TouchTextWrap.Shrink;
                 render.alignment = TouchAlignment.Center;
 
-                seperation = Allocation.Width / SelectionCount;
+                seperation = Allocation.Width / _selectionCount;
                 x = Allocation.Left;
-                for (int i = 0; i < SelectionCount; ++i) {
+                for (int i = 0; i < _selectionCount; ++i) {
                     if (!string.IsNullOrWhiteSpace (TextOptions [i])) {
                         render.font.color = TextColorOptions [i];
                         render.text = TextOptions [i];
@@ -212,14 +217,14 @@ namespace TouchWidgetLibrary
             if (Orientation == TouchOrientation.Horizontal) {
                 int x = (int)args.Event.X;
                 int sliderLength = Allocation.Width;
-                int seperation = sliderLength / SelectionCount;
+                int seperation = sliderLength / _selectionCount;
 
                 if (x < 0)
                     CurrentSelected = 0;
                 else if (x > sliderLength)
-                    CurrentSelected = SelectionCount - 1;
+                    CurrentSelected = _selectionCount - 1;
                 else {
-                    for (int i = 0; i < SelectionCount; ++i) {
+                    for (int i = 0; i < _selectionCount; ++i) {
                         int leftBoundery = i * seperation;
                         int rightBoundery = (i + 1) * seperation;
                         if ((x >= leftBoundery) && (x <= rightBoundery)) {
@@ -233,14 +238,14 @@ namespace TouchWidgetLibrary
                 int sliderSize = Allocation.Width;
                 int sliderLength = Allocation.Height - sliderSize;
                 int sliderMax = Allocation.Height;
-                int seperation = sliderLength / (SelectionCount - 1);
+                int seperation = sliderLength / (_selectionCount - 1);
 
                 if (y < 0)
                     CurrentSelected = 0;
                 else if (y > sliderMax)
-                    CurrentSelected = SelectionCount - 1;
+                    CurrentSelected = _selectionCount - 1;
                 else {
-                    for (int i = 0; i < SelectionCount; ++i) {
+                    for (int i = 0; i < _selectionCount; ++i) {
                         int leftBoundery = i * seperation;
                         int rightBoundery = (i + 1) * seperation;
                         if ((y >= leftBoundery) && (y <= rightBoundery)) {

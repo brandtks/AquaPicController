@@ -21,6 +21,13 @@ namespace TouchWidgetLibrary
         Shrink
     }
 
+    public enum UnitsOfMeasurement {
+        None,
+        Degrees,
+        Percentage,
+        Inches
+    }
+
     public static class TouchGlobal
     {
         public static void DrawRoundedRectangle (Cairo.Context cr, double x, double y, double width, double height, double radius) {

@@ -58,8 +58,8 @@ namespace AquaPic.UserInterface
             label.textColor = "pri";
             label.WidthRequest = 100;
             label.textAlignment = TouchAlignment.Center;
-            label.render.textWrap = TouchTextWrap.Shrink;
-            label.render.orientation = TouchOrientation.Vertical;
+            label.textRender.textWrap = TouchTextWrap.Shrink;
+            label.textRender.orientation = TouchOrientation.Vertical;
             Put (label, 29, 3);
 
             bar = new TouchProgressBar ();

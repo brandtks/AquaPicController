@@ -11,6 +11,7 @@ namespace TouchWidgetLibrary
         public TouchOrientation orientation;
         public TouchTextWrap textWrap;
         public string text;
+        public UnitsOfMeasurement unitOfMeasurement;
 
         public TouchText (string text) {
             this.text = text;
@@ -18,6 +19,7 @@ namespace TouchWidgetLibrary
             alignment = TouchAlignment.Left;
             orientation = TouchOrientation.Horizontal;
             textWrap = TouchTextWrap.WordWrap;
+            unitOfMeasurement = UnitsOfMeasurement.None;
         }
 
         public TouchText () : this (string.Empty) { }
@@ -35,7 +37,28 @@ namespace TouchWidgetLibrary
             Pango.Layout l = new Pango.Layout (widget.PangoContext);
 
             l.FontDescription = Pango.FontDescription.FromString (font.fontName + " " + font.size.ToString ());
-            l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + text + "</span>"); 
+
+            string t = text;
+            if (unitOfMeasurement != UnitsOfMeasurement.None) {
+                switch (unitOfMeasurement) {
+                case UnitsOfMeasurement.Degrees:
+                    t += Convert.ToChar (0x00B0).ToString ();
+                    t = " " + t;
+                    break;
+                case UnitsOfMeasurement.Percentage:
+                    t += "%";
+                    t = " " + t;
+                    break;
+                case UnitsOfMeasurement.Inches:
+                    t += "\"";
+                    t = " " + t;
+                    break;
+                default:
+                    break;
+                }
+            }
+           
+            l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + t + "</span>"); 
 
             if (orientation == TouchOrientation.Horizontal) {
                 if (textWrap == TouchTextWrap.WordWrap) {

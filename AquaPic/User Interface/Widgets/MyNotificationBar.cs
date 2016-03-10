@@ -74,7 +74,7 @@ namespace AquaPic.UserInterface
                 if (alarmName == "No Alarms")
                     textRender.font.color = "white";
                 else
-                    textRender.font.color = TouchColor.ToHTML ("compl");
+                    textRender.font.color = "compl";
                 textRender.alignment = TouchAlignment.Left;
                 textRender.Render (this, 0, 0, 500, 19);
             }

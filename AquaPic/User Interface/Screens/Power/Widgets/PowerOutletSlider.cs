@@ -18,7 +18,7 @@ namespace AquaPic.UserInterface
         public TouchLabel Status;
         public TouchSelectorSwitch ss;
         public TouchCurvedProgressBar ampBar;
-        public TouchTextBox ampText;
+        public TouchLabel ampText;
         public TouchButton settingsButton;
 
         public float amps {
@@ -39,17 +39,12 @@ namespace AquaPic.UserInterface
         public PowerOutletSlider (int id) {
             SetSizeRequest (180, 145);
 
-            //var box = new TouchGraphicalBox (180, 145);
-            //box.color = "grey3";
-            //Put (box, 0, 0);
-
             ampBar = new TouchCurvedProgressBar ();
             Put (ampBar, 10, 22);
             ampBar.Show ();
 
-            ampText = new TouchTextBox ();
+            ampText = new TouchLabel ();
             ampText.SetSizeRequest( 76, 20);
-            ampText.textSize = 10;
             ampText.textAlignment = TouchAlignment.Center;
             ampText.text = (ampBar.progress * 10.0f).ToString ("F1");
             Put (ampText, 52, 75);
@@ -76,7 +71,7 @@ namespace AquaPic.UserInterface
             OutletName = new TouchLabel ();
             OutletName.textColor = "grey4";
             OutletName.WidthRequest = 150;
-            OutletName.render.textWrap = TouchTextWrap.Shrink;
+            OutletName.textRender.textWrap = TouchTextWrap.Shrink;
             Put (OutletName, 5, 2);
             OutletName.Show ();
 

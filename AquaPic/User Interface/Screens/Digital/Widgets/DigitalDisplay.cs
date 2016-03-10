@@ -13,7 +13,7 @@ namespace AquaPic.UserInterface
         public TouchLabel label;
         public TouchTextBox textBox;
         public TouchButton button;
-        public ModeSelector selector;
+        public TouchSelectorSwitch selector;
 
         public DigitalDisplay () {
             SetSizeRequest (120, 140);
@@ -21,7 +21,7 @@ namespace AquaPic.UserInterface
             label = new TouchLabel ();
             label.WidthRequest = 120;
             label.textAlignment = TouchAlignment.Center;
-            label.render.textWrap = TouchTextWrap.Shrink;
+            label.textRender.textWrap = TouchTextWrap.Shrink;
             Put (label, 0, 0);
 
             textBox = new TouchTextBox ();
@@ -38,12 +38,15 @@ namespace AquaPic.UserInterface
             button.SetSizeRequest (120, 30);
             Put (button, 0, 55);
 
-            selector = new ModeSelector ();
-            selector.Visible = false;
-            selector.labels [0] = "Open";
-            selector.labels [1] = "Closed";
-            selector.SelectorChangedEvent += OnSelectorChange;
+            selector = new TouchSelectorSwitch (2);
             selector.SetSizeRequest (120, 30);
+            selector.SliderSize = MySliderSize.Large;
+            selector.TextOptions [0] = "Open";
+            selector.TextOptions [1] = "Closed";
+            selector.SliderColorOptions [0] = "grey2";
+            selector.SliderColorOptions [1] = "pri";
+            selector.SelectorChangedEvent += OnSelectorChange;
+            selector.Visible = false;
             Put (selector, 0, 90);
 
             Show ();

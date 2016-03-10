@@ -14,15 +14,16 @@ namespace AquaPic.UserInterface
     {
         private int fixtureID;
         private TouchComboBox combo;
-        private ModeSelector modeSelector;
+        private TouchSelectorSwitch modeSelector;
         private TouchLayeredProgressBar dimmingProgressBar;
         private TouchLabel dimmingHeader;
-        private TouchTextBox dimmingTextBox;
-        private TouchLabel dimmingLabel;
-        private TouchTextBox autoTextBox;
+        private TouchLabel actualTextBox;
+        private TouchLabel actualLabel;
+        private TouchLabel requestedLabel;
+        private TouchLabel requestedTextLabel;
+        private TouchTextBox requestedTextBox;
+        private TouchLabel autoTextBox;
         private TouchLabel autoLabel;
-        private TouchTextBox requestTextBox;
-        private TouchLabel requestLabel;
         private TouchLabel onTimeLabel;
         private TouchTextBox onTimeTextBox;
         private TouchLabel offTimeLabel;
@@ -36,89 +37,77 @@ namespace AquaPic.UserInterface
         private bool dimmingIsManual;
 
         public LightingWindow (params object[] options) : base () {
-            #region base level screen stuff that doesn't change after draw
-            //TouchGraphicalBox box1 = new TouchGraphicalBox (385, 395);
-            //Put (box1, 10, 30);
-            //box1.Show ();
-
-            //TouchGraphicalBox box2 = new TouchGraphicalBox (385, 395);
-            //Put (box2, 405, 30);
-            //box2.Show ();
-
-            //TouchGraphicalBox box3 = new TouchGraphicalBox (205, 350);
-            //box3.color = "grey3";
-            //Put (box3, 410, 70);
-            //box3.Show ();
-
-            //TouchGraphicalBox box4 = new TouchGraphicalBox (165, 350);
-            //box4.color = "grey3";
-            //Put (box4, 620, 70);
-            //box4.Show ();
-
             screenTitle = "Lighting";
 
-            TouchLabel fixtureLabel = new TouchLabel ();
+            var fixtureLabel = new TouchLabel ();
             fixtureLabel.text = "Lighting Fixtures";
             fixtureLabel.textColor = "seca";
             fixtureLabel.textSize = 12;
             Put (fixtureLabel, 415, 80);
             fixtureLabel.Show ();
 
-            TouchLabel genInfoLabel = new TouchLabel ();
-            genInfoLabel.text = "General Lighting Information";
-            genInfoLabel.textAlignment = TouchAlignment.Center;
-            genInfoLabel.WidthRequest = 342;
-            genInfoLabel.textColor = "seca";
-            genInfoLabel.textSize = 12;
-            Put (genInfoLabel, 60, 80);
-            genInfoLabel.Show ();
-
-            TouchLabel sunRiseLabel = new TouchLabel ();
+            var sunRiseLabel = new TouchLabel ();
             sunRiseLabel.text = "Sunrise Today";
-            sunRiseLabel.textColor = "grey4"; 
-            Put (sunRiseLabel, 60, 124);
+            sunRiseLabel.textColor = "grey3"; 
+            sunRiseLabel.textAlignment = TouchAlignment.Center;
+            sunRiseLabel.WidthRequest = 150;
+            Put (sunRiseLabel, 60, 125);
             sunRiseLabel.Show ();
 
-            TouchTextBox sunRise = new TouchTextBox ();
-            sunRise.WidthRequest = 155;
-            sunRise.text = Lighting.sunRiseToday.ToString ();
-            Put (sunRise, 235, 120);
+            var sunRise = new TouchLabel ();
+            sunRise.text = Lighting.sunRiseToday.TimeToString ();
+            sunRise.textAlignment = TouchAlignment.Center;
+            sunRise.textSize = 20;
+            sunRise.WidthRequest = 150;
+            Put (sunRise, 60, 90);
             sunRise.Show ();
 
-            TouchLabel sunSetLabel = new TouchLabel ();
+            var sunSetLabel = new TouchLabel ();
             sunSetLabel.text = "Sunset Today";
-            sunSetLabel.textColor = "grey4"; 
-            Put (sunSetLabel, 60, 159);
+            sunSetLabel.textColor = "grey3"; 
+            sunSetLabel.textAlignment = TouchAlignment.Center;
+            sunSetLabel.WidthRequest = 150;
+            Put (sunSetLabel, 220, 125);
             sunSetLabel.Show ();
 
-            TouchTextBox sunSet = new TouchTextBox ();
-            sunSet.WidthRequest = 155;
-            sunSet.text = Lighting.sunSetToday.ToString ();
-            Put (sunSet, 235, 155);
+            var sunSet = new TouchLabel ();
+            sunSet.text = Lighting.sunSetToday.TimeToString ();
+            sunSet.textAlignment = TouchAlignment.Center;
+            sunSet.textSize = 20;
+            sunSet.WidthRequest = 150;
+            Put (sunSet, 220, 90);
             sunSet.Show ();
 
-            TouchLabel sunRiseTomorrowLabel = new TouchLabel ();
+            var sunRiseTomorrowLabel = new TouchLabel ();
             sunRiseTomorrowLabel.text = "Sunrise Tomorrow";
-            sunRiseTomorrowLabel.textColor = "grey4"; 
-            Put (sunRiseTomorrowLabel, 60, 194);
+            sunRiseTomorrowLabel.textColor = "grey3"; 
+            sunRiseTomorrowLabel.textAlignment = TouchAlignment.Center;
+            sunRiseTomorrowLabel.WidthRequest = 150;
+            Put (sunRiseTomorrowLabel, 60, 225);
             sunRiseTomorrowLabel.Show ();
 
-            TouchTextBox sunRiseTomorrow = new TouchTextBox ();
-            sunRiseTomorrow.WidthRequest = 155;
-            sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToString ();
-            Put (sunRiseTomorrow, 235, 190);
+            var sunRiseTomorrow = new TouchLabel ();
+            sunRiseTomorrow.text = Lighting.sunRiseTomorrow.TimeToString ();
+            sunRiseTomorrow.textAlignment = TouchAlignment.Center;
+            sunRiseTomorrow.textSize = 20;
+            sunRiseTomorrow.WidthRequest = 150;
+            Put (sunRiseTomorrow, 60, 190);
             sunRiseTomorrow.Show ();
 
-            TouchLabel sunSetTomorrowLabel = new TouchLabel ();
+            var sunSetTomorrowLabel = new TouchLabel ();
             sunSetTomorrowLabel.text = "Sunset Tomorrow";
-            sunSetTomorrowLabel.textColor = "grey4"; 
-            Put (sunSetTomorrowLabel, 60, 229);
+            sunSetTomorrowLabel.textColor = "grey3"; 
+            sunSetTomorrowLabel.textAlignment = TouchAlignment.Center;
+            sunSetTomorrowLabel.WidthRequest = 150;
+            Put (sunSetTomorrowLabel, 220, 225);
             sunSetTomorrowLabel.Show ();
 
-            TouchTextBox sunSetTomorrow = new TouchTextBox ();
-            sunSetTomorrow.WidthRequest = 155;
-            sunSetTomorrow.text = Lighting.sunSetTomorrow.ToString ();
-            Put (sunSetTomorrow, 235, 225);
+            var sunSetTomorrow = new TouchLabel ();
+            sunSetTomorrow.text = Lighting.sunSetTomorrow.TimeToString ();
+            sunSetTomorrow.textAlignment = TouchAlignment.Center;
+            sunSetTomorrow.textSize = 20;
+            sunSetTomorrow.WidthRequest = 150;
+            Put (sunSetTomorrow, 220, 190);
             sunSetTomorrow.Show ();
 
             ExposeEvent += (o, args) => {
@@ -132,8 +121,6 @@ namespace AquaPic.UserInterface
                 }
             };
 
-            #endregion
-
             if (Lighting.fixtureCount == 0) {
                 fixtureID = -1;
                 fixtureLabel.text = "No lighing fixtures added";
@@ -145,11 +132,16 @@ namespace AquaPic.UserInterface
             dimmingHeader = new TouchLabel ();
             dimmingHeader.textAlignment = TouchAlignment.Center;
             dimmingHeader.WidthRequest = 165;
-            dimmingHeader.textColor = "secb";
             Put (dimmingHeader, 615, 117);
             dimmingHeader.Show ();
 
-            modeSelector = new ModeSelector ();
+            modeSelector = new TouchSelectorSwitch (2);
+            modeSelector.SetSizeRequest (135, 30);
+            modeSelector.SliderSize = MySliderSize.Large;
+            modeSelector.TextOptions [0] = "Manual";
+            modeSelector.TextOptions [1] = "Auto";
+            modeSelector.SliderColorOptions [0] = "grey2";
+            modeSelector.SliderColorOptions [1] = "pri";
             modeSelector.SelectorChangedEvent += OnDimmingModeSelectorChanged;
             Put (modeSelector, 630, 145);
             modeSelector.Show ();
@@ -164,24 +156,35 @@ namespace AquaPic.UserInterface
             Put (dimmingProgressBar, 745, 185);
             dimmingProgressBar.Show ();
 
-            dimmingTextBox = new TouchTextBox ();
-            dimmingTextBox.textAlignment = TouchAlignment.Center;
-            dimmingTextBox.WidthRequest = 110;
-            Put (dimmingTextBox, 623, 208);
-            dimmingTextBox.Show ();
+            actualTextBox = new TouchLabel ();
+            actualTextBox.WidthRequest = 110;
+            actualTextBox.textSize = 20;
+            actualTextBox.textColor = "pri";
+            actualTextBox.textAlignment = TouchAlignment.Center;
+            actualTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
+            Put (actualTextBox, 623, 187);
+            actualTextBox.Show ();
 
-            dimmingLabel = new TouchLabel ();
-            dimmingLabel.text = "Current";
-            dimmingLabel.textColor = "pri";
-            dimmingLabel.WidthRequest = 125;
-            dimmingLabel.textAlignment = TouchAlignment.Right;
-            Put (dimmingLabel, 608, 187);
-            dimmingLabel.Show ();
+            actualLabel = new TouchLabel ();
+            actualLabel.WidthRequest = 110;
+            actualLabel.text = "Current";
+            actualLabel.textColor = "grey3";
+            actualLabel.textAlignment = TouchAlignment.Center;
+            Put (actualLabel, 623, 222);
+            actualLabel.Show ();
 
-            requestTextBox = new TouchTextBox ();
-            requestTextBox.textAlignment = TouchAlignment.Center;
-            requestTextBox.WidthRequest = 110;
-            requestTextBox.TextChangedEvent += (sender, args) => {
+            requestedLabel = new TouchLabel ();
+            requestedLabel.WidthRequest = 110;
+            requestedLabel.textSize = 20;
+            requestedLabel.textColor = "seca";
+            requestedLabel.textAlignment = TouchAlignment.Center;
+            requestedLabel.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
+            Put (requestedLabel, 623, 250);
+            requestedLabel.Show ();
+
+            requestedTextBox = new TouchTextBox ();
+            requestedTextBox.enableTouch = true;
+            requestedTextBox.TextChangedEvent += (sender, args) => {
                 try {
                     float newLevel = Convert.ToSingle (args.text);
                     if (newLevel < 0.0f)
@@ -193,35 +196,40 @@ namespace AquaPic.UserInterface
                     MessageBox.Show (ex.ToString ());
                 }
             };
-            Put (requestTextBox, 623, 271);
-            requestTextBox.Show ();
+            requestedTextBox.SetSizeRequest (110, 36);
+            requestedTextBox.textSize = 20;
+            requestedTextBox.textColor = "seca";
+            requestedTextBox.textAlignment = TouchAlignment.Center;
+            requestedTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
+            requestedTextBox.Visible = false;
+            Put (requestedTextBox, 623, 247);
+            requestedTextBox.Show ();
 
-            requestLabel = new TouchLabel ();
-            requestLabel.text = "Requested";
-            requestLabel.textColor = "seca";
-            requestLabel.textColor.ModifyColor (1.45);
-            requestLabel.WidthRequest = 125;
-            requestLabel.textAlignment = TouchAlignment.Right;
-            requestLabel.WidthRequest = 125;
-            requestLabel.HeightRequest = 25;
-            Put (requestLabel, 608, 250);
-            requestLabel.Show ();
+            requestedTextLabel = new TouchLabel ();
+            requestedTextLabel.WidthRequest = 110;
+            requestedTextLabel.text = "Requested";
+            requestedTextLabel.textColor = "grey3";
+            requestedTextLabel.textAlignment = TouchAlignment.Center;
+            Put (requestedTextLabel, 623, 285);
+            requestedTextLabel.Show ();
 
-            autoTextBox = new TouchTextBox ();
-            autoTextBox.textAlignment = TouchAlignment.Center;
-            autoTextBox.Visible = false;
+            autoTextBox = new TouchLabel ();
             autoTextBox.WidthRequest = 110;
-            Put (autoTextBox, 623, 334);
+            autoTextBox.Visible = false;
+            autoTextBox.textSize = 20;
+            autoTextBox.textColor = "grey4";
+            autoTextBox.textAlignment = TouchAlignment.Center;
+            autoTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
+            Put (autoTextBox, 623, 313);
             autoTextBox.Show ();
 
             autoLabel = new TouchLabel ();
-            autoLabel.text = "Auto";
-            autoLabel.textColor = "grey4";
-            autoLabel.textAlignment = TouchAlignment.Right;
-            autoLabel.WidthRequest = 125;
-            autoLabel.HeightRequest = 25;
+            autoLabel.WidthRequest = 110;
             autoLabel.Visible = false;
-            Put (autoLabel, 608, 313);
+            autoLabel.text = "Auto";
+            autoLabel.textColor = "grey3";
+            autoLabel.textAlignment = TouchAlignment.Center;
+            Put (autoLabel, 623, 348);
             autoLabel.Show ();
 
             onTimeLabel = new TouchLabel ();
@@ -450,23 +458,24 @@ namespace AquaPic.UserInterface
 
                     modeSelector.Visible = true;
                     dimmingProgressBar.Visible = true;
-                    dimmingTextBox.Visible = true;
-                    dimmingLabel.Visible = true;
-                    requestTextBox.Visible = true;
-                    requestLabel.Visible = true;
+                    actualTextBox.Visible = true;
+                    actualLabel.Visible = true;
+                    requestedLabel.Visible = true;
+                    requestedTextLabel.Visible = true;
 
                     Mode m = Lighting.GetDimmingMode (fixtureID);
                     dimmingIsManual = m == Mode.Manual;
                     if (!dimmingIsManual) {
                         modeSelector.CurrentSelected = 1;
                         dimmingProgressBar.enableTouch = false;
-                        requestTextBox.enableTouch = false;
+                        requestedTextBox.Visible = false;
                         autoTextBox.Visible = false;
                         autoLabel.Visible = false;
                     } else {
                         modeSelector.CurrentSelected = 0;
                         dimmingProgressBar.enableTouch = true;
-                        requestTextBox.enableTouch = true;
+                        requestedTextBox.Visible = true;
+                        requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureID));
                         autoTextBox.Visible = true;
                         autoLabel.Visible = true;
                         autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
@@ -474,11 +483,11 @@ namespace AquaPic.UserInterface
 
                     float level = Lighting.GetCurrentDimmingLevel (fixtureID);
                     dimmingProgressBar.currentProgressSecondary = level / 100.0f;
-                    dimmingTextBox.text = string.Format ("{0:N2}", level);
+                    actualTextBox.text = string.Format ("{0:N2}", level);
 
                     level = Lighting.GetRequestedDimmingLevel (fixtureID);
                     dimmingProgressBar.currentProgress = level / 100.0f;
-                    requestTextBox.text = string.Format ("{0:N2}", level);
+                    requestedLabel.text = string.Format ("{0:N2}", level);
 
                     // bastardized way of getting the combobox in front of other widgets
                     // I think there's another way to do this but I can't remember what it is or if it ever works
@@ -492,12 +501,12 @@ namespace AquaPic.UserInterface
                     modeSelector.Visible = false;
                     dimmingProgressBar.Visible = false;
                     dimmingProgressBar.enableTouch = false;
-                    dimmingTextBox.Visible = false;
-                    dimmingLabel.Visible = false;
+                    actualTextBox.Visible = false;
+                    actualLabel.Visible = false;
                     autoTextBox.Visible = false;
                     autoLabel.Visible = false;
-                    requestTextBox.Visible = false;
-                    requestLabel.Visible = false;
+                    requestedLabel.Visible = false;
+                    requestedTextLabel.Visible = false;
                 }
 
                 QueueDraw ();
@@ -509,12 +518,12 @@ namespace AquaPic.UserInterface
                 dimmingHeader.Visible = false;
                 modeSelector.Visible = false;
                 dimmingProgressBar.Visible = false;
-                dimmingTextBox.Visible = false;
-                dimmingLabel.Visible = false;
+                actualTextBox.Visible = false;
+                actualLabel.Visible = false;
                 autoTextBox.Visible = false;
                 autoLabel.Visible = false;
-                requestTextBox.Visible = false;
-                requestLabel.Visible = false;
+                requestedLabel.Visible = false;
+                requestedTextLabel.Visible = false;
                 outletLabel.Visible = false;
                 outletStateLabel.Visible = false;
                 outletSelectorSwitch.Visible = false;
@@ -562,14 +571,15 @@ namespace AquaPic.UserInterface
                 if (isDimmingFixture) {
                     float level = Lighting.GetCurrentDimmingLevel (fixtureID);
                     dimmingProgressBar.currentProgressSecondary = level / 100.0f;
-                    dimmingTextBox.text = string.Format ("{0:N2}", level);
+                    actualTextBox.text = string.Format ("{0:N2}", level);
 
                     level = Lighting.GetRequestedDimmingLevel (fixtureID);
                     dimmingProgressBar.currentProgress = level / 100.0f;
-                    requestTextBox.text = string.Format ("{0:N2}", level);
+                    requestedLabel.text = string.Format ("{0:N2}", level);
+                    requestedTextBox.text = string.Format ("{0:N2}", level);
 
-                    dimmingTextBox.QueueDraw ();
-                    requestTextBox.QueueDraw ();
+                    actualTextBox.QueueDraw ();
+                    requestedLabel.QueueDraw ();
                     dimmingProgressBar.QueueDraw ();
 
                     if (dimmingIsManual) {
@@ -591,7 +601,8 @@ namespace AquaPic.UserInterface
                 Power.SetOutletManualState (ic, Power.GetOutletState (ic));
                 Power.SetOutletMode (ic, Mode.Manual);
                 dimmingProgressBar.enableTouch = true;
-                requestTextBox.enableTouch = true;
+                requestedTextBox.Visible = true;
+                requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureID));
                 autoTextBox.Visible = true;
                 autoLabel.Visible = true;
                 dimmingIsManual = true;
@@ -606,7 +617,7 @@ namespace AquaPic.UserInterface
                 Lighting.SetDimmingMode (fixtureID, Mode.Auto);
                 Power.SetOutletMode (Lighting.GetFixtureOutletIndividualControl (fixtureID), Mode.Auto);
                 dimmingProgressBar.enableTouch = false;
-                requestTextBox.enableTouch = false;
+                requestedTextBox.Visible = false;
                 autoTextBox.Visible = false;
                 autoLabel.Visible = false;
                 dimmingIsManual = false;
@@ -638,13 +649,13 @@ namespace AquaPic.UserInterface
         protected void OnProgressChanged (object sender, ProgressChangeEventArgs args) {
             Lighting.SetDimmingLevel (fixtureID, args.currentProgress * 100.0f);
             float level = Lighting.GetCurrentDimmingLevel (fixtureID);
-            dimmingTextBox.text = string.Format ("{0:N2}", level);
-            dimmingTextBox.QueueDraw ();
+            actualTextBox.text = string.Format ("{0:N2}", level);
+            actualTextBox.QueueDraw ();
         }
 
         protected void OnProgressChanging (object sender, ProgressChangeEventArgs args) {
-            requestTextBox.text = string.Format ("{0:N2}", args.currentProgress * 100.0f);
-            requestTextBox.QueueDraw ();
+            requestedTextBox.text = string.Format ("{0:N2}", args.currentProgress * 100.0f);
+            requestedTextBox.QueueDraw ();
         }
 
         protected void OnOutletStateChange (object sender, StateChangeEventArgs args) {

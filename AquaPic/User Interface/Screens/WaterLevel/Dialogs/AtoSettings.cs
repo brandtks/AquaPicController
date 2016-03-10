@@ -122,7 +122,7 @@ namespace AquaPic.UserInterface
 
             t = new SettingTextBox ();
             t.text = "Max Runtime";
-            t.textBox.text = string.Format ("{0} mins", WaterLevel.atoMaxRuntime / 60000);
+            t.textBox.text = string.Format ("{0} mins", WaterLevel.atoMaxRuntime / 60);
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
@@ -147,7 +147,7 @@ namespace AquaPic.UserInterface
 
             t = new SettingTextBox ();
             t.text = "Cooldown";
-            t.textBox.text = string.Format ("{0} mins", WaterLevel.atoCooldown / 60000);
+            t.textBox.text = string.Format ("{0} mins", WaterLevel.atoCooldown / 60);
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
@@ -263,7 +263,7 @@ namespace AquaPic.UserInterface
                 int periodIdx = timeString.IndexOf ("mins", StringComparison.InvariantCultureIgnoreCase);
                 if (periodIdx != -1)
                     timeString = timeString.Substring (0, periodIdx);
-                maxRuntime = Convert.ToUInt32 (timeString) * 60000;
+                maxRuntime = Convert.ToUInt32 (timeString) * 60;
 
                 WaterLevel.atoMaxRuntime = maxRuntime;
 
@@ -272,7 +272,7 @@ namespace AquaPic.UserInterface
                 periodIdx = timeString.IndexOf ("mins", StringComparison.InvariantCultureIgnoreCase);
                 if (periodIdx != -1)
                     timeString = timeString.Substring (0, periodIdx);
-                cooldown = Convert.ToUInt32 (timeString) * 60000;
+                cooldown = Convert.ToUInt32 (timeString) * 60;
                 WaterLevel.atoCooldown = cooldown;
             }
 
@@ -291,8 +291,8 @@ namespace AquaPic.UserInterface
                 jo ["AutoTopOff"] ["powerStrip"] = string.Empty;
                 jo ["AutoTopOff"] ["outlet"] = string.Empty;
             }
-            jo ["AutoTopOff"] ["maxPumpOnTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoMaxRuntime / 60000);
-            jo ["AutoTopOff"] ["minPumpOffTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoCooldown / 60000);
+            jo ["AutoTopOff"] ["maxPumpOnTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoMaxRuntime / 60);
+            jo ["AutoTopOff"] ["minPumpOffTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoCooldown / 60);
 
             File.WriteAllText (path, jo.ToString ());
 

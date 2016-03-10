@@ -30,7 +30,7 @@ namespace AquaPic.UserInterface
             label.WidthRequest = 115;
             label.textAlignment = TouchAlignment.Right;
             label.textColor = "white";
-            label.render.textWrap = TouchTextWrap.Shrink;
+            label.textRender.textWrap = TouchTextWrap.Shrink;
             label.text = "Error: No Title";
             Put (label, 0, 4);
             label.Show ();
@@ -91,8 +91,7 @@ namespace AquaPic.UserInterface
         public string[] labels;
 
         public SettingSelectorSwitch (string label1, string label2) : base () {
-            selectorSwitch = new TouchSelectorSwitch ();
-            selectorSwitch.SelectionCount = 2;
+            selectorSwitch = new TouchSelectorSwitch (2);
             selectorSwitch.CurrentSelected = 0;
             selectorSwitch.SliderSize = MySliderSize.Large;
             selectorSwitch.SliderColorOptions [0] = "pri";

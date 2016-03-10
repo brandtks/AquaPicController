@@ -6,41 +6,41 @@ namespace TouchWidgetLibrary
 {
     public class TouchLabel : EventBox
     {
-        public TouchText render;
+        public TouchText textRender;
 
         public string text {
             get {
-                return render.text;
+                return textRender.text;
             }
             set {
-                render.text = value;
+                textRender.text = value;
             }
         }
 
         public TouchColor textColor {
             get {
-                return render.font.color;
+                return textRender.font.color;
             }
             set {
-                render.font.color = value;
+                textRender.font.color = value;
             }
         }
 
         public int textSize {
             get {
-                return render.font.size;
+                return textRender.font.size;
             }
             set {
-                render.font.size = value;
+                textRender.font.size = value;
             }
         }
 
         public TouchAlignment textAlignment {
             get {
-                return render.alignment;
+                return textRender.alignment;
             }
             set {
-                render.alignment = value;
+                textRender.alignment = value;
             }
         }
 
@@ -58,7 +58,7 @@ namespace TouchWidgetLibrary
             this.Visible = true;
             this.VisibleWindow = false;
 
-            render = new TouchText (string.Empty);
+            textRender = new TouchText (string.Empty);
             _centered = false;
 
             HeightRequest = 30;
@@ -69,9 +69,9 @@ namespace TouchWidgetLibrary
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
             if (!_centered)
-                render.Render (this, Allocation.Left, Allocation.Top, Allocation.Width);
+                textRender.Render (this, Allocation.Left, Allocation.Top, Allocation.Width);
             else 
-                render.Render (this, Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
+                textRender.Render (this, Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
         }
     }
 }

@@ -3,6 +3,8 @@ using Gtk;
 using Cairo;
 using TouchWidgetLibrary;
 using AquaPic.Modules;
+using AquaPic.Drivers;
+using AquaPic.Utilites;
 
 namespace AquaPic.UserInterface
 {
@@ -11,28 +13,13 @@ namespace AquaPic.UserInterface
         TouchComboBox heaterCombo;
         TouchComboBox probeCombo;
         TouchLabel heaterLabel;
-        TouchTextBox probeTempTextbox;
-        TouchTextBox tempTextBox;
+        TouchLabel probeTempTextbox;
+        TouchLabel tempTextBox;
         int heaterId;
         int probeId;
         uint timerId;
 
-//        SettingTextBox setpoint;
-//        SettingTextBox deadband;
-
         public TemperatureWindow (params object[] options) : base () {
-            //TouchGraphicalBox box1 = new TouchGraphicalBox (385, 395);
-            //Put (box1, 10, 30);
-            //box1.Show ();
-
-            //TouchGraphicalBox box2 = new TouchGraphicalBox (385, 193);
-            //Put (box2, 405, 30);
-            //box2.Show ();
-
-            //TouchGraphicalBox box3 = new TouchGraphicalBox (385, 192);
-            //Put (box3, 405, 233);
-            //box3.Show ();
-
             screenTitle = "Temperature";
 
             ExposeEvent += (o, args) => {
@@ -52,49 +39,55 @@ namespace AquaPic.UserInterface
                 }
             };
 
-            TouchLabel genInfoLabel = new TouchLabel ();
-            genInfoLabel.text = "General Temperature Information";
-            genInfoLabel.textAlignment = TouchAlignment.Center;
-            genInfoLabel.WidthRequest = 342;
-            genInfoLabel.textColor = "seca";
-            genInfoLabel.textSize = 12;
-            Put (genInfoLabel, 60, 80);
-            genInfoLabel.Show ();
-
             var tempLabel = new TouchLabel ();
+            tempLabel.WidthRequest = 329;
             tempLabel.text = "Temperature";
-            tempLabel.textColor = "grey4"; 
-            Put (tempLabel, 60, 124);
+            tempLabel.textColor = "grey3";
+            tempLabel.textAlignment = TouchAlignment.Center;
+            Put (tempLabel, 60, 145);
             tempLabel.Show ();
 
-            tempTextBox = new TouchTextBox ();
-            tempTextBox.WidthRequest = 155;
+            tempTextBox = new TouchLabel ();
+            tempTextBox.SetSizeRequest (329, 40);
             tempTextBox.text = Temperature.WaterTemperature.ToString ("F1");
-            Put (tempTextBox, 235, 120);
+            tempTextBox.textSize = 36;
+            tempTextBox.textAlignment = TouchAlignment.Center;
+            tempTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
+            Put (tempTextBox, 60, 90);
             tempTextBox.Show ();
 
             var setpointlabel = new TouchLabel ();
+            setpointlabel.WidthRequest = 116;
             setpointlabel.text = "Setpoint";
-            setpointlabel.textColor = "grey4"; 
-            Put (setpointlabel, 60, 159);
+            setpointlabel.textColor = "grey3"; 
+            setpointlabel.textAlignment = TouchAlignment.Center;
+            Put (setpointlabel, 108, 230);
             setpointlabel.Show ();
 
-            var tempSetpoint = new TouchTextBox ();
-            tempSetpoint.WidthRequest = 155;
+            var tempSetpoint = new TouchLabel ();
+            tempSetpoint.SetSizeRequest (116, 30);
             tempSetpoint.text = Temperature.temperatureSetpoint.ToString ("F1");
-            Put (tempSetpoint, 235, 155);
+            tempSetpoint.textSize = 20;
+            tempSetpoint.textAlignment = TouchAlignment.Center;
+            tempSetpoint.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
+            Put (tempSetpoint, 108, 195);
             tempSetpoint.Show ();
 
             var tempDeadbandLabel = new TouchLabel ();
+            tempDeadbandLabel.WidthRequest = 116;
             tempDeadbandLabel.text = "Deadband";
-            tempDeadbandLabel.textColor = "grey4";
-            Put (tempDeadbandLabel, 60, 194);
+            tempDeadbandLabel.textColor = "grey3";
+            tempDeadbandLabel.textAlignment = TouchAlignment.Center;
+            Put (tempDeadbandLabel, 224, 230);
             tempDeadbandLabel.Show ();
 
-            var tempDeadband = new TouchTextBox ();
-            tempDeadband.WidthRequest = 155;
+            var tempDeadband = new TouchLabel ();
+            tempDeadband.SetSizeRequest (116, 30);
             tempDeadband.text = (Temperature.temperatureDeadband * 2).ToString ("F1");
-            Put (tempDeadband, 235, 190);
+            tempDeadband.textSize = 20;
+            tempDeadband.textAlignment = TouchAlignment.Center;
+            tempDeadband.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
+            Put (tempDeadband, 224, 195);
             tempDeadband.Show ();
 
             if (Temperature.heaterCount == 0)
@@ -111,20 +104,11 @@ namespace AquaPic.UserInterface
 
             heaterLabel = new TouchLabel ();
             heaterLabel.textAlignment = TouchAlignment.Center;
-            heaterLabel.WidthRequest = 375;
+            heaterLabel.WidthRequest = 370;
             heaterLabel.textColor = "secb";
-            Put (heaterLabel, 410, 120);
+            heaterLabel.textSize = 20;
+            Put (heaterLabel, 415, 120);
             heaterLabel.Show ();
-
-//            setpoint = new SettingTextBox ();
-//            setpoint.label.text = "Setpoint";
-//            setpoint.textBox.enableTouch = false;
-//            Put (setpoint, 410, 100);
-//
-//            deadband = new SettingTextBox ();
-//            deadband.label.text = "Deadband";
-//            deadband.textBox.enableTouch = false;
-//            Put (deadband, 410, 135);
 
             var globalSettingsBtn = new TouchButton ();
             globalSettingsBtn.text = "Settings";
@@ -258,14 +242,17 @@ namespace AquaPic.UserInterface
 
             var tLabel = new TouchLabel ();
             tLabel.text = "Temperature";
-            tLabel.textAlignment = TouchAlignment.Right;
-            tLabel.WidthRequest = 95;
-            Put (tLabel, 415, 324);
+            tLabel.textAlignment = TouchAlignment.Center;
+            tLabel.textColor = "grey3";
+            tLabel.WidthRequest = 370;
+            Put (tLabel, 415, 355);
             tLabel.Show ();
 
-            probeTempTextbox = new TouchTextBox ();
-            probeTempTextbox.WidthRequest = 215;
-            Put (probeTempTextbox, 560, 320);
+            probeTempTextbox = new TouchLabel ();
+            probeTempTextbox.WidthRequest = 370;
+            probeTempTextbox.textSize = 20;
+            probeTempTextbox.textAlignment = TouchAlignment.Center;
+            Put (probeTempTextbox, 415, 320);
             probeTempTextbox.Show ();
 
             string[] hNames = Temperature.GetAllHeaterNames ();
@@ -372,24 +359,16 @@ namespace AquaPic.UserInterface
 
         protected void GetHeaterData () {
             if (heaterId != -1) {
-//            if (Temperature.ControlsTemperature (heaterId)) {
-                heaterLabel.text = string.Format ("{0} control based upon global setpoints", Temperature.GetHeaterName (heaterId));
-//                setpoint.Visible = false;
-//                deadband.Visible = false;
-//            } else {
-//                heaterLabel.text = "Heater Control Setpoints";
-//                setpoint.Visible = true;
-//                deadband.Visible = true;
-//
-//                setpoint.textBox.text = Temperature.GetHeaterSetpoint (heaterId).ToString ("F1");
-//                deadband.textBox.text = Temperature.GetHeaterDeadband (heaterId).ToString ("F1");
-//            }
-
-
-//            setpoint.QueueDraw ();
-//            deadband.QueueDraw ();
+                if (Power.GetOutletState (Temperature.GetHeaterIndividualControl (heaterId)) == MyState.On) {
+                    heaterLabel.text = "Heater On";
+                    heaterLabel.textColor = "secb";
+                } else {
+                    heaterLabel.text = "Heater Off";
+                    heaterLabel.textColor = "white";
+                }
             } else {
-                heaterLabel.text = string.Empty;
+                heaterLabel.text = "No Heaters Connected";
+                heaterLabel.textColor = "white";
             }
 
             heaterLabel.QueueDraw ();
@@ -398,8 +377,10 @@ namespace AquaPic.UserInterface
         protected void GetProbeData () {
             if (probeId != -1) {
                 probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeId).ToString ("F2");
+                probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
             } else {
                 probeTempTextbox.text = "Probe not available";
+                probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
             }
 
             probeTempTextbox.QueueDraw ();
