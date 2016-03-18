@@ -57,7 +57,7 @@ namespace AquaPic.UserInterface
 
             label = new TouchLabel ();
             label.text = "Plot";
-            label.textColor = "pri";
+            label.textColor = "grey3";
             label.WidthRequest = 100;
             label.textAlignment = TouchAlignment.Center;
             label.textRender.textWrap = TouchTextWrap.Shrink;
@@ -76,6 +76,7 @@ namespace AquaPic.UserInterface
             textBox.SetSizeRequest (65, 30);
             textBox.textSize = 20;
             textBox.text = "0.0";
+            textBox.textColor = "pri";
             textBox.textAlignment = TouchAlignment.Center;
             Put (textBox, 32, 130);
         }
