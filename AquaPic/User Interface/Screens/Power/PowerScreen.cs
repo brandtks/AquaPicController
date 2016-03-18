@@ -24,11 +24,8 @@ namespace AquaPic.UserInterface
 
             if (Power.powerStripCount == 0) {
                 powerID = -1;
-
                 screenTitle = "No Power Strips Added";
-
                 Show ();
-
                 return;
             }
 
@@ -96,15 +93,9 @@ namespace AquaPic.UserInterface
                         cr.Stroke ();
 
                         cr.MoveTo (232.5+ (i * 185), 115);
-                        //cr.LineTo (232.5 + (i * 185), 240);
                         cr.LineTo (232.5 + (i * 185), 385);
                         cr.ClosePath ();
                         cr.Stroke ();
-
-                        //cr.MoveTo (232.5+ (i * 185), 265);
-                        //cr.LineTo (232.5 + (i * 185), 385);
-                        //cr.ClosePath ();
-                        //cr.Stroke ();
                     }
 
                     cr.MoveTo (615, 252.5);

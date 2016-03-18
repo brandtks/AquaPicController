@@ -14,18 +14,6 @@ namespace AquaPic.UserInterface
         private uint timerId;
 
         public AlarmWindow (params object[] options) : base () {
-            //var box = new TouchGraphicalBox (730, 440);
-            //Put (box, 60, 30);
-
-            //var label = new TouchLabel ();
-            //label.text = "Current Alarms";
-            //label.textSize = 14;
-            //label.textColor = "pri";
-            //label.WidthRequest = 780;
-            //label.textAlignment = TouchAlignment.Center;
-            //Put (label, 10, 35);
-            //label.Show ();
-
             screenTitle = "Current Alarms";
 
             var b = new TouchButton ();

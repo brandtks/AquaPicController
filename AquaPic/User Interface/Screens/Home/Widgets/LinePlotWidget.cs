@@ -25,7 +25,9 @@ namespace AquaPic.UserInterface
     public class LinePlotWidget : Fixed
     {
         public string text {
-            get { return displayLabel.text; }
+            get { 
+                return displayLabel.text; 
+            }
             set {
                 displayLabel.text = value;
             }
@@ -36,45 +38,50 @@ namespace AquaPic.UserInterface
                 return Convert.ToSingle (textBox.text);
             }
             set {
-                textBox.text = value.ToString ("0.0");
+                textBox.text = value.ToString ("F1");
             }
         }
 
         private TouchLabel displayLabel;
-        private TouchTextBox textBox;
+        private TouchLabel textBox;
 
         public LinePlotWidget () {
             SetSizeRequest (415, 82);
 
             var box1 = new TouchGraphicalBox (415, 82);
+            box1.color = "grey4";
+            box1.transparency = 0.1f;
             Put (box1, 0, 0);
 
             displayLabel = new TouchLabel ();
             displayLabel.text = "Plot";
             displayLabel.WidthRequest = 110;
-            displayLabel.textColor = "pri";
-            Put (displayLabel, 4, 2);
+            displayLabel.textColor = "grey3";
+            displayLabel.textAlignment = TouchAlignment.Center;
+            Put (displayLabel, 3, 50);
+
+            textBox = new TouchLabel ();
+            textBox.WidthRequest = 110;
+            textBox.textSize = 20;
+            textBox.text = "0.0";
+            textBox.textColor = "pri";
+            textBox.textAlignment = TouchAlignment.Center;
+            Put (textBox, 3, 15);
 
             var box2 = new TouchGraphicalBox (296, 76);
-            box2.color = "grey4";
-            box2.transparency = 0.85f;
+            box2.color = "grey3";
+            box2.transparency = 0.15f;
             Put (box2, 116, 3);
 
             //<TEMPORARY> just here until I get a plot library and data logging
             var label1 = new TouchLabel ();
             label1.text = "Not Implemented: For line plot";
-            label1.textColor = "black";
-            label1.WidthRequest = 320;
-            Put (label1, 120, 5);
-
-            textBox = new TouchTextBox ();
-            textBox.WidthRequest = 80;
-            textBox.HeightRequest = 35;
-            textBox.textSize = 14;
-            textBox.text = "0.0";
-            textBox.textAlignment = TouchAlignment.Center;
-            Put (textBox, 18, 30);
-
+            label1.textColor = "white";
+            label1.WidthRequest = 296;
+            label1.textSize = 10;
+            label1.textAlignment = TouchAlignment.Right;
+            Put (label1, 116, 62);
+            
             ShowAll ();
         }
 

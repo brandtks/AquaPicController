@@ -60,13 +60,13 @@ namespace AquaPic.Utilites
             this.millisec = value.millisec;
         }
 
-        public TimeSpan toTimeSpan () {
+        public TimeSpan ToTimeSpan () {
             TimeSpan val = new TimeSpan (0, hour, min, sec, millisec);
             return val;
         }
 
         public int CompareToTime (Time value) {
-            return TimeSpan.Compare (toTimeSpan (), value.toTimeSpan ());
+            return TimeSpan.Compare (ToTimeSpan (), value.ToTimeSpan ());
         }
 
         public bool EqualsShortTime (DateTime value) {
@@ -85,22 +85,11 @@ namespace AquaPic.Utilites
         }
 
         public void AddTimeToTime (Time value) {
-            TimeSpan val = toTimeSpan ();
-            val.Add (value.toTimeSpan ());
+            TimeSpan val = ToTimeSpan ();
+            val.Add (value.ToTimeSpan ());
             SetTime (val);
         }
-
-		public string TimeToString () {
-            int h = hour;
-            string t = "AM";
-
-            if (h > 12) {
-                h %= 12;
-                t = "PM";
-            }
-            return string.Format ("{0}:{1:00} {2}", h, min, t);
-		}
-
+          
         public static Time Parse (string value) {
             int pos = value.IndexOf (":");
 
@@ -129,6 +118,17 @@ namespace AquaPic.Utilites
             }
 
             return new Time ((byte)hour, (byte)min);
+        }
+
+        public string ToTimeString () {
+            int h = hour;
+            string t = "AM";
+
+            if (h > 12) {
+                h %= 12;
+                t = "PM";
+            }
+            return string.Format ("{0}:{1:00} {2}", h, min, t);
         }
     }
 }

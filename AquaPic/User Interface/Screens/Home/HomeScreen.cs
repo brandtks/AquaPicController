@@ -12,22 +12,22 @@ using AquaPic.Modules;
 
 namespace AquaPic.UserInterface
 {
-    public class MainWindow : WindowBase
+    public class HomeWindow : WindowBase
     {
         List<LinePlotWidget> linePlots;
         List<BarPlotWidget> barPlots;
 
         uint timerId;
 
-        public MainWindow (params object[] options) : base () {
+        public HomeWindow (params object[] options) : base () {
             showTitle = false;
 
             var names = Lighting.GetAllFixtureNames ();
             foreach (var name in names) {
                 int fixtureId = Lighting.GetFixtureIndex (name);
                 if (Lighting.IsDimmingFixture (fixtureId)) {
-                    if (!MainWindowWidgets.barPlots.ContainsKey (name))
-                        MainWindowWidgets.barPlots.Add (
+                    if (!HomeWindowWidgets.barPlots.ContainsKey (name))
+                        HomeWindowWidgets.barPlots.Add (
                             name, 
                             new BarPlotData (() => {
                                 return new DimmingLightBarPlot (
@@ -67,8 +67,8 @@ namespace AquaPic.UserInterface
                     case "LinePlot": {
                             string name = (string)jo ["name"];
 
-                            if (MainWindowWidgets.linePlots.ContainsKey (name)) {
-                                var lp = MainWindowWidgets.linePlots [name].CreateInstance ();
+                            if (HomeWindowWidgets.linePlots.ContainsKey (name)) {
+                                var lp = HomeWindowWidgets.linePlots [name].CreateInstance ();
                                 Put (lp, x, y);
                                 lp.Show ();
 
@@ -83,8 +83,8 @@ namespace AquaPic.UserInterface
                     case "BarPlot": {
                             string name = (string)jo ["name"];
 
-                            if (MainWindowWidgets.barPlots.ContainsKey (name)) {
-                                var bp = MainWindowWidgets.barPlots [name].CreateInstance ();
+                            if (HomeWindowWidgets.barPlots.ContainsKey (name)) {
+                                var bp = HomeWindowWidgets.barPlots [name].CreateInstance ();
                                 Put (bp, x, y);
                                 bp.Show ();
 

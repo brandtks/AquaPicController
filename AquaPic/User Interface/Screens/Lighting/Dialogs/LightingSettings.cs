@@ -44,11 +44,11 @@ namespace AquaPic.UserInterface
             t = new SettingTextBox ();
             t.text = "Default Rise";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.defaultSunRise.TimeToString ();
+            t.textBox.text = Lighting.defaultSunRise.ToTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.TimeToString ();
+                    args.text = time.ToTimeString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -59,11 +59,11 @@ namespace AquaPic.UserInterface
             t = new SettingTextBox ();
             t.text = "Default Set";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.defaultSunSet.TimeToString ();
+            t.textBox.text = Lighting.defaultSunSet.ToTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.TimeToString ();
+                    args.text = time.ToTimeString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -74,11 +74,11 @@ namespace AquaPic.UserInterface
             t = new SettingTextBox ();
             t.text = "Min Sunrise";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.minSunRise.TimeToString ();
+            t.textBox.text = Lighting.minSunRise.ToTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.TimeToString ();
+                    args.text = time.ToTimeString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -89,11 +89,11 @@ namespace AquaPic.UserInterface
             t = new SettingTextBox ();
             t.text = "Max Sunrise";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.maxSunRise.TimeToString ();
+            t.textBox.text = Lighting.maxSunRise.ToTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.TimeToString ();
+                    args.text = time.ToTimeString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -104,11 +104,11 @@ namespace AquaPic.UserInterface
             t = new SettingTextBox ();
             t.text = "Min Sunset";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.minSunSet.TimeToString ();
+            t.textBox.text = Lighting.minSunSet.ToTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.TimeToString ();
+                    args.text = time.ToTimeString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -119,11 +119,11 @@ namespace AquaPic.UserInterface
             t = new SettingTextBox ();
             t.text = "Max Sunset";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.maxSunSet.TimeToString ();
+            t.textBox.text = Lighting.maxSunSet.ToTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.TimeToString ();
+                    args.text = time.ToTimeString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;

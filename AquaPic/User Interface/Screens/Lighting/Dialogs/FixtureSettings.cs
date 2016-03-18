@@ -83,9 +83,38 @@ namespace AquaPic.UserInterface
                 s.selectorSwitch.CurrentSelected = 1;
             AddSetting (s);
 
+            /*
+            t = new SettingTextBox ();
+            t.text = "Default On Time";
+            t.textBox.includeTimeFunctions = true;
+            t.textBox.text = Lighting.defaultSunRise;
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Time.Parse (args.text);
+                } catch {
+                    MessageBox.Show ("Incorrect time format");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
+
+            t = new SettingTextBox ();
+            t.text = "Default Off Time";
+            t.textBox.includeTimeFunctions = true;
+            t.textBox.text = Lighting.defaultSunRise;
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    Time.Parse (args.text);
+                } catch {
+                    MessageBox.Show ("Incorrect time format");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
+            */
+
             t = new SettingTextBox ();
             t.text = "On Time Offset";
-            t.textBox.includeTimeFunctions = true;
             if (fixtureIdx != -1)
                 t.textBox.text = Lighting.GetFixtureOnTimeOffset (fixtureIdx).ToString ();
             else

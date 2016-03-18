@@ -142,7 +142,7 @@ namespace AquaPic.Utilites
 
         // returns 1 if after value, -1 if before value
         public int CompareToTime (TimeDate value) {
-            return TimeSpan.Compare (toTimeSpan (), value.toTimeSpan ());
+            return TimeSpan.Compare (ToTimeSpan (), value.ToTimeSpan ());
         }
 
         public double DifferenceInTime(TimeDate value) {
@@ -155,18 +155,6 @@ namespace AquaPic.Utilites
             return val;
         }
 
-//        public void addMinToDate (int value) {
-//            DateTime val = toDateTime ();
-//            val.AddMinutes (value);
-//            setTimeDate (val);
-//        }
-//
-//        public void addTimeToDate (Time value) {
-//            DateTime val = toDateTime ();
-//            val.Add (value.toTimeSpan ());
-//            setTimeDate (val);
-//        }
-
         public void AddDay (int value) {
             DateTime val = ToDateTime ();
             val = val.AddDays (value);
@@ -175,8 +163,13 @@ namespace AquaPic.Utilites
 
 		public override string ToString () {
 			DateTime val = ToDateTime ();
-			return val.ToString ("MM/dd/yy h:mm tt");
-		} 
+			return val.ToString ("M/dd/yy h:mm tt");
+		}
+
+        public string ToShortString () {
+            DateTime val = ToDateTime ();
+            return val.ToString ("M/dd h:mm tt");
+        }
     }
 }
 

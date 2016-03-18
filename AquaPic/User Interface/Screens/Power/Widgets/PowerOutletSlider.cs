@@ -13,7 +13,6 @@ namespace AquaPic.UserInterface
     {
         public UpdateScreenHandler UpdateScreen;
 
-        private string[] labels;
         public TouchLabel OutletName;
         public TouchLabel Status;
         public TouchSelectorSwitch ss;
@@ -44,10 +43,10 @@ namespace AquaPic.UserInterface
             ampBar.Show ();
 
             ampText = new TouchLabel ();
-            ampText.SetSizeRequest( 76, 20);
+            ampText.WidthRequest = 76;
             ampText.textAlignment = TouchAlignment.Center;
             ampText.text = (ampBar.progress * 10.0f).ToString ("F1");
-            Put (ampText, 52, 75);
+            Put (ampText, 52, 80);
             ampText.Show ();
 
             ss = new TouchSelectorSwitch (id, 3, 0, TouchOrientation.Horizontal);
@@ -57,16 +56,12 @@ namespace AquaPic.UserInterface
             ss.SliderColorOptions [0] = "grey2";
             ss.SliderColorOptions [1] = "pri";
             ss.SliderColorOptions [2] = "seca";
-            ss.Name = string.Empty;
-            ss.ExposeEvent += OnExpose;
+            ss.TextOptions [0] = "Off";
+            ss.TextOptions [1] = "Auto";
+            ss.TextOptions [2] = "On";
             Put (ss, 5, 110);
             ss.Show ();
 
-            labels = new string[3];
-
-            labels [0] = "Off";
-            labels [1] = "Auto";
-            labels [2] = "On";
 
             OutletName = new TouchLabel ();
             OutletName.textColor = "grey4";
@@ -95,43 +90,6 @@ namespace AquaPic.UserInterface
             settingsButton.Show ();
 
             ShowAll ();
-        }
-
-        protected void OnExpose (object sender, ExposeEventArgs args) {
-            TouchSelectorSwitch tss = sender as TouchSelectorSwitch;
-            int seperation = tss.Allocation.Width / tss.SelectionCount;
-            int x = tss.Allocation.Left;
-
-            TouchText render = new TouchText ();
-            render.textWrap = TouchTextWrap.Shrink;
-            render.alignment = TouchAlignment.Center;
-            render.font.color = "white";
-
-            foreach (var l in labels) {
-                render.text = l;
-                render.Render (tss, x, tss.Allocation.Top + 6, seperation);
-                x += seperation;
-            }
-
-            /*
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
-                //cr.Rectangle (Allocation.Left - 2, Allocation.Top - 2, Allocation.Width + 4, Allocation.Height + 4);
-                TouchGlobal.DrawRoundedRectangle (
-                    cr, 
-                    Allocation.Left + 1, 
-                    Allocation.Top + 1, 
-                    Allocation.Width - 2, 
-                    Allocation.Height - 2, 
-                    6);
-                if (Status.text == "On") {
-                    TouchColor.SetSource (cr, "seca");
-                } else {
-                    TouchColor.SetSource (cr, "grey2");
-                }
-                cr.LineWidth = 4;
-                cr.Stroke ();
-            }
-            */
         }
 
         protected void OnSettingButtonRelease (object sender, ButtonReleaseEventArgs args) {

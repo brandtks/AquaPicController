@@ -14,17 +14,6 @@ namespace AquaPic.UserInterface
         public TextView tv;
 
         public LoggerWindow (params object[] options) : base () {
-            //var box = new TouchGraphicalBox (780, 395);
-            //Put (box, 10, 30);
-
-            //var label = new TouchLabel ();
-            //label.text = "Logger";
-            //label.textSize = 13;
-            //label.textColor = "pri";
-            //label.WidthRequest = 780;
-            //label.textAlignment = TouchAlignment.Center;
-            //Put (label, 10, 35);
-
             screenTitle = "Logger";
 
             var b = new TouchButton ();

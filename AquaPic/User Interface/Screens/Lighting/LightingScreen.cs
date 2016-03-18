@@ -25,9 +25,9 @@ namespace AquaPic.UserInterface
         private TouchLabel autoTextBox;
         private TouchLabel autoLabel;
         private TouchLabel onTimeLabel;
-        private TouchTextBox onTimeTextBox;
+        private TouchLabel onTimeTextBox;
         private TouchLabel offTimeLabel;
-        private TouchTextBox offTimeTextBox;
+        private TouchLabel offTimeTextBox;
         private TouchLabel outletLabel;
         private TouchLabel outletStateLabel;
         private TouchSelectorSwitch outletSelectorSwitch;
@@ -55,7 +55,7 @@ namespace AquaPic.UserInterface
             sunRiseLabel.Show ();
 
             var sunRise = new TouchLabel ();
-            sunRise.text = Lighting.sunRiseToday.TimeToString ();
+            sunRise.text = Lighting.sunRiseToday.ToTimeString ();
             sunRise.textAlignment = TouchAlignment.Center;
             sunRise.textSize = 20;
             sunRise.WidthRequest = 150;
@@ -71,7 +71,7 @@ namespace AquaPic.UserInterface
             sunSetLabel.Show ();
 
             var sunSet = new TouchLabel ();
-            sunSet.text = Lighting.sunSetToday.TimeToString ();
+            sunSet.text = Lighting.sunSetToday.ToTimeString ();
             sunSet.textAlignment = TouchAlignment.Center;
             sunSet.textSize = 20;
             sunSet.WidthRequest = 150;
@@ -87,7 +87,7 @@ namespace AquaPic.UserInterface
             sunRiseTomorrowLabel.Show ();
 
             var sunRiseTomorrow = new TouchLabel ();
-            sunRiseTomorrow.text = Lighting.sunRiseTomorrow.TimeToString ();
+            sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToTimeString ();
             sunRiseTomorrow.textAlignment = TouchAlignment.Center;
             sunRiseTomorrow.textSize = 20;
             sunRiseTomorrow.WidthRequest = 150;
@@ -103,7 +103,7 @@ namespace AquaPic.UserInterface
             sunSetTomorrowLabel.Show ();
 
             var sunSetTomorrow = new TouchLabel ();
-            sunSetTomorrow.text = Lighting.sunSetTomorrow.TimeToString ();
+            sunSetTomorrow.text = Lighting.sunSetTomorrow.ToTimeString ();
             sunSetTomorrow.textAlignment = TouchAlignment.Center;
             sunSetTomorrow.textSize = 20;
             sunSetTomorrow.WidthRequest = 150;
@@ -132,7 +132,7 @@ namespace AquaPic.UserInterface
             dimmingHeader = new TouchLabel ();
             dimmingHeader.textAlignment = TouchAlignment.Center;
             dimmingHeader.WidthRequest = 165;
-            Put (dimmingHeader, 615, 117);
+            Put (dimmingHeader, 625, 117);
             dimmingHeader.Show ();
 
             modeSelector = new TouchSelectorSwitch (2);
@@ -143,7 +143,7 @@ namespace AquaPic.UserInterface
             modeSelector.SliderColorOptions [0] = "grey2";
             modeSelector.SliderColorOptions [1] = "pri";
             modeSelector.SelectorChangedEvent += OnDimmingModeSelectorChanged;
-            Put (modeSelector, 630, 145);
+            Put (modeSelector, 640, 145);
             modeSelector.Show ();
 
             dimmingProgressBar = new TouchLayeredProgressBar ();
@@ -233,85 +233,128 @@ namespace AquaPic.UserInterface
             autoLabel.Show ();
 
             onTimeLabel = new TouchLabel ();
+            onTimeLabel.WidthRequest = 185;
             onTimeLabel.text = "On Time";
-            onTimeLabel.textColor = "grey4"; 
-            Put (onTimeLabel, 415, 124);
+            onTimeLabel.textColor = "grey3"; 
+            onTimeLabel.textAlignment = TouchAlignment.Center;
+            Put (onTimeLabel, 415, 222);
             onTimeLabel.Show ();
 
-            onTimeTextBox = new TouchTextBox ();
-            onTimeTextBox.WidthRequest = 185;
-            onTimeTextBox.enableTouch = true;
-            onTimeTextBox.includeTimeFunctions = true;
-            onTimeTextBox.TextChangedEvent += (sender, args) => {
-                try {
-                    var t = Time.Parse (args.text);
-
-                    if (t.CompareToTime (new Time ()) == 1) {
-                        var td = Lighting.GetFixtureOnTime (fixtureID);
-                        td.SetTime (t);
-                        args.text = td.ToString ();
-                    } else {
-                        MessageBox.Show ("Can modify time to before current time");
-                        args.keepText = false;
-                    }
-                } catch {
-                    MessageBox.Show ("Incorrect time format");
-                    args.keepText = false;
-                }
-            };
-            Put (onTimeTextBox, 415, 145);
+            onTimeTextBox = new TouchLabel ();
+            onTimeTextBox.WidthRequest = 195;
+            onTimeTextBox.textSize = 20;
+            onTimeTextBox.textAlignment = TouchAlignment.Center;
+            Put (onTimeTextBox, 410, 187);
             onTimeTextBox.Show ();
 
+            var btn = new TouchButton ();
+            btn.SetSizeRequest (100, 60);
+            btn.text = "Modify On Time";
+            btn.ButtonReleaseEvent += (o, args) => {
+                TouchNumberInput numberInput;
+                var parent = this.Toplevel as Gtk.Window;
+                if (parent != null) {
+                    if (parent.IsTopLevel)
+                        numberInput = new TouchNumberInput (true, parent);
+                    else
+                        numberInput = new TouchNumberInput (true);
+                } else {
+                    numberInput = new TouchNumberInput (true);
+                }
+
+                numberInput.NumberSetEvent += (value) => {
+                    try {
+                        var t = Time.Parse (value);
+
+                        bool timeOk = true;
+                        if (t.CompareToTime (new Time ()) == -1) {
+                            timeOk = false;
+                            MessageBox.Show ("Can't modify time to before current time");
+                        }
+
+                        if (t.CompareToTime (Lighting.GetFixtureOffTime (fixtureID)) == 1) {
+                            timeOk = false;
+                            MessageBox.Show ("Can't modify on time to after off time");
+                        }
+
+                        if (timeOk) {
+                            var td = Lighting.GetFixtureOffTime (fixtureID);
+                            td.SetTime (t);
+                            onTimeTextBox.text = td.ToShortString ();
+                            onTimeTextBox.QueueDraw ();
+                        }
+                    } catch {
+                        MessageBox.Show ("Incorrect time format");
+                    }
+                };
+
+                numberInput.Run ();
+                numberInput.Destroy ();
+            };
+            Put (btn, 525, 405);
+            btn.Show ();
+
             offTimeLabel = new TouchLabel ();
+            offTimeLabel.WidthRequest = 185;
             offTimeLabel.text = "Off Time";
-            offTimeLabel.textColor = "grey4";
-            Put (offTimeLabel, 415, 187);
+            offTimeLabel.textColor = "grey3"; 
+            offTimeLabel.textAlignment = TouchAlignment.Center;
+            Put (offTimeLabel, 415, 285);
             offTimeLabel.Show ();
 
-            offTimeTextBox = new TouchTextBox ();
-            offTimeTextBox.WidthRequest = 185;
-            offTimeTextBox.enableTouch = true;
-            offTimeTextBox.includeTimeFunctions = true;
-            offTimeTextBox.TextChangedEvent += (sender, args) => {
-                try {
-                    var t = Time.Parse (args.text);
-
-                    if (t.CompareToTime (new Time ()) == 1) {
-                        var td = Lighting.GetFixtureOffTime (fixtureID);
-                        td.SetTime (t);
-                        args.text = td.ToString ();
-                    } else {
-                        MessageBox.Show ("Can modify time to before current time");
-                        args.keepText = false;
-                    }
-                } catch {
-                    MessageBox.Show ("Incorrect time format");
-                    args.keepText = false;
-                }
-            };
-            Put (offTimeTextBox, 415, 208);
+            offTimeTextBox = new TouchLabel ();
+            offTimeTextBox.WidthRequest = 195;
+            offTimeTextBox.textSize = 20;
+            offTimeTextBox.textAlignment = TouchAlignment.Center;
+            Put (offTimeTextBox, 410, 250);
             offTimeTextBox.Show ();
 
-            string[] names = Lighting.GetAllFixtureNames ();
-            combo = new TouchComboBox (names);
-            combo.Active = 0;
-            combo.WidthRequest = 235;
-            combo.List.Add ("New fixture...");
-            combo.ChangedEvent += OnComboChanged;
-            Put (combo, 550, 77);
-            combo.Show ();
-
-            if (options.Length >= 3) {
-                string requestedFixture = options [2] as string;
-                if (requestedFixture != null) {
-                    try {
-                        fixtureID = Lighting.GetFixtureIndex (requestedFixture);
-                        combo.Active = fixtureID;
-                    } catch {
-                        ;
-                    }
+            btn = new TouchButton ();
+            btn.SetSizeRequest (100, 60);
+            btn.text = "Modify Off Time";
+            btn.ButtonReleaseEvent += (o, args) => {
+                TouchNumberInput numberInput;
+                var parent = this.Toplevel as Gtk.Window;
+                if (parent != null) {
+                    if (parent.IsTopLevel)
+                        numberInput = new TouchNumberInput (true, parent);
+                    else
+                        numberInput = new TouchNumberInput (true);
+                } else {
+                    numberInput = new TouchNumberInput (true);
                 }
-            }
+
+                numberInput.NumberSetEvent += (value) => {
+                    try {
+                        var t = Time.Parse (value);
+
+                        bool timeOk = true;
+                        if (t.CompareToTime (new Time ()) == -1) {
+                            timeOk = false;
+                            MessageBox.Show ("Can't modify time to before current time");
+                        }
+
+                        if (t.CompareToTime (Lighting.GetFixtureOnTime (fixtureID)) == -1) {
+                            timeOk = false;
+                            MessageBox.Show ("Can't modify off time to before on time");
+                        }
+
+                        if (timeOk) {
+                            var td = Lighting.GetFixtureOffTime (fixtureID);
+                            td.SetTime (t);
+                            offTimeTextBox.text = td.ToShortString ();
+                            offTimeTextBox.QueueDraw ();
+                        }
+                    } catch {
+                        MessageBox.Show ("Incorrect time format");
+                    }
+                };
+
+                numberInput.Run ();
+                numberInput.Destroy ();
+            };
+            Put (btn, 635, 405);
+            btn.Show ();
 
             var settingsBtn = new TouchButton ();
             settingsBtn.text = "Settings";
@@ -321,10 +364,10 @@ namespace AquaPic.UserInterface
                 s.Run ();
                 s.Destroy ();
 
-                sunRise.text = Lighting.sunRiseToday.ToString ();
-                sunSet.text = Lighting.sunSetToday.ToString ();
-                sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToString ();
-                sunSetTomorrow.text = Lighting.sunSetTomorrow.ToString ();
+                sunRise.text = Lighting.sunRiseToday.ToTimeString ();
+                sunSet.text = Lighting.sunSetToday.ToTimeString ();
+                sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToTimeString ();
+                sunSetTomorrow.text = Lighting.sunSetTomorrow.ToTimeString ();
             };
             Put (settingsBtn, 290, 405);
             settingsBtn.Show ();
@@ -332,11 +375,11 @@ namespace AquaPic.UserInterface
             outletLabel = new TouchLabel ();
             outletLabel.text = "Outlet:";
             outletLabel.textColor = "grey4";
-            Put (outletLabel, 415, 250);
+            Put (outletLabel, 415, 117);
             outletLabel.Show ();
 
             outletStateLabel = new TouchLabel ();
-            Put (outletStateLabel, 463, 250);
+            Put (outletStateLabel, 465, 117);
             outletStateLabel.Show ();
 
             outletSelectorSwitch = new TouchSelectorSwitch (0, 3, 0, TouchOrientation.Horizontal);
@@ -348,7 +391,7 @@ namespace AquaPic.UserInterface
             outletSelectorSwitch.SliderColorOptions [2] = "seca";
             outletSelectorSwitch.TextOptions = new string[] {"Off", "Auto", "On"};
             outletSelectorSwitch.SelectorChangedEvent += OnOutletControlSelectorChanged;
-            Put (outletSelectorSwitch, 415, 271);
+            Put (outletSelectorSwitch, 415, 145);
             outletSelectorSwitch.Show ();
 
             fixtureSettingBtn = new TouchButton ();
@@ -406,6 +449,27 @@ namespace AquaPic.UserInterface
             Put (fixtureSettingBtn, 415, 405);
             fixtureSettingBtn.Show ();
 
+            string[] names = Lighting.GetAllFixtureNames ();
+            combo = new TouchComboBox (names);
+            combo.Active = 0;
+            combo.WidthRequest = 235;
+            combo.List.Add ("New fixture...");
+            combo.ChangedEvent += OnComboChanged;
+            Put (combo, 550, 77);
+            combo.Show ();
+
+            if (options.Length >= 3) {
+                string requestedFixture = options [2] as string;
+                if (requestedFixture != null) {
+                    try {
+                        fixtureID = Lighting.GetFixtureIndex (requestedFixture);
+                        combo.Active = fixtureID;
+                    } catch {
+                        ;
+                    }
+                }
+            }
+
             GetFixtureData ();
 
             Show ();
@@ -427,8 +491,8 @@ namespace AquaPic.UserInterface
                 outletLabel.Visible = true;
                 outletStateLabel.Visible = true;
 
-                onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureID).ToString ();
-                offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureID).ToString ();
+                onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureID).ToShortString ();
+                offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureID).ToShortString ();
 
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureID);
                 Power.AddHandlerOnStateChange (ic, OnOutletStateChange);

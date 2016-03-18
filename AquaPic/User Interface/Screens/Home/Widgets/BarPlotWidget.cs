@@ -44,13 +44,15 @@ namespace AquaPic.UserInterface
         public float fullScale;
 
         private TouchProgressBar bar;
-        private TouchTextBox textBox;
+        private TouchLabel textBox;
         private TouchLabel label;
 
         public BarPlotWidget () {
             SetSizeRequest (100, 169);
 
             var box = new TouchGraphicalBox (100, 169);
+            box.color = "grey4";
+            box.transparency = 0.1f;
             Put (box, 0, 0);
 
             label = new TouchLabel ();
@@ -63,14 +65,16 @@ namespace AquaPic.UserInterface
             Put (label, 29, 3);
 
             bar = new TouchProgressBar ();
+            bar.colorBackground = "grey3";
+            bar.colorBackground.A = 0.15f;
             bar.SetSizeRequest (26, 163);
             Put (bar, 3, 3);
 
             fullScale = 100.0f;
 
-            textBox = new TouchTextBox ();
+            textBox = new TouchLabel ();
             textBox.SetSizeRequest (65, 30);
-            textBox.textSize = 14;
+            textBox.textSize = 20;
             textBox.text = "0.0";
             textBox.textAlignment = TouchAlignment.Center;
             Put (textBox, 32, 130);

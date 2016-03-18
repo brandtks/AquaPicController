@@ -280,7 +280,7 @@ namespace AquaPic.Modules
             if (dl != null) {
                 Power.RemoveHandlerOnModeChange (dl.plug, dl.OnLightingPlugModeChange);
                 AquaPicDrivers.AnalogOutput.RemoveChannel (dl.dimCh);
-                MainWindowWidgets.barPlots.Remove (dl.name);
+                HomeWindowWidgets.barPlots.Remove (dl.name);
             }
 
             Power.RemoveOutlet (l.plug);

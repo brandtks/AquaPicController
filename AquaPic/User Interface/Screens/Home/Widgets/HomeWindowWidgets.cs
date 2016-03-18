@@ -3,13 +3,12 @@ using System.Collections.Generic;
 
 namespace AquaPic.UserInterface
 {
-    public class MainWindowWidgets
+    public class HomeWindowWidgets
     {
         public static Dictionary<string, LinePlotData> linePlots;
         public static Dictionary<string, BarPlotData> barPlots;
-//        public static Dictionary<string, ButtonData> buttons;
 
-        static MainWindowWidgets () {
+        static HomeWindowWidgets () {
             linePlots = new Dictionary<string, LinePlotData> () {
                 { "Temperature", new LinePlotData (() => {return new TemperatureLinePlot ();}) }
             };
@@ -17,8 +16,6 @@ namespace AquaPic.UserInterface
             barPlots = new Dictionary<string, BarPlotData> () {
                 { "Water Level", new BarPlotData (() => {return new WaterLevelWidget ();}) }
             };
-
-//            buttons = new Dictionary<string, ButtonData> ();
         }
     }
 }

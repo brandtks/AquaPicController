@@ -139,12 +139,12 @@ namespace AquaPic.UserInterface
                             50);
                     }
 
-                    t.text = "Home";
+                    t.text = "Menu";
                     t.font.size = 18;
                     t.alignment = TouchAlignment.Right;
                     t.Render (this, right - 120, top, 115, 40);
 
-                    t.text = "Menu";
+                    t.text = "Home";
                     t.Render (this, right - 120, bottom - 40, 115, 40);
                 } else {
                     /*
@@ -247,10 +247,10 @@ namespace AquaPic.UserInterface
                         if (x >= 680) {
                             if (y <= 40) {
                                 var topWidget = this.Toplevel;
-                                AquaPicGUI.ChangeScreens ("Home", topWidget, AquaPicGUI.currentScreen);
+                                AquaPicGUI.ChangeScreens ("Menu", topWidget, AquaPicGUI.currentScreen);
                             } else if (y >= 420) {
                                 var topWidget = this.Toplevel;
-                                AquaPicGUI.ChangeScreens ("Menu", topWidget, AquaPicGUI.currentScreen);
+                                AquaPicGUI.ChangeScreens ("Home", topWidget, AquaPicGUI.currentScreen);
                             } else {
                                 CollapseMenu ();
                             }
@@ -295,13 +295,9 @@ namespace AquaPic.UserInterface
                     oldDeltaPercentageFloor = Math.Floor (oldYDeltaPercentage + 0.5).ToInt ();
                     deltaPercentageFloor = Math.Floor (yDeltaPercentage + 0.5).ToInt ();
                 }
-            
-                //Console.WriteLine ("y%: {0:F2}, y%Old: {1:F2}, off {2:F2}, index {3}", yDeltaPercentage, oldYDeltaPercentage, offset, highlighedScreenIndex);
 
                 if (deltaPercentageFloor != oldDeltaPercentageFloor) {
                     int increment = deltaPercentageFloor - oldDeltaPercentageFloor;
-
-                    //Console.WriteLine ("increment: {0}, ", increment);
 
                     highlighedScreenIndex += increment;
 

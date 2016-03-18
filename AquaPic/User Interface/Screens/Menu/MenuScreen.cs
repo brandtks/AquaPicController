@@ -9,9 +9,6 @@ namespace AquaPic.UserInterface
     public class MenuWindow : WindowBase
     {
         public MenuWindow (params object[] options) : base () {
-            //var box = new TouchGraphicalBox (780, 395);
-            //Put (box, 10, 30);
-
             screenTitle = "Menu";
 
             List<string> screenNames = new List<string> ();

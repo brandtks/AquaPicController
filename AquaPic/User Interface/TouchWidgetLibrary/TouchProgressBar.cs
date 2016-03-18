@@ -1,6 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
+using AquaPic.Utilites;
 
 namespace TouchWidgetLibrary
 {
@@ -88,25 +89,60 @@ namespace TouchWidgetLibrary
                 int top = Allocation.Top;
                 int width = Allocation.Width;
                 int height = Allocation.Height;
-                int difference;
+                int bottom = Allocation.Bottom;
+                int difference, radius;
 
                 if (_orient == TouchOrientation.Vertical) {
-                    cr.Rectangle (left, top, width, height);
+                    radius = width / 2;
+
+                    //cr.Rectangle (left, top, width, height);
+                    TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, radius);
                     colorBackground.SetSource (cr);
                     cr.Fill ();
 
-                    difference = (int)(height * _currentProgress);
+                    difference = (height * _currentProgress).ToInt ();
                     top += (height - difference);
-                    cr.Rectangle (left, top, width, difference);
+                    //cr.Rectangle (left, top, width, difference);
+                    if (difference > width) {
+                        cr.MoveTo (left, bottom - radius);
+                        cr.ArcNegative (left + radius, bottom - radius, radius, (180.0).ToRadians (), (0.0).ToRadians ());
+                        cr.LineTo (left + width, top + radius);
+                        cr.ArcNegative (left + radius, top + radius, radius, (0.0).ToRadians (), (180.0).ToRadians ());
+                        cr.ClosePath ();
+                    } else {
+                        Console.WriteLine ("\nleft + radius is {0}, bottom is {1}, width is {2}", left + radius, bottom, width);
+                        Console.WriteLine ("difference is {0}", difference);
+
+                        double p =  (1.0 - (double)difference / (double)width);
+                        Console.WriteLine ("p is {0}", p);
+
+                        double angle1 = p * 90.0;
+                        Console.WriteLine ("angle1 is {0}", angle1);
+                        double r1 = angle1.ToRadians ();
+                        Console.WriteLine ("r1 is {0}", r1);
+
+                        double angle2 = 180 - angle1;
+                        double r2 = angle2.ToRadians ();
+
+                        double x2 = TouchGlobal.CalcX (left + radius, radius, r2);
+                        double y2 = TouchGlobal.CalcY (bottom - radius, radius, r2);
+                        Console.WriteLine ("x2 is {0}, y2 is {1}", x2, y2);
+
+                        cr.MoveTo (x2, y2);
+                        cr.ArcNegative (left + radius, bottom - radius, radius, r2, r1);
+                        cr.ClosePath ();
+                    }
                     colorProgress.SetSource (cr);
                     cr.Fill ();
                 } else {
-                    cr.Rectangle (left, top, width, height);
+                    //cr.Rectangle (left, top, width, height);
+                    TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, height / 2);
                     colorBackground.SetSource (cr);
                     cr.Fill ();
 
                     difference = (int)(width * _currentProgress);
-                    cr.Rectangle (left, top, difference, height);
+                    //cr.Rectangle (left, top, difference, height);
+                    TouchGlobal.DrawRoundedRectangle (cr, left, top, difference, height, height / 2);
                     colorProgress.SetSource (cr);
                     cr.Fill ();
                 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using Gtk;
 using Cairo;
+using AquaPic.Utilites;
 
 namespace TouchWidgetLibrary
 {
@@ -49,7 +50,6 @@ namespace TouchWidgetLibrary
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 int barWidth = 25;
                 int x = Allocation.Left;
-                int y = Allocation.Right;
                 int width = Allocation.Width;
                 int height = Allocation.Height;
                 int right = Allocation.Right;
@@ -58,39 +58,27 @@ namespace TouchWidgetLibrary
                 int originY = Allocation.Bottom;
 
                 cr.MoveTo (x, originY);
-                cr.Arc (originX, originY, height, CalcRadians (180.0), CalcRadians (0.0));
+                cr.Arc (originX, originY, height, (180.0).ToRadians (), (0.0).ToRadians ());
                 cr.LineTo (right - barWidth, originY);
-                cr.ArcNegative (originX, originY, height - barWidth, CalcRadians (0.0), CalcRadians (180.0));
+                cr.ArcNegative (originX, originY, height - barWidth, (0.0).ToRadians (), (180.0).ToRadians ());
                 cr.LineTo (x, originY);
                 cr.ClosePath ();
                 backgroundColor.SetSource (cr);
                 cr.Fill ();
 
-                double r = CalcRadians ((1 - _progress) * -180.0);
-                double x2 = CalcX (originX, height - barWidth, r);
-                double y2 = CalcY (originY, height - barWidth, r);
+                double r = ((1 - _progress) * -180.0).ToRadians ();
+                double x2 = TouchGlobal.CalcX (originX, height - barWidth, r);
+                double y2 = TouchGlobal.CalcY (originY, height - barWidth, r);
 
                 cr.MoveTo (x, originY);
-                cr.Arc (originX, originY, height, CalcRadians (180.0), r);
+                cr.Arc (originX, originY, height, (180.0).ToRadians (), r);
                 cr.LineTo (x2, y2);
-                cr.ArcNegative (originX, originY, height - barWidth, r, CalcRadians (180.0));
+                cr.ArcNegative (originX, originY, height - barWidth, r, (180.0).ToRadians ());
                 cr.LineTo (x, originY);
                 cr.ClosePath ();
                 progressColor.SetSource (cr);
                 cr.Fill ();
             }
-        }
-
-        protected double CalcRadians (double angle) {
-            return (Math.PI / 180) * angle;
-        }
-
-        protected double CalcX (double originX, double radius, double radians) {
-            return originX + radius * Math.Cos (radians);
-        }
-
-        protected double CalcY (double originY, double radius, double radians) {
-            return originY + radius * Math.Sin (radians);
         }
     }
 }

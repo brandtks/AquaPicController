@@ -48,5 +48,13 @@ namespace TouchWidgetLibrary
             cr.ClosePath ();
             cr.Restore ();
         }
+
+        public static double CalcX (double originX, double radius, double radians) {
+            return originX + radius * Math.Cos (radians);
+        }
+
+        public static double CalcY (double originY, double radius, double radians) {
+            return originY + radius * Math.Sin (radians);
+        }
     }
 }

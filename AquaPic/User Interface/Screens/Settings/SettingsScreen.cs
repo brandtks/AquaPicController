@@ -8,7 +8,7 @@ namespace AquaPic.UserInterface
 {
     public class SettingsWindow : WindowBase
     {
-        private AquaPicGUI tw;
+        private AquaPicGUI topWindow;
 
         public SettingsWindow (params object[] options) : base () {
             //var box = new TouchGraphicalBox (110, 395);
@@ -18,14 +18,14 @@ namespace AquaPic.UserInterface
             screenTitle = "Settings";
 
             if (options.Length >= 1) {
-                tw = options [0] as AquaPicGUI;
-                if (tw != null) {
-                    if (tw.IsTopLevel) {
+                topWindow = options [0] as AquaPicGUI;
+                if (topWindow != null) {
+                    if (topWindow.IsTopLevel) {
                         var b = new TouchButton ();
                         b.SetSizeRequest (100, 60);
                         b.text = "Unfullscreen";
                         b.ButtonReleaseEvent += (o, args) => {
-                            tw.ShowDecoration ();
+                            topWindow.ShowDecoration ();
                             #if RPI_BUILD
                             tw.Unfullscreen ();
                             #endif
@@ -40,7 +40,7 @@ namespace AquaPic.UserInterface
                         Put (b, 685, 210);
                         b.Show ();
                     } else
-                        tw = null;
+                        topWindow = null;
                 }
             }
 
@@ -55,9 +55,9 @@ namespace AquaPic.UserInterface
         }
 
         public override void Dispose () {
-            if (tw != null) {
-                if (tw.IsTopLevel) {
-                    tw.HideDecoration ();
+            if (topWindow != null) {
+                if (topWindow.IsTopLevel) {
+                    topWindow.HideDecoration ();
                     #if RPI_BUILD
                     tw.Fullscreen ();
                     #endif
