@@ -70,10 +70,10 @@ namespace AquaPic.UserInterface
 
             for (int i = 0; i < states.Length; ++i) {
                 if (states [i]) {
-                    displays [i].textBox.bkgndColor = "pri";
+                    displays [i].textBox.textColor = "pri";
                     displays [i].textBox.text = "Closed";
                 } else {
-                    displays [i].textBox.bkgndColor = "seca";
+                    displays [i].textBox.textColor = "seca";
                     displays [i].textBox.text = "Open";
                 }
 
@@ -125,11 +125,11 @@ namespace AquaPic.UserInterface
 
             if (!oldState && newState) {
                 AquaPicDrivers.DigitalInput.SetChannelValue (ic, true);
-                d.textBox.bkgndColor = "pri";
+                d.textBox.textColor = "pri";
                 d.textBox.text = "Closed";
             } else if (oldState && !newState) {
                 AquaPicDrivers.DigitalInput.SetChannelValue (ic, false);
-                d.textBox.bkgndColor = "seca";
+                d.textBox.textColor = "seca";
                 d.textBox.text = "Open";
             }
 
@@ -146,11 +146,11 @@ namespace AquaPic.UserInterface
                 d.label.text = names [i];
 
                 if (states [i]) {
-                    d.textBox.bkgndColor = "pri";
+                    d.textBox.textColor = "pri";
                     d.textBox.text = "Closed";
                     d.selector.currentSelected = 1;
                 } else {
-                    d.textBox.bkgndColor = "seca";
+                    d.textBox.textColor = "seca";
                     d.textBox.text = "Open";
                     d.selector.currentSelected = 0;
                 }

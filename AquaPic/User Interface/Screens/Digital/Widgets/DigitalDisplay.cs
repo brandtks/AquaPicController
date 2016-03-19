@@ -11,7 +11,7 @@ namespace AquaPic.UserInterface
         public event SelectorChangedEventHandler StateSelectedChangedEvent;
 
         public TouchLabel label;
-        public TouchTextBox textBox;
+        public TouchLabel textBox;
         public TouchButton button;
         public TouchSelectorSwitch selector;
 
@@ -22,14 +22,16 @@ namespace AquaPic.UserInterface
             label.WidthRequest = 120;
             label.textAlignment = TouchAlignment.Center;
             label.textRender.textWrap = TouchTextWrap.Shrink;
-            Put (label, 0, 0);
+            label.textColor = "grey3";
+            Put (label, 0, 35);
 
-            textBox = new TouchTextBox ();
+            textBox = new TouchLabel ();
             textBox.text = "Open";
-            textBox.bkgndColor = "seca";
+            textBox.textColor = "seca";
             textBox.textAlignment = TouchAlignment.Center;
+            textBox.textSize = 20;
             textBox.SetSizeRequest (120, 30);
-            Put (textBox, 0, 20);
+            Put (textBox, 0, 0);
 
             button = new TouchButton ();
             button.text = "Force";

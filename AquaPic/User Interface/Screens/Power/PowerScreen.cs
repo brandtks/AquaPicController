@@ -44,7 +44,7 @@ namespace AquaPic.UserInterface
                     IndividualControl indCont;
                     indCont.Group = powerID;
                     indCont.Individual = idx;
-                    selectors [idx].OutletName.text = Power.GetOutletName (indCont);
+                    selectors [idx].outletName.text = Power.GetOutletName (indCont);
                     Mode mode = Power.GetOutletMode (indCont);
                     MyState state = Power.GetOutletState (indCont);
                     if (mode  == Mode.Auto) {
@@ -60,12 +60,12 @@ namespace AquaPic.UserInterface
                     selectors [idx].QueueDraw ();
                 };
 
-                if ((i % 2) == 0) { // even number top row
+                if ((i % 2) == 0) { // even numbers top row
                     x = ((i - (i / 2)) * 185) + 50;
-                    y = 105;
+                    y = 85;
                 } else {
                     x = (((i - (i / 2)) - 1) * 185) + 50;
-                    y = 255;
+                    y = 275;
                 }
                 Put (selectors [i], x, y);
 
@@ -86,20 +86,22 @@ namespace AquaPic.UserInterface
                 using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                     TouchColor.SetSource (cr, "grey3", 0.75);
 
+                    double midY = 272.5;
+
                     for (int i = 0; i < 3; ++i) {
-                        cr.MoveTo (60 + (i * 185), 252.5);
-                        cr.LineTo (220 + (i * 185), 252.5);
+                        cr.MoveTo (60 + (i * 185), midY);
+                        cr.LineTo (220 + (i * 185), midY);
                         cr.ClosePath ();
                         cr.Stroke ();
 
                         cr.MoveTo (232.5+ (i * 185), 115);
-                        cr.LineTo (232.5 + (i * 185), 385);
+                        cr.LineTo (232.5 + (i * 185), 425);
                         cr.ClosePath ();
                         cr.Stroke ();
                     }
 
-                    cr.MoveTo (615, 252.5);
-                    cr.LineTo (775, 252.5);
+                    cr.MoveTo (615, midY);
+                    cr.LineTo (775, midY);
                     cr.ClosePath ();
                     cr.Stroke ();
                 }
@@ -130,14 +132,14 @@ namespace AquaPic.UserInterface
 
             int i = 0;
             foreach (var s in selectors) {
-                s.OutletName.text = names [i];
+                s.outletName.text = names [i];
 
                 if (states [i] == MyState.On) {
-                    s.Status.text = "On";
-                    s.Status.textColor = "secb";
+                    s.statusLabel.text = "On";
+                    s.statusLabel.textColor = "secb";
                 } else {
-                    s.Status.text = "Off";
-                    s.Status.textColor = "grey4";
+                    s.statusLabel.text = "Off";
+                    s.statusLabel.textColor = "grey4";
                 }
 
                 if (modes [i] == Mode.Auto) {
@@ -196,11 +198,11 @@ namespace AquaPic.UserInterface
             if (args.powerID == powerID) {
 
                 if (args.state == MyState.On) {
-                    selectors [args.outletID].Status.text = "On";
-                    selectors [args.outletID].Status.textColor = "secb";
+                    selectors [args.outletID].statusLabel.text = "On";
+                    selectors [args.outletID].statusLabel.textColor = "secb";
                 } else {
-                    selectors [args.outletID].Status.text = "Off";
-                    selectors [args.outletID].Status.textColor = "grey4";
+                    selectors [args.outletID].statusLabel.text = "Off";
+                    selectors [args.outletID].statusLabel.textColor = "grey4";
                 }
                    
                 selectors [args.outletID].QueueDraw ();

@@ -13,12 +13,12 @@ namespace AquaPic.UserInterface
     {
         public UpdateScreenHandler UpdateScreen;
 
-        public TouchLabel OutletName;
-        public TouchLabel Status;
+        public TouchLabel outletName;
+        public TouchLabel statusLabel;
         public TouchSelectorSwitch ss;
         public TouchCurvedProgressBar ampBar;
         public TouchLabel ampText;
-        public TouchButton settingsButton;
+        public EventBox settingsButton;
 
         public float amps {
             set {
@@ -36,17 +36,22 @@ namespace AquaPic.UserInterface
         }
 
         public PowerOutletSlider (int id) {
-            SetSizeRequest (180, 145);
+            SetSizeRequest (180, 180);
 
             ampBar = new TouchCurvedProgressBar ();
-            Put (ampBar, 10, 22);
+            ampBar.SetSizeRequest (170, 135);
+            ampBar.curveStyle = CurveStyle.ThreeQuarterCurve;
+            Put (ampBar, 5, 5);
             ampBar.Show ();
 
             ampText = new TouchLabel ();
-            ampText.WidthRequest = 76;
+            ampText.WidthRequest = 180;
             ampText.textAlignment = TouchAlignment.Center;
-            ampText.text = (ampBar.progress * 10.0f).ToString ("F1");
-            Put (ampText, 52, 80);
+            ampText.textRender.unitOfMeasurement = UnitsOfMeasurement.Amperage;
+            ampText.text = "0.0";
+            ampText.textSize = 20;
+            ampText.textColor = "pri";
+            Put (ampText, 0, 105);
             ampText.Show ();
 
             ss = new TouchSelectorSwitch (id, 3, 0, TouchOrientation.Horizontal);
@@ -59,49 +64,46 @@ namespace AquaPic.UserInterface
             ss.textOptions [0] = "Off";
             ss.textOptions [1] = "Auto";
             ss.textOptions [2] = "On";
-            Put (ss, 5, 110);
+            Put (ss, 5, 145);
             ss.Show ();
 
+            outletName = new TouchLabel ();
+            outletName.textColor = "grey3";
+            outletName.WidthRequest = 100;
+            outletName.textRender.textWrap = TouchTextWrap.Shrink;
+            outletName.textAlignment = TouchAlignment.Center;
+            Put (outletName, 40, 67);
+            outletName.Show ();
 
-            OutletName = new TouchLabel ();
-            OutletName.textColor = "grey4";
-            OutletName.WidthRequest = 150;
-            OutletName.textRender.textWrap = TouchTextWrap.Shrink;
-            Put (OutletName, 5, 2);
-            OutletName.Show ();
+            statusLabel = new TouchLabel ();
+            statusLabel.text = "Off";
+            statusLabel.textSize = 20;
+            statusLabel.textColor = "grey4";
+            statusLabel.WidthRequest = 180;
+            statusLabel.textAlignment = TouchAlignment.Center;
+            Put (statusLabel, 0, 37);
+            statusLabel.Show ();
 
-            Status = new TouchLabel ();
-            Status.text = "Off";
-            Status.textSize = 12;
-            Status.textColor = "grey4";
-            Status.WidthRequest = 66;
-            Status.textAlignment = TouchAlignment.Center;
-            Put (Status, 57, 55);
-            Status.Show ();
-
-            settingsButton = new TouchButton ();
-            settingsButton.SetSizeRequest (30, 30);
-            //settingsButton.text = Convert.ToChar (0x26ED).ToString (); //0x2699
-            //settingsButton.textFont = "Unifont";
-            //settingsButton.textSize = 20;
-            settingsButton.text = "S";
+            settingsButton = new EventBox ();
+            settingsButton.VisibleWindow = false;
+            settingsButton.SetSizeRequest (180, 140);
             settingsButton.ButtonReleaseEvent += OnSettingButtonRelease;
-            Put (settingsButton, 145, 5);
+            Put (settingsButton, 0, 0);
             settingsButton.Show ();
 
             ShowAll ();
         }
 
         protected void OnSettingButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            IndividualControl ic = Power.GetOutletIndividualControl (OutletName.text);
+            IndividualControl ic = Power.GetOutletIndividualControl (outletName.text);
             string owner = Power.GetOutletOwner (ic);
             if (owner == "Power") {
                 string n = string.Format ("{0}.p{1}", Power.GetPowerStripName (ic.Group), ic.Individual);
                 OutletSettings os;
-                if (n == OutletName.text)
-                    os = new OutletSettings (OutletName.text, false, ic);
+                if (n == outletName.text)
+                    os = new OutletSettings (outletName.text, false, ic);
                 else
-                    os = new OutletSettings (OutletName.text, true, ic);
+                    os = new OutletSettings (outletName.text, true, ic);
 
                 os.Run ();
                 os.Destroy ();
