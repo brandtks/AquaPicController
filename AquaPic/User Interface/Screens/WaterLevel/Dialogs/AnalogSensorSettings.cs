@@ -20,10 +20,10 @@ namespace AquaPic.UserInterface
             var s = new SettingSelectorSwitch ();
             s.text = "Enable";
             if (WaterLevel.analogSensorEnabled) {
-                s.selectorSwitch.CurrentSelected = 0;
+                s.selectorSwitch.currentSelected = 0;
                 showOptional = true;
             } else {
-                s.selectorSwitch.CurrentSelected = 1;
+                s.selectorSwitch.currentSelected = 1;
                 showOptional = false;
             }
             s.selectorSwitch.SelectorChangedEvent += (sender, args) => {
@@ -111,7 +111,7 @@ namespace AquaPic.UserInterface
             bool enable;
             try {
                 SettingSelectorSwitch s = settings ["Enable"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected == 0)
+                if (s.selectorSwitch.currentSelected == 0)
                     enable = true;
                 else
                     enable = false;

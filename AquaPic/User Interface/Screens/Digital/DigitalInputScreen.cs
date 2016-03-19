@@ -16,10 +16,6 @@ namespace AquaPic.UserInterface
         DigitalDisplay[] displays;
 
         public DigitalInputWindow (params object[] options) : base () {
-            //TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
-            //Put (box1, 10, 30);
-            //box1.Show ();
-
             screenTitle = "Digital Input Cards";
 
             if (AquaPicDrivers.DigitalInput.cardCount == 0) {
@@ -121,17 +117,18 @@ namespace AquaPic.UserInterface
             DigitalDisplay d = sender as DigitalDisplay;
 
             IndividualControl ic;
-            ic.Group = (byte)cardId;
+            ic.Group = cardId;
             ic.Individual = AquaPicDrivers.DigitalInput.GetChannelIndex (cardId, d.label.text);
 
-            bool s = AquaPicDrivers.DigitalInput.GetChannelValue (ic);
+            bool oldState = AquaPicDrivers.DigitalInput.GetChannelValue (ic);
+            bool newState = args.currentSelectedIndex == 1;
 
-            if (s) {
-                AquaPicDrivers.DigitalInput.SetChannelValue (ic, false);
+            if (!oldState && newState) {
+                AquaPicDrivers.DigitalInput.SetChannelValue (ic, true);
                 d.textBox.bkgndColor = "pri";
                 d.textBox.text = "Closed";
-            } else {
-                AquaPicDrivers.DigitalInput.SetChannelValue (ic, true);
+            } else if (oldState && !newState) {
+                AquaPicDrivers.DigitalInput.SetChannelValue (ic, false);
                 d.textBox.bkgndColor = "seca";
                 d.textBox.text = "Open";
             }
@@ -151,11 +148,11 @@ namespace AquaPic.UserInterface
                 if (states [i]) {
                     d.textBox.bkgndColor = "pri";
                     d.textBox.text = "Closed";
-                    d.selector.CurrentSelected = 1;
+                    d.selector.currentSelected = 1;
                 } else {
                     d.textBox.bkgndColor = "seca";
                     d.textBox.text = "Open";
-                    d.selector.CurrentSelected = 0;
+                    d.selector.currentSelected = 0;
                 }
 
                 if (modes [i] == Mode.Auto) {

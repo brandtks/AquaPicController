@@ -20,10 +20,10 @@ namespace AquaPic.UserInterface
             var s = new SettingSelectorSwitch ();
             s.text = "Enable";
             if (WaterLevel.atoEnabled) {
-                s.selectorSwitch.CurrentSelected = 0;
+                s.selectorSwitch.currentSelected = 0;
                 showOptional = true;
             } else {
-                s.selectorSwitch.CurrentSelected = 1;
+                s.selectorSwitch.currentSelected = 1;
                 showOptional = false;
             }
             s.selectorSwitch.SelectorChangedEvent += (sender, args) => {
@@ -39,9 +39,9 @@ namespace AquaPic.UserInterface
             s = new SettingSelectorSwitch ();
             s.text = "Use Analog";
             if (WaterLevel.atoUseAnalogSensor)
-                s.selectorSwitch.CurrentSelected = 0;
+                s.selectorSwitch.currentSelected = 0;
             else
-                s.selectorSwitch.CurrentSelected = 1;
+                s.selectorSwitch.currentSelected = 1;
             AddOptionalSetting (s);
 
             var t = new SettingTextBox ();
@@ -101,9 +101,9 @@ namespace AquaPic.UserInterface
             s = new SettingSelectorSwitch ();
             s.text = "Use Float Switch";
             if (WaterLevel.atoUseFloatSwitch)
-                s.selectorSwitch.CurrentSelected = 0;
+                s.selectorSwitch.currentSelected = 0;
             else
-                s.selectorSwitch.CurrentSelected = 1;
+                s.selectorSwitch.currentSelected = 1;
             AddOptionalSetting (s);
 
             var c = new SettingComboBox ();
@@ -177,7 +177,7 @@ namespace AquaPic.UserInterface
             bool enable;
             try {
                 SettingSelectorSwitch s = settings ["Enable"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected == 0)
+                if (s.selectorSwitch.currentSelected == 0)
                     enable = true;
                 else
                     enable = false;
@@ -195,7 +195,7 @@ namespace AquaPic.UserInterface
             if (enable) {
                 bool useAnalog;
                 SettingSelectorSwitch s = settings ["Use Analog"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected == 0)
+                if (s.selectorSwitch.currentSelected == 0)
                     useAnalog = true;
                 else
                     useAnalog = false;
@@ -226,7 +226,7 @@ namespace AquaPic.UserInterface
 
                 bool useFloatSwitch;
                 s = settings ["Use Float Switch"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected == 0)
+                if (s.selectorSwitch.currentSelected == 0)
                     useFloatSwitch = true;
                 else
                     useFloatSwitch = false;

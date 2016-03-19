@@ -15,19 +15,6 @@ namespace AquaPic.UserInterface
         uint timerId;
 
         public AnalogOutputWindow (params object[] options) : base () {
-            //TouchGraphicalBox box1 = new TouchGraphicalBox (730, 440);
-            //Put (box1, 60, 30);
-            //box1.Show ();
-
-            //var l = new TouchLabel ();
-            //l.text = "Analog Output Cards";
-            //l.textColor = "pri";
-            //l.textSize = 14;
-            //l.textAlignment = TouchAlignment.Center;
-            //l.WidthRequest = 780;
-            //Put (l, 10, 36);
-            //l.Show ();
-
             screenTitle = "Analog Output Cards";
 
             if (AquaPicDrivers.AnalogOutput.cardCount == 0) {
@@ -44,7 +31,9 @@ namespace AquaPic.UserInterface
                 displays [i] = new AnalogChannelDisplay ();
                 displays [i].typeLabel.Visible = true;
                 displays [i].divisionSteps = 1024;
+                #if SELECTABLE_ANALOG_OUTPUT_TYPE
                 displays [i].TypeSelectorChangedEvent += OnSelectorSwitchChanged;
+                #endif
                 displays [i].ForceButtonReleaseEvent += OnForceRelease;
                 displays [i].ValueChangedEvent += OnValueChanged;
                 Put (displays [i], 70, 90 + (i * 75));
@@ -109,14 +98,18 @@ namespace AquaPic.UserInterface
                 d.progressBar.enableTouch = true;
                 d.textBox.enableTouch = true;
                 d.button.buttonColor = "pri";
+                #if SELECTABLE_ANALOG_OUTPUT_TYPE
                 d.ss.Visible = true;
+                #endif
                 d.typeLabel.Visible = false;
             } else {
                 AquaPicDrivers.AnalogOutput.SetChannelMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;
                 d.textBox.enableTouch = false;
                 d.button.buttonColor = "grey4";
+                #if SELECTABLE_ANALOG_OUTPUT_TYPE
                 d.ss.Visible = false;
+                #endif
                 d.typeLabel.Visible = true;
             }
 
@@ -138,6 +131,8 @@ namespace AquaPic.UserInterface
             d.QueueDraw ();
         }
 
+        // This doesn't work with the current Analog Output Cards
+        #if SELECTABLE_ANALOG_OUTPUT_TYPE
         protected void OnSelectorSwitchChanged (object sender, SelectorChangedEventArgs args) {
             AnalogChannelDisplay d = sender as AnalogChannelDisplay;
 
@@ -151,6 +146,7 @@ namespace AquaPic.UserInterface
                 AquaPicDrivers.AnalogOutput.SetChannelType (ic, AnalogType.PWM);
             }
         }
+        #endif
 
         protected void GetCardData () {
             string[] names = AquaPicDrivers.AnalogOutput.GetAllChannelNames (cardId);
@@ -176,9 +172,9 @@ namespace AquaPic.UserInterface
                     d.ss.Visible = true;
 
                     if (types [i] == AnalogType.ZeroTen)
-                        d.ss.CurrentSelected = 0;
+                        d.ss.currentSelected = 0;
                     else
-                        d.ss.CurrentSelected = 1;
+                        d.ss.currentSelected = 1;
                 }
 
                 d.QueueDraw ();

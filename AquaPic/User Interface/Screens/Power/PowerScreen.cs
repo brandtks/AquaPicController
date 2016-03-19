@@ -48,12 +48,12 @@ namespace AquaPic.UserInterface
                     Mode mode = Power.GetOutletMode (indCont);
                     MyState state = Power.GetOutletState (indCont);
                     if (mode  == Mode.Auto) {
-                        selectors [idx].ss.CurrentSelected = 1;
+                        selectors [idx].ss.currentSelected = 1;
                     } else { // mode is manual
                         if (state == MyState.On) {
-                            selectors [idx].ss.CurrentSelected = 2;
+                            selectors [idx].ss.currentSelected = 2;
                         } else {
-                            selectors [idx].ss.CurrentSelected = 0;
+                            selectors [idx].ss.currentSelected = 0;
                         }
                     }
 
@@ -141,12 +141,12 @@ namespace AquaPic.UserInterface
                 }
 
                 if (modes [i] == Mode.Auto) {
-                    s.ss.CurrentSelected = 1;
+                    s.ss.currentSelected = 1;
                 } else { // mode is manual
                     if (states [i] == MyState.On) {
-                        s.ss.CurrentSelected = 2;
+                        s.ss.currentSelected = 2;
                     } else {
-                        s.ss.CurrentSelected = 0;
+                        s.ss.currentSelected = 0;
                     }
                 }
                 ++i;
@@ -179,14 +179,14 @@ namespace AquaPic.UserInterface
             var ss = sender as TouchSelectorSwitch;
             IndividualControl ic;
             ic.Group = (byte)powerID;
-            ic.Individual = ss.Id;
+            ic.Individual = ss.id;
 
-            if (ss.CurrentSelected == 1) // auto
+            if (ss.currentSelected == 1) // auto
                 Power.SetOutletMode (ic, Mode.Auto);
-            else if (ss.CurrentSelected == 0) { // manual and state off
+            else if (ss.currentSelected == 0) { // manual and state off
                 Power.SetOutletMode (ic, Mode.Manual);
                 Power.SetOutletManualState (ic, MyState.Off);
-            } else if (ss.CurrentSelected == 2) {// manual and state on
+            } else if (ss.currentSelected == 2) {// manual and state on
                 Power.SetOutletMode (ic, Mode.Manual);
                 Power.SetOutletManualState (ic, MyState.On);
             }

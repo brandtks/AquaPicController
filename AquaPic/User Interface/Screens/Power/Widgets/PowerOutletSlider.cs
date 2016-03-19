@@ -50,15 +50,15 @@ namespace AquaPic.UserInterface
             ampText.Show ();
 
             ss = new TouchSelectorSwitch (id, 3, 0, TouchOrientation.Horizontal);
-            ss.SliderSize = MySliderSize.Large;
+            ss.sliderSize = MySliderSize.Large;
             ss.WidthRequest = 170;
             ss.HeightRequest = 30;
-            ss.SliderColorOptions [0] = "grey2";
-            ss.SliderColorOptions [1] = "pri";
-            ss.SliderColorOptions [2] = "seca";
-            ss.TextOptions [0] = "Off";
-            ss.TextOptions [1] = "Auto";
-            ss.TextOptions [2] = "On";
+            ss.sliderColorOptions [0] = "grey2";
+            ss.sliderColorOptions [1] = "pri";
+            ss.sliderColorOptions [2] = "seca";
+            ss.textOptions [0] = "Off";
+            ss.textOptions [1] = "Auto";
+            ss.textOptions [2] = "On";
             Put (ss, 5, 110);
             ss.Show ();
 

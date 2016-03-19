@@ -54,33 +54,33 @@ namespace AquaPic.UserInterface
             s.text = "Lighting Time";
             if (fixtureIdx != -1) {
                 if (Lighting.GetFixtureLightingTime (fixtureIdx) == LightingTime.Daytime)
-                    s.selectorSwitch.CurrentSelected = 0;
+                    s.selectorSwitch.currentSelected = 0;
                 else
-                    s.selectorSwitch.CurrentSelected = 1;
+                    s.selectorSwitch.currentSelected = 1;
             } else
-                s.selectorSwitch.CurrentSelected = 0;
+                s.selectorSwitch.currentSelected = 0;
             AddSetting (s);
 
             s = new SettingSelectorSwitch ();
             s.text = "Temp Lockout";
             if (fixtureIdx != -1) {
                 if (Lighting.GetFixtureTemperatureLockout (fixtureIdx))
-                    s.selectorSwitch.CurrentSelected = 0;
+                    s.selectorSwitch.currentSelected = 0;
                 else
-                    s.selectorSwitch.CurrentSelected = 1;
+                    s.selectorSwitch.currentSelected = 1;
             } else
-                s.selectorSwitch.CurrentSelected = 0;
+                s.selectorSwitch.currentSelected = 0;
             AddSetting (s);
 
             s = new SettingSelectorSwitch ();
             s.text = "Auto Time Update";
             if (fixtureIdx != -1) {
                 if (Lighting.GetFixtureMode (fixtureIdx) == Mode.Auto)
-                    s.selectorSwitch.CurrentSelected = 0;
+                    s.selectorSwitch.currentSelected = 0;
                 else
-                    s.selectorSwitch.CurrentSelected = 1;
+                    s.selectorSwitch.currentSelected = 1;
             } else
-                s.selectorSwitch.CurrentSelected = 1;
+                s.selectorSwitch.currentSelected = 1;
             AddSetting (s);
 
             /*
@@ -155,10 +155,10 @@ namespace AquaPic.UserInterface
             s = new SettingSelectorSwitch ("Yes", "No");
             s.text = "Dimming Fixture";
             if (isDimming) {
-                s.selectorSwitch.CurrentSelected = 0;
+                s.selectorSwitch.currentSelected = 0;
                 showOptional = true;
             } else {
-                s.selectorSwitch.CurrentSelected = 1;
+                s.selectorSwitch.currentSelected = 1;
                 showOptional = false;
             }
             s.selectorSwitch.SelectorChangedEvent += (sender, args) => {
@@ -228,16 +228,18 @@ namespace AquaPic.UserInterface
             };
             AddOptionalSetting (t);
 
+            #if SELECTABLE_ANALOG_OUTPUT_TYPE
             s = new SettingSelectorSwitch ("0-10", "PWM");
             s.text = "Dimming Type";
             if ((fixtureIdx != -1) && (isDimming)) {
                 if (Lighting.GetDimmingType (fixtureIdx) == AnalogType.ZeroTen)
-                    s.selectorSwitch.CurrentSelected = 0;
+                    s.selectorSwitch.currentSelected = 0;
                 else
-                    s.selectorSwitch.CurrentSelected = 1;
+                    s.selectorSwitch.currentSelected = 1;
             } else
-                s.selectorSwitch.CurrentSelected = 0;
+                s.selectorSwitch.currentSelected = 0;
             AddOptionalSetting (s);
+            #endif
 
             DrawSettings ();
         }
@@ -265,7 +267,7 @@ namespace AquaPic.UserInterface
             LightingTime lTime = LightingTime.Daytime;
             try {
                 SettingSelectorSwitch s = settings ["Lighting Time"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected != 0)
+                if (s.selectorSwitch.currentSelected != 0)
                     lTime = LightingTime.Nighttime;
             } catch {
                 return false;
@@ -274,7 +276,7 @@ namespace AquaPic.UserInterface
             bool highTempLockout = true;
             try {
                 SettingSelectorSwitch s = settings ["Temp Lockout"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected != 0)
+                if (s.selectorSwitch.currentSelected != 0)
                     highTempLockout = false;
             } catch {
                 return false;
@@ -283,7 +285,7 @@ namespace AquaPic.UserInterface
             bool autoTimeUpdate = true;
             try {
                 SettingSelectorSwitch s = settings ["Auto Time Update"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected != 0)
+                if (s.selectorSwitch.currentSelected != 0)
                     autoTimeUpdate = false;
             } catch {
                 return false;
@@ -295,7 +297,7 @@ namespace AquaPic.UserInterface
             bool dimmingFixture = true;
             try {
                 SettingSelectorSwitch s = settings ["Dimming Fixture"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected != 0)
+                if (s.selectorSwitch.currentSelected != 0)
                     dimmingFixture = false;
             } catch {
                 return false;
@@ -310,7 +312,7 @@ namespace AquaPic.UserInterface
             AnalogType aType = AnalogType.ZeroTen;
             try {
                 SettingSelectorSwitch s = settings ["Dimming Type"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected != 0)
+                if (s.selectorSwitch.currentSelected != 0)
                     aType = AnalogType.PWM;
             } catch {
                 return false;

@@ -92,10 +92,10 @@ namespace AquaPic.UserInterface
 
         public SettingSelectorSwitch (string label1, string label2) : base () {
             selectorSwitch = new TouchSelectorSwitch (2);
-            selectorSwitch.CurrentSelected = 0;
-            selectorSwitch.SliderSize = MySliderSize.Large;
-            selectorSwitch.SliderColorOptions [0] = "pri";
-            selectorSwitch.SliderColorOptions [1] = "grey2";
+            selectorSwitch.currentSelected = 0;
+            selectorSwitch.sliderSize = MySliderSize.Large;
+            selectorSwitch.sliderColorOptions [0] = "pri";
+            selectorSwitch.sliderColorOptions [1] = "grey2";
 
             selectorSwitch.SetSizeRequest (170, 30);
             selectorSwitch.ExposeEvent += OnExpose;
@@ -111,7 +111,7 @@ namespace AquaPic.UserInterface
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
             TouchSelectorSwitch ss = sender as TouchSelectorSwitch;
-            int seperation = ss.Allocation.Width / ss.SelectionCount;
+            int seperation = ss.Allocation.Width / ss.selectionCount;
             int x = ss.Allocation.Left;
 
             TouchText render = new TouchText ();

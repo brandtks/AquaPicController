@@ -77,8 +77,8 @@ namespace AquaPic.UserInterface
 
             ss = new TouchSelectorSwitch (2);
             ss.SetSizeRequest (100, 30);
-            ss.SliderColorOptions [0] = "pri";
-            ss.SliderColorOptions [1] = "seca";
+            ss.sliderColorOptions [0] = "pri";
+            ss.sliderColorOptions [1] = "seca";
             ss.SelectorChangedEvent += OnSelectorSwitchChanged;
             ss.ExposeEvent += OnExpose;
             ss.Visible = false;
@@ -110,7 +110,7 @@ namespace AquaPic.UserInterface
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
             TouchSelectorSwitch ss = sender as TouchSelectorSwitch;
-            int seperation = ss.Allocation.Width / ss.SelectionCount;
+            int seperation = ss.Allocation.Width / ss.selectionCount;
             int x = ss.Allocation.Left;
 
             TouchText render = new TouchText ();

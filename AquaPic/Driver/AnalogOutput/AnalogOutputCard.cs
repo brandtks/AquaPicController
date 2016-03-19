@@ -79,20 +79,18 @@ namespace AquaPic.Drivers
 
             public void SetChannelType (int channel, AnalogType type) {
                 CheckChannelRange (channel);
-
-                if (type != AnalogType.ZeroTen)
-                    throw new Exception ("Dimming card only does 0-10V");
-
-                #if MULTI_TYPE_AO_CARD
+                #if SELECTABLE_ANALOG_OUTPUT_TYPE
                 channels [ch].type = type;
 
                 byte[] arr = new byte[2];
                 arr [0] = (byte)ch;
-                //<NOTE> CHANGE PWM to be 255 and 0-10 to be 0
                 arr [1] = (byte)channels [ch].type;
 
                 slave.Write (2, arr);
-                #endif //MULTI_TYPE_AO_CARD
+                #else
+                if (type != AnalogType.ZeroTen)
+                    throw new Exception ("Dimming card only does 0-10V");
+                #endif
             }
 
             public AnalogType GetChannelType (int channel) {

@@ -97,11 +97,11 @@ namespace AquaPic.UserInterface
             s.text = "Fallback";
             if (includeDelete) {
                 if (Power.GetOutletFallback (ic) == MyState.On)
-                    s.selectorSwitch.CurrentSelected = 0;
+                    s.selectorSwitch.currentSelected = 0;
                 else
-                    s.selectorSwitch.CurrentSelected = 1;
+                    s.selectorSwitch.currentSelected = 1;
             } else
-                s.selectorSwitch.CurrentSelected = 1;
+                s.selectorSwitch.currentSelected = 1;
             AddSetting (s);
 
             DrawSettings ();
@@ -113,7 +113,7 @@ namespace AquaPic.UserInterface
             MyState fallback = MyState.Off;
             try {
                 SettingSelectorSwitch s = settings ["Fallback"] as SettingSelectorSwitch;
-                if (s.selectorSwitch.CurrentSelected == 0)
+                if (s.selectorSwitch.currentSelected == 0)
                     fallback = MyState.On;
                 else
                     fallback = MyState.Off;

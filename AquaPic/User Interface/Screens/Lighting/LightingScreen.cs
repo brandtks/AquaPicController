@@ -137,11 +137,11 @@ namespace AquaPic.UserInterface
 
             modeSelector = new TouchSelectorSwitch (2);
             modeSelector.SetSizeRequest (135, 30);
-            modeSelector.SliderSize = MySliderSize.Large;
-            modeSelector.TextOptions [0] = "Manual";
-            modeSelector.TextOptions [1] = "Auto";
-            modeSelector.SliderColorOptions [0] = "grey2";
-            modeSelector.SliderColorOptions [1] = "pri";
+            modeSelector.sliderSize = MySliderSize.Large;
+            modeSelector.textOptions [0] = "Manual";
+            modeSelector.textOptions [1] = "Auto";
+            modeSelector.sliderColorOptions [0] = "grey2";
+            modeSelector.sliderColorOptions [1] = "pri";
             modeSelector.SelectorChangedEvent += OnDimmingModeSelectorChanged;
             Put (modeSelector, 640, 145);
             modeSelector.Show ();
@@ -383,13 +383,13 @@ namespace AquaPic.UserInterface
             outletStateLabel.Show ();
 
             outletSelectorSwitch = new TouchSelectorSwitch (0, 3, 0, TouchOrientation.Horizontal);
-            outletSelectorSwitch.SliderSize = MySliderSize.Large;
+            outletSelectorSwitch.sliderSize = MySliderSize.Large;
             outletSelectorSwitch.WidthRequest = 185;
             outletSelectorSwitch.HeightRequest = 30;
-            outletSelectorSwitch.SliderColorOptions [0] = "grey2";
-            outletSelectorSwitch.SliderColorOptions [1] = "pri";
-            outletSelectorSwitch.SliderColorOptions [2] = "seca";
-            outletSelectorSwitch.TextOptions = new string[] {"Off", "Auto", "On"};
+            outletSelectorSwitch.sliderColorOptions [0] = "grey2";
+            outletSelectorSwitch.sliderColorOptions [1] = "pri";
+            outletSelectorSwitch.sliderColorOptions [2] = "seca";
+            outletSelectorSwitch.textOptions = new string[] {"Off", "Auto", "On"};
             outletSelectorSwitch.SelectorChangedEvent += OnOutletControlSelectorChanged;
             Put (outletSelectorSwitch, 415, 145);
             outletSelectorSwitch.Show ();
@@ -498,13 +498,13 @@ namespace AquaPic.UserInterface
                 Power.AddHandlerOnStateChange (ic, OnOutletStateChange);
 
                 if (Power.GetOutletMode (ic) == Mode.Auto) {
-                    outletSelectorSwitch.CurrentSelected = 1;
+                    outletSelectorSwitch.currentSelected = 1;
                     outletSelectorSwitch.QueueDraw ();
                 } else {
                     if (Power.GetOutletManualState (ic) == MyState.Off) {
-                        outletSelectorSwitch.CurrentSelected = 0;
+                        outletSelectorSwitch.currentSelected = 0;
                     } else {
-                        outletSelectorSwitch.CurrentSelected = 2;
+                        outletSelectorSwitch.currentSelected = 2;
                     }
                 }
 
@@ -530,13 +530,13 @@ namespace AquaPic.UserInterface
                     Mode m = Lighting.GetDimmingMode (fixtureID);
                     dimmingIsManual = m == Mode.Manual;
                     if (!dimmingIsManual) {
-                        modeSelector.CurrentSelected = 1;
+                        modeSelector.currentSelected = 1;
                         dimmingProgressBar.enableTouch = false;
                         requestedTextBox.Visible = false;
                         autoTextBox.Visible = false;
                         autoLabel.Visible = false;
                     } else {
-                        modeSelector.CurrentSelected = 0;
+                        modeSelector.currentSelected = 0;
                         dimmingProgressBar.enableTouch = true;
                         requestedTextBox.Visible = true;
                         requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureID));
@@ -672,9 +672,9 @@ namespace AquaPic.UserInterface
                 dimmingIsManual = true;
                 autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
                 if (Power.GetOutletState (ic) == MyState.Off) {
-                    outletSelectorSwitch.CurrentSelected = 0;
+                    outletSelectorSwitch.currentSelected = 0;
                 } else {
-                    outletSelectorSwitch.CurrentSelected = 2;
+                    outletSelectorSwitch.currentSelected = 2;
                 }
                 outletSelectorSwitch.QueueDraw ();
             } else {
@@ -685,7 +685,7 @@ namespace AquaPic.UserInterface
                 autoTextBox.Visible = false;
                 autoLabel.Visible = false;
                 dimmingIsManual = false;
-                outletSelectorSwitch.CurrentSelected = 1;
+                outletSelectorSwitch.currentSelected = 1;
                 outletSelectorSwitch.QueueDraw ();
             }
 
