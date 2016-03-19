@@ -65,6 +65,8 @@ namespace TouchWidgetLibrary
                 int radius = barWidth / 2;
                 int bigRadius;
 
+                double fudgeFactor = -0.0125 * radius;
+
                 if (curveStyle == CurveStyle.HalfCurve) {
                     bigRadius = height - radius - 2;
                     int originX = x + (width / 2);
@@ -74,7 +76,7 @@ namespace TouchWidgetLibrary
                     cr.Arc (originX - bigRadius + radius, originY, radius, (0.0).ToRadians (), (180.0).ToRadians ());
                     cr.Arc (originX, originY, bigRadius, (180.0).ToRadians (), (0.0).ToRadians ());
                     cr.Arc (originX + bigRadius - radius, originY, radius, (0.0).ToRadians (), (180.0).ToRadians ());
-                    cr.ArcNegative (originX, originY, bigRadius - barWidth + (0.0125 * bigRadius), (0.0).ToRadians (), (180.0).ToRadians ());
+                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, (0.0).ToRadians (), (180.0).ToRadians ());
                     cr.ClosePath ();
                     backgroundColor.SetSource (cr);
                     cr.Fill ();
@@ -87,7 +89,7 @@ namespace TouchWidgetLibrary
                     cr.Arc (originX - bigRadius + radius, originY, radius, (0.0).ToRadians (), (180.0).ToRadians ());
                     cr.Arc (originX, originY, bigRadius, (180.0).ToRadians (), r);
                     cr.Arc (x2, y2, radius, r, r + Math.PI);
-                    cr.ArcNegative (originX, originY, bigRadius - barWidth + (0.01 * bigRadius), r, (180.0).ToRadians ());
+                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, r, (180.0).ToRadians ());
                     cr.LineTo (x, originY);
                     cr.ClosePath ();
                     progressColor.SetSource (cr);
@@ -107,7 +109,7 @@ namespace TouchWidgetLibrary
                     x2 = TouchGlobal.CalcX (originX, bigRadius - radius, (45.0).ToRadians ());
                     y2 = TouchGlobal.CalcY (originY, bigRadius - radius, (45.0).ToRadians ());
                     cr.Arc (x2, y2, radius, (45.0).ToRadians (), (-135.0).ToRadians ());
-                    cr.ArcNegative (originX, originY, bigRadius - barWidth + (0.01 * bigRadius), (45.0).ToRadians (), (135.0).ToRadians ());
+                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, (45.0).ToRadians (), (135.0).ToRadians ());
                     cr.ClosePath ();
                     backgroundColor.SetSource (cr);
                     cr.Fill ();
@@ -121,7 +123,7 @@ namespace TouchWidgetLibrary
                     x2 = TouchGlobal.CalcX (originX, bigRadius - radius, r);
                     y2 = TouchGlobal.CalcY (originY, bigRadius - radius, r);
                     cr.Arc (x2, y2, radius, r, r + Math.PI);
-                    cr.ArcNegative (originX, originY, bigRadius - barWidth + (0.01 * bigRadius), r, (135.0).ToRadians ());
+                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, r, (135.0).ToRadians ());
                     cr.ClosePath ();
                     progressColor.SetSource (cr);
                     cr.Fill ();

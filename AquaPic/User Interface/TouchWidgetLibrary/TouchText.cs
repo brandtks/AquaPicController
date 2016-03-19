@@ -47,11 +47,13 @@ namespace TouchWidgetLibrary
                     break;
                 case UnitsOfMeasurement.Percentage:
                     t += "%";
-                    t = " " + t;
                     break;
                 case UnitsOfMeasurement.Inches:
                     t += "\"";
                     t = " " + t;
+                    break;
+                case UnitsOfMeasurement.Amperage:
+                    t += "A";
                     break;
                 default:
                     break;

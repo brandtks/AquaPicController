@@ -42,6 +42,15 @@ namespace AquaPic.UserInterface
             }
         }
 
+        public UnitsOfMeasurement unitOfMeasurement {
+            get {
+                return textBox.textRender.unitOfMeasurement;
+            }
+            set {
+                textBox.textRender.unitOfMeasurement = value;
+            }
+        }
+
         private TouchLabel displayLabel;
         private TouchLabel textBox;
 

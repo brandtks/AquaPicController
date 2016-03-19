@@ -13,13 +13,14 @@ namespace AquaPic.UserInterface
 
         public WaterLevelWidget () : base () {
             text = "Water Level";
+            unitOfMeasurement = TouchWidgetLibrary.UnitsOfMeasurement.Inches;
 
             label = new TouchLabel ();
             label.textColor = "compl";
-            label.text = "Probe Dis-\nconnected";
-            label.WidthRequest = 94;
-            label.textAlignment = TouchAlignment.Right;
-            Put (label, 3, 90);
+            label.text = "Probe Disconnected";
+            label.WidthRequest = 199;
+            label.textAlignment = TouchAlignment.Center;
+            Put (label, 3, 55);
             label.Show ();
 
             var eventbox = new EventBox ();
@@ -44,7 +45,7 @@ namespace AquaPic.UserInterface
         public override void OnUpdate () {
             if (WaterLevel.analogSensorEnabled) {
                 if (!enabled)
-                    label.text = "Probe Dis-\nconnected";
+                    label.text = "Probe Disconnected";
 
                 if (WaterLevel.analogWaterLevel < 0.0f) {
                     currentValue = 0.0f;
@@ -61,7 +62,7 @@ namespace AquaPic.UserInterface
                 }
             } else {
                 if (enabled) {
-                    label.text = "Probe\nDisabled";
+                    label.text = "Probe Disabled";
                     label.Visible = true;
                 }
             }

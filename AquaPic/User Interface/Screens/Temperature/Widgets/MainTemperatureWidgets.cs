@@ -6,6 +6,7 @@ namespace AquaPic.UserInterface
     {
         public TemperatureLinePlot () : base () {
             text = "Temperature";
+            unitOfMeasurement = TouchWidgetLibrary.UnitsOfMeasurement.Degrees;
             OnUpdate ();
         }
 

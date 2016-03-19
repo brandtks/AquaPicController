@@ -12,6 +12,7 @@ namespace AquaPic.UserInterface
 
         public DimmingLightBarPlot (string name, GetDimmingLevelHandler GetDimmingLevel) {
             text = name;
+            unitOfMeasurement = TouchWidgetLibrary.UnitsOfMeasurement.Percentage;
             this.GetDimmingLevel = GetDimmingLevel;
 
             var eventbox = new EventBox ();

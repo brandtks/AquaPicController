@@ -25,7 +25,8 @@ namespace TouchWidgetLibrary
         None,
         Degrees,
         Percentage,
-        Inches
+        Inches,
+        Amperage
     }
 
     public static class TouchGlobal

@@ -55,38 +55,39 @@ namespace AquaPic.UserInterface
                 new TouchColor ("grey3"),
                 new TouchColor ("pri"),
                 100.0f);
-            timerProgress.SetSizeRequest (250, 120);
+            timerProgress.SetSizeRequest (250, 175);
             timerProgress.curveStyle = CurveStyle.ThreeQuarterCurve;
             Put (timerProgress, 275, 100);
             timerProgress.Visible = false;
 
             timerLabel = new TouchLabel ();
-            timerLabel.WidthRequest = 100;
+            timerLabel.WidthRequest = 200;
             timerLabel.textAlignment = TouchAlignment.Center;
-            Put (timerLabel, 350, 170);
+            timerLabel.textSize = 20;
+            Put (timerLabel, 300, 240);
             timerLabel.Visible = false;
 
             stepButton = new TouchButton ();
-            stepButton.SetSizeRequest (200, 80);
+            stepButton.SetSizeRequest (200, 50);
             stepButton.buttonColor = "grey2";
             stepButton.text = "N/A";
             stepButton.ButtonReleaseEvent += OnStepButtonReleased;
-            Put (stepButton, 300, 335);
+            Put (stepButton, 300, 365);
             stepButton.Show ();
 
             resetBtn = new TouchButton ();
-            resetBtn.SetSizeRequest (200, 80);
+            resetBtn.SetSizeRequest (200, 50);
             resetBtn.text = "Restart";
             resetBtn.ButtonReleaseEvent += OnResetButtonReleased;
-            Put (resetBtn, 510, 335);
+            Put (resetBtn, 510, 365);
             resetBtn.Visible = false;
 
             skipBtn = new TouchButton ();
-            skipBtn.SetSizeRequest (200, 80);
+            skipBtn.SetSizeRequest (200, 50);
             skipBtn.text = "Skip";
             skipBtn.buttonColor = "seca";
             skipBtn.ButtonReleaseEvent += OnSkipButtonReleased;
-            Put (skipBtn, 90, 335);
+            Put (skipBtn, 90, 365);
             skipBtn.Visible = false;
 
             nameLabel = new TouchLabel ();
@@ -101,7 +102,7 @@ namespace AquaPic.UserInterface
             stepLabel.SetSizeRequest (620, 75);
             stepLabel.textAlignment = TouchAlignment.Center;
             stepLabel.text = "Please select a test procedure";
-            Put (stepLabel, 90, 250);
+            Put (stepLabel, 90, 280);
             stepLabel.Show ();
 
             actionLabel = new TouchLabel ();
