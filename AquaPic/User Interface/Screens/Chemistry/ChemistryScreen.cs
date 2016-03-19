@@ -52,10 +52,11 @@ namespace AquaPic.UserInterface
             }
 
             timerProgress = new TouchCurvedProgressBar (
+                new TouchColor ("grey3"),
                 new TouchColor ("pri"),
-                new TouchColor ("grey4"),
-                0.0f);
+                100.0f);
             timerProgress.SetSizeRequest (250, 120);
+            timerProgress.curveStyle = CurveStyle.ThreeQuarterCurve;
             Put (timerProgress, 275, 100);
             timerProgress.Visible = false;
 
@@ -141,8 +142,8 @@ namespace AquaPic.UserInterface
                         currentTime = actionOption;
                         stepButton.text = "Start Timer";
                         timerProgress.Visible = true;
-                        timerProgress.progress = 0.0f;
-                        timerProgress.backgroundColor = "pri";
+                        timerProgress.progress = 100.0f;
+                        timerProgress.progressColor = "pri";
                         timerLabel.Visible = true;
                         timerLabel.text = string.Format ("{0:D} secs", currentTime / 5);
                         skipBtn.Visible = true;
@@ -204,8 +205,8 @@ namespace AquaPic.UserInterface
         protected bool OnTimer () {
             --currentTime;
 
-            timerProgress.progress = 1.0f - ((float)currentTime / (float)actionOption);
-            timerProgress.backgroundColor = new TouchColor ("pri").Blend(new TouchColor ("compl"), timerProgress.progress);
+            timerProgress.progress = (float)currentTime / (float)actionOption;
+            timerProgress.progressColor = new TouchColor ("compl").Blend(new TouchColor ("pri"), timerProgress.progress);
 
             if ((currentTime % 5) == 0) {
                 timerLabel.text = string.Format ("{0:D} secs", currentTime / 5);

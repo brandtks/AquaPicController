@@ -80,33 +80,21 @@ namespace TouchWidgetLibrary
                 int top = Allocation.Top;
                 int width = Allocation.Width;
                 int height = Allocation.Height;
-                int difference, radius, bottom;
+                int radius, bottom;
+                double difference;
 
                 radius = width / 2;
                 bottom = top + height;
 
-                double aspectRatio = (double)width / (double)height;
-                if (currentProgress > aspectRatio) {
-                    difference = (height * currentProgress).ToInt ();
-                    top += (height - difference);
+                difference = (height - width) * currentProgress;
+                top += (height - width - difference.ToInt ());
 
-                    cr.MoveTo (left, bottom - radius);
-                    cr.ArcNegative (left + radius, bottom - radius, radius, (180.0).ToRadians (), (0.0).ToRadians ());
-                    cr.LineTo (left + width, top + radius);
-                    cr.ArcNegative (left + radius, top + radius, radius, (0.0).ToRadians (), (180.0).ToRadians ());
-                    cr.ClosePath ();
-                } else {
-                    double angle1 = (1 - (currentProgress / aspectRatio)) * 180.0 - 90;
-                    double r1 = angle1.ToRadians ();
-                    double r2 = (180 - angle1).ToRadians ();
+                cr.MoveTo (left, bottom - radius);
+                cr.ArcNegative (left + radius, bottom - radius, radius, (180.0).ToRadians (), (0.0).ToRadians ());
+                cr.LineTo (left + width, top + radius);
+                cr.ArcNegative (left + radius, top + radius, radius, (0.0).ToRadians (), (180.0).ToRadians ());
+                cr.ClosePath ();
 
-                    double x2 = TouchGlobal.CalcX (left + radius, radius, r2);
-                    double y2 = TouchGlobal.CalcY (bottom - radius, radius, r2);
-
-                    cr.MoveTo (x2, y2);
-                    cr.ArcNegative (left + radius, bottom - radius, radius, r2, r1);
-                    cr.ClosePath ();
-                }
                 colorProgress.SetSource (cr);
                 cr.Fill ();
             }
@@ -127,33 +115,21 @@ namespace TouchWidgetLibrary
                 int top = Allocation.Top;
                 int width = Allocation.Width;
                 int height = Allocation.Height;
-                int difference, radius, bottom;
+                int radius, bottom;
+                double difference;
 
                 radius = width / 2;
                 bottom = top + height;
 
-                double aspectRatio = (double)width / (double)height;
-                if (currentProgressSecondary > aspectRatio) {
-                    difference = (height * currentProgressSecondary).ToInt ();
-                    top += (height - difference);
+                difference = ((height - width) * currentProgressSecondary);
+                top += ((height - width) - difference.ToInt ());
 
-                    cr.MoveTo (left, bottom - radius);
-                    cr.ArcNegative (left + radius, bottom - radius, radius, (180.0).ToRadians (), (0.0).ToRadians ());
-                    cr.LineTo (left + width, top + radius);
-                    cr.ArcNegative (left + radius, top + radius, radius, (0.0).ToRadians (), (180.0).ToRadians ());
-                    cr.ClosePath ();
-                } else {
-                    double angle1 = (1 - (currentProgressSecondary / aspectRatio)) * 180.0 - 90;
-                    double r1 = angle1.ToRadians ();
-                    double r2 = (180 - angle1).ToRadians ();
+                cr.MoveTo (left, bottom - radius);
+                cr.ArcNegative (left + radius, bottom - radius, radius, (180.0).ToRadians (), (0.0).ToRadians ());
+                cr.LineTo (left + width, top + radius);
+                cr.ArcNegative (left + radius, top + radius, radius, (0.0).ToRadians (), (180.0).ToRadians ());
+                cr.ClosePath ();
 
-                    double x2 = TouchGlobal.CalcX (left + radius, radius, r2);
-                    double y2 = TouchGlobal.CalcY (bottom - radius, radius, r2);
-
-                    cr.MoveTo (x2, y2);
-                    cr.ArcNegative (left + radius, bottom - radius, radius, r2, r1);
-                    cr.ClosePath ();
-                }
                 colorProgressSecondary.SetSource (cr);
                 cr.Fill ();
             }
