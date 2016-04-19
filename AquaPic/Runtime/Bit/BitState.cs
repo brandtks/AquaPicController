@@ -5,15 +5,15 @@ namespace AquaPic.Runtime
 {
     public partial class Bit
     {
-        private class IState
+        private class BitState
         {
             public MyState state;
 
-            public IState () {
+            public BitState () {
                 state = MyState.Off;
             }
 
-            public IState (MyState initState) {
+            public BitState (MyState initState) {
                 state = initState;
             }
         }
