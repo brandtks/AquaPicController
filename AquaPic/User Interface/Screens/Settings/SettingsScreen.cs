@@ -27,7 +27,7 @@ namespace AquaPic.UserInterface
                         b.ButtonReleaseEvent += (o, args) => {
                             topWindow.ShowDecoration ();
                             #if RPI_BUILD
-                            tw.Unfullscreen ();
+                            topWindow.Unfullscreen ();
                             #endif
                         };
                         Put (b, 685, 140);
@@ -59,7 +59,7 @@ namespace AquaPic.UserInterface
                 if (topWindow.IsTopLevel) {
                     topWindow.HideDecoration ();
                     #if RPI_BUILD
-                    tw.Fullscreen ();
+                    topWindow.Fullscreen ();
                     #endif
                 }
             }

@@ -231,6 +231,10 @@ namespace AquaPic.Modules
             }
         }
 
+
+        /**************************************************************************************************************/
+        /* Constructor                                                                                                */
+        /**************************************************************************************************************/
         static WaterLevel () {
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");

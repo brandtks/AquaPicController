@@ -11,22 +11,9 @@ namespace AquaPic.Modules
 {
     public partial class Temperature
     {
-        private static int highTempAlarmIdx;
-        private static int lowTempAlarmIdx;
-        public static int HighTemperatureAlarmIndex {
-            get { return highTempAlarmIdx; }
-        }
-        public static int LowTemperatureAlarmIndex {
-            get { return lowTempAlarmIdx; }
-        }
-
-        public static float highTempAlarmSetpoint;
-        public static float lowTempAlarmSetpoint;
-        public static float temperatureSetpoint;
-        public static float temperatureDeadband;
-
         private static List<Heater> heaters;
         private static List<TemperatureProbe> probes;
+        private static DataLogger dataLogger;
 
         private static float temperature;
         public static float WaterTemperature {
@@ -44,6 +31,20 @@ namespace AquaPic.Modules
                 return probes.Count;
             }
         }
+
+        private static int highTempAlarmIdx;
+        private static int lowTempAlarmIdx;
+        public static int HighTemperatureAlarmIndex {
+            get { return highTempAlarmIdx; }
+        }
+        public static int LowTemperatureAlarmIndex {
+            get { return lowTempAlarmIdx; }
+        }
+
+        public static float highTempAlarmSetpoint;
+        public static float lowTempAlarmSetpoint;
+        public static float temperatureSetpoint;
+        public static float temperatureDeadband;
 
         static Temperature () {
             heaters = new List<Heater> ();
@@ -84,6 +85,8 @@ namespace AquaPic.Modules
 
             temperature = 0.0f;
 
+            dataLogger = new DataLogger ("Temperature");
+
             TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);
         }
 
@@ -114,6 +117,8 @@ namespace AquaPic.Modules
                         Alarm.Clear (lowTempAlarmIdx);
                 }
             }
+
+            dataLogger.AddEntry (temperature);
         }
 
 //        public static void AddHeater (

@@ -31,6 +31,7 @@ namespace AquaPic.Modules
             public float highAlarmStpnt;
             public float lowAlarmStpnt;
             public IndividualControl sensorChannel;
+            public DataLogger dataLogger;
 
             public AnalogSensor (bool enable, float highAlarmSetpoint, float lowAlarmSetPoint, IndividualControl ic) {
                 this.enable = enable;
@@ -53,8 +54,11 @@ namespace AquaPic.Modules
 
                 sensorChannel = ic;
 
-                if (this.enable)
+                if (enable) {
                     AquaPicDrivers.AnalogInput.AddChannel (sensorChannel, "Water Level");
+                    dataLogger = new DataLogger ("WaterLevel");
+                    dataLogger.StartLogging ();
+                }
             }
 
             public void Run () {
@@ -85,6 +89,8 @@ namespace AquaPic.Modules
                             Alarm.Clear (highAnalogAlarmIndex);
                         }
                     }
+
+                    dataLogger.AddEntry (waterLevel);
                 }
             }
 
