@@ -47,8 +47,6 @@ namespace TouchWidgetLibrary
 
             this.ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
-
-
             entry = new Entry ();
             entry.WidthRequest = 145;
             entry.HeightRequest = 30;

@@ -101,6 +101,8 @@ namespace AquaPic.Modules
 
                     if (Alarm.CheckAlarming (analogSensor.sensorDisconnectedAlarmIndex))
                         Alarm.Clear (analogSensor.sensorDisconnectedAlarmIndex);
+
+                    analogSensor.StopLoggingWaterLevel ();
                 }
             }
         }

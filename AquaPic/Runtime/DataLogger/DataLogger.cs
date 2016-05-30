@@ -5,9 +5,15 @@ using FileHelpers;
 
 namespace AquaPic.Runtime
 {
+    public enum LoggerState {
+        FileOpen,
+        FileClosed
+    }
+
     public class DataLogger
     {
         FileHelperAsyncEngine<LogEntry> engine;
+        LoggerState state;
         string currentFileName, currentFilePath;
 
         public DataLogger (string name) {
@@ -15,13 +21,15 @@ namespace AquaPic.Runtime
             currentFilePath = Path.Combine (currentFilePath, "DataLogging");
             currentFilePath = Path.Combine (currentFilePath, name);
 
+            state = LoggerState.FileClosed;
+
             if (!Directory.Exists (currentFilePath)) {
                 Directory.CreateDirectory (currentFilePath);
             }
         }
 
         public void AddEntry (double value) {
-            if (engine == null) {
+            if (state == LoggerState.FileClosed) {
                 StartLogging ();
             } else {
                 string intendedFileName = String.Format ("{0:MMddyyHH}.csv", DateTime.Now);
@@ -42,6 +50,7 @@ namespace AquaPic.Runtime
         protected void OpenFile () {
             engine.Close ();
             engine.BeginAppendToFile (Path.Combine (currentFilePath, currentFileName));
+            state = LoggerState.FileOpen;
         }
 
         public void StartLogging () {
@@ -51,6 +60,11 @@ namespace AquaPic.Runtime
 
             currentFileName = String.Format ("{0:MMddyyHH}.csv", DateTime.Now);
             OpenFile ();
+        }
+
+        public void StopLogging () {
+            engine.Close ();
+            state = LoggerState.FileClosed;
         }
     }
 }

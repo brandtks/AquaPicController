@@ -54,9 +54,10 @@ namespace AquaPic.Modules
 
                 sensorChannel = ic;
 
+                dataLogger = new DataLogger ("WaterLevel");
+
                 if (enable) {
                     AquaPicDrivers.AnalogInput.AddChannel (sensorChannel, "Water Level");
-                    dataLogger = new DataLogger ("WaterLevel");
                     dataLogger.StartLogging ();
                 }
             }
@@ -98,6 +99,10 @@ namespace AquaPic.Modules
                 lowAnalogAlarmIndex = Alarm.Subscribe ("Low Water Level, Analog Sensor");
                 highAnalogAlarmIndex = Alarm.Subscribe ("High Water Level, Analog Sensor");
                 sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog water level probe disconnected");
+            }
+
+            public void StopLoggingWaterLevel () {
+                dataLogger.StopLogging ();
             }
         }
     }

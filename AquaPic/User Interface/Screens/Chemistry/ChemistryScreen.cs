@@ -29,10 +29,6 @@ namespace AquaPic.UserInterface
         bool timerRunning;
 
         public ChemistryWindow (params object[] options) : base () {
-            //TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
-            //Put (box1, 10, 30);
-            //box1.Show ();
-
             screenTitle = "Chemistry";
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
@@ -120,6 +116,13 @@ namespace AquaPic.UserInterface
             combo.ChangedEvent += OnComboChanged;
             Put (combo, 550, 35);
             combo.Show ();
+
+            CanFocus = true;
+            KeyPressEvent += EntryKeyPressEvent;
+
+            ExposeEvent += (o, args) => {
+                GrabFocus ();
+            };
                        
             Show ();
         }
@@ -127,6 +130,15 @@ namespace AquaPic.UserInterface
         public override void Dispose () {
             GLib.Source.Remove (timerId);
             base.Dispose ();
+        }
+
+        void EntryKeyPressEvent (object o, KeyPressEventArgs args) {
+            Console.WriteLine("DEBUG: KeyValue: " + args.Event.KeyValue);
+            if (args.Event.KeyValue == 32) {
+                if (enableStepButton) {
+                    OnStepButtonReleased (null, null);
+                }
+            }
         }
 
         protected void NextStep () {

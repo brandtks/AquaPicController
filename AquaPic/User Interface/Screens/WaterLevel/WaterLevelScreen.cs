@@ -132,7 +132,7 @@ namespace AquaPic.UserInterface
                     analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
                 }
             } else {
-                analogLevelTextBox.text = "Sensor not available";
+                analogLevelTextBox.text = "Sensor disabled";
             }
             analogLevelTextBox.textSize = 20;
             analogLevelTextBox.textAlignment = TouchAlignment.Center;
@@ -306,6 +306,8 @@ namespace AquaPic.UserInterface
                     analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
                 }
                 analogLevelTextBox.QueueDraw ();
+            } else {
+                analogLevelTextBox.text = "Sensor disabled";
             }
 
             if (switchId != -1) {
