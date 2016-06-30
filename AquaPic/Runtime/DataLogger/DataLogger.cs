@@ -6,47 +6,34 @@ using AquaPic.Utilites;
 
 namespace AquaPic.Runtime
 {
-    public enum LoggerState {
-        FileOpen,
-        FileClosed
-    }
-
     public delegate void DataLogEntryAddedEventHandler (object sender, DataLogEntryAddedEventArgs args);
 
     public class DataLogEntryAddedEventArgs : EventArgs
     {
-        public DateTime time;
+        public DateTime dateTime;
         public double value;
 
-        public DataLogEntryAddedEventArgs (DateTime time, double value) {
-            this.time = time;
+        public DataLogEntryAddedEventArgs (DateTime dateTime, double value) {
+            this.dateTime = dateTime;
             this.value = value;
         }
     }
 
     public class DataLogger
     {
-        FileHelperAsyncEngine<LogEntry> engine;
-        LoggerState state;
-        string currentFileName, currentFilePath;
-
-        public event DataLogEntryAddedEventHandler DataLogEntryAddedEvent;
-
-        CircularBuffer<LogEntry> rollingStorage;
-        public LogEntry[] locallyStoredData {
+        string  currentFilePath, _name;
+        public string name {
             get {
-                return rollingStorage.buffer.ToArray ();
+                return _name;
             }
         }
+        public event DataLogEntryAddedEventHandler DataLogEntryAddedEvent;
 
         public DataLogger (string name) {
+            _name = name;
             currentFilePath = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             currentFilePath = Path.Combine (currentFilePath, "DataLogging");
-            currentFilePath = Path.Combine (currentFilePath, name);
-
-            state = LoggerState.FileClosed;
-
-            rollingStorage = new CircularBuffer<LogEntry> (288);
+            currentFilePath = Path.Combine (currentFilePath, _name);
 
             if (!Directory.Exists (currentFilePath)) {
                 Directory.CreateDirectory (currentFilePath);
@@ -54,51 +41,72 @@ namespace AquaPic.Runtime
         }
 
         public void AddEntry (double value) {
-            if (state == LoggerState.FileClosed) {
-                StartLogging ();
-            } else {
-                string intendedFileName = String.Format ("{0:MMddyyHH}.csv", DateTime.Now);
-                if (currentFileName != intendedFileName) {
-                    currentFileName = intendedFileName;
-                    OpenFile ();
-                }
-            }
+            var entry = new LogEntry (DateTime.Now, value);
 
-            var entry = new LogEntry ();
-            entry.dateTime = DateTime.Now;
-            entry.value = value;
-
-            var previous = rollingStorage.buffer [rollingStorage.buffer.Count - 1].dateTime;
-            if (entry.dateTime.Subtract (previous).TotalMinutes >= 5) {
-                rollingStorage.Add (entry);
-            }
+            var filename = String.Format ("{0:MMddyyHH}.csv", DateTime.Now);
+            var writeEngine = new FileHelperEngine<LogEntry> ();
+            writeEngine.AppendToFile (Path.Combine (currentFilePath, filename), entry);
 
             if (DataLogEntryAddedEvent != null) {
                 DataLogEntryAddedEvent (this, new DataLogEntryAddedEventArgs (entry.dateTime, entry.value));
             }
-
-            engine.WriteNext (entry);
-            engine.Flush ();
         }
 
-        protected void OpenFile () {
-            engine.Close ();
-            engine.BeginAppendToFile (Path.Combine (currentFilePath, currentFileName));
-            state = LoggerState.FileOpen;
+        public LogEntry[] GetEntries (int maxEntries) {
+            return GetEntries (maxEntries, 1);
         }
 
-        public void StartLogging () {
-            if (engine == null) {
-                engine = new FileHelperAsyncEngine<LogEntry> ();
+        public LogEntry[] GetEntries (int maxEntries, int secondTimeSpan) {
+            List<LogEntry> entries = new List<LogEntry> ();
+            FileHelperEngine<LogEntry> readEngine = new FileHelperEngine<LogEntry> ();
+            int hourIndex = 0;
+            var lastEntryTime = DateTime.Now;
+
+            while ((entries.Count < maxEntries) && (hourIndex <= 0)) {
+                string filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now.AddHours (hourIndex));
+                string path = Path.Combine (currentFilePath, filename);
+                --hourIndex;
+
+                if (File.Exists (path)) {
+                    var fileEntries = readEngine.ReadFile (path);
+                    if (fileEntries.Length > 0) {
+                        Array.Reverse (fileEntries);
+                        
+                        foreach (var entry in fileEntries) {
+                            var difference = lastEntryTime.Subtract (entry.dateTime).TotalSeconds;
+
+                            if (difference > 2.5) {
+                                hourIndex = 1;
+                                break;
+                            }
+                            lastEntryTime = entry.dateTime;
+
+                            if (entries.Count > 0) {
+                                var previous = entries[entries.Count - 1].dateTime;
+                                var totalSeconds = previous.Subtract (entry.dateTime).TotalSeconds.ToInt ();
+
+                                if (totalSeconds >= secondTimeSpan) {
+                                    entries.Add (entry);
+                                }
+                            } else {
+                                entries.Add (entry);
+                            }
+
+                            if (entries.Count == maxEntries) {
+                                break;
+                            }
+                        }
+                    } else {
+                        hourIndex = 1;
+                    }
+                } else {
+                    hourIndex = 1;
+                }
             }
 
-            currentFileName = String.Format ("{0:MMddyyHH}.csv", DateTime.Now);
-            OpenFile ();
-        }
-
-        public void StopLogging () {
-            engine.Close ();
-            state = LoggerState.FileClosed;
+            var returnArray = entries.ToArray ();
+            Array.Reverse (returnArray);
+            return returnArray;
         }
     }
 }

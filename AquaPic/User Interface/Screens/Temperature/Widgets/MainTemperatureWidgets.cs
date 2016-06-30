@@ -1,5 +1,6 @@
 ﻿using System;
 using Gtk;
+using AquaPic.Modules;
 
 namespace AquaPic.UserInterface
 {
@@ -18,6 +19,12 @@ namespace AquaPic.UserInterface
             };
             Put (eventbox, 0, 0);
             eventbox.Show ();
+
+            linePlot.LinkDataLogger (Temperature.dataLogger);
+
+            Destroyed += (obj, args) => {
+                linePlot.UnLinkDataLogger (Temperature.dataLogger);
+            };
 
             OnUpdate ();
         }

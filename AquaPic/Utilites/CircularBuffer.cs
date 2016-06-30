@@ -16,11 +16,12 @@ namespace AquaPic.Utilites
 
         public CircularBuffer (int size) {
             _size = size;
+            buffer = new List<T> ();
         }
 
         public void Add (T value) {
             buffer.Add (value);
-            if (buffer.Count > _size) {
+            while (buffer.Count > _size) {
                 buffer.RemoveAt (0);
             }
         }

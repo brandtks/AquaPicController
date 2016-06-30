@@ -13,7 +13,12 @@ namespace AquaPic.Modules
     {
         private static List<Heater> heaters;
         private static List<TemperatureProbe> probes;
-        private static DataLogger dataLogger;
+        private static DataLogger _dataLogger;
+        public static DataLogger dataLogger {
+            get {
+                return _dataLogger;
+            }
+        }
 
         private static float temperature;
         public static float WaterTemperature {
@@ -85,7 +90,7 @@ namespace AquaPic.Modules
 
             temperature = 0.0f;
 
-            dataLogger = new DataLogger ("Temperature");
+            _dataLogger = new DataLogger ("Temperature");
 
             TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);
         }
@@ -118,7 +123,7 @@ namespace AquaPic.Modules
                 }
             }
 
-            dataLogger.AddEntry (temperature);
+            _dataLogger.AddEntry (temperature);
         }
 
 //        public static void AddHeater (

@@ -53,6 +53,7 @@ namespace AquaPic.UserInterface
 
         private TouchLabel displayLabel;
         private TouchLabel textBox;
+        protected TouchLinePlot linePlot;
 
         public LinePlotWidget () {
             SetSizeRequest (415, 82);
@@ -76,20 +77,10 @@ namespace AquaPic.UserInterface
             textBox.textColor = "pri";
             textBox.textAlignment = TouchAlignment.Center;
             Put (textBox, 3, 15);
-
-            var box2 = new TouchGraphicalBox (296, 76);
-            box2.color = "grey3";
-            box2.transparency = 0.15f;
-            Put (box2, 116, 3);
-
-            //<TEMPORARY> just here until I get a plot library and data logging
-            var label1 = new TouchLabel ();
-            label1.text = "Not Implemented: For line plot";
-            label1.textColor = "white";
-            label1.WidthRequest = 296;
-            label1.textSize = 10;
-            label1.textAlignment = TouchAlignment.Right;
-            Put (label1, 116, 62);
+            
+            linePlot = new TouchLinePlot ();
+            Put (linePlot, 116, 3);
+            
             
             ShowAll ();
         }

@@ -11,6 +11,16 @@ namespace AquaPic.Runtime
 
         [FieldConverter(ConverterKind.Double)]
         public double value;
+
+        public LogEntry (DateTime dateTime, double value) {
+            this.dateTime = dateTime;
+            this.value = value;
+        }
+
+        public LogEntry () {
+            dateTime = DateTime.MinValue;
+            value = 0.0;
+        }
     }
 }
 

@@ -87,6 +87,13 @@ namespace AquaPic.UserInterface
             Put (eventbox, 0, 0);
             eventbox.Show ();
 
+            linePlot.LinkDataLogger (WaterLevel.dataLogger);
+            linePlot.rangeMargin = 1;
+
+            Destroyed += (obj, args) => {
+                linePlot.UnLinkDataLogger (WaterLevel.dataLogger);
+            };
+
             OnUpdate ();
         }
 
