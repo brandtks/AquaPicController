@@ -9,8 +9,19 @@ namespace TouchWidgetLibrary
 {
     public class TouchLinePlot : EventBox
     {
-        TouchLinePlotOptions options;
-        CircularBuffer<LogEntry> rollingStorage;
+        private TouchLinePlotOptions _options;
+        public TouchLinePlotOptions options {
+            get {
+                return _options;
+            }
+        }
+        
+        private CircularBuffer<LogEntry> rollingStorage;
+        public CircularBuffer<LogEntry> DataLogEntries {
+            get {
+                return rollingStorage;
+            }
+        }
         public double rangeMargin;
 
         public TouchLinePlot () {
@@ -18,7 +29,7 @@ namespace TouchWidgetLibrary
             VisibleWindow = false;
             SetSizeRequest (296, 76);
 
-            options = new TouchLinePlotOptions ();
+            _options = new TouchLinePlotOptions ();
             rollingStorage = new CircularBuffer<LogEntry> (288);
             rangeMargin = 3;
 
@@ -42,7 +53,6 @@ namespace TouchWidgetLibrary
 
                     var min = workingBuffer.Min (entry => entry.value) - rangeMargin;
                     var max = workingBuffer.Max (entry => entry.value) + rangeMargin;
-                    var range = max - min;
 
                     Array.Reverse (workingBuffer);
 
@@ -61,13 +71,14 @@ namespace TouchWidgetLibrary
 
                     var textRender = new TouchText ();
                     textRender.textWrap = TouchTextWrap.Shrink;
+                    textRender.alignment = TouchAlignment.Right;
                     textRender.font.color = "white";
 
                     textRender.text = max.ToInt ().ToString ();
-                    textRender.Render (this, left, top - 2, 16);
+                    textRender.Render (this, left - 9, top - 2, 16);
 
                     textRender.text = min.ToInt ().ToString ();
-                    textRender.Render (this, left, bottom - 22, 16);
+                    textRender.Render (this, left - 9, bottom - 22, 16);
                 }
             }
         }
@@ -78,7 +89,7 @@ namespace TouchWidgetLibrary
 
         public void LinkDataLogger (DataLogger logger) {
             logger.DataLogEntryAddedEvent += OnDataLogEntryAdded;
-            var entries = logger.GetEntries (288, options.TimeSpanToSeconds ());
+            var entries = logger.GetEntries (288, _options.TimeSpanToSeconds ());
             rollingStorage.buffer.AddRange (entries);
         }
 
@@ -86,11 +97,11 @@ namespace TouchWidgetLibrary
             logger.DataLogEntryAddedEvent -= OnDataLogEntryAdded;
         }
 
-        protected void OnDataLogEntryAdded (object sender, DataLogEntryAddedEventArgs args) {
+        public void OnDataLogEntryAdded (object sender, DataLogEntryAddedEventArgs args) {
             if (rollingStorage.buffer.Count > 0) {
                 var previous = rollingStorage.buffer[rollingStorage.buffer.Count - 1].dateTime;
                 var totalSeconds = args.dateTime.Subtract (previous).TotalSeconds.ToInt ();
-                var secondTimeSpan = options.TimeSpanToSeconds ();
+                var secondTimeSpan = _options.TimeSpanToSeconds ();
                 if (totalSeconds >= secondTimeSpan) {
                     rollingStorage.Add (new LogEntry (args.dateTime, args.value));
                 } 

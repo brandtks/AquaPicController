@@ -14,7 +14,7 @@ namespace AquaPic.UserInterface
         private int updateAlarm;
         private string alarmName;
 
-        private string currentscreen = AquaPicGUI.currentScreen;
+        //private string currentscreen = AquaPicGUI.currentScreen;
 
         public MyNotificationBar () {
             Visible = true;

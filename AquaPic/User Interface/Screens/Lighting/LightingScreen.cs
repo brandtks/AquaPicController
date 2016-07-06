@@ -723,7 +723,6 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnOutletStateChange (object sender, StateChangeEventArgs args) {
-            IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureID);
             if (args.state == MyState.Off) {
                 outletStateLabel.text = "Off";
                 outletStateLabel.textColor = "grey4";

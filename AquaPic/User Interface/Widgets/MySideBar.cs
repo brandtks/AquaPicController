@@ -10,7 +10,7 @@ namespace AquaPic.UserInterface
     {
         private bool clicked, expanded;
         private uint clickTimer;
-        private int clickX, clickY;
+        private int clickY;
         private int highlighedScreenIndex;
         private double offset, yDeltaPercentage;
         private string[] windows;
@@ -27,6 +27,7 @@ namespace AquaPic.UserInterface
             ExposeEvent += onExpose;
             ButtonPressEvent += OnButtonPress;
             ButtonReleaseEvent += OnButtonRelease;
+            ScrollEvent += OnScollEvent;
 
             var wins = AquaPicGUI.allWindows.Keys;
             windows = new string[wins.Count];
@@ -36,6 +37,13 @@ namespace AquaPic.UserInterface
 
             yDeltaPercentage = 0.0;
             offset = 0.0;
+        }
+
+        public override void Dispose () {
+            if (clickTimer != 0) {
+                GLib.Source.Remove (clickTimer);
+            }
+            base.Dispose ();
         }
 
         protected void onExpose (object sender, ExposeEventArgs args) {
@@ -147,23 +155,6 @@ namespace AquaPic.UserInterface
                     t.text = "Home";
                     t.Render (this, right - 120, bottom - 40, 115, 40);
                 } else {
-                    /*
-                    cr.MoveTo (10, originY + 40);
-                    cr.ArcNegative (10, originY, 40, Math.PI / 2, -Math.PI / 2);
-                    cr.LineTo (10, top + 30);
-                    cr.LineTo (left - 5, top + 30);
-                    cr.LineTo (left - 5, top + height - 30);
-                    cr.LineTo (10, top + height - 30);
-                    cr.ClosePath ();
-
-                    TouchColor.SetSource (cr, "pri", 0.75);
-                    cr.LineWidth = 0.75;
-                    cr.StrokePreserve ();
-
-                    TouchColor.SetSource (cr, "grey3", 0.25);
-                    cr.Fill ();
-                    */
-
                     cr.Arc (originX - 208, originY, radius, 0, 2 * Math.PI);
                     cr.ClosePath ();
 
@@ -193,6 +184,7 @@ namespace AquaPic.UserInterface
                 clicked = true;
                 yDeltaPercentage = 0.0;
                 offset = 0.0;
+                int clickX;
                 GetPointer (out clickX, out clickY);
                 clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
             }
@@ -263,6 +255,25 @@ namespace AquaPic.UserInterface
                     offset = 0.0;
                     QueueDraw ();
                 }
+            }
+        }
+
+        protected void OnScollEvent (object sender, ScrollEventArgs args) {
+            int x = args.Event.X.ToInt ();
+            if ((x >= 0) && (x < 250)) {
+                if (args.Event.Direction == Gdk.ScrollDirection.Down) {
+                    ++highlighedScreenIndex;
+                } else if (args.Event.Direction == Gdk.ScrollDirection.Up) {
+                    --highlighedScreenIndex;
+                }
+
+                if (highlighedScreenIndex >= windows.Length) {
+                    highlighedScreenIndex = 0 + (highlighedScreenIndex - windows.Length);
+                } else if (highlighedScreenIndex < 0) {
+                    highlighedScreenIndex = windows.Length + highlighedScreenIndex;
+                }
+
+                QueueDraw ();
             }
         }
 

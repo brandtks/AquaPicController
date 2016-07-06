@@ -17,7 +17,6 @@ namespace TouchWidgetLibrary
         private float storedA;
 
         private string colorName;
-        private string storedColorName;
 
         private static Dictionary<string, float[]> colorLookup = new Dictionary<string, float[]> () {
             { "pri", new float [3] { 0.40392f, 0.8902f, 0f} }, // greenish
@@ -43,10 +42,6 @@ namespace TouchWidgetLibrary
                 colorFound = true;
             } catch {
                 colorFound = false;
-//                colorName = string.Empty;
-//                this.R = 0.0f;
-//                this.G = 0.0f;
-//                this.B = 0.0f;
             }
 
             if (!colorFound) {
@@ -66,7 +61,6 @@ namespace TouchWidgetLibrary
             storedG = G;
             storedB = B;
             storedA = this.A;
-            storedColorName = colorName;
         }
 
         public TouchColor (double R, double G, double B, double A = 1.0) {
@@ -79,7 +73,6 @@ namespace TouchWidgetLibrary
             storedG = this.G;
             storedB = this.B;
             storedA = this.A;
-            storedColorName = colorName;
         }
 
         public TouchColor (byte R, byte G, byte B, double A = 1.0) {
@@ -92,7 +85,6 @@ namespace TouchWidgetLibrary
             storedG = this.G;
             storedB = this.B;
             storedA = this.A;
-            storedColorName = colorName;
         }
 
         public static implicit operator TouchColor (string name) {

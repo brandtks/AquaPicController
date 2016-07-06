@@ -341,7 +341,7 @@ namespace AquaPic.UserInterface
 
         protected void OnValueTextBoxTextChanged (object sender, TextChangedEventArgs args) {
             try {
-                double val = Convert.ToDouble (args.text);
+                Convert.ToDouble (args.text);
             } catch {
                 args.keepText = false;
             }

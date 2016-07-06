@@ -417,7 +417,7 @@ namespace AquaPic.Modules
             double latRad = degToRad(lat);
             double sdRad = degToRad(solarDec);
 
-            double HAarg = (Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad));
+            //double HAarg = (Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad));
 
             double HA = (Math.Acos(Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad)));
 
@@ -441,7 +441,7 @@ namespace AquaPic.Modules
             double latRad = degToRad(lat);
             double sdRad = degToRad(solarDec);
 
-            double HAarg = (Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad));
+            //double HAarg = (Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad));
 
             double HA = (Math.Acos(Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad)));
 
@@ -567,16 +567,16 @@ namespace AquaPic.Modules
 		static private string getTimeString(double time, int timezone, double JD, bool dst)
         {
             var timeLocal = time + (timezone * 60.0);
-            var riseT = calcTimeJulianCent(JD + time / 1440.0);
+            //var riseT = calcTimeJulianCent(JD + time / 1440.0);
             timeLocal += ((dst) ? 60.0 : 0.0);
             return getTimeString(timeLocal);
         }
 
 		static private DateTime? getDateTime(double time, int timezone, DateTime date, bool dst)
         {
-            double JD = calcJD(date);
+            //double JD = calcJD(date);
             var timeLocal = time + (timezone * 60.0);
-            var riseT = calcTimeJulianCent(JD + time / 1440.0);
+            //var riseT = calcTimeJulianCent(JD + time / 1440.0);
             timeLocal += ((dst) ? 60.0 : 0.0);
             return getDateTime(timeLocal, date);
         }

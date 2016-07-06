@@ -71,22 +71,20 @@ namespace TouchWidgetLibrary
             for (int i = 0; i < textOptions.Length; ++i)
                 this.textOptions [i] = string.Empty;
 
-            this.clicked = false;
-            this.clickTimer = 0;
-            this.click1 = 0;
-            this.click2 = 0;
+            clicked = false;
+            clickTimer = 0;
+            click1 = 0;
+            click2 = 0;
 
             if (this.orientation == TouchOrientation.Horizontal) {
-                this.WidthRequest = 80;
-                this.HeightRequest = 20;
+                SetSizeRequest (80, 20);
             } else {
-                this.WidthRequest = 20;
-                this.HeightRequest = 80;
+                SetSizeRequest (20, 80);
             }
 
-            this.ExposeEvent += OnExpose;
-            this.ButtonPressEvent += OnSelectorPress;
-            this.ButtonReleaseEvent += OnSelectorRelease;
+            ExposeEvent += OnExpose;
+            ButtonPressEvent += OnSelectorPress;
+            ButtonReleaseEvent += OnSelectorRelease;
         }
 
         public TouchSelectorSwitch (int selectionCount) : this (0, selectionCount, 0, TouchOrientation.Horizontal) { }
@@ -99,6 +97,13 @@ namespace TouchWidgetLibrary
 
         public void AddSelectedColorOption (int selectionIndex, double R, double G, double B) {
             backgoundColorOptions [selectionIndex] = new TouchColor (R, G, B);
+        }
+
+        public override void Dispose () {
+            if (clickTimer != 0) {
+                GLib.Source.Remove (clickTimer);
+            }
+            base.Dispose ();
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {

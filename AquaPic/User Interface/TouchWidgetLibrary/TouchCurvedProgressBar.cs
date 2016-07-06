@@ -61,7 +61,7 @@ namespace TouchWidgetLibrary
                 int x = Allocation.Left;
                 int width = Allocation.Width;
                 int height = Allocation.Height;
-                int right = x + width;
+                //int right = x + width;
                 int radius = barWidth / 2;
                 int bigRadius;
 

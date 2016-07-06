@@ -59,20 +59,25 @@ namespace TouchWidgetLibrary
             this._currentProgress = currentProgress;
             this.enableTouch = enableTouch;
             _orient = orientation;
-            this.timerId = 0;
-            this.clicked = false;
+            timerId = 0;
+            clicked = false;
 
             if (_orient == TouchOrientation.Vertical) {
-                this.WidthRequest = 30;
-                this.HeightRequest = 200;
+                SetSizeRequest (30, 200);
             } else {
-                this.WidthRequest = 200;
-                this.HeightRequest = 30;
+                SetSizeRequest (200, 30);
             }
 
-            this.ExposeEvent += OnExpose;
-            this.ButtonPressEvent += OnProgressBarPress;
-            this.ButtonReleaseEvent += OnProgressBarRelease;
+            ExposeEvent += OnExpose;
+            ButtonPressEvent += OnProgressBarPress;
+            ButtonReleaseEvent += OnProgressBarRelease;
+        }
+
+        public override void Dispose () {
+            if (timerId != 0) {
+                GLib.Source.Remove (timerId);
+            }
+            base.Dispose ();
         }
 
         public TouchProgressBar () 

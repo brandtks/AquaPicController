@@ -218,7 +218,7 @@ namespace TouchWidgetLibrary
                 GetPointer (out x, out y);
 
                 if ((x >= 0) && (x <= Allocation.Width)) {
-                    int top = Allocation.Top + height;
+                    //int top = Allocation.Top + height;
 
                     for (int i = 0; i < List.Count; ++i) {
                         int topWindow = i * height + 25;
