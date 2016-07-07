@@ -66,31 +66,44 @@ namespace AquaPic.Modules
                     waterLevel = AquaPicDrivers.AnalogInput.GetChannelValue (sensorChannel);
                     waterLevel = waterLevel.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
 
-                    if (waterLevel < 0.0f)
-                        Alarm.Post (sensorDisconnectedAlarmIndex);
-                    else {
+                    if (waterLevel < 0.0f) {
+                        if (!Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
+                            Alarm.Post (sensorDisconnectedAlarmIndex);
+                            dataLogger.AddEntry ("disconnected alarm");
+                        }
+                    } else {
                         if (Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
                             Alarm.Clear (sensorDisconnectedAlarmIndex);
                         }
                     }
 
-                    if ((waterLevel <= lowAlarmStpnt) && (connected))
-                        Alarm.Post (lowAnalogAlarmIndex);
-                    else {
+                    if ((waterLevel <= lowAlarmStpnt) && (connected)) {
+                        if (!Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
+                            Alarm.Post (lowAnalogAlarmIndex);
+                            dataLogger.AddEntry ("low alarm");
+                        }
+                    } else {
                         if (Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
                             Alarm.Clear (lowAnalogAlarmIndex);
                         }
                     }
 
-                    if (waterLevel >= highAlarmStpnt)
-                        Alarm.Post (highAnalogAlarmIndex);
-                    else {
+                    if (waterLevel >= highAlarmStpnt) {
+                        if (!Alarm.CheckAlarming (highAnalogAlarmIndex)) {
+                            Alarm.Post (highAnalogAlarmIndex);
+                            dataLogger.AddEntry ("high alarm");
+                        }
+                    } else {
                         if (Alarm.CheckAlarming (highAnalogAlarmIndex)) {
                             Alarm.Clear (highAnalogAlarmIndex);
                         }
                     }
 
-                    dataLogger.AddEntry (waterLevel);
+                    if (waterLevel < 0.0f) {
+                        dataLogger.AddEntry ("probe disconnected");
+                    } else {
+                        dataLogger.AddEntry (waterLevel);
+                    }
                 }
             }
 

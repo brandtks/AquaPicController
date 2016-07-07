@@ -97,6 +97,7 @@ namespace AquaPic.Modules
                                 if (pumpOnRequest) {
                                     state = AutoTopOffState.Filling;
                                     Logger.Add ("Starting auto top off");
+                                    dataLogger.AddEntry ("ato started"); 
                                     pumpTimer.Reset ();
                                     pumpTimer.totalSeconds = maxPumpOnTime;
                                     pumpTimer.Start ();
@@ -120,7 +121,8 @@ namespace AquaPic.Modules
                             if (!pumpOnRequest) {
                                 state = AutoTopOffState.Cooldown;
                                 pumpTimer.Reset ();
-                                Logger.Add (string.Format ("Stopping auto top off. Runtime: {0} secs", pumpTimer.totalSeconds - pumpTimer.secondsRemaining));
+                                Logger.Add ("Stopping auto top off. Runtime: {0} secs", pumpTimer.totalSeconds - pumpTimer.secondsRemaining);
+                                dataLogger.AddEntry ("ato stopped"); 
                                 pumpTimer.totalSeconds = minPumpOffTime;
                                 pumpTimer.Start ();
                             }

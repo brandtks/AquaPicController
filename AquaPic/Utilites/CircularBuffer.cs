@@ -21,9 +21,10 @@ namespace AquaPic.Utilites
         }
 
         private List<T> _buffer;
-        public List<T> buffer {
+
+        public T this[int index] {
             get {
-                return _buffer;
+                return _buffer[index];
             }
         }
 
@@ -43,6 +44,17 @@ namespace AquaPic.Utilites
             while (_buffer.Count > _maxSize) {
                 _buffer.RemoveAt (0);
             }
+        }
+
+        public void AddRange (IEnumerable<T> collection) {
+            _buffer.AddRange (collection);
+            while (_buffer.Count > _maxSize) {
+                _buffer.RemoveAt (0);
+            }
+        }
+
+        public T[] ToArray () {
+            return _buffer.ToArray ();
         }
     }
 }
