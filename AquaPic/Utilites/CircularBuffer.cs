@@ -5,24 +5,43 @@ namespace AquaPic.Utilites
 {
     public class CircularBuffer<T>
     {
-        private int _size;
-        public int size {
+        private int _maxSize;
+        public int maxSize {
             get {
-                return _size;
+                return _maxSize;
+            }
+            set {
+                var oldMaxSize = _maxSize;
+                _maxSize = value;
+                //Shitily programmed. This might throw an exception, but probably never will
+                if (oldMaxSize > _maxSize) {
+                    _buffer.RemoveRange (0, oldMaxSize - _maxSize);
+                }
             }
         }
 
-        public List<T> buffer;
+        private List<T> _buffer;
+        public List<T> buffer {
+            get {
+                return _buffer;
+            }
+        }
 
-        public CircularBuffer (int size) {
-            _size = size;
-            buffer = new List<T> ();
+        public int count {
+            get {
+                return _buffer.Count;
+            }
+        }
+
+        public CircularBuffer (int maxSize) {
+            _maxSize = maxSize;
+            _buffer = new List<T> ();
         }
 
         public void Add (T value) {
-            buffer.Add (value);
-            while (buffer.Count > _size) {
-                buffer.RemoveAt (0);
+            _buffer.Add (value);
+            while (_buffer.Count > _maxSize) {
+                _buffer.RemoveAt (0);
             }
         }
     }

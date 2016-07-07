@@ -9,28 +9,50 @@ namespace TouchWidgetLibrary
 {
     public class TouchLinePlot : EventBox
     {
-        private TouchLinePlotOptions _options;
-        public TouchLinePlotOptions options {
-            get {
-                return _options;
-            }
-        }
-        
         private CircularBuffer<LogEntry> rollingStorage;
-        public CircularBuffer<LogEntry> DataLogEntries {
+        public CircularBuffer<LogEntry> dataPoints {
             get {
                 return rollingStorage;
             }
         }
+
         public double rangeMargin;
+        
+        public TouchLinePlotTimeSpan timeSpan;
+        
+        private int _pointSpacing;
+        public int pointSpacing {
+            get {
+                return _pointSpacing;
+            }
+            set {
+                if (value > 288) {
+                    _pointSpacing = 288;
+                } else if (value < 1) {
+                    _pointSpacing = 1;
+                } else {
+                    _pointSpacing = value;
+                }
+
+                rollingStorage.maxSize = maxDataPoints;
+            }
+        }
+
+        public int maxDataPoints {
+            get {
+                return 288 / _pointSpacing;
+            }
+        }
 
         public TouchLinePlot () {
             Visible = true;
             VisibleWindow = false;
             SetSizeRequest (296, 76);
 
-            _options = new TouchLinePlotOptions ();
-            rollingStorage = new CircularBuffer<LogEntry> (288);
+            timeSpan = TouchLinePlotTimeSpan.Seconds1;
+            _pointSpacing = 1;
+
+            rollingStorage = new CircularBuffer<LogEntry> (maxDataPoints);
             rangeMargin = 3;
 
             ExposeEvent += OnExpose;
@@ -51,19 +73,28 @@ namespace TouchWidgetLibrary
                 if (rollingStorage.buffer.Count > 0) {
                     var workingBuffer = rollingStorage.buffer.ToArray ();
 
-                    var min = workingBuffer.Min (entry => entry.value) - rangeMargin;
-                    var max = workingBuffer.Max (entry => entry.value) + rangeMargin;
+                    var min = workingBuffer.Min (entry => entry.value);
+                    var max = workingBuffer.Max (entry => entry.value);
+
+                    if ((max - min) < rangeMargin) {
+                        max += (rangeMargin / 2);
+                        min -= (rangeMargin / 2);
+                    }
 
                     Array.Reverse (workingBuffer);
 
-                    var y = workingBuffer[0].value.Map (min, max, bottom - 6, top);
+                    var y = workingBuffer[0].value.Map (min, max, bottom - 10, top + 4);
                     var x = left + 8;
                     cr.MoveTo (x, y);
 
                     for (int i = 1; i < workingBuffer.Length; ++i) {
-                        y = workingBuffer[i].value.Map (min, max, bottom - 6, top);
-                        x = left + 8 + i;
+                        y = workingBuffer[i].value.Map (min, max, bottom - 10, top + 4);
+                        x = left + 8 + (i * _pointSpacing);
                         cr.LineTo (x, y);
+                    }
+
+                    if (workingBuffer.Length == maxDataPoints) {
+                        cr.LineTo (left + 296, y);
                     }
 
                     TouchColor.SetSource (cr, "pri");
@@ -74,10 +105,10 @@ namespace TouchWidgetLibrary
                     textRender.alignment = TouchAlignment.Right;
                     textRender.font.color = "white";
 
-                    textRender.text = max.ToInt ().ToString ();
+                    textRender.text = Math.Ceiling (max).ToString ();
                     textRender.Render (this, left - 9, top - 2, 16);
 
-                    textRender.text = min.ToInt ().ToString ();
+                    textRender.text = Math.Floor (min).ToString ();
                     textRender.Render (this, left - 9, bottom - 22, 16);
                 }
             }
@@ -89,7 +120,7 @@ namespace TouchWidgetLibrary
 
         public void LinkDataLogger (DataLogger logger) {
             logger.DataLogEntryAddedEvent += OnDataLogEntryAdded;
-            var entries = logger.GetEntries (288, _options.TimeSpanToSeconds ());
+            var entries = logger.GetEntries (maxDataPoints, TimeSpanToSeconds ());
             rollingStorage.buffer.AddRange (entries);
         }
 
@@ -98,10 +129,10 @@ namespace TouchWidgetLibrary
         }
 
         public void OnDataLogEntryAdded (object sender, DataLogEntryAddedEventArgs args) {
-            if (rollingStorage.buffer.Count > 0) {
-                var previous = rollingStorage.buffer[rollingStorage.buffer.Count - 1].dateTime;
+            if (rollingStorage.count > 0) {
+                var previous = rollingStorage.buffer[rollingStorage.count - 1].dateTime;
                 var totalSeconds = args.dateTime.Subtract (previous).TotalSeconds.ToInt ();
-                var secondTimeSpan = _options.TimeSpanToSeconds ();
+                var secondTimeSpan = TimeSpanToSeconds ();
                 if (totalSeconds >= secondTimeSpan) {
                     rollingStorage.Add (new LogEntry (args.dateTime, args.value));
                 } 
@@ -110,15 +141,6 @@ namespace TouchWidgetLibrary
             }
 
             QueueDraw ();
-        }
-    }
-
-    public class TouchLinePlotOptions
-    {
-        TouchLinePlotTimeSpan timeSpan;
-
-        public TouchLinePlotOptions () {
-            timeSpan = TouchLinePlotTimeSpan.Seconds1;
         }
 
         public int TimeSpanToSeconds () {

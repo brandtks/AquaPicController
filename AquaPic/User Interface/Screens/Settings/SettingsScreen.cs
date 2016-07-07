@@ -11,10 +11,6 @@ namespace AquaPic.UserInterface
         private AquaPicGUI topWindow;
 
         public SettingsWindow (params object[] options) : base () {
-            //var box = new TouchGraphicalBox (110, 395);
-            //Put (box, 680, 30);
-            //box.Show ();
-
             screenTitle = "Settings";
 
             if (options.Length >= 1) {

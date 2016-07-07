@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Gtk;
 using AquaPic.Modules;
 using AquaPic.Runtime;
@@ -20,7 +21,7 @@ namespace AquaPic.UserInterface
             label.textColor = "compl";
             label.text = "Probe Disconnected";
             label.WidthRequest = 199;
-            Put (label, 118, 5);
+            Put (label, 126, 5);
             label.Show ();
 
             var eventbox = new EventBox ();
@@ -33,13 +34,15 @@ namespace AquaPic.UserInterface
             Put (eventbox, 0, 0);
             eventbox.Show ();
 
-            linePlot.LinkDataLogger (WaterLevel.dataLogger);
-            WaterLevel.dataLogger.DataLogEntryAddedEvent -= linePlot.OnDataLogEntryAdded;
+            linePlot.rangeMargin = 1;
             WaterLevel.dataLogger.DataLogEntryAddedEvent += OnWaterLevelDataLogEntryAdded;
-            linePlot.rangeMargin = 0.5;
+            var entries = WaterLevel.dataLogger.GetEntries (linePlot.maxDataPoints, linePlot.TimeSpanToSeconds ());
+            var usableEntries = from entry in entries
+                                where entry.value >= 0.0
+                                select entry;
+            linePlot.dataPoints.buffer.AddRange (usableEntries);
 
             Destroyed += (obj, args) => {
-                linePlot.UnLinkDataLogger (WaterLevel.dataLogger);
                 WaterLevel.dataLogger.DataLogEntryAddedEvent -= OnWaterLevelDataLogEntryAdded;
             };
 
@@ -47,19 +50,19 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnWaterLevelDataLogEntryAdded (object obj, DataLogEntryAddedEventArgs args) {
-            if (args.value < 0.0f) {
-
+            if (args.value <= 0.0f) {
+                return;
             }
             
-            if (linePlot.DataLogEntries.buffer.Count > 0) {
-                var previous = linePlot.DataLogEntries.buffer[linePlot.DataLogEntries.buffer.Count - 1].dateTime;
+            if (linePlot.dataPoints.count > 0) {
+                var previous = linePlot.dataPoints.buffer[linePlot.dataPoints.count - 1].dateTime;
                 var totalSeconds = args.dateTime.Subtract (previous).TotalSeconds.ToInt ();
-                var secondTimeSpan = linePlot.options.TimeSpanToSeconds ();
+                var secondTimeSpan = linePlot.TimeSpanToSeconds ();
                 if (totalSeconds >= secondTimeSpan) {
-                    linePlot.DataLogEntries.Add (new LogEntry (args.dateTime, args.value));
+                    linePlot.dataPoints.Add (new LogEntry (args.dateTime, args.value));
                 }
             } else {
-                linePlot.DataLogEntries.Add (new LogEntry (args.dateTime, args.value));
+                linePlot.dataPoints.Add (new LogEntry (args.dateTime, args.value));
             }
 
             QueueDraw ();

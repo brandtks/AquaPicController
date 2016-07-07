@@ -108,6 +108,16 @@ namespace AquaPic.Runtime
             Array.Reverse (returnArray);
             return returnArray;
         }
+
+        #if DEBUG
+        public void DeleteAllLogFiles () {           
+            var files = Directory.GetFiles (currentFilePath);
+            foreach (var file in files) {
+                Console.WriteLine ("Deleting {0} for {1}", file, _name);
+                File.Delete (file);
+            }
+        }
+        #endif
     }
 }
 
