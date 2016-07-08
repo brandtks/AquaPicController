@@ -11,6 +11,8 @@ namespace TouchWidgetLibrary
     public class TouchLinePlot : EventBox
     {
         string name;
+        uint timerId;
+        const int graphWidth = 240;
         
         private CircularBuffer<LogEntry> _dataPoints;
         public CircularBuffer<LogEntry> dataPoints {
@@ -28,19 +30,13 @@ namespace TouchWidgetLibrary
 
         public Dictionary<string, TouchColor> eventColors;
 
-        private int _pointSpacing;
-        public int pointSpacing {
+        private TouchLinePlotPointPixelDifference _pointSpacing;
+        public TouchLinePlotPointPixelDifference pointSpacing {
             get {
                 return _pointSpacing;
             }
             set {
-                if (value > 288) {
-                    _pointSpacing = 288;
-                } else if (value < 1) {
-                    _pointSpacing = 1;
-                } else {
-                    _pointSpacing = value;
-                }
+                _pointSpacing = value;
 
                 _dataPoints.maxSize = maxDataPoints;
                 _eventPoints.maxSize = maxDataPoints;
@@ -49,7 +45,7 @@ namespace TouchWidgetLibrary
 
         public int maxDataPoints {
             get {
-                return 288 / _pointSpacing;
+                return graphWidth / (int)_pointSpacing;
             }
         }
 
@@ -60,11 +56,11 @@ namespace TouchWidgetLibrary
         public TouchLinePlot () {
             Visible = true;
             VisibleWindow = false;
-            SetSizeRequest (296, 76);
+            SetSizeRequest (graphWidth + 8, 76);
 
             name = "Unlinked";
 
-            _pointSpacing = 1;
+            _pointSpacing = TouchLinePlotPointPixelDifference.One;
             _dataPoints = new CircularBuffer<LogEntry> (maxDataPoints);
             _eventPoints = new CircularBuffer<LogEntry> (maxDataPoints);
             eventColors = new Dictionary<string, TouchColor> ();
@@ -75,6 +71,13 @@ namespace TouchWidgetLibrary
 
             ExposeEvent += OnExpose;
             //ButtonReleaseEvent += OnButtonRelease;
+
+            timerId = GLib.Timeout.Add (1000, OnTimer);
+        }
+
+        public override void Dispose () {
+            GLib.Source.Remove (timerId);
+            base.Dispose ();
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
@@ -83,9 +86,10 @@ namespace TouchWidgetLibrary
                 int left = Allocation.Left;
                 int height = Allocation.Height;
                 int bottom = Allocation.Bottom;
+                int width = Allocation.Width;
                 var now = DateTime.Now;
 
-                cr.Rectangle (left + 8, top, 288, height - 6);
+                cr.Rectangle (left + 8, top, graphWidth, height - 6);
                 TouchColor.SetSource (cr, "grey3", 0.15f);
                 cr.Fill ();
 
@@ -124,14 +128,14 @@ namespace TouchWidgetLibrary
                         if (previousDifference > 2) {
                             cr.Stroke ();
 
-                            if (x > (left + 296)) {
+                            if (x > (left + width)) {
                                 break;
                             } else {
                                 cr.MoveTo (x, y);
                             }
                         } else {
-                            if (x > (left + 296)) {
-                                x = left + 296;
+                            if (x > (left + width)) {
+                                x = left + width;
                                 cr.LineTo (x, y);
                                 break;
                             } else {
@@ -161,11 +165,11 @@ namespace TouchWidgetLibrary
                     for (int i = 0; i < eventBuffer.Length; i++) {
                         double x = left + 8;
                         x += (now.Subtract (eventBuffer[i].dateTime).TotalSeconds / (double)PointTimeDifferenceToSeconds ()) * (double)_pointSpacing;
-                        if (x > (left + 296)) {
+                        if (x > (left + width)) {
                             break;
                         }
 
-                        cr.Rectangle (x, top, _pointSpacing, height - 6);
+                        cr.Rectangle (x, top, (int)_pointSpacing, height - 6);
 
                         if (eventColors.ContainsKey (eventBuffer[i].eventType)) {
                             eventColors[eventBuffer[i].eventType].SetSource (cr);
@@ -213,13 +217,10 @@ namespace TouchWidgetLibrary
             } else {
                 _dataPoints.Add (new LogEntry (args.entry));
             }
-
-            QueueDraw ();
         }
 
         public void OnEventLogEntryAdded (object sender, DataLogEntryAddedEventArgs args) {
             _eventPoints.Add (new LogEntry (args.entry));
-            QueueDraw ();
         }
 
         public int PointTimeDifferenceToSeconds () {
@@ -241,6 +242,11 @@ namespace TouchWidgetLibrary
                 default:
                     return 1;
             }
+        }
+
+        protected bool OnTimer () {
+            QueueDraw ();
+            return true;
         }
     }
 
@@ -265,6 +271,30 @@ namespace TouchWidgetLibrary
 
         [Description ("Ten minutes")]
         Minute10
+    }
+
+    //240 is a high composite number 
+    //factors are 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 16, 20, 24, 30, 40, 48, 60, 80, 120, and 240
+    public enum TouchLinePlotPointPixelDifference {
+        One = 1,
+        Two = 2,
+        Three = 3,
+        Four = 4,
+        Five = 5,
+        Six = 6,
+        Eight = 8,
+        Ten = 10,
+        Twelve = 12,
+        Fifteen = 15,
+        Sixteen = 16,
+        Twenty = 20,
+        TwentyFour = 24,
+        Thirty = 30,
+        Forty = 40,
+        FortyEight = 48,
+        Sixty = 60,
+        Eighty = 80,
+        OneTwenty = 120
     }
 
     public class TouchLinePlotStartingPoint

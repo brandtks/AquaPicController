@@ -249,6 +249,12 @@ namespace AquaPic.Modules
             foreach (var group in temperatureGroups.Values) {
                 group.Run ();
             }
+
+            foreach (var probe in probes) {
+                if (!CheckTemperatureGroupKeyNoThrow (probe.temperatureGroupName)) {
+                    probe.GetTemperature ();
+                }
+            }
         }
 
         /**************************************************************************************************************/
@@ -261,24 +267,25 @@ namespace AquaPic.Modules
             float temperatureSetpoint,
             float temperatureDeadband
         ) {
-            if (TemperatureGroupNameOk (name)) {
-                temperatureGroups.Add ( 
-                    name, 
-                    new TemperatureGroup (
-                        name,  
-                        highTemperatureAlarmSetpoint,
-                        lowTemperatureAlarmSetpoint,
-                        temperatureSetpoint,
-                        temperatureDeadband));
-            } else {
+            if (!TemperatureGroupNameOk (name)) {
                 throw new Exception (string.Format ("Temperature Group: {0} already exists", name));
+            }
+
+            temperatureGroups.Add ( 
+                name, 
+                new TemperatureGroup (
+                    name,  
+                    highTemperatureAlarmSetpoint,
+                    lowTemperatureAlarmSetpoint,
+                    temperatureSetpoint,
+                    temperatureDeadband));
+
+            if (_defaultTemperatureGroup.IsEmpty ()) {
+                _defaultTemperatureGroup = name;
             }
         }
 
         public static void RemoveTemperatureGroup (string name) {
-            //int temperatureGroupIndex = GetTemperatureGroupIndex (name);
-            //RemoveTemperatureGroup (temperatureGroupIndex);
-            
             CheckTemperatureGroupKey (name);
             temperatureGroups.Remove (name);
             
@@ -291,17 +298,6 @@ namespace AquaPic.Modules
                 }
             }
         }
-
-        //public static void RemoveTemperatureGroup (int groupIndex) {
-        //    CheckTemperatureGroupRange (groupIndex);
-        //    temperatureGroups.RemoveAt (groupIndex);
-        //}
-
-        //protected static void CheckTemperatureGroupRange (int groupIndex) {
-        //    if ((groupIndex < 0) || (groupIndex >= temperatureGroups.Count)) {
-        //        throw new ArgumentOutOfRangeException ("groupIndex");
-        //    }
-        //}
 
         public static void CheckTemperatureGroupKey (string name) {
             if (!temperatureGroups.ContainsKey (name)) {
@@ -323,12 +319,6 @@ namespace AquaPic.Modules
         }
 
         /***Getters****************************************************************************************************/
-        /***Name***/
-        //public static string GetTemperatureGroupName (int groupIndex) {
-        //    CheckTemperatureGroupRange (groupIndex);
-        //    return temperatureGroups[groupIndex].name;
-        //}
-
         /***Names***/
         public static string[] GetAllTemperatureGroupNames () {
             List<string> names = new List<string> ();
@@ -338,118 +328,47 @@ namespace AquaPic.Modules
             return names.ToArray ();
         }
 
-        /***Index***/
-        //public static int GetTemperatureGroupIndex (string name) {
-        //    for (int i = 0; i < temperatureGroups.Count; ++i) {
-        //        if (string.Equals (name, temperatureGroups[i].name, StringComparison.InvariantCultureIgnoreCase))
-        //            return i;
-        //    }
-        //
-        //    throw new ArgumentException (name + " does not exists");
-        //}
-
-        //public static int GetTemperatureGroupIndexNoThrow (string name) {
-        //    int temperatureGroupIndex;
-        //    
-        //    try {
-        //        temperatureGroupIndex = GetTemperatureGroupIndex (name);
-        //    } catch (ArgumentException) {
-        //        temperatureGroupIndex = -1;
-        //    }
-        //
-        //    return temperatureGroupIndex;
-        //}
-
         /***Temperature***/
         public static float GetTemperatureGroupTemperature (string name) {
-            //var groupIndex = GetTemperatureGroupIndex (name);
-            //return GetTemperatureGroupTemperature (groupIndex);
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].temperature;
         }
 
-        //public static float GetTemperatureGroupTemperature (int groupIndex) {
-        //    CheckTemperatureGroupRange (groupIndex);
-        //    return temperatureGroups[groupIndex].temperature;
-        //}
-
         /***High temperature alarm setpoint***/
         public static float GetTemperatureGroupHighTemperatureAlarmSetpoint (string name) {
-            //var groupIndex = GetTemperatureGroupIndex (name);
-            //return GetTemperatureGroupHighTemperatureAlarmSetpoint (groupIndex);
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].highTemperatureAlarmSetpoint;
         }
 
-        //public static float GetTemperatureGroupHighTemperatureAlarmSetpoint (int groupIndex) {
-        //    CheckTemperatureGroupRange (groupIndex);
-        //    return temperatureGroups[groupIndex].highTemperatureAlarmSetpoint;
-        //}
-
         /***Low temperature alarm setpoint***/
         public static float GetTemperatureGroupLowTemperatureAlarmSetpoint (string name) {
-            //var groupIndex = GetTemperatureGroupIndex (name);
-            //return GetTemperatureGroupLowTemperatureAlarmSetpoint (groupIndex);
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].lowTemperatureAlarmSetpoint;
         }
-        
-        //public static float GetTemperatureGroupLowTemperatureAlarmSetpoint (int groupIndex) {
-        //    CheckTemperatureGroupRange (groupIndex);
-        //    return temperatureGroups[groupIndex].lowTemperatureAlarmSetpoint;
-        //}
 
         /***Temperature setpoint***/
         public static float GetTemperatureGroupTemperatureSetpoint (string name) {
-            //var groupIndex = GetTemperatureGroupIndex (name);
-            //return GetTemperatureGroupTemperatureSetpoint (groupIndex);
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].temperatureSetpoint;
         }
-        
-        //public static float GetTemperatureGroupTemperatureSetpoint (int groupIndex) {
-        //    CheckTemperatureGroupRange (groupIndex);
-        //    return temperatureGroups[groupIndex].temperatureSetpoint;
-        //}
 
         /***Temperature deadband***/
         public static float GetTemperatureGroupTemperatureDeadband (string name) {
-            //var groupIndex = GetTemperatureGroupIndex (name);
-            //return GetTemperatureGroupTemperatureDeadband (groupIndex);
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].temperatureDeadband;
         }
-        
-        //public static float GetTemperatureGroupTemperatureDeadband (int groupIndex) {
-        //    CheckTemperatureGroupRange (groupIndex);
-        //    return temperatureGroups[groupIndex].temperatureDeadband;
-        //}
 
         /***High temperature alarm index***/
         public static int GetTemperatureGroupHighTemperatureAlarmIndex (string name) {
-            //var groupIndex = GetTemperatureGroupIndex (name);
-            //return GetTemperatureGroupHighTemperatureAlarmIndex (groupIndex);
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].highTemperatureAlarmIndex;
         }
-        
-        //public static int GetTemperatureGroupHighTemperatureAlarmIndex (int groupIndex) {
-        //    CheckTemperatureGroupRange (groupIndex);
-        //    return temperatureGroups[groupIndex].highTemperatureAlarmIndex;
-        //}
 
         /***Low temperature alarm index***/
         public static int GetTemperatureGroupLowTemperatureAlarmIndex (string name) {
-            //var groupIndex = GetTemperatureGroupIndex (name);
-            //return GetTemperatureGroupLowTemperatureAlarmIndex (groupIndex);
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].lowTemperatureAlarmIndex;
         }
-        
-        //public static int GetTemperatureGroupLowTemperatureAlarmIndex (int groupIndex) {
-        //    CheckTemperatureGroupRange (groupIndex);
-        //    return temperatureGroups[groupIndex].lowTemperatureAlarmIndex;
-        //}
 
         public static DataLogger GetTemperatureGroupDataLogger (string name) {
             CheckTemperatureGroupKey (name);

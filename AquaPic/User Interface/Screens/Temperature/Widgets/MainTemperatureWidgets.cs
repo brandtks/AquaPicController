@@ -54,7 +54,7 @@ namespace AquaPic.UserInterface
                 Put (label, 3, 65);
             }
 
-            linePlot.eventColors.Add ("probe disconnected", new TouchColor ("secb", 0.25));
+            linePlot.eventColors.Add ("no probes", new TouchColor ("secb", 0.25));
             linePlot.eventColors.Add ("heater on", new TouchColor ("seca", 0.5));
             linePlot.eventColors.Add ("heater off", new TouchColor ("secc", 0.5));
             linePlot.eventColors.Add ("disconnected alarm", new TouchColor ("compl", 0.25));

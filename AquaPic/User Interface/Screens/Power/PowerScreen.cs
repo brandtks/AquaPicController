@@ -16,10 +16,6 @@ namespace AquaPic.UserInterface
         private TouchComboBox combo;
 
         public PowerWindow (params object[] options) : base () {
-            //TouchGraphicalBox box1 = new TouchGraphicalBox (780, 395);
-            //Put (box1, 10, 30);
-            //box1.Show ();
-
             screenTitle = "Power Strip";
 
             if (Power.powerStripCount == 0) {

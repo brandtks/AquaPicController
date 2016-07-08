@@ -205,7 +205,7 @@ namespace AquaPic.UserInterface
                         parent = null;
                 }
 
-                var ms = new TouchDialog (Name + " is the default temperature group.\n" + 
+                var ms = new TouchDialog (groupName + " is the default temperature group.\n" + 
                     "Are you sure you want to delete this group", parent);
 
                 bool confirmed = false;

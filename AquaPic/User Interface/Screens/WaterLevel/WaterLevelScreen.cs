@@ -23,22 +23,7 @@ namespace AquaPic.UserInterface
         public WaterLevelWindow (params object[] options) : base () {
             screenTitle = "Water Level";
 
-            ExposeEvent += (o, args) => {
-                using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
-                    TouchColor.SetSource (cr, "grey3", 0.75);
-                    cr.LineWidth = 3;
-
-                    cr.MoveTo (402.5, 70);
-                    cr.LineTo (402.5, 460);
-                    cr.ClosePath ();
-                    cr.Stroke ();
-
-                    cr.MoveTo (417.5, 267.5);
-                    cr.LineTo (780, 267.5);
-                    cr.ClosePath ();
-                    cr.Stroke ();
-                }
-            };
+            ExposeEvent += OnExpose;
 
             /**************************************************************************************************************/
             /* ATO                                                                                                        */
@@ -293,6 +278,23 @@ namespace AquaPic.UserInterface
             Alarm.RemoveAlarmHandler (WaterLevel.atoFailedAlarmIndex, OnAtoFailedAlarmEvent);
             GLib.Source.Remove (timerId);
             base.Dispose ();
+        }
+
+        protected void OnExpose (object sender, ExposeEventArgs args) {
+            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                TouchColor.SetSource (cr, "grey3", 0.75);
+                cr.LineWidth = 3;
+
+                cr.MoveTo (402.5, 70);
+                cr.LineTo (402.5, 460);
+                cr.ClosePath ();
+                cr.Stroke ();
+
+                cr.MoveTo (417.5, 267.5);
+                cr.LineTo (780, 267.5);
+                cr.ClosePath ();
+                cr.Stroke ();
+            }
         }
 
         public bool OnUpdateTimer () {

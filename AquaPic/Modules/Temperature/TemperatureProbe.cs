@@ -51,7 +51,6 @@ namespace AquaPic.Modules
                 temperature = temperature.Map (zeroValue, fullScaleValue, zeroActual, fullScaleActual);
 
                 if (temperature < zeroActual) {
-                    temperature = 0.0f;
                     if (!Alarm.CheckAlarming (probeDisconnectedAlarmIndex)) {
                         Alarm.Post (probeDisconnectedAlarmIndex);
                         if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {

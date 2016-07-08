@@ -38,12 +38,21 @@ namespace AquaPic.UserInterface
             /******************************************************************************************************/
             groupName = Temperature.defaultTemperatureGroup;
 
+            var label = new TouchLabel ();
+            label.text = "Temperature Groups";
+            label.WidthRequest = 118;
+            label.textColor = "seca";
+            label.textSize = 12;
+            label.textAlignment = TouchAlignment.Right;
+            Put (label, 30, 70);
+            label.Show ();
+
             var tempLabel = new TouchLabel ();
             tempLabel.WidthRequest = 329;
             tempLabel.text = "Temperature";
             tempLabel.textColor = "grey3";
             tempLabel.textAlignment = TouchAlignment.Center;
-            Put (tempLabel, 60, 145);
+            Put (tempLabel, 60, 185);
             tempLabel.Show ();
 
             tempTextBox = new TouchLabel ();
@@ -51,7 +60,7 @@ namespace AquaPic.UserInterface
             tempTextBox.textSize = 36;
             tempTextBox.textAlignment = TouchAlignment.Center;
             tempTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
-            Put (tempTextBox, 60, 90);
+            Put (tempTextBox, 60, 130);
             tempTextBox.Show ();
 
             var setpointlabel = new TouchLabel ();
@@ -59,7 +68,7 @@ namespace AquaPic.UserInterface
             setpointlabel.text = "Setpoint";
             setpointlabel.textColor = "grey3"; 
             setpointlabel.textAlignment = TouchAlignment.Center;
-            Put (setpointlabel, 108, 230);
+            Put (setpointlabel, 108, 260);
             setpointlabel.Show ();
 
             tempSetpoint = new TouchLabel ();
@@ -67,7 +76,7 @@ namespace AquaPic.UserInterface
             tempSetpoint.textSize = 20;
             tempSetpoint.textAlignment = TouchAlignment.Center;
             tempSetpoint.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
-            Put (tempSetpoint, 108, 195);
+            Put (tempSetpoint, 108, 225);
             tempSetpoint.Show ();
 
             var tempDeadbandLabel = new TouchLabel ();
@@ -75,7 +84,7 @@ namespace AquaPic.UserInterface
             tempDeadbandLabel.text = "Deadband";
             tempDeadbandLabel.textColor = "grey3";
             tempDeadbandLabel.textAlignment = TouchAlignment.Center;
-            Put (tempDeadbandLabel, 224, 230);
+            Put (tempDeadbandLabel, 224, 260);
             tempDeadbandLabel.Show ();
 
             tempDeadband = new TouchLabel ();
@@ -83,7 +92,7 @@ namespace AquaPic.UserInterface
             tempDeadband.textSize = 20;
             tempDeadband.textAlignment = TouchAlignment.Center;
             tempDeadband.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
-            Put (tempDeadband, 224, 195);
+            Put (tempDeadband, 224, 225);
             tempDeadband.Show ();
 
             var globalSettingsBtn = new TouchButton ();
@@ -125,7 +134,7 @@ namespace AquaPic.UserInterface
             else
                 heaterId = 0;
 
-            var label = new TouchLabel ();
+            label = new TouchLabel ();
             label.text = "Heaters";
             label.textColor = "seca";
             label.textSize = 12;
@@ -300,7 +309,7 @@ namespace AquaPic.UserInterface
             groupCombo.WidthRequest = 235;
             groupCombo.comboList.Add ("New group...");
             groupCombo.ChangedEvent += OnGroupComboChanged;
-            Put (groupCombo, 108, 277);
+            Put (groupCombo, 153, 77);
             groupCombo.Show ();
 
             if (!groupName.IsEmpty ()) {
@@ -320,7 +329,6 @@ namespace AquaPic.UserInterface
 
         public override void Dispose () {
             GLib.Source.Remove (timerId);
-
             base.Dispose ();
         }
 
@@ -465,7 +473,7 @@ namespace AquaPic.UserInterface
         protected bool OnTimer () {
             GetGroupData ();
             GetProbeData ();
-
+            GetHeaterData ();
             return true;
         }
     }

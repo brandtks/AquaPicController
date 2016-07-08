@@ -78,6 +78,8 @@ namespace AquaPic.Modules
                     }
 
                     dataLogger.AddEntry (temperature);
+                } else {
+                    dataLogger.AddEntry ("no probes");
                 }
             }
         }

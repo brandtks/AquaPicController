@@ -135,53 +135,42 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnSave (object sender) {
-            Lighting.latitude = Convert.ToDouble (((SettingTextBox)settings ["Latitude"]).textBox.text);
-            Lighting.longitude = Convert.ToDouble (((SettingTextBox)settings ["Longitude"]).textBox.text);
-            Lighting.defaultSunRise = Time.Parse (((SettingTextBox)settings ["Default Sunrise"]).textBox.text);
-            Lighting.defaultSunSet = Time.Parse (((SettingTextBox)settings ["Default Sunset"]).textBox.text);
-            Lighting.minSunRise = Time.Parse (((SettingTextBox)settings ["Min Sunrise"]).textBox.text);
-            Lighting.maxSunRise = Time.Parse (((SettingTextBox)settings ["Max Sunrise"]).textBox.text);
-            Lighting.minSunSet = Time.Parse (((SettingTextBox)settings ["Min Sunset"]).textBox.text);
-            Lighting.maxSunSet = Time.Parse (((SettingTextBox)settings ["Max Sunset"]).textBox.text);
-
-            JObject jo = new JObject ();
-
-            jo.Add (new JProperty ("latitude", Lighting.latitude.ToString ()));
-            jo.Add (new JProperty ("longitude", Lighting.longitude.ToString ()));
-
-            jo.Add (new JProperty ("defaultSunRise", 
-                new JObject (
-                    new JProperty ("hour", Lighting.defaultSunRise.hour.ToString ()), 
-                    new JProperty ("minute", Lighting.defaultSunRise.min.ToString ()))));
-
-            jo.Add (new JProperty ("defaultSunSet", 
-                new JObject (
-                    new JProperty ("hour", Lighting.defaultSunSet.hour.ToString ()), 
-                    new JProperty ("minute", Lighting.defaultSunSet.min.ToString ()))));
-
-            jo.Add (new JProperty ("minSunRise", 
-                new JObject (
-                    new JProperty ("hour", Lighting.minSunRise.hour.ToString ()), 
-                    new JProperty ("minute", Lighting.minSunRise.min.ToString ()))));
-
-            jo.Add (new JProperty ("maxSunRise", 
-                new JObject (
-                    new JProperty ("hour", Lighting.maxSunRise.hour.ToString ()), 
-                    new JProperty ("minute", Lighting.maxSunRise.min.ToString ()))));
-
-            jo.Add (new JProperty ("minSunSet", 
-                new JObject (
-                    new JProperty ("hour", Lighting.minSunSet.hour.ToString ()), 
-                    new JProperty ("minute", Lighting.minSunSet.min.ToString ()))));
-
-            jo.Add (new JProperty ("maxSunSet", 
-                new JObject (
-                    new JProperty ("hour", Lighting.maxSunSet.hour.ToString ()), 
-                    new JProperty ("minute", Lighting.maxSunSet.min.ToString ()))));
+            Lighting.latitude = Convert.ToDouble ((settings["Latitude"] as SettingTextBox).textBox.text);
+            Lighting.longitude = Convert.ToDouble ((settings["Longitude"] as SettingTextBox).textBox.text);
+            Lighting.defaultSunRise = Time.Parse ((settings["Default Rise"] as SettingTextBox).textBox.text);
+            Lighting.defaultSunSet = Time.Parse ((settings["Default Set"] as SettingTextBox).textBox.text);
+            Lighting.minSunRise = Time.Parse ((settings ["Min Sunrise"] as SettingTextBox).textBox.text);
+            Lighting.maxSunRise = Time.Parse ((settings["Max Sunrise"] as SettingTextBox).textBox.text);
+            Lighting.minSunSet = Time.Parse ((settings["Min Sunset"] as SettingTextBox).textBox.text);
+            Lighting.maxSunSet = Time.Parse ((settings["Max Sunset"] as SettingTextBox).textBox.text);
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "lightingProperties.json");
+
+            string json = File.ReadAllText (path);
+            JObject jo = (JObject)JToken.Parse (json);
+
+            jo["latitude"] = Lighting.latitude.ToString ();
+            jo["longitude"] = Lighting.longitude.ToString ();
+
+            jo["defaultSunRise"]["hour"] = Lighting.defaultSunRise.hour.ToString ();
+            jo["defaultSunRise"]["minute"] = Lighting.defaultSunRise.min.ToString ();
+
+            jo["defaultSunSet"]["hour"] = Lighting.defaultSunSet.hour.ToString ();
+            jo["defaultSunSet"]["minute"] = Lighting.defaultSunSet.min.ToString ();
+
+            jo["minSunRise"]["hour"] = Lighting.minSunRise.hour.ToString ();
+            jo["minSunRise"]["minute"] = Lighting.minSunRise.min.ToString ();
+
+            jo["maxSunRise"]["hour"] = Lighting.maxSunRise.hour.ToString ();
+            jo["maxSunRise"]["minute"] = Lighting.maxSunRise.min.ToString ();
+
+            jo["minSunSet"]["hour"] = Lighting.minSunSet.hour.ToString ();
+            jo["minSunSet"]["minute"] = Lighting.minSunSet.min.ToString ();
+
+            jo["maxSunSet"]["hour"] = Lighting.maxSunSet.hour.ToString ();
+            jo["maxSunSet"]["minute"] = Lighting.maxSunSet.min.ToString ();
 
             File.WriteAllText (path, jo.ToString ());
 
