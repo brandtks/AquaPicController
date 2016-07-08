@@ -10,8 +10,8 @@ namespace AquaPic.UserInterface
 
         static HomeWindowWidgets () {
             linePlots = new Dictionary<string, LinePlotData> () {
-                { "Temperature", new LinePlotData (() => {return new TemperatureLinePlot ();}) },
-                { "Water Level", new LinePlotData (() => {return new WaterLevelLinePlot ();}) }
+                { "Temperature", new LinePlotData ((options) => {return new TemperatureLinePlot (options);}) },
+                { "Water Level", new LinePlotData ((options) => {return new WaterLevelLinePlot (options);}) }
             };
 
             barPlots = new Dictionary<string, BarPlotData> () {

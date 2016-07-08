@@ -5,7 +5,7 @@ using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
-    public delegate LinePlotWidget CreateLinePlotHandler ();
+    public delegate LinePlotWidget CreateLinePlotHandler (params object[] options);
 
     public class LinePlotData {
         public CreateLinePlotHandler CreateInstanceEvent;
@@ -14,9 +14,9 @@ namespace AquaPic.UserInterface
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 
-        public LinePlotWidget CreateInstance () {
+        public LinePlotWidget CreateInstance (params object[] options) {
             if (CreateInstanceEvent != null)
-                return CreateInstanceEvent ();
+                return CreateInstanceEvent (options);
             else
                 throw new Exception ("No line plot constructor implemented");
         }
@@ -69,7 +69,7 @@ namespace AquaPic.UserInterface
             displayLabel.WidthRequest = 112;
             displayLabel.textColor = "grey3";
             displayLabel.textAlignment = TouchAlignment.Center;
-            Put (displayLabel, 3, 50);
+            Put (displayLabel, 3, 46);
 
             textBox = new TouchLabel ();
             textBox.WidthRequest = 112;

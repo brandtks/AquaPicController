@@ -1,6 +1,7 @@
 ﻿using System;
 using AquaPic.Drivers;
 using AquaPic.Utilites;
+using AquaPic.Runtime;
 
 namespace AquaPic.Modules
 {
@@ -11,19 +12,60 @@ namespace AquaPic.Modules
             public IndividualControl channel;
             public float temperature;
             public string name;
+            public string temperatureGroupName;
 
-            public TemperatureProbe (string name, int cardId, int channelId) {
+            public float zeroActual;
+            public float zeroValue;
+            public float fullScaleActual;
+            public float fullScaleValue;
+
+            public int probeDisconnectedAlarmIndex;
+
+            public TemperatureProbe (
+                string name, 
+                int cardId, 
+                int channelId,
+                float zeroActual,
+                float zeroValue,
+                float fullScaleActual,
+                float fullScaleValue, 
+                string temperatureGroupName
+            ) {
                 this.name = name;
-                channel.Group = (byte)cardId;
-                channel.Individual = (byte)channelId;
+                channel.Group = cardId;
+                channel.Individual = channelId;
+                this.zeroActual = zeroActual;
+                this.zeroValue = zeroValue;
+                this.fullScaleActual = fullScaleActual;
+                this.fullScaleValue = fullScaleValue;
+                this.temperatureGroupName = temperatureGroupName;
+
                 AquaPicDrivers.AnalogInput.AddChannel (channel, this.name);
-                temperature = 0.0f;
+                temperature = 32.0f;
+                
+                probeDisconnectedAlarmIndex = Alarm.Subscribe (string.Format ("{0} disconnected", name));
             }
 
-            public float GetTemperature () {
+            public bool GetTemperature () {
                 temperature = AquaPicDrivers.AnalogInput.GetChannelValue (channel);
-                temperature = temperature.Map (0, 4096, 32.0f, 100.0f);
-                return temperature;
+                temperature = temperature.Map (zeroValue, fullScaleValue, zeroActual, fullScaleActual);
+
+                if (temperature < zeroActual) {
+                    temperature = 0.0f;
+                    if (!Alarm.CheckAlarming (probeDisconnectedAlarmIndex)) {
+                        Alarm.Post (probeDisconnectedAlarmIndex);
+                        if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
+                            temperatureGroups[temperatureGroupName].dataLogger.AddEntry ("disconnected alarm");
+                        }
+                    }
+                    return false;
+                } else {
+                    if (Alarm.CheckAlarming (probeDisconnectedAlarmIndex)) {
+                        Alarm.Clear (probeDisconnectedAlarmIndex);
+                    }
+                }
+
+                return true;
             }
         }
     }

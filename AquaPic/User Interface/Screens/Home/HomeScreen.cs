@@ -52,23 +52,24 @@ namespace AquaPic.UserInterface
                 foreach (var jt in ja) {
                     var jo = jt as JObject;
 
-                    int x = (Convert.ToInt32 (jo ["column"]) - 1) * 105 + 50;
-                    int y = (Convert.ToInt32 (jo ["row"]) - 1) * 87 + 32;
+                    int x = (Convert.ToInt32 (jo["column"]) - 1) * 105 + 50;
+                    int y = (Convert.ToInt32 (jo["row"]) - 1) * 87 + 32;
 
-                    string type = (string)jo ["type"];
+                    string type = (string)jo["type"];
                     switch (type) {
                     case "Timer": {
-                            var t = new DeluxeTimerWidget ((string)jo ["name"]);
+                            var t = new DeluxeTimerWidget ((string)jo["name"]);
                             Put (t, x, y);
                             t.Show ();
 
                             break;
                         }
                     case "LinePlot": {
-                            string name = (string)jo ["name"];
+                            string name = (string)jo["name"];
+                            var group = (string)jo["group"];
 
                             if (HomeWindowWidgets.linePlots.ContainsKey (name)) {
-                                var lp = HomeWindowWidgets.linePlots [name].CreateInstance ();
+                                var lp = HomeWindowWidgets.linePlots[name].CreateInstance (group);
                                 Put (lp, x, y);
                                 lp.Show ();
 

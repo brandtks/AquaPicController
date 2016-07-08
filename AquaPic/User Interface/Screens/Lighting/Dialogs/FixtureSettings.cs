@@ -42,12 +42,12 @@ namespace AquaPic.UserInterface
             if (fixtureIdx != -1) {
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureIdx);
                 string psName = Power.GetPowerStripName (ic.Group);
-                c.combo.List.Add (string.Format ("Current: {0}.p{1}", psName, ic.Individual));
-                c.combo.Active = 0;
+                c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", psName, ic.Individual));
+                c.combo.active = 0;
             } else {
-                c.combo.NonActiveMessage = "Select outlet";
+                c.combo.nonActiveMessage = "Select outlet";
             }
-            c.combo.List.AddRange (Power.GetAllAvaiblableOutlets ());
+            c.combo.comboList.AddRange (Power.GetAllAvaiblableOutlets ());
             AddSetting (c);
 
             var s = new SettingSelectorSwitch ("Day", "Night");
@@ -176,12 +176,12 @@ namespace AquaPic.UserInterface
             if ((fixtureIdx != -1) && (isDimming)) {
                 IndividualControl ic = Lighting.GetDimmingChannelIndividualControl (fixtureIdx);
                 string cardName = AquaPicDrivers.AnalogOutput.GetCardName (ic.Group);
-                c.combo.List.Add (string.Format ("Current: {0}.q{1}", cardName, ic.Individual));
-                c.combo.Active = 0;
+                c.combo.comboList.Add (string.Format ("Current: {0}.q{1}", cardName, ic.Individual));
+                c.combo.active = 0;
             } else {
-                c.combo.NonActiveMessage = "Select outlet";
+                c.combo.nonActiveMessage = "Select outlet";
             }
-            c.combo.List.AddRange (AquaPicDrivers.AnalogOutput.GetAllAvaiableChannels ());
+            c.combo.comboList.AddRange (AquaPicDrivers.AnalogOutput.GetAllAvaiableChannels ());
             AddOptionalSetting (c);
 
             t = new SettingTextBox ();
@@ -331,7 +331,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if (((SettingComboBox)settings ["Outlet"]).combo.Active == -1) {
+                if (((SettingComboBox)settings ["Outlet"]).combo.active == -1) {
                     MessageBox.Show ("Please select an outlet");
                     return false;
                 }
@@ -339,7 +339,7 @@ namespace AquaPic.UserInterface
                 ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
 
                 if (dimmingFixture) {
-                    if (((SettingComboBox)settings ["Dimming Channel"]).combo.Active == -1) {
+                    if (((SettingComboBox)settings ["Dimming Channel"]).combo.active == -1) {
                         MessageBox.Show ("Please select a dimming channel");
                         return false;
                     }

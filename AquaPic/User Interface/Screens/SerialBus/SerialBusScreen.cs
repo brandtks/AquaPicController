@@ -102,9 +102,9 @@ namespace AquaPic.UserInterface
                 c = new TouchComboBox (portNames);
             } else {
                 c = new TouchComboBox ();
-                c.List.Add (AquaPicBus.portName);
+                c.comboList.Add (AquaPicBus.portName);
             }
-            c.NonActiveMessage = "Select Port";
+            c.nonActiveMessage = "Select Port";
             c.WidthRequest = 300;
             Put (c, 380, 70);
             c.Show ();
@@ -151,7 +151,7 @@ namespace AquaPic.UserInterface
             TouchButton b = sender as TouchButton;
 
             if (b != null) { 
-                if (c.Active != -1) {
+                if (c.active != -1) {
                     AquaPicBus.Open (c.activeText);
                     if (AquaPicBus.isOpen) {
                         b.buttonColor = "grey3";

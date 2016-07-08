@@ -57,7 +57,7 @@ namespace AquaPic.Modules
             }
 
             public bool OnPlugControl () {
-                if (highTempLockout && Alarm.CheckAlarming (Temperature.HighTemperatureAlarmIndex))
+                if (highTempLockout && Alarm.CheckAlarming (Temperature.highTemperatureAlarmIndex))
                     return false;
 
                 TimeDate now = TimeDate.Now;

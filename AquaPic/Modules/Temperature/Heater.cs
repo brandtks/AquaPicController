@@ -10,52 +10,53 @@ namespace AquaPic.Modules
         private class Heater 
         {
             public IndividualControl plug;
-            //public bool controlWaterTemperature;
-            //public float setpoint;
-            //public float deadband;
             public string name;
-            //public Coil plugControl;
+            public string temperatureGroupName;
 
-//            public Heater (string name, byte powerID, byte plugID, bool controlTemp, float setpoint, float bandwidth) {
-//                this.plug.Group = powerID;
-//                this.plug.Individual = plugID;
-//                this.controlWaterTemperature = controlTemp;
-//                this.setpoint = setpoint;
-//                this.deadband = bandwidth / 2;
-//                this.name = name;
-//                plugControl = Power.AddOutlet (this.plug, name, MyState.On);
-//                plugControl.ConditionChecker = OnPlugControl;
-//            }
-
-            public Heater (string name, byte powerID, byte plugID) {
-                this.plug.Group = powerID;
-                this.plug.Individual = plugID;
+            public Heater (string name, byte powerID, byte plugID, string temperatureGroupName) {
                 this.name = name;
-                var plugControl = Power.AddOutlet (this.plug, name, MyState.On, "Temperature");
+                plug.Group = powerID;
+                plug.Individual = plugID;
+                this.temperatureGroupName = temperatureGroupName;
+                var plugControl = Power.AddOutlet (plug, name, MyState.On, "Temperature");
                 plugControl.ConditionChecker = OnPlugControl;
+                Power.AddHandlerOnStateChange (
+                    plug, 
+                    (obj, args) => {
+                        if (args.state == MyState.On) {
+                            if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
+                                GetTemperatureGroupDataLogger (temperatureGroupName).AddEntry ("heater on");
+                            }
+                        } else {
+                            if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
+                                GetTemperatureGroupDataLogger (temperatureGroupName).AddEntry ("heater off");
+                            }
+                        }
+                    });
             }
 
             public bool OnPlugControl () {
-                bool cond = true;
-                cond &= !Alarm.CheckAlarming (HighTemperatureAlarmIndex);
-                cond &= CheckTemperature ();
-                return cond;
+                if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
+                    bool cond = true;
+                    cond &= !Alarm.CheckAlarming (temperatureGroups[temperatureGroupName].highTemperatureAlarmIndex);
+                    cond &= CheckTemperature ();
+                    return cond;
+                } else {
+                    return false;
+                }
             }
 
             public bool CheckTemperature () {
-//                if (controlWaterTemperature) {
-                    if (temperature >= (temperatureSetpoint + temperatureDeadband))
+                if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
+                    var deadband =  temperatureGroups[temperatureGroupName].temperatureDeadband / 2;
+                    var temp = temperatureGroups[temperatureGroupName].temperatureSetpoint + deadband;
+                    if (temperatureGroups[temperatureGroupName].temperature >= temp)
                         return false;
 
-                    if (temperature <= (temperatureSetpoint - temperatureDeadband))
+                    temp = temperatureGroups[temperatureGroupName].temperatureSetpoint - deadband;
+                    if (temperatureGroups[temperatureGroupName].temperature <= temp)
                         return true;
-//                } else {
-//                    if (temperature >= (setpoint + deadband))
-//                        return false;
-//
-//                    if (temperature <= (setpoint - deadband))
-//                        return true;
-//                }
+                }
 
                 return false;
             }

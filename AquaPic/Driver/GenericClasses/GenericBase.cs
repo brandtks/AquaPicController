@@ -62,15 +62,20 @@ namespace AquaPic.Drivers
             return names;
         }
 
-        protected virtual bool CheckCardRange (int card, bool throwException = true) {
+        //Base class doesn't check channel range because card handles that
+        protected virtual void CheckCardRange (int card) {
             if ((card < 0) && (card >= cards.Count)) {
-                if (throwException) {
-                    throw new ArgumentOutOfRangeException ("channel");
-                } else {
-                    return false;
-                }
+                throw new ArgumentOutOfRangeException ("channel");
             }
-            return true;
+        }
+
+        public virtual bool CheckCardRangeNoThrow (int card) {
+            try {
+                CheckCardRange (card);
+                return true;
+            } catch (ArgumentOutOfRangeException) {
+                return false;
+            } 
         }
 
         public bool AquaPicBusCommunicationOk (string name) {

@@ -77,7 +77,7 @@ namespace AquaPic.UserInterface
 
             string[] pwrNames = Power.GetAllPowerStripNames ();
             combo = new TouchComboBox (pwrNames);
-            combo.Active = powerID;
+            combo.active = powerID;
             combo.ChangedEvent += OnComboChanged;
             Put (combo, 610, 35);
             combo.Show ();

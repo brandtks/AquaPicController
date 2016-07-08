@@ -33,7 +33,7 @@ namespace AquaPic.Runtime
             _name = name;
             currentFilePath = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             currentFilePath = Path.Combine (currentFilePath, "DataLogging");
-            currentFilePath = Path.Combine (currentFilePath, _name);
+            currentFilePath = Path.Combine (currentFilePath, _name.RemoveWhitespace ());
 
             if (!Directory.Exists (currentFilePath)) {
                 Directory.CreateDirectory (currentFilePath);
@@ -73,43 +73,46 @@ namespace AquaPic.Runtime
             FileHelperEngine<LogEntry> readEngine = new FileHelperEngine<LogEntry> ();
             int hourIndex = 0;
 
-            while (entries.Count < maxEntries) {
-                string filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now.AddHours (hourIndex));
-                string path = Path.Combine (currentFilePath, filename);
-                --hourIndex;
+            if (Directory.GetFiles (currentFilePath).Length > 0) {
+                while (entries.Count < maxEntries) {
+                    string filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now.AddHours (hourIndex));
+                    string path = Path.Combine (currentFilePath, filename);
+                    --hourIndex;
 
-                if (File.Exists (path)) {
-                    var fileEntries = readEngine.ReadFile (path);
-                    if (fileEntries.Length > 0) {
-                        Array.Reverse (fileEntries);
-                        
-                        foreach (var entry in fileEntries) {
-                            if (entry.eventType == "value") {
-                                if (entry.dateTime.CompareTo (endSearchTime) > -1) {
-                                    if (entries.Count > 0) {
-                                        var previous = entries[entries.Count - 1].dateTime;
-                                        var totalSeconds = previous.Subtract (entry.dateTime).TotalSeconds.ToInt ();
+                    if (File.Exists (path)) {
+                        var fileEntries = readEngine.ReadFile (path);
+                        if (fileEntries.Length > 0) {
+                            Array.Reverse (fileEntries);
 
-                                        if (totalSeconds >= secondTimeSpan) {
+                            foreach (var entry in fileEntries) {
+                                if (entry.eventType == "value") {
+                                    if (entry.dateTime.CompareTo (endSearchTime) > -1) {
+                                        if (entries.Count > 0) {
+                                            var previous = entries[entries.Count - 1].dateTime;
+                                            var totalSeconds = previous.Subtract (entry.dateTime).TotalSeconds.ToInt ();
+
+                                            if (totalSeconds >= secondTimeSpan) {
+                                                entries.Add (entry);
+                                            }
+                                        } else {
                                             entries.Add (entry);
                                         }
-                                    } else {
-                                        entries.Add (entry);
-                                    }
 
-                                    if (entries.Count == maxEntries) {
+                                        if (entries.Count == maxEntries) {
+                                            break;
+                                        }
+                                    } else {
+                                        maxEntries = entries.Count;
                                         break;
                                     }
-                                } else {
-                                    break;
                                 }
                             }
                         }
                     }
-                }
 
-                if (hourIndex < endSearchTime.Hour) {
-                    break;
+                    if (hourIndex < -24) {
+                        break;
+                    }
                 }
             }
 
@@ -123,34 +126,37 @@ namespace AquaPic.Runtime
             FileHelperEngine<LogEntry> readEngine = new FileHelperEngine<LogEntry> ();
             int hourIndex = 0;
 
-            while (entries.Count < maxEntries) {
-                string filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now.AddHours (hourIndex));
-                string path = Path.Combine (currentFilePath, filename);
-                --hourIndex;
+            if (Directory.GetFiles (currentFilePath).Length > 0) {
+                while (entries.Count < maxEntries) {
+                    string filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now.AddHours (hourIndex));
+                    string path = Path.Combine (currentFilePath, filename);
+                    --hourIndex;
 
-                if (File.Exists (path)) {
-                    var fileEntries = readEngine.ReadFile (path);
-                    if (fileEntries.Length > 0) {
-                        Array.Reverse (fileEntries);
+                    if (File.Exists (path)) {
+                        var fileEntries = readEngine.ReadFile (path);
+                        if (fileEntries.Length > 0) {
+                            Array.Reverse (fileEntries);
 
-                        foreach (var entry in fileEntries) {
-                            if (entry.eventType != "value") {
-                                if (entry.dateTime.CompareTo (endSearchTime) > -1) {
-                                    entries.Add (entry);
+                            foreach (var entry in fileEntries) {
+                                if (entry.eventType != "value") {
+                                    if (entry.dateTime.CompareTo (endSearchTime) > -1) {
+                                        entries.Add (entry);
 
-                                    if (entries.Count == maxEntries) {
+                                        if (entries.Count == maxEntries) {
+                                            break;
+                                        }
+                                    } else {
+                                        maxEntries = entries.Count;
                                         break;
                                     }
-                                } else {
-                                    break;
                                 }
                             }
                         }
                     }
-                }
 
-                if (hourIndex < endSearchTime.Hour) {
-                    break;
+                    if (hourIndex < -24) {
+                        break;
+                    }
                 }
             }
 

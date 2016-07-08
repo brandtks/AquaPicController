@@ -285,7 +285,7 @@ namespace AquaPic.Modules
 
                 analogSensor = new AnalogSensor (enable, highAlarmSetpoint, lowAlarmSetpoint, ic);
 
-                text = (string)jo ["ZeroCalibrationValue"];
+                text = (string)jo ["zeroCalibrationValue"];
                 if (string.IsNullOrWhiteSpace (text))
                     analogSensor.zeroValue = 819.2f;
                 else {
@@ -296,7 +296,7 @@ namespace AquaPic.Modules
                     }
                 }
 
-                text = (string)jo ["FullScaleCalibrationActual"];
+                text = (string)jo ["fullScaleCalibrationActual"];
                 if (string.IsNullOrWhiteSpace (text))
                     analogSensor.fullScaleActual = 15.0f;
                 else {
@@ -307,7 +307,7 @@ namespace AquaPic.Modules
                     }
                 }
 
-                text = (string)jo ["FullScaleCalibrationValue"];
+                text = (string)jo ["fullScaleCalibrationValue"];
                 if (string.IsNullOrWhiteSpace (text))
                     analogSensor.fullScaleValue = 4096.0f;
                 else {
@@ -423,7 +423,7 @@ namespace AquaPic.Modules
             analogSensor.Run ();
 
 //            bool mismatch = false;
-            ato.useFloatSwitch = false; //set use float switch to false, if no ATO float switch in found it remains false
+            ato.useFloatSwitch = false; //set 'use float switch' to false, if no ATO float switch in found it remains false
             foreach (var s in floatSwitches) {
                 bool state = AquaPicDrivers.DigitalInput.GetChannelValue (s.channel);
                 bool activated;
@@ -518,9 +518,9 @@ namespace AquaPic.Modules
             string jstring = File.ReadAllText (path);
             JObject jo = (JObject)JToken.Parse (jstring);
 
-            jo ["ZeroCalibrationValue"] = analogSensor.zeroValue.ToString ();
-            jo ["FullScaleCalibrationActual"] = analogSensor.fullScaleActual.ToString ();
-            jo ["FullScaleCalibrationValue"] = analogSensor.fullScaleValue.ToString ();
+            jo ["zeroCalibrationValue"] = analogSensor.zeroValue.ToString ();
+            jo ["fullScaleCalibrationActual"] = analogSensor.fullScaleActual.ToString ();
+            jo ["fullScaleCalibrationValue"] = analogSensor.fullScaleValue.ToString ();
 
             File.WriteAllText (path, jo.ToString ());
         }
@@ -548,10 +548,12 @@ namespace AquaPic.Modules
                     AquaPicDrivers.DigitalInput.AddChannel (fs.channel, name);
 
                     floatSwitches.Add (fs);
-                } else
+                } else {
                     throw new Exception (string.Format ("Float Switch: {0} function already exists", function));
-            } else
+                }
+            } else {
                 throw new Exception (string.Format ("Float Switch: {0} already exists", name));
+            }
         }
 
         public static void RemoveFloatSwitch (int floatSwitchId) {

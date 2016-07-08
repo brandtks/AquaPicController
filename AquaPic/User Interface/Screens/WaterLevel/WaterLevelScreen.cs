@@ -232,13 +232,13 @@ namespace AquaPic.UserInterface
                     try {
                         WaterLevel.GetFloatSwitchIndex (name);
                     } catch (ArgumentException) {
-                        switchCombo.List.Remove (name);
+                        switchCombo.comboList.Remove (name);
                         if (WaterLevel.floatSwitchCount != 0) {
                             switchId = 0;
-                            switchCombo.Active = switchId;
+                            switchCombo.active = switchId;
                         } else {
                             switchId = -1;
-                            switchCombo.Active = 0;
+                            switchCombo.active = 0;
                         }
 
                         GetSwitchData ();
@@ -252,16 +252,16 @@ namespace AquaPic.UserInterface
 
                     if (WaterLevel.floatSwitchCount > switchCount) {
                         switchId = WaterLevel.floatSwitchCount - 1;
-                        int listIdx = switchCombo.List.IndexOf ("New switch...");
-                        switchCombo.List.Insert (listIdx, WaterLevel.GetFloatSwitchName (switchId));
-                        switchCombo.Active = listIdx;
+                        int listIdx = switchCombo.comboList.IndexOf ("New switch...");
+                        switchCombo.comboList.Insert (listIdx, WaterLevel.GetFloatSwitchName (switchId));
+                        switchCombo.active = listIdx;
                         switchCombo.QueueDraw ();
                         GetSwitchData ();
                     } else {
                         if (switchId != -1)
-                            switchCombo.Active = switchId;
+                            switchCombo.active = switchId;
                         else
-                            switchCombo.Active = 0;
+                            switchCombo.active = 0;
                     }
                 }
 
@@ -273,11 +273,11 @@ namespace AquaPic.UserInterface
             string[] sNames = WaterLevel.GetAllFloatSwitches ();
             switchCombo = new TouchComboBox (sNames);
             if (switchId != -1)
-                switchCombo.Active = switchId;
+                switchCombo.active = switchId;
             else
-                switchCombo.Active = 0;
+                switchCombo.active = 0;
             switchCombo.WidthRequest = 235;
-            switchCombo.List.Add ("New switch...");
+            switchCombo.comboList.Add ("New switch...");
             switchCombo.ChangedEvent += OnSwitchComboChanged;
             Put (switchCombo, 550, 277);
             switchCombo.Show ();
@@ -344,16 +344,16 @@ namespace AquaPic.UserInterface
 
                 if (WaterLevel.floatSwitchCount > switchCount) {
                     switchId = WaterLevel.floatSwitchCount - 1;
-                    int listIdx = switchCombo.List.IndexOf ("New switch...");
-                    switchCombo.List.Insert (listIdx, WaterLevel.GetFloatSwitchName (switchId));
-                    switchCombo.Active = listIdx;
+                    int listIdx = switchCombo.comboList.IndexOf ("New switch...");
+                    switchCombo.comboList.Insert (listIdx, WaterLevel.GetFloatSwitchName (switchId));
+                    switchCombo.active = listIdx;
                     switchCombo.QueueDraw ();
                     GetSwitchData ();
                 } else {
                     if (switchId != -1)
-                        switchCombo.Active = switchId;
+                        switchCombo.active = switchId;
                     else
-                        switchCombo.Active = 0;
+                        switchCombo.active = 0;
                 }
             } else {
                 try {

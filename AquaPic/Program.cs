@@ -48,7 +48,10 @@ namespace AquaPic
 
             //for some reason this doesn't like to be in the destroyed event
             #if DEBUG
-            Temperature.dataLogger.DeleteAllLogFiles ();
+            var groups = Temperature.GetAllTemperatureGroupNames ();
+            foreach (var group in groups) {
+                Temperature.GetTemperatureGroupDataLogger (group).DeleteAllLogFiles ();
+            }
             WaterLevel.dataLogger.DeleteAllLogFiles ();
             #endif
 		}

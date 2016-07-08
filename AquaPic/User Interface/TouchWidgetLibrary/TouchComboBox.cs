@@ -20,15 +20,26 @@ namespace TouchWidgetLibrary
 
     public class TouchComboBox : EventBox
     {
-        public List<string> List;
-        public string NonActiveMessage;
-        public int Active;
+        public List<string> comboList;
+        public string nonActiveMessage;
+        public int active;
         public string activeText {
             get {
-                if (Active != -1)
-                    return List [Active];
-                else
+                if (active != -1) {
+                    return comboList[active];
+                } else {
                     return string.Empty;
+                }
+            }
+            set {
+                if (comboList.Contains (value)) {
+                    for (int i = 0; i < comboList.Count; i++) {
+                        if (value == comboList[i]) {
+                            active = i;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -43,8 +54,8 @@ namespace TouchWidgetLibrary
             this.Visible = true;
             this.VisibleWindow = false;
 
-            this.List = new List<string> ();
-            this.Active = -1;
+            this.comboList = new List<string> ();
+            this.active = -1;
             this.listDropdown = false;
             secondClick = false;
             this.highlighted = 0;
@@ -60,7 +71,7 @@ namespace TouchWidgetLibrary
 
         public TouchComboBox (string[] names) : this () {
             for (int i = 0; i < names.Length; ++i)
-                List.Add (names [i]);
+                comboList.Add (names [i]);
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
@@ -71,8 +82,8 @@ namespace TouchWidgetLibrary
 
                 if (listDropdown) {
                     int listHeight;
-                    if (List.Count > 0)
-                        listHeight = List.Count * 30 + height;
+                    if (comboList.Count > 0)
+                        listHeight = comboList.Count * 30 + height;
                     else
                         listHeight = 30 + height;
 
@@ -103,8 +114,8 @@ namespace TouchWidgetLibrary
 
                     TouchText textRender = new TouchText ();
                     textRender.font.color = "black";
-                    for (int i = 0; i < List.Count; ++i) {
-                        textRender.text = List [i];
+                    for (int i = 0; i < comboList.Count; ++i) {
+                        textRender.text = comboList [i];
                         int y = top + height + 6 + (height * i);
                         textRender.Render (this, left + 10, y, width - height);
                     }
@@ -121,15 +132,15 @@ namespace TouchWidgetLibrary
                     DrawDownButton (cr, left, top, width);
                 }
 
-                bool writeStringCond1 = !string.IsNullOrWhiteSpace (NonActiveMessage) && (Active == -1);
-                bool writeStringCond2 = (List.Count > 0) && (Active >= 0) ;
+                bool writeStringCond1 = !string.IsNullOrWhiteSpace (nonActiveMessage) && (active == -1);
+                bool writeStringCond2 = (comboList.Count > 0) && (active >= 0) ;
 
                 if (writeStringCond1 || writeStringCond2) {
                     string text;
                     if (writeStringCond1)
-                        text = NonActiveMessage;
+                        text = nonActiveMessage;
                     else
-                        text = List [Active];
+                        text = comboList[active];
 
                     TouchText t = new TouchText (text);
                     t.textWrap = TouchTextWrap.Shrink;
@@ -181,7 +192,7 @@ namespace TouchWidgetLibrary
                 secondClick = false;
             GLib.Timeout.Add (20, OnTimerEvent);
             listDropdown = true;
-            highlighted = Active;
+            highlighted = active;
             QueueDraw ();
         }
 
@@ -192,14 +203,14 @@ namespace TouchWidgetLibrary
             if ((x >= 0) && (x <= Allocation.Width)) {
                 int top = Allocation.Top;
 
-                for (int i = 0; i < List.Count; ++i) {
+                for (int i = 0; i < comboList.Count; ++i) {
                     int topWindow = i * height + 30;
                     int bottomWindow = (i + 1) * height + 30;
                     if ((y >= topWindow) && (y <= bottomWindow)) {
-                        Active = i;
+                        active = i;
                         listDropdown = false;
                         if (ChangedEvent != null)
-                            ChangedEvent (this, new ComboBoxChangedEventArgs (Active, List [Active]));
+                            ChangedEvent (this, new ComboBoxChangedEventArgs (active, comboList [active]));
                         QueueDraw ();
                         break;
                     }
@@ -220,7 +231,7 @@ namespace TouchWidgetLibrary
                 if ((x >= 0) && (x <= Allocation.Width)) {
                     //int top = Allocation.Top + height;
 
-                    for (int i = 0; i < List.Count; ++i) {
+                    for (int i = 0; i < comboList.Count; ++i) {
                         int topWindow = i * height + 25;
                         int bottomWindow = (i + 1) * height + 25;
                         if ((y >= topWindow) && (y <= bottomWindow)) {

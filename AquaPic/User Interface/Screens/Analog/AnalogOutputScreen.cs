@@ -42,7 +42,7 @@ namespace AquaPic.UserInterface
 
             string[] names = AquaPicDrivers.AnalogOutput.GetAllCardNames ();
             combo = new TouchComboBox (names);
-            combo.Active = cardId;
+            combo.active = cardId;
             combo.WidthRequest = 235;
             combo.ChangedEvent += OnComboChanged;
             Put (combo, 550, 35);

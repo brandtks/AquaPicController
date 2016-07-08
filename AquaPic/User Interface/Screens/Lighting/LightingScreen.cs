@@ -407,14 +407,14 @@ namespace AquaPic.UserInterface
                     try {
                         Lighting.GetFixtureIndex (name);
                     } catch (ArgumentException) {
-                        combo.List.Remove (name);
+                        combo.comboList.Remove (name);
                         if (Lighting.fixtureCount != 0) {
                             fixtureID = 0;
-                            combo.Active = fixtureID;
+                            combo.active = fixtureID;
                             GetFixtureData ();
                         } else {
                             fixtureID = -1;
-                            combo.Active = 0;
+                            combo.active = 0;
 
                             fixtureLabel.text = "No lighing fixtures added";
                             fixtureLabel.QueueDraw ();
@@ -431,16 +431,16 @@ namespace AquaPic.UserInterface
 
                     if (Lighting.fixtureCount > fixtureCount) { // a fixture was added
                         fixtureID = Lighting.fixtureCount - 1;
-                        int listIdx = combo.List.IndexOf ("New fixture...");
-                        combo.List.Insert (listIdx, Lighting.GetFixtureName (fixtureID));
-                        combo.Active = listIdx;
+                        int listIdx = combo.comboList.IndexOf ("New fixture...");
+                        combo.comboList.Insert (listIdx, Lighting.GetFixtureName (fixtureID));
+                        combo.active = listIdx;
                         combo.QueueDraw ();
                         GetFixtureData ();
                     } else {
                         if (fixtureID != -1)
-                            combo.Active = fixtureID;
+                            combo.active = fixtureID;
                         else
-                            combo.Active = 0;
+                            combo.active = 0;
                     }
                 }
 
@@ -451,9 +451,9 @@ namespace AquaPic.UserInterface
 
             string[] names = Lighting.GetAllFixtureNames ();
             combo = new TouchComboBox (names);
-            combo.Active = 0;
+            combo.active = 0;
             combo.WidthRequest = 235;
-            combo.List.Add ("New fixture...");
+            combo.comboList.Add ("New fixture...");
             combo.ChangedEvent += OnComboChanged;
             Put (combo, 550, 77);
             combo.Show ();
@@ -463,7 +463,7 @@ namespace AquaPic.UserInterface
                 if (requestedFixture != null) {
                     try {
                         fixtureID = Lighting.GetFixtureIndex (requestedFixture);
-                        combo.Active = fixtureID;
+                        combo.active = fixtureID;
                     } catch {
                         ;
                     }
@@ -604,17 +604,17 @@ namespace AquaPic.UserInterface
 
                 if (Lighting.fixtureCount > fixtureCount) { // a fixture was added
                     fixtureID = Lighting.fixtureCount - 1;
-                    int listIdx = combo.List.IndexOf ("New fixture...");
-                    combo.List.Insert (listIdx, Lighting.GetFixtureName (fixtureID));
-                    combo.Active = listIdx;
+                    int listIdx = combo.comboList.IndexOf ("New fixture...");
+                    combo.comboList.Insert (listIdx, Lighting.GetFixtureName (fixtureID));
+                    combo.active = listIdx;
                     combo.QueueDraw ();
 
                     GetFixtureData ();
                 } else {
                     if (fixtureID != -1)
-                        combo.Active = fixtureID;
+                        combo.active = fixtureID;
                     else
-                        combo.Active = 0;
+                        combo.active = 0;
                 }
             } else {
                 try {

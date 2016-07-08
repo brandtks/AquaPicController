@@ -109,9 +109,9 @@ namespace AquaPic.UserInterface
 
             combo = new TouchComboBox ();
             foreach (var test in tests) {
-                combo.List.Add (test.name);
+                combo.comboList.Add (test.name);
             }
-            combo.NonActiveMessage = "Select test";
+            combo.nonActiveMessage = "Select test";
             combo.WidthRequest = 235;
             combo.ChangedEvent += OnComboChanged;
             Put (combo, 550, 35);

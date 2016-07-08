@@ -13,7 +13,9 @@ namespace AquaPic.UserInterface
         //private TouchLabel label;
         //private int flashUpdate;
 
-        public WaterLevelLinePlot () : base () {
+        public WaterLevelLinePlot (params object[] options) 
+            : base () 
+        {
             text = "Water Level";
             unitOfMeasurement = TouchWidgetLibrary.UnitsOfMeasurement.Inches;
 

@@ -42,12 +42,12 @@ namespace AquaPic.UserInterface
             if (this.switchId != -1) {
                 IndividualControl ic = WaterLevel.GetFloatSwitchIndividualControl (switchId);
                 string cardName = AquaPicDrivers.DigitalInput.GetCardName (ic.Group);
-                c.combo.List.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
-                c.combo.Active = 0;
+                c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
+                c.combo.active = 0;
             } else {
-                c.combo.NonActiveMessage = "Please select channel";
+                c.combo.nonActiveMessage = "Please select channel";
             }
-            c.combo.List.AddRange (AquaPicDrivers.DigitalInput.GetAllAvaiableChannels ());
+            c.combo.comboList.AddRange (AquaPicDrivers.DigitalInput.GetAllAvaiableChannels ());
             AddSetting (c);
 
             t = new SettingTextBox ();
@@ -75,35 +75,35 @@ namespace AquaPic.UserInterface
             c = new SettingComboBox ();
             c.text = "Type";
             string[] types = Enum.GetNames (typeof(SwitchType));
-            c.combo.List.AddRange (types);
+            c.combo.comboList.AddRange (types);
             if (this.switchId != -1) {
                 string type = WaterLevel.GetFloatSwitchType (switchId).ToString ();
                 for (int i = 0; i < types.Length; ++i) {
                     if (type == types [i]) {
-                        c.combo.Active = i;
+                        c.combo.active = i;
                         break;
                     }
                 }
             } else {
-                c.combo.NonActiveMessage = "Please select type";
+                c.combo.nonActiveMessage = "Please select type";
             }
             AddSetting (c);
 
             c = new SettingComboBox ();
             c.text = "Function";
             string[] functions = Enum.GetNames (typeof(SwitchFunction));
-            c.combo.List.AddRange (functions);
-            c.combo.List.Remove ("None");
+            c.combo.comboList.AddRange (functions);
+            c.combo.comboList.Remove ("None");
             if (this.switchId != -1) {
                 string function = WaterLevel.GetFloatSwitchFunction (switchId).ToString ();
-                for (int i = 0; i < c.combo.List.Count; ++i) {
-                    if (function == c.combo.List [i]) {
-                        c.combo.Active = i;
+                for (int i = 0; i < c.combo.comboList.Count; ++i) {
+                    if (function == c.combo.comboList [i]) {
+                        c.combo.active = i;
                         break;
                     }
                 }
             } else {
-                c.combo.NonActiveMessage = "Please select function";
+                c.combo.nonActiveMessage = "Please select function";
             }
             AddSetting (c);
 
@@ -181,7 +181,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if (((SettingComboBox)settings ["Input"]).combo.Active == -1) {
+                if (((SettingComboBox)settings ["Input"]).combo.active == -1) {
                     MessageBox.Show ("Please select an channel");
                     return false;
                 }

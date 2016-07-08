@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -58,6 +59,16 @@ namespace AquaPic.Utilites
 			return en.ToString();
 		}
 
+        public static bool IsEmpty (this string value) {
+            return string.IsNullOrWhiteSpace (value);
+        }
+
+        public static string RemoveWhitespace (this string value) {
+            return new string (value.ToCharArray ()
+                .Where (c => !Char.IsWhiteSpace (c))
+                .ToArray ());
+        }
+        
         public static float CalcParabola(TimeDate start, TimeDate end, TimeDate now, float min, float max) {
             double period = end.DifferenceInTime(start);
             double phase = now.DifferenceInTime(start);

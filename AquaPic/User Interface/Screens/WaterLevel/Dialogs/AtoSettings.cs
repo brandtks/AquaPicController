@@ -113,11 +113,11 @@ namespace AquaPic.UserInterface
                 IndividualControl ic = WaterLevel.atoPumpOutlet;
                 string pwrName = Power.GetPowerStripName (ic.Group);
                 pwrName = string.Format ("{0}.p{1}", pwrName, ic.Individual);
-                c.combo.List.Add (string.Format ("Current: {0}", pwrName));
-                c.combo.Active = 0;
+                c.combo.comboList.Add (string.Format ("Current: {0}", pwrName));
+                c.combo.active = 0;
             } else
-                c.combo.NonActiveMessage = "Select outlet";
-            c.combo.List.AddRange (availOutlets); 
+                c.combo.nonActiveMessage = "Select outlet";
+            c.combo.comboList.AddRange (availOutlets); 
             AddOptionalSetting (c);
 
             t = new SettingTextBox ();
@@ -234,7 +234,7 @@ namespace AquaPic.UserInterface
                 WaterLevel.atoUseAnalogSensor = useFloatSwitch;
 
                 try {
-                    if (((SettingComboBox)settings ["Pump Outlet"]).combo.Active == -1) {
+                    if (((SettingComboBox)settings ["Pump Outlet"]).combo.active == -1) {
                         MessageBox.Show ("Please select power outlet for the pump");
                         return false;
                     }
