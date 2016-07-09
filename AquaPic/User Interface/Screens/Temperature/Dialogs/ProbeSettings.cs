@@ -124,7 +124,7 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("inputCard", AquaPicDrivers.AnalogInput.GetCardName (ic.Group)));
                 jobj.Add (new JProperty ("channel", ic.Individual.ToString ()));
                 jobj.Add (new JProperty ("zeroCalibrationActual", "32.0"));
-                jobj.Add (new JProperty ("zeroCalibrationValue", "0.0"));
+                jobj.Add (new JProperty ("zeroCalibrationValue", "82.0"));
                 jobj.Add (new JProperty ("fullScaleCalibrationActual", "100.0"));
                 jobj.Add (new JProperty ("fullScaleCalibrationValue", "4095.0"));
                 jobj.Add (new JProperty ("temperatureGroup", temperatureGroupName));

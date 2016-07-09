@@ -9,8 +9,8 @@ namespace AquaPic.Modules
     {
         private class Heater 
         {
-            public IndividualControl plug;
             public string name;
+            public IndividualControl plug;
             public string temperatureGroupName;
 
             public Heater (string name, byte powerID, byte plugID, string temperatureGroupName) {

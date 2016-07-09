@@ -103,11 +103,10 @@ namespace AquaPic.UserInterface
                             if (DeleteButtonEvent != null)
                                 success = DeleteButtonEvent (this);
 
-                            if (!success)
-                                MessageBox.Show ("Error while deleting " + name);
+                            if (success) {
+                                Destroy ();
+                            }
                         }
-
-                        Destroy ();
                     };
                     
                     ms.Run ();

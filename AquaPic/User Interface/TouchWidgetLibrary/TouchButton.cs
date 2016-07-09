@@ -15,6 +15,7 @@ namespace TouchWidgetLibrary
     {
         public TouchText render;
         public TouchColor buttonColor;
+        private TouchColor unmodifiedColor;
         public ButtonClickAction clickAction;
 
         public string text {
@@ -54,24 +55,23 @@ namespace TouchWidgetLibrary
         }
 
         public TouchButton () {
-            this.Visible = true;
-            this.VisibleWindow = false;
+            Visible = true;
+            VisibleWindow = false;
 
             render = new TouchText ();
-            this.buttonColor = "pri";
-            this.text = "";
-            this.textColor = "black";
-            this.HeightRequest = 45;
-            this.WidthRequest = 45;
-            this.textAlignment = TouchAlignment.Center;
-            this.clickAction = ButtonClickAction.Darken;
+            buttonColor = "pri";
+            text = "";
+            textColor = "black";
+            HeightRequest = 45;
+            WidthRequest = 45;
+            textAlignment = TouchAlignment.Center;
+            clickAction = ButtonClickAction.Darken;
 
-            this.ExposeEvent += onExpose;
-            this.ButtonPressEvent += onTouchButtonPress;
-            this.ButtonReleaseEvent += onTouchButtonRelease;
+            ExposeEvent += OnExpose;
+            ButtonPressEvent += OnTouchButtonPress;
         }
 
-        protected void onExpose (object sender, ExposeEventArgs args) {
+        protected void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 int height = Allocation.Height;
                 int width = Allocation.Width;
@@ -86,26 +86,36 @@ namespace TouchWidgetLibrary
             }
         }
 
-        protected void onTouchButtonPress (object o, ButtonPressEventArgs args) {
+        protected void OnTouchButtonPress (object o, ButtonPressEventArgs args) {
             if (args.Event.Type == Gdk.EventType.ButtonPress) {
-                if (clickAction == ButtonClickAction.NoTransparency)
-                    buttonColor.ModifyAlpha (1.0f);
-                else if (clickAction == ButtonClickAction.Brighten)
+                if (clickAction == ButtonClickAction.NoTransparency) {
+                    unmodifiedColor = new TouchColor(buttonColor);
+                    buttonColor.ModifyAlpha (1.0);
+                } else if (clickAction == ButtonClickAction.Brighten) {
+                    unmodifiedColor = new TouchColor (buttonColor);
                     buttonColor.ModifyColor (1.25);
-                else if (clickAction == ButtonClickAction.Darken)
+                } else if (clickAction == ButtonClickAction.Darken) {
+                    unmodifiedColor = new TouchColor (buttonColor);
                     buttonColor.ModifyColor (0.75);
+                }
 
-                this.QueueDraw ();
+                QueueDraw ();
             }
         }
 
-        protected void onTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
-            if (clickAction == ButtonClickAction.NoTransparency)
-                buttonColor.RestoreAlpha ();
-            else if ((clickAction == ButtonClickAction.Brighten) || (clickAction == ButtonClickAction.Darken))
-                buttonColor.RestoreColor ();
+        protected override bool OnButtonReleaseEvent (Gdk.EventButton evnt) {
+            buttonColor = unmodifiedColor;
+            QueueDraw ();
+            
+            if ((evnt.X < 0) || (evnt.X > Allocation.Width)) {
+                return true;
+            }
 
-            this.QueueDraw ();
+            if ((evnt.Y < 0) || (evnt.Y > Allocation.Height)) {
+                return true;
+            }
+
+            return base.OnButtonReleaseEvent (evnt);
         }
     }
 }

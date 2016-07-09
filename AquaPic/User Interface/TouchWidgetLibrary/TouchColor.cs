@@ -6,85 +6,68 @@ namespace TouchWidgetLibrary
 {
     public class TouchColor
     {
-        public float R { get; set; }
-        public float G { get; set; }
-        public float B { get; set; }
-        public float A { get; set; }
-
-        private float storedR;
-        private float storedG;
-        private float storedB;
-        private float storedA;
+        public double R { get; set; }
+        public double G { get; set; }
+        public double B { get; set; }
+        public double A { get; set; }
 
         private string colorName;
 
-        private static Dictionary<string, float[]> colorLookup = new Dictionary<string, float[]> () {
-            { "pri", new float [3] { 0.40392f, 0.8902f, 0f} }, // greenish
-            { "seca", new float [3] { 0.00784f, 0.55686f, 0.60784f} }, // blueish
-            { "secc", new float [3] { 1f, 0.99216f, 0.25098f} }, // yellowish
-            { "secb", new float [3] { 1f, 0.60392f, 0.25098f} }, // orangish
-            { "compl", new float [3] { 0.89412f, 0f, 0.27059f} }, // pinkish
-            { "grey0", new float [3] { 0.15f, 0.15f, 0.15f} },
-            { "grey1", new float [3] { 0.35f, 0.35f, 0.35f} },
-            { "grey2", new float [3] { 0.50f, 0.50f, 0.50f} },
-            { "grey3", new float [3] { 0.70f, 0.70f, 0.70f} },
-            { "grey4", new float [3] { 0.85f, 0.85f, 0.85f} }
+        private static Dictionary<string, int[]> colorLookup = new Dictionary<string, int[]> () {
+            { "pri", new int[3] {103, 227, 0}}, // greenish 67E300 {103, 227, 0}
+            { "seca", new int[3] {2, 142, 155}}, // blueish 028E9B {2, 142, 155}
+            { "secc", new int[3] {255, 253, 64}}, // yellowish FFFD40 {255, 253, 64}
+            { "secb", new int[3] {255, 154, 64}}, // orangish FF9A40 {255, 154, 64}
+            { "compl", new int[3] {228, 0, 69}}, // redish E40045 {228, 0, 69}
+            { "grey0", new int[3] {39, 39, 39}},
+            { "grey1", new int[3] {89, 89, 89}},
+            { "grey2", new int[3] {128, 128, 128}},
+            { "grey3", new int[3] {179, 179, 179}},
+            { "grey4", new int[3] {217, 217, 217}}
         };
 
         public TouchColor (string color, double A = 1.0) {
-            bool colorFound;
-
-            try {
-                colorName = color.ToLower ();
-                R = colorLookup [colorName] [0];
-                G = colorLookup [colorName] [1];
-                B = colorLookup [colorName] [2];
-                colorFound = true;
-            } catch {
-                colorFound = false;
-            }
-
-            if (!colorFound) {
+            colorName = color.ToLower ();
+            if (colorLookup.ContainsKey (colorName)) {
+                R = (double)colorLookup[colorName][0] / 255.0;
+                G = (double)colorLookup[colorName][1] / 255.0;
+                B = (double)colorLookup[colorName][2] / 255.0;
+            } else {
                 Gdk.Color c = new Gdk.Color ();
-                colorFound = Gdk.Color.Parse (color, ref c);
+                var colorFound = Gdk.Color.Parse (color, ref c);
                 if (colorFound) {
-                    R = (float)(c.Red / 65535);
-                    G = (float)(c.Green / 65535);
-                    B = (float)(c.Blue / 65535);
+                    R = c.Red / 65535.0;
+                    G = c.Green / 65535.0;
+                    B = c.Blue / 65535.0;
                 } else
                     throw new Exception ("No color could be found matching that description");
             }
 
-            this.A = (float)A;
-
-            storedR = R;
-            storedG = G;
-            storedB = B;
-            storedA = this.A;
+            this.A = A;
         }
 
         public TouchColor (double R, double G, double B, double A = 1.0) {
             colorName = string.Empty;
-            this.R = (float)R;
-            this.G = (float)G;
-            this.B = (float)B;
-            this.A = (float)A;
-            storedR = this.R;
-            storedG = this.G;
-            storedB = this.B;
-            storedA = this.A;
+            this.R = R;
+            this.G = G;
+            this.B = B;
+            this.A = A;
         }
 
         public TouchColor (byte R, byte G, byte B, double A = 1.0) {
             colorName = string.Empty;
-            this.R = (float)(R/255);
-            this.G = (float)(G/255);
-            this.B = (float)(B/255);
-            this.A = (float)A;
-            storedR = this.R;
-            storedG = this.G;
-            storedB = this.B;
-            storedA = this.A;
+            this.R = (double)R/255.0;
+            this.G = (double)G / 255.0;
+            this.B = (double)B / 255.0;
+            this.A = A;
+        }
+
+        public TouchColor (TouchColor colorCopy) {
+            colorName = colorCopy.colorName;
+            R = colorCopy.R;
+            G = colorCopy.G;
+            B = colorCopy.B;
+            A = colorCopy.A;
         }
 
         public static implicit operator TouchColor (string name) {
@@ -92,19 +75,10 @@ namespace TouchWidgetLibrary
         }
 
         public void ModifyAlpha (double a) {
-            storedA = A;
-            A = (float)a;
-        }
-
-        public void RestoreAlpha () {
-            A = storedA;
+            A = a;
         }
 
         public void ModifyColor(double ratio) {
-            storedR = R;
-            storedG = G;
-            storedB = B;
-
             R *= (float)ratio;
             if (R > 1.0f)
                 R = 1.0f;
@@ -116,16 +90,10 @@ namespace TouchWidgetLibrary
                 B = 1.0f;
         }
 
-        public void RestoreColor () {
-            R = storedR;
-            G = storedG;
-            B = storedB;
-        }
-
         public TouchColor Blend (TouchColor otherColor, float amount) {
-            float red = (R * (1 - amount)) + (otherColor.R * amount);
-            float green = (G * (1 - amount)) + (otherColor.G * amount);
-            float blue = (B * (1 - amount)) + (otherColor.B * amount);
+            double red = (R * (1 - amount)) + (otherColor.R * amount);
+            double green = (G * (1 - amount)) + (otherColor.G * amount);
+            double blue = (B * (1 - amount)) + (otherColor.B * amount);
             return new TouchColor (red, green, blue);
         }
 

@@ -46,6 +46,10 @@ namespace AquaPic.Modules
         
         public static string defaultTemperatureGroup {
             get {
+                if (_defaultTemperatureGroup.IsEmpty () && (temperatureGroupCount > 0)) {
+                    var first = temperatureGroups.First ();
+                    _defaultTemperatureGroup = first.Key;
+                }
                 return _defaultTemperatureGroup;
             }
         }
@@ -186,7 +190,7 @@ namespace AquaPic.Modules
                     try {
                         zeroValue = Convert.ToSingle (obj["zeroCalibrationValue"]);
                     } catch {
-                        zeroValue = 0.0f;
+                        zeroValue = 82.0f;
                     }
 
                     float fullScaleActual;
@@ -271,14 +275,12 @@ namespace AquaPic.Modules
                 throw new Exception (string.Format ("Temperature Group: {0} already exists", name));
             }
 
-            temperatureGroups.Add ( 
-                name, 
-                new TemperatureGroup (
-                    name,  
-                    highTemperatureAlarmSetpoint,
-                    lowTemperatureAlarmSetpoint,
-                    temperatureSetpoint,
-                    temperatureDeadband));
+            temperatureGroups[name] = new TemperatureGroup (
+                name,  
+                highTemperatureAlarmSetpoint,
+                lowTemperatureAlarmSetpoint,
+                temperatureSetpoint,
+                temperatureDeadband);
 
             if (_defaultTemperatureGroup.IsEmpty ()) {
                 _defaultTemperatureGroup = name;
