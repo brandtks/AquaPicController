@@ -13,7 +13,7 @@ namespace AquaPic.Modules
             public IndividualControl plug;
             public string temperatureGroupName;
 
-            public Heater (string name, byte powerID, byte plugID, string temperatureGroupName) {
+            public Heater (string name, int powerID, int plugID, string temperatureGroupName) {
                 this.name = name;
                 plug.Group = powerID;
                 plug.Individual = plugID;
@@ -21,10 +21,6 @@ namespace AquaPic.Modules
                 var plugControl = Power.AddOutlet (plug, name, MyState.On, "Temperature");
                 plugControl.ConditionChecker = OnPlugControl;
                 Power.AddHandlerOnStateChange (plug, OnStateChange);
-            }
-
-            ~Heater () {
-                Power.RemoveHandlerOnStateChange (plug, OnStateChange);
             }
 
             public bool OnPlugControl () {
@@ -53,7 +49,7 @@ namespace AquaPic.Modules
                 return false;
             }
 
-            protected void OnStateChange (object obj, StateChangeEventArgs args) {
+            public void OnStateChange (object obj, StateChangeEventArgs args) {
                 if (args.state == MyState.On) {
                     if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
                         GetTemperatureGroupDataLogger (temperatureGroupName).AddEntry ("heater on");

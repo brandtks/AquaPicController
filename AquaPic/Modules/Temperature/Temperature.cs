@@ -12,7 +12,7 @@ namespace AquaPic.Modules
 {
     public partial class Temperature
     {
-        private static List<Heater> heaters;
+        private static Dictionary<string,Heater> heaters;
         private static Dictionary<string,TemperatureProbe> probes;
         private static Dictionary<string,TemperatureGroup> temperatureGroups;
         private static string _defaultTemperatureGroup;
@@ -26,12 +26,34 @@ namespace AquaPic.Modules
             }
         }
 
+        public static string defaultHeater {
+            get {
+                if (heaters.Count > 0) {
+                    var first = heaters.First ();
+                    return first.Key;
+                } else {
+                    return string.Empty;
+                }
+            }
+        }
+
         /**************************************************************************************************************/
         /* Temperature Probes                                                                                         */
         /**************************************************************************************************************/
         public static int temperatureProbeCount {
             get {
                 return probes.Count;
+            }
+        }
+
+        public static string defaultTemperatureProbe {
+            get {
+                if (probes.Count > 0) {
+                    var first = probes.First ();
+                    return first.Key;
+                } else {
+                    return string.Empty;
+                }
             }
         }
 
@@ -128,7 +150,7 @@ namespace AquaPic.Modules
         /* Temperature                                                                                                */
         /**************************************************************************************************************/
         static Temperature () {
-            heaters = new List<Heater> ();
+            heaters = new Dictionary<string,Heater> ();
             probes = new Dictionary<string,TemperatureProbe> ();
             temperatureGroups = new Dictionary<string,TemperatureGroup> ();
 
@@ -406,102 +428,96 @@ namespace AquaPic.Modules
         /* Heaters                                                                                                    */
         /**************************************************************************************************************/
         public static void AddHeater (string name, int powerID, int plugID, string temperatureGroupName) {
-            if (HeaterNameOk (name)) {
-                heaters.Add (new Heater (name, (byte)powerID, (byte)plugID, temperatureGroupName));
-            } else {
+            if (!HeaterNameOk (name)) {
                 throw new Exception (string.Format ("Heater: {0} already exists", name));
             }
+            
+            heaters [name] = new Heater (name, powerID, plugID, temperatureGroupName);
         }
 
-        public static void RemoveHeater (string name) {
-            int heaterIndex = GetHeaterIndex (name);
-            RemoveHeater (heaterIndex);
+        public static void RemoveHeater (string heaterName) {
+            CheckHeaterKey (heaterName);
+            Power.RemoveOutlet (heaters[heaterName].plug);
+            Power.RemoveHandlerOnStateChange (heaters[heaterName].plug, heaters[heaterName].OnStateChange);
+            heaters.Remove (heaterName);
         }
 
-        public static void RemoveHeater (int heaterIndex) {
-            CheckHeaterRange (heaterIndex);
-            Power.RemoveOutlet (heaters[heaterIndex].plug);
-            heaters.RemoveAt (heaterIndex);
+        public static void CheckHeaterKey (string heaterName) {
+            if (!heaters.ContainsKey (heaterName)) {
+                throw new ArgumentException ("heaterName");
+            }
         }
 
-        public static bool HeaterNameOk (string name) {
+        public static bool CheckHeaterKeyNoThrow (string heaterName) {
             try {
-                GetHeaterIndex (name);
-                return false;
-            } catch {
+                CheckHeaterKey (heaterName);
                 return true;
+            } catch {
+                return false;
             }
         }
 
-        protected static void CheckHeaterRange (int heaterIndex) {
-            if ((heaterIndex < 0) || (heaterIndex >= heaters.Count)) {
-                throw new ArgumentOutOfRangeException ("heaterIndex");
-            }
+        public static bool HeaterNameOk (string heaterName) {
+            return !CheckHeaterKeyNoThrow (heaterName);
         }
 
         /***Getters****************************************************************************************************/
-        /***Name***/
-        public static string GetHeaterName (int heaterIndex) {
-            CheckHeaterRange (heaterIndex);
-            return heaters[heaterIndex].name;
-        }
-
         /***Names***/
         public static string[] GetAllHeaterNames () {
-            string[] names = new string[heaters.Count];
-            for (int i = 0; i < heaters.Count; ++i)
-                names [i] = heaters [i].name;
-            return names;
-        }
-
-        /***Index***/
-        public static int GetHeaterIndex (string name) {
-            for (int i = 0; i < heaters.Count; ++i) {
-                if (string.Equals (name, heaters[i].name, StringComparison.InvariantCultureIgnoreCase))
-                    return i;
+            List<string> names = new List<string> ();
+            foreach (var group in heaters.Values) {
+                names.Add (group.name);
             }
-
-            throw new ArgumentException (name + " does not exists");
+            return names.ToArray ();
         }
 
         /***Individual Control***/
-        public static IndividualControl GetHeaterIndividualControl (int heaterIndex) {
-            CheckHeaterRange (heaterIndex);
-            return heaters[heaterIndex].plug;
+        public static IndividualControl GetHeaterIndividualControl (string heaterName) {
+            CheckHeaterKey (heaterName);
+            return heaters[heaterName].plug;
         }
 
         /***Temperature group name***/
-        public static string GetHeaterTemperatureGroupName (int heaterIndex) {
-            CheckHeaterRange (heaterIndex);
-            return heaters[heaterIndex].temperatureGroupName;
+        public static string GetHeaterTemperatureGroupName (string heaterName) {
+            CheckHeaterKey (heaterName);
+            return heaters[heaterName].temperatureGroupName;
         }
 
         /***Setters****************************************************************************************************/
         /***Name***/
-        public static void SetHeaterName (int heaterIndex, string name) {
-            CheckHeaterRange (heaterIndex);
-            if (HeaterNameOk (name)) {
-                heaters[heaterIndex].name = name;
-                Power.SetOutletName (heaters[heaterIndex].plug, heaters[heaterIndex].name);
-                return;
-            } else {
-                throw new Exception (string.Format ("Heater: {0} already exists", name));
+        public static void SetHeaterName (string oldHeaterName, string newHeaterName) {
+            CheckHeaterKey (oldHeaterName);
+            if (!HeaterNameOk (newHeaterName)) {
+                throw new Exception (string.Format ("Heater: {0} already exists", newHeaterName));
             }
+
+            //get heater instance
+            var heater = heaters[oldHeaterName];
+            
+            //update heater specifics
+            heater.name = newHeaterName;
+            Power.SetOutletName (heater.plug, heater.name);
+            
+            //remove from hashtable and add to new key
+            heaters.Remove (oldHeaterName);
+            heaters[newHeaterName] = heater;
         }
 
         /***Individual Control***/
-        public static void SetHeaterIndividualControl (int heaterIndex, IndividualControl ic) {
-            CheckHeaterRange (heaterIndex);
-            Power.RemoveOutlet (heaters[heaterIndex].plug);
-            heaters[heaterIndex].plug = ic;
-            var coil = Power.AddOutlet (heaters[heaterIndex].plug, heaters[heaterIndex].name, MyState.On, "Temperature");
-            coil.ConditionChecker = heaters[heaterIndex].OnPlugControl;
+        public static void SetHeaterIndividualControl (string heaterName, IndividualControl ic) {
+            CheckHeaterKey (heaterName);
+            Power.RemoveOutlet (heaters[heaterName].plug);
+            Power.RemoveHandlerOnStateChange (heaters[heaterName].plug, heaters[heaterName].OnStateChange);
+            heaters[heaterName].plug = ic;
+            var coil = Power.AddOutlet (heaters[heaterName].plug, heaters[heaterName].name, MyState.On, "Temperature");
+            coil.ConditionChecker = heaters[heaterName].OnPlugControl;
+            Power.AddHandlerOnStateChange (heaters[heaterName].plug, heaters[heaterName].OnStateChange);
         }
 
         /***Temperature group***/
-        public static void SetHeaterTemperatureGroupName (int heaterIndex, string temperatureGroupName) {
-            CheckHeaterRange (heaterIndex);
-            heaters[heaterIndex].temperatureGroupName = temperatureGroupName;
+        public static void SetHeaterTemperatureGroupName (string heaterName, string temperatureGroupName) {
+            CheckHeaterKey (heaterName);
+            heaters[heaterName].temperatureGroupName = temperatureGroupName;
         }
         
         /**************************************************************************************************************/
@@ -567,16 +583,6 @@ namespace AquaPic.Modules
         }
 
         /***Getters****************************************************************************************************/
-        /***Names***/
-        public static string GetFirstTemperatureProbe () {
-            if (probes.Count > 0) {
-                var first = probes.First ();
-                return first.Key;
-            } else {
-                return string.Empty;
-            }
-        }
-
         /***Names***/
         public static string[] GetAllTemperatureProbeNames () {
             List<string> names = new List<string> ();

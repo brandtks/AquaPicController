@@ -16,7 +16,7 @@ namespace AquaPic.UserInterface
         TouchLabel tempDeadband;
         TouchComboBox groupCombo;
         
-        int heaterId;
+        string heaterName;
         TouchLabel heaterLabel;
         TouchComboBox heaterCombo;
 
@@ -105,12 +105,10 @@ namespace AquaPic.UserInterface
                 s.Destroy ();
 
                 // A new group was added
-                if (Temperature.CheckTemperatureGroupKeyNoThrow (newGroupName)) {
+                if (!Temperature.CheckTemperatureGroupKeyNoThrow (newGroupName)) {
                     groupName = newGroupName;
-                    if (!groupCombo.comboList.Contains (groupName)) {
-                        groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, groupName);
-                        groupCombo.activeText = groupName;
-                    }
+                    groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, groupName);
+                    groupCombo.activeText = groupName;
                 }
 
                 // The group was deleted
@@ -129,10 +127,7 @@ namespace AquaPic.UserInterface
             /******************************************************************************************************/
             /* Heaters                                                                                            */
             /******************************************************************************************************/
-            if (Temperature.heaterCount == 0)
-                heaterId = -1;
-            else
-                heaterId = 0;
+            heaterName = Temperature.defaultHeater;
 
             label = new TouchLabel ();
             label.text = "Heaters";
@@ -153,49 +148,27 @@ namespace AquaPic.UserInterface
             heaterSetupBtn.text = "Heater Setup";
             heaterSetupBtn.SetSizeRequest (100, 60);
             heaterSetupBtn.ButtonReleaseEvent += (o, args) => {
-                if (heaterId != -1) {
-                    string name = Temperature.GetHeaterName (heaterId);
-                    var s = new HeaterSettings (name, heaterId, true);
-                    s.Run ();
-                    s.Destroy ();
+                var s = new HeaterSettings (heaterName, heaterName.IsNotEmpty ());
+                s.Run ();
+                var newHeaterName = s.newOrUpdatedHeaterName;
+                s.Destroy ();
 
-                    try {
-                        Temperature.GetHeaterIndex (name);
-                    } catch (ArgumentException) {
-                        heaterCombo.comboList.Remove (name);
-                        if (Temperature.heaterCount != 0) {
-                            heaterId = 0;
-                            heaterCombo.active = heaterId;
-                        } else {
-                            heaterId = -1;
-                            heaterCombo.active = 0;
-                        }
-
-                        GetHeaterData ();
-                    }
-                } else {
-                    int heaterCount = Temperature.heaterCount;
-
-                    var s = new HeaterSettings ("New Heater", -1, false);
-                    s.Run ();
-                    s.Destroy ();
-
-                    if (Temperature.heaterCount > heaterCount) { // a heater was added
-                        heaterId = Temperature.heaterCount - 1;
-                        int listIdx = heaterCombo.comboList.IndexOf ("New heater...");
-                        heaterCombo.comboList.Insert (listIdx, Temperature.GetHeaterName (heaterId));
-                        heaterCombo.active = listIdx;
-                        heaterCombo.QueueDraw ();
-                        GetHeaterData ();
-                    } else {
-                        if (heaterId != -1)
-                            heaterCombo.active = heaterId;
-                        else
-                            heaterCombo.active = 0;
-                    }
+                if ((newHeaterName != heaterName) && heaterName.IsNotEmpty ()) { // The heater name was changed
+                    var index = heaterCombo.comboList.IndexOf (heaterName);
+                    heaterCombo.comboList[index] = newHeaterName;
+                    heaterName = newHeaterName;
+                } else if (!Temperature.CheckHeaterKeyNoThrow (newHeaterName)) { // A new heater was added
+                    heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
+                    heaterCombo.activeText = newHeaterName;
+                    heaterName = newHeaterName;
+                } else if (!Temperature.CheckHeaterKeyNoThrow (heaterName)) { // The heater was deleted
+                    heaterCombo.comboList.Remove (heaterName);
+                    heaterName = Temperature.defaultHeater;
+                    heaterCombo.activeText = heaterName;
                 }
 
                 heaterCombo.QueueDraw ();
+                GetHeaterData ();
             };
             Put (heaterSetupBtn, 415, 195);
             heaterSetupBtn.Show ();
@@ -203,7 +176,7 @@ namespace AquaPic.UserInterface
             /******************************************************************************************************/
             /* Temperature Probes                                                                                 */
             /******************************************************************************************************/
-            probeName = Temperature.GetFirstTemperatureProbe ();
+            probeName = Temperature.defaultTemperatureProbe;
 
             label = new TouchLabel ();
             label.text = "Probes";
@@ -225,13 +198,13 @@ namespace AquaPic.UserInterface
                     var index = probeCombo.comboList.IndexOf (probeName);
                     probeCombo.comboList[index] = newProbeName;
                     probeName = newProbeName;
-                } else if (Temperature.CheckTemperatureProbeKeyNoThrow (newProbeName)) { // A new group was added
+                } else if (!Temperature.CheckTemperatureProbeKeyNoThrow (newProbeName)) { // A new probe was added
                     probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
                     probeCombo.activeText = newProbeName;
                     probeName = newProbeName;
-                } else if (!Temperature.CheckTemperatureProbeKeyNoThrow (probeName)) { // The group was deleted
+                } else if (!Temperature.CheckTemperatureProbeKeyNoThrow (probeName)) { // The probe was deleted
                     probeCombo.comboList.Remove (probeName);
-                    probeName = Temperature.GetFirstTemperatureProbe ();
+                    probeName = Temperature.defaultTemperatureProbe;
                     probeCombo.activeText = probeName;
                 }
 
@@ -263,8 +236,8 @@ namespace AquaPic.UserInterface
             Put (heaterCombo, 550, 77);
             heaterCombo.Show ();
 
-            if (heaterId != -1)
-                heaterCombo.active = heaterId;
+            if (heaterName.IsNotEmpty ())
+                heaterCombo.activeText = heaterName;
             else
                 heaterCombo.active = 0;
 
@@ -328,25 +301,21 @@ namespace AquaPic.UserInterface
             if (e.ActiveText == "New heater...") {
                 int heaterCount = Temperature.heaterCount;
 
-                var s = new HeaterSettings ("New Heater", -1, false);
+                var s = new HeaterSettings (string.Empty, false);
                 s.Run ();
+                var newHeaterName = s.newOrUpdatedHeaterName;
                 s.Destroy ();
 
-                if (Temperature.heaterCount > heaterCount) { // a heater was added
-                    heaterId = Temperature.heaterCount - 1;
-                    int listIdx = heaterCombo.comboList.IndexOf ("New heater...");
-                    heaterCombo.comboList.Insert (listIdx, Temperature.GetHeaterName (heaterId));
-                    heaterCombo.active = listIdx;
-                    heaterCombo.QueueDraw ();
-                    GetHeaterData ();
-                } else {
-                    if (heaterId != -1)
-                        heaterCombo.active = heaterId;
-                    else
-                        heaterCombo.active = 0;
+                if (Temperature.CheckHeaterKeyNoThrow (newHeaterName)) { // A new heater was added
+                    heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
+                    heaterCombo.activeText = newHeaterName;
+                    heaterName = newHeaterName;
                 }
+
+                heaterCombo.QueueDraw ();
+                GetHeaterData ();
             } else {
-                heaterId = Temperature.GetHeaterIndex (e.ActiveText);
+                heaterName = e.ActiveText;
             }
 
             GetHeaterData ();
@@ -393,8 +362,8 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetHeaterData () {
-            if (heaterId != -1) {
-                if (Power.GetOutletState (Temperature.GetHeaterIndividualControl (heaterId)) == MyState.On) {
+            if (heaterName.IsNotEmpty ()) {
+                if (Power.GetOutletState (Temperature.GetHeaterIndividualControl (heaterName)) == MyState.On) {
                     heaterLabel.text = "Heater On";
                     heaterLabel.textColor = "secb";
                 } else {

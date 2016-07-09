@@ -13,22 +13,28 @@ namespace AquaPic.UserInterface
 {
     public class HeaterSettings : TouchSettingsDialog
     {
-        int heaterIndex;
+        string heaterName;
+        public string newOrUpdatedHeaterName {
+            get {
+                return heaterName;
+            }
+        }
 
-        public HeaterSettings (string name, int heaterIndex, bool includeDelete) 
-            : base (name, includeDelete) 
+        public HeaterSettings (string heaterName, bool includeDelete)
+            : base (heaterName, includeDelete) 
         {
-            this.heaterIndex = heaterIndex;
+            this.heaterName = heaterName;
 
             SaveEvent += OnSave;
             DeleteButtonEvent += OnDelete;
 
             var t = new SettingTextBox ();
             t.text = "Name";
-            if (heaterIndex != -1)
-                t.textBox.text = Temperature.GetHeaterName (heaterIndex);
-            else
+            if (this.heaterName.IsNotEmpty ()) {
+                t.textBox.text = this.heaterName;
+            } else {
                 t.textBox.text = "Enter name";
+            }
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
@@ -41,8 +47,8 @@ namespace AquaPic.UserInterface
 
             var c = new SettingComboBox ();
             c.label.text = "Outlet";
-            if (heaterIndex != -1) {
-                IndividualControl ic = Temperature.GetHeaterIndividualControl (heaterIndex);
+            if (this.heaterName.IsNotEmpty ()) {
+                IndividualControl ic = Temperature.GetHeaterIndividualControl (this.heaterName);
                 string psName = Power.GetPowerStripName (ic.Group);
                 c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", psName, ic.Individual));
                 c.combo.active = 0;
@@ -56,8 +62,8 @@ namespace AquaPic.UserInterface
             c.label.text = "Temperature Group";
             c.combo.comboList.AddRange (Temperature.GetAllTemperatureGroupNames ());
             c.combo.nonActiveMessage = "Select group";
-            if (heaterIndex != -1) {
-                c.combo.activeText = Temperature.GetHeaterTemperatureGroupName (heaterIndex);
+            if (this.heaterName.IsNotEmpty ()) {
+                c.combo.activeText = Temperature.GetHeaterTemperatureGroupName (this.heaterName);
             }
             AddSetting (c);
 
@@ -83,7 +89,7 @@ namespace AquaPic.UserInterface
             string json = File.ReadAllText (path);
             JObject jo = (JObject)JToken.Parse (json);
 
-            if (heaterIndex == -1) {
+            if (heaterName.IsEmpty ()) {
                 if (name == "Enter name") {
                     MessageBox.Show ("Invalid heater name");
                     return false;
@@ -112,27 +118,31 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("temperatureGroup", temperatureGroupName));
 
                 ((JArray)jo["heaters"]).Add (jobj);
+
+                heaterName = name;
             } else {
                 if ((settings["Temperature Group"] as SettingComboBox).combo.active == -1) {
                     MessageBox.Show ("Please select an temperature group");
                     return false;
                 }
                 
-                string oldName = Temperature.GetHeaterName (heaterIndex);
-                if (oldName != name)
-                    Temperature.SetHeaterName (heaterIndex, name);
+                string oldName = heaterName;
+                if (heaterName != name) {
+                    Temperature.SetHeaterName (heaterName, name);
+                    heaterName = name;
+                }
                 
                 IndividualControl ic = IndividualControl.Empty;
                 if (!unparseOutletString.StartsWith ("Current:")) {
                     ParseOutlet (unparseOutletString, ref ic.Group, ref ic.Individual);
-                    Temperature.SetHeaterIndividualControl (heaterIndex, ic);
+                    Temperature.SetHeaterIndividualControl (heaterName, ic);
                 } else {
-                    ic = Temperature.GetHeaterIndividualControl (heaterIndex);
+                    ic = Temperature.GetHeaterIndividualControl (heaterName);
                 }
 
-                string oldTemperatureGroup = Temperature.GetHeaterTemperatureGroupName (heaterIndex);
+                string oldTemperatureGroup = Temperature.GetHeaterTemperatureGroupName (heaterName);
                 if (oldTemperatureGroup != temperatureGroupName) {
-                    Temperature.SetHeaterTemperatureGroupName (heaterIndex, temperatureGroupName);
+                    Temperature.SetHeaterTemperatureGroupName (heaterName, temperatureGroupName);
                 }
 
                 JArray ja = jo ["heaters"] as JArray;
@@ -163,8 +173,6 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            string name = Temperature.GetHeaterName (heaterIndex);
-
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
@@ -177,7 +185,7 @@ namespace AquaPic.UserInterface
             int arrIdx = -1;
             for (int i = 0; i < ja.Count; ++i) {
                 string n = (string)ja[i]["name"];
-                if (name == n) {
+                if (heaterName == n) {
                     arrIdx = i;
                     break;
                 }
@@ -192,7 +200,7 @@ namespace AquaPic.UserInterface
 
             File.WriteAllText (path, jo.ToString ());
 
-            Temperature.RemoveHeater (heaterIndex);
+            Temperature.RemoveHeater (heaterName);
 
             return true;
         }
