@@ -207,7 +207,7 @@ namespace AquaPic.Drivers
         }
 
         /**************************************************************************************************************/
-        /* Channel Name                                                                                               */
+        /* Channel Name Getters                                                                                       */
         /**************************************************************************************************************/
         public virtual string GetChannelName (IndividualControl channel) {
             return GetChannelName (channel.Group, channel.Individual);
@@ -221,6 +221,18 @@ namespace AquaPic.Drivers
         public virtual string[] GetAllChannelNames (int card) {
             CheckCardRange (card);
             return cards [card].GetAllChannelNames ();
+        }
+
+        /**************************************************************************************************************/
+        /* Channel Name Setters                                                                                       */
+        /**************************************************************************************************************/
+        public virtual void SetChannelName (IndividualControl channel, string name) {
+            SetChannelName (channel.Group, channel.Individual, name);
+        }
+
+        public virtual void SetChannelName (int card, int channel, string name) {
+            CheckCardRange (card);
+            cards[card].SetChannelName (channel, name);
         }
 
         /**************************************************************************************************************/

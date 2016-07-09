@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using AquaPic.Drivers;
@@ -13,7 +14,7 @@ namespace AquaPic.Modules
     {
         private static AnalogSensor analogSensor;
         private static AutoTopOff ato;
-        private static List<FloatSwitch> floatSwitches;
+        private static Dictionary<string,FloatSwitch> floatSwitches;
 
         private static int highSwitchAlarmIndex;
         private static int lowSwitchAlarmIndex;
@@ -237,9 +238,19 @@ namespace AquaPic.Modules
             }
         }
 
+        public static string defaultFloatSwitch {
+            get {
+                if (floatSwitches.Count > 0) {
+                    var first = floatSwitches.First ();
+                    return first.Key;
+                } else {
+                    return string.Empty;
+                }
+            }
+        }
 
         /**************************************************************************************************************/
-        /* Constructor                                                                                                */
+        /* Water Level                                                                                                */
         /**************************************************************************************************************/
         static WaterLevel () {
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
@@ -249,6 +260,9 @@ namespace AquaPic.Modules
             using (StreamReader reader = File.OpenText (path)) {
                 JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
+                /******************************************************************************************************/
+                /* Analog Sensor                                                                                      */
+                /******************************************************************************************************/
                 bool enable = Convert.ToBoolean (jo ["enableAnalogSensor"]);
 
                 float highAlarmSetpoint;
@@ -318,8 +332,10 @@ namespace AquaPic.Modules
                     }
                 }
 
-                //Float Switches
-                floatSwitches = new List<FloatSwitch> ();
+                /******************************************************************************************************/
+                /* Float Switches                                                                                     */
+                /******************************************************************************************************/
+                floatSwitches = new Dictionary<string,FloatSwitch> ();
                 JArray ja = (JArray)jo ["floatSwitches"];
                 foreach (var jt in ja) {
                     JObject obj = jt as JObject;
@@ -333,21 +349,20 @@ namespace AquaPic.Modules
                     string tString = (string)obj ["timeOffset"];
                     uint timeOffset = Timer.ParseTime (tString);
 
-                    if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed))
+                    if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed)) {
                         Logger.AddWarning ("High level switch should be normally closed");
-                    else if ((function == SwitchFunction.LowLevel) && (type != SwitchType.NormallyClosed))
+                    } else if ((function == SwitchFunction.LowLevel) && (type != SwitchType.NormallyClosed)) {
                         Logger.AddWarning ("Low level switch should be normally closed");
-                    else if ((function == SwitchFunction.ATO) && (type != SwitchType.NormallyOpened))
+                    } else if ((function == SwitchFunction.ATO) && (type != SwitchType.NormallyOpened)) {
                         Logger.AddWarning ("ATO switch should be normally opened");
-                    else if (function == SwitchFunction.None) {
-                        Logger.AddWarning ("Can't add a float switch with no function");
-                        continue; // skip adding float switch since it does nothing
                     }
 
                     AddFloatSwitch (name, ic, physicalLevel, type, function, timeOffset);
                 }
 
-                //Auto Top Off
+                /******************************************************************************************************/
+                /* Auto Top Off                                                                                       */
+                /******************************************************************************************************/
                 JObject joAto = (JObject)jo ["AutoTopOff"];
 
                 enable = Convert.ToBoolean (joAto ["enableAto"]);
@@ -424,7 +439,7 @@ namespace AquaPic.Modules
 
 //            bool mismatch = false;
             ato.useFloatSwitch = false; //set 'use float switch' to false, if no ATO float switch in found it remains false
-            foreach (var s in floatSwitches) {
+            foreach (var s in floatSwitches.Values) {
                 bool state = AquaPicDrivers.DigitalInput.GetChannelValue (s.channel);
                 bool activated;
 
@@ -530,67 +545,56 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         public static void AddFloatSwitch (
             string name, 
-            IndividualControl ic, 
+            IndividualControl channel, 
             float physicalLevel, 
             SwitchType type,
             SwitchFunction function,
-            uint timeOffset)
-        {
-            if (FloatSwitchNameOk (name)) {
-                if (FloatSwitchFunctionOk (function)) {
-                    FloatSwitch fs = new FloatSwitch (timeOffset);
-                    fs.name = name;
-                    fs.channel = ic;
-                    fs.physicalLevel = physicalLevel;
-                    fs.type = type;
-                    fs.function = function;
-
-                    AquaPicDrivers.DigitalInput.AddChannel (fs.channel, name);
-
-                    floatSwitches.Add (fs);
-                } else {
-                    throw new Exception (string.Format ("Float Switch: {0} function already exists", function));
-                }
-            } else {
+            uint timeOffset
+        ) {
+            if (!FloatSwitchNameOk (name)) {
                 throw new Exception (string.Format ("Float Switch: {0} already exists", name));
+            }
+
+            if (!FloatSwitchFunctionOk (function)) {
+                throw new Exception (string.Format ("Float Switch: {0} function already exists", function));
+            }
+
+            floatSwitches[name] = new FloatSwitch (
+                name,
+                type,
+                function,
+                physicalLevel,
+                channel,
+                timeOffset);
+        }
+
+        public static void RemoveFloatSwitch (string floatSwitchName) {
+            CheckFloatSwitchKey (floatSwitchName);
+            AquaPicDrivers.DigitalInput.RemoveChannel (floatSwitches[floatSwitchName].channel);
+            floatSwitches.Remove (floatSwitchName);
+        }
+
+        public static void CheckFloatSwitchKey (string floatSwitchName) {
+            if (!floatSwitches.ContainsKey (floatSwitchName)) {
+                throw new ArgumentException ("floatSwitchName");
             }
         }
 
-        public static void RemoveFloatSwitch (int floatSwitchId) {
-            if ((floatSwitchId >= 0) && (floatSwitchId < floatSwitches.Count)) {
-                FloatSwitch fs = floatSwitches [floatSwitchId];
-                AquaPicDrivers.DigitalInput.RemoveChannel (fs.channel);
-                floatSwitches.Remove (fs);
-                return;
-            }
-
-            throw new ArgumentOutOfRangeException ("floatSwitchId");
-        }
-
-        public static void SetFloatSwitchName (int switchId, string name) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            if (FloatSwitchNameOk (name)) {
-                floatSwitches [switchId].name = name;
-            } else 
-                throw new Exception (string.Format ("Float Switch: {0} already exists", name));
-        }
-
-        public static bool FloatSwitchNameOk (string name) {
+        public static bool CheckFloatSwitchKeyNoThrow (string floatSwitchName) {
             try {
-                GetFloatSwitchIndex (name);
-                return false;
-            } catch (ArgumentException) {
+                CheckFloatSwitchKey (floatSwitchName);
                 return true;
+            } catch {
+                return false;
             }
+        }
+
+        public static bool FloatSwitchNameOk (string floatSwitchName) {
+            return !CheckFloatSwitchKeyNoThrow (floatSwitchName);
         }
 
         public static bool FloatSwitchFunctionOk (SwitchFunction function) {
-            if (function == SwitchFunction.None)
-                return true;
-
-            foreach (var fs in floatSwitches) {
+            foreach (var fs in floatSwitches.Values) {
                 if (function == fs.function)
                     return false;
             }
@@ -598,112 +602,97 @@ namespace AquaPic.Modules
             return true;
         }
 
+        /***Getters****************************************************************************************************/
+        /***Names***/
         public static string[] GetAllFloatSwitches () {
-            string[] names = new string[floatSwitches.Count];
-            for (int i = 0; i < floatSwitches.Count; ++i)
-                names [i] = floatSwitches [i].name;
-            return names;
+            List<string> names = new List<string> ();
+            foreach (var floatSwitch in floatSwitches.Values) {
+                names.Add (floatSwitch.name);
+            }
+            return names.ToArray ();
         }
 
-        public static string GetFloatSwitchName (int switchId) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            return floatSwitches [switchId].name;
+        public static bool GetFloatSwitchState (string floatSwitchName) {
+            CheckFloatSwitchKey (floatSwitchName);
+            return floatSwitches[floatSwitchName].activated;
         }
 
-        public static int GetFloatSwitchIndex (string name) {
-            for (int i = 0; i < floatSwitches.Count; ++i) {
-                if (string.Equals (name, floatSwitches [i].name, StringComparison.InvariantCultureIgnoreCase))
-                    return i;
+        public static SwitchType GetFloatSwitchType (string floatSwitchName) {
+            CheckFloatSwitchKey (floatSwitchName);
+            return floatSwitches[floatSwitchName].type;
+        }
+
+        public static SwitchFunction GetFloatSwitchFunction (string floatSwitchName) {
+            CheckFloatSwitchKey (floatSwitchName);
+            return floatSwitches[floatSwitchName].function;
+        }
+
+        public static float GetFloatSwitchPhysicalLevel (string floatSwitchName) {
+            CheckFloatSwitchKey (floatSwitchName);
+            return floatSwitches[floatSwitchName].physicalLevel;
+        }
+
+        public static uint GetFloatSwitchTimeOffset (string floatSwitchName) {
+            CheckFloatSwitchKey (floatSwitchName);
+            return floatSwitches[floatSwitchName].odt.timerInterval;
+        }
+
+        public static IndividualControl GetFloatSwitchIndividualControl (string floatSwitchName) {
+            CheckFloatSwitchKey (floatSwitchName);
+            return floatSwitches[floatSwitchName].channel;
+        }
+
+        /***Setters****************************************************************************************************/
+        /***Name***/
+        public static void SetFloatSwitchName (string oldSwitchName, string newSwitchName) {
+            CheckFloatSwitchKey (oldSwitchName);
+            if (!FloatSwitchNameOk (newSwitchName)) {
+                throw new Exception (string.Format ("Float Switch: {0} already exists", newSwitchName));
             }
 
-            throw new ArgumentException (name + " does not exists");
+            var floatSwitch = floatSwitches[oldSwitchName];
+            
+            floatSwitch.name = newSwitchName;
+            AquaPicDrivers.DigitalInput.SetChannelName (floatSwitch.channel, floatSwitch.name);
+
+            floatSwitches.Remove (oldSwitchName);
+            floatSwitches[newSwitchName] = floatSwitch;
         }
 
-        public static IndividualControl GetFloatSwitchIndividualControl (int switchId) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            return floatSwitches [switchId].channel;
+        public static void SetFloatSwitchIndividualControl (string floatSwitchName, IndividualControl ic) {
+            CheckFloatSwitchKey (floatSwitchName);
+            AquaPicDrivers.DigitalInput.RemoveChannel (floatSwitches[floatSwitchName].channel);
+            floatSwitches[floatSwitchName].channel = ic;
+            AquaPicDrivers.DigitalInput.AddChannel (floatSwitches[floatSwitchName].channel, floatSwitches[floatSwitchName].name);
         }
 
-        public static void SetFloatSwitchIndividualControl (int switchId, IndividualControl ic) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            AquaPicDrivers.DigitalInput.RemoveChannel (ic);
-            floatSwitches [switchId].channel = ic;
-            AquaPicDrivers.DigitalInput.AddChannel (floatSwitches [switchId].channel, floatSwitches [switchId].name);
+        public static void SetFloatSwitchPhysicalLevel (string floatSwitchName, float physicalLevel) {
+            CheckFloatSwitchKey (floatSwitchName);
+            floatSwitches[floatSwitchName].physicalLevel = physicalLevel;
         }
 
-        public static float GetFloatSwitchPhysicalLevel (int switchId) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
+        public static void SetFloatSwitchType (string floatSwitchName, SwitchType type) {
+            CheckFloatSwitchKey (floatSwitchName);
 
-            return floatSwitches [switchId].physicalLevel; 
+            if (floatSwitches[floatSwitchName].type != type) { // if swapping between NO and NC activation is reversed
+                floatSwitches[floatSwitchName].activated = !floatSwitches[floatSwitchName].activated;
+            }
+
+            floatSwitches[floatSwitchName].type = type;
         }
 
-        public static void SetFloatSwitchPhysicalLevel (int switchId, float physicalLevel) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            floatSwitches [switchId].physicalLevel = physicalLevel;
-        }
-
-        public static SwitchType GetFloatSwitchType (int switchId) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            return floatSwitches [switchId].type; 
-        }
-
-        public static void SetFloatSwitchType (int switchId, SwitchType type) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            if (floatSwitches [switchId].type != type) // if swapping between NO and NC activation is reversed
-                floatSwitches [switchId].activated = !floatSwitches [switchId].activated;
-
-            floatSwitches [switchId].type = type;
-        }
-
-        public static SwitchFunction GetFloatSwitchFunction (int switchId) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            return floatSwitches [switchId].function; 
-        }
-
-        public static void SetFloatSwitchFunction (int switchId, SwitchFunction function) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            if (FloatSwitchFunctionOk (function))
-                floatSwitches [switchId].function = function;
-            else 
+        public static void SetFloatSwitchFunction (string floatSwitchName, SwitchFunction function) {
+            CheckFloatSwitchKey (floatSwitchName);
+            if (FloatSwitchFunctionOk (function)) {
                 throw new Exception (string.Format ("Float Switch: {0} function already exists", function));
+            }
+
+            floatSwitches[floatSwitchName].function = function;
         }
 
-        public static uint GetFloatSwitchTimeOffset (int switchId) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            return floatSwitches [switchId].odt.timerInterval;
-        }
-
-        public static void SetFloatSwitchTimeOffset (int switchId, uint timeOffset) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            floatSwitches [switchId].odt.timerInterval = timeOffset;
-        }
-
-        public static bool GetFloatSwitchState (int switchId) {
-            if ((switchId < 0) || (switchId >= floatSwitches.Count))
-                throw new ArgumentOutOfRangeException ("switchId");
-
-            return floatSwitches [switchId].activated;
+        public static void SetFloatSwitchTimeOffset (string floatSwitchName, uint timeOffset) {
+            CheckFloatSwitchKey (floatSwitchName);
+            floatSwitches[floatSwitchName].odt.timerInterval = timeOffset;
         }
     }
 }

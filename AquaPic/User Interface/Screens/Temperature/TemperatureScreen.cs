@@ -157,7 +157,7 @@ namespace AquaPic.UserInterface
                     var index = heaterCombo.comboList.IndexOf (heaterName);
                     heaterCombo.comboList[index] = newHeaterName;
                     heaterName = newHeaterName;
-                } else if (!Temperature.CheckHeaterKeyNoThrow (newHeaterName)) { // A new heater was added
+                } else if (Temperature.CheckHeaterKeyNoThrow (newHeaterName)) { // A new heater was added
                     heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
                     heaterCombo.activeText = newHeaterName;
                     heaterName = newHeaterName;
@@ -198,7 +198,7 @@ namespace AquaPic.UserInterface
                     var index = probeCombo.comboList.IndexOf (probeName);
                     probeCombo.comboList[index] = newProbeName;
                     probeName = newProbeName;
-                } else if (!Temperature.CheckTemperatureProbeKeyNoThrow (newProbeName)) { // A new probe was added
+                } else if (Temperature.CheckTemperatureProbeKeyNoThrow (newProbeName)) { // A new probe was added
                     probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
                     probeCombo.activeText = newProbeName;
                     probeName = newProbeName;
@@ -349,6 +349,8 @@ namespace AquaPic.UserInterface
                     heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
                     heaterCombo.activeText = newHeaterName;
                     heaterName = newHeaterName;
+                } else {
+                    heaterCombo.activeText = heaterName;
                 }
 
                 heaterCombo.QueueDraw ();
@@ -371,6 +373,8 @@ namespace AquaPic.UserInterface
                     probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
                     probeCombo.activeText = newProbeName;
                     probeName = newProbeName;
+                } else {
+                    probeCombo.activeText = probeName;
                 }
             } else {
                 probeName = e.ActiveText;
@@ -391,6 +395,8 @@ namespace AquaPic.UserInterface
                     groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, newGroupName);
                     groupCombo.activeText = newGroupName;
                     groupName = newGroupName;
+                } else {
+                    groupCombo.activeText = groupName;
                 }
             } else {
                 groupName = e.ActiveText;

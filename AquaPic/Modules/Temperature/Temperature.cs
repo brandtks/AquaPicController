@@ -465,8 +465,8 @@ namespace AquaPic.Modules
         /***Names***/
         public static string[] GetAllHeaterNames () {
             List<string> names = new List<string> ();
-            foreach (var group in heaters.Values) {
-                names.Add (group.name);
+            foreach (var heater in heaters.Values) {
+                names.Add (heater.name);
             }
             return names.ToArray ();
         }
@@ -491,14 +491,11 @@ namespace AquaPic.Modules
                 throw new Exception (string.Format ("Heater: {0} already exists", newHeaterName));
             }
 
-            //get heater instance
             var heater = heaters[oldHeaterName];
             
-            //update heater specifics
             heater.name = newHeaterName;
             Power.SetOutletName (heater.plug, heater.name);
             
-            //remove from hashtable and add to new key
             heaters.Remove (oldHeaterName);
             heaters[newHeaterName] = heater;
         }
@@ -556,7 +553,7 @@ namespace AquaPic.Modules
 
         public static void CheckTemperatureProbeKey (string probeName) {
             if (!probes.ContainsKey (probeName)) {
-                throw new ArgumentException ("name");
+                throw new ArgumentException ("probeName");
             }
         }
 
@@ -586,8 +583,8 @@ namespace AquaPic.Modules
         /***Names***/
         public static string[] GetAllTemperatureProbeNames () {
             List<string> names = new List<string> ();
-            foreach (var group in probes.Values) {
-                names.Add (group.name);
+            foreach (var probe in probes.Values) {
+                names.Add (probe.name);
             }
             return names.ToArray ();
         }
@@ -643,7 +640,10 @@ namespace AquaPic.Modules
             }
 
             var probe = probes[oldProbeName];
+            
             probe.name = newProbeName;
+            AquaPicDrivers.AnalogInput.SetChannelName (probe.channel, probe.name);
+            
             probes.Remove (oldProbeName);
             probes[newProbeName] = probe;
         }

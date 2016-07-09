@@ -1,6 +1,7 @@
 ﻿using System;
 using AquaPic.Utilites;
 using AquaPic.Runtime;
+using AquaPic.Drivers;
 
 namespace AquaPic.Modules
 {
@@ -12,7 +13,6 @@ namespace AquaPic.Modules
     }
 
     public enum SwitchFunction {
-        None,
         LowLevel,
         HighLevel,
         ATO
@@ -30,13 +30,23 @@ namespace AquaPic.Modules
             public IndividualControl channel;
             public OnDelayTimer odt;
 
-            public FloatSwitch (uint timeOffset) {
+            public FloatSwitch (
+                string name,
+                SwitchType type,
+                SwitchFunction function,
+                float physicalLevel,
+                IndividualControl channel,
+                uint timeOffset
+            ) {
                 activated = false;
-                type = SwitchType.NormallyOpened;
-                function = SwitchFunction.None;
-                physicalLevel = -1.0f;
-                channel = IndividualControl.Empty;
+                this.name = name;
+                this.type = type;
+                this.function = function;
+                this.physicalLevel = physicalLevel;
+                this.channel = channel;
                 odt = new OnDelayTimer (timeOffset);
+
+                AquaPicDrivers.DigitalInput.AddChannel (this.channel, this.name);
             }
         }
     }
