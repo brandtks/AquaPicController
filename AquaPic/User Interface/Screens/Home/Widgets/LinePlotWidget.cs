@@ -57,31 +57,32 @@ namespace AquaPic.UserInterface
         protected TouchLinePlot linePlot;
 
         public LinePlotWidget () {
-            SetSizeRequest (415, 82);
+            SetSizeRequest (310, 82);
 
-            var box1 = new TouchGraphicalBox (415, 82);
+            var box1 = new TouchGraphicalBox (310, 82);
             box1.color = "grey4";
             box1.transparency = 0.1f;
             Put (box1, 0, 0);
 
             displayLabel = new TouchLabel ();
+            displayLabel.SetSizeRequest (152, 16);
             displayLabel.text = "Plot";
-            displayLabel.WidthRequest = 112;
             displayLabel.textColor = "grey3";
-            displayLabel.textAlignment = TouchAlignment.Center;
-            Put (displayLabel, 3, 46);
+            displayLabel.textAlignment = TouchAlignment.Left;
+            displayLabel.textHorizontallyCentered = true;
+            Put (displayLabel, 3, 63);
 
             textBox = new TouchLabel ();
-            textBox.WidthRequest = 112;
-            textBox.textSize = 20;
+            textBox.SetSizeRequest (57, 60);
+            textBox.textSize = 19;
             textBox.text = "0.0";
             textBox.textColor = "pri";
             textBox.textAlignment = TouchAlignment.Center;
             textBox.textHorizontallyCentered = true;
-            Put (textBox, 3, 15);
+            Put (textBox, 1, 3);
             
             linePlot = new TouchLinePlot ();
-            Put (linePlot, 116, 3);
+            Put (linePlot, 59, 3);
             
             ShowAll ();
         }

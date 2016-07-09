@@ -46,12 +46,12 @@ namespace AquaPic.UserInterface
                 };
 
                 var label = new TouchLabel ();
+                label.SetSizeRequest (152, 16);
                 label.text = groupName;
-                label.WidthRequest = 112;
-                label.textSize = 9;
                 label.textColor = "grey3";
-                label.textAlignment = TouchAlignment.Center;
-                Put (label, 3, 65);
+                label.textAlignment = TouchAlignment.Right;
+                label.textHorizontallyCentered = true;
+                Put (label, 155, 63);
             }
 
             linePlot.eventColors.Add ("no probes", new TouchColor ("secb", 0.25));

@@ -10,7 +10,6 @@ namespace TouchWidgetLibrary
 {
     public class TouchLinePlot : EventBox
     {
-        string name;
         uint timerId;
         const int graphWidth = 240;
         
@@ -56,9 +55,7 @@ namespace TouchWidgetLibrary
         public TouchLinePlot () {
             Visible = true;
             VisibleWindow = false;
-            SetSizeRequest (graphWidth + 8, 76);
-
-            name = "Unlinked";
+            SetSizeRequest (graphWidth + 8, 60);
 
             _pointSpacing = TouchLinePlotPointPixelDifference.One;
             _dataPoints = new CircularBuffer<LogEntry> (maxDataPoints);
@@ -89,7 +86,7 @@ namespace TouchWidgetLibrary
                 int width = Allocation.Width;
                 var now = DateTime.Now;
 
-                cr.Rectangle (left + 8, top, graphWidth, height - 6);
+                cr.Rectangle (left + 8, top, graphWidth, height);
                 TouchColor.SetSource (cr, "grey3", 0.15f);
                 cr.Fill ();
 
@@ -109,7 +106,7 @@ namespace TouchWidgetLibrary
 
                     TouchColor.SetSource (cr, "pri");
 
-                    var y = valueBuffer[0].value.Map (min, max, bottom - 10, top + 4);
+                    var y = valueBuffer[0].value.Map (min, max, bottom - 4, top + 4);
                     double x = left + 8;
                     var pointDifference = now.Subtract (valueBuffer[0].dateTime).TotalSeconds / (double)PointTimeDifferenceToSeconds ();
                     if (pointDifference > 2) {
@@ -118,7 +115,7 @@ namespace TouchWidgetLibrary
                     cr.MoveTo (x, y);
 
                     for (int i = 1; i < valueBuffer.Length; ++i) {
-                        y = valueBuffer[i].value.Map (min, max, bottom - 10, top + 4);
+                        y = valueBuffer[i].value.Map (min, max, bottom - 4, top + 4);
                         x = left + 8;
                         
                         pointDifference = now.Subtract (valueBuffer[i].dateTime).TotalSeconds / (double)PointTimeDifferenceToSeconds ();
@@ -155,7 +152,7 @@ namespace TouchWidgetLibrary
                     textRender.Render (this, left - 9, top - 2, 16);
 
                     textRender.text = Math.Floor (min).ToString ();
-                    textRender.Render (this, left - 9, bottom - 22, 16);
+                    textRender.Render (this, left - 9, bottom - 16, 16);
                 }
 
                 //Event points
@@ -169,7 +166,7 @@ namespace TouchWidgetLibrary
                             break;
                         }
 
-                        cr.Rectangle (x, top, (int)_pointSpacing, height - 6);
+                        cr.Rectangle (x, top, (int)_pointSpacing, height);
 
                         if (eventColors.ContainsKey (eventBuffer[i].eventType)) {
                             eventColors[eventBuffer[i].eventType].SetSource (cr);
@@ -187,9 +184,7 @@ namespace TouchWidgetLibrary
 
         }
 
-        public void LinkDataLogger (DataLogger logger) {
-            name = logger.name;
-            
+        public void LinkDataLogger (DataLogger logger) {          
             var endSearchTime = DateTime.Now.Subtract (new TimeSpan (0, 0, maxDataPoints * PointTimeDifferenceToSeconds ()));
             
             logger.ValueLogEntryAddedEvent += OnValueLogEntryAdded;
