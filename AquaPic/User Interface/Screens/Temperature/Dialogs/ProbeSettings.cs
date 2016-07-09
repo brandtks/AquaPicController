@@ -13,20 +13,28 @@ namespace AquaPic.UserInterface
 {
     public class ProbeSettings : TouchSettingsDialog
     {
-        int probeIndex;
+        string probeName;
+        public string newOrUpdatedProbeName {
+            get {
+                return probeName;
+            }
+        }
 
-        public ProbeSettings (string name, int probeIdx, bool includeDelete) : base (name, includeDelete) {
-            this.probeIndex = probeIdx;
+        public ProbeSettings (string probeName, bool includeDelete)
+            : base (probeName, includeDelete) 
+        {
+            this.probeName = probeName;
             
             SaveEvent += OnSave;
             DeleteButtonEvent += OnDelete;
 
             var t = new SettingTextBox ();
             t.text = "Name";
-            if (probeIndex != -1)
-                t.textBox.text = Temperature.GetTemperatureProbeName (probeIndex);
-            else
+            if (this.probeName.IsNotEmpty ()) {
+                t.textBox.text = this.probeName;
+            } else {
                 t.textBox.text = "Enter name";
+            }
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
@@ -39,8 +47,8 @@ namespace AquaPic.UserInterface
 
             var c = new SettingComboBox ();
             c.label.text = "Input Channel";
-            if (this.probeIndex != -1) {
-                IndividualControl ic = Temperature.GetTemperatureProbeIndividualControl (probeIndex);
+            if (this.probeName.IsNotEmpty ()) {
+                IndividualControl ic = Temperature.GetTemperatureProbeIndividualControl (this.probeName);
                 string cardName = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
                 c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
                 c.combo.active = 0;
@@ -54,8 +62,8 @@ namespace AquaPic.UserInterface
             c.label.text = "Temperature Group";
             c.combo.comboList.AddRange (Temperature.GetAllTemperatureGroupNames ());
             c.combo.nonActiveMessage = "Select group";
-            if (probeIndex != -1) {
-                c.combo.activeText = Temperature.GetTemperatureProbeTemperatureGroupName (probeIndex);
+            if (this.probeName.IsNotEmpty ()) {
+                c.combo.activeText = Temperature.GetTemperatureProbeTemperatureGroupName (this.probeName);
             }
             AddSetting (c);
 
@@ -81,8 +89,8 @@ namespace AquaPic.UserInterface
             string json = File.ReadAllText (path);
             JObject jo = (JObject)JToken.Parse (json);
 
-            if (probeIndex == -1) {
-                if (((SettingComboBox)settings["Input Channel"]).combo.active == -1) {
+            if (probeName.IsEmpty ()) {
+                if ((settings["Input Channel"] as SettingComboBox).combo.active == -1) {
                     MessageBox.Show ("Please select an channel");
                     return false;
                 }
@@ -110,11 +118,9 @@ namespace AquaPic.UserInterface
                     4095.0f,
                     temperatureGroupName);
 
-                probeIndex = Temperature.GetTemperatureProbeIndex (name);
-
                 JObject jobj = new JObject ();
 
-                jobj.Add (new JProperty ("name", Temperature.GetTemperatureProbeName (probeIndex)));
+                jobj.Add (new JProperty ("name", name));
                 jobj.Add (new JProperty ("inputCard", AquaPicDrivers.AnalogInput.GetCardName (ic.Group)));
                 jobj.Add (new JProperty ("channel", ic.Individual.ToString ()));
                 jobj.Add (new JProperty ("zeroCalibrationActual", "32.0"));
@@ -123,29 +129,32 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("fullScaleCalibrationValue", "4095.0"));
                 jobj.Add (new JProperty ("temperatureGroup", temperatureGroupName));
 
-                ((JArray)jo["temperatureProbes"]).Add (jobj);
+                (jo["temperatureProbes"] as JArray).Add (jobj);
+
+                probeName = name;
             } else {
                 if ((settings["Temperature Group"] as SettingComboBox).combo.active == -1) {
                     MessageBox.Show ("Please select an temperature group");
                     return false;
                 }
-                
-                var oldName = Temperature.GetTemperatureProbeName (probeIndex);
-                if (oldName != name) {
-                    Temperature.SetTemperatureProbeName (probeIndex, name);
+
+                var oldName = probeName;
+                if (probeName != name) {
+                    Temperature.SetTemperatureProbeName (probeName, name);
+                    probeName = name;
                 }
 
                 IndividualControl ic = IndividualControl.Empty;
                 if (!unparseProbeChannelString.StartsWith ("Current:")) {
                     ParseChannnel (unparseProbeChannelString, ref ic.Group, ref ic.Individual);
-                    Temperature.SetTemperatureProbeIndividualControl (probeIndex, ic);
+                    Temperature.SetTemperatureProbeIndividualControl (probeName, ic);
                 } else {
-                    ic = Temperature.GetTemperatureProbeIndividualControl (probeIndex);
+                    ic = Temperature.GetTemperatureProbeIndividualControl (probeName);
                 }
 
-                string oldTemperatureGroup = Temperature.GetTemperatureProbeTemperatureGroupName (probeIndex);
+                string oldTemperatureGroup = Temperature.GetTemperatureProbeTemperatureGroupName (probeName);
                 if (oldTemperatureGroup != temperatureGroupName) {
-                    Temperature.SetTemperatureProbeTemperatureGroupName (probeIndex, temperatureGroupName);
+                    Temperature.SetTemperatureProbeTemperatureGroupName (probeName, temperatureGroupName);
                 }
 
                 JArray ja = jo["temperatureProbes"] as JArray;
@@ -176,8 +185,6 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            string name = Temperature.GetTemperatureProbeName (probeIndex);
-
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
@@ -190,7 +197,7 @@ namespace AquaPic.UserInterface
             int arrIdx = -1;
             for (int i = 0; i < ja.Count; ++i) {
                 string n = (string)ja [i] ["name"];
-                if (name == n) {
+                if (probeName == n) {
                     arrIdx = i;
                     break;
                 }
@@ -205,7 +212,7 @@ namespace AquaPic.UserInterface
 
             File.WriteAllText (path, jo.ToString ());
 
-            Temperature.RemoveTemperatureProbe (probeIndex);
+            Temperature.RemoveTemperatureProbe (probeName);
 
             return true;
         }

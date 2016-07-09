@@ -75,10 +75,10 @@ namespace TouchWidgetLibrary
                 else // center
                     l.Alignment = Pango.Alignment.Center;
 
-                string displayedText = text;
+                string displayedText = t;
                 if ((l.LineCount > 1) && (textWrap == TouchTextWrap.None)) {
                     Pango.LayoutLine[] ll = l.Lines;
-                    displayedText = text.Substring (0, ll [1].StartIndex - 1);
+                    displayedText = t.Substring (0, ll [1].StartIndex - 1);
                     int lastSpace = displayedText.LastIndexOf (' ');
                     if (lastSpace != -1)
                         displayedText = displayedText.Substring (0, lastSpace);

@@ -20,7 +20,7 @@ namespace AquaPic.UserInterface
         TouchLabel heaterLabel;
         TouchComboBox heaterCombo;
 
-        int probeId;
+        string probeName;
         TouchLabel probeTempTextbox;
         TouchComboBox probeCombo;
         
@@ -203,10 +203,7 @@ namespace AquaPic.UserInterface
             /******************************************************************************************************/
             /* Temperature Probes                                                                                 */
             /******************************************************************************************************/
-            if (Temperature.temperatureProbeCount == 0)
-                probeId = -1;
-            else
-                probeId = 0;
+            probeName = Temperature.GetFirstTemperatureProbe ();
 
             label = new TouchLabel ();
             label.text = "Probes";
@@ -219,49 +216,27 @@ namespace AquaPic.UserInterface
             probeSetupBtn.text = "Probe Setup";
             probeSetupBtn.SetSizeRequest (100, 60);
             probeSetupBtn.ButtonReleaseEvent += (o, args) => {
-                if (probeId != -1) {
-                    string name = Temperature.GetTemperatureProbeName (probeId);
-                    var s = new ProbeSettings (name, probeId, true);
-                    s.Run ();
-                    s.Destroy ();
+                var s = new ProbeSettings (probeName, probeName.IsNotEmpty ());
+                s.Run ();
+                var newProbeName = s.newOrUpdatedProbeName;
+                s.Destroy ();
 
-                    try {
-                        Temperature.GetTemperatureProbeIndex (name);
-                    } catch (ArgumentException) {
-                        probeCombo.comboList.Remove (name);
-                        if (Temperature.temperatureProbeCount != 0) {
-                            probeId = 0;
-                            probeCombo.active = probeId;
-                        } else {
-                            probeId = -1;
-                            probeCombo.active = 0;
-                        }
-
-                        GetProbeData ();
-                    }
-                } else {
-                    int probeCount = Temperature.temperatureProbeCount;
-
-                    var s = new ProbeSettings ("New probe", -1, false);
-                    s.Run ();
-                    s.Destroy ();
-
-                    if (Temperature.temperatureProbeCount > probeCount) {
-                        probeId = Temperature.temperatureProbeCount - 1;
-                        int listIdx = probeCombo.comboList.IndexOf ("New probe...");
-                        probeCombo.comboList.Insert (listIdx, Temperature.GetTemperatureProbeName (probeId));
-                        probeCombo.active = listIdx;
-                        probeCombo.QueueDraw ();
-                        GetProbeData ();
-                    } else {
-                        if (probeId != -1)
-                            probeCombo.active = probeId;
-                        else
-                            probeCombo.active = 0;
-                    }
+                if ((newProbeName != probeName) && probeName.IsNotEmpty ()) { // The probe name was changed
+                    var index = probeCombo.comboList.IndexOf (probeName);
+                    probeCombo.comboList[index] = newProbeName;
+                    probeName = newProbeName;
+                } else if (Temperature.CheckTemperatureProbeKeyNoThrow (newProbeName)) { // A new group was added
+                    probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
+                    probeCombo.activeText = newProbeName;
+                    probeName = newProbeName;
+                } else if (!Temperature.CheckTemperatureProbeKeyNoThrow (probeName)) { // The group was deleted
+                    probeCombo.comboList.Remove (probeName);
+                    probeName = Temperature.GetFirstTemperatureProbe ();
+                    probeCombo.activeText = probeName;
                 }
 
                 probeCombo.QueueDraw ();
+                GetProbeData ();
             };
             Put (probeSetupBtn, 415, 405);
             probeSetupBtn.Show ();
@@ -300,8 +275,8 @@ namespace AquaPic.UserInterface
             Put (probeCombo, 550, 277);
             probeCombo.Show ();
 
-            if (probeId != -1)
-                probeCombo.active = probeId;
+            if (probeName.IsNotEmpty ())
+                probeCombo.activeText = probeName;
             else
                 probeCombo.active = 0;
 
@@ -312,7 +287,7 @@ namespace AquaPic.UserInterface
             Put (groupCombo, 153, 77);
             groupCombo.Show ();
 
-            if (!groupName.IsEmpty ()) {
+            if (groupName.IsNotEmpty ()) {
                 groupCombo.activeText = groupName;
             } else {
                 groupCombo.active = 0;
@@ -379,29 +354,21 @@ namespace AquaPic.UserInterface
 
         protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.ActiveText == "New probe...") {
-                int probeCount = Temperature.temperatureProbeCount;
-
-                var s = new ProbeSettings ("New probe", -1, false);
+                var s = new ProbeSettings (string.Empty, false);
                 s.Run ();
+                var newProbeName = s.newOrUpdatedProbeName;
                 s.Destroy ();
 
-                if (Temperature.temperatureProbeCount > probeCount) {
-                    probeId = Temperature.temperatureProbeCount - 1;
-                    int listIdx = probeCombo.comboList.IndexOf ("New probe...");
-                    probeCombo.comboList.Insert (listIdx, Temperature.GetTemperatureProbeName (probeId));
-                    probeCombo.active = listIdx;
-                    probeCombo.QueueDraw ();
-                    GetProbeData ();
-                } else {
-                    if (probeId != -1)
-                        probeCombo.active = probeId;
-                    else
-                        probeCombo.active = 0;
+                if (Temperature.CheckTemperatureProbeKeyNoThrow (newProbeName)) {
+                    probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
+                    probeCombo.activeText = newProbeName;
+                    probeName = newProbeName;
                 }
             } else {
-                probeId = Temperature.GetTemperatureProbeIndex (e.ActiveText);
+                probeName = e.ActiveText;
             }
 
+            probeCombo.QueueDraw ();
             GetProbeData ();
         }
 
@@ -413,9 +380,9 @@ namespace AquaPic.UserInterface
                 s.Destroy ();
 
                 if (Temperature.CheckTemperatureGroupKeyNoThrow (newGroupName)) {
+                    groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, newGroupName);
+                    groupCombo.activeText = newGroupName;
                     groupName = newGroupName;
-                    groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, groupName);
-                    groupCombo.activeText = groupName;
                 }
             } else {
                 groupName = e.ActiveText;
@@ -443,9 +410,9 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetProbeData () {
-            if (probeId != -1) {
-                if (Temperature.IsTemperatureProbeConnected (probeId)) {
-                    probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeId).ToString ("F2");
+            if (probeName.IsNotEmpty ()) {
+                if (Temperature.IsTemperatureProbeConnected (probeName)) {
+                    probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeName).ToString ("F2");
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
                 } else {
                     probeTempTextbox.text = "Probe disconnected";

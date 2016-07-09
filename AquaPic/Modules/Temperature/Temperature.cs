@@ -13,7 +13,7 @@ namespace AquaPic.Modules
     public partial class Temperature
     {
         private static List<Heater> heaters;
-        private static List<TemperatureProbe> probes;
+        private static Dictionary<string,TemperatureProbe> probes;
         private static Dictionary<string,TemperatureGroup> temperatureGroups;
         private static string _defaultTemperatureGroup;
 
@@ -125,7 +125,7 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         static Temperature () {
             heaters = new List<Heater> ();
-            probes = new List<TemperatureProbe> ();
+            probes = new Dictionary<string,TemperatureProbe> ();
             temperatureGroups = new Dictionary<string,TemperatureGroup> ();
 
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
@@ -250,7 +250,7 @@ namespace AquaPic.Modules
                 group.Run ();
             }
 
-            foreach (var probe in probes) {
+            foreach (var probe in probes.Values) {
                 if (!CheckTemperatureGroupKeyNoThrow (probe.temperatureGroupName)) {
                     probe.GetTemperature ();
                 }
@@ -474,12 +474,6 @@ namespace AquaPic.Modules
             return heaters[heaterIndex].temperatureGroupName;
         }
 
-        /***Temperature group index***/
-        //public static int GetHeaterTemperatureGroupIndex (int heaterIndex) {
-        //    CheckHeaterRange (heaterIndex);
-        //    return GetTemperatureGroupIndexNoThrow (heaters[heaterIndex].temperatureGroupName);
-        //}
-
         /***Setters****************************************************************************************************/
         /***Name***/
         public static void SetHeaterName (int heaterIndex, string name) {
@@ -521,122 +515,117 @@ namespace AquaPic.Modules
             float fullScaleValue, 
             string temperatureGroupName
         ) {
-            if (TemperatureProbeNameOk (name)) {
-                probes.Add (
-                    new TemperatureProbe (
-                        name, 
-                        cardID, 
-                        channelID, 
-                        zeroActual, 
-                        zeroValue, 
-                        fullScaleActual, 
-                        fullScaleValue,
-                        temperatureGroupName));
-            } else {
+            if (!TemperatureProbeNameOk (name)) {
                 throw new Exception (string.Format ("Probe: {0} already exists", name));
             }
+
+            probes[name] = new TemperatureProbe (
+                name, 
+                cardID, 
+                channelID, 
+                zeroActual, 
+                zeroValue, 
+                fullScaleActual, 
+                fullScaleValue,
+                temperatureGroupName);
         }
 
-        public static void RemoveTemperatureProbe (int probeId) {
-            if ((probeId >= 0) && (probeId < probes.Count)) {
-                TemperatureProbe p = probes[probeId];
-                AquaPicDrivers.AnalogInput.RemoveChannel (p.channel);
-                probes.Remove (p);
-            } else {
-                throw new ArgumentOutOfRangeException ("probeId");
+        public static void RemoveTemperatureProbe (string probeName) {
+            CheckTemperatureProbeKey (probeName);
+            AquaPicDrivers.AnalogInput.RemoveChannel (probes[probeName].channel);
+            probes.Remove (probeName);
+        }
+
+        public static void CheckTemperatureProbeKey (string probeName) {
+            if (!probes.ContainsKey (probeName)) {
+                throw new ArgumentException ("name");
             }
         }
 
-        public static bool TemperatureProbeNameOk (string name) {
+        public static bool CheckTemperatureProbeKeyNoThrow (string probeName) {
             try {
-                GetTemperatureProbeIndex (name);
-                return false;
-            } catch {
+                CheckTemperatureProbeKey (probeName);
                 return true;
+            } catch {
+                return false;
             }
         }
 
-        protected static void CheckTemperatureProbeRange (int probeIndex) {
-            if ((probeIndex < 0) || (probeIndex >= probes.Count)) {
-                throw new ArgumentOutOfRangeException ("probeIndex");
-            }
+        public static bool TemperatureProbeNameOk (string probeName) {
+            return !CheckTemperatureProbeKeyNoThrow (probeName);
         }
 
-        public static string[] GetAllTemperatureProbeNames () {
-            string[] names = new string[probes.Count];
-            for (int i = 0; i < names.Length; ++i)
-                names [i] = probes [i].name;
-
-            return names;
-        }
-
-        public static string GetTemperatureProbeName (int probeIdx) {
-            if ((probeIdx >= 0) && (probeIdx < probes.Count))
-                return probes [probeIdx].name;
-
-            throw new ArgumentOutOfRangeException ("probeId");
-        }
-
-        public static void SetTemperatureProbeName (int probeId, string name) {
-            if ((probeId >= 0) && (probeId < probes.Count)) {
-                if (TemperatureProbeNameOk (name)) {
-                    probes [probeId].name = name;
-                    return;
-                } else
-                    throw new Exception (string.Format ("Probe: {0} already exists", name));
-            }
-
-            throw new ArgumentOutOfRangeException ("probeId");
-        }
-
-        public static int GetTemperatureProbeIndex (string name) {
-            for (int i = 0; i < probes.Count; ++i) {
-                if (string.Equals (name, probes [i].name, StringComparison.InvariantCultureIgnoreCase))
-                    return i;
-            }
-
-            throw new ArgumentException (name + " does not exists");
-        }
-
-        public static IndividualControl GetTemperatureProbeIndividualControl (int probeId) {
-            if ((probeId >= 0) && (probeId < probes.Count))
-                return probes [probeId].channel;
-
-            throw new ArgumentOutOfRangeException ("probeId");
-        }
-
-        public static void SetTemperatureProbeIndividualControl (int probeId, IndividualControl ic) {
-            if ((probeId >= 0) && (probeId < probes.Count)) {
-                AquaPicDrivers.AnalogInput.RemoveChannel (probes [probeId].channel);
-                probes [probeId].channel = ic;
-                AquaPicDrivers.AnalogInput.AddChannel (probes [probeId].channel, probes [probeId].name);
-            }
-        }
-
-        public static float GetTemperatureProbeTemperature (int probeId) {
-            if ((probeId >= 0) && (probeId < probes.Count))
-                return probes [probeId].temperature;
-
-            throw new ArgumentOutOfRangeException ("probeId");
-        }
-
-        public static string GetTemperatureProbeTemperatureGroupName (int probeIndex) {
-            CheckTemperatureProbeRange (probeIndex);
-            return probes[probeIndex].temperatureGroupName;
-        }
-
-        public static void SetTemperatureProbeTemperatureGroupName (int probeIndex, string temperatureGroupName) {
-            CheckTemperatureProbeRange (probeIndex);
-            probes[probeIndex].temperatureGroupName = temperatureGroupName;
-        }
-
-        public static bool IsTemperatureProbeConnected (int probeIndex) {
-            CheckTemperatureProbeRange (probeIndex);
-            if (probes[probeIndex].temperature < probes[probeIndex].zeroActual) {
+        public static bool IsTemperatureProbeConnected (string probeName) {
+            CheckTemperatureProbeKey (probeName);
+            if (probes[probeName].temperature < probes[probeName].zeroActual) {
                 return false;
             } else {
                 return true;
             }
+        }
+
+        /***Getters****************************************************************************************************/
+        /***Names***/
+        public static string GetFirstTemperatureProbe () {
+            if (probes.Count > 0) {
+                var first = probes.First ();
+                return first.Key;
+            } else {
+                return string.Empty;
+            }
+        }
+
+        /***Names***/
+        public static string[] GetAllTemperatureProbeNames () {
+            List<string> names = new List<string> ();
+            foreach (var group in probes.Values) {
+                names.Add (group.name);
+            }
+            return names.ToArray ();
+        }
+
+        public static float GetTemperatureProbeTemperature (string probeName) {
+            CheckTemperatureProbeKey (probeName);
+            return probes[probeName].temperature;
+        }
+
+        /***Individual Control***/
+        public static IndividualControl GetTemperatureProbeIndividualControl (string probeName) {
+            CheckTemperatureProbeKey (probeName);
+            return probes[probeName].channel;
+        }
+
+        public static string GetTemperatureProbeTemperatureGroupName (string probeName) {
+            CheckTemperatureProbeKey (probeName);
+            return probes[probeName].temperatureGroupName;
+        }
+
+        /***Setters****************************************************************************************************/
+        /***Name***/
+        public static void SetTemperatureProbeName (string oldProbeName, string newProbeName) {
+            CheckTemperatureProbeKey (oldProbeName);
+            if (!TemperatureProbeNameOk (newProbeName)) {
+                throw new Exception (string.Format ("Probe: {0} already exists", newProbeName));
+            }
+
+            var probe = probes[oldProbeName];
+            probe.name = newProbeName;
+            probes.Remove (oldProbeName);
+            probes[newProbeName] = probe;
+        }
+
+        /***Individual Control***/
+        public static void SetTemperatureProbeIndividualControl (string probeName, IndividualControl ic) {
+            CheckTemperatureProbeKey (probeName);
+            AquaPicDrivers.AnalogInput.RemoveChannel (probes[probeName].channel);
+            probes[probeName].channel = ic;
+            AquaPicDrivers.AnalogInput.AddChannel (probes[probeName].channel, probes[probeName].name);
+        }
+
+        /***Temperature group***/
+        public static void SetTemperatureProbeTemperatureGroupName (string probeName, string temperatureGroupName) {
+            CheckTemperatureProbeKey (probeName);
+            probes[probeName].temperatureGroupName = temperatureGroupName;
         }
     }
 }

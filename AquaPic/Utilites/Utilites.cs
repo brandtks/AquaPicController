@@ -63,6 +63,10 @@ namespace AquaPic.Utilites
             return string.IsNullOrWhiteSpace (value);
         }
 
+        public static bool IsNotEmpty (this string value) {
+            return !value.IsEmpty ();
+        }
+
         public static string RemoveWhitespace (this string value) {
             return new string (value.ToCharArray ()
                 .Where (c => !Char.IsWhiteSpace (c))

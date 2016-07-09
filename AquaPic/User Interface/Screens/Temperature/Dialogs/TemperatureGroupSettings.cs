@@ -29,7 +29,7 @@ namespace AquaPic.UserInterface
 
             var t = new SettingTextBox ();
             t.text = "Name";
-            if (!string.IsNullOrWhiteSpace (groupName)) {
+            if (groupName.IsNotEmpty ()) {
                 t.textBox.text = groupName;
                 t.textBox.enableTouch = false;
                 t.textBox.TextChangedEvent += (sender, args) => {
@@ -51,7 +51,7 @@ namespace AquaPic.UserInterface
 
             t = new SettingTextBox ();
             t.text = "Setpoint";
-            if (!string.IsNullOrWhiteSpace (groupName)) {
+            if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupTemperatureSetpoint (groupName).ToString ();
             } else {
                 t.textBox.text = "0.0";
@@ -68,7 +68,7 @@ namespace AquaPic.UserInterface
 
             t = new SettingTextBox ();
             t.text = "Deadband";
-            if (!string.IsNullOrWhiteSpace (groupName)) {
+            if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupTemperatureDeadband (groupName).ToString ();
             } else {
                 t.textBox.text = "0.5";
@@ -85,7 +85,7 @@ namespace AquaPic.UserInterface
 
             t = new SettingTextBox ();
             t.text = "High Alarm";
-            if (!string.IsNullOrWhiteSpace (groupName)) {
+            if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupHighTemperatureAlarmSetpoint (groupName).ToString ();
             } else {
                 t.textBox.text = "100.0";
@@ -102,7 +102,7 @@ namespace AquaPic.UserInterface
 
             t = new SettingTextBox ();
             t.text = "Low Alarm";
-            if (!string.IsNullOrWhiteSpace (groupName)) {
+            if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupLowTemperatureAlarmSetpoint (groupName).ToString ();
             } else {
                 t.textBox.text = "0.0";
@@ -128,7 +128,7 @@ namespace AquaPic.UserInterface
             string json = File.ReadAllText (path);
             JObject jo = (JObject)JToken.Parse (json);
 
-            if (string.IsNullOrWhiteSpace (groupName)) {
+            if (groupName.IsEmpty ()) {
                 var name = (settings["Name"] as SettingTextBox).textBox.text;
                 if (name == "Enter name") {
                     MessageBox.Show ("Invalid heater name");

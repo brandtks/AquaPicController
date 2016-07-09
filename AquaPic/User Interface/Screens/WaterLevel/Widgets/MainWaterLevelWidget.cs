@@ -10,6 +10,8 @@ namespace AquaPic.UserInterface
 {
     public class WaterLevelLinePlot : LinePlotWidget
     {
+        TouchLabel label;
+        
         public WaterLevelLinePlot (params object[] options) 
             : base () 
         {
@@ -25,6 +27,13 @@ namespace AquaPic.UserInterface
             };
             Put (eventbox, 0, 0);
             eventbox.Show ();
+
+            label = new TouchLabel ();
+            label.SetSizeRequest (152, 16);
+            label.textColor = "compl";
+            label.textAlignment = TouchAlignment.Right;
+            label.textHorizontallyCentered = true;
+            Put (label, 155, 63);
 
             linePlot.rangeMargin = 1;
             linePlot.LinkDataLogger (WaterLevel.dataLogger);
@@ -60,24 +69,17 @@ namespace AquaPic.UserInterface
         public override void OnUpdate () {
             if (WaterLevel.analogSensorEnabled) {
                 if (WaterLevel.analogWaterLevel < 0.0f) {
-                    unitOfMeasurement = UnitsOfMeasurement.None;
-                    textBox.WidthRequest = 306;
-                    textBox.textAlignment = TouchAlignment.Left;
-                    textBox.textColor = "compl";
-                    textBox.text = "Disconnected";
+                    textBox.text = "--";
+                    label.Visible = true;
+                    label.text = "Disconnected";
                 } else {
-                    unitOfMeasurement = UnitsOfMeasurement.Inches;
-                    textBox.WidthRequest = 57;
-                    textBox.textAlignment = TouchAlignment.Center;
-                    textBox.textColor = "pri";
                     currentValue = WaterLevel.analogWaterLevel;
+                    label.Visible = false;
                 }
             } else {
-                unitOfMeasurement = UnitsOfMeasurement.None;
-                textBox.WidthRequest = 306;
-                textBox.textAlignment = TouchAlignment.Left;
-                textBox.textColor = "compl";
-                textBox.text = "Disabled";
+                textBox.text = "--";
+                label.Visible = true;
+                label.text = "Disabled";
             }
         }
     }

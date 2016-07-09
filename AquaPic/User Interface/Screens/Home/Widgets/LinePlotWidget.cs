@@ -81,6 +81,7 @@ namespace AquaPic.UserInterface
             textBox.textColor = "pri";
             textBox.textAlignment = TouchAlignment.Center;
             textBox.textHorizontallyCentered = true;
+            textBox.textRender.textWrap = TouchTextWrap.Shrink;
             Put (textBox, 1, 3);
             
             ShowAll ();
