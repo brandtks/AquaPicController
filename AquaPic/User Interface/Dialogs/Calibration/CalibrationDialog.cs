@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using Cairo;
 using Gtk;
 using TouchWidgetLibrary;
+using AquaPic.Utilites;
 
 namespace AquaPic.UserInterface
 {
     public class CalibrationArguments {
+        public double zeroActual;
         public double zeroValue;
         public double fullScaleActual;
         public double fullScaleValue;
 
         public CalibrationArguments () {
-            this.zeroValue = 0;
-            this.fullScaleActual = 0;
-            this.fullScaleValue = 0;
+            zeroActual = 0;
+            zeroValue = 0;
+            fullScaleActual = 0;
+            fullScaleValue = 0;
         }
     }
 
@@ -22,6 +25,7 @@ namespace AquaPic.UserInterface
     public delegate double GetCalibrationValueHandler ();
 
     public enum CalibrationState {
+        ZeroActual,
         ZeroValue,
         FullScaleActual,
         FullScaleValue
@@ -38,6 +42,7 @@ namespace AquaPic.UserInterface
 
         protected Fixed fix;
 
+        public string zeroActualInstructions;
         public string zeroValueInstructions;
         public string fullScaleActualInstructions;
         public string fullScaleValueInstructions;
@@ -47,7 +52,11 @@ namespace AquaPic.UserInterface
 
         public CalibrationArguments calArgs;
 
-        public CalibrationDialog (string name, GetCalibrationValueHandler GetCalibrationValue) {
+        public CalibrationDialog (
+            string name, 
+            GetCalibrationValueHandler GetCalibrationValue, 
+            CalibrationState startingState = CalibrationState.ZeroValue
+        ) {
             Name = "AquaPic.Calibration." + name;
             Title = name + " Calibration";
             WindowPosition = (Gtk.WindowPosition)4;
@@ -77,30 +86,14 @@ namespace AquaPic.UserInterface
                 w.Dispose ();
             }
 
-            ExposeEvent += (sender, e) => {
-                if (!init) {
-                    TextBuffer tb = tv.Buffer;
-                    if (!string.IsNullOrWhiteSpace (zeroValueInstructions))
-                        tb.Text = zeroValueInstructions;
-                    else
-                        tb.Text = "Please the instrument in its zero state.\n" +
-                            "Once value has settled, press the button.\n\n";
-
-                    var tag = new TextTag (null);
-                    tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
-                    tb.TagTable.Add (tag);
-
-                    var ti = tb.EndIter;
-                    tb.InsertWithTags (ref ti, string.Format ("Previous zero actual: {0:F2}", calArgs.zeroValue), tag);
-
-                    tv.QueueDraw ();
-
-                    init = true;
-                }
-            };
+            ExposeEvent += OnExpose;
 
             this.GetCalibrationValue = GetCalibrationValue;
-            calState = CalibrationState.ZeroValue;
+            if ((startingState == CalibrationState.ZeroActual) || (startingState == CalibrationState.ZeroValue)) {
+                calState = startingState;
+            } else {
+                calState = CalibrationState.ZeroValue;
+            }
             calArgs = new CalibrationArguments ();
             forced = false;
             init = false;
@@ -132,13 +125,23 @@ namespace AquaPic.UserInterface
             valTb = new TouchTextBox ();
             valTb.SetSizeRequest (110, 30);
             valTb.textAlignment = TouchAlignment.Center;
-            valTb.text = GetCalibrationValue ().ToString ("F2");
+            if (calState == CalibrationState.ZeroActual) {
+                valTb.text = "Actual";
+                valTb.enableTouch = true;
+                valTb.TextChangedEvent += OnValueTextBoxTextChanged;
+            } else {
+                valTb.text = GetCalibrationValue ().ToString ("F2");
+            }
             fix.Put (valTb, 10, 260);
             valTb.Show ();
 
             actionBtn = new TouchButton ();
             actionBtn.SetSizeRequest (150, 30);
-            actionBtn.text = "Zero";
+            if (calState == CalibrationState.ZeroActual) {
+                actionBtn.text = "Zero Actual";
+            } else {
+                actionBtn.text = "Zero Value";
+            }
             actionBtn.ButtonReleaseEvent += OnActionButtonReleaseEvent;
             fix.Put (actionBtn, 440, 260);
             actionBtn.Show ();
@@ -186,7 +189,7 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnUpdateTimer () {
-            if ((calState != CalibrationState.FullScaleActual) && (!forced)) {
+            if ((calState != CalibrationState.ZeroActual) && (calState != CalibrationState.FullScaleActual) && (!forced)) {
                 valTb.text = GetCalibrationValue ().ToString ("F2");
                 valTb.QueueDraw ();
             }
@@ -194,38 +197,85 @@ namespace AquaPic.UserInterface
             return true;
         }
 
+        protected void OnExpose (object sender, ExposeEventArgs args) {
+            if (!init) {
+                if (calState == CalibrationState.ZeroActual) {
+                    TextBuffer tb = tv.Buffer;
+                    if (zeroActualInstructions.IsNotEmpty ()) {
+                        tb.Text = zeroValueInstructions;
+                    } else {
+                        tb.Text = "Please enter the zero actual value.\n" +
+                            "Once the zero actual value is entered press the button.\n\n";
+                    }
+
+                    var tag = new TextTag (null);
+                    tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
+                    tb.TagTable.Add (tag);
+
+                    var ti = tb.EndIter;
+                    tb.InsertWithTags (ref ti, string.Format ("Previous zero actual: {0:F2}", calArgs.zeroActual), tag);
+                } else if (calState == CalibrationState.ZeroValue) {
+                    TextBuffer tb = tv.Buffer;
+                    if (!string.IsNullOrWhiteSpace (zeroValueInstructions))
+                        tb.Text = zeroValueInstructions;
+                    else
+                        tb.Text = "Place the instrument in its zero state.\n" +
+                            "Once value has settled, press the button.\n\n";
+
+                    var tag = new TextTag (null);
+                    tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
+                    tb.TagTable.Add (tag);
+
+                    var ti = tb.EndIter;
+                    tb.InsertWithTags (ref ti, string.Format ("Previous zero value: {0:F2}", calArgs.zeroValue), tag);
+                }
+
+                tv.QueueDraw ();
+                init = true;
+            }
+        }
+
         protected void OnActionButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
             switch (calState) {
-            case CalibrationState.ZeroValue:
-                if (!forced)
-                    calArgs.zeroValue = GetCalibrationValue ();
-                else
-                    calArgs.zeroValue = Convert.ToDouble (valTb.text);
+                case CalibrationState.ZeroActual:
+                    if (valTb.text == "Actual")
+                        MessageBox.Show ("Please enter the zero actual value");
+                    else {
+                        calArgs.zeroActual = Convert.ToDouble (valTb.text);
+                        MoveToNextState ();
+                    }
 
-                MoveToNextState ();
-                break;
-            case CalibrationState.FullScaleActual:
-                if (valTb.text == "Actual")
-                    MessageBox.Show ("Please enter the full scale actual value");
-                else {
-                    calArgs.fullScaleActual = Convert.ToDouble (valTb.text);
+                    break;
+                case CalibrationState.ZeroValue:
+                    if (!forced)
+                        calArgs.zeroValue = GetCalibrationValue ();
+                    else
+                        calArgs.zeroValue = Convert.ToDouble (valTb.text);
+
                     MoveToNextState ();
-                }
+                    break;
+                case CalibrationState.FullScaleActual:
+                    if (valTb.text == "Actual")
+                        MessageBox.Show ("Please enter the full scale actual value");
+                    else {
+                        calArgs.fullScaleActual = Convert.ToDouble (valTb.text);
+                        MoveToNextState ();
+                    }
                 
-                break;
-            case CalibrationState.FullScaleValue:
-                if (!forced)
-                    calArgs.fullScaleValue = GetCalibrationValue ();
-                else
-                    calArgs.fullScaleValue = Convert.ToDouble (valTb.text);
+                    break;
+                case CalibrationState.FullScaleValue:
+                    if (!forced)
+                        calArgs.fullScaleValue = GetCalibrationValue ();
+                    else
+                        calArgs.fullScaleValue = Convert.ToDouble (valTb.text);
 
-                if (CalibrationCompleteEvent != null)
-                    CalibrationCompleteEvent (calArgs);
+                    if (CalibrationCompleteEvent != null)
+                        CalibrationCompleteEvent (calArgs);
                 
-                Destroy ();
-                break;
-            default:
-                break;
+                    Destroy ();
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -239,73 +289,104 @@ namespace AquaPic.UserInterface
             TextIter ti;
 
             switch (calState) {
-            case CalibrationState.ZeroValue:
-                if (!forced) {
-                    valTb.enableTouch = true;
-                    valTb.TextChangedEvent += OnValueTextBoxTextChanged;
-                }
-                valTb.text = "Actual";
-                valTb.QueueDraw ();
+                case CalibrationState.ZeroActual:
+                    if (!forced) {
+                        valTb.enableTouch = false;
+                        valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
 
-                actionBtn.text = "Full Scale Actual";
-                actionBtn.QueueDraw ();
+                    }
+                    valTb.text = GetCalibrationValue ().ToString ("F2");
+                    valTb.QueueDraw ();
 
-                tb = tv.Buffer;
-                if (!string.IsNullOrWhiteSpace (fullScaleActualInstructions))
-                    tb.Text = fullScaleActualInstructions;
-                else
-                    tb.Text = "Please enter the full scale actual value.\n" +
-                        "Once the full scale value is entered press the button.\n\n";
+                    actionBtn.text = "Zero Value";
+                    actionBtn.QueueDraw ();
 
-                tag = new TextTag (null);
-                tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
-                tb.TagTable.Add (tag);
+                    tb = tv.Buffer;
+                    if (!string.IsNullOrWhiteSpace (zeroValueInstructions))
+                        tb.Text = zeroValueInstructions;
+                    else
+                        tb.Text = "Place the instrument in its zero state.\n" +
+                            "Once value has settled, press the button.\n\n";
 
-                ti = tb.EndIter;
-                tb.InsertWithTags (ref ti, string.Format ("Previous full scale actual: {0:F2}", calArgs.fullScaleActual), tag);
+                    tag = new TextTag (null);
+                    tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
+                    tb.TagTable.Add (tag);
 
-                tv.QueueDraw ();
+                    ti = tb.EndIter;
+                    tb.InsertWithTags (ref ti, string.Format ("Previous zero value: {0:F2}", calArgs.zeroValue), tag);
 
-                calState = CalibrationState.FullScaleActual;
-                break;
-            case CalibrationState.FullScaleActual:
-                if (!forced) {
-                    valTb.enableTouch = false;
-                    valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
+                    tv.QueueDraw ();
 
-                }
-                valTb.text = GetCalibrationValue ().ToString ("F2");
-                valTb.QueueDraw ();
+                    calState = CalibrationState.ZeroValue;
 
-                actionBtn.text = "Full Scale Value";
-                actionBtn.QueueDraw ();
+                    break;
+                case CalibrationState.ZeroValue:
+                    if (!forced) {
+                        valTb.enableTouch = true;
+                        valTb.TextChangedEvent += OnValueTextBoxTextChanged;
+                    }
+                    valTb.text = "Actual";
+                    valTb.QueueDraw ();
 
-                tb = tv.Buffer;
-                if (!string.IsNullOrWhiteSpace (fullScaleValueInstructions))
-                    tb.Text = fullScaleValueInstructions;
-                else
-                    tb.Text = "Please the instrument in its full scale state.\n" +
-                    "Once value has settled, press the button.\n\n";
+                    actionBtn.text = "Full Scale Actual";
+                    actionBtn.QueueDraw ();
 
-                tag = new TextTag (null);
-                tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
-                tb.TagTable.Add (tag);
+                    tb = tv.Buffer;
+                    if (!string.IsNullOrWhiteSpace (fullScaleActualInstructions))
+                        tb.Text = fullScaleActualInstructions;
+                    else
+                        tb.Text = "Please enter the full scale actual value.\n" +
+                            "Once the full scale value is entered press the button.\n\n";
 
-                ti = tb.EndIter;
-                tb.InsertWithTags (ref ti, string.Format ("Previous full scale value: {0:F2}", calArgs.fullScaleValue), tag);
+                    tag = new TextTag (null);
+                    tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
+                    tb.TagTable.Add (tag);
 
-                tv.QueueDraw ();
+                    ti = tb.EndIter;
+                    tb.InsertWithTags (ref ti, string.Format ("Previous full scale actual: {0:F2}", calArgs.fullScaleActual), tag);
 
-                calState = CalibrationState.FullScaleValue;
-                break;
-            case CalibrationState.FullScaleValue:
-                if (CalibrationCompleteEvent != null)
-                    CalibrationCompleteEvent (calArgs);
+                    tv.QueueDraw ();
 
-                Destroy ();
-                break;
-            default:
-                break;
+                    calState = CalibrationState.FullScaleActual;
+                    break;
+                case CalibrationState.FullScaleActual:
+                    if (!forced) {
+                        valTb.enableTouch = false;
+                        valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
+
+                    }
+                    valTb.text = GetCalibrationValue ().ToString ("F2");
+                    valTb.QueueDraw ();
+
+                    actionBtn.text = "Full Scale Value";
+                    actionBtn.QueueDraw ();
+
+                    tb = tv.Buffer;
+                    if (!string.IsNullOrWhiteSpace (fullScaleValueInstructions))
+                        tb.Text = fullScaleValueInstructions;
+                    else
+                        tb.Text = "Please the instrument in its full scale state.\n" +
+                        "Once value has settled, press the button.\n\n";
+
+                    tag = new TextTag (null);
+                    tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
+                    tb.TagTable.Add (tag);
+
+                    ti = tb.EndIter;
+                    tb.InsertWithTags (ref ti, string.Format ("Previous full scale value: {0:F2}", calArgs.fullScaleValue), tag);
+
+                    tv.QueueDraw ();
+
+                    calState = CalibrationState.FullScaleValue;
+                    break;
+                case CalibrationState.FullScaleValue:
+                    if (CalibrationCompleteEvent != null)
+                        CalibrationCompleteEvent (calArgs);
+
+                    Destroy ();
+                    break;
+                default:
+                    break;
             }
         }
 

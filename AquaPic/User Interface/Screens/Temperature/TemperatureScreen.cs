@@ -214,6 +214,45 @@ namespace AquaPic.UserInterface
             Put (probeSetupBtn, 415, 405);
             probeSetupBtn.Show ();
 
+            var b = new TouchButton ();
+            b.text = "Calibrate";
+            b.SetSizeRequest (100, 60);
+            b.ButtonReleaseEvent += (o, args) => {
+                if (probeName.IsNotEmpty ()) {
+                    var cal = new CalibrationDialog (
+                        probeName + " Probe",
+                        () => {
+                            return AquaPicDrivers.AnalogInput.GetChannelValue (Temperature.GetTemperatureProbeIndividualControl (probeName));
+                        },
+                        CalibrationState.ZeroActual);
+
+                    cal.CalibrationCompleteEvent += (aa) => {
+                        bool success = Temperature.SetTemperatureProbeCalibrationData (
+                            probeName,
+                            (float)aa.zeroActual,
+                            (float)aa.zeroValue,
+                            (float)aa.fullScaleActual,
+                            (float)aa.fullScaleValue);
+
+                        if (!success) {
+                            MessageBox.Show ("Something went wrong");
+                        }
+                    };
+
+                    cal.calArgs.zeroActual = Temperature.GetTemperatureProbeZeroActual (probeName);
+                    cal.calArgs.zeroValue = Temperature.GetTemperatureProbeZeroValue (probeName);
+                    cal.calArgs.fullScaleActual = Temperature.GetTemperatureProbeFullScaleActual (probeName);
+                    cal.calArgs.fullScaleValue = Temperature.GetTemperatureProbeFullScaleValue (probeName);
+
+                    cal.Run ();
+                    cal.Destroy ();
+                } else {
+                    MessageBox.Show ("No probe selected\n" +
+                                    "Can't perfom a calibration");
+                }
+            };
+            Put (b, 525, 405);
+
             var tLabel = new TouchLabel ();
             tLabel.text = "Temperature";
             tLabel.textAlignment = TouchAlignment.Center;

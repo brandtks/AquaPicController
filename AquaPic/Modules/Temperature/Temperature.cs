@@ -592,6 +592,7 @@ namespace AquaPic.Modules
             return names.ToArray ();
         }
 
+        /***Temperature***/
         public static float GetTemperatureProbeTemperature (string probeName) {
             CheckTemperatureProbeKey (probeName);
             return probes[probeName].temperature;
@@ -603,9 +604,34 @@ namespace AquaPic.Modules
             return probes[probeName].channel;
         }
 
+        /***Temperature group***/
         public static string GetTemperatureProbeTemperatureGroupName (string probeName) {
             CheckTemperatureProbeKey (probeName);
             return probes[probeName].temperatureGroupName;
+        }
+
+        /***Zero actual***/
+        public static float GetTemperatureProbeZeroActual (string probeName) {
+            CheckTemperatureProbeKey (probeName);
+            return probes[probeName].zeroActual;
+        }
+
+        /***Zero value***/
+        public static float GetTemperatureProbeZeroValue (string probeName) {
+            CheckTemperatureProbeKey (probeName);
+            return probes[probeName].zeroValue;
+        }
+
+        /***Full scale actual***/
+        public static float GetTemperatureProbeFullScaleActual (string probeName) {
+            CheckTemperatureProbeKey (probeName);
+            return probes[probeName].fullScaleActual;
+        }
+
+        /***Full scale value***/
+        public static float GetTemperatureProbeFullScaleValue (string probeName) {
+            CheckTemperatureProbeKey (probeName);
+            return probes[probeName].fullScaleValue;
         }
 
         /***Setters****************************************************************************************************/
@@ -635,6 +661,58 @@ namespace AquaPic.Modules
             CheckTemperatureProbeKey (probeName);
             probes[probeName].temperatureGroupName = temperatureGroupName;
         }
+
+        /***Calibration data***/
+        public static bool SetTemperatureProbeCalibrationData (
+            string probeName,
+            float zeroActual,
+            float zeroValue,
+            float fullScaleActual,
+            float fullScaleValue
+        ) {
+            if (fullScaleValue <= zeroValue)
+                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
+
+            if (fullScaleActual < 0.0f)
+                throw new ArgumentException ("Full scale actual can't be less than zero");
+
+            probes[probeName].zeroActual = zeroActual;
+            probes[probeName].zeroValue = zeroValue;
+            probes[probeName].fullScaleActual = fullScaleActual;
+            probes[probeName].fullScaleValue = fullScaleValue;
+
+            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            path = System.IO.Path.Combine (path, "Settings");
+            path = System.IO.Path.Combine (path, "tempProperties.json");
+
+            string json = File.ReadAllText (path);
+            JObject jo = (JObject)JToken.Parse (json);
+
+            JArray ja = jo["temperatureProbes"] as JArray;
+
+            int arrIdx = -1;
+            for (int i = 0; i < ja.Count; ++i) {
+                string n = (string)ja[i]["name"];
+                if (probeName == n) {
+                    arrIdx = i;
+                    break;
+                }
+            }
+
+            if (arrIdx == -1) {
+                return false;
+            }
+
+            ja[arrIdx]["zeroCalibrationActual"] = probes[probeName].zeroActual.ToString ();
+            ja[arrIdx]["zeroCalibrationValue"] = probes[probeName].zeroValue.ToString ();
+            ja[arrIdx]["fullScaleCalibrationActual"] = probes[probeName].fullScaleActual.ToString ();
+            ja[arrIdx]["fullScaleCalibrationValue"] = probes[probeName].fullScaleValue.ToString ();
+
+            File.WriteAllText (path, jo.ToString ());
+
+            return true;
+        }
+
     }
 }
 
