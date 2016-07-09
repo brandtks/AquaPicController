@@ -33,8 +33,8 @@ namespace AquaPic.UserInterface
             }
 
             var box2 = new TimerBackground (310, 129);
-            box2.color = "grey1";
-            box2.transparency = 1.0f;
+            box2.color = "grey4";
+            box2.transparency = 0.1f;
             Put (box2, 0, 40);
 
             tabs = new TimerTab[3];

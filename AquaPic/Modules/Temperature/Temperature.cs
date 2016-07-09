@@ -370,6 +370,7 @@ namespace AquaPic.Modules
             return temperatureGroups[name].lowTemperatureAlarmIndex;
         }
 
+        /***Data logger***/
         public static DataLogger GetTemperatureGroupDataLogger (string name) {
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].dataLogger;
@@ -574,7 +575,7 @@ namespace AquaPic.Modules
             if ((probeIdx >= 0) && (probeIdx < probes.Count))
                 return probes [probeIdx].name;
 
-            throw new ArgumentOutOfRangeException ("probeId");
+            throw new ArgumentOutOfRangeException ("probeIdx");
         }
 
         public static void SetTemperatureProbeName (int probeId, string name) {
@@ -628,6 +629,15 @@ namespace AquaPic.Modules
         public static void SetTemperatureProbeTemperatureGroupName (int probeIndex, string temperatureGroupName) {
             CheckTemperatureProbeRange (probeIndex);
             probes[probeIndex].temperatureGroupName = temperatureGroupName;
+        }
+
+        public static bool IsTemperatureProbeConnected (int probeIndex) {
+            CheckTemperatureProbeRange (probeIndex);
+            if (probes[probeIndex].temperature < probes[probeIndex].zeroActual) {
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 }
