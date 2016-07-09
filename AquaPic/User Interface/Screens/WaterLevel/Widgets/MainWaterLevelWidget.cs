@@ -10,9 +10,6 @@ namespace AquaPic.UserInterface
 {
     public class WaterLevelLinePlot : LinePlotWidget
     {
-        //private TouchLabel label;
-        //private int flashUpdate;
-
         public WaterLevelLinePlot (params object[] options) 
             : base () 
         {
@@ -63,12 +60,24 @@ namespace AquaPic.UserInterface
         public override void OnUpdate () {
             if (WaterLevel.analogSensorEnabled) {
                 if (WaterLevel.analogWaterLevel < 0.0f) {
-                    OverrideTextBoxValue ("Disconnected");
+                    unitOfMeasurement = UnitsOfMeasurement.None;
+                    textBox.WidthRequest = 306;
+                    textBox.textAlignment = TouchAlignment.Left;
+                    textBox.textColor = "compl";
+                    textBox.text = "Disconnected";
                 } else {
+                    unitOfMeasurement = UnitsOfMeasurement.Inches;
+                    textBox.WidthRequest = 57;
+                    textBox.textAlignment = TouchAlignment.Center;
+                    textBox.textColor = "pri";
                     currentValue = WaterLevel.analogWaterLevel;
                 }
             } else {
-                OverrideTextBoxValue ("Disabled");
+                unitOfMeasurement = UnitsOfMeasurement.None;
+                textBox.WidthRequest = 306;
+                textBox.textAlignment = TouchAlignment.Left;
+                textBox.textColor = "compl";
+                textBox.text = "Disabled";
             }
         }
     }

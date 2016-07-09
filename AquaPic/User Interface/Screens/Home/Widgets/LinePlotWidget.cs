@@ -38,7 +38,6 @@ namespace AquaPic.UserInterface
                 return Convert.ToSingle (textBox.text);
             }
             set {
-                textBox.textRender.textWrap = TouchTextWrap.None;
                 textBox.text = value.ToString ("F1");
             }
         }
@@ -53,7 +52,7 @@ namespace AquaPic.UserInterface
         }
 
         private TouchLabel displayLabel;
-        private TouchLabel textBox;
+        protected TouchLabel textBox;
         protected TouchLinePlot linePlot;
 
         public LinePlotWidget () {
@@ -63,6 +62,9 @@ namespace AquaPic.UserInterface
             box1.color = "grey4";
             box1.transparency = 0.1f;
             Put (box1, 0, 0);
+
+            linePlot = new TouchLinePlot ();
+            Put (linePlot, 59, 3);
 
             displayLabel = new TouchLabel ();
             displayLabel.SetSizeRequest (152, 16);
@@ -81,19 +83,11 @@ namespace AquaPic.UserInterface
             textBox.textHorizontallyCentered = true;
             Put (textBox, 1, 3);
             
-            linePlot = new TouchLinePlot ();
-            Put (linePlot, 59, 3);
-            
             ShowAll ();
         }
 
         public virtual void OnUpdate () {
             throw new Exception ("Update method not implemented");
-        }
-
-        public void OverrideTextBoxValue (string value) {
-            textBox.textRender.textWrap = TouchTextWrap.Shrink;
-            textBox.text = value;
         }
     }
 }

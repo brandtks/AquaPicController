@@ -629,6 +629,15 @@ namespace AquaPic.Modules
             CheckTemperatureProbeRange (probeIndex);
             probes[probeIndex].temperatureGroupName = temperatureGroupName;
         }
+
+        public static bool IsTemperatureProbeConnected (int probeIndex) {
+            CheckTemperatureProbeRange (probeIndex);
+            if (probes[probeIndex].temperature < probes[probeIndex].zeroActual) {
+                return false;
+            } else {
+                return true;
+            }
+        }
     }
 }
 

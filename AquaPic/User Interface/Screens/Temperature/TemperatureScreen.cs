@@ -444,8 +444,13 @@ namespace AquaPic.UserInterface
 
         protected void GetProbeData () {
             if (probeId != -1) {
-                probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeId).ToString ("F2");
-                probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
+                if (Temperature.IsTemperatureProbeConnected (probeId)) {
+                    probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeId).ToString ("F2");
+                    probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
+                } else {
+                    probeTempTextbox.text = "Probe disconnected";
+                    probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
+                }
             } else {
                 probeTempTextbox.text = "Probe not available";
                 probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
