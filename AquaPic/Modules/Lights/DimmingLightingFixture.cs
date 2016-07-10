@@ -14,46 +14,40 @@ namespace AquaPic.Modules
             public float requestedDimmingLevel;
             public float minDimmingOutput;
             public float maxDimmingOutput;
-            public IndividualControl dimCh;
-            //public AnalogType type;
-            //public Value valueControl;
+            public IndividualControl channel;
             public Mode dimmingMode;
             public RateOfChangeLimiter rocl;
 
             public DimmingLightingFixture (
                 string name,
-                byte powerID,
-                byte plugID,
+                IndividualControl plug, 
                 Time onTime,
                 Time offTime,
-                byte cardID,
-                byte channelID,
+                IndividualControl channel, 
                 float minDimmingOutput,
                 float maxDimmingOutput,
                 AnalogType type,
                 LightingTime lightingTime,
                 bool highTempLockout)
-            : base (name,
-                    powerID, 
-                    plugID, 
-                    onTime,
-                    offTime,
-                    lightingTime, 
-                    highTempLockout) 
-            {
+            : base (
+                name,
+                plug, 
+                onTime,
+                offTime,
+                lightingTime, 
+                highTempLockout
+            ) {
                 currentDimmingLevel = 0.0f;
                 autoDimmingLevel = 0.0f;
                 requestedDimmingLevel = 0.0f;
                 rocl = new RateOfChangeLimiter (1.0f);
-                this.dimCh.Group = cardID;
-                this.dimCh.Individual = channelID;
-                //this.type = type;
+                this.channel = channel;
                 this.minDimmingOutput = minDimmingOutput;
                 this.maxDimmingOutput = maxDimmingOutput;
                 dimmingMode = Mode.Auto;
-                AquaPicDrivers.AnalogOutput.AddChannel (dimCh, name);
-                AquaPicDrivers.AnalogOutput.SetChannelType (dimCh, type);
-                var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (dimCh);
+                AquaPicDrivers.AnalogOutput.AddChannel (channel, name);
+                AquaPicDrivers.AnalogOutput.SetChannelType (channel, type);
+                var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (channel);
                 valueControl.ValueGetter = OnSetDimmingLevel;
 
                 Power.AddHandlerOnModeChange (

@@ -13,20 +13,28 @@ namespace AquaPic.UserInterface
 {
     public class FixtureSettings : TouchSettingsDialog
     {
-        int fixtureIdx;
+        string fixtureName;
+        public string newOrUpdatedFixtureName {
+            get {
+                return fixtureName;
+            }
+        }
 
-        public FixtureSettings (string name, int fixtureId, bool includeDelete) : base (name, includeDelete) {
+        public FixtureSettings (string fixtureName, bool includeDelete)
+            : base (fixtureName, includeDelete) 
+        {
             SaveEvent += OnSave;
             DeleteButtonEvent += OnDelete;
 
-            fixtureIdx = fixtureId;
+            this.fixtureName = fixtureName;
 
             var t = new SettingTextBox ();
             t.text = "Name";
-            if (fixtureIdx != -1)
-                t.textBox.text = Lighting.GetFixtureName (fixtureIdx);
-            else
+            if (this.fixtureName.IsNotEmpty ()) {
+                t.textBox.text = this.fixtureName;
+            } else {
                 t.textBox.text = "Enter name";
+            }
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
@@ -39,8 +47,8 @@ namespace AquaPic.UserInterface
 
             var c = new SettingComboBox ();
             c.label.text = "Outlet";
-            if (fixtureIdx != -1) {
-                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureIdx);
+            if (this.fixtureName.IsNotEmpty ()) {
+                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (this.fixtureName);
                 string psName = Power.GetPowerStripName (ic.Group);
                 c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", psName, ic.Individual));
                 c.combo.active = 0;
@@ -52,8 +60,8 @@ namespace AquaPic.UserInterface
 
             var s = new SettingSelectorSwitch ("Day", "Night");
             s.text = "Lighting Time";
-            if (fixtureIdx != -1) {
-                if (Lighting.GetFixtureLightingTime (fixtureIdx) == LightingTime.Daytime)
+            if (this.fixtureName.IsNotEmpty ()) {
+                if (Lighting.GetFixtureLightingTime (this.fixtureName) == LightingTime.Daytime)
                     s.selectorSwitch.currentSelected = 0;
                 else
                     s.selectorSwitch.currentSelected = 1;
@@ -63,8 +71,8 @@ namespace AquaPic.UserInterface
 
             s = new SettingSelectorSwitch ();
             s.text = "Temp Lockout";
-            if (fixtureIdx != -1) {
-                if (Lighting.GetFixtureTemperatureLockout (fixtureIdx))
+            if (this.fixtureName.IsNotEmpty ()) {
+                if (Lighting.GetFixtureTemperatureLockout (this.fixtureName))
                     s.selectorSwitch.currentSelected = 0;
                 else
                     s.selectorSwitch.currentSelected = 1;
@@ -74,8 +82,8 @@ namespace AquaPic.UserInterface
 
             s = new SettingSelectorSwitch ();
             s.text = "Auto Time Update";
-            if (fixtureIdx != -1) {
-                if (Lighting.GetFixtureMode (fixtureIdx) == Mode.Auto)
+            if (this.fixtureName.IsNotEmpty ()) {
+                if (Lighting.GetFixtureMode (this.fixtureName) == Mode.Auto)
                     s.selectorSwitch.currentSelected = 0;
                 else
                     s.selectorSwitch.currentSelected = 1;
@@ -115,8 +123,8 @@ namespace AquaPic.UserInterface
 
             t = new SettingTextBox ();
             t.text = "On Time Offset";
-            if (fixtureIdx != -1)
-                t.textBox.text = Lighting.GetFixtureOnTimeOffset (fixtureIdx).ToString ();
+            if (this.fixtureName.IsNotEmpty ())
+                t.textBox.text = Lighting.GetFixtureOnTimeOffset (this.fixtureName).ToString ();
             else
                 t.textBox.text = "0";
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -132,8 +140,8 @@ namespace AquaPic.UserInterface
             t = new SettingTextBox ();
             t.text = "Off Time Offset";
             t.textBox.includeTimeFunctions = true;
-            if (fixtureIdx != -1)
-                t.textBox.text = Lighting.GetFixtureOffTimeOffset (fixtureIdx).ToString ();
+            if (this.fixtureName.IsNotEmpty ())
+                t.textBox.text = Lighting.GetFixtureOffTimeOffset (this.fixtureName).ToString ();
             else
                 t.textBox.text = "0";
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -147,8 +155,8 @@ namespace AquaPic.UserInterface
             AddSetting (t);
 
             bool isDimming;
-            if (fixtureIdx != -1)
-                isDimming = Lighting.IsDimmingFixture (fixtureIdx);
+            if (this.fixtureName.IsNotEmpty ())
+                isDimming = Lighting.IsDimmingFixture (this.fixtureName);
             else
                 isDimming = false;
 
@@ -173,8 +181,8 @@ namespace AquaPic.UserInterface
 
             c = new SettingComboBox ();
             c.label.text = "Dimming Channel";
-            if ((fixtureIdx != -1) && (isDimming)) {
-                IndividualControl ic = Lighting.GetDimmingChannelIndividualControl (fixtureIdx);
+            if ((this.fixtureName.IsNotEmpty ()) && (isDimming)) {
+                IndividualControl ic = Lighting.GetDimmingChannelIndividualControl (this.fixtureName);
                 string cardName = AquaPicDrivers.AnalogOutput.GetCardName (ic.Group);
                 c.combo.comboList.Add (string.Format ("Current: {0}.q{1}", cardName, ic.Individual));
                 c.combo.active = 0;
@@ -186,8 +194,8 @@ namespace AquaPic.UserInterface
 
             t = new SettingTextBox ();
             t.text = "Max Dimming";
-            if ((fixtureIdx != -1) && (isDimming))
-                t.textBox.text = Lighting.GetMaxDimmingLevel (fixtureIdx).ToString ();
+            if ((this.fixtureName.IsNotEmpty ()) && (isDimming))
+                t.textBox.text = Lighting.GetMaxDimmingLevel (this.fixtureName).ToString ();
             else
                 t.textBox.text = "100.0";
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -208,8 +216,8 @@ namespace AquaPic.UserInterface
 
             t = new SettingTextBox ();
             t.text = "Min Dimming";
-            if ((fixtureIdx != -1) && (isDimming))
-                t.textBox.text = Lighting.GetMinDimmingLevel (fixtureIdx).ToString ();
+            if ((this.fixtureName.IsNotEmpty ()) && (isDimming))
+                t.textBox.text = Lighting.GetMinDimmingLevel (this.fixtureName).ToString ();
             else
                 t.textBox.text = "0.0";
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -325,13 +333,13 @@ namespace AquaPic.UserInterface
             string json = File.ReadAllText (path);
             JObject jo = (JObject)JToken.Parse (json);
 
-            if (fixtureIdx == -1) {
+            if (fixtureName.IsNotEmpty ()) {
                 if (name == "Enter name") {
                     MessageBox.Show ("Invalid probe name");
                     return false;
                 }
 
-                if (((SettingComboBox)settings ["Outlet"]).combo.active == -1) {
+                if ((settings["Outlet"] as SettingComboBox).combo.active == -1) {
                     MessageBox.Show ("Please select an outlet");
                     return false;
                 }
@@ -346,13 +354,13 @@ namespace AquaPic.UserInterface
 
                     ParseChannnel (chStr, ref chIc.Group, ref chIc.Individual);
 
-                    fixtureIdx = Lighting.AddLight (name, outletIc, chIc, minDimming, maxDimming, aType, lTime, highTempLockout);
+                    Lighting.AddLight (name, outletIc, chIc, minDimming, maxDimming, aType, lTime, highTempLockout);
                 } else {
-                    fixtureIdx = Lighting.AddLight (name, outletIc, lTime, highTempLockout);
+                    Lighting.AddLight (name, outletIc, lTime, highTempLockout);
                 }
 
                 if (autoTimeUpdate)
-                    Lighting.SetupAutoOnOffTime (fixtureIdx, onOffset, offOffset);
+                    Lighting.SetupAutoOnOffTime (name, onOffset, offOffset);
 
                 JObject jobj = new JObject ();
                 if (dimmingFixture)
@@ -379,37 +387,42 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("offTimeOffset", offOffset.ToString ()));
 
                 ((JArray)jo ["lightingFixtures"]).Add (jobj);
+
+                fixtureName = name;
             } else {
-                bool isDimming = Lighting.IsDimmingFixture (fixtureIdx);
-                if (isDimming == dimmingFixture) { 
-                    string oldName = Lighting.GetFixtureName (fixtureIdx);
-                    if (oldName != name)
-                        Lighting.SetFixtureName (fixtureIdx, name);
+                bool isDimming = Lighting.IsDimmingFixture (fixtureName);
+                if (isDimming == dimmingFixture) {
+                    string oldName = fixtureName;
+                    if (oldName != name) {
+                        Lighting.SetFixtureName (fixtureName, name);
+                        fixtureName = name;
+                    }
 
                     if (!outletStr.StartsWith ("Current:")) {
                         ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
-                        Lighting.SetFixtureOutletIndividualControl (fixtureIdx, outletIc);
+                        Lighting.SetFixtureOutletIndividualControl (fixtureName, outletIc);
+                    } else {
+                        outletIc = Lighting.GetFixtureOutletIndividualControl (fixtureName);
                     }
-                    outletIc = Lighting.GetFixtureOutletIndividualControl (fixtureIdx);
-                        
-                    Lighting.SetFixtureLightingTime (fixtureIdx, lTime);
 
-                    Lighting.SetFixtureTemperatureLockout (fixtureIdx, highTempLockout);
+                    Lighting.SetFixtureLightingTime (fixtureName, lTime);
+
+                    Lighting.SetFixtureTemperatureLockout (fixtureName, highTempLockout);
 
                     if (autoTimeUpdate)
-                        Lighting.SetupAutoOnOffTime (fixtureIdx, onOffset, offOffset);
+                        Lighting.SetupAutoOnOffTime (fixtureName, onOffset, offOffset);
 
                     if (dimmingFixture) {
-                        Lighting.SetMaxDimmingLevel (fixtureIdx, maxDimming);
-                        Lighting.SetMinDimmingLevel (fixtureIdx, minDimming);
+                        Lighting.SetMaxDimmingLevel (fixtureName, maxDimming);
+                        Lighting.SetMinDimmingLevel (fixtureName, minDimming);
 
-                        Lighting.SetDimmingType (fixtureIdx, aType);
+                        Lighting.SetDimmingType (fixtureName, aType);
 
                         if (!chStr.StartsWith ("Current:")) {
                             ParseChannnel (chStr, ref chIc.Group, ref chIc.Individual);
-                            Lighting.SetDimmingChannelIndividualControl (fixtureIdx, chIc);
+                            Lighting.SetDimmingChannelIndividualControl (fixtureName, chIc);
                         }
-                        chIc = Lighting.GetDimmingChannelIndividualControl (fixtureIdx);
+                        chIc = Lighting.GetDimmingChannelIndividualControl (fixtureName);
                     }
 
                     JArray ja = jo ["lightingFixtures"] as JArray;
@@ -428,24 +441,24 @@ namespace AquaPic.UserInterface
                         return false;
                     }
 
-                    ((JArray)jo ["lightingFixtures"]) [arrIdx] ["name"] = name;
-                    ((JArray)jo ["lightingFixtures"]) [arrIdx] ["powerStrip"] = Power.GetPowerStripName (outletIc.Group);
-                    ((JArray)jo ["lightingFixtures"]) [arrIdx] ["outlet"] = outletIc.Individual.ToString ();
+                    ((JArray)jo["lightingFixtures"])[arrIdx]["name"] = name;
+                    ((JArray)jo["lightingFixtures"])[arrIdx]["powerStrip"] = Power.GetPowerStripName (outletIc.Group);
+                    ((JArray)jo["lightingFixtures"])[arrIdx]["outlet"] = outletIc.Individual.ToString ();
                     if (lTime == LightingTime.Daytime)
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["lightingTime"] = "day";
+                        ((JArray)jo["lightingFixtures"])[arrIdx]["lightingTime"] = "day";
                     else
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["lightingTime"] = "night";
-                    ((JArray)jo ["lightingFixtures"]) [arrIdx] ["highTempLockout"] = highTempLockout.ToString ();
-                    ((JArray)jo ["lightingFixtures"]) [arrIdx] ["autoTimeUpdate"] = autoTimeUpdate.ToString ();
-                    ((JArray)jo ["lightingFixtures"]) [arrIdx] ["onTimeOffset"] = onOffset.ToString ();
-                    ((JArray)jo ["lightingFixtures"]) [arrIdx] ["offTimeOffset"] = offOffset.ToString ();
+                        ((JArray)jo["lightingFixtures"])[arrIdx]["lightingTime"] = "night";
+                    ((JArray)jo["lightingFixtures"])[arrIdx]["highTempLockout"] = highTempLockout.ToString ();
+                    ((JArray)jo["lightingFixtures"])[arrIdx]["autoTimeUpdate"] = autoTimeUpdate.ToString ();
+                    ((JArray)jo["lightingFixtures"])[arrIdx]["onTimeOffset"] = onOffset.ToString ();
+                    ((JArray)jo["lightingFixtures"])[arrIdx]["offTimeOffset"] = offOffset.ToString ();
 
                     if (dimmingFixture) {
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["dimmingCard"] = AquaPicDrivers.AnalogOutput.GetCardName (chIc.Group);
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["channel"] = chIc.Individual.ToString ();
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["minDimmingOutput"] = minDimming.ToString ();
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["maxDimmingOutput"] = maxDimming.ToString ();
-                        ((JArray)jo ["lightingFixtures"]) [arrIdx] ["analogType"] = aType.ToString ();
+                        ((JArray)jo["lightingFixtures"])[arrIdx]["dimmingCard"] = AquaPicDrivers.AnalogOutput.GetCardName (chIc.Group);
+                        ((JArray)jo["lightingFixtures"])[arrIdx]["channel"] = chIc.Individual.ToString ();
+                        ((JArray)jo["lightingFixtures"])[arrIdx]["minDimmingOutput"] = minDimming.ToString ();
+                        ((JArray)jo["lightingFixtures"])[arrIdx]["maxDimmingOutput"] = maxDimming.ToString ();
+                        ((JArray)jo["lightingFixtures"])[arrIdx]["analogType"] = aType.ToString ();
                     }
                 } else {
                     MessageBox.Show ("Can't change dimmablility");
@@ -459,8 +472,6 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            string name = Lighting.GetFixtureName (fixtureIdx);
-
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "lightingProperties.json");
@@ -473,7 +484,7 @@ namespace AquaPic.UserInterface
             int arrIdx = -1;
             for (int i = 0; i < ja.Count; ++i) {
                 string n = (string)ja [i] ["name"];
-                if (name == n) {
+                if (fixtureName == n) {
                     arrIdx = i;
                     break;
                 }
@@ -488,7 +499,7 @@ namespace AquaPic.UserInterface
 
             File.WriteAllText (path, jo.ToString ());
 
-            Lighting.RemoveLight (fixtureIdx);
+            Lighting.RemoveLight (fixtureName);
 
             return true;
         }

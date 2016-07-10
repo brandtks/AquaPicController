@@ -19,22 +19,18 @@ namespace AquaPic.Modules
             public MyState lightingOn;
             public bool highTempLockout;
             public IndividualControl plug;
-            //public Coil plugControl;
             public Mode mode;
 
             public LightingFixture (
                 string name, 
-                byte powerID, 
-                byte plugID, 
+                IndividualControl plug, 
                 Time onTime, 
                 Time offTime, 
                 LightingTime lightingTime,
-                bool highTempLockout)
-            {
+                bool highTempLockout
+            ) {
                 this.name = name;
-
-                plug.Group = powerID;
-                plug.Individual = plugID;
+                this.plug = plug;
 
                 // sets time to today and whatever onTime and offTime are
                 this.onTime = new TimeDate (onTime);

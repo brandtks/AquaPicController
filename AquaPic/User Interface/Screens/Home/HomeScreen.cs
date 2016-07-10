@@ -24,15 +24,14 @@ namespace AquaPic.UserInterface
 
             var names = Lighting.GetAllFixtureNames ();
             foreach (var name in names) {
-                int fixtureId = Lighting.GetFixtureIndex (name);
-                if (Lighting.IsDimmingFixture (fixtureId)) {
+                if (Lighting.IsDimmingFixture (name)) {
                     if (!HomeWindowWidgets.barPlots.ContainsKey (name))
                         HomeWindowWidgets.barPlots.Add (
                             name, 
                             new BarPlotData (() => {
                                 return new DimmingLightBarPlot (
                                     name, 
-                                    () => {return Lighting.GetCurrentDimmingLevel (fixtureId);}
+                                    () => {return Lighting.GetCurrentDimmingLevel (name);}
                                 );}
                             )
                         );

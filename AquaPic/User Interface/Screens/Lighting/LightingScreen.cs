@@ -12,7 +12,7 @@ namespace AquaPic.UserInterface
 {
     public class LightingWindow : WindowBase
     {
-        private int fixtureID;
+        private string fixtureName;
         private TouchComboBox combo;
         private TouchSelectorSwitch modeSelector;
         private TouchLayeredProgressBar dimmingProgressBar;
@@ -121,12 +121,20 @@ namespace AquaPic.UserInterface
                 }
             };
 
-            if (Lighting.fixtureCount == 0) {
-                fixtureID = -1;
+            fixtureName = Lighting.defaultFixture;
+            if (fixtureName.IsEmpty ()) {
                 fixtureLabel.text = "No lighing fixtures added";
             } else {
                 dimmingIsManual = false;
-                fixtureID = 0;
+            }
+
+            if (options.Length >= 3) {
+                string requestedFixture = options [2] as string;
+                if (requestedFixture != null) {
+                    if (Lighting.CheckFixtureKeyNoThrow (requestedFixture)) {
+                        fixtureName = requestedFixture;
+                    }
+                }
             }
 
             dimmingHeader = new TouchLabel ();
@@ -191,7 +199,7 @@ namespace AquaPic.UserInterface
                         newLevel = 0.0f;
                     if (newLevel > 100.0f)
                         newLevel = 100.0f;
-                    Lighting.SetDimmingLevel (fixtureID, newLevel);
+                    Lighting.SetDimmingLevel (fixtureName, newLevel);
                 } catch (Exception ex) {
                     MessageBox.Show (ex.ToString ());
                 }
@@ -272,13 +280,13 @@ namespace AquaPic.UserInterface
                             MessageBox.Show ("Can't modify time to before current time");
                         }
 
-                        if (t.CompareToTime (Lighting.GetFixtureOffTime (fixtureID)) == 1) {
+                        if (t.CompareToTime (Lighting.GetFixtureOffTime (fixtureName)) == 1) {
                             timeOk = false;
                             MessageBox.Show ("Can't modify on time to after off time");
                         }
 
                         if (timeOk) {
-                            var td = Lighting.GetFixtureOffTime (fixtureID);
+                            var td = Lighting.GetFixtureOffTime (fixtureName);
                             td.SetTime (t);
                             onTimeTextBox.text = td.ToShortString ();
                             onTimeTextBox.QueueDraw ();
@@ -334,13 +342,13 @@ namespace AquaPic.UserInterface
                             MessageBox.Show ("Can't modify time to before current time");
                         }
 
-                        if (t.CompareToTime (Lighting.GetFixtureOnTime (fixtureID)) == -1) {
+                        if (t.CompareToTime (Lighting.GetFixtureOnTime (fixtureName)) == -1) {
                             timeOk = false;
                             MessageBox.Show ("Can't modify off time to before on time");
                         }
 
                         if (timeOk) {
-                            var td = Lighting.GetFixtureOffTime (fixtureID);
+                            var td = Lighting.GetFixtureOffTime (fixtureName);
                             td.SetTime (t);
                             offTimeTextBox.text = td.ToShortString ();
                             offTimeTextBox.QueueDraw ();
@@ -398,53 +406,27 @@ namespace AquaPic.UserInterface
             fixtureSettingBtn.text = "Fixture Setup";
             fixtureSettingBtn.SetSizeRequest (100, 60);
             fixtureSettingBtn.ButtonReleaseEvent += (o, args) => {
-                if (fixtureID != -1) {
-                    string name = Lighting.GetFixtureName (fixtureID);
-                    var s = new FixtureSettings (name, fixtureID, true);
-                    s.Run ();
-                    s.Destroy ();
+                var s = new FixtureSettings (fixtureName, fixtureName.IsNotEmpty ());
+                s.Run ();
+                var newFixtureName = s.newOrUpdatedFixtureName;
+                s.Destroy ();
 
-                    try {
-                        Lighting.GetFixtureIndex (name);
-                    } catch (ArgumentException) {
-                        combo.comboList.Remove (name);
-                        if (Lighting.fixtureCount != 0) {
-                            fixtureID = 0;
-                            combo.active = fixtureID;
-                            GetFixtureData ();
-                        } else {
-                            fixtureID = -1;
-                            combo.active = 0;
-
-                            fixtureLabel.text = "No lighing fixtures added";
-                            fixtureLabel.QueueDraw ();
-
-                            GetFixtureData ();
-                        }
-                    }
-                } else {
-                    int fixtureCount = Lighting.fixtureCount;
-
-                    var s = new FixtureSettings ("New fixture", -1, false);
-                    s.Run ();
-                    s.Destroy ();
-
-                    if (Lighting.fixtureCount > fixtureCount) { // a fixture was added
-                        fixtureID = Lighting.fixtureCount - 1;
-                        int listIdx = combo.comboList.IndexOf ("New fixture...");
-                        combo.comboList.Insert (listIdx, Lighting.GetFixtureName (fixtureID));
-                        combo.active = listIdx;
-                        combo.QueueDraw ();
-                        GetFixtureData ();
-                    } else {
-                        if (fixtureID != -1)
-                            combo.active = fixtureID;
-                        else
-                            combo.active = 0;
-                    }
-                }
+                if ((newFixtureName != fixtureName) && fixtureName.IsNotEmpty ()) { // The fixture name was changed
+                    var index = combo.comboList.IndexOf (fixtureName);
+                    combo.comboList[index] = newFixtureName;
+                    fixtureName = newFixtureName;
+                } else if (Lighting.CheckFixtureKeyNoThrow (newFixtureName)) { // A new fixture was added
+                    combo.comboList.Insert (combo.comboList.Count - 1, newFixtureName);
+                    combo.activeText = newFixtureName;
+                    fixtureName = newFixtureName;
+                } else if (!Lighting.CheckFixtureKeyNoThrow (fixtureName)) { // The fixture was deleted
+                    combo.comboList.Remove (fixtureName);
+                    fixtureName = Lighting.defaultFixture;
+                    combo.activeText = fixtureName;
+                }  
 
                 combo.QueueDraw ();
+                GetFixtureData ();
             };
             Put (fixtureSettingBtn, 415, 405);
             fixtureSettingBtn.Show ();
@@ -458,16 +440,10 @@ namespace AquaPic.UserInterface
             Put (combo, 550, 77);
             combo.Show ();
 
-            if (options.Length >= 3) {
-                string requestedFixture = options [2] as string;
-                if (requestedFixture != null) {
-                    try {
-                        fixtureID = Lighting.GetFixtureIndex (requestedFixture);
-                        combo.active = fixtureID;
-                    } catch {
-                        ;
-                    }
-                }
+            if (fixtureName.IsNotEmpty ()) {
+                combo.activeText = fixtureName;
+            } else {
+                combo.active = 0;
             }
 
             GetFixtureData ();
@@ -476,13 +452,13 @@ namespace AquaPic.UserInterface
         }
 
         public override void Dispose () {
-            Power.RemoveHandlerOnStateChange (Lighting.GetFixtureOutletIndividualControl (fixtureID), OnOutletStateChange);
+            Power.RemoveHandlerOnStateChange (Lighting.GetFixtureOutletIndividualControl (fixtureName), OnOutletStateChange);
             GLib.Source.Remove (timerId);
             base.Dispose ();
         }
 
         protected void GetFixtureData () {
-            if (fixtureID != -1) {
+            if (fixtureName.IsNotEmpty ()) {
                 onTimeLabel.Visible = true;
                 onTimeTextBox.Visible = true;
                 offTimeLabel.Visible = true;
@@ -491,10 +467,10 @@ namespace AquaPic.UserInterface
                 outletLabel.Visible = true;
                 outletStateLabel.Visible = true;
 
-                onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureID).ToShortString ();
-                offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureID).ToShortString ();
+                onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureName).ToShortString ();
+                offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureName).ToShortString ();
 
-                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureID);
+                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
                 Power.AddHandlerOnStateChange (ic, OnOutletStateChange);
 
                 if (Power.GetOutletMode (ic) == Mode.Auto) {
@@ -516,7 +492,7 @@ namespace AquaPic.UserInterface
                     outletStateLabel.textColor = "secb";
                 }
 
-                isDimmingFixture = Lighting.IsDimmingFixture (fixtureID);
+                isDimmingFixture = Lighting.IsDimmingFixture (fixtureName);
                 if (isDimmingFixture) {
                     dimmingHeader.text = "Dimming Control";
 
@@ -527,7 +503,7 @@ namespace AquaPic.UserInterface
                     requestedLabel.Visible = true;
                     requestedTextLabel.Visible = true;
 
-                    Mode m = Lighting.GetDimmingMode (fixtureID);
+                    Mode m = Lighting.GetDimmingMode (fixtureName);
                     dimmingIsManual = m == Mode.Manual;
                     if (!dimmingIsManual) {
                         modeSelector.currentSelected = 1;
@@ -539,17 +515,17 @@ namespace AquaPic.UserInterface
                         modeSelector.currentSelected = 0;
                         dimmingProgressBar.enableTouch = true;
                         requestedTextBox.Visible = true;
-                        requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureID));
+                        requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureName));
                         autoTextBox.Visible = true;
                         autoLabel.Visible = true;
-                        autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
+                        autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureName));
                     }
 
-                    float level = Lighting.GetCurrentDimmingLevel (fixtureID);
+                    float level = Lighting.GetCurrentDimmingLevel (fixtureName);
                     dimmingProgressBar.currentProgressSecondary = level / 100.0f;
                     actualTextBox.text = string.Format ("{0:N2}", level);
 
-                    level = Lighting.GetRequestedDimmingLevel (fixtureID);
+                    level = Lighting.GetRequestedDimmingLevel (fixtureName);
                     dimmingProgressBar.currentProgress = level / 100.0f;
                     requestedLabel.text = string.Format ("{0:N2}", level);
 
@@ -596,48 +572,32 @@ namespace AquaPic.UserInterface
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.ActiveText == "New fixture...") {
-                int fixtureCount = Lighting.fixtureCount;
-
-                var s = new FixtureSettings ("New fixture", -1, false);
+                var s = new FixtureSettings (string.Empty, false);
                 s.Run ();
+                var newFixtureName = s.newOrUpdatedFixtureName;
                 s.Destroy ();
 
-                if (Lighting.fixtureCount > fixtureCount) { // a fixture was added
-                    fixtureID = Lighting.fixtureCount - 1;
-                    int listIdx = combo.comboList.IndexOf ("New fixture...");
-                    combo.comboList.Insert (listIdx, Lighting.GetFixtureName (fixtureID));
-                    combo.active = listIdx;
-                    combo.QueueDraw ();
+                if (Lighting.CheckFixtureKeyNoThrow (newFixtureName)) { // A new fixture was added
+                    combo.comboList.Insert (combo.comboList.Count - 1, newFixtureName);
+                    combo.activeText = newFixtureName;
+                    fixtureName = newFixtureName;
+                }
 
-                    GetFixtureData ();
-                } else {
-                    if (fixtureID != -1)
-                        combo.active = fixtureID;
-                    else
-                        combo.active = 0;
-                }
+                combo.QueueDraw ();
+                GetFixtureData ();
             } else {
-                try {
-                    int id = Lighting.GetFixtureIndex (e.ActiveText);
-                    if (id != -1) {
-                        Power.RemoveHandlerOnStateChange (Lighting.GetFixtureOutletIndividualControl (fixtureID), OnOutletStateChange);
-                        fixtureID = id;
-                        GetFixtureData ();
-                    }
-                } catch {
-                    ;
-                }
+                fixtureName = e.ActiveText;
             }
         }
 
         protected bool OnTimer () {
-            if (fixtureID != -1) {
+            if (fixtureName.IsNotEmpty ()) {
                 if (isDimmingFixture) {
-                    float level = Lighting.GetCurrentDimmingLevel (fixtureID);
+                    float level = Lighting.GetCurrentDimmingLevel (fixtureName);
                     dimmingProgressBar.currentProgressSecondary = level / 100.0f;
                     actualTextBox.text = string.Format ("{0:N2}", level);
 
-                    level = Lighting.GetRequestedDimmingLevel (fixtureID);
+                    level = Lighting.GetRequestedDimmingLevel (fixtureName);
                     dimmingProgressBar.currentProgress = level / 100.0f;
                     requestedLabel.text = string.Format ("{0:N2}", level);
                     requestedTextBox.text = string.Format ("{0:N2}", level);
@@ -647,7 +607,7 @@ namespace AquaPic.UserInterface
                     dimmingProgressBar.QueueDraw ();
 
                     if (dimmingIsManual) {
-                        autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
+                        autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureName));
                         autoTextBox.QueueDraw ();
                     }
                 }
@@ -660,17 +620,17 @@ namespace AquaPic.UserInterface
 
         protected void OnDimmingModeSelectorChanged (object sender, SelectorChangedEventArgs args) {
             if (args.currentSelectedIndex == 0) {
-                Lighting.SetDimmingMode (fixtureID, Mode.Manual);
-                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureID);
+                Lighting.SetDimmingMode (fixtureName, Mode.Manual);
+                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
                 Power.SetOutletManualState (ic, Power.GetOutletState (ic));
                 Power.SetOutletMode (ic, Mode.Manual);
                 dimmingProgressBar.enableTouch = true;
                 requestedTextBox.Visible = true;
-                requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureID));
+                requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureName));
                 autoTextBox.Visible = true;
                 autoLabel.Visible = true;
                 dimmingIsManual = true;
-                autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureID));
+                autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureName));
                 if (Power.GetOutletState (ic) == MyState.Off) {
                     outletSelectorSwitch.currentSelected = 0;
                 } else {
@@ -678,8 +638,8 @@ namespace AquaPic.UserInterface
                 }
                 outletSelectorSwitch.QueueDraw ();
             } else {
-                Lighting.SetDimmingMode (fixtureID, Mode.Auto);
-                Power.SetOutletMode (Lighting.GetFixtureOutletIndividualControl (fixtureID), Mode.Auto);
+                Lighting.SetDimmingMode (fixtureName, Mode.Auto);
+                Power.SetOutletMode (Lighting.GetFixtureOutletIndividualControl (fixtureName), Mode.Auto);
                 dimmingProgressBar.enableTouch = false;
                 requestedTextBox.Visible = false;
                 autoTextBox.Visible = false;
@@ -695,7 +655,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnOutletControlSelectorChanged (object sender, SelectorChangedEventArgs args) {
-            IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureID);
+            IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
 
             if (args.currentSelectedIndex == 0) { // Manual Off
                 Power.SetOutletMode (ic, Mode.Manual);
@@ -711,8 +671,8 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnProgressChanged (object sender, ProgressChangeEventArgs args) {
-            Lighting.SetDimmingLevel (fixtureID, args.currentProgress * 100.0f);
-            float level = Lighting.GetCurrentDimmingLevel (fixtureID);
+            Lighting.SetDimmingLevel (fixtureName, args.currentProgress * 100.0f);
+            float level = Lighting.GetCurrentDimmingLevel (fixtureName);
             actualTextBox.text = string.Format ("{0:N2}", level);
             actualTextBox.QueueDraw ();
         }
