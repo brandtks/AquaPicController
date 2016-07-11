@@ -39,12 +39,12 @@ namespace AquaPic.UserInterface
             groupName = Temperature.defaultTemperatureGroup;
 
             var label = new TouchLabel ();
-            label.text = "Temperature Groups";
+            label.text = "Groups";
             label.WidthRequest = 118;
             label.textColor = "seca";
             label.textSize = 12;
-            label.textAlignment = TouchAlignment.Right;
-            Put (label, 30, 70);
+            label.textAlignment = TouchAlignment.Left;
+            Put (label, 30, 80);
             label.Show ();
 
             var tempLabel = new TouchLabel ();
