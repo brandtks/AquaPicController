@@ -582,12 +582,12 @@ namespace AquaPic.UserInterface
                     combo.activeText = newFixtureName;
                     fixtureName = newFixtureName;
                 }
-
-                combo.QueueDraw ();
-                GetFixtureData ();
             } else {
                 fixtureName = e.ActiveText;
             }
+
+            combo.QueueDraw ();
+            GetFixtureData ();
         }
 
         protected bool OnTimer () {

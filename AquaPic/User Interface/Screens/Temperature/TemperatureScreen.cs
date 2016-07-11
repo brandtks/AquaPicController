@@ -352,13 +352,11 @@ namespace AquaPic.UserInterface
                 } else {
                     heaterCombo.activeText = heaterName;
                 }
-
-                heaterCombo.QueueDraw ();
-                GetHeaterData ();
             } else {
                 heaterName = e.ActiveText;
             }
 
+            heaterCombo.QueueDraw ();
             GetHeaterData ();
         }
 
