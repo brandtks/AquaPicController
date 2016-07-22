@@ -51,6 +51,7 @@ namespace AquaPic.UserInterface
             OnUpdate ();
         }
 
+        /*
         protected void OnWaterLevelDataLogEntryAdded (object obj, DataLogEntryAddedEventArgs args) {
             if (linePlot.dataPoints.count > 0) {
                 var previous = linePlot.dataPoints[linePlot.dataPoints.count - 1].dateTime;
@@ -64,7 +65,7 @@ namespace AquaPic.UserInterface
             }
 
             QueueDraw ();
-        }
+        }*/
 
         public override void OnUpdate () {
             if (WaterLevel.analogSensorEnabled) {

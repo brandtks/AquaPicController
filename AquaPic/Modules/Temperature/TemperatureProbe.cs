@@ -43,7 +43,7 @@ namespace AquaPic.Modules
                 AquaPicDrivers.AnalogInput.AddChannel (channel, this.name);
                 temperature = 32.0f;
                 
-                probeDisconnectedAlarmIndex = Alarm.Subscribe (string.Format ("{0} disconnected", name));
+                probeDisconnectedAlarmIndex = Alarm.Subscribe (string.Format ("{0} temperature probe disconnected", name));
             }
 
             public bool GetTemperature () {

@@ -91,36 +91,6 @@ namespace AquaPic.UserInterface
                 s.selectorSwitch.currentSelected = 1;
             AddSetting (s);
 
-            /*
-            t = new SettingTextBox ();
-            t.text = "Default On Time";
-            t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.defaultSunRise;
-            t.textBox.TextChangedEvent += (sender, args) => {
-                try {
-                    Time.Parse (args.text);
-                } catch {
-                    MessageBox.Show ("Incorrect time format");
-                    args.keepText = false;
-                }
-            };
-            AddSetting (t);
-
-            t = new SettingTextBox ();
-            t.text = "Default Off Time";
-            t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.defaultSunRise;
-            t.textBox.TextChangedEvent += (sender, args) => {
-                try {
-                    Time.Parse (args.text);
-                } catch {
-                    MessageBox.Show ("Incorrect time format");
-                    args.keepText = false;
-                }
-            };
-            AddSetting (t);
-            */
-
             t = new SettingTextBox ();
             t.text = "On Time Offset";
             if (this.fixtureName.IsNotEmpty ())
@@ -318,6 +288,7 @@ namespace AquaPic.UserInterface
             float minDimming = Convert.ToSingle (((SettingTextBox)settings ["Min Dimming"]).textBox.text);
 
             AnalogType aType = AnalogType.ZeroTen;
+            #if SELECTABLE_ANALOG_OUTPUT_TYPE
             try {
                 SettingSelectorSwitch s = settings ["Dimming Type"] as SettingSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
@@ -325,6 +296,7 @@ namespace AquaPic.UserInterface
             } catch {
                 return false;
             }
+            #endif
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
@@ -333,7 +305,7 @@ namespace AquaPic.UserInterface
             string json = File.ReadAllText (path);
             JObject jo = (JObject)JToken.Parse (json);
 
-            if (fixtureName.IsNotEmpty ()) {
+            if (fixtureName.IsEmpty ()) {
                 if (name == "Enter name") {
                     MessageBox.Show ("Invalid probe name");
                     return false;

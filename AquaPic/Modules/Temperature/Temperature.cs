@@ -342,6 +342,17 @@ namespace AquaPic.Modules
             return !CheckTemperatureGroupKeyNoThrow (name);
         }
 
+        public static bool AreTemperatureProbesConnected (string name) {
+            CheckTemperatureGroupKey (name);
+            bool connected = true;
+            foreach (var probe in probes.Values) {
+                if (probe.temperatureGroupName == name) {
+                    connected &= IsTemperatureProbeConnected (probe.name);
+                }
+            }
+            return connected;
+        }
+
         /***Getters****************************************************************************************************/
         /***Names***/
         public static string[] GetAllTemperatureGroupNames () {
@@ -504,11 +515,9 @@ namespace AquaPic.Modules
         public static void SetHeaterIndividualControl (string heaterName, IndividualControl ic) {
             CheckHeaterKey (heaterName);
             Power.RemoveOutlet (heaters[heaterName].plug);
-            Power.RemoveHandlerOnStateChange (heaters[heaterName].plug, heaters[heaterName].OnStateChange);
             heaters[heaterName].plug = ic;
             var coil = Power.AddOutlet (heaters[heaterName].plug, heaters[heaterName].name, MyState.On, "Temperature");
             coil.ConditionChecker = heaters[heaterName].OnPlugControl;
-            Power.AddHandlerOnStateChange (heaters[heaterName].plug, heaters[heaterName].OnStateChange);
         }
 
         /***Temperature group***/

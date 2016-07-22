@@ -16,15 +16,14 @@ namespace AquaPic.UserInterface
         public AlarmWindow (params object[] options) : base () {
             screenTitle = "Current Alarms";
 
-            var b = new TouchButton ();
-            b.SetSizeRequest (100, 60);
-            b.text = "Acknowledge Alarms";
-            b.ButtonReleaseEvent += (o, args) => {
+            var acknowledgeButton = new TouchButton ();
+            acknowledgeButton.SetSizeRequest (100, 60);
+            acknowledgeButton.text = "Acknowledge Alarms";
+            acknowledgeButton.buttonColor = "compl";
+            acknowledgeButton.ButtonReleaseEvent += (o, args) => {
                 Alarm.Acknowledge ();
                 OnTimer ();
             };
-            Put (b, 685, 405);
-            b.Show ();
 
             tv = new TextView ();
             tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
@@ -43,18 +42,23 @@ namespace AquaPic.UserInterface
             if (options.Length >= 2) {
                 var lastScreen = options [1] as string;
                 if (lastScreen != null) {
-                    b = new TouchButton ();
+                    var b = new TouchButton ();
                     b.SetSizeRequest (100, 60);
                     b.text = "Back\n" + lastScreen;
-                    b.buttonColor = "compl";
+
                     b.ButtonPressEvent += (o, args) => {
                         var tl = this.Toplevel;
                         AquaPicGUI.ChangeScreens (lastScreen, tl, AquaPicGUI.currentScreen);
                     };
                     Put (b, 575, 405);
                     b.Show ();
+
+                    Put (acknowledgeButton, 685, 405);
+                } else {
+                    Put (acknowledgeButton, 575, 405);
                 }
             }
+            acknowledgeButton.Show ();
 
             OnTimer ();
 

@@ -380,21 +380,10 @@ namespace AquaPic.Modules
 
         public static void SetFixtureOutletIndividualControl (string fixtureName, IndividualControl ic) {
             CheckFixtureKey (fixtureName);
-
-            Power.RemoveHandlerOnStateChange (fixtures[fixtureName].plug, fixtures[fixtureName].OnLightingPlugStateChange);
-            DimmingLightingFixture dimmingFixture = fixtures[fixtureName] as DimmingLightingFixture;
-            if (dimmingFixture != null) {
-                Power.RemoveHandlerOnModeChange (dimmingFixture.plug, dimmingFixture.OnLightingPlugModeChange);
-            }
-
             Power.RemoveOutlet (fixtures[fixtureName].plug);
-
             fixtures[fixtureName].plug = ic;
             var coil = Power.AddOutlet (fixtures[fixtureName].plug, fixtures[fixtureName].name, MyState.On, "Heater");
             coil.ConditionChecker = fixtures[fixtureName].OnPlugControl;
-            Power.AddHandlerOnStateChange (fixtures[fixtureName].plug, fixtures[fixtureName].OnLightingPlugStateChange);
-            if (dimmingFixture != null)
-                Power.AddHandlerOnModeChange (dimmingFixture.plug, dimmingFixture.OnLightingPlugModeChange);
         }
 
         public static IndividualControl GetDimmingChannelIndividualControl (string fixtureName) {

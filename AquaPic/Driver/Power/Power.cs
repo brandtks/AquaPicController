@@ -59,7 +59,7 @@ namespace AquaPic.Drivers
             TaskManager.AddCyclicInterrupt ("Power", 1000, Run);
         }
 
-        public static void Run () {
+        protected static void Run () {
             foreach (var strip in pwrStrips) {
                 strip.GetStatus ();
 

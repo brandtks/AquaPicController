@@ -29,9 +29,9 @@ namespace AquaPic.UserInterface
             displays = new AnalogChannelDisplay[4];
             for (int i = 0; i < 4; ++i) {
                 displays [i] = new AnalogChannelDisplay ();
-                displays [i].typeLabel.Visible = true;
                 displays [i].divisionSteps = 1024;
                 #if SELECTABLE_ANALOG_OUTPUT_TYPE
+                displays [i].typeLabel.Visible = true;
                 displays [i].TypeSelectorChangedEvent += OnSelectorSwitchChanged;
                 #endif
                 displays [i].ForceButtonReleaseEvent += OnForceRelease;
@@ -100,8 +100,9 @@ namespace AquaPic.UserInterface
                 d.button.buttonColor = "pri";
                 #if SELECTABLE_ANALOG_OUTPUT_TYPE
                 d.ss.Visible = true;
-                #endif
                 d.typeLabel.Visible = false;
+                #endif
+
             } else {
                 AquaPicDrivers.AnalogOutput.SetChannelMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;
@@ -109,8 +110,8 @@ namespace AquaPic.UserInterface
                 d.button.buttonColor = "grey4";
                 #if SELECTABLE_ANALOG_OUTPUT_TYPE
                 d.ss.Visible = false;
-                #endif
                 d.typeLabel.Visible = true;
+                #endif
             }
 
             d.QueueDraw ();

@@ -8,6 +8,8 @@ namespace AquaPic.UserInterface
 {
     public class TemperatureLinePlot : LinePlotWidget
     {
+        string groupName;
+
         public TemperatureLinePlot (params object[] options)
             : base () 
         {
@@ -24,7 +26,7 @@ namespace AquaPic.UserInterface
             Put (eventbox, 0, 0);
             eventbox.Show ();
 
-            string groupName = string.Empty;
+            groupName = string.Empty;
             if (options.Length >= 1) {
                 groupName = options[0] as string;
                 if (groupName != null) {
@@ -65,7 +67,15 @@ namespace AquaPic.UserInterface
         }
 
         public override void OnUpdate () {
-            currentValue = Modules.Temperature.temperature;
+            if (groupName.IsNotEmpty ()) {
+                if (Temperature.AreTemperatureProbesConnected (groupName)) {
+                    currentValue = Temperature.GetTemperatureGroupTemperature (groupName);
+                } else {
+                    textBox.text = "--";
+                }
+            } else {
+                currentValue = Temperature.temperature;
+            }
         }
     }
 }
