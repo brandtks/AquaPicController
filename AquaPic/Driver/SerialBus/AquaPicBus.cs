@@ -110,7 +110,7 @@ namespace AquaPic.SerialBus
             messageBuffer = new Queue ();
 
             retryCount = 2;
-            readTimeout = 500;
+            readTimeout = 50;
 
             txRxThread = new Thread (txRx);
             txRxThread.IsBackground = true;
@@ -192,7 +192,7 @@ namespace AquaPic.SerialBus
                     count = messageBuffer.Count;
                 }
 
-                if (count > 0) {
+                if (count > 0) { //We've got messages, lets send them
                     if (count > 8) {
                         Gtk.Application.Invoke ((sender, e) => {
                             Logger.AddWarning (string.Format ("Message queue count is {0}", count));
@@ -220,61 +220,24 @@ namespace AquaPic.SerialBus
 
                                 #if DEBUG_SERIAL
                                 Console.WriteLine ("Sent Message");
-                                foreach (var w in m.writeBuffer)
+                                foreach (var w in m.writeBuffer) {
                                     Console.WriteLine ("{0:X}", w);
+                                }
                                 #endif
 
+                                // write message
                                 apbPort.Write (m.writeBuffer);
 
+                                // wait for response
                                 stopwatch.Restart (); // resets stopwatch for response time, getResponse(ref byte[]) stops it
 
+                                lock (receiveBuffer.SyncLock) {
+                                    receiveBuffer.responseLength = m.responseLength;
+                                    receiveBuffer.buffer.Clear ();
+                                }
+
                                 try {
-                                    lock (receiveBuffer.SyncLock) {
-                                        receiveBuffer.responseLength = m.responseLength;
-                                        receiveBuffer.buffer.Clear ();
-                                    }
-
                                     getResponse (ref m.readBuffer);
-
-                                    if (m.readBuffer.Length >= m.responseLength) {
-                                        if (checkResponse (ref m.readBuffer)) {
-
-                                            #if DEBUG_SERIAL
-                                            Console.WriteLine ("Received Message in main thread");
-                                            Console.WriteLine ("Message length is {0}, expected {1}", m.readBuffer.Length, m.responseLength);
-                                            foreach (var w in m.readBuffer)
-                                                Console.WriteLine ("{0:X}", w);
-                                            #endif
-
-                                            if (m.callback != null) {
-                                                Gtk.Application.Invoke ((sender, e) => m.callback (new CallbackArgs (m.readBuffer)));
-                                            }
-
-                                            if (Alarm.CheckAlarming (m.slave.alarmIdx))
-                                                Alarm.Clear (m.slave.alarmIdx);
-
-                                            m.slave.UpdateStatus (AquaPicBusStatus.CommunicationSuccess, (int)stopwatch.ElapsedMilliseconds);
-                                            break;
-                                        } else {
-                                            m.slave.UpdateStatus (AquaPicBusStatus.CrcError, readTimeout);
-                                            Gtk.Application.Invoke ((sender, e) => {
-                                                Logger.AddWarning ("APB {0} crc error on function number {1}", m.slave.Address, m.writeBuffer [1]);
-                                            });
-
-                                            #if DEBUG_SERIAL
-                                            Console.WriteLine ("<ERROR> APB {0} crc error on function number {1}", m.slave.Address, m.writeBuffer [1]);
-                                            #endif
-                                        }
-                                    } else {
-                                        m.slave.UpdateStatus (AquaPicBusStatus.LengthError, readTimeout);
-                                        Gtk.Application.Invoke ((sender, e) => {
-                                            Logger.AddWarning ("APB {0} response length error on function number {1}", m.slave.Address, m.writeBuffer [1]);
-                                        });
-
-                                        #if DEBUG_SERIAL
-                                        Console.WriteLine ("<ERROR> APB {0} response length error on function number {1}", m.slave.Address, m.writeBuffer [1]);
-                                        #endif
-                                    }
                                 } catch (TimeoutException) {
                                     m.slave.UpdateStatus (AquaPicBusStatus.Timeout, readTimeout);
                                     Gtk.Application.Invoke ((sender, e) => {
@@ -286,11 +249,54 @@ namespace AquaPic.SerialBus
                                     #endif
                                 }
 
+                                // check response
+                                if (m.readBuffer.Length >= m.responseLength) {
+                                    if (checkResponse (ref m.readBuffer)) {
+                                        // response is all good
+                                        #if DEBUG_SERIAL
+                                        Console.WriteLine ("Received Message in main thread");
+                                        Console.WriteLine ("Message length is {0}, expected {1}", m.readBuffer.Length, m.responseLength);
+                                        foreach (var w in m.readBuffer) {
+                                            Console.WriteLine ("{0:X}", w);
+                                        }
+                                        #endif
+
+                                        if (m.callback != null) {
+                                            Gtk.Application.Invoke ((sender, e) => m.callback (new CallbackArgs (m.readBuffer)));
+                                        }
+
+                                        if (Alarm.CheckAlarming (m.slave.alarmIdx)) {
+                                            Alarm.Clear (m.slave.alarmIdx);
+                                        }
+
+                                        m.slave.UpdateStatus (AquaPicBusStatus.CommunicationSuccess, (int)stopwatch.ElapsedMilliseconds);
+                                        break;
+                                    } else {
+                                        m.slave.UpdateStatus (AquaPicBusStatus.CrcError, readTimeout);
+                                        Gtk.Application.Invoke ((sender, e) => {
+                                            Logger.AddWarning ("APB {0} crc error on function number {1}", m.slave.Address, m.writeBuffer[1]);
+                                        });
+
+                                        #if DEBUG_SERIAL
+                                        Console.WriteLine ("<ERROR> APB {0} crc error on function number {1}", m.slave.Address, m.writeBuffer [1]);
+                                        #endif
+                                    }
+                                } else {
+                                    m.slave.UpdateStatus (AquaPicBusStatus.LengthError, readTimeout);
+                                    Gtk.Application.Invoke ((sender, e) => {
+                                        Logger.AddWarning ("APB {0} response length error on function number {1}", m.slave.Address, m.writeBuffer[1]);
+                                    });
+
+                                    #if DEBUG_SERIAL
+                                    Console.WriteLine ("<ERROR> APB {0} response length error on function number {1}", m.slave.Address, m.writeBuffer [1]);
+                                    #endif
+                                }
+
                                 lock (receiveBuffer.SyncLock) {
                                     receiveBuffer.waitForResponse = false;
                                 }
 
-                                Thread.Sleep (100);
+                                // Thread.Sleep (100);
                             }
 
                             //all retry attempts have failed, post alarm

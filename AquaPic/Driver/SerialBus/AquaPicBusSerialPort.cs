@@ -14,6 +14,25 @@ namespace AquaPic.SerialBus
     {
         public SerialPort uart;
 
+        public AquaPicBusSerialPort () { }
+
+        public void Open (string port, int baudRate) {
+            uart = new SerialPort (port, baudRate, Parity.None, 8, StopBits.One);
+            uart.Handshake = Handshake.None;
+            uart.Open ();
+        }
+
+        public void Write (byte[] message) {
+            Thread.Sleep (12);
+            uart.Write (message, 0, message.Length);
+        }
+    }
+
+    /*
+    public class AquaPicBusSerialPort
+    {
+        public SerialPort uart;
+
         #if !HACK_PARITY_ON_LINUX
         int fd; // termios fd for setting parity on linux
         #endif
@@ -67,6 +86,7 @@ namespace AquaPic.SerialBus
         protected void LinuxWrite (byte[] message) {
             #if HACK_PARITY_ON_LINUX
             WriteWithHackParity (message [0], Parity.Mark);                 //send address
+            Thread.Sleep (10);
             for (int i = 1; i < message.Length; ++i) {                      //send message
                 WriteWithHackParity (message [i]);
             }
@@ -102,5 +122,6 @@ namespace AquaPic.SerialBus
             Thread.Sleep (10);
         }
     }
+    */
 }
 
