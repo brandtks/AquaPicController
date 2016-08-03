@@ -208,17 +208,18 @@ namespace AquaPic.UserInterface
                 var s = new SwitchSettings (switchName, switchName.IsNotEmpty ());
                 s.Run ();
                 var newSwitchName = s.newOrUpdatedFloatSwitchName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                if ((newSwitchName != switchName) && switchName.IsNotEmpty ()) { // The switch name was changed
+                if ((outcome == TouchSettingsOutcome.Modified) && (newSwitchName != switchName)) {
                     var index = switchCombo.comboList.IndexOf (switchName);
                     switchCombo.comboList[index] = newSwitchName;
                     switchName = newSwitchName;
-                } else if (!WaterLevel.CheckFloatSwitchKeyNoThrow (newSwitchName)) { // A new switch was added
+                } else if (outcome == TouchSettingsOutcome.Added) {
                     switchCombo.comboList.Insert (switchCombo.comboList.Count - 1, newSwitchName);
                     switchCombo.activeText = newSwitchName;
                     switchName = newSwitchName;
-                } else if (!WaterLevel.CheckFloatSwitchKeyNoThrow (switchName)) { // The switch was deleted
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
                     switchCombo.comboList.Remove (switchName);
                     switchName = WaterLevel.defaultFloatSwitch;
                     switchCombo.activeText = switchName;
@@ -307,9 +308,10 @@ namespace AquaPic.UserInterface
                 var s = new SwitchSettings (string.Empty, false);
                 s.Run ();
                 var newSwitchName = s.newOrUpdatedFloatSwitchName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                if (WaterLevel.CheckFloatSwitchKeyNoThrow (newSwitchName)) {
+                if (outcome == TouchSettingsOutcome.Added) {
                     switchCombo.comboList.Insert (switchCombo.comboList.Count - 1, newSwitchName);
                     switchCombo.activeText = newSwitchName;
                     switchName = newSwitchName;

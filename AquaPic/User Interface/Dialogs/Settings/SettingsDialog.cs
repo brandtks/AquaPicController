@@ -8,6 +8,13 @@ namespace AquaPic.UserInterface
 {
     public delegate bool SaveHandler (object sender);
 
+    public enum TouchSettingsOutcome {
+        Added,
+        Modified,
+        Deleted,
+        Cancelled
+    }
+    
     public class TouchSettingsDialog : Gtk.Dialog
     {
         public Fixed fix;
@@ -16,6 +23,7 @@ namespace AquaPic.UserInterface
         public Dictionary<string, SettingsWidget> settings;
         public bool includeDelete;
         public bool showOptional;
+        public TouchSettingsOutcome outcome;
 
         public TouchButton saveBtn;
         public TouchButton cancelButton;
@@ -67,8 +75,15 @@ namespace AquaPic.UserInterface
                 if (SaveEvent != null)
                     success = SaveEvent (this);
 
-                if (success)
+                if (success) {
+                    if (this.includeDelete) {
+                        outcome = TouchSettingsOutcome.Modified;
+                    } else {
+                        outcome = TouchSettingsOutcome.Added;
+                    }
+
                     Destroy ();
+                }
             };
             fix.Put (saveBtn, 495, height - 35);
             saveBtn.Show ();
@@ -77,6 +92,7 @@ namespace AquaPic.UserInterface
             cancelButton.SetSizeRequest (100, 30);
             cancelButton.text = "Cancel";
             cancelButton.ButtonReleaseEvent += (o, args) => {
+                outcome = TouchSettingsOutcome.Cancelled;
                 Destroy ();
             };
             fix.Put (cancelButton, 385, height - 35);
@@ -104,6 +120,7 @@ namespace AquaPic.UserInterface
                                 success = DeleteButtonEvent (this);
 
                             if (success) {
+                                outcome = TouchSettingsOutcome.Deleted;
                                 Destroy ();
                             }
                         }

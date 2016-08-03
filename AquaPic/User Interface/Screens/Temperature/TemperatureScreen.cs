@@ -102,17 +102,14 @@ namespace AquaPic.UserInterface
                 var s = new TemperatureGroupSettings (groupName, !groupName.IsEmpty ());
                 s.Run ();
                 var newGroupName = s.temperatureGroupName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                // A new group was added
-                if (!Temperature.CheckTemperatureGroupKeyNoThrow (newGroupName)) {
+                if (outcome == TouchSettingsOutcome.Added) {
                     groupName = newGroupName;
                     groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, groupName);
                     groupCombo.activeText = groupName;
-                }
-
-                // The group was deleted
-                if (!Temperature.CheckTemperatureGroupKeyNoThrow (groupName)) {
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
                     groupCombo.comboList.Remove (groupName);
                     groupName = Temperature.defaultTemperatureGroup;
                     groupCombo.activeText = groupName;
@@ -151,17 +148,18 @@ namespace AquaPic.UserInterface
                 var s = new HeaterSettings (heaterName, heaterName.IsNotEmpty ());
                 s.Run ();
                 var newHeaterName = s.newOrUpdatedHeaterName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                if ((newHeaterName != heaterName) && heaterName.IsNotEmpty ()) { // The heater name was changed
+                if ((outcome == TouchSettingsOutcome.Modified) && (newHeaterName != heaterName)) {
                     var index = heaterCombo.comboList.IndexOf (heaterName);
                     heaterCombo.comboList[index] = newHeaterName;
                     heaterName = newHeaterName;
-                } else if (Temperature.CheckHeaterKeyNoThrow (newHeaterName)) { // A new heater was added
+                } else if (outcome == TouchSettingsOutcome.Added) {
                     heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
                     heaterCombo.activeText = newHeaterName;
                     heaterName = newHeaterName;
-                } else if (!Temperature.CheckHeaterKeyNoThrow (heaterName)) { // The heater was deleted
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
                     heaterCombo.comboList.Remove (heaterName);
                     heaterName = Temperature.defaultHeater;
                     heaterCombo.activeText = heaterName;
@@ -192,17 +190,18 @@ namespace AquaPic.UserInterface
                 var s = new ProbeSettings (probeName, probeName.IsNotEmpty ());
                 s.Run ();
                 var newProbeName = s.newOrUpdatedProbeName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                if ((newProbeName != probeName) && probeName.IsNotEmpty ()) { // The probe name was changed
+                if ((outcome == TouchSettingsOutcome.Modified) && (newProbeName != probeName)) {
                     var index = probeCombo.comboList.IndexOf (probeName);
                     probeCombo.comboList[index] = newProbeName;
                     probeName = newProbeName;
-                } else if (Temperature.CheckTemperatureProbeKeyNoThrow (newProbeName)) { // A new probe was added
+                } else if (outcome == TouchSettingsOutcome.Added) {
                     probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
                     probeCombo.activeText = newProbeName;
                     probeName = newProbeName;
-                } else if (!Temperature.CheckTemperatureProbeKeyNoThrow (probeName)) { // The probe was deleted
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
                     probeCombo.comboList.Remove (probeName);
                     probeName = Temperature.defaultTemperatureProbe;
                     probeCombo.activeText = probeName;
@@ -343,9 +342,10 @@ namespace AquaPic.UserInterface
                 var s = new HeaterSettings (string.Empty, false);
                 s.Run ();
                 var newHeaterName = s.newOrUpdatedHeaterName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                if (Temperature.CheckHeaterKeyNoThrow (newHeaterName)) { // A new heater was added
+                if (outcome == TouchSettingsOutcome.Added) { 
                     heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
                     heaterCombo.activeText = newHeaterName;
                     heaterName = newHeaterName;
@@ -365,9 +365,10 @@ namespace AquaPic.UserInterface
                 var s = new ProbeSettings (string.Empty, false);
                 s.Run ();
                 var newProbeName = s.newOrUpdatedProbeName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                if (Temperature.CheckTemperatureProbeKeyNoThrow (newProbeName)) {
+                if (outcome == TouchSettingsOutcome.Added) {
                     probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
                     probeCombo.activeText = newProbeName;
                     probeName = newProbeName;
@@ -387,9 +388,10 @@ namespace AquaPic.UserInterface
                 var s = new TemperatureGroupSettings (string.Empty, false);
                 s.Run ();
                 string newGroupName = s.temperatureGroupName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                if (Temperature.CheckTemperatureGroupKeyNoThrow (newGroupName)) {
+                if (outcome == TouchSettingsOutcome.Added) {
                     groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, newGroupName);
                     groupCombo.activeText = newGroupName;
                     groupName = newGroupName;

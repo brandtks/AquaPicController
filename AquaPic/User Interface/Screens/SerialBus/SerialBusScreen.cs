@@ -21,10 +21,6 @@ namespace AquaPic.UserInterface
         public SerialBusWindow (params object[] options) : base () {
             screenTitle = "AquaPic Bus";
 
-            //var box = new TouchGraphicalBox (780, 395);
-            //Put (box, 10, 30);
-
-            //int height = (slaves.Length * 35) + 27;
             var f = new Fixed ();
             f.SetSizeRequest (715, 360);
 
@@ -70,13 +66,6 @@ namespace AquaPic.UserInterface
                 f.Put (slaves [i], 5, (i * 35) + 23);
                 slaves [i].Show ();
             }
-                
-//            ScrolledWindow sw = new ScrolledWindow ();
-//            sw.SetSizeRequest (770, 350);
-//            sw.AddWithViewport (eb);
-//            //sw.AddWithViewport (f);
-//            Put (sw, 15, 70);
-//            sw.Show ();
 
             var b = new TouchButton ();
             b.SetSizeRequest (100, 30);
@@ -88,6 +77,7 @@ namespace AquaPic.UserInterface
             Put (b, 685, 70);
             b.Show ();
 
+            c = new TouchComboBox ();
             if (!AquaPicBus.isOpen) {
                 string[] portNames = SerialPort.GetPortNames ();
                 if (Utils.ExecutingOperatingSystem == Platform.Linux) {
@@ -99,24 +89,15 @@ namespace AquaPic.UserInterface
                     }
                     portNames = sortedPortNames.ToArray ();
                 }
-                c = new TouchComboBox (portNames);
+                c.comboList.AddRange (portNames);
+                c.nonActiveMessage = "Select Port";
             } else {
-                c = new TouchComboBox ();
                 c.comboList.Add (AquaPicBus.portName);
+                c.activeText = AquaPicBus.portName;
             }
-            c.nonActiveMessage = "Select Port";
             c.WidthRequest = 300;
             Put (c, 380, 70);
             c.Show ();
-                
-//            eb = new EventBox ();
-//            eb.SetSizeRequest (300, 380);
-//            eb.VisibleWindow = false;
-//            eb.Visible = true;
-//            eb.Add (c);
-//            Put (eb, 380, 35);
-//            eb.Show ();
-//            c.Show ();
 
             GetSlaveData ();
 

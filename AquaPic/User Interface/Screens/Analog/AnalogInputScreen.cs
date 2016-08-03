@@ -112,6 +112,7 @@ namespace AquaPic.UserInterface
                 d.progressBar.enableTouch = false;
                 d.textBox.enableTouch = false;
                 d.button.buttonColor = "grey4";
+
             }
 
             d.QueueDraw ();

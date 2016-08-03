@@ -408,7 +408,7 @@ namespace AquaPic.Modules
                 AquaPicDrivers.AnalogOutput.AddChannel (fixture.channel, fixture.name);
                 AquaPicDrivers.AnalogOutput.SetChannelType (fixture.name, type);
                 var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (fixture.channel);
-                valueControl.ValueGetter = fixture.OnSetDimmingLevel;
+                valueControl.ValueGetter = fixture.CalculateDimmingLevel;
                 return;
             }
 

@@ -102,7 +102,6 @@ namespace AquaPic.UserInterface
                 d.ss.Visible = true;
                 d.typeLabel.Visible = false;
                 #endif
-
             } else {
                 AquaPicDrivers.AnalogOutput.SetChannelMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;

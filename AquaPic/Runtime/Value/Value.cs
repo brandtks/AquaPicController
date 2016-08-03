@@ -18,12 +18,10 @@ namespace AquaPic.Runtime
                 newValue = ValueGetter ();
             }
 
-            if (value != newValue) {
-                value = newValue;
+            value = newValue;
 
-                if (ValueSetter != null) {
-                    ValueSetter (value);
-                }
+            if (ValueSetter != null) {
+                ValueSetter (value);
             }
         }
     }

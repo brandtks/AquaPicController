@@ -48,14 +48,14 @@ namespace AquaPic.Modules
                 AquaPicDrivers.AnalogOutput.AddChannel (channel, name);
                 AquaPicDrivers.AnalogOutput.SetChannelType (channel, type);
                 var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (channel);
-                valueControl.ValueGetter = OnSetDimmingLevel;
+                valueControl.ValueGetter = CalculateDimmingLevel;
 
                 Power.AddHandlerOnModeChange (
                     plug,
                     OnLightingPlugModeChange);
             }
 
-            public float OnSetDimmingLevel () {
+            public float CalculateDimmingLevel () {
                 if (lightingOn == MyState.On) {
                     TimeDate now = TimeDate.Now;
 

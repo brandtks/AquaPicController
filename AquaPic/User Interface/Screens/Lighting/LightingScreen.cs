@@ -409,21 +409,22 @@ namespace AquaPic.UserInterface
                 var s = new FixtureSettings (fixtureName, fixtureName.IsNotEmpty ());
                 s.Run ();
                 var newFixtureName = s.newOrUpdatedFixtureName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                if ((newFixtureName != fixtureName) && fixtureName.IsNotEmpty ()) { // The fixture name was changed
+                if ((outcome == TouchSettingsOutcome.Modified) && (newFixtureName != fixtureName)) {
                     var index = combo.comboList.IndexOf (fixtureName);
                     combo.comboList[index] = newFixtureName;
                     fixtureName = newFixtureName;
-                } else if (Lighting.CheckFixtureKeyNoThrow (newFixtureName)) { // A new fixture was added
+                } else if (outcome == TouchSettingsOutcome.Added) {
                     combo.comboList.Insert (combo.comboList.Count - 1, newFixtureName);
                     combo.activeText = newFixtureName;
                     fixtureName = newFixtureName;
-                } else if (!Lighting.CheckFixtureKeyNoThrow (fixtureName)) { // The fixture was deleted
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
                     combo.comboList.Remove (fixtureName);
                     fixtureName = Lighting.defaultFixture;
                     combo.activeText = fixtureName;
-                }  
+                }
 
                 combo.QueueDraw ();
                 GetFixtureData ();
@@ -575,12 +576,15 @@ namespace AquaPic.UserInterface
                 var s = new FixtureSettings (string.Empty, false);
                 s.Run ();
                 var newFixtureName = s.newOrUpdatedFixtureName;
+                var outcome = s.outcome;
                 s.Destroy ();
 
-                if (Lighting.CheckFixtureKeyNoThrow (newFixtureName)) { // A new fixture was added
+                if (outcome == TouchSettingsOutcome.Added) {
                     combo.comboList.Insert (combo.comboList.Count - 1, newFixtureName);
                     combo.activeText = newFixtureName;
                     fixtureName = newFixtureName;
+                } else {
+                    combo.activeText = fixtureName;
                 }
             } else {
                 fixtureName = e.ActiveText;
