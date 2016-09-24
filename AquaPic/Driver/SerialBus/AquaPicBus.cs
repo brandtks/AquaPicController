@@ -130,7 +130,6 @@ namespace AquaPic.SerialBus
         }
 
         //57600
-        //RPi gpio uart port is /dev/ttyAMA0
         public static void Open (string port, int baudRate = 57600) {
             try {
                 uart = new SerialPort (port, baudRate, Parity.None, 8, StopBits.One);

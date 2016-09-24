@@ -7,6 +7,7 @@ namespace AquaPic.UserInterface
     {
         public static Dictionary<string, LinePlotData> linePlots;
         public static Dictionary<string, BarPlotData> barPlots;
+        public static Dictionary<string, CurvedBarPlotData> curvedBarPlots;
 
         static HomeWindowWidgets () {
             linePlots = new Dictionary<string, LinePlotData> () {
@@ -15,8 +16,11 @@ namespace AquaPic.UserInterface
             };
 
             barPlots = new Dictionary<string, BarPlotData> () {
-                { "Water Level", new BarPlotData (() => {return new WaterLevelWidget ();}) }
+                { "Water Level", new BarPlotData (() => {return new WaterLevelWidget ();}) },
+                { "ATO Reservoir Level", new BarPlotData (() => {return new AtoReservoirLevelWidget ();}) }
             };
+
+            curvedBarPlots = new Dictionary<string, CurvedBarPlotData> ();
         }
     }
 }

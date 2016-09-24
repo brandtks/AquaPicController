@@ -50,6 +50,7 @@ namespace AquaPic.UserInterface
 
             var minuteLabel = new TouchLabel ();
             minuteLabel.text = "Minutes";
+            minuteLabel.textColor = "grey3";
             Put (minuteLabel, 5, 47);
             minuteLabel.Show ();
 
@@ -91,6 +92,7 @@ namespace AquaPic.UserInterface
 
             var secondsLabel = new TouchLabel ();
             secondsLabel.text = "Seconds";
+            secondsLabel.textColor = "grey3";
             Put (secondsLabel, 108, 47);
             secondsLabel.Show ();
 
@@ -248,7 +250,7 @@ namespace AquaPic.UserInterface
 
         protected void UpdateScreen () {
             if (timers [timerIndex].state == DeluxeTimerState.Waiting)
-                resetButton.buttonColor = "grey2";
+                resetButton.buttonColor = "grey1";
             else
                 resetButton.buttonColor = "pri";
 
@@ -260,12 +262,12 @@ namespace AquaPic.UserInterface
                 startStopButton.buttonColor = "seca";
 
                 if (timers [timerIndex].totalSeconds == 0)
-                    secUpDown.down.buttonColor = "grey2";
+                    secUpDown.down.buttonColor = "grey1";
                 else
                     secUpDown.down.buttonColor = "pri";
 
                 if (minutes.text == "0")
-                    minUpDown.down.buttonColor = "grey2";
+                    minUpDown.down.buttonColor = "grey1";
                 else
                     minUpDown.down.buttonColor = "pri";
 
@@ -322,24 +324,19 @@ namespace AquaPic.UserInterface
                     cr.ClosePath ();
 
                     if (selected) {
-                        color = "pri";
+                        color = "grey2";
+                        color.A = 1.0f;
                     } else {
-                        color = "grey3";
+                        color = "grey4";
+                        color.A = 0.1f;
                     }
                     color.SetSource (cr);
 
-                    if (selected) {
-                        cr.Fill ();
-                    } else {
-                        cr.FillPreserve ();
-                        cr.LineWidth = 0.4;
-                        TouchColor.SetSource (cr, "black");
-                        cr.Stroke ();
-                    }
+                    cr.Fill ();
 
                     TouchText render = new TouchText (text);
                     render.alignment = TouchAlignment.Center;
-                    render.font.color = "black";
+                    render.font.color = "white";
                     render.Render (this, left, top, width, height);
                 }
             }
@@ -355,10 +352,10 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, color, transparency);
                     cr.Fill ();
 
-                    cr.MoveTo (Allocation.Left, Allocation.Top - 1);
-                    cr.LineTo (Allocation.Right, Allocation.Top - 1);
-                    TouchColor.SetSource (cr, "pri");
-                    cr.LineWidth = 8.0;
+                    cr.MoveTo (Allocation.Left, Allocation.Top - 2);
+                    cr.LineTo (Allocation.Right, Allocation.Top - 2);
+                    TouchColor.SetSource (cr, "grey2", 1.0);
+                    cr.LineWidth = 4.0;
                     cr.Stroke ();
                 }
             }

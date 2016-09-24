@@ -31,6 +31,14 @@ namespace AquaPic.Modules
             public uint maxPumpOnTime;
             public uint minPumpOffTime;
 
+            public IndividualControl reservoirLevelChannel;
+            public float reservoirLevel;
+            public float zeroValue;
+            public float fullScaleActual;
+            public float fullScaleValue;
+            public float reservoirLowLevelSetpoint;
+            public bool disableOnLowResevoirLevel;
+
             public AutoTopOffState state;
             public int atoFailAlarmIndex;
 
@@ -42,8 +50,8 @@ namespace AquaPic.Modules
                 bool useFloatSwitch,
                 IndividualControl pumpPlug,
                 uint maxPumpOnTime,
-                uint minPumpOffTime) 
-            {
+                uint minPumpOffTime
+            ) {
                 this.enable = enable;
 
                 this.useAnalogSensor = useAnalogSensor;
@@ -60,6 +68,14 @@ namespace AquaPic.Modules
                 this.maxPumpOnTime = maxPumpOnTime;
                 this.minPumpOffTime = minPumpOffTime;
 
+                reservoirLevelChannel = IndividualControl.Empty;
+                reservoirLevel = 0.0f;
+                zeroValue = 819.2f;
+                fullScaleActual = 15.0f;
+                fullScaleValue = 4096.0f;
+                reservoirLowLevelSetpoint = 0.0f;
+                disableOnLowResevoirLevel = false;
+
                 state = AutoTopOffState.Standby;
                 atoFailAlarmIndex = Alarm.Subscribe ("Auto top off failed");
 
@@ -71,6 +87,13 @@ namespace AquaPic.Modules
 
             public void Run () {
                 if (enable) {
+                    if (reservoirLevelChannel.IsNotEmpty ()) {
+                        reservoirLevel = AquaPicDrivers.AnalogInput.GetChannelValue (reservoirLevelChannel);
+                        reservoirLevel = reservoirLevel.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
+                    } else {
+                        disableOnLowResevoirLevel = false;
+                    }
+                    
                     if ((!Alarm.CheckAlarming (highSwitchAlarmIndex)) || (!Alarm.CheckAlarming (analogSensor.highAnalogAlarmIndex))) {
                         switch (state) {
                         case AutoTopOffState.Standby:
@@ -82,16 +105,25 @@ namespace AquaPic.Modules
                                     if (analogSensor.connected) {
                                         usedAnalog = true;
 
-                                        if (analogSensor.waterLevel < analogOnSetpoint)
+                                        if (analogSensor.waterLevel < analogOnSetpoint) {
                                             pumpOnRequest = true;
+                                        }
                                     }
                                 } 
 
                                 if (useFloatSwitch) {
-                                    if (usedAnalog)
-                                        pumpOnRequest &= floatSwitchActivated; // set during water level run function
-                                    else
+                                    // floatSwitchActivated is set by water level run function
+                                    if (usedAnalog) {
+                                        pumpOnRequest &= floatSwitchActivated; 
+                                    } else {
                                         pumpOnRequest = floatSwitchActivated;
+                                    }
+                                }
+
+                                if ((disableOnLowResevoirLevel) && (reservoirLevel < reservoirLowLevelSetpoint)) {
+                                    pumpOnRequest = false;
+                                    state = AutoTopOffState.Error;
+                                    Alarm.Post (atoFailAlarmIndex);
                                 }
 
                                 if (pumpOnRequest) {
@@ -108,6 +140,7 @@ namespace AquaPic.Modules
                         case AutoTopOffState.Filling:
                             pumpOnRequest = true;
 
+                            // check analog sensor
                             if ((analogSensor.enable) && (useAnalogSensor)) {
                                 if (!Alarm.CheckAlarming (analogSensor.sensorDisconnectedAlarmIndex)) { 
                                     if (analogSensor.waterLevel > analogOffSetpoint)
@@ -115,9 +148,11 @@ namespace AquaPic.Modules
                                 }
                             }
 
-                            if ((useFloatSwitch) && (!floatSwitchActivated))
+                            // check float switch
+                            if ((useFloatSwitch) && (!floatSwitchActivated)) {
                                 pumpOnRequest = false;
-
+                            }
+                            
                             if (!pumpOnRequest) {
                                 state = AutoTopOffState.Cooldown;
                                 pumpTimer.Reset ();
@@ -146,8 +181,8 @@ namespace AquaPic.Modules
 
             protected void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
                 if (state == AutoTopOffState.Filling) {
-                    state = AutoTopOffState.Error;
                     pumpOnRequest = false;
+                    state = AutoTopOffState.Error;
                     Alarm.Post (atoFailAlarmIndex);
                 } else if (state == AutoTopOffState.Cooldown) {
                     state = AutoTopOffState.Standby;

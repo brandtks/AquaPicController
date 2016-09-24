@@ -6,7 +6,7 @@ namespace AquaPic.UserInterface
 {
     public delegate float GetDimmingLevelHandler ();
 
-    public class DimmingLightBarPlot : BarPlotWidget
+    public class DimmingLightBarPlot : CurvedBarPlotWidget
     {
         public GetDimmingLevelHandler GetDimmingLevel;
 

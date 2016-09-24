@@ -6,6 +6,7 @@ using AquaPic.Runtime;
 using AquaPic.Modules;
 using AquaPic.Drivers;
 using AquaPic.Utilites;
+using AquaPic.Sensors;
 
 namespace AquaPic.UserInterface
 {

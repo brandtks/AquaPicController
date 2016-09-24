@@ -9,6 +9,7 @@ namespace AquaPic.UserInterface
     public class TemperatureLinePlot : LinePlotWidget
     {
         string groupName;
+        TouchLabel label;
 
         public TemperatureLinePlot (params object[] options)
             : base () 
@@ -25,6 +26,13 @@ namespace AquaPic.UserInterface
             };
             Put (eventbox, 0, 0);
             eventbox.Show ();
+
+            label = new TouchLabel ();
+            label.SetSizeRequest (152, 16);
+            label.textColor = "compl";
+            label.textAlignment = TouchAlignment.Right;
+            label.textHorizontallyCentered = true;
+            Put (label, 155, 63);
 
             groupName = string.Empty;
             if (options.Length >= 1) {
@@ -47,13 +55,7 @@ namespace AquaPic.UserInterface
                     linePlot.UnLinkDataLogger (Temperature.GetTemperatureGroupDataLogger (groupName));
                 };
 
-                var label = new TouchLabel ();
-                label.SetSizeRequest (152, 16);
-                label.text = groupName;
-                label.textColor = "grey3";
-                label.textAlignment = TouchAlignment.Right;
-                label.textHorizontallyCentered = true;
-                Put (label, 155, 63);
+                text = string.Format ("{0} Temperature", groupName);
             }
 
             linePlot.eventColors.Add ("no probes", new TouchColor ("secb", 0.25));
@@ -72,6 +74,8 @@ namespace AquaPic.UserInterface
                     currentValue = Temperature.GetTemperatureGroupTemperature (groupName);
                 } else {
                     textBox.text = "--";
+                    label.Visible = true;
+                    label.text = "Disconnected";
                 }
             } else {
                 currentValue = Temperature.temperature;

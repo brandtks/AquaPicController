@@ -7,7 +7,8 @@ namespace AquaPic.UserInterface
 {
     public delegate BarPlotWidget CreateBarPlotHandler ();
 
-    public class BarPlotData {
+    public class BarPlotData
+    {
         public CreateBarPlotHandler CreateInstanceEvent;
 
         public BarPlotData (CreateBarPlotHandler CreateInstanceEvent) {
@@ -25,18 +26,18 @@ namespace AquaPic.UserInterface
     public class BarPlotWidget : Fixed
     {
         public string text {
-            get { return label.text; }
+            get { return nameLabel.text; }
             set {
-                label.text = value;
+                nameLabel.text = value;
             }
         }
 
         public float currentValue {
             get {
-                return bar.progress;
+                return bar.currentProgress;
             }
             set {
-                bar.progress = value / fullScale;
+                bar.currentProgress = value / fullScale;
                 textBox.text = value.ToString ("F1");
             }
         }
@@ -52,42 +53,42 @@ namespace AquaPic.UserInterface
 
         public float fullScale;
 
-        private TouchCurvedProgressBar bar;
-        private TouchLabel textBox;
-        private TouchLabel label;
+        private TouchProgressBar bar;
+        protected TouchLabel textBox;
+        protected TouchLabel nameLabel;
 
         public BarPlotWidget () {
-            SetSizeRequest (205, 169);
+            SetSizeRequest (100, 169);
 
-            var box = new TouchGraphicalBox (205, 169);
+            var box = new TouchGraphicalBox (100, 169);
             box.color = "grey4";
             box.transparency = 0.1f;
             Put (box, 0, 0);
 
-            label = new TouchLabel ();
-            label.text = "Plot";
-            label.textColor = "grey3";
-            label.WidthRequest = 199;
-            label.textAlignment = TouchAlignment.Center;
-            label.textRender.textWrap = TouchTextWrap.Shrink;
-            Put (label, 3, 80);
+            nameLabel = new TouchLabel ();
+            nameLabel.text = "Plot";
+            nameLabel.textColor = "grey3";
+            nameLabel.HeightRequest = 151;
+            nameLabel.textAlignment = TouchAlignment.Center;
+            nameLabel.textRender.textWrap = TouchTextWrap.Shrink;
+            nameLabel.textRender.orientation = TouchOrientation.Vertical;
+            Put (nameLabel, 82, 9);
 
-            bar = new TouchCurvedProgressBar ();
-            bar.backgroundColor = "grey3";
-            bar.backgroundColor.A = 0.15f;
-            bar.curveStyle = CurveStyle.ThreeQuarterCurve;
-            bar.SetSizeRequest (199, 163);
-            Put (bar, 3, 3);
+            bar = new TouchProgressBar ();
+            bar.colorBackground = "grey3";
+            bar.colorBackground.A = 0.15f;
+            bar.SetSizeRequest (26, 161);
+            Put (bar, 56, 4);
 
             fullScale = 100.0f;
 
             textBox = new TouchLabel ();
-            textBox.SetSizeRequest (199, 30);
-            textBox.textSize = 20;
+            textBox.SetSizeRequest (53, 30);
+            textBox.textSize = 14;
             textBox.text = "0.0";
             textBox.textColor = "pri";
             textBox.textAlignment = TouchAlignment.Center;
-            Put (textBox, 3, 130);
+            Put (textBox, 0, 49);
         }
 
         public virtual void OnUpdate () {

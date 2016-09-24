@@ -16,6 +16,7 @@ namespace AquaPic.UserInterface
     {
         List<LinePlotWidget> linePlots;
         List<BarPlotWidget> barPlots;
+        List<CurvedBarPlotWidget> curvedBarPlots;
 
         uint timerId;
 
@@ -25,21 +26,27 @@ namespace AquaPic.UserInterface
             var names = Lighting.GetAllFixtureNames ();
             foreach (var name in names) {
                 if (Lighting.IsDimmingFixture (name)) {
-                    if (!HomeWindowWidgets.barPlots.ContainsKey (name))
-                        HomeWindowWidgets.barPlots.Add (
+                    if (!HomeWindowWidgets.curvedBarPlots.ContainsKey (name)) {
+                        Console.WriteLine ("Adding {0}", name);
+                        HomeWindowWidgets.curvedBarPlots.Add (
                             name, 
-                            new BarPlotData (() => {
+                            new CurvedBarPlotData (() => {
                                 return new DimmingLightBarPlot (
                                     name, 
-                                    () => {return Lighting.GetCurrentDimmingLevel (name);}
-                                );}
+                                    () => {
+                                        return Lighting.GetCurrentDimmingLevel (name);
+                                    }
+                                );
+                            }
                             )
                         );
+                    }
                 }
             }
 
             linePlots = new List<LinePlotWidget> ();
             barPlots = new List<BarPlotWidget> ();
+            curvedBarPlots = new List<CurvedBarPlotWidget> ();
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
@@ -96,6 +103,22 @@ namespace AquaPic.UserInterface
 
                             break;
                         }
+                    case "CurvedBarPlot": {
+                            string name = (string)jo["name"];
+
+                            if (HomeWindowWidgets.curvedBarPlots.ContainsKey (name)) {
+                                var bp = HomeWindowWidgets.curvedBarPlots[name].CreateInstance ();
+                                Put (bp, x, y);
+                                bp.Show ();
+
+                                curvedBarPlots.Add (bp);
+
+                            } else {
+                                Logger.AddWarning (string.Format ("Unknown bar plot for main window: {0}", name));
+                            }
+
+                            break;
+                        }
                     case "Button": {
                             string name = (string)jo ["name"];
 
@@ -133,6 +156,11 @@ namespace AquaPic.UserInterface
             foreach (var bp in barPlots) {
                 bp.OnUpdate ();
                 bp.QueueDraw ();
+            }
+
+            foreach (var curvedBarPlot in curvedBarPlots) {
+                curvedBarPlot.OnUpdate ();
+                curvedBarPlot.QueueDraw ();
             }
 
             return true;

@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
 using AquaPic.Drivers;
 using AquaPic.Utilites;
+using AquaPic.Sensors;
 
 namespace AquaPic.Modules
 {
@@ -344,10 +345,10 @@ namespace AquaPic.Modules
 
         public static bool AreTemperatureProbesConnected (string name) {
             CheckTemperatureGroupKey (name);
-            bool connected = true;
+            bool connected = false;
             foreach (var probe in probes.Values) {
                 if (probe.temperatureGroupName == name) {
-                    connected &= IsTemperatureProbeConnected (probe.name);
+                    connected |= IsTemperatureProbeConnected (probe.name);
                 }
             }
             return connected;

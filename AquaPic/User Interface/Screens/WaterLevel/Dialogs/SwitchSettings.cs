@@ -9,6 +9,7 @@ using TouchWidgetLibrary;
 using AquaPic.Modules;
 using AquaPic.Utilites;
 using AquaPic.Drivers;
+using AquaPic.Sensors;
 
 namespace AquaPic.UserInterface
 {

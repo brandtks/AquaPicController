@@ -67,7 +67,7 @@ namespace AquaPic.UserInterface
             Put (linePlot, 59, 3);
 
             displayLabel = new TouchLabel ();
-            displayLabel.SetSizeRequest (152, 16);
+            displayLabel.SetSizeRequest (200, 16);
             displayLabel.text = "Plot";
             displayLabel.textColor = "grey3";
             displayLabel.textAlignment = TouchAlignment.Left;
