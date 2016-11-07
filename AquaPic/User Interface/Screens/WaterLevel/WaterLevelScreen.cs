@@ -14,6 +14,7 @@ namespace AquaPic.UserInterface
     {
         uint timerId;
         TouchLabel atoStateTextBox;
+        TouchLabel reservoirLevelTextBox;
         TouchLabel analogLevelTextBox;
         TouchLabel switchStateTextBox;
         TouchLabel switchTypeLabel;
@@ -59,6 +60,32 @@ namespace AquaPic.UserInterface
             atoStateTextBox.textAlignment = TouchAlignment.Center;
             Put (atoStateTextBox, 60, 120);
             atoStateTextBox.Show ();
+
+            var reservoirLevelLabel = new TouchLabel ();
+            reservoirLevelLabel.WidthRequest = 329;
+            reservoirLevelLabel.text = "Reservoir Level";
+            reservoirLevelLabel.textColor = "grey3";
+            reservoirLevelLabel.textAlignment = TouchAlignment.Center;
+            Put (reservoirLevelLabel, 60, 230);
+            reservoirLevelLabel.Show ();
+
+            reservoirLevelTextBox = new TouchLabel ();
+            reservoirLevelTextBox.SetSizeRequest (329, 50);
+            reservoirLevelTextBox.textSize = 20;
+            reservoirLevelTextBox.textAlignment = TouchAlignment.Center;
+            if (WaterLevel.atoReservoirLevelEnabled) {
+                float wl = WaterLevel.atoReservoirLevel;
+                if (wl < 0.0f) {
+                    reservoirLevelTextBox.text = "Probe Disconnected";
+                } else {
+                    reservoirLevelTextBox.text = wl.ToString ("F2");
+                    reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
+                }
+            } else {
+                reservoirLevelTextBox.text = "Sensor disabled";
+            }
+            Put (reservoirLevelTextBox, 60, 195);
+            reservoirLevelTextBox.Show ();
 
             var atoSettingsBtn = new TouchButton ();
             atoSettingsBtn.text = "Settings";
@@ -285,15 +312,32 @@ namespace AquaPic.UserInterface
                     analogLevelTextBox.text = wl.ToString ("F2");
                     analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
                 }
-                analogLevelTextBox.QueueDraw ();
             } else {
                 analogLevelTextBox.text = "Sensor disabled";
+                reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
             }
+            analogLevelTextBox.QueueDraw ();
 
             if (WaterLevel.atoEnabled) {
                 atoStateTextBox.text = string.Format ("{0} : {1}", 
                     WaterLevel.atoState, 
                     WaterLevel.atoTime.SecondsToString ());
+
+                if (WaterLevel.atoReservoirLevelEnabled) {
+                    float wl = WaterLevel.atoReservoirLevel;
+                    if (wl < 0.0f) {
+                        reservoirLevelTextBox.text = "Probe Disconnected";
+                        reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
+                    } else {
+                        reservoirLevelTextBox.text = wl.ToString ("F2");
+                        reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
+                    }
+                } else {
+                    reservoirLevelTextBox.text = "Sensor disabled";
+                    reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
+                }
+                reservoirLevelTextBox.QueueDraw ();
+
             } else {
                 atoStateTextBox.text = "ATO Disabled";
             }

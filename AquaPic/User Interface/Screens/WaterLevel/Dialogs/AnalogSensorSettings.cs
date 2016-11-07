@@ -36,7 +36,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (s);
 
-            var t = new SettingTextBox ();
+            var t = new SettingsTextBox ();
             t.text = "High Alarm";
             t.textBox.text = WaterLevel.highAnalogLevelAlarmSetpoint.ToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -49,7 +49,7 @@ namespace AquaPic.UserInterface
                         return;
                     }
 
-                    float lowAlarmStpnt = Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text);
+                    float lowAlarmStpnt = Convert.ToSingle (((SettingsTextBox)settings ["Low Alarm"]).textBox.text);
 
                     if (lowAlarmStpnt >= highAlarmStpnt) {
                         MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
@@ -63,7 +63,7 @@ namespace AquaPic.UserInterface
             };
             AddOptionalSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Low Alarm";
             t.textBox.text = WaterLevel.lowAnalogLevelAlarmSetpoint.ToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -76,7 +76,7 @@ namespace AquaPic.UserInterface
                         return;
                     }
                         
-                    float highAlarmStpnt = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
+                    float highAlarmStpnt = Convert.ToSingle (((SettingsTextBox)settings ["High Alarm"]).textBox.text);
 
                     if (lowAlarmStpnt >= highAlarmStpnt) {
                         MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
@@ -90,7 +90,7 @@ namespace AquaPic.UserInterface
             };
             AddOptionalSetting (t);
 
-            var c = new SettingComboBox ();
+            var c = new SettingsComboBox ();
             c.text = "Sensor Channel";
             string[] availCh = AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ();
             if ((WaterLevel.analogSensorEnabled) || (WaterLevel.analogSensorChannel.IsNotEmpty ())) {
@@ -127,14 +127,14 @@ namespace AquaPic.UserInterface
             JObject jo = (JObject)JToken.Parse (jstring);
 
             if (enable) {
-                float lowAlarmStpnt = Convert.ToSingle (Convert.ToSingle (((SettingTextBox)settings ["Low Alarm"]).textBox.text));
+                float lowAlarmStpnt = Convert.ToSingle (Convert.ToSingle (((SettingsTextBox)settings ["Low Alarm"]).textBox.text));
 
                 if (lowAlarmStpnt < 0.0f) {
                     MessageBox.Show ("Low alarm setpoint can't be negative");
                     return false;
                 }
 
-                float highAlarmStpnt = Convert.ToSingle (((SettingTextBox)settings ["High Alarm"]).textBox.text);
+                float highAlarmStpnt = Convert.ToSingle (((SettingsTextBox)settings ["High Alarm"]).textBox.text);
 
                 if (highAlarmStpnt < 0.0f) {
                     MessageBox.Show ("Low alarm setpoint can't be negative");
@@ -150,12 +150,12 @@ namespace AquaPic.UserInterface
                 WaterLevel.lowAnalogLevelAlarmSetpoint = lowAlarmStpnt;
 
                 try {
-                    if (((SettingComboBox)settings ["Sensor Channel"]).combo.active == -1) {
+                    if (((SettingsComboBox)settings ["Sensor Channel"]).combo.active == -1) {
                         MessageBox.Show ("Please Select an input channel");
                         return false;
                     }
 
-                    string s = ((SettingComboBox)settings ["Sensor Channel"]).combo.activeText;
+                    string s = ((SettingsComboBox)settings ["Sensor Channel"]).combo.activeText;
 
                     if (!s.StartsWith ("Current:")) {
                         int idx = s.IndexOf ('.');

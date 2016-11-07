@@ -77,7 +77,7 @@ namespace AquaPic.UserInterface
             };
             fix.Put (verifyBtn, 275, 365);
 
-            var t = new SettingTextBox ();
+            var t = new SettingsTextBox ();
             t.text = "Name";
             if (includeDelete)
                 t.textBox.text = Power.GetOutletName (ic);
@@ -108,7 +108,7 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnSave (object sender) {
-            string name = ((SettingTextBox)settings ["Name"]).textBox.text;
+            string name = ((SettingsTextBox)settings ["Name"]).textBox.text;
 
             MyState fallback = MyState.Off;
             try {

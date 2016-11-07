@@ -2,6 +2,7 @@
 using AquaPic.Drivers;
 using AquaPic.Runtime;
 using AquaPic.Utilites;
+using AquaPic.Sensors;
 
 namespace AquaPic.Modules
 {
@@ -31,13 +32,9 @@ namespace AquaPic.Modules
             public uint maxPumpOnTime;
             public uint minPumpOffTime;
 
-            public IndividualControl reservoirLevelChannel;
-            public float reservoirLevel;
-            public float zeroValue;
-            public float fullScaleActual;
-            public float fullScaleValue;
-            public float reservoirLowLevelSetpoint;
             public bool disableOnLowResevoirLevel;
+
+            public AnalogLevelSensor reservoirLevel;
 
             public AutoTopOffState state;
             public int atoFailAlarmIndex;
@@ -61,20 +58,16 @@ namespace AquaPic.Modules
                 this.useFloatSwitch = useFloatSwitch;
                 floatSwitchActivated = false;
 
-                this.pumpOutlet = pumpPlug;
+                pumpOutlet = pumpPlug;
                 pumpOnRequest = false;
                 pumpTimer = DeluxeTimer.GetTimer ("ATO");
                 pumpTimer.TimerElapsedEvent += OnTimerElapsed;
                 this.maxPumpOnTime = maxPumpOnTime;
                 this.minPumpOffTime = minPumpOffTime;
 
-                reservoirLevelChannel = IndividualControl.Empty;
-                reservoirLevel = 0.0f;
-                zeroValue = 819.2f;
-                fullScaleActual = 15.0f;
-                fullScaleValue = 4096.0f;
-                reservoirLowLevelSetpoint = 0.0f;
                 disableOnLowResevoirLevel = false;
+
+                reservoirLevel = new AnalogLevelSensor ("Top Off Reservoir", IndividualControl.Empty, 0.0f, 0.0f, false, false, false);
 
                 state = AutoTopOffState.Standby;
                 atoFailAlarmIndex = Alarm.Subscribe ("Auto top off failed");
@@ -87,9 +80,9 @@ namespace AquaPic.Modules
 
             public void Run () {
                 if (enable) {
-                    if (reservoirLevelChannel.IsNotEmpty ()) {
-                        reservoirLevel = AquaPicDrivers.AnalogInput.GetChannelValue (reservoirLevelChannel);
-                        reservoirLevel = reservoirLevel.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
+                    if (reservoirLevel.sensorChannel.IsNotEmpty ()) {
+                        reservoirLevel.enable = true;
+                        reservoirLevel.Run ();
                     } else {
                         disableOnLowResevoirLevel = false;
                     }
@@ -105,7 +98,7 @@ namespace AquaPic.Modules
                                     if (analogSensor.connected) {
                                         usedAnalog = true;
 
-                                        if (analogSensor.waterLevel < analogOnSetpoint) {
+                                        if (analogSensor.level < analogOnSetpoint) {
                                             pumpOnRequest = true;
                                         }
                                     }
@@ -120,7 +113,8 @@ namespace AquaPic.Modules
                                     }
                                 }
 
-                                if ((disableOnLowResevoirLevel) && (reservoirLevel < reservoirLowLevelSetpoint)) {
+                                if ((disableOnLowResevoirLevel) && (Alarm.CheckAlarming (reservoirLevel.lowAnalogAlarmIndex))) {
+                                    Console.WriteLine ("ATO alarming based upon low reservoir level");
                                     pumpOnRequest = false;
                                     state = AutoTopOffState.Error;
                                     Alarm.Post (atoFailAlarmIndex);
@@ -143,7 +137,7 @@ namespace AquaPic.Modules
                             // check analog sensor
                             if ((analogSensor.enable) && (useAnalogSensor)) {
                                 if (!Alarm.CheckAlarming (analogSensor.sensorDisconnectedAlarmIndex)) { 
-                                    if (analogSensor.waterLevel > analogOffSetpoint)
+                                    if (analogSensor.level > analogOffSetpoint)
                                         pumpOnRequest = false;
                                 }
                             }

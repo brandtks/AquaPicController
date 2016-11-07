@@ -1,70 +1,156 @@
 ﻿using System;
-using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
 using AquaPic.Utilites;
 
 namespace AquaPic.Sensors
 {
-    public class AnalogSensor
+    public class AnalogLevelSensor
     {
-        public bool enable;
+        private bool _enable;
+        public bool enable {
+            get {
+                return _enable;
+            }
+            set {
+                _enable = value;
+                if (_enable) {
+                    sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
+                } else {
+                    Alarm.Clear (highAnalogAlarmIndex);
+                    Alarm.Clear (lowAnalogAlarmIndex);
+                    Alarm.Clear (sensorDisconnectedAlarmIndex);
+                    sensorDisconnectedAlarmIndex = -1;
+                }
+            }
+        }
+
         public bool connected {
             get {
                 return !Alarm.CheckAlarming (sensorDisconnectedAlarmIndex);
             }
         }
-        public float waterLevel;
+        public float level;
 
         public float zeroValue;
         public float fullScaleActual;
         public float fullScaleValue;
 
-        public int sensorDisconnectedAlarmIndex;
-        public int lowAnalogAlarmIndex;
-        public int highAnalogAlarmIndex;
+        public string name;
 
-        public float highAlarmStpnt;
-        public float lowAlarmStpnt;
+        public float highAlarmSetpoint;
+        public int highAnalogAlarmIndex;
+        public bool enableHighAlarm {
+            get {
+                return highAnalogAlarmIndex != -1;
+            }
+            set {
+                if (value) {
+                    highAnalogAlarmIndex = Alarm.Subscribe ("High level, " + name);
+                } else {
+                    highAnalogAlarmIndex = -1;
+                }
+            }
+        }
+
+        public float lowAlarmSetpoint;
+        public int lowAnalogAlarmIndex;
+        public bool enableLowAlarm {
+            get {
+                return lowAnalogAlarmIndex != -1;
+            }
+            set {
+                if (value) {
+                    lowAnalogAlarmIndex = Alarm.Subscribe ("Low level, " + name);
+                } else {
+                    lowAnalogAlarmIndex = -1;
+                }
+            }
+        }
+
+        public int sensorDisconnectedAlarmIndex;
+        public bool enableDisconnectedAlarm {
+            get {
+                return sensorDisconnectedAlarmIndex != -1;
+            }
+            set {
+                if (value) {
+                    sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
+                } else {
+                    sensorDisconnectedAlarmIndex = -1;
+                }
+            }
+        }
+
         public IndividualControl sensorChannel;
         public DataLogger dataLogger;
 
-        public AnalogSensor (bool enable, float highAlarmSetpoint, float lowAlarmSetPoint, IndividualControl ic) {
+        public AnalogLevelSensor (
+            string name,
+            IndividualControl ic,
+            float highAlarmSetpoint, 
+            float lowAlarmSetpoint, 
+            bool enable,
+            bool enableHighAlarm,
+            bool enableLowAlarm
+        ) {
+            this.name = name;
+
             this.enable = enable;
-            waterLevel = 0.0f;
+            level = 0.0f;
 
             zeroValue = 819.2f;
             fullScaleActual = 15.0f;
             fullScaleValue = 4096.0f;
-
-            if (this.enable) 
-                SubscribeToAlarms ();
-            else {
-                sensorDisconnectedAlarmIndex = -1;
-                lowAnalogAlarmIndex = -1;
+        
+            if (enableHighAlarm && enable) {
+                highAnalogAlarmIndex = Alarm.Subscribe ("High level, " + name);
+            } else {
                 highAnalogAlarmIndex = -1;
             }
 
-            this.highAlarmStpnt = highAlarmSetpoint;
-            this.lowAlarmStpnt = lowAlarmSetPoint;
+            if (enableLowAlarm && enable) {
+                lowAnalogAlarmIndex = Alarm.Subscribe ("Low level, " + name);
+            } else {
+                lowAnalogAlarmIndex = -1;
+            }
+
+            if (enable) {
+                sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
+            } else {
+                sensorDisconnectedAlarmIndex = -1;
+            }
+            
+            this.highAlarmSetpoint = highAlarmSetpoint;
+            this.lowAlarmSetpoint = lowAlarmSetpoint;
 
             sensorChannel = ic;
 
-            dataLogger = new DataLogger ("WaterLevel");
+            dataLogger = new DataLogger ("WaterLevel" + name);
 
-            if (enable) {
-                AquaPicDrivers.AnalogInput.AddChannel (sensorChannel, "Water Level");
+            if (sensorChannel.IsNotEmpty ()) {
+                AquaPicDrivers.AnalogInput.AddChannel (sensorChannel, name);
             }
         }
 
+        public AnalogLevelSensor (string name, IndividualControl ic)
+            : this (name, ic, 0.0f, 0.0f, true, false, false) { }
+
+        public AnalogLevelSensor (string name, IndividualControl ic, float highAlarmSetpoint)
+            : this (name, ic, highAlarmSetpoint, 0.0f, true, true, false) { }
+
+        public AnalogLevelSensor (string name, IndividualControl ic, float highAlarmSetpoint, float lowAlarmSetpoint)
+            : this (name, ic, highAlarmSetpoint, lowAlarmSetpoint, true, true, true) { }
+
+        public AnalogLevelSensor (string name, IndividualControl ic, float highAlarmSetpoint, float lowAlarmSetpoint, bool enable)
+            : this (name, ic, highAlarmSetpoint, lowAlarmSetpoint, enable, true, true) { }
+
         public void Run () {
             if (enable) {
-                waterLevel = AquaPicDrivers.AnalogInput.GetChannelValue (sensorChannel);
-                waterLevel = waterLevel.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
+                level = AquaPicDrivers.AnalogInput.GetChannelValue (sensorChannel);
+                level = level.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
 
-                if (waterLevel < 0.0f) {
+                if (level < 0.0f) {
                     if (!Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
                         Alarm.Post (sensorDisconnectedAlarmIndex);
                         dataLogger.AddEntry ("disconnected alarm");
@@ -75,7 +161,7 @@ namespace AquaPic.Sensors
                     }
                 }
 
-                if ((waterLevel <= lowAlarmStpnt) && (connected)) {
+                if ((level <= lowAlarmSetpoint) && (connected)) {
                     if (!Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
                         Alarm.Post (lowAnalogAlarmIndex);
                         dataLogger.AddEntry ("low alarm");
@@ -86,7 +172,7 @@ namespace AquaPic.Sensors
                     }
                 }
 
-                if (waterLevel >= highAlarmStpnt) {
+                if (level >= highAlarmSetpoint) {
                     if (!Alarm.CheckAlarming (highAnalogAlarmIndex)) {
                         Alarm.Post (highAnalogAlarmIndex);
                         dataLogger.AddEntry ("high alarm");
@@ -97,18 +183,24 @@ namespace AquaPic.Sensors
                     }
                 }
 
-                if (waterLevel < 0.0f) {
+                if (level < 0.0f) {
                     dataLogger.AddEntry ("probe disconnected");
                 } else {
-                    dataLogger.AddEntry (waterLevel);
+                    dataLogger.AddEntry (level);
+                }
+            } else {
+                if (Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
+                    Alarm.Clear (lowAnalogAlarmIndex);
+                }
+
+                if (Alarm.CheckAlarming (highAnalogAlarmIndex)) {
+                    Alarm.Clear (highAnalogAlarmIndex);
+                }
+
+                if (Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
+                    Alarm.Clear (sensorDisconnectedAlarmIndex);
                 }
             }
-        }
-
-        public void SubscribeToAlarms () {
-            lowAnalogAlarmIndex = Alarm.Subscribe ("Low Water Level, Analog Sensor");
-            highAnalogAlarmIndex = Alarm.Subscribe ("High Water Level, Analog Sensor");
-            sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog water level probe disconnected");
         }
     }
 }

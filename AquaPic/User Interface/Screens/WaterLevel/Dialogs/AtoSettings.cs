@@ -44,7 +44,7 @@ namespace AquaPic.UserInterface
                 s.selectorSwitch.currentSelected = 1;
             AddOptionalSetting (s);
 
-            var t = new SettingTextBox ();
+            var t = new SettingsTextBox ();
             t.text = "Analog On";
             t.textBox.text = WaterLevel.atoAnalogOnSetpoint.ToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -57,7 +57,7 @@ namespace AquaPic.UserInterface
                         return;
                     }
                         
-                    float offStpnt = Convert.ToSingle (((SettingTextBox)settings ["Analog Off"]).textBox.text);
+                    float offStpnt = Convert.ToSingle (((SettingsTextBox)settings ["Analog Off"]).textBox.text);
 
                     if (onStpnt >= offStpnt) {
                         MessageBox.Show ("Analog on setpoint can't be greater than or equal to off setpoint");
@@ -71,7 +71,7 @@ namespace AquaPic.UserInterface
             };
             AddOptionalSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Analog Off";
             t.textBox.text = WaterLevel.atoAnalogOffSetpoint.ToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -84,7 +84,7 @@ namespace AquaPic.UserInterface
                         return;
                     }
 
-                    float onStpnt = Convert.ToSingle (((SettingTextBox)settings ["Analog On"]).textBox.text);
+                    float onStpnt = Convert.ToSingle (((SettingsTextBox)settings ["Analog On"]).textBox.text);
 
                     if (onStpnt >= offStpnt) {
                         MessageBox.Show ("Analog on setpoint can't be greater than or equal to off setpoint");
@@ -106,7 +106,7 @@ namespace AquaPic.UserInterface
                 s.selectorSwitch.currentSelected = 1;
             AddOptionalSetting (s);
 
-            var c = new SettingComboBox ();
+            var c = new SettingsComboBox ();
             c.text = "Pump Outlet";
             string[] availOutlets = Power.GetAllAvaiblableOutlets ();
             if (WaterLevel.atoPumpOutlet.IsNotEmpty ()) {
@@ -120,7 +120,7 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (availOutlets); 
             AddOptionalSetting (c);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Max Runtime";
             t.textBox.text = string.Format ("{0} mins", WaterLevel.atoMaxRuntime / 60);
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -145,7 +145,7 @@ namespace AquaPic.UserInterface
             };
             AddOptionalSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Cooldown";
             t.textBox.text = string.Format ("{0} mins", WaterLevel.atoCooldown / 60);
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -165,6 +165,58 @@ namespace AquaPic.UserInterface
                     args.text = string.Format ("{0} mins", time);
                 } catch {
                     MessageBox.Show ("Improper format");
+                    args.keepText = false;
+                }
+            };
+            AddOptionalSetting (t);
+
+            s = new SettingSelectorSwitch ();
+            s.text = "Enable Reservoir Level";
+            if (WaterLevel.atoReservoirLevelEnabled) {
+                s.selectorSwitch.currentSelected = 0;
+            } else {
+                s.selectorSwitch.currentSelected = 1;
+            }
+            AddOptionalSetting (s);
+
+            c = new SettingsComboBox ();
+            c.text = "Reservoir Channel";
+            string[] availCh = AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ();
+            if ((WaterLevel.atoReservoirLevelEnabled) || (WaterLevel.atoReservoirLevelChannel.IsNotEmpty ())) {
+                IndividualControl ic = WaterLevel.atoReservoirLevelChannel;
+                string chName = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
+                chName = string.Format ("{0}.i{1}", chName, ic.Individual);
+                c.combo.comboList.Add (string.Format ("Current: {0}", chName));
+                c.combo.active = 0;
+            } else {
+                c.combo.nonActiveMessage = "Select input";
+            }
+            c.combo.comboList.AddRange (availCh);
+            AddOptionalSetting (c);
+
+            s = new SettingSelectorSwitch ();
+            s.text = "Disable on Low Reservoir Level";
+            if (WaterLevel.atoReservoirDisableOnLowLevel) {
+                s.selectorSwitch.currentSelected = 0;
+            } else {
+                s.selectorSwitch.currentSelected = 1;
+            }
+            AddOptionalSetting (s);
+
+            t = new SettingsTextBox ();
+            t.text = "Reservoir Low Level";
+            t.textBox.text = WaterLevel.atoReservoirLowLevelSetpoint.ToString ();
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    float lowStpnt = Convert.ToSingle (args.text);
+
+                    if (lowStpnt < 0.0f) {
+                        MessageBox.Show ("Low level setpoint can't be negative");
+                        args.keepText = false;
+                        return;
+                    }
+                } catch {
+                    MessageBox.Show ("Improper low level setpoint format");
                     args.keepText = false;
                 }
             };
@@ -202,14 +254,14 @@ namespace AquaPic.UserInterface
 
                 WaterLevel.atoUseAnalogSensor = useAnalog;
 
-                float analogOnStpnt = Convert.ToSingle (Convert.ToSingle (((SettingTextBox)settings ["Analog On"]).textBox.text));
+                float analogOnStpnt = Convert.ToSingle (Convert.ToSingle (((SettingsTextBox)settings ["Analog On"]).textBox.text));
 
                 if (analogOnStpnt < 0.0f) {
                     MessageBox.Show ("Analog on setpoint can't be negative");
                     return false;
                 }
 
-                float analogOffStpnt = Convert.ToSingle (((SettingTextBox)settings ["Analog Off"]).textBox.text);
+                float analogOffStpnt = Convert.ToSingle (((SettingsTextBox)settings ["Analog Off"]).textBox.text);
 
                 if (analogOffStpnt < 0.0f) {
                     MessageBox.Show ("Analog off setpoint can't be negative");
@@ -234,12 +286,12 @@ namespace AquaPic.UserInterface
                 WaterLevel.atoUseAnalogSensor = useFloatSwitch;
 
                 try {
-                    if (((SettingComboBox)settings ["Pump Outlet"]).combo.active == -1) {
+                    if (((SettingsComboBox)settings ["Pump Outlet"]).combo.active == -1) {
                         MessageBox.Show ("Please select power outlet for the pump");
                         return false;
                     }
 
-                    string outletString = ((SettingComboBox)settings ["Pump Outlet"]).combo.activeText;
+                    string outletString = ((SettingsComboBox)settings ["Pump Outlet"]).combo.activeText;
 
                     if (!outletString.StartsWith ("Current:")) {
                         int idx = outletString.IndexOf ('.');
@@ -259,7 +311,7 @@ namespace AquaPic.UserInterface
                 }
 
                 uint maxRuntime = 0;
-                string timeString = ((SettingTextBox)settings ["Max Runtime"]).textBox.text;
+                string timeString = ((SettingsTextBox)settings ["Max Runtime"]).textBox.text;
                 int periodIdx = timeString.IndexOf ("mins", StringComparison.InvariantCultureIgnoreCase);
                 if (periodIdx != -1)
                     timeString = timeString.Substring (0, periodIdx);
@@ -268,31 +320,99 @@ namespace AquaPic.UserInterface
                 WaterLevel.atoMaxRuntime = maxRuntime;
 
                 uint cooldown = 0;
-                timeString = ((SettingTextBox)settings ["Cooldown"]).textBox.text;
+                timeString = ((SettingsTextBox)settings ["Cooldown"]).textBox.text;
                 periodIdx = timeString.IndexOf ("mins", StringComparison.InvariantCultureIgnoreCase);
                 if (periodIdx != -1)
                     timeString = timeString.Substring (0, periodIdx);
                 cooldown = Convert.ToUInt32 (timeString) * 60;
                 WaterLevel.atoCooldown = cooldown;
+
+                bool reservoirEnable;
+                try {
+                    s = settings["Enable Reservoir Level"] as SettingSelectorSwitch;
+                    if (s.selectorSwitch.currentSelected == 0) {
+                        reservoirEnable = true;
+                    } else {
+                        reservoirEnable = false;
+                    }
+                } catch {
+                    return false;
+                }
+
+                if (reservoirEnable) {
+                    try {
+                        if (((SettingsComboBox)settings["Reservoir Channel"]).combo.active == -1) {
+                            MessageBox.Show ("Please Select an input channel");
+                            return false;
+                        }
+
+                        string text = ((SettingsComboBox)settings["Reservoir Channel"]).combo.activeText;
+
+                        if (!text.StartsWith ("Current:")) {
+                            int idx = text.IndexOf ('.');
+                            string cardName = text.Substring (0, idx);
+                            int cardId = AquaPicDrivers.AnalogInput.GetCardIndex (cardName);
+                            int channelId = Convert.ToInt32 (text.Substring (idx + 2));
+
+                            IndividualControl ic;
+                            ic.Group = cardId;
+                            ic.Individual = channelId;
+                            WaterLevel.atoReservoirLevelChannel = ic;
+                        }
+                    } catch (Exception ex) {
+                        Logger.AddError (ex.ToString ());
+                        MessageBox.Show ("Something went wrong, check logger");
+                        return false;
+                    }
+
+                    bool disableOnLow;
+                    try {
+                        s = settings["Disable on Low Reservoir Level"] as SettingSelectorSwitch;
+                        if (s.selectorSwitch.currentSelected == 0) {
+                            disableOnLow = true;
+                        } else {
+                            disableOnLow = false;
+                        }
+                    } catch {
+                        return false;
+                    }
+
+                    WaterLevel.atoReservoirDisableOnLowLevel = disableOnLow;
+
+                    float lowLevel = Convert.ToSingle (((SettingsTextBox)settings["Reservoir Low Level"]).textBox.text);
+                    WaterLevel.atoReservoirLowLevelSetpoint = lowLevel;
+                } else {
+                    WaterLevel.atoReservoirLevelChannel = IndividualControl.Empty;
+                }
             }
 
             //this has to be last because if for whatever reason something above this crashes we need leave the module disable
             WaterLevel.atoEnabled = enable;
 
-            jo ["AutoTopOff"] ["enableAto"] = WaterLevel.atoEnabled.ToString ();
-            jo ["AutoTopOff"] ["useAnalogSensor"] = WaterLevel.atoUseAnalogSensor.ToString ();
-            jo ["AutoTopOff"] ["analogOnSetpoint"]= WaterLevel.atoAnalogOnSetpoint.ToString ();
-            jo ["AutoTopOff"] ["analogOffSetpoint"]= WaterLevel.atoAnalogOffSetpoint.ToString ();
-            jo ["AutoTopOff"] ["useFloatSwitch"]= WaterLevel.atoUseFloatSwitch.ToString ();
+            jo["AutoTopOff"]["enableAto"] = WaterLevel.atoEnabled.ToString ();
+            jo["AutoTopOff"]["useAnalogSensor"] = WaterLevel.atoUseAnalogSensor.ToString ();
+            jo["AutoTopOff"]["analogOnSetpoint"] = WaterLevel.atoAnalogOnSetpoint.ToString ();
+            jo["AutoTopOff"]["analogOffSetpoint"] = WaterLevel.atoAnalogOffSetpoint.ToString ();
+            jo["AutoTopOff"]["useFloatSwitch"] = WaterLevel.atoUseFloatSwitch.ToString ();
             if (WaterLevel.atoPumpOutlet.IsNotEmpty ()) {
-                jo ["AutoTopOff"] ["powerStrip"] = Power.GetPowerStripName (WaterLevel.atoPumpOutlet.Group);
-                jo ["AutoTopOff"] ["outlet"] = WaterLevel.atoPumpOutlet.Individual.ToString ();
+                jo["AutoTopOff"]["powerStrip"] = Power.GetPowerStripName (WaterLevel.atoPumpOutlet.Group);
+                jo["AutoTopOff"]["outlet"] = WaterLevel.atoPumpOutlet.Individual.ToString ();
             } else {
-                jo ["AutoTopOff"] ["powerStrip"] = string.Empty;
-                jo ["AutoTopOff"] ["outlet"] = string.Empty;
+                jo["AutoTopOff"]["powerStrip"] = string.Empty;
+                jo["AutoTopOff"]["outlet"] = string.Empty;
             }
-            jo ["AutoTopOff"] ["maxPumpOnTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoMaxRuntime / 60);
-            jo ["AutoTopOff"] ["minPumpOffTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoCooldown / 60);
+            jo["AutoTopOff"]["maxPumpOnTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoMaxRuntime / 60);
+            jo["AutoTopOff"]["minPumpOffTime"] = string.Format ("{0:D2}:00:00", WaterLevel.atoCooldown / 60);
+
+            if (WaterLevel.atoReservoirLevelEnabled) {
+                jo["AutoTopOff"]["reservoirInputCard"] = AquaPicDrivers.AnalogInput.GetCardName (WaterLevel.atoReservoirLevelChannel.Group);
+                jo["AutoTopOff"]["reservoirChannel"] = WaterLevel.atoReservoirLevelChannel.Individual.ToString ();
+                jo["AutoTopOff"]["reservoirLowLevelSetpoint"] = WaterLevel.atoReservoirLowLevelSetpoint.ToString ();
+                jo["AutoTopOff"]["disableOnLowResevoirLevel"] = WaterLevel.atoReservoirDisableOnLowLevel.ToString ();
+            } else {
+                jo["AutoTopOff"]["reservoirInputCard"] = "";
+                jo["AutoTopOff"]["reservoirChannel"] = "";
+            }
 
             File.WriteAllText (path, jo.ToString ());
 

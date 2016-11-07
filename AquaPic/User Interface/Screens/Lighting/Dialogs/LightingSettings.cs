@@ -15,7 +15,7 @@ namespace AquaPic.UserInterface
         public LightingSettings () : base ("Lighting") {
             SaveEvent += OnSave;
 
-            var t = new SettingTextBox ();
+            var t = new SettingsTextBox ();
             t.text = "Latitude";
             t.textBox.text = Lighting.latitude.ToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -28,7 +28,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Longitude";
             t.textBox.text = Lighting.longitude.ToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -41,7 +41,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Default Rise";
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.defaultSunRise.ToTimeString ();
@@ -56,7 +56,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Default Set";
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.defaultSunSet.ToTimeString ();
@@ -71,7 +71,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Min Sunrise";
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.minSunRise.ToTimeString ();
@@ -86,7 +86,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Max Sunrise";
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.maxSunRise.ToTimeString ();
@@ -101,7 +101,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Min Sunset";
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.minSunSet.ToTimeString ();
@@ -116,7 +116,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Max Sunset";
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.maxSunSet.ToTimeString ();
@@ -135,14 +135,14 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnSave (object sender) {
-            Lighting.latitude = Convert.ToDouble ((settings["Latitude"] as SettingTextBox).textBox.text);
-            Lighting.longitude = Convert.ToDouble ((settings["Longitude"] as SettingTextBox).textBox.text);
-            Lighting.defaultSunRise = Time.Parse ((settings["Default Rise"] as SettingTextBox).textBox.text);
-            Lighting.defaultSunSet = Time.Parse ((settings["Default Set"] as SettingTextBox).textBox.text);
-            Lighting.minSunRise = Time.Parse ((settings ["Min Sunrise"] as SettingTextBox).textBox.text);
-            Lighting.maxSunRise = Time.Parse ((settings["Max Sunrise"] as SettingTextBox).textBox.text);
-            Lighting.minSunSet = Time.Parse ((settings["Min Sunset"] as SettingTextBox).textBox.text);
-            Lighting.maxSunSet = Time.Parse ((settings["Max Sunset"] as SettingTextBox).textBox.text);
+            Lighting.latitude = Convert.ToDouble ((settings["Latitude"] as SettingsTextBox).textBox.text);
+            Lighting.longitude = Convert.ToDouble ((settings["Longitude"] as SettingsTextBox).textBox.text);
+            Lighting.defaultSunRise = Time.Parse ((settings["Default Rise"] as SettingsTextBox).textBox.text);
+            Lighting.defaultSunSet = Time.Parse ((settings["Default Set"] as SettingsTextBox).textBox.text);
+            Lighting.minSunRise = Time.Parse ((settings ["Min Sunrise"] as SettingsTextBox).textBox.text);
+            Lighting.maxSunRise = Time.Parse ((settings["Max Sunrise"] as SettingsTextBox).textBox.text);
+            Lighting.minSunSet = Time.Parse ((settings["Min Sunset"] as SettingsTextBox).textBox.text);
+            Lighting.maxSunSet = Time.Parse ((settings["Max Sunset"] as SettingsTextBox).textBox.text);
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");

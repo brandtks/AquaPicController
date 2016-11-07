@@ -28,7 +28,7 @@ namespace AquaPic.UserInterface
             SaveEvent += OnSave;
             DeleteButtonEvent += OnDelete;
 
-            var t = new SettingTextBox ();
+            var t = new SettingsTextBox ();
             t.text = "Name";
             if (this.probeName.IsNotEmpty ()) {
                 t.textBox.text = this.probeName;
@@ -45,7 +45,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            var c = new SettingComboBox ();
+            var c = new SettingsComboBox ();
             c.label.text = "Input Channel";
             if (this.probeName.IsNotEmpty ()) {
                 IndividualControl ic = Temperature.GetTemperatureProbeIndividualControl (this.probeName);
@@ -58,7 +58,7 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ());
             AddSetting (c);
 
-            c = new SettingComboBox ();
+            c = new SettingsComboBox ();
             c.label.text = "Temperature Group";
             c.combo.comboList.AddRange (Temperature.GetAllTemperatureGroupNames ());
             c.combo.nonActiveMessage = "Select group";
@@ -78,9 +78,9 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnSave (object sender) {
-            string unparseProbeChannelString = (settings["Input Channel"] as SettingComboBox).combo.activeText;
-            string name = (settings["Name"] as SettingTextBox).textBox.text;
-            var temperatureGroupName = (settings["Temperature Group"] as SettingComboBox).combo.activeText;
+            string unparseProbeChannelString = (settings["Input Channel"] as SettingsComboBox).combo.activeText;
+            string name = (settings["Name"] as SettingsTextBox).textBox.text;
+            var temperatureGroupName = (settings["Temperature Group"] as SettingsComboBox).combo.activeText;
 
             string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
@@ -90,7 +90,7 @@ namespace AquaPic.UserInterface
             JObject jo = (JObject)JToken.Parse (json);
 
             if (probeName.IsEmpty ()) {
-                if ((settings["Input Channel"] as SettingComboBox).combo.active == -1) {
+                if ((settings["Input Channel"] as SettingsComboBox).combo.active == -1) {
                     MessageBox.Show ("Please select an channel");
                     return false;
                 }
@@ -100,7 +100,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if ((settings["Temperature Group"] as SettingComboBox).combo.active == -1) {
+                if ((settings["Temperature Group"] as SettingsComboBox).combo.active == -1) {
                     MessageBox.Show ("Please select an temperature group");
                     return false;
                 }
@@ -133,7 +133,7 @@ namespace AquaPic.UserInterface
 
                 probeName = name;
             } else {
-                if ((settings["Temperature Group"] as SettingComboBox).combo.active == -1) {
+                if ((settings["Temperature Group"] as SettingsComboBox).combo.active == -1) {
                     MessageBox.Show ("Please select an temperature group");
                     return false;
                 }

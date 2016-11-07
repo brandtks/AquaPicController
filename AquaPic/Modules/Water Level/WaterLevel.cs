@@ -13,7 +13,7 @@ namespace AquaPic.Modules
 {
     public partial class WaterLevel
     {
-        private static AnalogSensor analogSensor;
+        private static AnalogLevelSensor analogSensor;
         private static AutoTopOff ato;
         private static Dictionary<string,FloatSwitch> floatSwitches;
 
@@ -26,25 +26,25 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         public static float highAnalogLevelAlarmSetpoint {
             get {
-                return analogSensor.highAlarmStpnt;
+                return analogSensor.highAlarmSetpoint;
             }
             set {
-                analogSensor.highAlarmStpnt = value;
+                analogSensor.highAlarmSetpoint = value;
             }
         }
 
         public static float lowAnalogLevelAlarmSetpoint {
             get {
-                return analogSensor.lowAlarmStpnt;
+                return analogSensor.lowAlarmSetpoint;
             }
             set {
-                analogSensor.lowAlarmStpnt = value;
+                analogSensor.lowAlarmSetpoint = value;
             }
         }
 
         public static float analogWaterLevel {
             get {
-                return analogSensor.waterLevel;
+                return analogSensor.level;
             }
         }
 
@@ -74,9 +74,12 @@ namespace AquaPic.Modules
                 if (analogSensor.sensorChannel.IsNotEmpty ()) {
                     AquaPicDrivers.AnalogInput.RemoveChannel (analogSensor.sensorChannel);
                 }
+
                 analogSensor.sensorChannel = value;
-                AquaPicDrivers.AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
-                    
+
+                if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
+                    AquaPicDrivers.AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
+                }
             }
         }
 
@@ -87,22 +90,14 @@ namespace AquaPic.Modules
             set {
                 analogSensor.enable = value;
                 if (analogSensor.enable) {
-                    analogSensor.SubscribeToAlarms ();
+                    analogSensor.enableHighAlarm = true;
+                    analogSensor.enableLowAlarm = true;
                 
                     try {
                         AquaPicDrivers.AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
                     } catch (Exception) {
                         ; //channel already added
                     }
-                } else {
-                    if (Alarm.CheckAlarming (analogSensor.highAnalogAlarmIndex))
-                        Alarm.Clear (analogSensor.highAnalogAlarmIndex);
-
-                    if (Alarm.CheckAlarming (analogSensor.lowAnalogAlarmIndex))
-                        Alarm.Clear (analogSensor.lowAnalogAlarmIndex);
-
-                    if (Alarm.CheckAlarming (analogSensor.sensorDisconnectedAlarmIndex))
-                        Alarm.Clear (analogSensor.sensorDisconnectedAlarmIndex);
                 }
             }
         }
@@ -232,39 +227,50 @@ namespace AquaPic.Modules
 
         public static bool atoReservoirLevelEnabled {
             get {
-                return ato.reservoirLevelChannel.IsNotEmpty ();
+                return ato.reservoirLevel.sensorChannel.IsNotEmpty ();
             }
         }
 
         public static float atoReservoirLevel {
             get {
-                return ato.reservoirLevel;
+                return ato.reservoirLevel.level;
             }
         }
 
         public static IndividualControl atoReservoirLevelChannel {
             get {
-                return ato.reservoirLevelChannel;
+                return ato.reservoirLevel.sensorChannel;
             }
             set {
-                if (ato.reservoirLevelChannel.IsNotEmpty ()) {
-                    AquaPicDrivers.AnalogInput.RemoveChannel (ato.reservoirLevelChannel);
+                if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
+                    AquaPicDrivers.AnalogInput.RemoveChannel (ato.reservoirLevel.sensorChannel);
                 }
+
+                ato.reservoirLevel.sensorChannel = value;
                 
-                ato.reservoirLevelChannel = value;
-                
-                if (ato.reservoirLevelChannel.IsNotEmpty ()) {
-                    AquaPicDrivers.AnalogInput.AddChannel (ato.reservoirLevelChannel, "ATO Reservoir Level");
+                if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
+                    AquaPicDrivers.AnalogInput.AddChannel (ato.reservoirLevel.sensorChannel, "ATO Reservoir Level");
+                    ato.reservoirLevel.enable = true;
+                    ato.reservoirLevel.enableLowAlarm = true;
                 }
             }
         }
 
-        public static bool atoDisableOnReservoirLowLevel {
+        public static bool atoReservoirDisableOnLowLevel {
             get {
                 return ato.disableOnLowResevoirLevel;
             }
             set {
                 ato.disableOnLowResevoirLevel = value;
+            }
+        }
+
+        public static float atoReservoirLowLevelSetpoint {
+            get {
+                return ato.reservoirLevel.lowAlarmSetpoint;
+            }
+            set {
+                ato.reservoirLevel.lowAlarmSetpoint = value;
             }
         }
 
@@ -336,7 +342,7 @@ namespace AquaPic.Modules
                 } else
                     ic.Individual = Convert.ToInt32 (text);
 
-                analogSensor = new AnalogSensor (enable, highAlarmSetpoint, lowAlarmSetpoint, ic);
+                analogSensor = new AnalogLevelSensor ("Water Level", ic, highAlarmSetpoint, lowAlarmSetpoint, enable);
 
                 text = (string)jo ["zeroCalibrationValue"];
                 if (string.IsNullOrWhiteSpace (text))
@@ -494,54 +500,62 @@ namespace AquaPic.Modules
                     ic.Individual = Convert.ToInt32 (text);
                 }
 
-                ato.reservoirLevelChannel = ic;
+                ato.reservoirLevel.sensorChannel = ic;
 
-                text = (string)joAto["zeroCalibrationValue"];
+                if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
+                    AquaPicDrivers.AnalogInput.AddChannel (ato.reservoirLevel.sensorChannel, "ATO Reservoir Level");
+                    ato.reservoirLevel.enable = true;
+                }
+
+                text = (string)joAto["reservoirZeroCalibrationValue"];
                 if (string.IsNullOrWhiteSpace (text))
-                    ato.zeroValue = 819.2f;
+                    ato.reservoirLevel.zeroValue = 819.2f;
                 else {
                     try {
-                        ato.zeroValue = Convert.ToSingle (text);
+                        ato.reservoirLevel.zeroValue = Convert.ToSingle (text);
                     } catch {
-                        ato.zeroValue = 819.2f;
+                        ato.reservoirLevel.zeroValue = 819.2f;
                     }
                 }
 
-                text = (string)joAto["fullScaleCalibrationActual"];
+                text = (string)joAto["reservoirFullScaleCalibrationActual"];
                 if (string.IsNullOrWhiteSpace (text))
-                    ato.fullScaleActual = 15.0f;
+                    ato.reservoirLevel.fullScaleActual = 15.0f;
                 else {
                     try {
-                        ato.fullScaleActual = Convert.ToSingle (text);
+                        ato.reservoirLevel.fullScaleActual = Convert.ToSingle (text);
                     } catch {
-                        ato.fullScaleActual = 15.0f;
+                        ato.reservoirLevel.fullScaleActual = 15.0f;
                     }
                 }
 
-                text = (string)joAto["fullScaleCalibrationValue"];
+                text = (string)joAto["reservoirFullScaleCalibrationValue"];
                 if (string.IsNullOrWhiteSpace (text))
-                    ato.fullScaleValue = 4096.0f;
+                    ato.reservoirLevel.fullScaleValue = 4096.0f;
                 else {
                     try {
-                        ato.fullScaleValue = Convert.ToSingle (text);
+                        ato.reservoirLevel.fullScaleValue = Convert.ToSingle (text);
                     } catch {
-                        ato.fullScaleValue = 4096.0f;
+                        ato.reservoirLevel.fullScaleValue = 4096.0f;
                     }
                 }
 
                 text = (string)joAto["reservoirLowLevelSetpoint"];
                 if (string.IsNullOrWhiteSpace (text))
-                    ato.reservoirLowLevelSetpoint = 0.0f;
+                    ato.reservoirLevel.lowAlarmSetpoint = 0.0f;
                 else {
                     try {
-                        ato.reservoirLowLevelSetpoint = Convert.ToSingle (text);
+                        ato.reservoirLevel.lowAlarmSetpoint = Convert.ToSingle (text);
                     } catch {
-                        ato.reservoirLowLevelSetpoint = 0.0f;
+                        ato.reservoirLevel.lowAlarmSetpoint = 0.0f;
                     }
                 }
 
                 try {
                     ato.disableOnLowResevoirLevel = Convert.ToBoolean (joAto["disableOnLowResevoirLevel"]);
+                    if (ato.disableOnLowResevoirLevel) {
+                        ato.reservoirLevel.enableLowAlarm = true;
+                    }
                 } catch {
                     ato.disableOnLowResevoirLevel = false;
                 }
@@ -643,9 +657,9 @@ namespace AquaPic.Modules
             if (fullScaleActual > 15.0f)
                 throw new ArgumentException ("Full scale actual can't be greater than 15");
 
-            ato.zeroValue = zeroValue;
-            ato.fullScaleActual = fullScaleActual;
-            ato.fullScaleValue = fullScaleValue;
+            ato.reservoirLevel.zeroValue = zeroValue;
+            ato.reservoirLevel.fullScaleActual = fullScaleActual;
+            ato.reservoirLevel.fullScaleValue = fullScaleValue;
 
             string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
@@ -654,9 +668,9 @@ namespace AquaPic.Modules
             string jstring = File.ReadAllText (path);
             JObject jo = (JObject)JToken.Parse (jstring);
 
-            jo["AutoTopOff"]["zeroCalibrationValue"] = ato.zeroValue.ToString ();
-            jo["AutoTopOff"]["fullScaleCalibrationActual"] = ato.fullScaleActual.ToString ();
-            jo["AutoTopOff"]["fullScaleCalibrationValue"] = ato.fullScaleValue.ToString ();
+            jo["AutoTopOff"]["reservoirZeroCalibrationValue"] = ato.reservoirLevel.zeroValue.ToString ();
+            jo["AutoTopOff"]["reservoirFullScaleCalibrationActual"] = ato.reservoirLevel.fullScaleActual.ToString ();
+            jo["AutoTopOff"]["reservoirFullScaleCalibrationValue"] = ato.reservoirLevel.fullScaleValue.ToString ();
 
             File.WriteAllText (path, jo.ToString ());
         }

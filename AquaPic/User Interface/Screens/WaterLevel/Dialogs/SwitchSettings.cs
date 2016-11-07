@@ -29,7 +29,7 @@ namespace AquaPic.UserInterface
             DeleteButtonEvent += OnDelete;
             this.switchName = switchName;
 
-            var t = new SettingTextBox ();
+            var t = new SettingsTextBox ();
             t.text = "Name";
             if (this.switchName.IsNotEmpty ()) {
                 t.textBox.text = this.switchName;
@@ -46,7 +46,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            var c = new SettingComboBox ();
+            var c = new SettingsComboBox ();
             c.text = "Input";
             if (this.switchName.IsNotEmpty ()) {
                 IndividualControl ic = WaterLevel.GetFloatSwitchIndividualControl (this.switchName);
@@ -59,7 +59,7 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (AquaPicDrivers.DigitalInput.GetAllAvaiableChannels ());
             AddSetting (c);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Physical Level";
             if (this.switchName.IsNotEmpty ()) {
                 t.textBox.text = WaterLevel.GetFloatSwitchPhysicalLevel (this.switchName).ToString ();
@@ -82,7 +82,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            c = new SettingComboBox ();
+            c = new SettingsComboBox ();
             c.text = "Type";
             string[] types = Enum.GetNames (typeof(SwitchType));
             c.combo.comboList.AddRange (types);
@@ -99,7 +99,7 @@ namespace AquaPic.UserInterface
             }
             AddSetting (c);
 
-            c = new SettingComboBox ();
+            c = new SettingsComboBox ();
             c.text = "Function";
             string[] functions = Enum.GetNames (typeof(SwitchFunction));
             c.combo.comboList.AddRange (functions);
@@ -117,7 +117,7 @@ namespace AquaPic.UserInterface
             }
             AddSetting (c);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Time Offset";
             if (this.switchName.IsNotEmpty ())
                 t.textBox.text = string.Format ("{0} secs", WaterLevel.GetFloatSwitchTimeOffset (this.switchName) / 1000);
@@ -155,21 +155,21 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnSave (object sender) {
-            string name = (settings["Name"] as SettingTextBox).textBox.text;
+            string name = (settings["Name"] as SettingsTextBox).textBox.text;
 
-            string chName = (settings["Input"] as SettingComboBox).combo.activeText;
+            string chName = (settings["Input"] as SettingsComboBox).combo.activeText;
             IndividualControl ic = new IndividualControl ();
 
-            float physicalLevel = Convert.ToSingle ((settings["Physical Level"] as SettingTextBox).textBox.text);
+            float physicalLevel = Convert.ToSingle ((settings["Physical Level"] as SettingsTextBox).textBox.text);
 
-            string typeString = (settings ["Type"] as SettingComboBox).combo.activeText;
+            string typeString = (settings ["Type"] as SettingsComboBox).combo.activeText;
             SwitchType type;
 
-            string functionString = (settings["Function"] as SettingComboBox).combo.activeText;
+            string functionString = (settings["Function"] as SettingsComboBox).combo.activeText;
             SwitchFunction function;
 
             uint timeOffset = 0;
-            string timeOffsetString = (settings["Time Offset"] as SettingTextBox).textBox.text;
+            string timeOffsetString = (settings["Time Offset"] as SettingsTextBox).textBox.text;
             if (timeOffsetString != "Enter time") {
                 int idx = timeOffsetString.IndexOf ("secs", StringComparison.InvariantCultureIgnoreCase);
                 if (idx != -1)
@@ -191,7 +191,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if ((settings["Input"] as SettingComboBox).combo.active == -1) {
+                if ((settings["Input"] as SettingsComboBox).combo.active == -1) {
                     MessageBox.Show ("Please select an channel");
                     return false;
                 }
@@ -205,7 +205,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if (functionString.IsNotEmpty () || ((settings["Function"] as SettingComboBox).combo.active == -1)) {
+                if (functionString.IsNotEmpty () || ((settings["Function"] as SettingsComboBox).combo.active == -1)) {
                     function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), functionString);
                 } else {
                     MessageBox.Show ("Please select switch function");
@@ -223,6 +223,8 @@ namespace AquaPic.UserInterface
                     MessageBox.Show (ex.Message);
                     return false;
                 }
+
+
 
                 JObject jobj = new JObject ();
 

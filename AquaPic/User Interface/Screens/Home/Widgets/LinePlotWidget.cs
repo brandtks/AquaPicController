@@ -72,6 +72,7 @@ namespace AquaPic.UserInterface
             displayLabel.textColor = "grey3";
             displayLabel.textAlignment = TouchAlignment.Left;
             displayLabel.textHorizontallyCentered = true;
+            displayLabel.textRender.textWrap = TouchTextWrap.Shrink;
             Put (displayLabel, 3, 63);
 
             textBox = new TouchLabel ();

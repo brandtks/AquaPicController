@@ -27,7 +27,7 @@ namespace AquaPic.UserInterface
             SaveEvent += OnSave;
             DeleteButtonEvent += OnDelete;
 
-            var t = new SettingTextBox ();
+            var t = new SettingsTextBox ();
             t.text = "Name";
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = groupName;
@@ -49,7 +49,7 @@ namespace AquaPic.UserInterface
             }
             AddSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Setpoint";
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupTemperatureSetpoint (groupName).ToString ();
@@ -66,7 +66,7 @@ namespace AquaPic.UserInterface
             };
             settings.Add (t.label.text, t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Deadband";
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupTemperatureDeadband (groupName).ToString ();
@@ -83,7 +83,7 @@ namespace AquaPic.UserInterface
             };
             settings.Add (t.label.text, t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "High Alarm";
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupHighTemperatureAlarmSetpoint (groupName).ToString ();
@@ -100,7 +100,7 @@ namespace AquaPic.UserInterface
             };
             settings.Add (t.label.text, t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Low Alarm";
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupLowTemperatureAlarmSetpoint (groupName).ToString ();
@@ -129,16 +129,16 @@ namespace AquaPic.UserInterface
             JObject jo = (JObject)JToken.Parse (json);
 
             if (groupName.IsEmpty ()) {
-                var name = (settings["Name"] as SettingTextBox).textBox.text;
+                var name = (settings["Name"] as SettingsTextBox).textBox.text;
                 if (name == "Enter name") {
                     MessageBox.Show ("Invalid heater name");
                     return false;
                 }
 
-                var highTemperatureAlarmSetpoint = Convert.ToSingle ((settings["High Alarm"] as SettingTextBox).textBox.text);
-                var lowTemperatureAlarmSetpoint = Convert.ToSingle ((settings["Low Alarm"] as SettingTextBox).textBox.text);
-                var temperatureSetpoint = Convert.ToSingle ((settings["Setpoint"] as SettingTextBox).textBox.text);
-                var temperatureDeadband = Convert.ToSingle ((settings["Deadband"] as SettingTextBox).textBox.text);
+                var highTemperatureAlarmSetpoint = Convert.ToSingle ((settings["High Alarm"] as SettingsTextBox).textBox.text);
+                var lowTemperatureAlarmSetpoint = Convert.ToSingle ((settings["Low Alarm"] as SettingsTextBox).textBox.text);
+                var temperatureSetpoint = Convert.ToSingle ((settings["Setpoint"] as SettingsTextBox).textBox.text);
+                var temperatureDeadband = Convert.ToSingle ((settings["Deadband"] as SettingsTextBox).textBox.text);
 
                 Temperature.AddTemperatureGroup (
                     name,
@@ -160,10 +160,10 @@ namespace AquaPic.UserInterface
                 //Get new groups name
                 groupName = name;
             } else {
-                var highTemperatureAlarmSetpoint = Convert.ToSingle ((settings["High Alarm"] as SettingTextBox).textBox.text);
-                var lowTemperatureAlarmSetpoint = Convert.ToSingle ((settings["Low Alarm"] as SettingTextBox).textBox.text);
-                var temperatureSetpoint = Convert.ToSingle ((settings["Setpoint"] as SettingTextBox).textBox.text);
-                var temperatureDeadband = Convert.ToSingle ((settings["Deadband"] as SettingTextBox).textBox.text);
+                var highTemperatureAlarmSetpoint = Convert.ToSingle ((settings["High Alarm"] as SettingsTextBox).textBox.text);
+                var lowTemperatureAlarmSetpoint = Convert.ToSingle ((settings["Low Alarm"] as SettingsTextBox).textBox.text);
+                var temperatureSetpoint = Convert.ToSingle ((settings["Setpoint"] as SettingsTextBox).textBox.text);
+                var temperatureDeadband = Convert.ToSingle ((settings["Deadband"] as SettingsTextBox).textBox.text);
 
                 Temperature.SetTemperatureGroupHighTemperatureAlarmSetpoint (groupName, highTemperatureAlarmSetpoint);
                 Temperature.SetTemperatureGroupLowTemperatureAlarmSetpoint (groupName, lowTemperatureAlarmSetpoint);

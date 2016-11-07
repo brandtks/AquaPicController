@@ -1,6 +1,5 @@
 ﻿using System;
 using Gtk;
-using Cairo;
 
 namespace TouchWidgetLibrary  
 {
@@ -11,7 +10,7 @@ namespace TouchWidgetLibrary
         private bool buttonsPlaced;
 
         public TouchUpDownButtons () {
-            SetSizeRequest (98, 46);
+            SetSizeRequest (98, 51);
             up = new TouchButton ();
             down = new TouchButton ();
             buttonsPlaced = false;

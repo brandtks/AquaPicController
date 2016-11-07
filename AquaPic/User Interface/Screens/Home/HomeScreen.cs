@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Gtk;
-using Cairo;
-using TouchWidgetLibrary;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
-using AquaPic.Utilites;
 using AquaPic.Modules;
 
 namespace AquaPic.UserInterface

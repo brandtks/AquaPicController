@@ -32,10 +32,10 @@ namespace AquaPic.UserInterface
                 timers [i].TimerStopEvent += OnTimerStartStop;
             }
 
-            var box2 = new TimerBackground (310, 129);
+            var box2 = new TimerBackground (310, 139);
             box2.color = "grey4";
             box2.transparency = 0.1f;
-            Put (box2, 0, 40);
+            Put (box2, 0, 30);
 
             tabs = new TimerTab[3];
             for (int i = 2; i >= 0; --i) {
@@ -51,11 +51,11 @@ namespace AquaPic.UserInterface
             var minuteLabel = new TouchLabel ();
             minuteLabel.text = "Minutes";
             minuteLabel.textColor = "grey3";
-            Put (minuteLabel, 5, 47);
+            Put (minuteLabel, 5, 37);
             minuteLabel.Show ();
 
             minutes = new TouchTextBox ();
-            minutes.SetSizeRequest (99, 46);
+            minutes.SetSizeRequest (99, 51);
             minutes.enableTouch = true;
             minutes.textSize = 16;
             minutes.textAlignment = TouchAlignment.Center;
@@ -68,7 +68,7 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (minutes, 3, 67);
+            Put (minutes, 3, 57);
 
             minUpDown = new TouchUpDownButtons ();
             minUpDown.up.ButtonReleaseEvent += (o, args) => {
@@ -87,17 +87,17 @@ namespace AquaPic.UserInterface
                     }
                 }
             };
-            Put (minUpDown, 3, 117);
+            Put (minUpDown, 3, 113);
             minUpDown.Show ();
 
             var secondsLabel = new TouchLabel ();
             secondsLabel.text = "Seconds";
             secondsLabel.textColor = "grey3";
-            Put (secondsLabel, 108, 47);
+            Put (secondsLabel, 108, 37);
             secondsLabel.Show ();
 
             seconds = new TouchTextBox ();
-            seconds.SetSizeRequest (98, 46);
+            seconds.SetSizeRequest (98, 51);
             seconds.enableTouch = true;
             seconds.textAlignment = TouchAlignment.Center;
             seconds.textSize = 16;
@@ -113,7 +113,7 @@ namespace AquaPic.UserInterface
                     args.keepText = false;
                 }
             };
-            Put (seconds, 106, 67);
+            Put (seconds, 106, 57);
 
             secUpDown = new TouchUpDownButtons ();
             secUpDown.up.ButtonReleaseEvent += (o, args) => {
@@ -134,19 +134,19 @@ namespace AquaPic.UserInterface
                     }
                 }
             };
-            Put (secUpDown, 106, 117);
+            Put (secUpDown, 106, 113);
             secUpDown.Show ();
 
             startStopButton = new TouchButton ();
-            startStopButton.SetSizeRequest (98, 56);
+            startStopButton.SetSizeRequest (98, 51);
             startStopButton.ButtonReleaseEvent += OnStartStopButtonRelease;
-            Put (startStopButton, 209, 47);
+            Put (startStopButton, 209, 57);
 
             resetButton = new TouchButton ();
-            resetButton.SetSizeRequest (98, 56);
+            resetButton.SetSizeRequest (98, 51);
             resetButton.text = "Reset";
             resetButton.ButtonReleaseEvent += OnResetButtonRelease;
-            Put (resetButton, 209, 107);
+            Put (resetButton, 209, 113);
 
             if (timers [timerIndex].enabled)
                 UpdateTime (timers [timerIndex].secondsRemaining, false);
@@ -287,7 +287,7 @@ namespace AquaPic.UserInterface
             public int position;
 
             public TimerTab (int position) {
-                SetSizeRequest (130, 40);
+                SetSizeRequest (130, 30);
 
                 VisibleWindow = false;
                 ExposeEvent += OnEventBoxExpose;
@@ -306,13 +306,13 @@ namespace AquaPic.UserInterface
                     int width = Allocation.Width;
                     int top = Allocation.Top;
                     int left = Allocation.Left;
-                    int radius = 10;
+                    int radius = 4;
 
                     if (!selected) {
-                        width -= 26;
+                        width -= 25;
                         left += position * 13;
-                        top += 10;
-                        height -= 10;
+                        top += 7;
+                        height -= 7;
                     }
 
                     cr.MoveTo (left, top + radius);
@@ -352,10 +352,10 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, color, transparency);
                     cr.Fill ();
 
-                    cr.MoveTo (Allocation.Left, Allocation.Top - 2);
-                    cr.LineTo (Allocation.Right, Allocation.Top - 2);
+                    cr.MoveTo (Allocation.Left, Allocation.Top);
+                    cr.LineTo (Allocation.Right + 1, Allocation.Top);
                     TouchColor.SetSource (cr, "grey2", 1.0);
-                    cr.LineWidth = 4.0;
+                    cr.LineWidth = 2.0;
                     cr.Stroke ();
                 }
             }

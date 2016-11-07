@@ -1,6 +1,5 @@
 ﻿using System;
 using Gtk;
-using Cairo;
 using TouchWidgetLibrary;
 using AquaPic.Drivers;
 using AquaPic.Utilites;
@@ -137,6 +136,8 @@ namespace AquaPic.UserInterface
             string[] names = AquaPicDrivers.AnalogInput.GetAllChannelNames (cardId);
             float[] values = AquaPicDrivers.AnalogInput.GetAllChannelValues (cardId);
             Mode[] modes = AquaPicDrivers.AnalogInput.GetAllChannelModes (cardId);
+            
+            
 
             int i = 0;
             foreach (var d in displays) {

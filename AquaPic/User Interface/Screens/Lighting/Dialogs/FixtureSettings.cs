@@ -28,7 +28,7 @@ namespace AquaPic.UserInterface
 
             this.fixtureName = fixtureName;
 
-            var t = new SettingTextBox ();
+            var t = new SettingsTextBox ();
             t.text = "Name";
             if (this.fixtureName.IsNotEmpty ()) {
                 t.textBox.text = this.fixtureName;
@@ -45,7 +45,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            var c = new SettingComboBox ();
+            var c = new SettingsComboBox ();
             c.label.text = "Outlet";
             if (this.fixtureName.IsNotEmpty ()) {
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (this.fixtureName);
@@ -91,7 +91,7 @@ namespace AquaPic.UserInterface
                 s.selectorSwitch.currentSelected = 1;
             AddSetting (s);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "On Time Offset";
             if (this.fixtureName.IsNotEmpty ())
                 t.textBox.text = Lighting.GetFixtureOnTimeOffset (this.fixtureName).ToString ();
@@ -107,7 +107,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Off Time Offset";
             t.textBox.includeTimeFunctions = true;
             if (this.fixtureName.IsNotEmpty ())
@@ -149,7 +149,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (s);
 
-            c = new SettingComboBox ();
+            c = new SettingsComboBox ();
             c.label.text = "Dimming Channel";
             if ((this.fixtureName.IsNotEmpty ()) && (isDimming)) {
                 IndividualControl ic = Lighting.GetDimmingChannelIndividualControl (this.fixtureName);
@@ -162,7 +162,7 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (AquaPicDrivers.AnalogOutput.GetAllAvaiableChannels ());
             AddOptionalSetting (c);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Max Dimming";
             if ((this.fixtureName.IsNotEmpty ()) && (isDimming))
                 t.textBox.text = Lighting.GetMaxDimmingLevel (this.fixtureName).ToString ();
@@ -171,7 +171,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     float max = Convert.ToSingle (args.text);
-                    float min = Convert.ToSingle (((SettingTextBox)settings ["Min Dimming"]).textBox.text);
+                    float min = Convert.ToSingle (((SettingsTextBox)settings ["Min Dimming"]).textBox.text);
 
                     if (max < min) {
                         MessageBox.Show ("Maximum cannot be less than minimum");
@@ -184,7 +184,7 @@ namespace AquaPic.UserInterface
             };
             AddOptionalSetting (t);
 
-            t = new SettingTextBox ();
+            t = new SettingsTextBox ();
             t.text = "Min Dimming";
             if ((this.fixtureName.IsNotEmpty ()) && (isDimming))
                 t.textBox.text = Lighting.GetMinDimmingLevel (this.fixtureName).ToString ();
@@ -193,7 +193,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     float min = Convert.ToSingle (args.text);
-                    float max = Convert.ToSingle (((SettingTextBox)settings ["Max Dimming"]).textBox.text);
+                    float max = Convert.ToSingle (((SettingsTextBox)settings ["Max Dimming"]).textBox.text);
 
                     if (min > max) {
                         MessageBox.Show ("Minimum cannot be greater than maximum");
@@ -237,9 +237,9 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnSave (object sender) {
-            string name = ((SettingTextBox)settings ["Name"]).textBox.text;
+            string name = ((SettingsTextBox)settings ["Name"]).textBox.text;
 
-            string outletStr = ((SettingComboBox)settings ["Outlet"]).combo.activeText;
+            string outletStr = ((SettingsComboBox)settings ["Outlet"]).combo.activeText;
             IndividualControl outletIc = IndividualControl.Empty;
 
             LightingTime lTime = LightingTime.Daytime;
@@ -269,8 +269,8 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            int onOffset = Convert.ToInt32 (((SettingTextBox)settings ["On Time Offset"]).textBox.text);
-            int offOffset = Convert.ToInt32 (((SettingTextBox)settings ["Off Time Offset"]).textBox.text);
+            int onOffset = Convert.ToInt32 (((SettingsTextBox)settings ["On Time Offset"]).textBox.text);
+            int offOffset = Convert.ToInt32 (((SettingsTextBox)settings ["Off Time Offset"]).textBox.text);
 
             bool dimmingFixture = true;
             try {
@@ -281,11 +281,11 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            string chStr = ((SettingComboBox)settings ["Dimming Channel"]).combo.activeText;
+            string chStr = ((SettingsComboBox)settings ["Dimming Channel"]).combo.activeText;
             IndividualControl chIc = IndividualControl.Empty;
 
-            float maxDimming = Convert.ToSingle (((SettingTextBox)settings ["Max Dimming"]).textBox.text);
-            float minDimming = Convert.ToSingle (((SettingTextBox)settings ["Min Dimming"]).textBox.text);
+            float maxDimming = Convert.ToSingle (((SettingsTextBox)settings ["Max Dimming"]).textBox.text);
+            float minDimming = Convert.ToSingle (((SettingsTextBox)settings ["Min Dimming"]).textBox.text);
 
             AnalogType aType = AnalogType.ZeroTen;
             #if SELECTABLE_ANALOG_OUTPUT_TYPE
@@ -311,7 +311,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if ((settings["Outlet"] as SettingComboBox).combo.active == -1) {
+                if ((settings["Outlet"] as SettingsComboBox).combo.active == -1) {
                     MessageBox.Show ("Please select an outlet");
                     return false;
                 }
@@ -319,7 +319,7 @@ namespace AquaPic.UserInterface
                 ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
 
                 if (dimmingFixture) {
-                    if (((SettingComboBox)settings ["Dimming Channel"]).combo.active == -1) {
+                    if (((SettingsComboBox)settings ["Dimming Channel"]).combo.active == -1) {
                         MessageBox.Show ("Please select a dimming channel");
                         return false;
                     }

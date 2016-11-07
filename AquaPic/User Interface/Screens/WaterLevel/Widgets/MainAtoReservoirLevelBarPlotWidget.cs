@@ -20,8 +20,9 @@ namespace AquaPic.UserInterface
             label = new TouchLabel ();
             label.textColor = "compl";
             label.text = "Disconnected";
+            label.textRender.orientation = TouchOrientation.Vertical;
             label.WidthRequest = 100;
-            Put (label, 3, 149);
+            Put (label, 60, 9);
             label.Show ();
 
             var eventbox = new EventBox ();
