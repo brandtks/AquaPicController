@@ -274,6 +274,24 @@ namespace AquaPic.Modules
             }
         }
 
+        public static float atoReservoirLevelSensorZeroCalibrationValue {
+            get {
+                return ato.reservoirLevel.zeroValue;
+            }
+        }
+
+        public static float atoReservoirLevelSensorFullScaleCalibrationActual {
+            get {
+                return ato.reservoirLevel.fullScaleActual;
+            }
+        }
+
+        public static float atoReservoirLevelSensorFullScaleCalibrationValue {
+            get {
+                return ato.reservoirLevel.fullScaleValue;
+            }
+        }
+
         /**************************************************************************************************************/
         /* Float Switches                                                                                             */
         /**************************************************************************************************************/
@@ -647,7 +665,7 @@ namespace AquaPic.Modules
             return false;
         }
 
-        public static void SetAtoCalibrationData (float zeroValue, float fullScaleActual, float fullScaleValue) {
+        public static void SetAtoReservoirCalibrationData (float zeroValue, float fullScaleActual, float fullScaleValue) {
             if (fullScaleValue <= zeroValue)
                 throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
 

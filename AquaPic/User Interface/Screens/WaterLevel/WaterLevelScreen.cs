@@ -98,6 +98,38 @@ namespace AquaPic.UserInterface
             Put (atoSettingsBtn, 290, 405);
             atoSettingsBtn.Show ();
 
+            var b = new TouchButton ();
+            b.text = "Calibrate";
+            b.SetSizeRequest (100, 60);
+            b.ButtonReleaseEvent += (o, args) => {
+                if (WaterLevel.atoReservoirLevelEnabled) {
+                    var cal = new CalibrationDialog (
+                        "ATO Reservoir Level Sensor",
+                        () => {
+                            return AquaPicDrivers.AnalogInput.GetChannelValue (WaterLevel.atoReservoirLevelChannel);
+                        });
+
+                    cal.CalibrationCompleteEvent += (aa) => {
+                        WaterLevel.SetAtoReservoirCalibrationData (
+                            (float)aa.zeroValue,
+                            (float)aa.fullScaleActual,
+                            (float)aa.fullScaleValue);
+                    };
+
+                    cal.calArgs.zeroValue = WaterLevel.atoReservoirLevelSensorZeroCalibrationValue;
+                    cal.calArgs.fullScaleActual = WaterLevel.atoReservoirLevelSensorFullScaleCalibrationActual;
+                    cal.calArgs.fullScaleValue = WaterLevel.atoReservoirLevelSensorFullScaleCalibrationValue;
+
+                    cal.Run ();
+                    cal.Destroy ();
+                } else {
+                    MessageBox.Show ("ATO reservoir level sensor is disabled\n" +
+                                    "Can't perfom a calibration");
+                }
+            };
+            Put (b, 180, 405);
+            b.Show ();
+
             atoClearFailBtn = new TouchButton ();
             atoClearFailBtn.SetSizeRequest (100, 60);
             atoClearFailBtn.text = "Reset ATO";
@@ -106,7 +138,7 @@ namespace AquaPic.UserInterface
                 if (!WaterLevel.ClearAtoAlarm ())
                     MessageBox.Show ("Please acknowledge alarms first");
             };
-            Put (atoClearFailBtn, 180, 405);
+            Put (atoClearFailBtn, 70, 405);
             if (Alarm.CheckAlarming (WaterLevel.atoFailedAlarmIndex)) {
                 atoClearFailBtn.Visible = true;
                 atoClearFailBtn.Show ();
@@ -162,7 +194,7 @@ namespace AquaPic.UserInterface
             Put (settingsBtn, 415, 195);
             settingsBtn.Show ();
 
-            var b = new TouchButton ();
+            b = new TouchButton ();
             b.text = "Calibrate";
             b.SetSizeRequest (100, 60);
             b.ButtonReleaseEvent += (o, args) => {
