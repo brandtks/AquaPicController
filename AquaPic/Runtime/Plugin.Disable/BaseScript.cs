@@ -34,7 +34,7 @@ namespace AquaPic.Runtime
             Assembly pluginAssembly = null;
             try {
                 if (Plugin.CompileCode (this)) {
-                    var dllPath = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+                    var dllPath = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
                     dllPath = Path.Combine (dllPath, "Scripts");
                     dllPath = Path.Combine (dllPath, "dll");
                     dllPath = Path.Combine (dllPath, name + ".dll");

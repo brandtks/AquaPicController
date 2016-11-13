@@ -6,6 +6,7 @@ using AquaPic.Utilites;
 using AquaPic.UserInterface;
 using AquaPic.Drivers;
 using AquaPic.Modules;
+using AquaPic.SerialBus;
 
 namespace AquaPic
 {
@@ -16,44 +17,72 @@ namespace AquaPic
             if (Utils.ExecutingOperatingSystem == Platform.Windows)
                 CheckWindowsGtk ();
 
+            //Get the AquaPic directory environment
+            string aquaPicEnvironment = string.Empty;
+            aquaPicEnvironment = Environment.GetEnvironmentVariable ("AquaPic");
+            if (aquaPicEnvironment.IsEmpty ()) {
+                if (File.Exists ("AquaPicEnvironment.txt")) {
+                    var lines = File.ReadAllLines ("AquaPicEnvironment.txt");
+                    aquaPicEnvironment = lines[0];
+                }
+            }
+
+            if (aquaPicEnvironment.IsNotEmpty ()) {
+                string path = Path.Combine (aquaPicEnvironment, "AquaPicRuntimeProject");
+                if (!Directory.Exists (path)) {
+                    Console.WriteLine ("Path to AquaPic directory environment is incorrect");
+                    aquaPicEnvironment = string.Empty;
+                }
+            }
+
+            if (aquaPicEnvironment.IsEmpty ()) {
+                Console.WriteLine ("Please add an environment variable or file in execution path");
+                Console.WriteLine ("with the path to the AquaPic directory environment");
+                Application.Quit ();
+                return;
+            }
+
+            Utils.AquaPicEnvironment = aquaPicEnvironment;
+
+            //Setup
             Application.Init ();
 
             Logger.Add ("Executing operating system is {0}", Utils.GetDescription (Utils.ExecutingOperatingSystem));
 
-            #if DEBUG
+#if DEBUG
             try {
-            #endif
+#endif
                 Equipment.AddFromJson ();
-
                 Temperature.Init ();
                 Lighting.Init ();
                 WaterLevel.Init ();
                 Power.Init ();
-            #if DEBUG
+#if DEBUG
             } catch (Exception ex) {
                 Logger.AddError (ex.ToString ());
+                return;
             }
-            #endif
+#endif
 
+            //Run the control
             AquaPicGUI win = new AquaPicGUI ();
             win.Show ();
 
-            win.DestroyEvent += (o, a) => {
-                if (AquaPic.SerialBus.AquaPicBus.isOpen) {
-                    AquaPic.SerialBus.AquaPicBus.Close ();
-                }
-            };
-
             Application.Run ();
 
+            //Cleanup
+            if (AquaPicBus.isOpen) {
+                AquaPicBus.Close ();
+            }
+
+#if DEBUG
             //for some reason this doesn't like to be in the destroyed event
-            #if DEBUG
             var groups = Temperature.GetAllTemperatureGroupNames ();
             foreach (var group in groups) {
                 Temperature.GetTemperatureGroupDataLogger (group).DeleteAllLogFiles ();
             }
             WaterLevel.dataLogger.DeleteAllLogFiles ();
-            #endif
+#endif
 		}
 
         //Gtk library hack because Windows

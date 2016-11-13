@@ -316,267 +316,319 @@ namespace AquaPic.Modules
         /* Water Level                                                                                                */
         /**************************************************************************************************************/
         static WaterLevel () {
-            string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            floatSwitches = new Dictionary<string, FloatSwitch> ();
+
+            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
             path = Path.Combine (path, "waterLevelProperties.json");
 
-            using (StreamReader reader = File.OpenText (path)) {
-                JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
+            if (File.Exists (path)) {
+                using (StreamReader reader = File.OpenText (path)) {
+                    JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
-                /******************************************************************************************************/
-                /* Analog Sensor                                                                                      */
-                /******************************************************************************************************/
-                bool enable = Convert.ToBoolean (jo ["enableAnalogSensor"]);
+                    /******************************************************************************************************/
+                    /* Analog Sensor                                                                                      */
+                    /******************************************************************************************************/
+                    bool enable = Convert.ToBoolean (jo["enableAnalogSensor"]);
 
-                float highAlarmSetpoint;
-                string text = (string)jo ["highAnalogLevelAlarmSetpoint"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    highAlarmSetpoint = 0.0f;
-                    enable = false;
-                } else
-                    highAlarmSetpoint = Convert.ToSingle (text);
+                    float highAlarmSetpoint;
+                    string text = (string)jo["highAnalogLevelAlarmSetpoint"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        highAlarmSetpoint = 0.0f;
+                        enable = false;
+                    } else
+                        highAlarmSetpoint = Convert.ToSingle (text);
 
 
-                float lowAlarmSetpoint;
-                text = (string)jo ["lowAnalogLevelAlarmSetpoint"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    lowAlarmSetpoint = 0.0f;
-                    enable = false;
-                } else
-                    lowAlarmSetpoint = Convert.ToSingle (text);
+                    float lowAlarmSetpoint;
+                    text = (string)jo["lowAnalogLevelAlarmSetpoint"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        lowAlarmSetpoint = 0.0f;
+                        enable = false;
+                    } else
+                        lowAlarmSetpoint = Convert.ToSingle (text);
 
-                IndividualControl ic;
-                text = Convert.ToString (jo ["inputCard"]);
-                if (string.IsNullOrWhiteSpace (text)) {
-                    ic = IndividualControl.Empty;
-                    enable = false;
-                } else
-                    ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
+                    IndividualControl ic;
+                    text = Convert.ToString (jo["inputCard"]);
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        ic = IndividualControl.Empty;
+                        enable = false;
+                    } else
+                        ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
 
-                text = (string)jo ["channel"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    ic = IndividualControl.Empty;
-                    enable = false;
-                } else
-                    ic.Individual = Convert.ToInt32 (text);
+                    text = (string)jo["channel"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        ic = IndividualControl.Empty;
+                        enable = false;
+                    } else
+                        ic.Individual = Convert.ToInt32 (text);
 
-                analogSensor = new AnalogLevelSensor ("Water Level", ic, highAlarmSetpoint, lowAlarmSetpoint, enable);
+                    analogSensor = new AnalogLevelSensor ("Water Level", ic, highAlarmSetpoint, lowAlarmSetpoint, enable);
 
-                text = (string)jo ["zeroCalibrationValue"];
-                if (string.IsNullOrWhiteSpace (text))
-                    analogSensor.zeroValue = 819.2f;
-                else {
-                    try {
-                        analogSensor.zeroValue = Convert.ToSingle (text);
-                    } catch {
+                    text = (string)jo["zeroCalibrationValue"];
+                    if (string.IsNullOrWhiteSpace (text))
                         analogSensor.zeroValue = 819.2f;
+                    else {
+                        try {
+                            analogSensor.zeroValue = Convert.ToSingle (text);
+                        } catch {
+                            analogSensor.zeroValue = 819.2f;
+                        }
                     }
-                }
 
-                text = (string)jo ["fullScaleCalibrationActual"];
-                if (string.IsNullOrWhiteSpace (text))
-                    analogSensor.fullScaleActual = 15.0f;
-                else {
-                    try {
-                        analogSensor.fullScaleActual = Convert.ToSingle (text);
-                    } catch {
+                    text = (string)jo["fullScaleCalibrationActual"];
+                    if (string.IsNullOrWhiteSpace (text))
                         analogSensor.fullScaleActual = 15.0f;
+                    else {
+                        try {
+                            analogSensor.fullScaleActual = Convert.ToSingle (text);
+                        } catch {
+                            analogSensor.fullScaleActual = 15.0f;
+                        }
                     }
-                }
 
-                text = (string)jo ["fullScaleCalibrationValue"];
-                if (string.IsNullOrWhiteSpace (text))
-                    analogSensor.fullScaleValue = 4096.0f;
-                else {
-                    try {
-                        analogSensor.fullScaleValue = Convert.ToSingle (text);
-                    } catch {
+                    text = (string)jo["fullScaleCalibrationValue"];
+                    if (string.IsNullOrWhiteSpace (text))
                         analogSensor.fullScaleValue = 4096.0f;
-                    }
-                }
-
-                /******************************************************************************************************/
-                /* Float Switches                                                                                     */
-                /******************************************************************************************************/
-                floatSwitches = new Dictionary<string,FloatSwitch> ();
-                JArray ja = (JArray)jo ["floatSwitches"];
-                foreach (var jt in ja) {
-                    JObject obj = jt as JObject;
-
-                    string name = (string)obj ["name"];
-                    ic.Group = AquaPicDrivers.DigitalInput.GetCardIndex ((string)obj ["inputCard"]);
-                    ic.Individual = Convert.ToInt32 (obj ["channel"]);
-                    float physicalLevel = Convert.ToSingle (obj ["physicalLevel"]);
-                    SwitchType type = (SwitchType)Enum.Parse (typeof (SwitchType), (string)obj ["switchType"]);
-                    SwitchFunction function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), (string)obj ["switchFuntion"]);
-                    string tString = (string)obj ["timeOffset"];
-                    uint timeOffset = Timer.ParseTime (tString);
-
-                    if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed)) {
-                        Logger.AddWarning ("High level switch should be normally closed");
-                    } else if ((function == SwitchFunction.LowLevel) && (type != SwitchType.NormallyClosed)) {
-                        Logger.AddWarning ("Low level switch should be normally closed");
-                    } else if ((function == SwitchFunction.ATO) && (type != SwitchType.NormallyOpened)) {
-                        Logger.AddWarning ("ATO switch should be normally opened");
+                    else {
+                        try {
+                            analogSensor.fullScaleValue = Convert.ToSingle (text);
+                        } catch {
+                            analogSensor.fullScaleValue = 4096.0f;
+                        }
                     }
 
-                    AddFloatSwitch (name, ic, physicalLevel, type, function, timeOffset);
+                    /******************************************************************************************************/
+                    /* Float Switches                                                                                     */
+                    /******************************************************************************************************/
+                    JArray ja = (JArray)jo["floatSwitches"];
+                    foreach (var jt in ja) {
+                        JObject obj = jt as JObject;
+
+                        string name = (string)obj["name"];
+                        ic.Group = AquaPicDrivers.DigitalInput.GetCardIndex ((string)obj["inputCard"]);
+                        ic.Individual = Convert.ToInt32 (obj["channel"]);
+                        float physicalLevel = Convert.ToSingle (obj["physicalLevel"]);
+                        SwitchType type = (SwitchType)Enum.Parse (typeof (SwitchType), (string)obj["switchType"]);
+                        SwitchFunction function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), (string)obj["switchFuntion"]);
+                        string tString = (string)obj["timeOffset"];
+                        uint timeOffset = Timer.ParseTime (tString);
+
+                        if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed)) {
+                            Logger.AddWarning ("High level switch should be normally closed");
+                        } else if ((function == SwitchFunction.LowLevel) && (type != SwitchType.NormallyClosed)) {
+                            Logger.AddWarning ("Low level switch should be normally closed");
+                        } else if ((function == SwitchFunction.ATO) && (type != SwitchType.NormallyOpened)) {
+                            Logger.AddWarning ("ATO switch should be normally opened");
+                        }
+
+                        AddFloatSwitch (name, ic, physicalLevel, type, function, timeOffset);
+                    }
+
+                    /******************************************************************************************************/
+                    /* Auto Top Off                                                                                       */
+                    /******************************************************************************************************/
+                    JObject joAto = (JObject)jo["AutoTopOff"];
+
+                    try {
+                        enable = Convert.ToBoolean (joAto["enableAto"]);
+                    } catch {
+                        enable = false;
+                    }
+
+                    bool useAnalogSensor;
+                    try {
+                        useAnalogSensor = Convert.ToBoolean (joAto["useAnalogSensor"]);
+                    } catch {
+                        useAnalogSensor = false;
+                    }
+
+                    float analogOnSetpoint;
+                    text = (string)joAto["analogOnSetpoint"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        analogOnSetpoint = 0.0f;
+                        useAnalogSensor = false;
+                    } else
+                        analogOnSetpoint = Convert.ToSingle (text);
+
+                    float analogOffSetpoint;
+                    text = (string)joAto["analogOffSetpoint"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        analogOffSetpoint = 0.0f;
+                        useAnalogSensor = false;
+                    } else
+                        analogOffSetpoint = Convert.ToSingle (text);
+
+                    bool useFloatSwitch = Convert.ToBoolean (joAto["useFloatSwitch"]);
+
+                    if (!useFloatSwitch && !useAnalogSensor)
+                        enable = false;
+
+                    text = (string)joAto["powerStrip"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        ic = IndividualControl.Empty;
+                        enable = false;
+                    } else {
+                        ic.Group = Power.GetPowerStripIndex (text);
+                    }
+
+                    text = (string)joAto["outlet"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        ic = IndividualControl.Empty;
+                        enable = false;
+                    } else {
+                        ic.Individual = Convert.ToInt32 (text);
+                    }
+
+                    uint maxPumpOnTime;
+                    text = (string)joAto["maxPumpOnTime"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        maxPumpOnTime = 0U;
+                        enable = false;
+                    } else
+                        maxPumpOnTime = Timer.ParseTime (text) / 1000;
+
+                    uint minPumpOffTime;
+                    text = (string)joAto["minPumpOffTime"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        minPumpOffTime = uint.MaxValue;
+                        enable = false;
+                    } else
+                        minPumpOffTime = Timer.ParseTime (text) / 1000;
+
+                    ato = new AutoTopOff (
+                        enable,
+                        useAnalogSensor,
+                        analogOnSetpoint,
+                        analogOffSetpoint,
+                        useFloatSwitch,
+                        ic,
+                        maxPumpOnTime,
+                        minPumpOffTime);
+
+                    text = (string)joAto["reservoirInputCard"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        ic = IndividualControl.Empty;
+                    } else {
+                        ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
+                    }
+
+                    text = (string)joAto["reservoirChannel"];
+                    if (string.IsNullOrWhiteSpace (text)) {
+                        ic = IndividualControl.Empty;
+                    } else {
+                        ic.Individual = Convert.ToInt32 (text);
+                    }
+
+                    ato.reservoirLevel.sensorChannel = ic;
+
+                    if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
+                        AquaPicDrivers.AnalogInput.AddChannel (ato.reservoirLevel.sensorChannel, "ATO Reservoir Level");
+                        ato.reservoirLevel.enable = true;
+                    }
+
+                    text = (string)joAto["reservoirZeroCalibrationValue"];
+                    if (string.IsNullOrWhiteSpace (text))
+                        ato.reservoirLevel.zeroValue = 819.2f;
+                    else {
+                        try {
+                            ato.reservoirLevel.zeroValue = Convert.ToSingle (text);
+                        } catch {
+                            ato.reservoirLevel.zeroValue = 819.2f;
+                        }
+                    }
+
+                    text = (string)joAto["reservoirFullScaleCalibrationActual"];
+                    if (string.IsNullOrWhiteSpace (text))
+                        ato.reservoirLevel.fullScaleActual = 15.0f;
+                    else {
+                        try {
+                            ato.reservoirLevel.fullScaleActual = Convert.ToSingle (text);
+                        } catch {
+                            ato.reservoirLevel.fullScaleActual = 15.0f;
+                        }
+                    }
+
+                    text = (string)joAto["reservoirFullScaleCalibrationValue"];
+                    if (string.IsNullOrWhiteSpace (text))
+                        ato.reservoirLevel.fullScaleValue = 4096.0f;
+                    else {
+                        try {
+                            ato.reservoirLevel.fullScaleValue = Convert.ToSingle (text);
+                        } catch {
+                            ato.reservoirLevel.fullScaleValue = 4096.0f;
+                        }
+                    }
+
+                    text = (string)joAto["reservoirLowLevelSetpoint"];
+                    if (string.IsNullOrWhiteSpace (text))
+                        ato.reservoirLevel.lowAlarmSetpoint = 0.0f;
+                    else {
+                        try {
+                            ato.reservoirLevel.lowAlarmSetpoint = Convert.ToSingle (text);
+                        } catch {
+                            ato.reservoirLevel.lowAlarmSetpoint = 0.0f;
+                        }
+                    }
+
+                    try {
+                        ato.disableOnLowResevoirLevel = Convert.ToBoolean (joAto["disableOnLowResevoirLevel"]);
+                        if (ato.disableOnLowResevoirLevel) {
+                            ato.reservoirLevel.enableLowAlarm = true;
+                        }
+                    } catch {
+                        ato.disableOnLowResevoirLevel = false;
+                    }
                 }
-
-                /******************************************************************************************************/
-                /* Auto Top Off                                                                                       */
-                /******************************************************************************************************/
-                JObject joAto = (JObject)jo ["AutoTopOff"];
-
-                try {
-                    enable = Convert.ToBoolean (joAto["enableAto"]);
-                } catch {
-                    enable = false;
-                }
-
-                bool useAnalogSensor;
-                try {
-                    useAnalogSensor = Convert.ToBoolean (joAto["useAnalogSensor"]);
-                } catch {
-                    useAnalogSensor = false;
-                }
-
-                float analogOnSetpoint;
-                text = (string)joAto ["analogOnSetpoint"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    analogOnSetpoint = 0.0f;
-                    useAnalogSensor = false;
-                } else 
-                    analogOnSetpoint = Convert.ToSingle (text);
-
-                float analogOffSetpoint;
-                text = (string)joAto ["analogOffSetpoint"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    analogOffSetpoint = 0.0f;
-                    useAnalogSensor = false;
-                } else 
-                    analogOffSetpoint = Convert.ToSingle (text);
-
-                bool useFloatSwitch = Convert.ToBoolean (joAto ["useFloatSwitch"]);
-
-                if (!useFloatSwitch && !useAnalogSensor)
-                    enable = false;
-
-                text = (string)joAto ["powerStrip"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    ic = IndividualControl.Empty;
-                    enable = false;
-                } else {
-                    ic.Group = Power.GetPowerStripIndex (text);
-                }
-
-                text = (string)joAto ["outlet"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    ic = IndividualControl.Empty;
-                    enable = false;
-                } else {
-                    ic.Individual = Convert.ToInt32 (text);
-                }
-
-                uint maxPumpOnTime;
-                text = (string)joAto ["maxPumpOnTime"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    maxPumpOnTime = 0U;
-                    enable = false;
-                } else
-                    maxPumpOnTime = Timer.ParseTime (text) / 1000;
-
-                uint minPumpOffTime;
-                text = (string)joAto ["minPumpOffTime"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    minPumpOffTime = uint.MaxValue;
-                    enable = false;
-                } else
-                    minPumpOffTime = Timer.ParseTime (text) / 1000;
+            } else {
+                analogSensor = new AnalogLevelSensor ("Water Level", IndividualControl.Empty, 0.0f, 0.0f, false);
 
                 ato = new AutoTopOff (
-                    enable, 
-                    useAnalogSensor, 
-                    analogOnSetpoint, 
-                    analogOffSetpoint, 
-                    useFloatSwitch, 
-                    ic, 
-                    maxPumpOnTime, 
-                    minPumpOffTime);
+                        false,
+                        false,
+                        0.0f,
+                        0.0f,
+                        false,
+                        IndividualControl.Empty,
+                        0,
+                        uint.MaxValue);
 
-                text = (string)joAto["reservoirInputCard"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    ic = IndividualControl.Empty;
-                } else {
-                    ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
-                }
+                Logger.Add ("Water level settings file did not exist, created new water level settings");
+                var file = File.Create (path);
+                file.Close ();
 
-                text = (string)joAto["reservoirChannel"];
-                if (string.IsNullOrWhiteSpace (text)) {
-                    ic = IndividualControl.Empty;
-                } else {
-                    ic.Individual = Convert.ToInt32 (text);
-                }
+                var jo = new JObject ();
+                jo.Add (new JProperty ("enableAnalogSensor", "false"));
+                jo.Add (new JProperty ("highAnalogLevelAlarmSetpoint", "0.0"));
+                jo.Add (new JProperty ("lowAnalogLevelAlarmSetpoint", "0.0"));
+                jo.Add (new JProperty ("zeroCalibrationValue", "819.2"));
+                jo.Add (new JProperty ("fullScaleCalibrationActual", "15.0"));
+                jo.Add (new JProperty ("fullScaleCalibrationValue", "4096.0"));
+                jo.Add (new JProperty ("inputCard", string.Empty));
+                jo.Add (new JProperty ("channel", string.Empty));
 
-                ato.reservoirLevel.sensorChannel = ic;
+                jo.Add (new JProperty ("floatSwitches", new JArray ()));
 
-                if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
-                    AquaPicDrivers.AnalogInput.AddChannel (ato.reservoirLevel.sensorChannel, "ATO Reservoir Level");
-                    ato.reservoirLevel.enable = true;
-                }
+                var joato = new JObject ();
+                joato.Add (new JProperty ("enableAto", "false"));
+                joato.Add (new JProperty ("useAnalogSensor", "false"));
+                joato.Add (new JProperty ("analogOnSetpoint", "0.0"));
+                joato.Add (new JProperty ("analogOffSetpoint", "0.0"));
+                joato.Add (new JProperty ("useFloatSwitch", "false"));
+                joato.Add (new JProperty ("powerStrip", string.Empty));
+                joato.Add (new JProperty ("outlet", string.Empty));
+                joato.Add (new JProperty ("maxPumpOnTime", "0"));
+                joato.Add (new JProperty ("minPumpOffTime", uint.MaxValue.ToString ()));
+                joato.Add (new JProperty ("reservoirInputCard", string.Empty));
+                joato.Add (new JProperty ("reservoirChannel", string.Empty));
+                joato.Add (new JProperty ("reservoirZeroCalibrationValue", "819.2"));
+                joato.Add (new JProperty ("reservoirFullScaleCalibrationActual", "15.0"));
+                joato.Add (new JProperty ("reservoirFullScaleCalibrationValue", "4096.0"));
+                joato.Add (new JProperty ("reservoirLowLevelSetpoint", "0.0"));
+                joato.Add (new JProperty ("disableOnLowResevoirLevel", "false"));
+                jo.Add (new JProperty ("AutoTopOff", joato));
 
-                text = (string)joAto["reservoirZeroCalibrationValue"];
-                if (string.IsNullOrWhiteSpace (text))
-                    ato.reservoirLevel.zeroValue = 819.2f;
-                else {
-                    try {
-                        ato.reservoirLevel.zeroValue = Convert.ToSingle (text);
-                    } catch {
-                        ato.reservoirLevel.zeroValue = 819.2f;
-                    }
-                }
-
-                text = (string)joAto["reservoirFullScaleCalibrationActual"];
-                if (string.IsNullOrWhiteSpace (text))
-                    ato.reservoirLevel.fullScaleActual = 15.0f;
-                else {
-                    try {
-                        ato.reservoirLevel.fullScaleActual = Convert.ToSingle (text);
-                    } catch {
-                        ato.reservoirLevel.fullScaleActual = 15.0f;
-                    }
-                }
-
-                text = (string)joAto["reservoirFullScaleCalibrationValue"];
-                if (string.IsNullOrWhiteSpace (text))
-                    ato.reservoirLevel.fullScaleValue = 4096.0f;
-                else {
-                    try {
-                        ato.reservoirLevel.fullScaleValue = Convert.ToSingle (text);
-                    } catch {
-                        ato.reservoirLevel.fullScaleValue = 4096.0f;
-                    }
-                }
-
-                text = (string)joAto["reservoirLowLevelSetpoint"];
-                if (string.IsNullOrWhiteSpace (text))
-                    ato.reservoirLevel.lowAlarmSetpoint = 0.0f;
-                else {
-                    try {
-                        ato.reservoirLevel.lowAlarmSetpoint = Convert.ToSingle (text);
-                    } catch {
-                        ato.reservoirLevel.lowAlarmSetpoint = 0.0f;
-                    }
-                }
-
-                try {
-                    ato.disableOnLowResevoirLevel = Convert.ToBoolean (joAto["disableOnLowResevoirLevel"]);
-                    if (ato.disableOnLowResevoirLevel) {
-                        ato.reservoirLevel.enableLowAlarm = true;
-                    }
-                } catch {
-                    ato.disableOnLowResevoirLevel = false;
-                }
+                File.WriteAllText (path, jo.ToString ());
             }
 
             lowSwitchAlarmIndex = Alarm.Subscribe ("Low Water Level, Float Switch");
@@ -679,7 +731,7 @@ namespace AquaPic.Modules
             ato.reservoirLevel.fullScaleActual = fullScaleActual;
             ato.reservoirLevel.fullScaleValue = fullScaleValue;
 
-            string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
             path = Path.Combine (path, "waterLevelProperties.json");
 
@@ -710,7 +762,7 @@ namespace AquaPic.Modules
             analogSensor.fullScaleActual = fullScaleActual;
             analogSensor.fullScaleValue = fullScaleValue;
 
-            string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
             path = Path.Combine (path, "waterLevelProperties.json");
 

@@ -4,8 +4,8 @@ using System.IO;
 using Gtk;
 using Cairo;
 using TouchWidgetLibrary;
-
 using AquaPic.Runtime;
+using AquaPic.Utilites;
 
 namespace AquaPic.UserInterface
 {
@@ -31,7 +31,7 @@ namespace AquaPic.UserInterface
         public ChemistryWindow (params object[] options) : base () {
             screenTitle = "Chemistry";
 
-            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "TestProcedures");
 
             DirectoryInfo d = new DirectoryInfo (path);

@@ -178,7 +178,7 @@ namespace AquaPic.UserInterface
                 timeOffset = Convert.ToUInt32 (timeOffsetString) * 1000;
             }
 
-            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");
 
@@ -300,7 +300,7 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");
 

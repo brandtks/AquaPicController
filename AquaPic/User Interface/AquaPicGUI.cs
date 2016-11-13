@@ -4,6 +4,7 @@ using Cairo;
 using Gtk;
 using TouchWidgetLibrary;
 using AquaPic.Runtime;
+using AquaPic.SerialBus;
 
 namespace AquaPic.UserInterface
 {
@@ -15,16 +16,19 @@ namespace AquaPic.UserInterface
         MyNotificationBar notification;
 
         public AquaPicGUI () : base (Gtk.WindowType.Toplevel) {
-            this.Name = "AquaPicGUI";
-            this.Title = "AquaPic Controller Version 1";
-            this.WindowPosition = WindowPosition.Center;
-            this.DefaultWidth = 800;
-            this.DefaultHeight = 480;
-            this.DeleteEvent += new Gtk.DeleteEventHandler (this.OnDeleteEvent);
-            this.Resizable = false;
-            this.AllowGrow = false;
+            Name = "AquaPicGUI";
+            Title = "AquaPic Controller Version 1";
+            WindowPosition = WindowPosition.Center;
+            SetSizeRequest (800, 480); 
+            Resizable = false;
+            AllowGrow = false;
 
-            this.ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
+            DeleteEvent += (o, args) => {
+                Application.Quit ();
+                args.RetVal = true;
+            };
+
+            ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
             #if RPI_BUILD
             this.Decorated = false;
@@ -60,11 +64,6 @@ namespace AquaPic.UserInterface
             f.Show ();
 
             Show ();
-        }
-
-        protected void OnDeleteEvent (object sender, DeleteEventArgs a) {
-            Application.Quit ();
-            a.RetVal = true;
         }
 
         public void ScreenChange (ScreenData screen, params object[] options) {

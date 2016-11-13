@@ -23,7 +23,7 @@ namespace AquaPic.Runtime
         }
 
         public static void AddPlugins () {
-            var topPath = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            var topPath = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             topPath = Path.Combine (topPath, "Scripts");
 
             var files = Directory.GetFiles (topPath, "*.cs");
@@ -79,7 +79,7 @@ namespace AquaPic.Runtime
 
             options.GenerateExecutable = false; // create dll
 
-            var dllPath = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            var dllPath = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             dllPath = Path.Combine (dllPath, "Scripts");
             dllPath = Path.Combine (dllPath, "dll");
             dllPath = Path.Combine (dllPath, script.name + ".dll");

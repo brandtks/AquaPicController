@@ -453,7 +453,9 @@ namespace AquaPic.UserInterface
         }
 
         public override void Dispose () {
-            Power.RemoveHandlerOnStateChange (Lighting.GetFixtureOutletIndividualControl (fixtureName), OnOutletStateChange);
+            if (fixtureName.IsNotEmpty ()) {
+                Power.RemoveHandlerOnStateChange (Lighting.GetFixtureOutletIndividualControl (fixtureName), OnOutletStateChange);
+            }
             GLib.Source.Remove (timerId);
             base.Dispose ();
         }

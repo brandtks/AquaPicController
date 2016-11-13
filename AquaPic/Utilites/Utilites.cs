@@ -22,6 +22,20 @@ namespace AquaPic.Utilites
 
 	public static class Utils
 	{
+        private static string _aquaPicEnvironment = string.Empty;
+        public static string AquaPicEnvironment {
+            get {
+                return _aquaPicEnvironment;
+            }
+            set {
+                if (_aquaPicEnvironment != string.Empty) {
+                    throw new Exception ("Environment already set");
+                }
+
+                _aquaPicEnvironment = value;
+            }
+        }
+
         public static Platform ExecutingOperatingSystem {
             get {
                 switch (Environment.OSVersion.Platform) {

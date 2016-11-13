@@ -6,6 +6,7 @@ using Gtk;
 using Cairo;
 using TouchWidgetLibrary;
 using AquaPic.Runtime;
+using AquaPic.Utilites;
 
 namespace AquaPic.UserInterface
 {
@@ -97,7 +98,7 @@ namespace AquaPic.UserInterface
 
         protected void SaveEvents () {
             if (!string.IsNullOrWhiteSpace (Logger.buffer.Text)) {
-                string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+                string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
                 path = System.IO.Path.Combine (path, "Logs");
                 path = System.IO.Path.Combine (path, DateTime.Now.ToString ("yy-MM-dd-HH-mm-ss") + ".txt");
 

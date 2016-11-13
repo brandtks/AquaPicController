@@ -144,7 +144,7 @@ namespace AquaPic.UserInterface
             Lighting.minSunSet = Time.Parse ((settings["Min Sunset"] as SettingsTextBox).textBox.text);
             Lighting.maxSunSet = Time.Parse ((settings["Max Sunset"] as SettingsTextBox).textBox.text);
 
-            string path = System.IO.Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "lightingProperties.json");
 

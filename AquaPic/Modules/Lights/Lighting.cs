@@ -70,102 +70,152 @@ namespace AquaPic.Modules
         }
 
         static Lighting () {
-            fixtures = new Dictionary<string,LightingFixture> ();
+            fixtures = new Dictionary<string, LightingFixture> ();
 
-            string path = Path.Combine (Environment.GetEnvironmentVariable ("AquaPic"), "AquaPicRuntimeProject");
+            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
             path = Path.Combine (path, "lightingProperties.json");
 
-            using (StreamReader reader = File.OpenText (path)) {
-                JObject jo = (JObject)JToken.ReadFrom(new JsonTextReader(reader));
+            if (File.Exists (path)) {
+                using (StreamReader reader = File.OpenText (path)) {
+                    JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
-                RiseSetCalc.latitude = Convert.ToDouble (jo ["latitude"]);
-                RiseSetCalc.longitude = Convert.ToDouble (jo ["longitude"]);
+                    RiseSetCalc.latitude = Convert.ToDouble (jo["latitude"]);
+                    RiseSetCalc.longitude = Convert.ToDouble (jo["longitude"]);
 
-                defaultSunRise = new Time (
-                    Convert.ToByte (jo ["defaultSunRise"] ["hour"]),
-                    Convert.ToByte (jo ["defaultSunRise"] ["minute"]));
-                defaultSunSet = new Time (
-                    Convert.ToByte (jo ["defaultSunSet"] ["hour"]),
-                    Convert.ToByte (jo ["defaultSunSet"] ["minute"]));
+                    defaultSunRise = new Time (
+                        Convert.ToByte (jo["defaultSunRise"]["hour"]),
+                        Convert.ToByte (jo["defaultSunRise"]["minute"]));
+                    defaultSunSet = new Time (
+                        Convert.ToByte (jo["defaultSunSet"]["hour"]),
+                        Convert.ToByte (jo["defaultSunSet"]["minute"]));
 
-                minSunRise = new Time (
-                    Convert.ToByte (jo ["minSunRise"] ["hour"]),
-                    Convert.ToByte (jo ["minSunRise"] ["minute"]));
-                maxSunRise = new Time (
-                    Convert.ToByte (jo ["maxSunRise"] ["hour"]),
-                    Convert.ToByte (jo ["maxSunRise"] ["minute"]));
+                    minSunRise = new Time (
+                        Convert.ToByte (jo["minSunRise"]["hour"]),
+                        Convert.ToByte (jo["minSunRise"]["minute"]));
+                    maxSunRise = new Time (
+                        Convert.ToByte (jo["maxSunRise"]["hour"]),
+                        Convert.ToByte (jo["maxSunRise"]["minute"]));
 
-                minSunSet = new Time (
-                    Convert.ToByte (jo ["minSunSet"] ["hour"]),
-                    Convert.ToByte (jo ["minSunSet"] ["minute"]));
+                    minSunSet = new Time (
+                        Convert.ToByte (jo["minSunSet"]["hour"]),
+                        Convert.ToByte (jo["minSunSet"]["minute"]));
 
-                maxSunSet = new Time (
-                    Convert.ToByte (jo ["maxSunSet"] ["hour"]),
-                    Convert.ToByte (jo ["maxSunSet"] ["minute"]));
+                    maxSunSet = new Time (
+                        Convert.ToByte (jo["maxSunSet"]["hour"]),
+                        Convert.ToByte (jo["maxSunSet"]["minute"]));
 
-                // Very important to update rise/set times before we setup auto on/off for lighting fixtures
-                UpdateRiseSetTimes ();
+                    // Very important to update rise/set times before we setup auto on/off for lighting fixtures
+                    UpdateRiseSetTimes ();
 
-                JArray ja = jo["lightingFixtures"] as JArray;
-                foreach (var jt in ja) {
-                    JObject obj = jt as JObject;
-                    string type = (string)obj ["type"];
+                    JArray ja = jo["lightingFixtures"] as JArray;
+                    foreach (var jt in ja) {
+                        JObject obj = jt as JObject;
+                        string type = (string)obj["type"];
 
-                    string name = (string)obj ["name"];
-                    IndividualControl plug ;
-                    plug.Group = Power.GetPowerStripIndex ((string)obj["powerStrip"]);
-                    plug.Individual = Convert.ToInt32 (obj["outlet"]);
-                    bool highTempLockout = Convert.ToBoolean (obj ["highTempLockout"]);
+                        string name = (string)obj["name"];
+                        IndividualControl plug;
+                        plug.Group = Power.GetPowerStripIndex ((string)obj["powerStrip"]);
+                        plug.Individual = Convert.ToInt32 (obj["outlet"]);
+                        bool highTempLockout = Convert.ToBoolean (obj["highTempLockout"]);
 
-                    string lTime = (string)obj ["lightingTime"];
-                    LightingTime lightingTime;
-                    if (string.Equals (lTime, "night", StringComparison.InvariantCultureIgnoreCase)) {
-                        lightingTime = LightingTime.Nighttime;
-                    } else {
-                        lightingTime = LightingTime.Daytime;
-                    }
-
-                    if (string.Equals (type, "dimming", StringComparison.InvariantCultureIgnoreCase)) {
-                        IndividualControl channel;
-                        channel.Group = AquaPicDrivers.AnalogOutput.GetCardIndex ((string)obj["dimmingCard"]);
-                        channel.Individual = Convert.ToInt32 (obj ["channel"]);
-                        float minDimmingOutput = Convert.ToSingle (obj ["minDimmingOutput"]);
-                        float maxDimmingOutput = Convert.ToSingle (obj ["maxDimmingOutput"]);
-
-                        string aType = (string)obj ["analogType"];
-                        AnalogType analogType;
-                        if (string.Equals (aType, "ZeroTen", StringComparison.InvariantCultureIgnoreCase)) {
-                            analogType = AnalogType.ZeroTen;
+                        string lTime = (string)obj["lightingTime"];
+                        LightingTime lightingTime;
+                        if (string.Equals (lTime, "night", StringComparison.InvariantCultureIgnoreCase)) {
+                            lightingTime = LightingTime.Nighttime;
                         } else {
-                            analogType = AnalogType.PWM;
+                            lightingTime = LightingTime.Daytime;
                         }
 
-                        AddLight (
-                            name,
-                            plug,
-                            channel,
-                            minDimmingOutput,
-                            maxDimmingOutput,
-                            analogType,
-                            lightingTime,
-                            highTempLockout
-                        );
-                    } else {
-                        AddLight (
-                            name,
-                            plug,
-                            lightingTime,
-                            highTempLockout
-                        );
-                    }
+                        if (string.Equals (type, "dimming", StringComparison.InvariantCultureIgnoreCase)) {
+                            IndividualControl channel;
+                            channel.Group = AquaPicDrivers.AnalogOutput.GetCardIndex ((string)obj["dimmingCard"]);
+                            channel.Individual = Convert.ToInt32 (obj["channel"]);
+                            float minDimmingOutput = Convert.ToSingle (obj["minDimmingOutput"]);
+                            float maxDimmingOutput = Convert.ToSingle (obj["maxDimmingOutput"]);
 
-                    if (Convert.ToBoolean (obj ["autoTimeUpdate"])) {
-                        int onTimeOffset = Convert.ToInt32 (obj ["onTimeOffset"]);
-                        int offTimeOffset = Convert.ToInt32 (obj ["offTimeOffset"]);
-                        SetupAutoOnOffTime (name, onTimeOffset, offTimeOffset);
+                            string aType = (string)obj["analogType"];
+                            AnalogType analogType;
+                            if (string.Equals (aType, "ZeroTen", StringComparison.InvariantCultureIgnoreCase)) {
+                                analogType = AnalogType.ZeroTen;
+                            } else {
+                                analogType = AnalogType.PWM;
+                            }
+
+                            AddLight (
+                                name,
+                                plug,
+                                channel,
+                                minDimmingOutput,
+                                maxDimmingOutput,
+                                analogType,
+                                lightingTime,
+                                highTempLockout
+                            );
+                        } else {
+                            AddLight (
+                                name,
+                                plug,
+                                lightingTime,
+                                highTempLockout
+                            );
+                        }
+
+                        if (Convert.ToBoolean (obj["autoTimeUpdate"])) {
+                            int onTimeOffset = Convert.ToInt32 (obj["onTimeOffset"]);
+                            int offTimeOffset = Convert.ToInt32 (obj["offTimeOffset"]);
+                            SetupAutoOnOffTime (name, onTimeOffset, offTimeOffset);
+                        }
                     }
                 }
+            } else {
+                RiseSetCalc.latitude = 41.181946;
+                RiseSetCalc.longitude = -85.063345;
+                defaultSunRise = new Time (7, 30);
+                defaultSunSet = new Time (20, 30);
+                minSunRise = new Time (7, 15);
+                maxSunRise = new Time (8, 00);
+                minSunSet = new Time (19, 30);
+                maxSunSet = new Time (21, 00);
+
+                UpdateRiseSetTimes ();
+
+                Logger.Add ("Temperature settings file did not exist, created new temperature settings");
+                var file = File.Create (path);
+                file.Close ();
+
+                var jo = new JObject ();
+                jo.Add (new JProperty ("latitude", RiseSetCalc.latitude.ToString ()));
+                jo.Add (new JProperty ("longitude", RiseSetCalc.longitude.ToString ()));
+
+                var jot = new JObject ();
+                jot.Add ("hour", defaultSunRise.hour.ToString ());
+                jot.Add ("minute", defaultSunRise.min.ToString ());
+                jo.Add (new JProperty ("defaultSunRise", jot));
+
+                jot["hour"] = defaultSunSet.hour.ToString ();
+                jot["minute"] = defaultSunSet.min.ToString ();
+                jo.Add (new JProperty ("defaultSunSet", jot));
+
+                jot["hour"] = minSunRise.hour.ToString ();
+                jot["minute"] = minSunRise.min.ToString ();
+                jo.Add (new JProperty ("minSunRise", jot));
+
+                jot["hour"] = maxSunRise.hour.ToString ();
+                jot["minute"] = maxSunRise.min.ToString ();
+                jo.Add (new JProperty ("maxSunRise", jot));
+
+                jot["hour"] = minSunSet.hour.ToString ();
+                jot["minute"] = minSunSet.min.ToString ();
+                jo.Add (new JProperty ("minSunSet", jot));
+
+                jot["hour"] = maxSunSet.hour.ToString ();
+                jot["minute"] = maxSunSet.min.ToString ();
+                jo.Add (new JProperty ("maxSunSet", jot));
+
+                jo.Add (new JProperty ("lightingFixtures", new JArray ()));
+
+                File.WriteAllText (path, jo.ToString ());
             }
 
             TaskManager.AddTimeOfDayInterrupt ("RiseSetUpdate", new Time (0, 0), () => UpdateRiseSetTimes ());
