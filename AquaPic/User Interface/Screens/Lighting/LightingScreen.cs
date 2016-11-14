@@ -32,6 +32,8 @@ namespace AquaPic.UserInterface
         private TouchLabel outletStateLabel;
         private TouchSelectorSwitch outletSelectorSwitch;
         private TouchButton fixtureSettingBtn;
+        private TouchButton modifyOnTime;
+        private TouchButton modifyOffTime;
         private uint timerId;
         private bool isDimmingFixture;
         private bool dimmingIsManual;
@@ -122,9 +124,7 @@ namespace AquaPic.UserInterface
             };
 
             fixtureName = Lighting.defaultFixture;
-            if (fixtureName.IsEmpty ()) {
-                fixtureLabel.text = "No lighing fixtures added";
-            } else {
+            if (fixtureName.IsNotEmpty ()) {
                 dimmingIsManual = false;
             }
 
@@ -255,12 +255,12 @@ namespace AquaPic.UserInterface
             Put (onTimeTextBox, 410, 187);
             onTimeTextBox.Show ();
 
-            var btn = new TouchButton ();
-            btn.SetSizeRequest (100, 60);
-            btn.text = "Modify On Time";
-            btn.ButtonReleaseEvent += (o, args) => {
+            modifyOnTime = new TouchButton ();
+            modifyOnTime.SetSizeRequest (100, 60);
+            modifyOnTime.text = "Modify On Time";
+            modifyOnTime.ButtonReleaseEvent += (o, args) => {
                 TouchNumberInput numberInput;
-                var parent = this.Toplevel as Gtk.Window;
+                var parent = Toplevel as Window;
                 if (parent != null) {
                     if (parent.IsTopLevel)
                         numberInput = new TouchNumberInput (true, parent);
@@ -299,8 +299,8 @@ namespace AquaPic.UserInterface
                 numberInput.Run ();
                 numberInput.Destroy ();
             };
-            Put (btn, 525, 405);
-            btn.Show ();
+            Put (modifyOnTime, 525, 405);
+            modifyOnTime.Show ();
 
             offTimeLabel = new TouchLabel ();
             offTimeLabel.WidthRequest = 185;
@@ -317,10 +317,10 @@ namespace AquaPic.UserInterface
             Put (offTimeTextBox, 410, 250);
             offTimeTextBox.Show ();
 
-            btn = new TouchButton ();
-            btn.SetSizeRequest (100, 60);
-            btn.text = "Modify Off Time";
-            btn.ButtonReleaseEvent += (o, args) => {
+            modifyOffTime = new TouchButton ();
+            modifyOffTime.SetSizeRequest (100, 60);
+            modifyOffTime.text = "Modify Off Time";
+            modifyOffTime.ButtonReleaseEvent += (o, args) => {
                 TouchNumberInput numberInput;
                 var parent = this.Toplevel as Gtk.Window;
                 if (parent != null) {
@@ -361,8 +361,8 @@ namespace AquaPic.UserInterface
                 numberInput.Run ();
                 numberInput.Destroy ();
             };
-            Put (btn, 635, 405);
-            btn.Show ();
+            Put (modifyOffTime, 635, 405);
+            modifyOffTime.Show ();
 
             var settingsBtn = new TouchButton ();
             settingsBtn.text = "Settings";
@@ -469,6 +469,9 @@ namespace AquaPic.UserInterface
                 dimmingHeader.Visible = true;
                 outletLabel.Visible = true;
                 outletStateLabel.Visible = true;
+                outletSelectorSwitch.Visible = true;
+                modifyOnTime.Visible = true;
+                modifyOffTime.Visible = true;
 
                 onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureName).ToShortString ();
                 offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureName).ToShortString ();
@@ -505,6 +508,8 @@ namespace AquaPic.UserInterface
                     actualLabel.Visible = true;
                     requestedLabel.Visible = true;
                     requestedTextLabel.Visible = true;
+                    modifyOnTime.Visible = true;
+                    modifyOffTime.Visible = true;
 
                     Mode m = Lighting.GetDimmingMode (fixtureName);
                     dimmingIsManual = m == Mode.Manual;
@@ -550,6 +555,7 @@ namespace AquaPic.UserInterface
                     autoLabel.Visible = false;
                     requestedLabel.Visible = false;
                     requestedTextLabel.Visible = false;
+                    requestedTextBox.Visible = false;
                 }
 
                 QueueDraw ();
@@ -570,6 +576,9 @@ namespace AquaPic.UserInterface
                 outletLabel.Visible = false;
                 outletStateLabel.Visible = false;
                 outletSelectorSwitch.Visible = false;
+                requestedTextBox.Visible = false;
+                modifyOnTime.Visible = false;
+                modifyOffTime.Visible = false;
             }
         }
 

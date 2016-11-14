@@ -79,7 +79,7 @@ namespace AquaPic.UserInterface
             combo.Show ();
 
             ExposeEvent += (o, args) => {
-                using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                     TouchColor.SetSource (cr, "grey3", 0.75);
 
                     double midY = 272.5;

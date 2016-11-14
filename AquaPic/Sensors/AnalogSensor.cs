@@ -17,9 +17,18 @@ namespace AquaPic.Sensors
                 if (_enable) {
                     sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
                 } else {
-                    Alarm.Clear (highAnalogAlarmIndex);
-                    Alarm.Clear (lowAnalogAlarmIndex);
-                    Alarm.Clear (sensorDisconnectedAlarmIndex);
+                    if (lowAnalogAlarmIndex != -1) {
+                        Alarm.Clear (highAnalogAlarmIndex);
+                    }
+
+                    if (lowAnalogAlarmIndex != -1) {
+                        Alarm.Clear (lowAnalogAlarmIndex);
+                    }
+
+                    if (sensorDisconnectedAlarmIndex != -1) {
+                        Alarm.Clear (sensorDisconnectedAlarmIndex);
+                    }
+
                     sensorDisconnectedAlarmIndex = -1;
                 }
             }
@@ -39,7 +48,7 @@ namespace AquaPic.Sensors
         public string name;
 
         public float highAlarmSetpoint;
-        public int highAnalogAlarmIndex;
+        public int highAnalogAlarmIndex = -1;
         public bool enableHighAlarm {
             get {
                 return highAnalogAlarmIndex != -1;
@@ -54,7 +63,7 @@ namespace AquaPic.Sensors
         }
 
         public float lowAlarmSetpoint;
-        public int lowAnalogAlarmIndex;
+        public int lowAnalogAlarmIndex = -1;
         public bool enableLowAlarm {
             get {
                 return lowAnalogAlarmIndex != -1;
@@ -68,7 +77,7 @@ namespace AquaPic.Sensors
             }
         }
 
-        public int sensorDisconnectedAlarmIndex;
+        public int sensorDisconnectedAlarmIndex = -1;
         public bool enableDisconnectedAlarm {
             get {
                 return sensorDisconnectedAlarmIndex != -1;

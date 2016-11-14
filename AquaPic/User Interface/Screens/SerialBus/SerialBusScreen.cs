@@ -60,20 +60,27 @@ namespace AquaPic.UserInterface
             int[] addresses = AquaPicBus.slaveAdresses;
 
             for (int i = 0; i < slaves.Length; ++i) {
-                slaves [i] = new SerialBusSlaveWidget ();
-                slaves [i].name = names [i];
-                slaves [i].address = addresses [i];
-                f.Put (slaves [i], 5, (i * 35) + 23);
-                slaves [i].Show ();
+                slaves[i] = new SerialBusSlaveWidget ();
+                slaves[i].name = names[i];
+                slaves[i].address = addresses[i];
+                f.Put (slaves[i], 5, (i * 35) + 23);
+                slaves[i].Show ();
+            }
+
+            if (AquaPicBus.slaveCount == 0) {
+                var blankWidget = new SerialBusSlaveWidget ();
+                f.Put (blankWidget, 5, 23);
+                blankWidget.Show ();
             }
 
             var b = new TouchButton ();
             b.SetSizeRequest (100, 30);
             b.text = "Open";
-            if (AquaPicBus.isOpen)
+            if (AquaPicBus.isOpen) {
                 b.buttonColor = "grey3";
-            else
+            } else {
                 b.ButtonReleaseEvent += OnOpenButtonRelease;
+            }
             Put (b, 685, 70);
             b.Show ();
 
@@ -98,6 +105,17 @@ namespace AquaPic.UserInterface
             c.WidthRequest = 300;
             Put (c, 380, 70);
             c.Show ();
+
+            var addSlaveBtn = new TouchButton ();
+            addSlaveBtn.text = "Add Slave";
+            addSlaveBtn.SetSizeRequest (100, 30);
+            addSlaveBtn.ButtonReleaseEvent += (o, args) => {
+                var s = new AddSlaveSettings ();
+                s.Run ();
+                s.Destroy ();
+            };
+            Put (addSlaveBtn, 60, 70);
+            addSlaveBtn.Show ();
 
             GetSlaveData ();
 
