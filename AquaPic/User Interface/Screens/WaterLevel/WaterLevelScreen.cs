@@ -296,11 +296,11 @@ namespace AquaPic.UserInterface
             if (switchName.IsNotEmpty ()) {
                 switchCombo.activeText = switchName;
             } else {
-                switchCombo.active = 0;
+                switchCombo.activeIndex = 0;
             }
             switchCombo.WidthRequest = 235;
             switchCombo.comboList.Add ("New switch...");
-            switchCombo.ChangedEvent += OnSwitchComboChanged;
+            switchCombo.ComboChangedEvent += OnSwitchComboChanged;
             Put (switchCombo, 550, 277);
             switchCombo.Show ();
 
@@ -381,7 +381,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnSwitchComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.ActiveText == "New switch...") {
+            if (e.activeText == "New switch...") {
                 var s = new SwitchSettings (string.Empty, false);
                 s.Run ();
                 var newSwitchName = s.newOrUpdatedFloatSwitchName;
@@ -399,7 +399,7 @@ namespace AquaPic.UserInterface
                 switchCombo.QueueDraw ();
                 GetSwitchData ();
             } else {
-                switchName = e.ActiveText;
+                switchName = e.activeText;
             }
         }
 

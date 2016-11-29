@@ -24,7 +24,7 @@ namespace AquaPic.Drivers
             }
 
             public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) {
-                this.slave = new AquaPicBus.Slave (address, name + " (Power Strip)");
+                slave = new AquaPicBus.Slave (address, name + " (Power Strip)");
                 this.powerID = powerID;
 
                 if (alarmOnLossOfPower && (powerLossAlarmIndex == -1)) {
@@ -34,14 +34,14 @@ namespace AquaPic.Drivers
                 }
 
                 this.name = name;
-                this.AcPowerAvailable = false;
+                AcPowerAvailable = false;
 
-                this.outlets = new OutletData[8];
+                outlets = new OutletData[8];
                 for (int i = 0; i < 8; ++i) {
                     int plugID = i;
                     string plugName = this.name + "." + "p" + plugID.ToString() ;
                         
-                    this.outlets [plugID] = new OutletData (
+                    outlets [plugID] = new OutletData (
                         plugName,
                         () => {
                             if (outlets [plugID].currentState != MyState.On)

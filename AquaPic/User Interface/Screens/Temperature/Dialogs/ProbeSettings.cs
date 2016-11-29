@@ -51,7 +51,7 @@ namespace AquaPic.UserInterface
                 IndividualControl ic = Temperature.GetTemperatureProbeIndividualControl (this.probeName);
                 string cardName = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
                 c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
-                c.combo.active = 0;
+                c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Please select channel";
             }
@@ -90,7 +90,7 @@ namespace AquaPic.UserInterface
             JObject jo = (JObject)JToken.Parse (json);
 
             if (probeName.IsEmpty ()) {
-                if ((settings["Input Channel"] as SettingsComboBox).combo.active == -1) {
+                if ((settings["Input Channel"] as SettingsComboBox).combo.activeIndex == -1) {
                     MessageBox.Show ("Please select an channel");
                     return false;
                 }
@@ -100,7 +100,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if ((settings["Temperature Group"] as SettingsComboBox).combo.active == -1) {
+                if ((settings["Temperature Group"] as SettingsComboBox).combo.activeIndex == -1) {
                     MessageBox.Show ("Please select an temperature group");
                     return false;
                 }
@@ -133,7 +133,7 @@ namespace AquaPic.UserInterface
 
                 probeName = name;
             } else {
-                if ((settings["Temperature Group"] as SettingsComboBox).combo.active == -1) {
+                if ((settings["Temperature Group"] as SettingsComboBox).combo.activeIndex == -1) {
                     MessageBox.Show ("Please select an temperature group");
                     return false;
                 }

@@ -39,7 +39,7 @@ namespace AquaPic.UserInterface
             WindowPosition = (Gtk.WindowPosition)4;
             SetSizeRequest (600, height);
 
-            #if RPI_BUILD
+#if RPI_BUILD
             Decorated = false;
 
             ExposeEvent += (o, args) => {
@@ -54,7 +54,7 @@ namespace AquaPic.UserInterface
                     cr.Stroke ();
                 }
             };
-            #endif
+#endif
 
             ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
@@ -96,6 +96,7 @@ namespace AquaPic.UserInterface
                 Destroy ();
             };
             fix.Put (cancelButton, 385, height - 35);
+            cancelButton.Show ();
 
             this.includeDelete = includeDelete;
             if (this.includeDelete) {

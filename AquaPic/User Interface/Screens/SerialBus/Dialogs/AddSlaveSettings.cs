@@ -57,7 +57,7 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnSave (object sender) {
-            var typeNumber = (settings["Type"] as SettingsComboBox).combo.active;
+            var typeNumber = (settings["Type"] as SettingsComboBox).combo.activeIndex;
             if (typeNumber == -1) {
                 MessageBox.Show ("Please select a slave type");
                 return false;
@@ -71,6 +71,11 @@ namespace AquaPic.UserInterface
                 address = Convert.ToInt32 (addressString);
             } catch {
                 MessageBox.Show ("Improper slave address");
+                return false;
+            }
+
+            if (!SerialBus.AquaPicBus.IsAddressOk (address)) {
+                MessageBox.Show ("Address already in use");
                 return false;
             }
 

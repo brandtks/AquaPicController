@@ -434,17 +434,17 @@ namespace AquaPic.UserInterface
 
             string[] names = Lighting.GetAllFixtureNames ();
             combo = new TouchComboBox (names);
-            combo.active = 0;
+            combo.activeIndex = 0;
             combo.WidthRequest = 235;
             combo.comboList.Add ("New fixture...");
-            combo.ChangedEvent += OnComboChanged;
+            combo.ComboChangedEvent += OnComboChanged;
             Put (combo, 550, 77);
             combo.Show ();
 
             if (fixtureName.IsNotEmpty ()) {
                 combo.activeText = fixtureName;
             } else {
-                combo.active = 0;
+                combo.activeIndex = 0;
             }
 
             GetFixtureData ();
@@ -538,7 +538,7 @@ namespace AquaPic.UserInterface
                     requestedLabel.text = string.Format ("{0:N2}", level);
 
                     // bastardized way of getting the combobox in front of other widgets
-                    // I think there's another way to do this but I can't remember what it is or if it ever works
+                    // I think there's another way to do this but I can't remember what it is or if it even works
                     combo.Visible = false;
                     combo.Visible = true;
 
@@ -583,7 +583,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.ActiveText == "New fixture...") {
+            if (e.activeText == "New fixture...") {
                 var s = new FixtureSettings (string.Empty, false);
                 s.Run ();
                 var newFixtureName = s.newOrUpdatedFixtureName;
@@ -598,7 +598,7 @@ namespace AquaPic.UserInterface
                     combo.activeText = fixtureName;
                 }
             } else {
-                fixtureName = e.ActiveText;
+                fixtureName = e.activeText;
             }
 
             combo.QueueDraw ();

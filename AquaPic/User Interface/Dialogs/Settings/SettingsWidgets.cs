@@ -76,10 +76,10 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnComboButtonPressed (object sender, ButtonPressEventArgs args) {
-            Fixed p = this.Parent as Fixed;
+            Fixed p = Parent as Fixed;
             if (p != null) {
-                int x = this.Allocation.Left;
-                int y = this.Allocation.Top;
+                int x = Allocation.Left;
+                int y = Allocation.Top;
                 p.Remove (this);
                 p.Put (this, x, y);
             }

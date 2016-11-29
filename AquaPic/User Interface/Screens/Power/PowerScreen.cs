@@ -73,8 +73,8 @@ namespace AquaPic.UserInterface
 
             string[] pwrNames = Power.GetAllPowerStripNames ();
             combo = new TouchComboBox (pwrNames);
-            combo.active = powerID;
-            combo.ChangedEvent += OnComboChanged;
+            combo.activeIndex = powerID;
+            combo.ComboChangedEvent += OnComboChanged;
             Put (combo, 610, 35);
             combo.Show ();
 
@@ -152,7 +152,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            int id = Power.GetPowerStripIndex (e.ActiveText);
+            int id = Power.GetPowerStripIndex (e.activeText);
             if (id != -1) {
                 IndividualControl ic;
                 ic.Group = (byte)powerID; // old powerID

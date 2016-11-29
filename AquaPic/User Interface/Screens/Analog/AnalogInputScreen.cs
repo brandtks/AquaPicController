@@ -49,9 +49,9 @@ namespace AquaPic.UserInterface
 
             string[] names = AquaPicDrivers.AnalogInput.GetAllCardNames ();
             combo = new TouchComboBox (names);
-            combo.active = cardId;
+            combo.activeIndex = cardId;
             combo.WidthRequest = 235;
-            combo.ChangedEvent += OnComboChanged;
+            combo.ComboChangedEvent += OnComboChanged;
             Put (combo, 550, 35);
             combo.Show ();
 
@@ -85,7 +85,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            int id = AquaPicDrivers.AnalogInput.GetCardIndex (e.ActiveText);
+            int id = AquaPicDrivers.AnalogInput.GetCardIndex (e.activeText);
             if (id != -1) {
                 cardId = id;
                 GetCardData ();

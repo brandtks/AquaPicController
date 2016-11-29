@@ -51,7 +51,7 @@ namespace AquaPic.UserInterface
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (this.fixtureName);
                 string psName = Power.GetPowerStripName (ic.Group);
                 c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", psName, ic.Individual));
-                c.combo.active = 0;
+                c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Select outlet";
             }
@@ -155,7 +155,7 @@ namespace AquaPic.UserInterface
                 IndividualControl ic = Lighting.GetDimmingChannelIndividualControl (this.fixtureName);
                 string cardName = AquaPicDrivers.AnalogOutput.GetCardName (ic.Group);
                 c.combo.comboList.Add (string.Format ("Current: {0}.q{1}", cardName, ic.Individual));
-                c.combo.active = 0;
+                c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Select outlet";
             }
@@ -311,7 +311,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if ((settings["Outlet"] as SettingsComboBox).combo.active == -1) {
+                if ((settings["Outlet"] as SettingsComboBox).combo.activeIndex == -1) {
                     MessageBox.Show ("Please select an outlet");
                     return false;
                 }
@@ -319,7 +319,7 @@ namespace AquaPic.UserInterface
                 ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
 
                 if (dimmingFixture) {
-                    if (((SettingsComboBox)settings ["Dimming Channel"]).combo.active == -1) {
+                    if (((SettingsComboBox)settings ["Dimming Channel"]).combo.activeIndex == -1) {
                         MessageBox.Show ("Please select a dimming channel");
                         return false;
                     }

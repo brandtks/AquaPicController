@@ -114,7 +114,7 @@ namespace AquaPic.UserInterface
                 string pwrName = Power.GetPowerStripName (ic.Group);
                 pwrName = string.Format ("{0}.p{1}", pwrName, ic.Individual);
                 c.combo.comboList.Add (string.Format ("Current: {0}", pwrName));
-                c.combo.active = 0;
+                c.combo.activeIndex = 0;
             } else
                 c.combo.nonActiveMessage = "Select outlet";
             c.combo.comboList.AddRange (availOutlets); 
@@ -187,7 +187,7 @@ namespace AquaPic.UserInterface
                 string chName = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
                 chName = string.Format ("{0}.i{1}", chName, ic.Individual);
                 c.combo.comboList.Add (string.Format ("Current: {0}", chName));
-                c.combo.active = 0;
+                c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Select input";
             }
@@ -286,7 +286,7 @@ namespace AquaPic.UserInterface
                 WaterLevel.atoUseAnalogSensor = useFloatSwitch;
 
                 try {
-                    if (((SettingsComboBox)settings ["Pump Outlet"]).combo.active == -1) {
+                    if (((SettingsComboBox)settings ["Pump Outlet"]).combo.activeIndex == -1) {
                         MessageBox.Show ("Please select power outlet for the pump");
                         return false;
                     }
@@ -341,7 +341,7 @@ namespace AquaPic.UserInterface
 
                 if (reservoirEnable) {
                     try {
-                        if (((SettingsComboBox)settings["Reservoir Channel"]).combo.active == -1) {
+                        if (((SettingsComboBox)settings["Reservoir Channel"]).combo.activeIndex == -1) {
                             MessageBox.Show ("Please Select an input channel");
                             return false;
                         }

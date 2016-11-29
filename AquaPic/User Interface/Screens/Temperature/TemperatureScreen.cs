@@ -270,38 +270,38 @@ namespace AquaPic.UserInterface
             heaterCombo = new TouchComboBox (Temperature.GetAllHeaterNames ()); 
             heaterCombo.WidthRequest = 235;
             heaterCombo.comboList.Add ("New heater...");
-            heaterCombo.ChangedEvent += OnHeaterComboChanged;
+            heaterCombo.ComboChangedEvent += OnHeaterComboChanged;
             Put (heaterCombo, 550, 77);
             heaterCombo.Show ();
 
             if (heaterName.IsNotEmpty ())
                 heaterCombo.activeText = heaterName;
             else
-                heaterCombo.active = 0;
+                heaterCombo.activeIndex = 0;
 
             probeCombo = new TouchComboBox (Temperature.GetAllTemperatureProbeNames ());
             probeCombo.WidthRequest = 235;
             probeCombo.comboList.Add ("New probe...");
-            probeCombo.ChangedEvent += OnProbeComboChanged;
+            probeCombo.ComboChangedEvent += OnProbeComboChanged;
             Put (probeCombo, 550, 277);
             probeCombo.Show ();
 
             if (probeName.IsNotEmpty ())
                 probeCombo.activeText = probeName;
             else
-                probeCombo.active = 0;
+                probeCombo.activeIndex = 0;
 
             groupCombo = new TouchComboBox (Temperature.GetAllTemperatureGroupNames ());
             groupCombo.WidthRequest = 235;
             groupCombo.comboList.Add ("New group...");
-            groupCombo.ChangedEvent += OnGroupComboChanged;
+            groupCombo.ComboChangedEvent += OnGroupComboChanged;
             Put (groupCombo, 153, 77);
             groupCombo.Show ();
 
             if (groupName.IsNotEmpty ()) {
                 groupCombo.activeText = groupName;
             } else {
-                groupCombo.active = 0;
+                groupCombo.activeIndex = 0;
             }
 
             GetHeaterData ();
@@ -336,7 +336,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.ActiveText == "New heater...") {
+            if (e.activeText == "New heater...") {
                 int heaterCount = Temperature.heaterCount;
 
                 var s = new HeaterSettings (string.Empty, false);
@@ -353,7 +353,7 @@ namespace AquaPic.UserInterface
                     heaterCombo.activeText = heaterName;
                 }
             } else {
-                heaterName = e.ActiveText;
+                heaterName = e.activeText;
             }
 
             heaterCombo.QueueDraw ();
@@ -361,7 +361,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.ActiveText == "New probe...") {
+            if (e.activeText == "New probe...") {
                 var s = new ProbeSettings (string.Empty, false);
                 s.Run ();
                 var newProbeName = s.newOrUpdatedProbeName;
@@ -376,7 +376,7 @@ namespace AquaPic.UserInterface
                     probeCombo.activeText = probeName;
                 }
             } else {
-                probeName = e.ActiveText;
+                probeName = e.activeText;
             }
 
             probeCombo.QueueDraw ();
@@ -384,7 +384,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.ActiveText == "New group...") {
+            if (e.activeText == "New group...") {
                 var s = new TemperatureGroupSettings (string.Empty, false);
                 s.Run ();
                 string newGroupName = s.temperatureGroupName;
@@ -399,7 +399,7 @@ namespace AquaPic.UserInterface
                     groupCombo.activeText = groupName;
                 }
             } else {
-                groupName = e.ActiveText;
+                groupName = e.activeText;
             }
 
             groupCombo.QueueDraw ();

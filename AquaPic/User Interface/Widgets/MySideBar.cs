@@ -47,7 +47,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void onExpose (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 int left = Allocation.Left;
                 int right = Allocation.Right;
                 int top = Allocation.Top;
@@ -246,6 +246,10 @@ namespace AquaPic.UserInterface
                             } else {
                                 CollapseMenu ();
                             }
+                        } else if ((x >= 640) && (y >= 420)) {
+                            var s = new HomeSettings ();
+                            s.Run ();
+                            s.Destroy ();
                         } else {
                             CollapseMenu ();
                         }

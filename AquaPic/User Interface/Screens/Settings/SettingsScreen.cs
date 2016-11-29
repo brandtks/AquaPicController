@@ -32,7 +32,7 @@ namespace AquaPic.UserInterface
                         b = new TouchButton ();
                         b.SetSizeRequest (100, 60);
                         b.text = "Back";
-                        b.ButtonReleaseEvent += (o, args) => AquaPicGUI.ChangeScreens ("Main");
+                        b.ButtonReleaseEvent += (o, args) => AquaPicGUI.ChangeScreens ("Home");
                         Put (b, 685, 210);
                         b.Show ();
                     } else
@@ -54,9 +54,9 @@ namespace AquaPic.UserInterface
             if (topWindow != null) {
                 if (topWindow.IsTopLevel) {
                     topWindow.HideDecoration ();
-                    #if RPI_BUILD
+#if RPI_BUILD
                     topWindow.Fullscreen ();
-                    #endif
+#endif
                 }
             }
             base.Dispose ();

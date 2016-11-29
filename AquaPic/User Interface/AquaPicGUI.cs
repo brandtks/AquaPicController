@@ -5,6 +5,7 @@ using Gtk;
 using TouchWidgetLibrary;
 using AquaPic.Runtime;
 using AquaPic.SerialBus;
+using Gdk;
 
 namespace AquaPic.UserInterface
 {
@@ -30,11 +31,11 @@ namespace AquaPic.UserInterface
 
             ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
-            #if RPI_BUILD
+#if RPI_BUILD
             this.Decorated = false;
             this.Fullscreen ();
-            #endif
-
+#endif
+            
             GLib.ExceptionManager.UnhandledException += (args) => {
                 Exception ex = args.ExceptionObject as Exception;
                 Logger.AddError (ex.ToString ());
@@ -126,9 +127,9 @@ namespace AquaPic.UserInterface
 
         public void HideDecoration () {
             SetSizeRequest (800, 480);
-            #if RPI_BUILD
+#if RPI_BUILD
             Decorated = false;
-            #endif
+#endif
         }
     }
 }

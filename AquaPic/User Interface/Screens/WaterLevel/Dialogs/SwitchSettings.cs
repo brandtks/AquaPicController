@@ -52,7 +52,7 @@ namespace AquaPic.UserInterface
                 IndividualControl ic = WaterLevel.GetFloatSwitchIndividualControl (this.switchName);
                 string cardName = AquaPicDrivers.DigitalInput.GetCardName (ic.Group);
                 c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
-                c.combo.active = 0;
+                c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Please select channel";
             }
@@ -90,7 +90,7 @@ namespace AquaPic.UserInterface
                 string type = WaterLevel.GetFloatSwitchType (this.switchName).ToString ();
                 for (int i = 0; i < types.Length; ++i) {
                     if (type == types [i]) {
-                        c.combo.active = i;
+                        c.combo.activeIndex = i;
                         break;
                     }
                 }
@@ -108,7 +108,7 @@ namespace AquaPic.UserInterface
                 string function = WaterLevel.GetFloatSwitchFunction (this.switchName).ToString ();
                 for (int i = 0; i < c.combo.comboList.Count; ++i) {
                     if (function == c.combo.comboList [i]) {
-                        c.combo.active = i;
+                        c.combo.activeIndex = i;
                         break;
                     }
                 }
@@ -191,7 +191,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if ((settings["Input"] as SettingsComboBox).combo.active == -1) {
+                if ((settings["Input"] as SettingsComboBox).combo.activeIndex == -1) {
                     MessageBox.Show ("Please select an channel");
                     return false;
                 }
@@ -205,7 +205,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if (functionString.IsNotEmpty () || ((settings["Function"] as SettingsComboBox).combo.active == -1)) {
+                if (functionString.IsNotEmpty () || ((settings["Function"] as SettingsComboBox).combo.activeIndex == -1)) {
                     function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), functionString);
                 } else {
                     MessageBox.Show ("Please select switch function");

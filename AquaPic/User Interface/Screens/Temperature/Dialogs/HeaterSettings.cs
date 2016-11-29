@@ -51,7 +51,7 @@ namespace AquaPic.UserInterface
                 IndividualControl ic = Temperature.GetHeaterIndividualControl (this.heaterName);
                 string psName = Power.GetPowerStripName (ic.Group);
                 c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", psName, ic.Individual));
-                c.combo.active = 0;
+                c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Select outlet";
             }
@@ -95,12 +95,12 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                if ((settings["Outlet"] as SettingsComboBox).combo.active == -1) {
+                if ((settings["Outlet"] as SettingsComboBox).combo.activeIndex == -1) {
                     MessageBox.Show ("Please select an outlet");
                     return false;
                 }
 
-                if ((settings["Temperature Group"] as SettingsComboBox).combo.active == -1) {
+                if ((settings["Temperature Group"] as SettingsComboBox).combo.activeIndex == -1) {
                     MessageBox.Show ("Please select an temperature group");
                     return false;
                 }
@@ -121,7 +121,7 @@ namespace AquaPic.UserInterface
 
                 heaterName = name;
             } else {
-                if ((settings["Temperature Group"] as SettingsComboBox).combo.active == -1) {
+                if ((settings["Temperature Group"] as SettingsComboBox).combo.activeIndex == -1) {
                     MessageBox.Show ("Please select an temperature group");
                     return false;
                 }

@@ -98,7 +98,7 @@ namespace AquaPic.UserInterface
                 string chName = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
                 chName = string.Format ("{0}.i{1}", chName, ic.Individual);
                 c.combo.comboList.Add (string.Format ("Current: {0}", chName));
-                c.combo.active = 0;
+                c.combo.activeIndex = 0;
             } else
                 c.combo.nonActiveMessage = "Select outlet";
             c.combo.comboList.AddRange (availCh); 
@@ -150,7 +150,7 @@ namespace AquaPic.UserInterface
                 WaterLevel.lowAnalogLevelAlarmSetpoint = lowAlarmStpnt;
 
                 try {
-                    if (((SettingsComboBox)settings ["Sensor Channel"]).combo.active == -1) {
+                    if (((SettingsComboBox)settings ["Sensor Channel"]).combo.activeIndex == -1) {
                         MessageBox.Show ("Please Select an input channel");
                         return false;
                     }

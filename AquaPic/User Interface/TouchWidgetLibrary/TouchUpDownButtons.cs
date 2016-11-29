@@ -12,7 +12,9 @@ namespace TouchWidgetLibrary
         public TouchUpDownButtons () {
             SetSizeRequest (98, 51);
             up = new TouchButton ();
+            up.Name = "Up";
             down = new TouchButton ();
+            down.Name = "Down";
             buttonsPlaced = false;
 
             ExposeEvent += (o, args) => {

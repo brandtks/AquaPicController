@@ -113,7 +113,7 @@ namespace AquaPic.UserInterface
             }
             combo.nonActiveMessage = "Select test";
             combo.WidthRequest = 235;
-            combo.ChangedEvent += OnComboChanged;
+            combo.ComboChangedEvent += OnComboChanged;
             Put (combo, 550, 35);
             combo.Show ();
 
@@ -266,17 +266,17 @@ namespace AquaPic.UserInterface
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {
-                            newIdx = e.Active;
+                            newIdx = e.activeIndex;
                         }
                     };
 
                     ms.Run ();
                     ms.Destroy ();
                 } else {
-                    newIdx = e.Active;
+                    newIdx = e.activeIndex;
                 }
             } else {
-                newIdx = e.Active;
+                newIdx = e.activeIndex;
             }
 
             if (newIdx != testIdx) {
