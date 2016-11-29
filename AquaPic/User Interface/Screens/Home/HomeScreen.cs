@@ -25,7 +25,6 @@ namespace AquaPic.UserInterface
                 foreach (var name in names) {
                     if (Lighting.IsDimmingFixture (name)) {
                         if (!HomeWindowWidgets.curvedBarPlots.ContainsKey (name)) {
-                            Console.WriteLine ("Adding {0}", name);
                             HomeWindowWidgets.curvedBarPlots.Add (
                                 name,
                                 new CurvedBarPlotData (() => {

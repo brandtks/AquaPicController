@@ -78,6 +78,7 @@ namespace TouchWidgetLibrary
             ExposeEvent += OnExpose;
             ButtonPressEvent += OnComboBoxPressed;
             ButtonReleaseEvent += OnComboBoxReleased;
+            ScrollEvent += OnScollEvent;
         }
 
         public TouchComboBox (string[] names) : this () {
@@ -258,7 +259,7 @@ namespace TouchWidgetLibrary
             }
             cr.FillPreserve ();
             cr.LineWidth = 0.85;
-            cr.SetSourceRGB (0.0, 0.0, 0.0);
+            TouchColor.SetSource (cr, "black");
             cr.Stroke ();
 
             int triOffset = 7;
@@ -455,6 +456,22 @@ namespace TouchWidgetLibrary
                 }
                 QueueDraw ();
             }
+        }
+
+        protected void OnScollEvent (object sender, ScrollEventArgs args) {
+            if (args.Event.Direction == Gdk.ScrollDirection.Down) {
+                ++listOffset;
+            } else if (args.Event.Direction == Gdk.ScrollDirection.Up) {
+                --listOffset;
+            }
+
+            if (listOffset < 0) {
+                listOffset = 0;
+            } else if ((listOffset + 6) > comboList.Count) {
+                listOffset = comboList.Count - 6;
+            }
+
+            QueueDraw ();
         }
     }
 }
