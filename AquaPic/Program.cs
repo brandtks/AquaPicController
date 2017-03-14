@@ -10,12 +10,13 @@ using AquaPic.SerialBus;
 
 namespace AquaPic
 {
-	class MainClass
-	{
+    class MainClass
+    {
         public static void Main (string[] args) {
             //Call the Gtk library hack because Windows sucks at everything
-            if (Utils.ExecutingOperatingSystem == Platform.Windows)
+            if (Utils.ExecutingOperatingSystem == Platform.Windows) {
                 CheckWindowsGtk ();
+            }
 
             //Get the AquaPic directory environment
             string aquaPicEnvironment = string.Empty;
@@ -23,14 +24,15 @@ namespace AquaPic
             if (aquaPicEnvironment.IsEmpty ()) {
                 if (File.Exists ("AquaPicEnvironment.txt")) {
                     var lines = File.ReadAllLines ("AquaPicEnvironment.txt");
-                    aquaPicEnvironment = lines[0];
+                    aquaPicEnvironment = lines [0];
                 }
             }
 
             if (aquaPicEnvironment.IsNotEmpty ()) {
-                string path = Path.Combine (aquaPicEnvironment, "AquaPicRuntimeProject");
+                var path = Path.Combine (aquaPicEnvironment, "AquaPicRuntimeProject");
                 if (!Directory.Exists (path)) {
                     Console.WriteLine ("Path to AquaPic directory environment is incorrect");
+                    Console.WriteLine("Incorrect path was {0}", path);
                     aquaPicEnvironment = string.Empty;
                 }
             }
@@ -65,7 +67,7 @@ namespace AquaPic
 #endif
 
             //Run the control
-            AquaPicGUI win = new AquaPicGUI ();
+            var win = AquaPicGui.CreateInstance ();
             win.Show ();
 
             Application.Run ();
@@ -83,7 +85,7 @@ namespace AquaPic
             }
             WaterLevel.dataLogger.DeleteAllLogFiles ();
 #endif
-		}
+        }
 
         //Gtk library hack because Windows
         [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
