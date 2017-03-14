@@ -293,7 +293,7 @@ namespace AquaPic.Modules
 
             foreach (var probe in probes.Values) {
                 if (!CheckTemperatureGroupKeyNoThrow (probe.temperatureGroupName)) {
-                    probe.GetTemperature ();
+                    probe.Get ();
                 }
             }
         }
@@ -571,7 +571,7 @@ namespace AquaPic.Modules
 
         public static void RemoveTemperatureProbe (string probeName) {
             CheckTemperatureProbeKey (probeName);
-            AquaPicDrivers.AnalogInput.RemoveChannel (probes[probeName].channel);
+            probes[probeName].Remove ();
             probes.Remove (probeName);
         }
 
@@ -665,8 +665,7 @@ namespace AquaPic.Modules
 
             var probe = probes[oldProbeName];
             
-            probe.name = newProbeName;
-            AquaPicDrivers.AnalogInput.SetChannelName (probe.channel, probe.name);
+            probe.ChangeName (newProbeName);
             
             probes.Remove (oldProbeName);
             probes[newProbeName] = probe;
@@ -675,9 +674,8 @@ namespace AquaPic.Modules
         /***Individual Control***/
         public static void SetTemperatureProbeIndividualControl (string probeName, IndividualControl ic) {
             CheckTemperatureProbeKey (probeName);
-            AquaPicDrivers.AnalogInput.RemoveChannel (probes[probeName].channel);
-            probes[probeName].channel = ic;
-            AquaPicDrivers.AnalogInput.AddChannel (probes[probeName].channel, probes[probeName].name);
+            probes[probeName].Remove ();
+            probes[probeName].Add (ic);
         }
 
         /***Temperature group***/

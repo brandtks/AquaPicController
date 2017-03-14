@@ -32,9 +32,10 @@ namespace AquaPic.Modules
             public uint maxPumpOnTime;
             public uint minPumpOffTime;
 
-            public bool disableOnLowResevoirLevel;
-
             public AnalogLevelSensor reservoirLevel;
+            public bool disableOnLowResevoirLevel;
+            public float reservoirLowLevelAlarmSetpoint;
+            public int reservoirLowLevelAlarmIndex;
 
             public AutoTopOffState state;
             public int atoFailAlarmIndex;
@@ -67,7 +68,8 @@ namespace AquaPic.Modules
 
                 disableOnLowResevoirLevel = false;
 
-                reservoirLevel = new AnalogLevelSensor ("Top Off Reservoir", IndividualControl.Empty, 0.0f, 0.0f, false, false, false);
+                reservoirLevel = new WaterLevelSensor ("Top Off Reservoir", IndividualControl.Empty);
+                reservoirLowLevelAlarmIndex = Alarm.Subscribe ("Low ATO Reservoir Level");
 
                 state = AutoTopOffState.Standby;
                 atoFailAlarmIndex = Alarm.Subscribe ("Auto top off failed");
@@ -80,11 +82,20 @@ namespace AquaPic.Modules
 
             public void Run () {
                 if (enable) {
-                    if (reservoirLevel.sensorChannel.IsNotEmpty ()) {
-                        reservoirLevel.enable = true;
-                        reservoirLevel.Run ();
+                    if (reservoirLevel.channel.IsNotEmpty ()) {
+                        reservoirLevel.Get ();
+                        if (reservoirLevel.level < reservoirLowLevelAlarmSetpoint) {
+                            Alarm.Post (reservoirLowLevelAlarmIndex);
+                        } else {
+                            if (Alarm.CheckAlarming (reservoirLowLevelAlarmIndex)) {
+                                Alarm.Clear (reservoirLowLevelAlarmIndex);
+                            }
+                        }
                     } else {
                         disableOnLowResevoirLevel = false;
+                        if (Alarm.CheckAlarming (reservoirLowLevelAlarmIndex)) {
+                            Alarm.Clear (reservoirLowLevelAlarmIndex);
+                        }
                     }
                     
                     if ((!Alarm.CheckAlarming (highSwitchAlarmIndex)) || (!Alarm.CheckAlarming (analogSensor.highAnalogAlarmIndex))) {
@@ -113,8 +124,7 @@ namespace AquaPic.Modules
                                     }
                                 }
 
-                                if ((disableOnLowResevoirLevel) && (Alarm.CheckAlarming (reservoirLevel.lowAnalogAlarmIndex))) {
-                                    Console.WriteLine ("ATO alarming based upon low reservoir level");
+                                if ((disableOnLowResevoirLevel) && (Alarm.CheckAlarming (reservoirLowLevelAlarmIndex))) {
                                     pumpOnRequest = false;
                                     state = AutoTopOffState.Error;
                                     Alarm.Post (atoFailAlarmIndex);

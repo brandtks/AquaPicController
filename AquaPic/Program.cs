@@ -54,7 +54,7 @@ namespace AquaPic
 #if DEBUG
             try {
 #endif
-                Equipment.AddFromJson ();
+                Hardware.AddFromJson ();
                 Temperature.Init ();
                 Lighting.Init ();
                 WaterLevel.Init ();

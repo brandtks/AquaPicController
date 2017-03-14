@@ -13,13 +13,12 @@ namespace AquaPic.Modules
 {
     public partial class WaterLevel
     {
-        private static AnalogLevelSensor analogSensor;
+        private static WaterLevelSensor analogSensor;
         private static AutoTopOff ato;
         private static Dictionary<string,FloatSwitch> floatSwitches;
 
         private static int highSwitchAlarmIndex;
         private static int lowSwitchAlarmIndex;
-//        private static int switchAnalogMismatchAlarmIndex;
 
         /**************************************************************************************************************/
         /* Analog water sensor                                                                                        */
@@ -68,17 +67,15 @@ namespace AquaPic.Modules
 
         public static IndividualControl analogSensorChannel {
             get {
-                return analogSensor.sensorChannel;
+                return analogSensor.channel;
             }
             set {
-                if (analogSensor.sensorChannel.IsNotEmpty ()) {
-                    AquaPicDrivers.AnalogInput.RemoveChannel (analogSensor.sensorChannel);
+                if (analogSensor.channel.IsNotEmpty ()) {
+                    analogSensor.Remove ();
                 }
 
-                analogSensor.sensorChannel = value;
-
-                if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
-                    AquaPicDrivers.AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
+                if (value.IsNotEmpty ()) {
+                    analogSensor.Add (value);
                 }
             }
         }
@@ -94,7 +91,7 @@ namespace AquaPic.Modules
                     analogSensor.enableLowAlarm = true;
                 
                     try {
-                        AquaPicDrivers.AnalogInput.AddChannel (analogSensor.sensorChannel, "Water Level");
+                        AquaPicDrivers.AnalogInput.AddChannel (analogSensor.channel, "Water Level");
                     } catch (Exception) {
                         ; //channel already added
                     }
@@ -227,7 +224,7 @@ namespace AquaPic.Modules
 
         public static bool atoReservoirLevelEnabled {
             get {
-                return ato.reservoirLevel.sensorChannel.IsNotEmpty ();
+                return ato.reservoirLevel.channel.IsNotEmpty ();
             }
         }
 
@@ -239,19 +236,15 @@ namespace AquaPic.Modules
 
         public static IndividualControl atoReservoirLevelChannel {
             get {
-                return ato.reservoirLevel.sensorChannel;
+                return ato.reservoirLevel.channel;
             }
             set {
-                if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
-                    AquaPicDrivers.AnalogInput.RemoveChannel (ato.reservoirLevel.sensorChannel);
+                if (ato.reservoirLevel.channel.IsNotEmpty ()) {
+                    AquaPicDrivers.AnalogInput.RemoveChannel (ato.reservoirLevel.channel);
                 }
-
-                ato.reservoirLevel.sensorChannel = value;
                 
-                if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
-                    AquaPicDrivers.AnalogInput.AddChannel (ato.reservoirLevel.sensorChannel, "ATO Reservoir Level");
-                    ato.reservoirLevel.enable = true;
-                    ato.reservoirLevel.enableLowAlarm = true;
+                if (value.IsNotEmpty ()) {
+                    ato.reservoirLevel.Add (value);
                 }
             }
         }
@@ -267,10 +260,10 @@ namespace AquaPic.Modules
 
         public static float atoReservoirLowLevelSetpoint {
             get {
-                return ato.reservoirLevel.lowAlarmSetpoint;
+                return ato.reservoirLowLevelAlarmSetpoint;
             }
             set {
-                ato.reservoirLevel.lowAlarmSetpoint = value;
+                ato.reservoirLowLevelAlarmSetpoint = value;
             }
         }
 
@@ -363,7 +356,7 @@ namespace AquaPic.Modules
                     } else
                         ic.Individual = Convert.ToInt32 (text);
 
-                    analogSensor = new AnalogLevelSensor ("Water Level", ic, highAlarmSetpoint, lowAlarmSetpoint, enable);
+                    analogSensor = new WaterLevelSensor ("Water Level", ic, highAlarmSetpoint, lowAlarmSetpoint, enable);
 
                     text = (string)jo["zeroCalibrationValue"];
                     if (string.IsNullOrWhiteSpace (text))
@@ -520,11 +513,8 @@ namespace AquaPic.Modules
                         ic.Individual = Convert.ToInt32 (text);
                     }
 
-                    ato.reservoirLevel.sensorChannel = ic;
-
-                    if (ato.reservoirLevel.sensorChannel.IsNotEmpty ()) {
-                        AquaPicDrivers.AnalogInput.AddChannel (ato.reservoirLevel.sensorChannel, "ATO Reservoir Level");
-                        ato.reservoirLevel.enable = true;
+                    if (ic.IsNotEmpty ()) {
+                        ato.reservoirLevel.Add (ic);
                     }
 
                     text = (string)joAto["reservoirZeroCalibrationValue"];
@@ -562,26 +552,23 @@ namespace AquaPic.Modules
 
                     text = (string)joAto["reservoirLowLevelSetpoint"];
                     if (string.IsNullOrWhiteSpace (text))
-                        ato.reservoirLevel.lowAlarmSetpoint = 0.0f;
+                        ato.reservoirLowLevelAlarmSetpoint = 0.0f;
                     else {
                         try {
-                            ato.reservoirLevel.lowAlarmSetpoint = Convert.ToSingle (text);
+                            ato.reservoirLowLevelAlarmSetpoint = Convert.ToSingle (text);
                         } catch {
-                            ato.reservoirLevel.lowAlarmSetpoint = 0.0f;
+                            ato.reservoirLowLevelAlarmSetpoint = 0.0f;
                         }
                     }
 
                     try {
                         ato.disableOnLowResevoirLevel = Convert.ToBoolean (joAto["disableOnLowResevoirLevel"]);
-                        if (ato.disableOnLowResevoirLevel) {
-                            ato.reservoirLevel.enableLowAlarm = true;
-                        }
                     } catch {
                         ato.disableOnLowResevoirLevel = false;
                     }
                 }
             } else {
-                analogSensor = new AnalogLevelSensor ("Water Level", IndividualControl.Empty, 0.0f, 0.0f, false);
+                analogSensor = new WaterLevelSensor ("Water Level", IndividualControl.Empty, 0.0f, 0.0f, false);
 
                 ato = new AutoTopOff (
                         false,
@@ -633,7 +620,6 @@ namespace AquaPic.Modules
 
             lowSwitchAlarmIndex = Alarm.Subscribe ("Low Water Level, Float Switch");
             highSwitchAlarmIndex = Alarm.Subscribe ("High Water Level, Float Switch");
-//            switchAnalogMismatchAlarmIndex = Alarm.Subscribe ("Float switch and analog water sensor mismatch");
 
             TaskManager.AddCyclicInterrupt ("Water Level", 1000, Run);
         }
@@ -643,34 +629,23 @@ namespace AquaPic.Modules
         }
 
         public static void Run () {
-            analogSensor.Run ();
+            analogSensor.UpdateWaterLevel ();
 
-//            bool mismatch = false;
             ato.useFloatSwitch = false; //set 'use float switch' to false, if no ATO float switch in found it remains false
             foreach (var s in floatSwitches.Values) {
-                bool state = AquaPicDrivers.DigitalInput.GetChannelValue (s.channel);
-                bool activated;
+                s.Get ();
 
-                if (s.type == SwitchType.NormallyClosed)
-                    state = !state; //normally closed switches are reversed
-
-                activated = s.odt.Evaluate (s.activated != state); // if current state and switch activation do not match start timer
-                if (activated) // once timer has finished, toggle switch activation
-                    s.activated = !s.activated;
-
-//                if ((s.activated) && (analogSensor.enable) && (analogSensor.connected)) {
-//                    if (s.type == SwitchType.NormallyClosed) {
-//                        if (analogSensor.waterLevel > (s.physicalLevel + 1.0f)) {
-//                            mismatch = true;
-//                            Logger.AddInfo ("Float switch {0} is reporting a mismatch with analog sensor", s.name);
-//                        }
-//                    } else {
-//                        if (analogSensor.waterLevel < (s.physicalLevel - 1.0f)) {
-//                            mismatch = true;
-//                            Logger.AddInfo ("Float switch {0} is reporting a mismatch with analog sensor", s.name);
-//                        }
-//                    }
-//                }
+                if ((s.activated) && (analogSensor.enable) && (analogSensor.connected)) {
+                    if (s.type == SwitchType.NormallyClosed) {
+                        if (analogSensor.level > (s.physicalLevel + 1.0f)) {
+                            Logger.AddInfo ("Float switch {0} is reporting a mismatch with analog sensor", s.name);
+                        }
+                    } else {
+                        if (analogSensor.level < (s.physicalLevel - 1.0f)) {
+                            Logger.AddInfo ("Float switch {0} is reporting a mismatch with analog sensor", s.name);
+                        }
+                    }
+                }
 
                 if (s.function == SwitchFunction.HighLevel) {
                     if (s.activated)
@@ -691,13 +666,6 @@ namespace AquaPic.Modules
                     ato.floatSwitchActivated = s.activated;
                 }
             }
-
-//            if (mismatch)
-//                Alarm.Post (switchAnalogMismatchAlarmIndex);
-//            else {
-//                if (Alarm.CheckAlarming (switchAnalogMismatchAlarmIndex))
-//                    Alarm.Clear (switchAnalogMismatchAlarmIndex);
-//            }
 
             ato.Run ();
         }
@@ -806,7 +774,7 @@ namespace AquaPic.Modules
 
         public static void RemoveFloatSwitch (string floatSwitchName) {
             CheckFloatSwitchKey (floatSwitchName);
-            AquaPicDrivers.DigitalInput.RemoveChannel (floatSwitches[floatSwitchName].channel);
+            floatSwitches[floatSwitchName].Remove ();
             floatSwitches.Remove (floatSwitchName);
         }
 
@@ -870,7 +838,7 @@ namespace AquaPic.Modules
 
         public static uint GetFloatSwitchTimeOffset (string floatSwitchName) {
             CheckFloatSwitchKey (floatSwitchName);
-            return floatSwitches[floatSwitchName].odt.timerInterval;
+            return floatSwitches[floatSwitchName].onDelayTimer.timerInterval;
         }
 
         public static IndividualControl GetFloatSwitchIndividualControl (string floatSwitchName) {
@@ -888,8 +856,7 @@ namespace AquaPic.Modules
 
             var floatSwitch = floatSwitches[oldSwitchName];
             
-            floatSwitch.name = newSwitchName;
-            AquaPicDrivers.DigitalInput.SetChannelName (floatSwitch.channel, floatSwitch.name);
+            floatSwitch.ChangeName (newSwitchName);
 
             floatSwitches.Remove (oldSwitchName);
             floatSwitches[newSwitchName] = floatSwitch;
@@ -897,9 +864,8 @@ namespace AquaPic.Modules
 
         public static void SetFloatSwitchIndividualControl (string floatSwitchName, IndividualControl ic) {
             CheckFloatSwitchKey (floatSwitchName);
-            AquaPicDrivers.DigitalInput.RemoveChannel (floatSwitches[floatSwitchName].channel);
-            floatSwitches[floatSwitchName].channel = ic;
-            AquaPicDrivers.DigitalInput.AddChannel (floatSwitches[floatSwitchName].channel, floatSwitches[floatSwitchName].name);
+            floatSwitches[floatSwitchName].Remove ();
+            floatSwitches[floatSwitchName].Add (ic);
         }
 
         public static void SetFloatSwitchPhysicalLevel (string floatSwitchName, float physicalLevel) {
@@ -909,11 +875,6 @@ namespace AquaPic.Modules
 
         public static void SetFloatSwitchType (string floatSwitchName, SwitchType type) {
             CheckFloatSwitchKey (floatSwitchName);
-
-            if (floatSwitches[floatSwitchName].type != type) { // if swapping between NO and NC activation is reversed
-                floatSwitches[floatSwitchName].activated = !floatSwitches[floatSwitchName].activated;
-            }
-
             floatSwitches[floatSwitchName].type = type;
         }
 
@@ -928,7 +889,7 @@ namespace AquaPic.Modules
 
         public static void SetFloatSwitchTimeOffset (string floatSwitchName, uint timeOffset) {
             CheckFloatSwitchKey (floatSwitchName);
-            floatSwitches[floatSwitchName].odt.timerInterval = timeOffset;
+            floatSwitches[floatSwitchName].onDelayTimer.timerInterval = timeOffset;
         }
     }
 }

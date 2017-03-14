@@ -1,11 +1,13 @@
 ﻿using System;
+using AquaPic.Utilites;
 
 namespace AquaPic.Sensors
 {
     interface ISensor<T>
     {
-        void Add ();
+        void Add (IndividualControl channel);
         void Remove ();
         T Get ();
+        void ChangeName (string name);
     }
 }

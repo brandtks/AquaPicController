@@ -45,7 +45,8 @@ namespace AquaPic.Modules
                 temperature = 0.0f;
                 foreach (var probe in probes.Values) {
                     if (probe.temperatureGroupName == name) {
-                        if (probe.GetTemperature ()) {
+                        probe.Get ();
+                        if (probe.temperature >= probe.zeroActual) {
                             temperature += probe.temperature;
                             ++probeCount;
                         }

@@ -8,10 +8,10 @@ using AquaPic.SerialBus;
 
 namespace AquaPic.Runtime
 {
-    public class Equipment
+    public class Hardware
     {
         public static void AddFromJson () {
-            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
+            var path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
             path = Path.Combine (path, "equipment.json");
 
