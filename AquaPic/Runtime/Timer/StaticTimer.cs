@@ -7,15 +7,15 @@ namespace AquaPic.Runtime
 {
     public partial class Timer
     {
-        protected static Dictionary<string, OnDelayTimer> odts = new Dictionary<string, OnDelayTimer> ();
+        protected static Dictionary<string, OnDelayTimer> staticOnDelayTimers = new Dictionary<string, OnDelayTimer> ();
 
         public static bool OnDelay (string name, string time, bool enable) {
-            if (!odts.ContainsKey (name)) {
+            if (!staticOnDelayTimers.ContainsKey (name)) {
                 uint timeDelay = ParseTime (time);
-                odts.Add (name, new OnDelayTimer (timeDelay));
+                staticOnDelayTimers.Add (name, new OnDelayTimer (timeDelay));
             }
 
-            return odts [name].Evaluate (enable);
+            return staticOnDelayTimers [name].Evaluate (enable);
         }
 
         public static uint ParseTime (string timeString) {

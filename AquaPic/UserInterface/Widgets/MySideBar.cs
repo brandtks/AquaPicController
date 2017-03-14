@@ -19,8 +19,8 @@ namespace AquaPic.UserInterface
         public event EventHandler ExpandEvent;
         public event EventHandler CollapseEvent;
 
-        public MySideBar() : 
-            this (AquaPicGui.AquaPicUserInterface.scenes, AquaPicGui.AquaPicUserInterface.currentScene) { }
+        public MySideBar() 
+            : this (AquaPicGui.AquaPicUserInterface.scenes, AquaPicGui.AquaPicUserInterface.currentScene) { }
 
         public MySideBar (Dictionary<string, SceneData> scenes, string currentScene) {
             Visible = true;

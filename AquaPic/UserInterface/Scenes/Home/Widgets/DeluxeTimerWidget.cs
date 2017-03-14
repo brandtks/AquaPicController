@@ -8,7 +8,7 @@ namespace AquaPic.UserInterface
 {
     public class DeluxeTimerWidget : Fixed
     {
-        private DeluxeTimer[] timers;
+        private IntervalTimer[] timers;
         private TimerTab[] tabs;
         private int timerIndex;
         private TouchTextBox minutes;
@@ -23,9 +23,9 @@ namespace AquaPic.UserInterface
 
             SetSizeRequest (310, 169);
 
-            timers = new DeluxeTimer[3];
+            timers = new IntervalTimer[3];
             for (int i = 0; i < timers.Length; ++i) {
-                timers [i] = DeluxeTimer.GetTimer ("Timer " + name + " " + (i + 1).ToString ());
+                timers [i] = IntervalTimer.GetTimer ("Timer " + name + " " + (i + 1).ToString ());
                 timers [i].TimerInterumEvent += OnTimerInterum;
                 timers [i].TimerElapsedEvent += OnTimerElapsed;
                 timers [i].TimerStartEvent += OnTimerStartStop;
@@ -166,14 +166,14 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnTimerInterum (object sender) {
-            DeluxeTimer timer = sender as DeluxeTimer;
+            IntervalTimer timer = sender as IntervalTimer;
             int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
             if (timerIndex == tIdx)
                 UpdateTime (timer.secondsRemaining, false);
         }
 
         protected void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
-            DeluxeTimer timer = sender as DeluxeTimer;
+            IntervalTimer timer = sender as IntervalTimer;
             int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
             if (timerIndex == tIdx)
                 UpdateTime (timers [timerIndex].totalSeconds);
@@ -182,7 +182,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnTimerStartStop (object sender) {
-            DeluxeTimer timer = sender as DeluxeTimer;
+            IntervalTimer timer = sender as IntervalTimer;
             int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
             if (timerIndex == tIdx)
                 UpdateTime (timers [timerIndex].secondsRemaining, false);
@@ -200,7 +200,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnResetButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            if (timers [timerIndex].state != DeluxeTimerState.Waiting) {
+            if (timers [timerIndex].state != IntervalTimerState.Waiting) {
                 timers [timerIndex].Reset ();
             }
 
@@ -249,7 +249,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void UpdateScreen () {
-            if (timers [timerIndex].state == DeluxeTimerState.Waiting)
+            if (timers [timerIndex].state == IntervalTimerState.Waiting)
                 resetButton.buttonColor = "grey1";
             else
                 resetButton.buttonColor = "pri";

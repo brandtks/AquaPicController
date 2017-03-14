@@ -28,7 +28,7 @@ namespace AquaPic.Modules
 
             public IndividualControl pumpOutlet;
             public bool pumpOnRequest;
-            public DeluxeTimer pumpTimer;
+            public IntervalTimer pumpTimer;
             public uint maxPumpOnTime;
             public uint minPumpOffTime;
 
@@ -60,7 +60,7 @@ namespace AquaPic.Modules
 
                 pumpOutlet = pumpPlug;
                 pumpOnRequest = false;
-                pumpTimer = DeluxeTimer.GetTimer ("ATO");
+                pumpTimer = IntervalTimer.GetTimer ("ATO");
                 pumpTimer.TimerElapsedEvent += OnTimerElapsed;
                 this.maxPumpOnTime = maxPumpOnTime;
                 this.minPumpOffTime = minPumpOffTime;

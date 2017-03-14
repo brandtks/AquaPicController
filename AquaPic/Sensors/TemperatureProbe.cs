@@ -56,10 +56,10 @@ namespace AquaPic.Sensors
                     //}
                 }
                 return false;
-            } else {
-                if (Alarm.CheckAlarming (probeDisconnectedAlarmIndex)) {
-                    Alarm.Clear (probeDisconnectedAlarmIndex);
-                }
+            }
+                
+            if (Alarm.CheckAlarming (probeDisconnectedAlarmIndex)) {
+                Alarm.Clear (probeDisconnectedAlarmIndex);
             }
 
             return true;

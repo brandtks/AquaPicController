@@ -1,5 +1,4 @@
 ﻿using System;
-using Gtk;
 
 namespace AquaPic.Runtime
 {

@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using TouchWidgetLibrary;
 
 namespace AquaPic.Runtime
 {
     public delegate void TimerHandler (object sender);
 
-    public enum DeluxeTimerState {
+    public enum IntervalTimerState {
         Waiting,
         Running,
         Paused
     };
 
-    public class DeluxeTimer
+    public class IntervalTimer
     {
-        private static Dictionary<string, DeluxeTimer> deluxeTimers = new Dictionary<string, DeluxeTimer> ();
+        protected static Dictionary<string, IntervalTimer> intervalTimers = new Dictionary<string, IntervalTimer> ();
 
         public string name;
 
@@ -33,27 +32,27 @@ namespace AquaPic.Runtime
         }
         protected uint timerId;
 
-        private DeluxeTimerState _state;
-        public DeluxeTimerState state {
+        protected IntervalTimerState _state;
+        public IntervalTimerState state {
             get {
                 return _state;
             }
         }
 
-        private uint _secondsRemaining;
+        protected uint _secondsRemaining;
         public uint secondsRemaining {
             get {
                 return _secondsRemaining;
             }
         }
 
-        private uint _totalSeconds;
+        protected uint _totalSeconds;
         public uint totalSeconds {
             get {
                 return _totalSeconds;
             }
             set {
-                if (_state == DeluxeTimerState.Waiting)
+                if (_state == IntervalTimerState.Waiting)
                     _totalSeconds = value;
             }
         }
@@ -63,40 +62,40 @@ namespace AquaPic.Runtime
         public event TimerHandler TimerStartEvent;
         public event TimerHandler TimerStopEvent;
 
-        private DeluxeTimer (string name, uint minutes, uint seconds) {
+        protected IntervalTimer (string name, uint minutes, uint seconds) {
             this.name = name;
             SetTime (minutes, seconds);
             _secondsRemaining = _totalSeconds;
-            _state = DeluxeTimerState.Waiting;
+            _state = IntervalTimerState.Waiting;
         }
 
-        public static DeluxeTimer GetTimer (string name) {
+        public static IntervalTimer GetTimer (string name) {
             return GetTimer (name, 0, 0);
         }
 
-        public static DeluxeTimer GetTimer (string name, uint minutes, uint seconds) {
-            if (deluxeTimers.ContainsKey (name))
-                return deluxeTimers [name];
+        public static IntervalTimer GetTimer (string name, uint minutes, uint seconds) {
+            if (intervalTimers.ContainsKey (name))
+                return intervalTimers [name];
 
-            DeluxeTimer dt = new DeluxeTimer (name, minutes, seconds);
-            deluxeTimers.Add (name, dt);
-            return dt;
+            IntervalTimer intervalTimer = new IntervalTimer (name, minutes, seconds);
+            intervalTimers.Add (name, intervalTimer);
+            return intervalTimer;
         }
 
         public void Start () {
-            if (_state == DeluxeTimerState.Waiting) {
+            if (_state == IntervalTimerState.Waiting) {
                 if (_totalSeconds > 0) {
                     _secondsRemaining = _totalSeconds;
                     _enabled = true;
-                    _state = DeluxeTimerState.Running;
+                    _state = IntervalTimerState.Running;
                     timerId = GLib.Timeout.Add (1000, OnTimeout);
                     if (TimerStartEvent != null)
                         TimerStartEvent (this);
                 }
-            } else if (_state == DeluxeTimerState.Paused) {
+            } else if (_state == IntervalTimerState.Paused) {
                 if (_secondsRemaining > 0) {
                     _enabled = true;
-                    _state = DeluxeTimerState.Running;
+                    _state = IntervalTimerState.Running;
                     timerId = GLib.Timeout.Add (1000, OnTimeout);
                     if (TimerStartEvent != null)
                         TimerStartEvent (this);
@@ -105,9 +104,9 @@ namespace AquaPic.Runtime
         }
 
         public void Stop () {
-            if (_state == DeluxeTimerState.Running) {
+            if (_state == IntervalTimerState.Running) {
                 _enabled = false;
-                _state = DeluxeTimerState.Paused;
+                _state = IntervalTimerState.Paused;
                 GLib.Source.Remove (timerId);
                 if (TimerStopEvent != null)
                     TimerStopEvent (this);
@@ -116,11 +115,11 @@ namespace AquaPic.Runtime
 
         public void Reset () {
             Stop ();
-            _state = DeluxeTimerState.Waiting;
+            _state = IntervalTimerState.Waiting;
         }
 
         public void SetTime (uint minutes, uint seconds) {
-            if (_state == DeluxeTimerState.Waiting) {
+            if (_state == IntervalTimerState.Waiting) {
                 _totalSeconds = minutes * 60 + seconds;
             }
         }
@@ -135,7 +134,7 @@ namespace AquaPic.Runtime
                 if (_secondsRemaining <= 0) {
                     _enabled = false;
                     _secondsRemaining = _totalSeconds;
-                    _state = DeluxeTimerState.Waiting;
+                    _state = IntervalTimerState.Waiting;
 
                     // We want any user code to execute first before the dialog screen is shown
                     if (TimerElapsedEvent != null)
