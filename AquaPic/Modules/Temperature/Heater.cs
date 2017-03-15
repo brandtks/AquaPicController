@@ -29,9 +29,9 @@ namespace AquaPic.Modules
                     cond &= !Alarm.CheckAlarming (temperatureGroups[temperatureGroupName].highTemperatureAlarmIndex);
                     cond &= CheckTemperature ();
                     return cond;
-                } else {
-                    return false;
                 }
+
+                return false;
             }
 
             public bool CheckTemperature () {

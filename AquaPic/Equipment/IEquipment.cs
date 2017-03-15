@@ -1,12 +1,13 @@
 ﻿using System;
+using AquaPic.Utilites;
 
 namespace AquaPic.Equipment
 {
-    public class IEquipment
+    interface IEquipment<T>
     {
-        public IEquipment ()
-        {
-            
-        }
+        void Add (IndividualControl channel);
+        void Remove ();
+        T Set ();
+        void SetName (string name);
     }
 }

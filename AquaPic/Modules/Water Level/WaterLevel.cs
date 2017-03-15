@@ -856,7 +856,7 @@ namespace AquaPic.Modules
 
             var floatSwitch = floatSwitches[oldSwitchName];
             
-            floatSwitch.ChangeName (newSwitchName);
+            floatSwitch.SetName (newSwitchName);
 
             floatSwitches.Remove (oldSwitchName);
             floatSwitches[newSwitchName] = floatSwitch;

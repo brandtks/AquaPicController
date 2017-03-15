@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using AquaPic.Utilites;
 using AquaPic.SerialBus;
 using AquaPic.Runtime;
+using AquaPic.Operands;
 
 namespace AquaPic.Drivers
 {
@@ -322,14 +323,19 @@ namespace AquaPic.Drivers
                 pwrStrips [outlet.Group].outlets [outlet.Individual].fallback);
         }
 
-        public static void SetOutletConditionCheck (IndividualControl outlet, IOutletScript script) {
+
+        public static void SetOutletConditionCheck (IndividualControl outlet, ConditionCheckHandler checker) {
             if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
                 throw new ArgumentOutOfRangeException ("outlet.Group");
 
             if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
                 throw new ArgumentOutOfRangeException ("outlet.Individual");
-                
-            pwrStrips [outlet.Group].outlets [outlet.Individual].OutletControl.ConditionChecker = script.OutletConditionCheck;
+
+            pwrStrips[outlet.Group].outlets[outlet.Individual].OutletControl.ConditionChecker = checker;
+        }
+
+        public static void SetOutletConditionCheck (IndividualControl outlet, IOutletScript script) {
+            SetOutletConditionCheck (outlet, script.OutletConditionCheck);
         }
 
         public static IndividualControl GetOutletIndividualControl (string name) {

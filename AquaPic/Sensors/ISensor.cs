@@ -8,6 +8,6 @@ namespace AquaPic.Sensors
         void Add (IndividualControl channel);
         void Remove ();
         T Get ();
-        void ChangeName (string name);
+        void SetName (string name);
     }
 }

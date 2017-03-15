@@ -316,12 +316,12 @@ namespace AquaPic.Modules
             CheckFixtureKey (fixtureName);
 
             LightingFixture fixture = fixtures[fixtureName];
-            Power.RemoveOutlet (fixture.plug);
-            Power.RemoveHandlerOnStateChange (fixture.plug, fixture.OnLightingPlugStateChange);
+            Power.RemoveOutlet (fixture.powerOutlet);
+            Power.RemoveHandlerOnStateChange (fixture.powerOutlet, fixture.OnLightingPlugStateChange);
 
             DimmingLightingFixture dimmingFixture = fixture as DimmingLightingFixture;
             if (dimmingFixture != null) {
-                Power.RemoveHandlerOnModeChange (dimmingFixture.plug, dimmingFixture.OnLightingPlugModeChange);
+                Power.RemoveHandlerOnModeChange (dimmingFixture.powerOutlet, dimmingFixture.OnLightingPlugModeChange);
                 AquaPicDrivers.AnalogOutput.RemoveChannel (dimmingFixture.channel);
                 HomeWindowWidgets.barPlots.Remove (dimmingFixture.name);
             }
@@ -410,7 +410,7 @@ namespace AquaPic.Modules
             var fixture = fixtures[oldFixtureName];
             
             fixture.name = newFixtureName;
-            Power.SetOutletName (fixture.plug, fixture.name);
+            Power.SetOutletName (fixture.powerOutlet, fixture.name);
             DimmingLightingFixture dimmingFixture = fixture as DimmingLightingFixture;
             if (dimmingFixture != null) {
                 AquaPicDrivers.AnalogOutput.SetChannelName (dimmingFixture.channel, fixture.name);
@@ -425,14 +425,14 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         public static IndividualControl GetFixtureOutletIndividualControl (string fixtureName) {
             CheckFixtureKey (fixtureName);
-            return fixtures[fixtureName].plug;
+            return fixtures[fixtureName].powerOutlet;
         }
 
         public static void SetFixtureOutletIndividualControl (string fixtureName, IndividualControl ic) {
             CheckFixtureKey (fixtureName);
-            Power.RemoveOutlet (fixtures[fixtureName].plug);
-            fixtures[fixtureName].plug = ic;
-            var coil = Power.AddOutlet (fixtures[fixtureName].plug, fixtures[fixtureName].name, MyState.On, "Heater");
+            Power.RemoveOutlet (fixtures[fixtureName].powerOutlet);
+            fixtures[fixtureName].powerOutlet = ic;
+            var coil = Power.AddOutlet (fixtures[fixtureName].powerOutlet, fixtures[fixtureName].name, MyState.On, "Heater");
             coil.ConditionChecker = fixtures[fixtureName].OnPlugControl;
         }
 

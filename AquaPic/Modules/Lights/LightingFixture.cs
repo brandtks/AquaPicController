@@ -18,7 +18,7 @@ namespace AquaPic.Modules
             public LightingTime lightingTime;
             public MyState lightingOn;
             public bool highTempLockout;
-            public IndividualControl plug;
+            public IndividualControl powerOutlet;
             public Mode mode;
 
             public LightingFixture (
@@ -30,7 +30,7 @@ namespace AquaPic.Modules
                 bool highTempLockout
             ) {
                 this.name = name;
-                this.plug = plug;
+                this.powerOutlet = plug;
 
                 // sets time to today and whatever onTime and offTime are
                 this.onTime = new TimeDate (onTime);

@@ -106,7 +106,7 @@ namespace AquaPic.Sensors
             return _activated;
         }
 
-        public void ChangeName (string name) {
+        public void SetName (string name) {
             _name = name;
             AquaPicDrivers.DigitalInput.SetChannelName (_channel, _name);
         }

@@ -23,19 +23,19 @@ namespace AquaPic.Drivers
 
             public OutletData (string name, OutputHandler outputTrue, OutputHandler outputFalse) {
                 this.name = name;
-                this.currentState = MyState.Off;
-                this.manualState = MyState.Off;
-                this.fallback = MyState.Off;
-                this.mode = Mode.Manual;
-                this.ampCurrent = 0.0f;
-                this.wattPower = 0.0f;
-                this.powerFactor = 1.0f;
-                this.OutletControl = new Coil ();
-                this.OutletControl.ConditionChecker = () => {
+                currentState = MyState.Off;
+                manualState = MyState.Off;
+                fallback = MyState.Off;
+                mode = Mode.Manual;
+                ampCurrent = 0.0f;
+                wattPower = 0.0f;
+                powerFactor = 1.0f;
+                OutletControl = new Coil ();
+                OutletControl.ConditionChecker = () => {
                     return false;
                 };
-                this.OutletControl.OutputTrue = outputTrue;
-                this.OutletControl.OutputFalse = outputFalse;
+                OutletControl.OutputTrue = outputTrue;
+                OutletControl.OutputFalse = outputFalse;
                 owner = "Power";
             }
 

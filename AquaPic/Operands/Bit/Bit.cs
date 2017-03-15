@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using AquaPic.Utilites;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Operands
 {
     public partial class Bit
     {

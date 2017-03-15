@@ -665,7 +665,7 @@ namespace AquaPic.Modules
 
             var probe = probes[oldProbeName];
             
-            probe.ChangeName (newProbeName);
+            probe.SetName (newProbeName);
             
             probes.Remove (oldProbeName);
             probes[newProbeName] = probe;
