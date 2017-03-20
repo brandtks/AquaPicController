@@ -1,6 +1,3 @@
-# Created by https://www.gitignore.io
-
-### XamarinStudio ###
 bin/
 obj/
 Properties/
@@ -8,9 +5,10 @@ gtk-gui/
 packages/
 *.config
 *.userprefs
-*.sln
-*.csproj
 *.dll
 *.pdb
 *.xml
 *.suo
+
+.directory
+

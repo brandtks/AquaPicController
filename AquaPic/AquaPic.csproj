@@ -1,0 +1,229 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{5272A01C-4356-4F37-AF92-B53974F21B34}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>AquaPic</RootNamespace>
+    <AssemblyName>AquaPic</AssemblyName>
+    <StartupObject>AquaPic.MainClass</StartupObject>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG; _GUI_VERSION_2;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <DefineConstants>RPI_BUILD;</DefineConstants>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="CSScriptLibrary">
+      <HintPath>CSScriptLibrary.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glib-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>glade-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+    <Reference Include="Mono.CSharp">
+      <HintPath>..\packages\Mono.CSharp.4.0.0.143\lib\4.5\Mono.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Posix" />
+    <Reference Include="Mono.Cairo" />
+    <Reference Include="FileHelpers">
+      <HintPath>FileHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Package>gtk-sharp-2.0</Package>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Modules\Temperature\TemperatureGroup.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Driver\Power\PowerStrip.cs" />
+    <Compile Include="Driver\AnalogInput\AnalogInputCard.cs" />
+    <Compile Include="Driver\AnalogInput\AnalogInputChannel.cs" />
+    <Compile Include="Driver\SerialBus\AquaPicBus.cs" />
+    <Compile Include="Driver\SerialBus\AquaPicBusMessage.cs" />
+    <Compile Include="Driver\SerialBus\AquaPicBusSlave.cs" />
+    <Compile Include="Driver\SerialBus\AquaPicDefines.cs" />
+    <Compile Include="Driver\Power\Power.cs" />
+    <Compile Include="Driver\Power\PowerDefines.cs" />
+    <Compile Include="Driver\AnalogInput\AnalogInput.cs" />
+    <Compile Include="Driver\AnalogOutput\AnalogOutput.cs" />
+    <Compile Include="Driver\AnalogOutput\AnalogOutputCard.cs" />
+    <Compile Include="Driver\AnalogOutput\AnalogOutputChannel.cs" />
+    <Compile Include="Modules\Temperature\Heater.cs" />
+    <Compile Include="Modules\Temperature\Temperature.cs" />
+    <Compile Include="Modules\Lights\DimmingLightingFixture.cs" />
+    <Compile Include="Modules\Lights\Lighting.cs" />
+    <Compile Include="Modules\Lights\LightingFixture.cs" />
+    <Compile Include="Modules\Lights\RiseSetCalc.cs" />
+    <Compile Include="Utilites\Time.cs" />
+    <Compile Include="Utilites\TimeDate.cs" />
+    <Compile Include="Utilites\Utilites.cs" />
+    <Compile Include="Globals\GlobalEnums.cs" />
+    <Compile Include="Globals\GlobalStructs.cs" />
+    <Compile Include="Driver\DigitalInput\DigitalInput.cs" />
+    <Compile Include="Driver\DigitalInput\DigitalInputCard.cs" />
+    <Compile Include="Runtime\TaskManager\TaskManager.cs" />
+    <Compile Include="Runtime\Alarm\Alarm.cs" />
+    <Compile Include="Runtime\Alarm\AlarmEvents.cs" />
+    <Compile Include="Runtime\Alarm\AlarmType.cs" />
+    <Compile Include="Driver\Power\PowerOutlet.cs" />
+    <Compile Include="Runtime\Hardware\Hardware.cs" />
+    <Compile Include="Runtime\Timer\Timer.cs" />
+    <Compile Include="Runtime\Timer\IntervalTimer.cs" />
+    <Compile Include="Modules\Water Level\WaterLevel.cs" />
+    <Compile Include="Runtime\Script\Script.cs" />
+    <Compile Include="Runtime\Timer\OffDelayTimer.cs" />
+    <Compile Include="Runtime\Timer\OnDelayTimer.cs" />
+    <Compile Include="Runtime\Timer\StaticTimer.cs" />
+    <Compile Include="Sensors\TemperatureProbe.cs" />
+    <Compile Include="Runtime\Logger\Logger.cs" />
+    <Compile Include="Modules\Water Level\AutoTopOff.cs" />
+    <Compile Include="Sensors\AnalogLevelSensor.cs" />
+    <Compile Include="Sensors\FloatSwitch.cs" />
+    <Compile Include="Runtime\Chemistry\Chemistry.cs" />
+    <Compile Include="Runtime\Chemistry\TestProcedure.cs" />
+    <Compile Include="Driver\GenericClasses\GenericChannel.cs" />
+    <Compile Include="Driver\GenericClasses\GenericCard.cs" />
+    <Compile Include="Driver\GenericClasses\CardTypeEnum.cs" />
+    <Compile Include="Driver\GenericClasses\GenericBase.cs" />
+    <Compile Include="Driver\Driver.cs" />
+    <Compile Include="Driver\DigitalInput\DigitalInputChannel.cs" />
+    <Compile Include="Runtime\DataLogger\DataLogger.cs" />
+    <Compile Include="Runtime\DataLogger\LogEntry.cs" />
+    <Compile Include="Utilites\CircularBuffer.cs" />
+    <Compile Include="Utilites\RateOfChangeLimiter.cs" />
+    <Compile Include="Operands\Bit\Bit.cs" />
+    <Compile Include="Operands\Bit\BitState.cs" />
+    <Compile Include="Operands\Coil\Coil.cs" />
+    <Compile Include="Operands\Value\Value.cs" />
+    <Compile Include="UserInterface\AquaPicGui.cs" />
+    <Compile Include="UserInterface\Dialogs\Calibration\CalibrationDialog.cs" />
+    <Compile Include="UserInterface\Dialogs\Settings\SettingsDialog.cs" />
+    <Compile Include="UserInterface\Dialogs\Settings\SettingsWidgets.cs" />
+    <Compile Include="UserInterface\Scenes\SceneBase.cs" />
+    <Compile Include="UserInterface\Scenes\SceneData.cs" />
+    <Compile Include="UserInterface\Scenes\Alarm\AlarmScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Analog\AnalogInputScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Analog\AnalogOutputScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Analog\Widgets\AnalogChannelDisplay.cs" />
+    <Compile Include="UserInterface\Scenes\Chemistry\ChemistryScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Digital\DigitalInputScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Digital\Widgets\DigitalDisplay.cs" />
+    <Compile Include="UserInterface\Scenes\Home\HomeScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Dialogs\AddHomeWidget.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Dialogs\CheckBoard.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Dialogs\HomeSettings.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Dialogs\HomeSettingsWidget.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Widgets\BarPlotWidget.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Widgets\ButtonWidget.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Widgets\CurvedBarPlotWidget.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Widgets\DeluxeTimerWidget.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Widgets\HomeWindowWidgets.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Widgets\LinePlotWidget.cs" />
+    <Compile Include="UserInterface\Scenes\Lighting\LightingScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Lighting\Dialogs\FixtureSettings.cs" />
+    <Compile Include="UserInterface\Scenes\Lighting\Dialogs\LightingSettings.cs" />
+    <Compile Include="UserInterface\Scenes\Lighting\Widgets\MainLightingWidgets.cs" />
+    <Compile Include="UserInterface\Scenes\Logger\LoggerScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Menu\MenuScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Power\PowerScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Power\Dialogs\OutletSettings.cs" />
+    <Compile Include="UserInterface\Scenes\Power\Widgets\PowerOutletSlider.cs" />
+    <Compile Include="UserInterface\Scenes\SerialBus\SerialBusScreen.cs" />
+    <Compile Include="UserInterface\Scenes\SerialBus\Dialogs\AddSlaveSettings.cs" />
+    <Compile Include="UserInterface\Scenes\SerialBus\Widgets\SerialBusSlaveWidget.cs" />
+    <Compile Include="UserInterface\Scenes\Settings\SettingsScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Temperature\TemperatureScreen.cs" />
+    <Compile Include="UserInterface\Scenes\Temperature\Dialogs\HeaterSettings.cs" />
+    <Compile Include="UserInterface\Scenes\Temperature\Dialogs\ProbeSettings.cs" />
+    <Compile Include="UserInterface\Scenes\Temperature\Dialogs\TemperatureGroupSettings.cs" />
+    <Compile Include="UserInterface\Scenes\Temperature\Widgets\MainTemperatureWidgets.cs" />
+    <Compile Include="UserInterface\Scenes\WaterLevel\WaterLevelScreen.cs" />
+    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AnalogSensorSettings.cs" />
+    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AtoSettings.cs" />
+    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\SwitchSettings.cs" />
+    <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainAtoReservoirLevelBarPlotWidget.cs" />
+    <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainWaterLevelBarPlotWidget.cs" />
+    <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainWaterLevelLinePlotWidget.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchButton.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchColor.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchComboBox.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchCurvedProgressBar.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchDialogs.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchGlobal.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchGraphicalBox.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchLabel.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchLayeredProgressBar.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchLinePlot.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchNumberInput.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchProgressBar.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchSelectorSwitch.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchText.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchTextBox.cs" />
+    <Compile Include="UserInterface\TouchWidgetLibrary\TouchUpDownButtons.cs" />
+    <Compile Include="UserInterface\Widgets\MyNotificationBar.cs" />
+    <Compile Include="UserInterface\Widgets\MySideBar.cs" />
+    <Compile Include="Sensors\ISensor.cs" />
+    <Compile Include="Equipment\IEquipment.cs" />
+    <Compile Include="Modules\Water Level\WaterLevelSensor.cs" />
+    <Compile Include="Equipment\Pump.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
+  <ItemGroup>
+    <None Include="Runtime\Plugin.Disable\PluginDefines.cs" />
+    <None Include="Runtime\Plugin.Disable\Plugin.cs" />
+    <None Include="Runtime\Plugin.Disable\CyclicScript.cs" />
+    <None Include="Runtime\Plugin.Disable\BaseScript.cs" />
+    <None Include="Runtime\Plugin.Disable\StartupScript.cs" />
+    <None Include="Runtime\Plugin.Disable\EventScript.cs" />
+    <None Include="Runtime\Plugin.Disable\ScriptMessage.cs" />
+    <None Include="Runtime\Plugin.Disable\ModuleScript.cs" />
+    <None Include="UserInterface\Scenes\Plugin.Disable\EditPluginScreen.cs" />
+    <None Include="UserInterface\Scenes\Plugin.Disable\PluginScreen.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Operands\" />
+    <Folder Include="Operands\Bit\" />
+    <Folder Include="Operands\Coil\" />
+    <Folder Include="Operands\Value\" />
+    <Folder Include="Equipment\" />
+  </ItemGroup>
+</Project>
