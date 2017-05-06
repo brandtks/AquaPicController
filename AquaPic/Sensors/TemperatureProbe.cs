@@ -70,8 +70,8 @@ namespace AquaPic.Sensors
             float zeroValue,
             float fullScaleActual,
             float fullScaleValue, 
-            string temperatureGroupName
-        ) {
+            string temperatureGroupName) 
+        {
             _name = name;
             _channel.Group = cardId;
             _channel.Individual = channelId;

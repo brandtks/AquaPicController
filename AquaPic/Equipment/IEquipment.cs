@@ -33,7 +33,7 @@ namespace AquaPic.Equipment
     {
         void Add (IndividualControl channel);
         void Remove ();
-        T Set ();
+        void Set (T state);
         void SetName (string name);
     }
 }

@@ -61,6 +61,13 @@ namespace AquaPic.Equipment
             }
         }
 
+        protected bool _requestedState;
+        public bool requestedState {
+            get {
+                return _requestedState;
+            }
+        }
+
         public Pump (IndividualControl outlet, string name, MyState fallback, string owner) {
             Add (outlet, name, fallback, owner);
         }
@@ -75,15 +82,19 @@ namespace AquaPic.Equipment
         public void Add (IndividualControl outlet) {
             _outlet = outlet;
             var coil = Power.AddOutlet (_outlet, _name, _fallback, _owner);
-            coil.ConditionChecker = Set;
+            coil.ConditionChecker = PumpConditionChecker;
         }
 
         public void Remove () {
             Power.RemoveOutlet (_outlet);
         }
 
-        public virtual bool Set () {
-            return false;
+        public void Set (bool state) {
+            _requestedState = state;
+        }
+
+        public void Set (MyState state) {
+            _requestedState = state.ToBool ();
         }
 
         public void SetName (string name) {
@@ -91,8 +102,8 @@ namespace AquaPic.Equipment
             Power.SetOutletName (_outlet, name);
         }
 
-        public void SetConditionChecker (ConditionCheckHandler checker) {
-            Power.SetOutletConditionCheck (outlet, checker);
+        protected virtual bool PumpConditionChecker () {
+            return _requestedState;
         }
     }
 }
