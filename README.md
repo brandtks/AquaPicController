@@ -1,17 +1,18 @@
 README
 ======
 **AquaPic Main Control**
+
 Handles all functionality for the AquaPic aquarium controller. Also provides a graphical user interface.
 
 ### Status
 All code are a work in progress. 
 
 ### Prerequisites
-[GtkSharp](http://www.mono-project.com/docs/gui/gtksharp/) - The Mono Project
-[cs-script](http://www.csscript.net/) - Oleg Shilo
-[Json.NET](http://www.newtonsoft.com/json) - Newtonsoft
-[FileHeloper](http://www.filehelpers.net/) - Devoo - Marcos Meli
-Either [Mono](http://www.mono-project.com/), or [.NET](https://www.microsoft.com/net/download). _.NET Core_ has not been tested.
+ * [GtkSharp](http://www.mono-project.com/docs/gui/gtksharp/) - The Mono Project
+ * [cs-script](http://www.csscript.net/) - Oleg Shilo
+ * [Json.NET](http://www.newtonsoft.com/json) - Newtonsoft
+ * [FileHeloper](http://www.filehelpers.net/) - Devoo - Marcos Meli
+ * Either [Mono](http://www.mono-project.com/), or [.NET](https://www.microsoft.com/net/download). _.NET Core_ has not been tested.
 
 ### Toolchain
 Any C# IDE
