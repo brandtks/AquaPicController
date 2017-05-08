@@ -54,8 +54,8 @@ namespace AquaPic.UserInterface
             powerID = 0;
 
             int x, y;
-            IndividualControl ic;
-            ic.Group = (byte)powerID;
+            var ic = IndividualControl.Empty;
+            ic.Group = powerID;
             selectors = new PowerOutletSlider[8];
             for (int i = 0; i < 8; ++i) {
                 selectors [i] = new PowerOutletSlider (i);
@@ -63,7 +63,7 @@ namespace AquaPic.UserInterface
 
                 int idx = i;
                 selectors [i].UpdateScreen = () => {
-                    IndividualControl indCont;
+                    var indCont = IndividualControl.Empty;
                     indCont.Group = powerID;
                     indCont.Individual = idx;
                     selectors [idx].outletName.text = Power.GetOutletName (indCont);
@@ -136,7 +136,7 @@ namespace AquaPic.UserInterface
 
         public override void Dispose () {
             if (powerID != -1) {
-                IndividualControl ic;
+                var ic = IndividualControl.Empty;
                 ic.Group = (byte)powerID;
                 for (int i = 0; i < selectors.Length; ++i) {
                     ic.Individual = (byte)i;
@@ -180,7 +180,7 @@ namespace AquaPic.UserInterface
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
             int id = Power.GetPowerStripIndex (e.activeText);
             if (id != -1) {
-                IndividualControl ic;
+                var ic = IndividualControl.Empty;
                 ic.Group = (byte)powerID; // old powerID
                 for (int i = 0; i < selectors.Length; ++i) {
                     ic.Individual = (byte)i;
@@ -201,7 +201,7 @@ namespace AquaPic.UserInterface
 
         protected void OnSelectorChanged (object sender, SelectorChangedEventArgs e) {
             var ss = sender as TouchSelectorSwitch;
-            IndividualControl ic;
+            var ic = IndividualControl.Empty;
             ic.Group = (byte)powerID;
             ic.Individual = ss.id;
 

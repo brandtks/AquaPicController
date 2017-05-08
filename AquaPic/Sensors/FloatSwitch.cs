@@ -104,18 +104,29 @@ namespace AquaPic.Sensors
             _type = type;
             this.function = function;
             this.physicalLevel = physicalLevel;
+            _channel = channel;
             _onDelayTimer = new OnDelayTimer (timeOffset);
 
-            Add (channel);
+            if (_channel.IsNotEmpty ()) {
+                Add (channel);
+            }
         }
 
         public void Add (IndividualControl channel) {
+            if (!_channel.Equals (channel))
+                Remove ();
+
             _channel = channel;
-            AquaPicDrivers.DigitalInput.AddChannel (_channel, _name);
+
+            if (_channel.IsNotEmpty ()) {
+                AquaPicDrivers.DigitalInput.AddChannel (_channel, _name);
+            }
         }
 
         public void Remove () {
-            AquaPicDrivers.DigitalInput.RemoveChannel (_channel);
+            if (_channel.IsNotEmpty ()) {
+                AquaPicDrivers.DigitalInput.RemoveChannel (_channel);
+            }
         }
 
         public bool Get () {

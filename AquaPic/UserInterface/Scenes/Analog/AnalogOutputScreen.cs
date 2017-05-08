@@ -113,7 +113,7 @@ namespace AquaPic.UserInterface
         protected void OnForceRelease (object sender, ButtonReleaseEventArgs args) {
             AnalogChannelDisplay d = sender as AnalogChannelDisplay;
 
-            IndividualControl ic;
+            var ic = IndividualControl.Empty;
             ic.Group = cardId;
             ic.Individual = AquaPicDrivers.AnalogOutput.GetChannelIndex (cardId, d.label.text);
 
@@ -145,7 +145,7 @@ namespace AquaPic.UserInterface
         protected void OnValueChanged (object sender, float value) {
             AnalogChannelDisplay d = sender as AnalogChannelDisplay;
 
-            IndividualControl ic;
+            var ic = IndividualControl.Empty;
             ic.Group = (byte)cardId;
             ic.Individual = AquaPicDrivers.AnalogOutput.GetChannelIndex (cardId, d.label.text);
 

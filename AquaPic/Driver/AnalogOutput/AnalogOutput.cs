@@ -48,7 +48,7 @@ namespace AquaPic.Drivers
                     var channel = genericChannel as AnalogOutputChannel<int>;
 
                     if (channel.mode == Mode.Auto) {
-                        channel.ValueControl.Execute ();
+                        channel.valueControl.Execute ();
                     }
 
                     values [channelId] = Convert.ToInt16 (channel.value);

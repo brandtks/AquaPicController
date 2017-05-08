@@ -145,7 +145,7 @@ namespace AquaPic.Drivers
         }
 
         public virtual IndividualControl GetChannelIndividualControl (string channelName) {
-            IndividualControl channel;
+            var channel = IndividualControl.Empty;
 
             for (int i = 0; i < cardCount; ++i) {
                 for (int j = 0; j < cards [i].channels.Length; ++j) {

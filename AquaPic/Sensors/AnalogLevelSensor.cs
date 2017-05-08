@@ -73,6 +73,7 @@ namespace AquaPic.Sensors
         }
 
         public AnalogLevelSensor (string name, IndividualControl ic) {
+            _channel = ic;
             _name = name;
             _level = 0.0f;
 
@@ -81,19 +82,25 @@ namespace AquaPic.Sensors
             fullScaleValue = 4096.0f;
 
             sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
-
-            if (ic.IsNotEmpty ()) {
-                Add (ic);
-            }
+            Add (ic);
         }
 
         public void Add (IndividualControl channel) {
+            if (!_channel.Equals (channel)) {
+                Remove ();
+            }
+            
             _channel = channel;
-            AquaPicDrivers.AnalogInput.AddChannel (_channel, name);
+
+            if (_channel.IsNotEmpty ()) {
+                AquaPicDrivers.AnalogInput.AddChannel (_channel, name);
+            }
         }
 
         public void Remove () {
-            AquaPicDrivers.AnalogInput.RemoveChannel (_channel);
+            if (_channel.IsNotEmpty ()) {
+                AquaPicDrivers.AnalogInput.RemoveChannel (_channel);
+            }
         }
 
         public float Get () {

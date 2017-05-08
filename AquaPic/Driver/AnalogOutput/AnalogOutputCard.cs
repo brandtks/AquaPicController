@@ -137,7 +137,7 @@ namespace AquaPic.Drivers
             public Value GetChannelValueControl (int channel) {
                 CheckChannelRange (channel);
                 var analogOutputChannel = channels [channel] as AnalogOutputChannel<T>;
-                return analogOutputChannel.ValueControl;
+                return analogOutputChannel.valueControl;
             }
         }
     }

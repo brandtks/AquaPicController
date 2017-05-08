@@ -26,6 +26,7 @@
 
 ﻿using System;
 using AquaPic.Utilites;
+using AquaPic.Operands;
 
 namespace AquaPic.Equipment
 {
@@ -33,7 +34,7 @@ namespace AquaPic.Equipment
     {
         void Add (IndividualControl channel);
         void Remove ();
-        void Set (T state);
         void SetName (string name);
+        void SetGetter (T OnGetter);
     }
 }

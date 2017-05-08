@@ -140,7 +140,7 @@ namespace AquaPic.Modules
                         string type = (string)obj["type"];
 
                         string name = (string)obj["name"];
-                        IndividualControl plug;
+                        var plug = IndividualControl.Empty;
                         plug.Group = Power.GetPowerStripIndex ((string)obj["powerStrip"]);
                         plug.Individual = Convert.ToInt32 (obj["outlet"]);
                         bool highTempLockout = Convert.ToBoolean (obj["highTempLockout"]);
@@ -154,7 +154,7 @@ namespace AquaPic.Modules
                         }
 
                         if (string.Equals (type, "dimming", StringComparison.InvariantCultureIgnoreCase)) {
-                            IndividualControl channel;
+                            var channel = IndividualControl.Empty;
                             channel.Group = AquaPicDrivers.AnalogOutput.GetCardIndex ((string)obj["dimmingCard"]);
                             channel.Individual = Convert.ToInt32 (obj["channel"]);
                             float minDimmingOutput = Convert.ToSingle (obj["minDimmingOutput"]);
@@ -459,7 +459,7 @@ namespace AquaPic.Modules
             Power.RemoveOutlet (fixtures[fixtureName].powerOutlet);
             fixtures[fixtureName].powerOutlet = ic;
             var coil = Power.AddOutlet (fixtures[fixtureName].powerOutlet, fixtures[fixtureName].name, MyState.On, "Heater");
-            coil.ConditionChecker = fixtures[fixtureName].OnPlugControl;
+            coil.ConditionGetter = fixtures[fixtureName].OnPlugControl;
         }
 
         public static IndividualControl GetDimmingChannelIndividualControl (string fixtureName) {

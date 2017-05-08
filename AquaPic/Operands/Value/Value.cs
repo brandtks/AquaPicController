@@ -37,18 +37,13 @@ namespace AquaPic.Operands
         public ValueSetterHandler ValueSetter;
         public float value;
 
+        public Value () {
+            value = 0.0f;
+        }
+
         public void Execute () {
-            float newValue = 0.0f;
-
-            if (ValueGetter != null) {
-                newValue = ValueGetter ();
-            }
-
-            value = newValue;
-
-            if (ValueSetter != null) {
-                ValueSetter (value);
-            }
+            value = (float)ValueGetter?.Invoke();
+            ValueSetter?.Invoke (value);
         }
     }
 }

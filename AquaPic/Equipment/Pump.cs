@@ -31,7 +31,7 @@ using AquaPic.Operands;
 
 namespace AquaPic.Equipment
 {
-    public class Pump : IEquipment<bool>
+    public class Pump : IEquipment<ConditionGetterHandler>
     {
         protected IndividualControl _outlet;
         public IndividualControl outlet {
@@ -61,40 +61,31 @@ namespace AquaPic.Equipment
             }
         }
 
-        protected bool _requestedState;
-        public bool requestedState {
-            get {
-                return _requestedState;
-            }
-        }
-
         public Pump (IndividualControl outlet, string name, MyState fallback, string owner) {
-            Add (outlet, name, fallback, owner);
-        }
-
-        public void Add (IndividualControl outlet, string name, MyState fallback, string owner) {
             _name = name;
             _fallback = fallback;
             _owner = owner;
+            _outlet = IndividualControl.Empty;
             Add (outlet);
         }
 
         public void Add (IndividualControl outlet) {
+            if (!_outlet.Equals(outlet)) {
+                Remove ();
+            }
+
             _outlet = outlet;
-            var coil = Power.AddOutlet (_outlet, _name, _fallback, _owner);
-            coil.ConditionChecker = PumpConditionChecker;
+
+            if (_outlet.IsNotEmpty ()) {
+                var coil = Power.AddOutlet (_outlet, _name, _fallback, _owner);
+                coil.ConditionGetter = OnConditionGetter;
+            }
         }
 
         public void Remove () {
-            Power.RemoveOutlet (_outlet);
-        }
-
-        public void Set (bool state) {
-            _requestedState = state;
-        }
-
-        public void Set (MyState state) {
-            _requestedState = state.ToBool ();
+            if (_outlet.IsNotEmpty ()) {
+                Power.RemoveOutlet (_outlet);
+            }
         }
 
         public void SetName (string name) {
@@ -102,8 +93,14 @@ namespace AquaPic.Equipment
             Power.SetOutletName (_outlet, name);
         }
 
-        protected virtual bool PumpConditionChecker () {
-            return _requestedState;
+        public void SetGetter (ConditionGetterHandler OnGetter) {
+            if (_outlet.IsNotEmpty ()) {
+                Power.SetOutletConditionCheck (_outlet, OnGetter);
+            }
+        }
+
+        protected virtual bool OnConditionGetter () {
+            return false;
         }
     }
 }

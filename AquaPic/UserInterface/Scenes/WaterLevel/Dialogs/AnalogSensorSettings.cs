@@ -189,7 +189,7 @@ namespace AquaPic.UserInterface
                         int cardId = AquaPicDrivers.AnalogInput.GetCardIndex (cardName);
                         int channelId = Convert.ToInt32 (s.Substring (idx + 2));
 
-                        IndividualControl ic;
+                        var ic = IndividualControl.Empty;
                         ic.Group = cardId;
                         ic.Individual = channelId;
                         WaterLevel.analogSensorChannel = ic;

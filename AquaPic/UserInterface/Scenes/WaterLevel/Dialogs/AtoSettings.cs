@@ -325,7 +325,7 @@ namespace AquaPic.UserInterface
                         int pwrId = Power.GetPowerStripIndex (pwrName);
                         int outletId = Convert.ToInt32 (outletString.Substring (idx + 2));
 
-                        IndividualControl ic;
+                        IndividualControl ic = IndividualControl.Empty;
                         ic.Group = pwrId;
                         ic.Individual = outletId;
                         WaterLevel.atoPumpOutlet = ic;
@@ -380,7 +380,7 @@ namespace AquaPic.UserInterface
                             int cardId = AquaPicDrivers.AnalogInput.GetCardIndex (cardName);
                             int channelId = Convert.ToInt32 (text.Substring (idx + 2));
 
-                            IndividualControl ic;
+                            var ic = IndividualControl.Empty;
                             ic.Group = cardId;
                             ic.Individual = channelId;
                             WaterLevel.atoReservoirLevelChannel = ic;

@@ -184,7 +184,7 @@ namespace AquaPic.UserInterface
             string name = (settings["Name"] as SettingsTextBox).textBox.text;
 
             string chName = (settings["Input"] as SettingsComboBox).combo.activeText;
-            IndividualControl ic = new IndividualControl ();
+            var ic = IndividualControl.Empty;
 
             float physicalLevel = Convert.ToSingle ((settings["Physical Level"] as SettingsTextBox).textBox.text);
 

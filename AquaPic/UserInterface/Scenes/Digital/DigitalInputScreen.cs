@@ -120,8 +120,8 @@ namespace AquaPic.UserInterface
         protected void OnForceRelease (object sender, ButtonReleaseEventArgs args) {
             DigitalDisplay d = sender as DigitalDisplay;
 
-            IndividualControl ic;
-            ic.Group = (byte)cardId;
+            var ic = IndividualControl.Empty;
+            ic.Group = cardId;
             ic.Individual = AquaPicDrivers.DigitalInput.GetChannelIndex (cardId, d.label.text);
 
             Mode m = AquaPicDrivers.DigitalInput.GetChannelMode (ic);
@@ -142,7 +142,7 @@ namespace AquaPic.UserInterface
         protected void OnSelectorChanged (object sender, SelectorChangedEventArgs args) {
             DigitalDisplay d = sender as DigitalDisplay;
 
-            IndividualControl ic;
+            var ic = IndividualControl.Empty;
             ic.Group = cardId;
             ic.Individual = AquaPicDrivers.DigitalInput.GetChannelIndex (cardId, d.label.text);
 

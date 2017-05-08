@@ -75,7 +75,7 @@ namespace AquaPic.Drivers
                         var script = Script.CompileOutletConditionCheck (conditions.ToArray ());
                         if (script != null) {
                             var c = AddOutlet (powerStripId, outletId, name, fallback);
-                            c.ConditionChecker = () => {
+                            c.ConditionGetter = () => {
                                 return script.OutletConditionCheck ();
                             };
                         } else {
@@ -105,8 +105,9 @@ namespace AquaPic.Drivers
                         if (outlet.manualState != outlet.currentState)
                             strip.SetOutletState ((byte)i, outlet.manualState);
 
-                    } else
+                    } else {
                         outlet.OutletControl.Execute ();
+                    }
 
                     ++i;
                 }
@@ -180,7 +181,7 @@ namespace AquaPic.Drivers
             pwrStrips [powerID].outlets [outletID].owner = "Power";
             pwrStrips [powerID].outlets [outletID].manualState = MyState.Off;
 
-            pwrStrips [powerID].outlets [outletID].OutletControl.ConditionChecker = () => {
+            pwrStrips [powerID].outlets [outletID].OutletControl.ConditionGetter = () => {
                 return false;
             };
 
@@ -350,14 +351,14 @@ namespace AquaPic.Drivers
         }
 
 
-        public static void SetOutletConditionCheck (IndividualControl outlet, ConditionCheckHandler checker) {
+        public static void SetOutletConditionCheck (IndividualControl outlet, ConditionGetterHandler checker) {
             if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
                 throw new ArgumentOutOfRangeException ("outlet.Group");
 
             if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
                 throw new ArgumentOutOfRangeException ("outlet.Individual");
 
-            pwrStrips[outlet.Group].outlets[outlet.Individual].OutletControl.ConditionChecker = checker;
+            pwrStrips[outlet.Group].outlets[outlet.Individual].OutletControl.ConditionGetter = checker;
         }
 
         public static void SetOutletConditionCheck (IndividualControl outlet, IOutletScript script) {
@@ -365,13 +366,13 @@ namespace AquaPic.Drivers
         }
 
         public static IndividualControl GetOutletIndividualControl (string name) {
-            IndividualControl outlet;
+            var outlet = IndividualControl.Empty;
 
             for (int i = 0; i < pwrStrips.Count; ++i) {
                 for (int j = 0; j < pwrStrips [i].outlets.Length; ++j) {
                     if (string.Equals (pwrStrips [i].outlets [j].name, name, StringComparison.InvariantCultureIgnoreCase)) {
-                        outlet.Group = (byte)i;
-                        outlet.Individual = (byte)j;
+                        outlet.Group = i;
+                        outlet.Individual = j;
                         return outlet;
                     }
                 }

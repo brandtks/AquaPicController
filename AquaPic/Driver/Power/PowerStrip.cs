@@ -69,13 +69,14 @@ namespace AquaPic.Drivers
                         
                     outlets [plugID] = new OutletData (
                         plugName,
-                        () => {
-                            if (outlets [plugID].currentState != MyState.On)
-                                SetOutletState ((byte)plugID, MyState.On);
-                        },
-                        () => {
-                            if (outlets [plugID].currentState != MyState.Off)
-                                SetOutletState ((byte)plugID, MyState.Off);
+                        (state) => {
+                            if (state) {
+                                if (outlets[plugID].currentState != MyState.On)
+                                    SetOutletState ((byte)plugID, MyState.On);
+                            } else {
+                                if (outlets[plugID].currentState != MyState.Off)
+                                    SetOutletState ((byte)plugID, MyState.Off);
+                            }
                         });
                 }
             }

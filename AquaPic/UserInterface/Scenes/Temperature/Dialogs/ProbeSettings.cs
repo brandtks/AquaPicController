@@ -131,7 +131,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                IndividualControl ic = new IndividualControl ();
+                var ic = IndividualControl.Empty;
                 ParseChannnel (unparseProbeChannelString, ref ic.Group, ref ic.Individual);
 
                 Temperature.AddTemperatureProbe (

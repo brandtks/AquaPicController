@@ -35,14 +35,15 @@ namespace AquaPic.Drivers
         protected class AnalogOutputChannel<T> : GenericChannel<T>
         {
             public AnalogType type;
-            public Value ValueControl;
+            public Value valueControl;
 
             public AnalogOutputChannel (string name)
                 : base (name, (T)(object)0) 
             {
                 type = AnalogType.ZeroTen;
-                ValueControl = new Value ();
-                ValueControl.ValueSetter = (value) => SetValue (value);
+                valueControl = new Value ();
+                valueControl.ValueGetter = () => 0.0f;
+                valueControl.ValueSetter = (value) => SetValue (value);
             }
         }
     }

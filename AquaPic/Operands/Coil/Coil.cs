@@ -28,14 +28,13 @@
 
 namespace AquaPic.Operands
 {
-    public delegate bool ConditionCheckHandler ();
-    public delegate void OutputHandler ();
+    public delegate bool ConditionGetterHandler ();
+    public delegate void ConditionSetterHandler (bool condition);
 
     public class Coil
     {
-        public ConditionCheckHandler ConditionChecker;
-        public OutputHandler OutputTrue;
-        public OutputHandler OutputFalse;
+        public ConditionGetterHandler ConditionGetter;
+        public ConditionSetterHandler ConditionSetter;
         public bool state;
 
         public Coil () {
@@ -43,13 +42,8 @@ namespace AquaPic.Operands
         }
 
         public void Execute () {  
-            state = (bool)ConditionChecker?.Invoke ();  // do we have a condition check method, if yes, lets run it to find out the new state
-
-            if (state) {                        // if state is true
-                OutputTrue?.Invoke ();          // do we have a method to run if the state is true, if yes, run it
-            } else {
-                OutputFalse?.Invoke ();         // do we have a method to run if the state is false, if yes, run it
-            }
+            state = (bool)ConditionGetter?.Invoke ();  // do we have a condition check method, if yes, lets run it to find out the new state
+            ConditionSetter?.Invoke (state);
         }
     }
 }

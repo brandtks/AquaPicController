@@ -96,7 +96,7 @@
     <Compile Include="Utilites\TimeDate.cs" />
     <Compile Include="Utilites\Utilites.cs" />
     <Compile Include="Globals\GlobalEnums.cs" />
-    <Compile Include="Globals\GlobalStructs.cs" />
+    <Compile Include="Globals\IndividualControl.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInput.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputCard.cs" />
     <Compile Include="Runtime\TaskManager\TaskManager.cs" />

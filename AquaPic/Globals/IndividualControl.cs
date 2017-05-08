@@ -24,16 +24,18 @@
 
 #endregion // License
 
-﻿using System;
+using System;
 
 namespace AquaPic.Utilites
 {
-    public struct IndividualControl {
+    // This is a struct to force passing by value instead of by reference
+    public struct IndividualControl
+    {
         public static IndividualControl Empty {
             get {
-                IndividualControl ic = new IndividualControl ();
-                ic.Group = -1;
+                var ic = new IndividualControl ();
                 ic.Individual = -1;
+                ic.Group = -1;
                 return ic;
             }
         }
@@ -46,6 +48,13 @@ namespace AquaPic.Utilites
             check &= (Individual != -1);
             check &= (Group != -1);
             return check;
+        }
+
+        public bool Equals (IndividualControl ic) {
+            bool check = true;
+            check &= (Individual == ic.Individual);
+            check &= (Group == ic.Group);
+            return check; 
         }
     }
 }

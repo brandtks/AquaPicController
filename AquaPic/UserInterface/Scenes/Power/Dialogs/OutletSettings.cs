@@ -203,7 +203,7 @@ namespace AquaPic.UserInterface
                 }
 
                 var c = Power.AddOutlet (ic, name, fallback);
-                c.ConditionChecker = () => {
+                c.ConditionGetter = () => {
                     return script.OutletConditionCheck ();
                 };
 

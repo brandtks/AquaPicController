@@ -118,7 +118,7 @@ namespace AquaPic.Modules
                     analogSensor.enableLowAlarm = true;
                 
                     try {
-                        AquaPicDrivers.AnalogInput.AddChannel (analogSensor.channel, "Water Level");
+                        analogSensor.Add (analogSensor.channel);
                     } catch (Exception) {
                         ; //channel already added
                     }
@@ -141,20 +141,13 @@ namespace AquaPic.Modules
             }
             set {
                 ato.enable = value;
-                if (ato.enable) {
-                    ato.atoFailAlarmIndex = Alarm.Subscribe ("Auto top off failed");
 
-                    try {
-                        Coil c = Power.AddOutlet (ato.pumpOutlet, "ATO pump", MyState.Off, "ATO");
-                        c.ConditionChecker = () => {
-                            return ato.pumpOnRequest;
-                        };
-                    } catch (Exception) {
-                        ; // Outlet already added
-                    }
-                } else {
-                    if (Alarm.CheckAlarming (ato.atoFailAlarmIndex))
-                        Alarm.Clear (ato.atoFailAlarmIndex);
+                if (!ato.pump.outlet.IsNotEmpty ()) {
+                    ato.enable = false;
+                }
+
+                if (!ato.enable) {
+                    Alarm.Clear (ato.atoFailAlarmIndex);
                 }
             }
         }
@@ -186,11 +179,11 @@ namespace AquaPic.Modules
         public static uint atoTime {
             get {
                 if (atoState == AutoTopOffState.Filling)
-                    return ato.maxPumpOnTime - ato.pumpTimer.secondsRemaining;
-                else if (atoState == AutoTopOffState.Cooldown)
-                    return ato.pumpTimer.secondsRemaining;
-                else
-                    return 0;
+                    return ato.maxPumpOnTime - ato.atoTimer.secondsRemaining;
+                if (atoState == AutoTopOffState.Cooldown)
+                    return ato.atoTimer.secondsRemaining;
+                
+                return 0;
             }
         }
 
@@ -214,14 +207,15 @@ namespace AquaPic.Modules
 
         public static IndividualControl atoPumpOutlet {
             get {
-                return ato.pumpOutlet;
+                return ato.pump.outlet;
             }
             set {
-                if (ato.pumpOutlet.IsNotEmpty ())
-                    Power.RemoveOutlet (ato.pumpOutlet);
-                ato.pumpOutlet = value;
-                Coil c = Power.AddOutlet (ato.pumpOutlet, "ATO pump", MyState.Off, "ATO");
-                c.ConditionChecker = () => { return ato.pumpOnRequest; };
+                ato.pump.Add (value);
+                if (ato.pump.outlet.IsNotEmpty ()) {
+                    ato.pump.SetGetter (() => ato.pumpOnRequest);
+                } else {
+                    ato.enable = false;
+                }
             }
         }
 
@@ -269,9 +263,12 @@ namespace AquaPic.Modules
                 if (ato.reservoirLevel.channel.IsNotEmpty ()) {
                     AquaPicDrivers.AnalogInput.RemoveChannel (ato.reservoirLevel.channel);
                 }
-                
+
                 if (value.IsNotEmpty ()) {
                     ato.reservoirLevel.Add (value);
+                } else {
+                    ato.disableOnLowResevoirLevel = false;
+                    Alarm.Clear (ato.reservoirLowLevelAlarmIndex);
                 }
             }
         }
@@ -368,10 +365,9 @@ namespace AquaPic.Modules
                     } else
                         lowAlarmSetpoint = Convert.ToSingle (text);
 
-                    IndividualControl ic;
+                    var ic = IndividualControl.Empty;
                     text = Convert.ToString (jo["inputCard"]);
                     if (string.IsNullOrWhiteSpace (text)) {
-                        ic = IndividualControl.Empty;
                         enable = false;
                     } else
                         ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
@@ -426,6 +422,7 @@ namespace AquaPic.Modules
                         JObject obj = jt as JObject;
 
                         string name = (string)obj["name"];
+                        ic = IndividualControl.Empty;
                         ic.Group = AquaPicDrivers.DigitalInput.GetCardIndex ((string)obj["inputCard"]);
                         ic.Individual = Convert.ToInt32 (obj["channel"]);
                         float physicalLevel = Convert.ToSingle (obj["physicalLevel"]);
@@ -484,9 +481,9 @@ namespace AquaPic.Modules
                     if (!useFloatSwitch && !useAnalogSensor)
                         enable = false;
 
+                    ic = IndividualControl.Empty;
                     text = (string)joAto["powerStrip"];
                     if (string.IsNullOrWhiteSpace (text)) {
-                        ic = IndividualControl.Empty;
                         enable = false;
                     } else {
                         ic.Group = Power.GetPowerStripIndex (text);
@@ -526,10 +523,9 @@ namespace AquaPic.Modules
                         maxPumpOnTime,
                         minPumpOffTime);
 
+                    ic = IndividualControl.Empty;
                     text = (string)joAto["reservoirInputCard"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        ic = IndividualControl.Empty;
-                    } else {
+                    if (text.IsNotEmpty ()) {
                         ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
                     }
 

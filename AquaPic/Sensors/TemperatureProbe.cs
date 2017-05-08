@@ -73,6 +73,7 @@ namespace AquaPic.Sensors
             string temperatureGroupName) 
         {
             _name = name;
+            _channel = IndividualControl.Empty;
             _channel.Group = cardId;
             _channel.Individual = channelId;
             this.zeroActual = zeroActual;
@@ -81,19 +82,26 @@ namespace AquaPic.Sensors
             this.fullScaleValue = fullScaleValue;
             this.temperatureGroupName = temperatureGroupName;
             _temperature = this.zeroActual;
-
             Add (_channel);
-
             probeDisconnectedAlarmIndex = Alarm.Subscribe (string.Format ("{0} temperature probe disconnected", name));
         }
 
         public void Add (IndividualControl channel) {
+            if (_channel.IsNotEmpty ()) {
+                Remove ();
+            }
+
             _channel = channel;
-            AquaPicDrivers.AnalogInput.AddChannel (_channel, this.name);
+
+            if (_channel.IsNotEmpty ()) {
+                AquaPicDrivers.AnalogInput.AddChannel (_channel, name);
+            }
         }
 
         public void Remove () {
-            AquaPicDrivers.AnalogInput.RemoveChannel (_channel);
+            if (_channel.IsNotEmpty ()) {
+                AquaPicDrivers.AnalogInput.RemoveChannel (_channel);
+            }
         }
 
         public float Get () {

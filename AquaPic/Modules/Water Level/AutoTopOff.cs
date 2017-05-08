@@ -25,14 +25,15 @@
 #endregion // License
 
 ﻿using System;
-using AquaPic.Drivers;
 using AquaPic.Runtime;
 using AquaPic.Utilites;
 using AquaPic.Sensors;
+using AquaPic.Equipment;
 
 namespace AquaPic.Modules
 {
     public enum AutoTopOffState {
+        Off,
         Standby,
         Filling,
         Cooldown,
@@ -52,13 +53,13 @@ namespace AquaPic.Modules
             public bool useFloatSwitch;
             public bool floatSwitchActivated;
 
-            public IndividualControl pumpOutlet;
+            public Pump pump;
             public bool pumpOnRequest;
-            public IntervalTimer pumpTimer;
+            public IntervalTimer atoTimer;
             public uint maxPumpOnTime;
             public uint minPumpOffTime;
 
-            public AnalogLevelSensor reservoirLevel;
+            public WaterLevelSensor reservoirLevel;
             public bool disableOnLowResevoirLevel;
             public float reservoirLowLevelAlarmSetpoint;
             public int reservoirLowLevelAlarmIndex;
@@ -72,11 +73,18 @@ namespace AquaPic.Modules
                 float analogOnSetpoint,
                 float analogOffSetpoint,
                 bool useFloatSwitch,
-                IndividualControl pumpPlug,
+                IndividualControl pumpOutlet,
                 uint maxPumpOnTime,
                 uint minPumpOffTime
             ) {
                 this.enable = enable;
+                if (this.enable) {
+                    state = AutoTopOffState.Standby;
+                } else {
+                    state = AutoTopOffState.Off;
+                }
+
+                atoFailAlarmIndex = Alarm.Subscribe ("Auto top off failed");
 
                 this.useAnalogSensor = useAnalogSensor;
                 this.analogOnSetpoint = analogOnSetpoint;
@@ -85,25 +93,20 @@ namespace AquaPic.Modules
                 this.useFloatSwitch = useFloatSwitch;
                 floatSwitchActivated = false;
 
-                pumpOutlet = pumpPlug;
+                atoTimer = IntervalTimer.GetTimer ("ATO");
+                atoTimer.TimerElapsedEvent += OnTimerElapsed;
+
+                pump = new Pump (pumpOutlet, "ATO pump", MyState.Off, "ATO");
+                if (pump.outlet.IsNotEmpty ()) {
+                    pump.SetGetter (() => pumpOnRequest);
+                }
                 pumpOnRequest = false;
-                pumpTimer = IntervalTimer.GetTimer ("ATO");
-                pumpTimer.TimerElapsedEvent += OnTimerElapsed;
                 this.maxPumpOnTime = maxPumpOnTime;
                 this.minPumpOffTime = minPumpOffTime;
 
                 disableOnLowResevoirLevel = false;
-
                 reservoirLevel = new WaterLevelSensor ("Top Off Reservoir", IndividualControl.Empty);
                 reservoirLowLevelAlarmIndex = Alarm.Subscribe ("Low ATO Reservoir Level");
-
-                state = AutoTopOffState.Standby;
-                atoFailAlarmIndex = Alarm.Subscribe ("Auto top off failed");
-
-                if (this.enable) {
-                    var c = Power.AddOutlet (pumpPlug, "ATO pump", MyState.Off, "ATO");
-                    c.ConditionChecker = () => { return pumpOnRequest; };
-                }
             }
 
             public void Run () {
@@ -112,19 +115,10 @@ namespace AquaPic.Modules
                         reservoirLevel.Get ();
                         if (reservoirLevel.level < reservoirLowLevelAlarmSetpoint) {
                             Alarm.Post (reservoirLowLevelAlarmIndex);
-                        } else {
-                            if (Alarm.CheckAlarming (reservoirLowLevelAlarmIndex)) {
-                                Alarm.Clear (reservoirLowLevelAlarmIndex);
-                            }
-                        }
-                    } else {
-                        disableOnLowResevoirLevel = false;
-                        if (Alarm.CheckAlarming (reservoirLowLevelAlarmIndex)) {
-                            Alarm.Clear (reservoirLowLevelAlarmIndex);
                         }
                     }
                     
-                    if ((!Alarm.CheckAlarming (highSwitchAlarmIndex)) || (!Alarm.CheckAlarming (analogSensor.highAnalogAlarmIndex))) {
+                    if (!Alarm.CheckAlarming (highSwitchAlarmIndex) || !Alarm.CheckAlarming (analogSensor.highAnalogAlarmIndex)) {
                         switch (state) {
                         case AutoTopOffState.Standby:
                             {
@@ -150,7 +144,7 @@ namespace AquaPic.Modules
                                     }
                                 }
 
-                                if ((disableOnLowResevoirLevel) && (Alarm.CheckAlarming (reservoirLowLevelAlarmIndex))) {
+                                if (disableOnLowResevoirLevel && Alarm.CheckAlarming (reservoirLowLevelAlarmIndex)) {
                                     pumpOnRequest = false;
                                     state = AutoTopOffState.Error;
                                     Alarm.Post (atoFailAlarmIndex);
@@ -160,9 +154,9 @@ namespace AquaPic.Modules
                                     state = AutoTopOffState.Filling;
                                     Logger.Add ("Starting auto top off");
                                     dataLogger.AddEntry ("ato started"); 
-                                    pumpTimer.Reset ();
-                                    pumpTimer.totalSeconds = maxPumpOnTime;
-                                    pumpTimer.Start ();
+                                    atoTimer.Reset ();
+                                    atoTimer.totalSeconds = maxPumpOnTime;
+                                    atoTimer.Start ();
                                 }
 
                                 break;
@@ -185,11 +179,11 @@ namespace AquaPic.Modules
                             
                             if (!pumpOnRequest) {
                                 state = AutoTopOffState.Cooldown;
-                                pumpTimer.Reset ();
-                                Logger.Add ("Stopping auto top off. Runtime: {0} secs", pumpTimer.totalSeconds - pumpTimer.secondsRemaining);
+                                atoTimer.Reset ();
+                                Logger.Add ("Stopping auto top off. Runtime: {0} secs", atoTimer.totalSeconds - atoTimer.secondsRemaining);
                                 dataLogger.AddEntry ("ato stopped"); 
-                                pumpTimer.totalSeconds = minPumpOffTime;
-                                pumpTimer.Start ();
+                                atoTimer.totalSeconds = minPumpOffTime;
+                                atoTimer.Start ();
                             }
 
                             break;
@@ -204,7 +198,7 @@ namespace AquaPic.Modules
                         pumpOnRequest = false;
                     }
                 } else {
-                    state = AutoTopOffState.Standby;
+                    state = AutoTopOffState.Off;
                     pumpOnRequest = false;
                 }
             }

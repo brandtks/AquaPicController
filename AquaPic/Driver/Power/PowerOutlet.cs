@@ -47,7 +47,7 @@ namespace AquaPic.Drivers
             public Coil OutletControl;
             public string owner;
 
-            public OutletData (string name, OutputHandler outputTrue, OutputHandler outputFalse) {
+            public OutletData (string name, ConditionSetterHandler outletSetter) {
                 this.name = name;
                 currentState = MyState.Off;
                 manualState = MyState.Off;
@@ -57,11 +57,10 @@ namespace AquaPic.Drivers
                 wattPower = 0.0f;
                 powerFactor = 1.0f;
                 OutletControl = new Coil ();
-                OutletControl.ConditionChecker = () => {
+                OutletControl.ConditionGetter = () => {
                     return false;
                 };
-                OutletControl.OutputTrue = outputTrue;
-                OutletControl.OutputFalse = outputFalse;
+                OutletControl.ConditionSetter = outletSetter;
                 owner = "Power";
             }
 
