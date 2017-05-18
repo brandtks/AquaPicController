@@ -17,11 +17,8 @@ All code are a work in progress.
 ### Toolchain
 Any C# IDE
  * MonoDeveloper
+  * Xamarin Studio
  * Visual Studio 
- * Xamarin Studio
-
-### Building
-I'm lazy so I just use the IDE.
 
 ### License
 The AquaPic main control code is released under the terms of the GNU General Public License (GPL), version 3 or later. See COPYING for details.
