@@ -5,7 +5,7 @@ README
 Handles all functionality for the AquaPic aquarium controller. Also provides a graphical user interface.
 
 ### Status
-All code are a work in progress. 
+All code is a work in progress. 
 
 ### Prerequisites
  * [GtkSharp](http://www.mono-project.com/docs/gui/gtksharp/) - The Mono Project
