@@ -39,9 +39,9 @@ namespace AquaPic.Modules
 {
     public partial class Temperature
     {
-        private static Dictionary<string,Heater> heaters;
-        private static Dictionary<string,TemperatureProbe> probes;
-        private static Dictionary<string,TemperatureGroup> temperatureGroups;
+        private static Dictionary<string, Heater> heaters;
+        private static Dictionary<string, TemperatureProbe> probes;
+        private static Dictionary<string, TemperatureGroup> temperatureGroups;
         private static string _defaultTemperatureGroup;
 
         /**************************************************************************************************************/
@@ -58,9 +58,9 @@ namespace AquaPic.Modules
                 if (heaters.Count > 0) {
                     var first = heaters.First ();
                     return first.Key;
-                } else {
-                    return string.Empty;
                 }
+
+                return string.Empty;
             }
         }
 
@@ -78,9 +78,9 @@ namespace AquaPic.Modules
                 if (probes.Count > 0) {
                     var first = probes.First ();
                     return first.Key;
-                } else {
-                    return string.Empty;
                 }
+                    
+                return string.Empty;
             }
         }
 
@@ -99,6 +99,7 @@ namespace AquaPic.Modules
                     var first = temperatureGroups.First ();
                     _defaultTemperatureGroup = first.Key;
                 }
+
                 return _defaultTemperatureGroup;
             }
         }
@@ -107,9 +108,9 @@ namespace AquaPic.Modules
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].temperature;
-                } else {
-                    return 0.0f;
                 }
+                    
+                return 0.0f;
             }
         }
 
@@ -117,9 +118,9 @@ namespace AquaPic.Modules
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].temperatureSetpoint;
-                } else {
-                    return 0.0f;
                 }
+                    
+                return 0.0f;
             }
         }
 
@@ -127,9 +128,9 @@ namespace AquaPic.Modules
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].temperatureDeadband;
-                } else {
-                    return 0.0f;
                 }
+                    
+                return 0.0f;
             }
         }
 
@@ -137,9 +138,9 @@ namespace AquaPic.Modules
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].highTemperatureAlarmSetpoint;
-                } else {
-                    return 0.0f;
                 }
+                    
+                return 0.0f;
             }
         }
 
@@ -147,9 +148,9 @@ namespace AquaPic.Modules
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].lowTemperatureAlarmSetpoint;
-                } else {
-                    return 0.0f;
                 }
+                    
+                return 0.0f;
             }
         }
 
@@ -157,9 +158,9 @@ namespace AquaPic.Modules
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].highTemperatureAlarmIndex;
-                } else {
-                    return -1;
                 }
+
+                return -1;
             }
         }
 

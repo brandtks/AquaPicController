@@ -40,16 +40,33 @@ namespace AquaPic.Modules
 {
     public partial class WaterLevel
     {
-        private static WaterLevelSensor analogSensor;
-        private static AutoTopOff ato;
-        private static Dictionary<string,FloatSwitch> floatSwitches;
+        private static Dictionary<string, WaterLevelSensor> analogLevelSensors;
+        private static Dictionary<string, FloatSwitch> floatSwitches;
+        private static Dictionary<string, WaterGroup> waterGroups;
 
         private static int highSwitchAlarmIndex;
         private static int lowSwitchAlarmIndex;
 
         /**************************************************************************************************************/
-        /* Analog water sensor                                                                                        */
+        /* Analog Water Sensors                                                                                       */
         /**************************************************************************************************************/
+        public static int analogLevelSensorCount {
+            get {
+                return levelSensors.Count;
+            }
+        }
+
+        public static string defaultAnalogLevelSensor {
+            get {
+                if (levelSensors.Count > 0) {
+                    var first = levelSensors.First ();
+                    return first.Key;
+                }
+
+                return string.Empty;
+            }
+        }
+
         public static float highAnalogLevelAlarmSetpoint {
             get {
                 return analogSensor.highAlarmSetpoint;
@@ -129,183 +146,6 @@ namespace AquaPic.Modules
         public static DataLogger dataLogger {
             get {
                 return analogSensor.dataLogger;
-            }
-        }
-            
-        /**************************************************************************************************************/
-        /* Auto Top-off                                                                                               */
-        /**************************************************************************************************************/
-        public static bool atoEnabled {
-            get {
-                return ato.enable;
-            }
-            set {
-                ato.enable = value;
-
-                if (!ato.pump.outlet.IsNotEmpty ()) {
-                    ato.enable = false;
-                }
-
-                if (!ato.enable) {
-                    Alarm.Clear (ato.atoFailAlarmIndex);
-                }
-            }
-        }
-
-        public static bool atoUseAnalogSensor {
-            get {
-                return ato.useAnalogSensor;
-            }
-            set {
-                ato.useAnalogSensor = value;
-            }
-        }
-
-        public static bool atoUseFloatSwitch {
-            get {
-                return ato.useFloatSwitch;
-            }
-            set {
-                ato.useFloatSwitch = value;
-            }
-        }
-
-        public static AutoTopOffState atoState {
-            get {
-                return ato.state;
-            }
-        }
-
-        public static uint atoTime {
-            get {
-                if (atoState == AutoTopOffState.Filling)
-                    return ato.maxPumpOnTime - ato.atoTimer.secondsRemaining;
-                if (atoState == AutoTopOffState.Cooldown)
-                    return ato.atoTimer.secondsRemaining;
-                
-                return 0;
-            }
-        }
-
-        public static uint atoMaxRuntime {
-            get {
-                return ato.maxPumpOnTime;
-            }
-            set {
-                ato.maxPumpOnTime = value;
-            }
-        }
-
-        public static uint atoCooldown {
-            get {
-                return ato.minPumpOffTime;
-            }
-            set {
-                ato.minPumpOffTime = value;
-            }
-        }
-
-        public static IndividualControl atoPumpOutlet {
-            get {
-                return ato.pump.outlet;
-            }
-            set {
-                ato.pump.Add (value);
-                if (ato.pump.outlet.IsNotEmpty ()) {
-                    ato.pump.SetGetter (() => ato.pumpOnRequest);
-                } else {
-                    ato.enable = false;
-                }
-            }
-        }
-
-        public static float atoAnalogOnSetpoint {
-            get {
-                return ato.analogOnSetpoint;
-            }
-            set {
-                ato.analogOnSetpoint = value;
-            }
-        }
-
-        public static float atoAnalogOffSetpoint {
-            get {
-                return ato.analogOffSetpoint;
-            }
-            set {
-                ato.analogOffSetpoint = value;
-            }
-        }
-
-        public static int atoFailedAlarmIndex {
-            get {
-                return ato.atoFailAlarmIndex;
-            }
-        }
-
-        public static bool atoReservoirLevelEnabled {
-            get {
-                return ato.reservoirLevel.channel.IsNotEmpty ();
-            }
-        }
-
-        public static float atoReservoirLevel {
-            get {
-                return ato.reservoirLevel.level;
-            }
-        }
-
-        public static IndividualControl atoReservoirLevelChannel {
-            get {
-                return ato.reservoirLevel.channel;
-            }
-            set {
-                if (ato.reservoirLevel.channel.IsNotEmpty ()) {
-                    AquaPicDrivers.AnalogInput.RemoveChannel (ato.reservoirLevel.channel);
-                }
-
-                if (value.IsNotEmpty ()) {
-                    ato.reservoirLevel.Add (value);
-                } else {
-                    ato.disableOnLowResevoirLevel = false;
-                    Alarm.Clear (ato.reservoirLowLevelAlarmIndex);
-                }
-            }
-        }
-
-        public static bool atoReservoirDisableOnLowLevel {
-            get {
-                return ato.disableOnLowResevoirLevel;
-            }
-            set {
-                ato.disableOnLowResevoirLevel = value;
-            }
-        }
-
-        public static float atoReservoirLowLevelSetpoint {
-            get {
-                return ato.reservoirLowLevelAlarmSetpoint;
-            }
-            set {
-                ato.reservoirLowLevelAlarmSetpoint = value;
-            }
-        }
-
-        public static float atoReservoirLevelSensorZeroCalibrationValue {
-            get {
-                return ato.reservoirLevel.zeroValue;
-            }
-        }
-
-        public static float atoReservoirLevelSensorFullScaleCalibrationActual {
-            get {
-                return ato.reservoirLevel.fullScaleActual;
-            }
-        }
-
-        public static float atoReservoirLevelSensorFullScaleCalibrationValue {
-            get {
-                return ato.reservoirLevel.fullScaleValue;
             }
         }
 
@@ -446,82 +286,6 @@ namespace AquaPic.Modules
                     /* Auto Top Off                                                                                       */
                     /******************************************************************************************************/
                     JObject joAto = (JObject)jo["AutoTopOff"];
-
-                    try {
-                        enable = Convert.ToBoolean (joAto["enableAto"]);
-                    } catch {
-                        enable = false;
-                    }
-
-                    bool useAnalogSensor;
-                    try {
-                        useAnalogSensor = Convert.ToBoolean (joAto["useAnalogSensor"]);
-                    } catch {
-                        useAnalogSensor = false;
-                    }
-
-                    float analogOnSetpoint;
-                    text = (string)joAto["analogOnSetpoint"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        analogOnSetpoint = 0.0f;
-                        useAnalogSensor = false;
-                    } else
-                        analogOnSetpoint = Convert.ToSingle (text);
-
-                    float analogOffSetpoint;
-                    text = (string)joAto["analogOffSetpoint"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        analogOffSetpoint = 0.0f;
-                        useAnalogSensor = false;
-                    } else
-                        analogOffSetpoint = Convert.ToSingle (text);
-
-                    bool useFloatSwitch = Convert.ToBoolean (joAto["useFloatSwitch"]);
-
-                    if (!useFloatSwitch && !useAnalogSensor)
-                        enable = false;
-
-                    ic = IndividualControl.Empty;
-                    text = (string)joAto["powerStrip"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        enable = false;
-                    } else {
-                        ic.Group = Power.GetPowerStripIndex (text);
-                    }
-
-                    text = (string)joAto["outlet"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        ic = IndividualControl.Empty;
-                        enable = false;
-                    } else {
-                        ic.Individual = Convert.ToInt32 (text);
-                    }
-
-                    uint maxPumpOnTime;
-                    text = (string)joAto["maxPumpOnTime"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        maxPumpOnTime = 0U;
-                        enable = false;
-                    } else
-                        maxPumpOnTime = Timer.ParseTime (text) / 1000;
-
-                    uint minPumpOffTime;
-                    text = (string)joAto["minPumpOffTime"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        minPumpOffTime = uint.MaxValue;
-                        enable = false;
-                    } else
-                        minPumpOffTime = Timer.ParseTime (text) / 1000;
-
-                    ato = new AutoTopOff (
-                        enable,
-                        useAnalogSensor,
-                        analogOnSetpoint,
-                        analogOffSetpoint,
-                        useFloatSwitch,
-                        ic,
-                        maxPumpOnTime,
-                        minPumpOffTime);
 
                     ic = IndividualControl.Empty;
                     text = (string)joAto["reservoirInputCard"];

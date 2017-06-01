@@ -114,7 +114,6 @@
     <Compile Include="Runtime\Timer\StaticTimer.cs" />
     <Compile Include="Sensors\TemperatureProbe.cs" />
     <Compile Include="Runtime\Logger\Logger.cs" />
-    <Compile Include="Modules\Water Level\AutoTopOff.cs" />
     <Compile Include="Sensors\AnalogLevelSensor.cs" />
     <Compile Include="Sensors\FloatSwitch.cs" />
     <Compile Include="Runtime\Chemistry\Chemistry.cs" />
@@ -202,8 +201,10 @@
     <Compile Include="UserInterface\Widgets\MySideBar.cs" />
     <Compile Include="Sensors\ISensor.cs" />
     <Compile Include="Equipment\IEquipment.cs" />
-    <Compile Include="Modules\Water Level\WaterLevelSensor.cs" />
     <Compile Include="Equipment\Pump.cs" />
+    <Compile Include="Modules\ATO\AutoTopOff.cs" />
+    <Compile Include="Modules\Water Level\WaterGroup.cs" />
+    <Compile Include="Sensors\WaterLevelSensor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -225,5 +226,6 @@
     <Folder Include="Operands\Coil\" />
     <Folder Include="Operands\Value\" />
     <Folder Include="Equipment\" />
+    <Folder Include="Modules\ATO\" />
   </ItemGroup>
 </Project>
