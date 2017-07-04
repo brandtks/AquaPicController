@@ -383,7 +383,9 @@ namespace AquaPic.Modules
                     light.SetOnTime (sunRiseToday);
                     light.SetOffTime (sunSetToday);
                 } else { // lights are supposed to be on, a little funny bussiness is required
-                    light.onTime = now; // no need to worry about offset
+                    TimeDate sunSetYesterday = new TimeDate (sunSetToday);
+                    sunSetYesterday.AddDay (-1);
+                    light.SetOnTime (sunSetYesterday);
                     light.SetOffTime (sunRiseToday); // night time lighting turns off at sunrise
                 }
             } else { // time is after sunrise

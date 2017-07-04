@@ -34,8 +34,8 @@ namespace AquaPic.UserInterface
 {
     public class SceneBase : Fixed
     {
-        //private Image background;
-        private TouchLabel label;
+        //Image background;
+        TouchLabel label;
 
         public string sceneTitle {
             get {
@@ -87,7 +87,6 @@ namespace AquaPic.UserInterface
             foreach (var w in this.Children) {
                 w.Dispose ();
             }
-
             base.Dispose ();
         }
     }

@@ -25,7 +25,6 @@
 #endregion // License
 
 ﻿using System;
-using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
@@ -44,10 +43,11 @@ namespace AquaPic.UserInterface
         }
 
         public SceneBase CreateInstance (params object[] options) {
-            if (CreateInstanceEvent != null)
+            if (CreateInstanceEvent != null) {
                 return CreateInstanceEvent (options);
-            else
-                throw new Exception ("No screen constructor");
+            }
+
+            throw new Exception ("No screen constructor");
         }
     }
 }
