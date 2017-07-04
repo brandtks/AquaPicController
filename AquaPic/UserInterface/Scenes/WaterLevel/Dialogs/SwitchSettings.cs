@@ -250,8 +250,6 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-
-
                 JObject jobj = new JObject ();
 
                 jobj.Add (new JProperty ("name", name));

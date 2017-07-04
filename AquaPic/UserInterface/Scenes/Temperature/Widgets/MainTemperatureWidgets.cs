@@ -41,7 +41,7 @@ namespace AquaPic.UserInterface
             : base () 
         {
             text = "Temperature";
-            unitOfMeasurement = TouchWidgetLibrary.UnitsOfMeasurement.Degrees;
+            unitOfMeasurement = UnitsOfMeasurement.Degrees;
 
             var eventbox = new EventBox ();
             eventbox.VisibleWindow = false;

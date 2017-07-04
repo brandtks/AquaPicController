@@ -36,13 +36,15 @@ namespace AquaPic.UserInterface
 {
     public class WaterLevelWidget : BarPlotWidget
     {
-        private TouchLabel label;
-        private int flashUpdate;
+        string groupName;
+        TouchLabel label;
+        int flashUpdate;
 
-        public WaterLevelWidget ()
-            : base () {
+        public WaterLevelWidget (params object[] options)
+            : base () 
+        {
             text = "Water Level";
-            unitOfMeasurement = TouchWidgetLibrary.UnitsOfMeasurement.Inches;
+            unitOfMeasurement = UnitsOfMeasurement.Inches;
 
             label = new TouchLabel ();
             label.textColor = "compl";
@@ -51,6 +53,20 @@ namespace AquaPic.UserInterface
             label.textAlignment = TouchAlignment.Center;
             Put (label, 3, 55);
             label.Show ();
+
+            groupName = string.Empty;
+            if (options.Length >= 1) {
+                groupName = options[0] as string;
+                if (groupName != null) {
+                    if (!WaterLevel.CheckWaterLevelGroupKeyNoThrow (groupName)) {
+                        groupName = Temperature.defaultTemperatureGroup;
+                    }
+                } else {
+                    groupName = Temperature.defaultTemperatureGroup;
+                }
+            } else {
+                groupName = Temperature.defaultTemperatureGroup;
+            }
 
             var eventbox = new EventBox ();
             eventbox.VisibleWindow = false;
@@ -63,28 +79,36 @@ namespace AquaPic.UserInterface
             eventbox.Show ();
 
             fullScale = 15.0f;
-
             flashUpdate = 0;
-
             OnUpdate ();
         }
 
         public override void OnUpdate () {
-            if (WaterLevel.analogSensorEnabled) {
-                if (WaterLevel.analogWaterLevel < 0.0f) {
-                    currentValue = 0.0f;
+            bool usingLevel = false;
+            if (groupName.IsNotEmpty ()) {
+                var analogSensorName = WaterLevel.GetWaterLevelGroupAnalogSensorName (groupName);
+                if (analogSensorName.IsNotEmpty ()) {
+                    if (WaterLevel.GetAnalogLevelSensorEnable (analogSensorName)) {
+                        usingLevel = true;
+                        var level = WaterLevel.GetAnalogLevelSensorLevel (analogSensorName);
+                        if (level < 0.0f) {
+                            currentValue = 0.0f;
 
-                    flashUpdate = ++flashUpdate % 4;
-                    if (flashUpdate <= 1)
-                        label.Visible = true;
-                    else
-                        label.Visible = false;
-                } else {
-                    currentValue = WaterLevel.analogWaterLevel;
-                    label.Visible = false;
-                    flashUpdate = 0;
+                            flashUpdate = ++flashUpdate % 4;
+                            if (flashUpdate <= 1)
+                                label.Visible = true;
+                            else
+                                label.Visible = false;
+                        } else {
+                            currentValue = level;
+                            label.Visible = false;
+                            flashUpdate = 0;
+                        }
+                    }
                 }
-            } else {
+            }
+
+            if (!usingLevel) {
                 label.text = "Probe Disabled";
                 label.Visible = true;
             }

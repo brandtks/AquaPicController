@@ -24,7 +24,7 @@
 
 #endregion // License
 
-﻿using System;
+using System;
 using System.IO;
 using Cairo;
 using Gtk;
@@ -45,11 +45,10 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public TemperatureGroupSettings (string name, bool includeDelete) 
-            : base (name + " Temperature", includeDelete) 
-        {
+        public TemperatureGroupSettings (string name, bool includeDelete)
+            : base (name + " Temperature", includeDelete) {
             groupName = name;
-            
+
             SaveEvent += OnSave;
             DeleteButtonEvent += OnDelete;
 
@@ -157,7 +156,7 @@ namespace AquaPic.UserInterface
             if (groupName.IsEmpty ()) {
                 var name = (settings["Name"] as SettingsTextBox).textBox.text;
                 if (name == "Enter name") {
-                    MessageBox.Show ("Invalid heater name");
+                    MessageBox.Show ("Invalid temperature group name");
                     return false;
                 }
 
@@ -195,7 +194,7 @@ namespace AquaPic.UserInterface
                 Temperature.SetTemperatureGroupLowTemperatureAlarmSetpoint (groupName, lowTemperatureAlarmSetpoint);
                 Temperature.SetTemperatureGroupTemperatureSetpoint (groupName, temperatureSetpoint);
                 Temperature.SetTemperatureGroupTemperatureDeadband (groupName, temperatureDeadband);
-                
+
                 JArray ja = jo["temperatureGroups"] as JArray;
 
                 int arrIdx = -1;
@@ -219,7 +218,7 @@ namespace AquaPic.UserInterface
             }
 
             File.WriteAllText (path, jo.ToString ());
-            
+
             return true;
         }
 
@@ -231,7 +230,7 @@ namespace AquaPic.UserInterface
                         parent = null;
                 }
 
-                var ms = new TouchDialog (groupName + " is the default temperature group.\n" + 
+                var ms = new TouchDialog (groupName + " is the default temperature group.\n" +
                     "Are you sure you want to delete this group", parent);
 
                 bool confirmed = false;
@@ -248,7 +247,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
             }
-            
+
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");

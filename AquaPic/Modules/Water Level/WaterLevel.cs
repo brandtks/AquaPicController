@@ -40,112 +40,28 @@ namespace AquaPic.Modules
 {
     public partial class WaterLevel
     {
+        private static Dictionary<string, WaterLevelGroup> waterLevelGroups;
         private static Dictionary<string, WaterLevelSensor> analogLevelSensors;
         private static Dictionary<string, FloatSwitch> floatSwitches;
-        private static Dictionary<string, WaterGroup> waterGroups;
-
-        private static int highSwitchAlarmIndex;
-        private static int lowSwitchAlarmIndex;
+        private static string _defaultWaterLevelGroup;
 
         /**************************************************************************************************************/
         /* Analog Water Sensors                                                                                       */
         /**************************************************************************************************************/
         public static int analogLevelSensorCount {
             get {
-                return levelSensors.Count;
+                return analogLevelSensors.Count;
             }
         }
 
         public static string defaultAnalogLevelSensor {
             get {
-                if (levelSensors.Count > 0) {
-                    var first = levelSensors.First ();
+                if (analogLevelSensors.Count > 0) {
+                    var first = analogLevelSensors.First ();
                     return first.Key;
                 }
 
                 return string.Empty;
-            }
-        }
-
-        public static float highAnalogLevelAlarmSetpoint {
-            get {
-                return analogSensor.highAlarmSetpoint;
-            }
-            set {
-                analogSensor.highAlarmSetpoint = value;
-            }
-        }
-
-        public static float lowAnalogLevelAlarmSetpoint {
-            get {
-                return analogSensor.lowAlarmSetpoint;
-            }
-            set {
-                analogSensor.lowAlarmSetpoint = value;
-            }
-        }
-
-        public static float analogWaterLevel {
-            get {
-                return analogSensor.level;
-            }
-        }
-
-        public static float analogSensorZeroCalibrationValue {
-            get {
-                return analogSensor.zeroValue;
-            }
-        }
-
-        public static float analogSensorFullScaleCalibrationActual {
-            get {
-                return analogSensor.fullScaleActual;
-            }
-        }
-
-        public static float analogSensorFullScaleCalibrationValue {
-            get {
-                return analogSensor.fullScaleValue;
-            }
-        }
-
-        public static IndividualControl analogSensorChannel {
-            get {
-                return analogSensor.channel;
-            }
-            set {
-                if (analogSensor.channel.IsNotEmpty ()) {
-                    analogSensor.Remove ();
-                }
-
-                if (value.IsNotEmpty ()) {
-                    analogSensor.Add (value);
-                }
-            }
-        }
-
-        public static bool analogSensorEnabled {
-            get {
-                return analogSensor.enable;
-            }
-            set {
-                analogSensor.enable = value;
-                if (analogSensor.enable) {
-                    analogSensor.enableHighAlarm = true;
-                    analogSensor.enableLowAlarm = true;
-                
-                    try {
-                        analogSensor.Add (analogSensor.channel);
-                    } catch (Exception) {
-                        ; //channel already added
-                    }
-                }
-            }
-        }
-
-        public static DataLogger dataLogger {
-            get {
-                return analogSensor.dataLogger;
             }
         }
 
@@ -170,9 +86,35 @@ namespace AquaPic.Modules
         }
 
         /**************************************************************************************************************/
+        /* Default water level properties                                                                             */
+        /**************************************************************************************************************/
+        public static int waterLevelGroupCount {
+            get {
+                return waterLevelGroups.Count;
+            }
+        }
+
+        public static string defaultWaterLevelGroup {
+            get {
+                if (_defaultWaterLevelGroup.IsEmpty () && (waterLevelGroupCount > 0)) {
+                    var first = waterLevelGroups.First ();
+                    _defaultWaterLevelGroup = first.Key;
+                }
+
+                return _defaultWaterLevelGroup;
+            }
+        }
+
+        /**************************************************************************************************************/
         /* Water Level                                                                                                */
         /**************************************************************************************************************/
-        static WaterLevel () {
+        static WaterLevel () { }
+
+        public static void Init () {
+            Logger.Add ("Initializing Water Level");
+
+            waterLevelGroups = new Dictionary<string, WaterLevelGroup> ();
+            analogLevelSensors = new Dictionary<string, WaterLevelSensor> ();
             floatSwitches = new Dictionary<string, FloatSwitch> ();
 
             string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
@@ -183,93 +125,229 @@ namespace AquaPic.Modules
                 using (StreamReader reader = File.OpenText (path)) {
                     JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
-                    /******************************************************************************************************/
-                    /* Analog Sensor                                                                                      */
-                    /******************************************************************************************************/
-                    bool enable = Convert.ToBoolean (jo["enableAnalogSensor"]);
+                    /**************************************************************************************************/
+                    /* Water Level Groups                                                                             */
+                    /**************************************************************************************************/
+                    JArray ja = (JArray)jo["waterLevelGroups"];
+                    foreach (var jt in ja) {
+                        JObject obj = jt as JObject;
 
-                    float highAlarmSetpoint;
-                    string text = (string)jo["highAnalogLevelAlarmSetpoint"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        highAlarmSetpoint = 0.0f;
-                        enable = false;
-                    } else
-                        highAlarmSetpoint = Convert.ToSingle (text);
+                        var name = (string)obj["name"];
+                        var analogLevelSensorName = (string)obj["analogLevelSensorName"];
 
+                        AddWaterLevelGroup (name, analogLevelSensorName);
+                    }
 
-                    float lowAlarmSetpoint;
-                    text = (string)jo["lowAnalogLevelAlarmSetpoint"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        lowAlarmSetpoint = 0.0f;
-                        enable = false;
-                    } else
-                        lowAlarmSetpoint = Convert.ToSingle (text);
-
-                    var ic = IndividualControl.Empty;
-                    text = Convert.ToString (jo["inputCard"]);
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        enable = false;
-                    } else
-                        ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
-
-                    text = (string)jo["channel"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        ic = IndividualControl.Empty;
-                        enable = false;
-                    } else
-                        ic.Individual = Convert.ToInt32 (text);
-
-                    analogSensor = new WaterLevelSensor ("Water Level", ic, highAlarmSetpoint, lowAlarmSetpoint, enable);
-
-                    text = (string)jo["zeroCalibrationValue"];
-                    if (string.IsNullOrWhiteSpace (text))
-                        analogSensor.zeroValue = 819.2f;
-                    else {
-                        try {
-                            analogSensor.zeroValue = Convert.ToSingle (text);
-                        } catch {
-                            analogSensor.zeroValue = 819.2f;
+                    _defaultWaterLevelGroup = (string)jo["defaultTemperatureGroup"];
+                    if (!CheckWaterLevelGroupKeyNoThrow (_defaultWaterLevelGroup)) {
+                        if (waterLevelGroups.Count > 0) {
+                            var first = waterLevelGroups.First ();
+                            _defaultWaterLevelGroup = first.Key;
+                        } else {
+                            _defaultWaterLevelGroup = string.Empty;
                         }
                     }
 
-                    text = (string)jo["fullScaleCalibrationActual"];
-                    if (string.IsNullOrWhiteSpace (text))
-                        analogSensor.fullScaleActual = 15.0f;
-                    else {
-                        try {
-                            analogSensor.fullScaleActual = Convert.ToSingle (text);
-                        } catch {
-                            analogSensor.fullScaleActual = 15.0f;
+                    /**************************************************************************************************/
+                    /* Analog Sensors                                                                                 */
+                    /**************************************************************************************************/
+                    ja = (JArray)jo["analogSensors"];
+                    foreach (var jt in ja) {
+                        JObject obj = jt as JObject;
+
+                        var name = (string)obj["name"];
+
+                        bool enable = false;
+                        string text = (string)obj["enable"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                enable = Convert.ToBoolean (text);
+                            } catch {
+                                //
+                            }
                         }
+
+                        bool enableHighLevelAlarm = true;
+                        text = (string)obj["enableHighLevelAlarm"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                enableHighLevelAlarm = Convert.ToBoolean (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        float highLevelAlarmSetpoint = 0.0f;
+                        text = (string)obj["highLevelAlarmSetpoint"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                highLevelAlarmSetpoint = Convert.ToSingle (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        bool enableLowLevelAlarm = true;
+                        text = (string)obj["enableLowLevelAlarm"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                enableLowLevelAlarm = Convert.ToBoolean (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        float lowLevelAlarmSetpoint = 0.0f;
+                        text = (string)obj["lowLevelAlarmSetpoint"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                lowLevelAlarmSetpoint = Convert.ToSingle (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var ic = IndividualControl.Empty;
+                        text = (string)obj["inputCard"];
+                        if (text.IsEmpty ()) {
+                            enable = false;
+                        } else {
+                            try {
+                                ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        if (ic.Group != -1) {
+                            text = (string)obj["channel"];
+                            if (text.IsEmpty ()) {
+                                ic = IndividualControl.Empty;
+                                enable = false;
+                            } else {
+                                try {
+                                    ic.Individual = Convert.ToInt32 (text);
+                                } catch {
+                                    ic = IndividualControl.Empty;
+                                }
+                            }
+                        }
+
+                        var zeroScaleCalibrationValue = 819.2f;
+                        text = (string)obj["zeroScaleCalibrationValue"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                zeroScaleCalibrationValue = Convert.ToSingle (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var fullScaleCalibrationActual = 10.0f;
+                        text = (string)obj["fullScaleCalibrationActual"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                fullScaleCalibrationActual = Convert.ToSingle (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var fullScaleCalibrationValue = 3003.73f;
+                        text = (string)obj["fullScaleCalibrationValue"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                fullScaleCalibrationValue = Convert.ToSingle (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        AddAnalogLevelSensor (
+                            name,
+                            enable,
+                            enableHighLevelAlarm,
+                            highLevelAlarmSetpoint,
+                            enableLowLevelAlarm,
+                            lowLevelAlarmSetpoint,
+                            ic,
+                            zeroScaleCalibrationValue,
+                            fullScaleCalibrationActual,
+                            fullScaleCalibrationActual
+                        );
                     }
 
-                    text = (string)jo["fullScaleCalibrationValue"];
-                    if (string.IsNullOrWhiteSpace (text))
-                        analogSensor.fullScaleValue = 4096.0f;
-                    else {
-                        try {
-                            analogSensor.fullScaleValue = Convert.ToSingle (text);
-                        } catch {
-                            analogSensor.fullScaleValue = 4096.0f;
-                        }
-                    }
-
-                    /******************************************************************************************************/
-                    /* Float Switches                                                                                     */
-                    /******************************************************************************************************/
-                    JArray ja = (JArray)jo["floatSwitches"];
+                    /**************************************************************************************************/
+                    /* Float Switches                                                                                 */
+                    /**************************************************************************************************/
+                    ja = (JArray)jo["floatSwitches"];
                     foreach (var jt in ja) {
                         JObject obj = jt as JObject;
 
                         string name = (string)obj["name"];
-                        ic = IndividualControl.Empty;
-                        ic.Group = AquaPicDrivers.DigitalInput.GetCardIndex ((string)obj["inputCard"]);
-                        ic.Individual = Convert.ToInt32 (obj["channel"]);
-                        float physicalLevel = Convert.ToSingle (obj["physicalLevel"]);
-                        SwitchType type = (SwitchType)Enum.Parse (typeof (SwitchType), (string)obj["switchType"]);
-                        SwitchFunction function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), (string)obj["switchFuntion"]);
-                        string tString = (string)obj["timeOffset"];
-                        uint timeOffset = Timer.ParseTime (tString);
+
+                        var ic = IndividualControl.Empty;
+                        var text = (string)obj["inputCard"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                ic.Group = AquaPicDrivers.DigitalInput.GetCardIndex (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        if (ic.Group != -1) {
+                            text = (string)obj["channel"];
+                            if (text.IsEmpty ()) {
+                                ic = IndividualControl.Empty;
+                            } else {
+                                try {
+                                    ic.Individual = Convert.ToInt32 (text);
+                                } catch {
+                                    ic = IndividualControl.Empty;
+                                }
+                            }
+                        }
+
+                        var physicalLevel = 0f;
+                        text = (string)obj["physicalLevel"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                physicalLevel = Convert.ToSingle (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var type = SwitchType.NormallyOpened;
+                        text = (string)obj["switchType"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                type = (SwitchType)Enum.Parse (typeof (SwitchType), text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var function = SwitchFunction.Other;
+                        text = (string)obj["switchFuntion"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var timeOffset = 0u;
+                        text = (string)obj["timeOffset"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                timeOffset = Timer.ParseTime (text);
+                            } catch {
+                                //
+                            }
+                        }
 
                         if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed)) {
                             Logger.AddWarning ("High level switch should be normally closed");
@@ -281,198 +359,364 @@ namespace AquaPic.Modules
 
                         AddFloatSwitch (name, ic, physicalLevel, type, function, timeOffset);
                     }
-
-                    /******************************************************************************************************/
-                    /* Auto Top Off                                                                                       */
-                    /******************************************************************************************************/
-                    JObject joAto = (JObject)jo["AutoTopOff"];
-
-                    ic = IndividualControl.Empty;
-                    text = (string)joAto["reservoirInputCard"];
-                    if (text.IsNotEmpty ()) {
-                        ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
-                    }
-
-                    text = (string)joAto["reservoirChannel"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        ic = IndividualControl.Empty;
-                    } else {
-                        ic.Individual = Convert.ToInt32 (text);
-                    }
-
-                    if (ic.IsNotEmpty ()) {
-                        ato.reservoirLevel.Add (ic);
-                    }
-
-                    text = (string)joAto["reservoirZeroCalibrationValue"];
-                    if (string.IsNullOrWhiteSpace (text))
-                        ato.reservoirLevel.zeroValue = 819.2f;
-                    else {
-                        try {
-                            ato.reservoirLevel.zeroValue = Convert.ToSingle (text);
-                        } catch {
-                            ato.reservoirLevel.zeroValue = 819.2f;
-                        }
-                    }
-
-                    text = (string)joAto["reservoirFullScaleCalibrationActual"];
-                    if (string.IsNullOrWhiteSpace (text))
-                        ato.reservoirLevel.fullScaleActual = 15.0f;
-                    else {
-                        try {
-                            ato.reservoirLevel.fullScaleActual = Convert.ToSingle (text);
-                        } catch {
-                            ato.reservoirLevel.fullScaleActual = 15.0f;
-                        }
-                    }
-
-                    text = (string)joAto["reservoirFullScaleCalibrationValue"];
-                    if (string.IsNullOrWhiteSpace (text))
-                        ato.reservoirLevel.fullScaleValue = 4096.0f;
-                    else {
-                        try {
-                            ato.reservoirLevel.fullScaleValue = Convert.ToSingle (text);
-                        } catch {
-                            ato.reservoirLevel.fullScaleValue = 4096.0f;
-                        }
-                    }
-
-                    text = (string)joAto["reservoirLowLevelSetpoint"];
-                    if (string.IsNullOrWhiteSpace (text))
-                        ato.reservoirLowLevelAlarmSetpoint = 0.0f;
-                    else {
-                        try {
-                            ato.reservoirLowLevelAlarmSetpoint = Convert.ToSingle (text);
-                        } catch {
-                            ato.reservoirLowLevelAlarmSetpoint = 0.0f;
-                        }
-                    }
-
-                    try {
-                        ato.disableOnLowResevoirLevel = Convert.ToBoolean (joAto["disableOnLowResevoirLevel"]);
-                    } catch {
-                        ato.disableOnLowResevoirLevel = false;
-                    }
                 }
             } else {
-                analogSensor = new WaterLevelSensor ("Water Level", IndividualControl.Empty, 0.0f, 0.0f, false);
-
-                ato = new AutoTopOff (
-                        false,
-                        false,
-                        0.0f,
-                        0.0f,
-                        false,
-                        IndividualControl.Empty,
-                        0,
-                        uint.MaxValue);
-
                 Logger.Add ("Water level settings file did not exist, created new water level settings");
                 var file = File.Create (path);
                 file.Close ();
 
                 var jo = new JObject ();
-                jo.Add (new JProperty ("enableAnalogSensor", "false"));
-                jo.Add (new JProperty ("highAnalogLevelAlarmSetpoint", "0.0"));
-                jo.Add (new JProperty ("lowAnalogLevelAlarmSetpoint", "0.0"));
-                jo.Add (new JProperty ("zeroCalibrationValue", "819.2"));
-                jo.Add (new JProperty ("fullScaleCalibrationActual", "15.0"));
-                jo.Add (new JProperty ("fullScaleCalibrationValue", "4096.0"));
-                jo.Add (new JProperty ("inputCard", string.Empty));
-                jo.Add (new JProperty ("channel", string.Empty));
-
+                jo.Add (new JProperty ("waterLevelGroups", new JArray ()));
+                jo.Add (new JProperty ("defaultWaterLevelGroup", string.Empty));
+                jo.Add (new JProperty ("analogSensors", new JArray ()));
                 jo.Add (new JProperty ("floatSwitches", new JArray ()));
-
-                var joato = new JObject ();
-                joato.Add (new JProperty ("enableAto", "false"));
-                joato.Add (new JProperty ("useAnalogSensor", "false"));
-                joato.Add (new JProperty ("analogOnSetpoint", "0.0"));
-                joato.Add (new JProperty ("analogOffSetpoint", "0.0"));
-                joato.Add (new JProperty ("useFloatSwitch", "false"));
-                joato.Add (new JProperty ("powerStrip", string.Empty));
-                joato.Add (new JProperty ("outlet", string.Empty));
-                joato.Add (new JProperty ("maxPumpOnTime", "0"));
-                joato.Add (new JProperty ("minPumpOffTime", uint.MaxValue.ToString ()));
-                joato.Add (new JProperty ("reservoirInputCard", string.Empty));
-                joato.Add (new JProperty ("reservoirChannel", string.Empty));
-                joato.Add (new JProperty ("reservoirZeroCalibrationValue", "819.2"));
-                joato.Add (new JProperty ("reservoirFullScaleCalibrationActual", "15.0"));
-                joato.Add (new JProperty ("reservoirFullScaleCalibrationValue", "4096.0"));
-                joato.Add (new JProperty ("reservoirLowLevelSetpoint", "0.0"));
-                joato.Add (new JProperty ("disableOnLowResevoirLevel", "false"));
-                jo.Add (new JProperty ("AutoTopOff", joato));
 
                 File.WriteAllText (path, jo.ToString ());
             }
 
-            lowSwitchAlarmIndex = Alarm.Subscribe ("Low Water Level, Float Switch");
-            highSwitchAlarmIndex = Alarm.Subscribe ("High Water Level, Float Switch");
-
             TaskManager.AddCyclicInterrupt ("Water Level", 1000, Run);
         }
 
-        public static void Init () {
-            Logger.Add ("Initializing Water Level");
-        }
-
         public static void Run () {
-            analogSensor.UpdateWaterLevel ();
-
-            ato.useFloatSwitch = false; //set 'use float switch' to false, if no ATO float switch in found it remains false
-            foreach (var s in floatSwitches.Values) {
-                s.Get ();
-
-                if ((s.activated) && (analogSensor.enable) && (analogSensor.connected)) {
-                    if (s.type == SwitchType.NormallyClosed) {
-                        if (analogSensor.level > (s.physicalLevel + 1.0f)) {
-                            Logger.AddInfo ("Float switch {0} is reporting a mismatch with analog sensor", s.name);
-                        }
-                    } else {
-                        if (analogSensor.level < (s.physicalLevel - 1.0f)) {
-                            Logger.AddInfo ("Float switch {0} is reporting a mismatch with analog sensor", s.name);
-                        }
-                    }
-                }
-
-                if (s.function == SwitchFunction.HighLevel) {
-                    if (s.activated)
-                        Alarm.Post (highSwitchAlarmIndex);
-                    else {
-                        if (Alarm.CheckAlarming (highSwitchAlarmIndex))
-                            Alarm.Clear (highSwitchAlarmIndex);
-                    }
-                } else if (s.function == SwitchFunction.LowLevel) {
-                    if (s.activated)
-                        Alarm.Post (lowSwitchAlarmIndex);
-                    else {
-                        if (Alarm.CheckAlarming (lowSwitchAlarmIndex))
-                            Alarm.Clear (lowSwitchAlarmIndex);
-                    }
-                } else if (s.function == SwitchFunction.ATO) {
-                    ato.useFloatSwitch = true; //we found an ATO float switch use it
-                    ato.floatSwitchActivated = s.activated;
-                }
+            foreach (var waterLevelGroup in waterLevelGroups.Values) {
+                waterLevelGroup.Run ();
             }
-
-            ato.Run ();
         }
 
         /**************************************************************************************************************/
-        /* Auto Topoff                                                                                                */
+        /* Water Level Groups                                                                                         */
         /**************************************************************************************************************/
-        public static bool ClearAtoAlarm () {
-            if (ato.state == AutoTopOffState.Error) {
-                if (Alarm.CheckAcknowledged (atoFailedAlarmIndex)) {
-                    Alarm.Clear (atoFailedAlarmIndex);
-                    ato.state = AutoTopOffState.Standby;
-                    return true;
-                }
+        public static void AddWaterLevelGroup (string name, string analogLevelSensorName) {
+            if (!WaterLevelGroupNameOk (name)) {
+                throw new Exception (string.Format ("Water Level Group: {0} already exists", name));
             }
 
-            return false;
+            waterLevelGroups.Add (name, new WaterLevelGroup (name, analogLevelSensorName));
+
+            if (_defaultWaterLevelGroup.IsEmpty ()) {
+                _defaultWaterLevelGroup = name;
+            }
         }
 
-        public static void SetAtoReservoirCalibrationData (float zeroValue, float fullScaleActual, float fullScaleValue) {
+        public static void RemoveWaterLevelGroup (string name) {
+            CheckWaterLevelGroupKey (name);
+            waterLevelGroups.Remove (name);
+
+            if (_defaultWaterLevelGroup == name) {
+                if (waterLevelGroups.Count > 0) {
+                    var first = waterLevelGroups.First ();
+                    _defaultWaterLevelGroup = first.Key;
+                } else {
+                    _defaultWaterLevelGroup = string.Empty;
+                }
+            }
+        }
+
+        public static void CheckWaterLevelGroupKey (string name) {
+            if (!waterLevelGroups.ContainsKey (name)) {
+                throw new ArgumentException ("name");
+            }
+        }
+
+        public static bool CheckWaterLevelGroupKeyNoThrow (string name) {
+            try {
+                CheckWaterLevelGroupKey (name);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        public static bool WaterLevelGroupNameOk (string name) {
+            return !CheckWaterLevelGroupKeyNoThrow (name);
+        }
+
+        /***Getters****************************************************************************************************/
+        /***Names***/
+        public static string[] GetAllWaterLevelGroupNames () {
+            List<string> names = new List<string> ();
+            foreach (var waterLevelGroup in waterLevelGroups.Values) {
+                names.Add (waterLevelGroup.name);
+            }
+            return names.ToArray ();
+        }
+
+        /***Level***/
+        public static float GetWaterLevelGroupLevel (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].level;
+        }
+
+        /***Analog Sensor Name***/
+        public static string GetWaterLevelGroupAnalogSensorName (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].analogLevelSensorName;
+        }
+
+        /***High switch alarm index***/
+        public static int GetWaterLevelGroupHighSwitchAlarmIndex (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].highSwitchAlarmIndex;
+        }
+
+        /***Low switch alarm index***/
+        public static int GetWaterLevelGroupLowSwitchAlarmIndex (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].lowSwitchAlarmIndex;
+        }
+
+        /***Data logger***/
+        public static DataLogger GetWaterLevelGroupDataLogger (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].dataLogger;
+        }
+
+        /***Setters****************************************************************************************************/
+        /***Analog Sensor***/
+        public static void SetWaterLevelGroupAnalogSensorName (string name, string analogSensorName) {
+            CheckWaterLevelGroupKey (name);
+            CheckAnalogLevelSensorKey (analogSensorName);
+            waterLevelGroups[name].analogLevelSensorName = analogSensorName;
+        }
+
+        /**************************************************************************************************************/
+        /* Analog Level Sensor                                                                                        */
+        /**************************************************************************************************************/
+        public static void AddAnalogLevelSensor (
+            string name,
+            bool enable,
+            bool enableHighLevelAlarm,
+            float highLevelAlarmSetpoint,
+            bool enableLowLevelAlarm,
+            float lowLevelAlarmSetpoint,
+            IndividualControl ic,
+            float zeroScaleCalibrationValue,
+            float fullScaleCalibrationActual,
+            float fullScaleCalibrationValue
+        ) {
+            if (!AnalogLevelSensorNameOk (name)) {
+                throw new Exception (string.Format ("Water Level Group: {0} already exists", name));
+            }
+
+            analogLevelSensors.Add (name, new WaterLevelSensor (
+                name,
+                ic,
+                highLevelAlarmSetpoint,
+                lowLevelAlarmSetpoint,
+                enable,
+                enableHighLevelAlarm,
+                enableLowLevelAlarm
+            ));
+
+            analogLevelSensors[name].zeroScaleValue = zeroScaleCalibrationValue;
+            analogLevelSensors[name].fullScaleActual = fullScaleCalibrationActual;
+            analogLevelSensors[name].fullScaleValue = fullScaleCalibrationValue;
+        }
+
+        public static void AddAnalogLevelSensor (
+            string name,
+            bool enable,
+            bool enableHighLevelAlarm,
+            float highLevelAlarmSetpoint,
+            bool enableLowLevelAlarm,
+            float lowLevelAlarmSetpoint,
+            IndividualControl ic
+        ) {
+            if (!AnalogLevelSensorNameOk (name)) {
+                throw new Exception (string.Format ("Water Level Group: {0} already exists", name));
+            }
+
+            analogLevelSensors.Add (name, new WaterLevelSensor (
+                name,
+                ic,
+                highLevelAlarmSetpoint,
+                lowLevelAlarmSetpoint,
+                enable,
+                enableHighLevelAlarm,
+                enableLowLevelAlarm
+            ));
+        }
+
+        public static void RemoveAnalogLevelSensor (string analogLevelSensorName) {
+            CheckWaterLevelGroupKey (analogLevelSensorName);
+            analogLevelSensors[analogLevelSensorName].Remove ();
+            analogLevelSensors.Remove (analogLevelSensorName);
+        }
+
+        public static void CheckAnalogLevelSensorKey (string analogLevelSensorName) {
+            if (!analogLevelSensors.ContainsKey (analogLevelSensorName)) {
+                throw new ArgumentException ("analogLevelSensorName");
+            }
+        }
+
+        public static bool CheckAnalogLevelSensorKeyNoThrow (string analogLevelSensorName) {
+            try {
+                CheckAnalogLevelSensorKey (analogLevelSensorName);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        public static bool AnalogLevelSensorNameOk (string analogLevelSensorName) {
+            return !CheckAnalogLevelSensorKeyNoThrow (analogLevelSensorName);
+        }
+
+        /***Getters****************************************************************************************************/
+        /***Names***/
+        public static string[] GetAllAnalogLevelSensors () {
+            List<string> names = new List<string> ();
+            foreach (var analogLevelSensor in analogLevelSensors.Values) {
+                names.Add (analogLevelSensor.name);
+            }
+            return names.ToArray ();
+        }
+
+        /***Individual Control***/
+        public static IndividualControl GetAnalogLevelSensorIndividualControl (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].channel;
+        }
+
+        /***Level***/
+        public static float GetAnalogLevelSensorLevel (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].level;
+        }
+
+        /***Enable***/
+        public static bool GetAnalogLevelSensorEnable (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].enable;
+        }
+
+        /***High level alarm enable***/
+        public static bool GetAnalogLevelSensorHighLevelAlarmEnable (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].enableHighAlarm;
+        }
+
+        /***High level alarm setpoint***/
+        public static float GetAnalogLevelSensorHighLevelAlarmSetpoint (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].highAlarmSetpoint;
+        }
+
+        /***High level alarm index***/
+        public static int GetAnalogLevelSensorHighLevelAlarmIndex (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].highAlarmIndex;
+        }
+
+        /***Low level alarm enable***/
+        public static bool GetAnalogLevelSensorLowLevelAlarmEnable (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].enableLowAlarm;
+        }
+
+        /***Low level alarm setpoint***/
+        public static float GetAnalogLevelSensorLowLevelAlarmSetpoint (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].lowAlarmSetpoint;
+        }
+
+        /***Low level alarm index***/
+        public static int GetAnalogLevelSensorLowLevelAlarmIndex (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].lowAlarmIndex;
+        }
+
+        /***Disconnected alarm enable***/
+        public static bool GetAnalogLevelSensorDisconnectedAlarmEnable (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].enableDisconnectedAlarm;
+        }
+
+        /***Disconnected alarm index***/
+        public static int GetAnalogLevelSensorDisconnectedAlarmIndex (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].disconnectedAlarmIndex;
+        }
+
+        /***Zero scale value***/
+        public static float GetAnalogLevelSensorZeroScaleValue (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].zeroScaleValue;
+        }
+
+        /***Full scale actual***/
+        public static float GetAnalogLevelSensorFullScaleActual (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].fullScaleActual;
+        }
+
+        /***Full scale value***/
+        public static float GetAnalogLevelSensorFullScaleValue (string analogLevelSensorName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            return analogLevelSensors[analogLevelSensorName].fullScaleValue;
+        }
+
+        /***Setters****************************************************************************************************/
+        /***Name***/
+        public static void SetAnalogLevelSensorName (string oldAnalogLevelSensorName, string newAnalogLevelSensorName) {
+            CheckAnalogLevelSensorKey (oldAnalogLevelSensorName);
+            if (!AnalogLevelSensorNameOk (newAnalogLevelSensorName)) {
+                throw new Exception (string.Format ("Water Level Group: {0} already exists", newAnalogLevelSensorName));
+            }
+
+            var analogLevelSensor = analogLevelSensors[oldAnalogLevelSensorName];
+            analogLevelSensor.SetName (newAnalogLevelSensorName);
+            analogLevelSensors.Remove (oldAnalogLevelSensorName);
+            analogLevelSensors.Add(newAnalogLevelSensorName, analogLevelSensor);
+        }
+
+        /***Enable***/
+        public static void SetAnalogLevelSensorEnable (string analogLevelSensorName, bool enable) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            analogLevelSensors[analogLevelSensorName].enable = enable;
+        }
+
+        /***Individual Control***/
+        public static void SetAnalogLevelSensorIndividualControl (string analogLevelSensorName, IndividualControl channel) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            analogLevelSensors[analogLevelSensorName].Remove ();
+            analogLevelSensors[analogLevelSensorName].Add (channel);
+        }
+
+        /***High level alarm enable***/
+        public static void SetAnalogLevelSensorHighLevelAlarmEnable (string analogLevelSensorName, bool enableHighLevelAlarm) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            analogLevelSensors[analogLevelSensorName].enableHighAlarm = enableHighLevelAlarm;
+        }
+
+        /***High level alarm setpoint***/
+        public static void SetAnalogLevelSensorHighLevelAlarmSetpoint (string analogLevelSensorName, float highLevelAlarmSetpoint) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            analogLevelSensors[analogLevelSensorName].highAlarmSetpoint = highLevelAlarmSetpoint;
+        }
+
+        /***Low level alarm enable***/
+        public static void SetAnalogLevelSensorLowLevelAlarmEnable (string analogLevelSensorName, bool enableLowLevelAlarm) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            analogLevelSensors[analogLevelSensorName].enableLowAlarm = enableLowLevelAlarm;
+        }
+
+        /***Low level alarm setpoint***/
+        public static void SetAnalogLevelSensorLowLevelAlarmSetpoint (string analogLevelSensorName, float lowLevelAlarmSetpoint) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            analogLevelSensors[analogLevelSensorName].lowAlarmSetpoint = lowLevelAlarmSetpoint;
+        }
+
+        /***Disconnected alarm enable***/
+        public static void SetAnalogLevelSensorDisconnectedAlarmEnable (string analogLevelSensorName, bool enableDisconnectedAlarm) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            analogLevelSensors[analogLevelSensorName].enableDisconnectedAlarm = enableDisconnectedAlarm;
+        }
+
+        /***Calibration data***/
+        public static bool SetCalibrationData (string name, float zeroValue, float fullScaleActual, float fullScaleValue) {
+            CheckAnalogLevelSensorKey (name);
+
             if (fullScaleValue <= zeroValue)
                 throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
 
@@ -482,53 +726,38 @@ namespace AquaPic.Modules
             if (fullScaleActual > 15.0f)
                 throw new ArgumentException ("Full scale actual can't be greater than 15");
 
-            ato.reservoirLevel.zeroValue = zeroValue;
-            ato.reservoirLevel.fullScaleActual = fullScaleActual;
-            ato.reservoirLevel.fullScaleValue = fullScaleValue;
+            analogLevelSensors[name].zeroScaleValue = zeroValue;
+            analogLevelSensors[name].fullScaleActual = fullScaleActual;
+            analogLevelSensors[name].fullScaleValue = fullScaleValue;
 
             string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
             path = Path.Combine (path, "waterLevelProperties.json");
 
-            string jstring = File.ReadAllText (path);
-            JObject jo = (JObject)JToken.Parse (jstring);
+            string json = File.ReadAllText (path);
+            JObject jo = (JObject)JToken.Parse (json);
+            JArray ja = jo["analogSensors"] as JArray;
 
-            jo["AutoTopOff"]["reservoirZeroCalibrationValue"] = ato.reservoirLevel.zeroValue.ToString ();
-            jo["AutoTopOff"]["reservoirFullScaleCalibrationActual"] = ato.reservoirLevel.fullScaleActual.ToString ();
-            jo["AutoTopOff"]["reservoirFullScaleCalibrationValue"] = ato.reservoirLevel.fullScaleValue.ToString ();
+            int arrayIndex = -1;
+            for (int i = 0; i < ja.Count; ++i) {
+                string n = (string)ja[i]["name"];
+                if (name == n) {
+                    arrayIndex = i;
+                    break;
+                }
+            }
 
-            File.WriteAllText (path, jo.ToString ());
-        }
+            if (arrayIndex == -1) {
+                return false;
+            }
 
-        /**************************************************************************************************************/
-        /* Analog Sensor                                                                                              */
-        /**************************************************************************************************************/
-        public static void SetCalibrationData (float zeroValue, float fullScaleActual, float fullScaleValue) {
-            if (fullScaleValue <= zeroValue)
-                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
-
-            if (fullScaleActual < 0.0f)
-                throw new ArgumentException ("Full scale actual can't be less than zero");
-
-            if (fullScaleActual > 15.0f)
-                throw new ArgumentException ("Full scale actual can't be greater than 15");
-
-            analogSensor.zeroValue = zeroValue;
-            analogSensor.fullScaleActual = fullScaleActual;
-            analogSensor.fullScaleValue = fullScaleValue;
-
-            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
-            path = Path.Combine (path, "waterLevelProperties.json");
-
-            string jstring = File.ReadAllText (path);
-            JObject jo = (JObject)JToken.Parse (jstring);
-
-            jo ["zeroCalibrationValue"] = analogSensor.zeroValue.ToString ();
-            jo ["fullScaleCalibrationActual"] = analogSensor.fullScaleActual.ToString ();
-            jo ["fullScaleCalibrationValue"] = analogSensor.fullScaleValue.ToString ();
+            ja[arrayIndex]["zeroCalibrationValue"] = analogLevelSensors[name].zeroScaleValue.ToString ();
+            ja[arrayIndex]["fullScaleCalibrationActual"] = analogLevelSensors[name].fullScaleActual.ToString ();
+            ja[arrayIndex]["fullScaleCalibrationValue"] = analogLevelSensors[name].fullScaleValue.ToString ();
 
             File.WriteAllText (path, jo.ToString ());
+
+            return true;
         }
 
         /**************************************************************************************************************/
@@ -546,23 +775,19 @@ namespace AquaPic.Modules
                 throw new Exception (string.Format ("Float Switch: {0} already exists", name));
             }
 
-            if (!FloatSwitchFunctionOk (function)) {
-                throw new Exception (string.Format ("Float Switch: {0} function already exists", function));
-            }
-
-            floatSwitches[name] = new FloatSwitch (
+            floatSwitches.Add (name, new FloatSwitch (
                 name,
                 type,
                 function,
                 physicalLevel,
                 channel,
-                timeOffset);
+                timeOffset));
         }
 
         public static void RemoveFloatSwitch (string floatSwitchName) {
             CheckFloatSwitchKey (floatSwitchName);
-            floatSwitches[floatSwitchName].Remove ();
-            floatSwitches.Remove (floatSwitchName);
+            floatSwitches[floatSwitchName].Remove ();   // this removes the physical digital input
+            floatSwitches.Remove (floatSwitchName);     // this removes the entry from the dictionary
         }
 
         public static void CheckFloatSwitchKey (string floatSwitchName) {
@@ -584,15 +809,6 @@ namespace AquaPic.Modules
             return !CheckFloatSwitchKeyNoThrow (floatSwitchName);
         }
 
-        public static bool FloatSwitchFunctionOk (SwitchFunction function) {
-            foreach (var fs in floatSwitches.Values) {
-                if (function == fs.function)
-                    return false;
-            }
-
-            return true;
-        }
-
         /***Getters****************************************************************************************************/
         /***Names***/
         public static string[] GetAllFloatSwitches () {
@@ -603,34 +819,46 @@ namespace AquaPic.Modules
             return names.ToArray ();
         }
 
+        /***Individual Control***/
+        public static IndividualControl GetFloatSwitchIndividualControl (string floatSwitchName) {
+            CheckFloatSwitchKey (floatSwitchName);
+            return floatSwitches[floatSwitchName].channel;
+        }
+
+        /***State***/
         public static bool GetFloatSwitchState (string floatSwitchName) {
             CheckFloatSwitchKey (floatSwitchName);
             return floatSwitches[floatSwitchName].activated;
         }
 
+        /***Water level group name***/
+        public static string GetFloatSwitchWaterLevelGroupName (string floatSwitchName) {
+            CheckFloatSwitchKey (floatSwitchName);
+            return floatSwitches[floatSwitchName].waterLevelGroupName;
+        }
+
+        /***Type***/
         public static SwitchType GetFloatSwitchType (string floatSwitchName) {
             CheckFloatSwitchKey (floatSwitchName);
             return floatSwitches[floatSwitchName].type;
         }
 
+        /***Function***/
         public static SwitchFunction GetFloatSwitchFunction (string floatSwitchName) {
             CheckFloatSwitchKey (floatSwitchName);
             return floatSwitches[floatSwitchName].function;
         }
 
+        /***Physical Level***/
         public static float GetFloatSwitchPhysicalLevel (string floatSwitchName) {
             CheckFloatSwitchKey (floatSwitchName);
             return floatSwitches[floatSwitchName].physicalLevel;
         }
 
+        /***Time Offset***/
         public static uint GetFloatSwitchTimeOffset (string floatSwitchName) {
             CheckFloatSwitchKey (floatSwitchName);
             return floatSwitches[floatSwitchName].onDelayTimer.timerInterval;
-        }
-
-        public static IndividualControl GetFloatSwitchIndividualControl (string floatSwitchName) {
-            CheckFloatSwitchKey (floatSwitchName);
-            return floatSwitches[floatSwitchName].channel;
         }
 
         /***Setters****************************************************************************************************/
@@ -649,31 +877,32 @@ namespace AquaPic.Modules
             floatSwitches[newSwitchName] = floatSwitch;
         }
 
+        /***Individual Control***/
         public static void SetFloatSwitchIndividualControl (string floatSwitchName, IndividualControl ic) {
             CheckFloatSwitchKey (floatSwitchName);
             floatSwitches[floatSwitchName].Remove ();
             floatSwitches[floatSwitchName].Add (ic);
         }
 
-        public static void SetFloatSwitchPhysicalLevel (string floatSwitchName, float physicalLevel) {
-            CheckFloatSwitchKey (floatSwitchName);
-            floatSwitches[floatSwitchName].physicalLevel = physicalLevel;
-        }
-
+        /***Type***/
         public static void SetFloatSwitchType (string floatSwitchName, SwitchType type) {
             CheckFloatSwitchKey (floatSwitchName);
             floatSwitches[floatSwitchName].type = type;
         }
 
+        /***Function***/
         public static void SetFloatSwitchFunction (string floatSwitchName, SwitchFunction function) {
             CheckFloatSwitchKey (floatSwitchName);
-            if (FloatSwitchFunctionOk (function)) {
-                throw new Exception (string.Format ("Float Switch: {0} function already exists", function));
-            }
-
             floatSwitches[floatSwitchName].function = function;
         }
 
+        /***Physical Level***/
+        public static void SetFloatSwitchPhysicalLevel (string floatSwitchName, float physicalLevel) {
+            CheckFloatSwitchKey (floatSwitchName);
+            floatSwitches[floatSwitchName].physicalLevel = physicalLevel;
+        }
+
+        /***Time Offset***/
         public static void SetFloatSwitchTimeOffset (string floatSwitchName, uint timeOffset) {
             CheckFloatSwitchKey (floatSwitchName);
             floatSwitches[floatSwitchName].onDelayTimer.timerInterval = timeOffset;

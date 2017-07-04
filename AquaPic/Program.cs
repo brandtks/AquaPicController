@@ -109,7 +109,10 @@ namespace AquaPic
             foreach (var group in groups) {
                 Temperature.GetTemperatureGroupDataLogger (group).DeleteAllLogFiles ();
             }
-            WaterLevel.dataLogger.DeleteAllLogFiles ();
+            groups = WaterLevel.GetAllWaterLevelGroupNames ();
+            foreach (var group in groups) {
+                WaterLevel.GetWaterLevelGroupDataLogger (group).DeleteAllLogFiles ();
+            }
 #endif
         }
 

@@ -53,6 +53,7 @@ namespace AquaPic.Sensors
                 return _temperature;
             }
         }
+
         public string temperatureGroupName;
 
         public float zeroActual;
@@ -63,9 +64,8 @@ namespace AquaPic.Sensors
         public int probeDisconnectedAlarmIndex;
 
         public TemperatureProbe (
-            string name, 
-            int cardId, 
-            int channelId,
+            string name,
+            IndividualControl channel,
             float zeroActual,
             float zeroValue,
             float fullScaleActual,
@@ -73,9 +73,7 @@ namespace AquaPic.Sensors
             string temperatureGroupName) 
         {
             _name = name;
-            _channel = IndividualControl.Empty;
-            _channel.Group = cardId;
-            _channel.Individual = channelId;
+            _channel = channel;
             this.zeroActual = zeroActual;
             this.zeroValue = zeroValue;
             this.fullScaleActual = fullScaleActual;

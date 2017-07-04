@@ -42,8 +42,7 @@ namespace AquaPic.UserInterface
             };
 
             barPlots = new Dictionary<string, BarPlotData> () {
-                { "Water Level", new BarPlotData (() => {return new WaterLevelWidget ();}) },
-                { "ATO Reservoir Level", new BarPlotData (() => {return new AtoReservoirLevelWidget ();}) }
+                { "Water Level", new BarPlotData ((options) => {return new WaterLevelWidget (options);}) }
             };
 
             curvedBarPlots = new Dictionary<string, CurvedBarPlotData> ();

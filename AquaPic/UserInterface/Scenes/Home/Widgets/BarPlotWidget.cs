@@ -31,7 +31,7 @@ using TouchWidgetLibrary;
 
 namespace AquaPic.UserInterface
 {
-    public delegate BarPlotWidget CreateBarPlotHandler ();
+    public delegate BarPlotWidget CreateBarPlotHandler (params object[] options);
 
     public class BarPlotData
     {
@@ -41,9 +41,9 @@ namespace AquaPic.UserInterface
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 
-        public BarPlotWidget CreateInstance () {
+        public BarPlotWidget CreateInstance (params object[] options) {
             if (CreateInstanceEvent != null)
-                return CreateInstanceEvent ();
+                return CreateInstanceEvent (options);
             else
                 throw new Exception ("No bar plot constructor implemented");
         }

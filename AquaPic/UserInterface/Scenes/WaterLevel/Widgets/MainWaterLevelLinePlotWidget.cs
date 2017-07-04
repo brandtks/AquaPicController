@@ -36,13 +36,14 @@ namespace AquaPic.UserInterface
 {
     public class WaterLevelLinePlot : LinePlotWidget
     {
+        string groupName;
         TouchLabel label;
         
         public WaterLevelLinePlot (params object[] options) 
             : base () 
         {
             text = "Water Level";
-            unitOfMeasurement = TouchWidgetLibrary.UnitsOfMeasurement.Inches;
+            unitOfMeasurement = UnitsOfMeasurement.Inches;
 
             var eventbox = new EventBox ();
             eventbox.VisibleWindow = false;
@@ -61,8 +62,32 @@ namespace AquaPic.UserInterface
             label.textHorizontallyCentered = true;
             Put (label, 155, 63);
 
+            groupName = string.Empty;
+            if (options.Length >= 1) {
+                groupName = options[0] as string;
+                if (groupName != null) {
+                    if (!WaterLevel.CheckWaterLevelGroupKeyNoThrow (groupName)) {
+                        groupName = Temperature.defaultTemperatureGroup;
+                    }
+                } else {
+                    groupName = Temperature.defaultTemperatureGroup;
+                }
+            } else {
+                groupName = Temperature.defaultTemperatureGroup;
+            }
+
+            if (groupName.IsNotEmpty ()) {
+                var dataLogger = WaterLevel.GetWaterLevelGroupDataLogger (groupName);
+                linePlot.LinkDataLogger (dataLogger);
+
+                Destroyed += (obj, args) => {
+                    linePlot.UnLinkDataLogger (dataLogger);
+                };
+
+                text = string.Format ("{0} Temperature", groupName);
+            }
+
             linePlot.rangeMargin = 1;
-            linePlot.LinkDataLogger (WaterLevel.dataLogger);
             linePlot.eventColors.Add ("probe disconnected", new TouchColor ("secb", 0.25));
             linePlot.eventColors.Add ("ato started", new TouchColor ("seca", 0.5));
             linePlot.eventColors.Add ("ato stopped", new TouchColor ("secc", 0.5));
@@ -70,27 +95,32 @@ namespace AquaPic.UserInterface
             linePlot.eventColors.Add ("low alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("high alarm", new TouchColor ("compl", 0.25));
 
-            Destroyed += (obj, args) => {
-                linePlot.UnLinkDataLogger (WaterLevel.dataLogger);
-            };
-
             OnUpdate ();
         }
 
         public override void OnUpdate () {
-            if (WaterLevel.analogSensorEnabled) {
-                if (WaterLevel.analogWaterLevel < 0.0f) {
-                    textBox.text = "--";
-                    label.Visible = true;
-                    label.text = "Disconnected";
-                } else {
-                    currentValue = WaterLevel.analogWaterLevel;
-                    label.Visible = false;
+            bool usingLevel = false;
+            if (groupName.IsNotEmpty ()) {
+                var analogSensorName = WaterLevel.GetWaterLevelGroupAnalogSensorName (groupName);
+                if (analogSensorName.IsNotEmpty ()) {
+                    if (WaterLevel.GetAnalogLevelSensorEnable (analogSensorName)) {
+                        usingLevel = true;
+                        var level = WaterLevel.GetAnalogLevelSensorLevel (analogSensorName);
+                        if (level < 0.0f) {
+                            textBox.text = "--";
+                            label.Visible = true;
+                            label.text = "Disconnected";
+                        } else {
+                            currentValue = level;
+                            label.Visible = false;
+                        }
+                    }
                 }
-            } else {
-                textBox.text = "--";
+            } 
+
+            if (!usingLevel) {
+                label.text = "Probe Disabled";
                 label.Visible = true;
-                label.text = "Disabled";
             }
         }
     }

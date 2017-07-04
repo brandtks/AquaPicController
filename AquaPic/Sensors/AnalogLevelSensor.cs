@@ -54,20 +54,25 @@ namespace AquaPic.Sensors
             }
         }
 
-        public float zeroValue;
+        public float zeroScaleValue;
         public float fullScaleActual;
         public float fullScaleValue;
 
-        public int sensorDisconnectedAlarmIndex = -1;
+        private int _sensorDisconnectedAlarmIndex;
+        public int disconnectedAlarmIndex {
+            get {
+                return _sensorDisconnectedAlarmIndex;
+            }
+        }
         public bool enableDisconnectedAlarm {
             get {
-                return sensorDisconnectedAlarmIndex != -1;
+                return disconnectedAlarmIndex != -1;
             }
             set {
                 if (value) {
-                    sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
+                    _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
                 } else {
-                    sensorDisconnectedAlarmIndex = -1;
+                    _sensorDisconnectedAlarmIndex = -1;
                 }
             }
         }
@@ -77,11 +82,11 @@ namespace AquaPic.Sensors
             _name = name;
             _level = 0.0f;
 
-            zeroValue = 819.2f;
+            zeroScaleValue = 819.2f;
             fullScaleActual = 15.0f;
             fullScaleValue = 4096.0f;
 
-            sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
+            _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
             Add (ic);
         }
 
@@ -105,15 +110,15 @@ namespace AquaPic.Sensors
 
         public float Get () {
             _level = AquaPicDrivers.AnalogInput.GetChannelValue (_channel);
-            _level = _level.Map (zeroValue, fullScaleValue, 0.0f, fullScaleActual);
+            _level = _level.Map (zeroScaleValue, fullScaleValue, 0.0f, fullScaleActual);
 
             if (_level < 0.0f) {
-                if (!Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
-                    Alarm.Post (sensorDisconnectedAlarmIndex);
+                if (!Alarm.CheckAlarming (_sensorDisconnectedAlarmIndex)) {
+                    Alarm.Post (_sensorDisconnectedAlarmIndex);
                 }
             } else {
-                if (Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
-                    Alarm.Clear (sensorDisconnectedAlarmIndex);
+                if (Alarm.CheckAlarming (_sensorDisconnectedAlarmIndex)) {
+                    Alarm.Clear (_sensorDisconnectedAlarmIndex);
                 }
             }
 

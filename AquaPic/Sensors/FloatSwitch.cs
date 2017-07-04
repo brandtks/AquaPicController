@@ -90,6 +90,7 @@ namespace AquaPic.Sensors
 
         public SwitchFunction function;
         public float physicalLevel;
+        public string waterLevelGroupName;
 
         public FloatSwitch (
             string name,

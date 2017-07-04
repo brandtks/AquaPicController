@@ -41,10 +41,11 @@ namespace AquaPic.UserInterface
         }
 
         public LinePlotWidget CreateInstance (params object[] options) {
-            if (CreateInstanceEvent != null)
+            if (CreateInstanceEvent != null) {
                 return CreateInstanceEvent (options);
-            else
-                throw new Exception ("No line plot constructor implemented");
+            }
+
+            throw new Exception ("No line plot constructor implemented");
         }
     }
 

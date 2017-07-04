@@ -331,6 +331,49 @@ namespace AquaPic.Modules
                 _state = AutoTopOffState.Standby;
             }
         }
+
+        /**************************************************************************************************************/
+        /* Auto Topoff                                                                                                */
+        /**************************************************************************************************************/
+        public static bool ClearAtoAlarm () {
+            if (ato.state == AutoTopOffState.Error) {
+                if (Alarm.CheckAcknowledged (atoFailedAlarmIndex)) {
+                    Alarm.Clear (atoFailedAlarmIndex);
+                    ato.state = AutoTopOffState.Standby;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static void SetAtoReservoirCalibrationData (float zeroValue, float fullScaleActual, float fullScaleValue) {
+            if (fullScaleValue <= zeroValue)
+                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
+
+            if (fullScaleActual < 0.0f)
+                throw new ArgumentException ("Full scale actual can't be less than zero");
+
+            if (fullScaleActual > 15.0f)
+                throw new ArgumentException ("Full scale actual can't be greater than 15");
+
+            ato.reservoirLevel.zeroValue = zeroValue;
+            ato.reservoirLevel.fullScaleActual = fullScaleActual;
+            ato.reservoirLevel.fullScaleValue = fullScaleValue;
+
+            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
+            path = Path.Combine (path, "Settings");
+            path = Path.Combine (path, "waterLevelProperties.json");
+
+            string jstring = File.ReadAllText (path);
+            JObject jo = (JObject)JToken.Parse (jstring);
+
+            jo["AutoTopOff"]["reservoirZeroCalibrationValue"] = ato.reservoirLevel.zeroValue.ToString ();
+            jo["AutoTopOff"]["reservoirFullScaleCalibrationActual"] = ato.reservoirLevel.fullScaleActual.ToString ();
+            jo["AutoTopOff"]["reservoirFullScaleCalibrationValue"] = ato.reservoirLevel.fullScaleValue.ToString ();
+
+            File.WriteAllText (path, jo.ToString ());
+        }
     }
 }
 

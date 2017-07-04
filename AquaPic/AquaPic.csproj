@@ -176,9 +176,7 @@
     <Compile Include="UserInterface\Scenes\Temperature\Widgets\MainTemperatureWidgets.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\WaterLevelScreen.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AnalogSensorSettings.cs" />
-    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AtoSettings.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\SwitchSettings.cs" />
-    <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainAtoReservoirLevelBarPlotWidget.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainWaterLevelBarPlotWidget.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainWaterLevelLinePlotWidget.cs" />
     <Compile Include="UserInterface\TouchWidgetLibrary\TouchButton.cs" />
@@ -202,9 +200,9 @@
     <Compile Include="Sensors\ISensor.cs" />
     <Compile Include="Equipment\IEquipment.cs" />
     <Compile Include="Equipment\Pump.cs" />
-    <Compile Include="Modules\ATO\AutoTopOff.cs" />
-    <Compile Include="Modules\Water Level\WaterGroup.cs" />
+    <Compile Include="Modules\Water Level\WaterLevelGroup.cs" />
     <Compile Include="Sensors\WaterLevelSensor.cs" />
+    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\WaterGroupSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -219,6 +217,10 @@
     <None Include="Runtime\Plugin.Disable\ModuleScript.cs" />
     <None Include="UserInterface\Scenes\Plugin.Disable\EditPluginScreen.cs" />
     <None Include="UserInterface\Scenes\Plugin.Disable\PluginScreen.cs" />
+    <None Include="UserInterface\Scenes\ATO\Dialogs\AtoSettings.cs" />
+    <None Include="UserInterface\Scenes\ATO\AtoScreen.cs" />
+    <None Include="Modules\ATO\AutoTopOff.cs" />
+    <None Include="UserInterface\Scenes\WaterLevel\Widgets\MainAtoReservoirLevelBarPlotWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Operands\" />
@@ -227,5 +229,8 @@
     <Folder Include="Operands\Value\" />
     <Folder Include="Equipment\" />
     <Folder Include="Modules\ATO\" />
+    <Folder Include="UserInterface\Scenes\ATO\" />
+    <Folder Include="UserInterface\Scenes\ATO\Dialogs\" />
+    <Folder Include="UserInterface\Scenes\ATO\Widgets\" />
   </ItemGroup>
 </Project>

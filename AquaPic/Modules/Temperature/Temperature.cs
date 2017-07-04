@@ -177,10 +177,14 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Temperature                                                                                                */
         /**************************************************************************************************************/
-        static Temperature () {
-            heaters = new Dictionary<string,Heater> ();
-            probes = new Dictionary<string,TemperatureProbe> ();
-            temperatureGroups = new Dictionary<string,TemperatureGroup> ();
+        static Temperature () { }
+
+        public static void Init () {
+            Logger.Add ("Initializing Temperature");
+
+            heaters = new Dictionary<string, Heater> ();
+            probes = new Dictionary<string, TemperatureProbe> ();
+            temperatureGroups = new Dictionary<string, TemperatureGroup> ();
 
             string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = Path.Combine (path, "Settings");
@@ -197,17 +201,17 @@ namespace AquaPic.Modules
                     foreach (var jt in ja) {
                         var obj = jt as JObject;
                         var name = (string)obj["name"];
-                        var highTemperatureAlarmSetpoint = Convert.ToSingle (obj["highTemperatureAlarmSetpoint"]);
-                        var lowTemperatureAlarmSetpoint = Convert.ToSingle (obj["lowTemperatureAlarmSetpoint"]);
-                        var temperatureSetpoint = Convert.ToSingle (obj["temperatureSetpoint"]);
-                        var temperatureDeadband = Convert.ToSingle (obj["temperatureDeadband"]);
+                        var highTempSetpoint = Convert.ToSingle (obj["highTemperatureAlarmSetpoint"]);
+                        var lowTempSetpoint = Convert.ToSingle (obj["lowTemperatureAlarmSetpoint"]);
+                        var tempSetpoint = Convert.ToSingle (obj["temperatureSetpoint"]);
+                        var tempDeadband = Convert.ToSingle (obj["temperatureDeadband"]);
 
                         AddTemperatureGroup (
                             name,
-                            highTemperatureAlarmSetpoint,
-                            lowTemperatureAlarmSetpoint,
-                            temperatureSetpoint,
-                            temperatureDeadband);
+                            highTempSetpoint,
+                            lowTempSetpoint,
+                            tempSetpoint,
+                            tempDeadband);
                     }
 
                     _defaultTemperatureGroup = (string)jo["defaultTemperatureGroup"];
@@ -227,8 +231,29 @@ namespace AquaPic.Modules
                     foreach (var jt in ja) {
                         JObject obj = jt as JObject;
                         string name = (string)obj["name"];
-                        int cardId = AquaPicDrivers.AnalogInput.GetCardIndex ((string)obj["inputCard"]);
-                        int channelId = Convert.ToInt32 (obj["channel"]);
+
+                        var ic = IndividualControl.Empty;
+                        var text = (string)obj["inputCard"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        if (ic.Group != -1) {
+                            text = (string)obj["channel"];
+                            if (text.IsEmpty ()) {
+                                ic = IndividualControl.Empty;
+                            } else {
+                                try {
+                                    ic.Individual = Convert.ToInt32 (text);
+                                } catch {
+                                    ic = IndividualControl.Empty;
+                                }
+                            }
+                        }
 
                         float zeroActual;
                         try {
@@ -265,8 +290,7 @@ namespace AquaPic.Modules
 
                         AddTemperatureProbe (
                             name,
-                            cardId,
-                            channelId,
+                            ic,
                             zeroActual,
                             zeroValue,
                             fullScaleActual,
@@ -309,15 +333,12 @@ namespace AquaPic.Modules
             TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);
         }
 
-        public static void Init () {
-            Logger.Add ("Initializing Temperature");
-        }
-
         public static void Run () {
-            foreach (var group in temperatureGroups.Values) {
-                group.Run ();
+            foreach (var tempGroup in temperatureGroups.Values) {
+                tempGroup.Run ();
             }
 
+            // Get the value of the all the temperature probes no assigned to a group
             foreach (var probe in probes.Values) {
                 if (!CheckTemperatureGroupKeyNoThrow (probe.temperatureGroupName)) {
                     probe.Get ();
@@ -447,6 +468,7 @@ namespace AquaPic.Modules
             return temperatureGroups[name].lowTemperatureAlarmIndex;
         }
 
+        /***Data logger***/
         public static DataLogger GetTemperatureGroupDataLogger (string name) {
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].dataLogger;
@@ -478,107 +500,15 @@ namespace AquaPic.Modules
         }
 
         /**************************************************************************************************************/
-        /* Heaters                                                                                                    */
-        /**************************************************************************************************************/
-        public static void AddHeater (string name, int powerID, int plugID, string temperatureGroupName) {
-            if (!HeaterNameOk (name)) {
-                throw new Exception (string.Format ("Heater: {0} already exists", name));
-            }
-            
-            heaters [name] = new Heater (name, powerID, plugID, temperatureGroupName);
-        }
-
-        public static void RemoveHeater (string heaterName) {
-            CheckHeaterKey (heaterName);
-            Power.RemoveOutlet (heaters[heaterName].plug);
-            Power.RemoveHandlerOnStateChange (heaters[heaterName].plug, heaters[heaterName].OnStateChange);
-            heaters.Remove (heaterName);
-        }
-
-        public static void CheckHeaterKey (string heaterName) {
-            if (!heaters.ContainsKey (heaterName)) {
-                throw new ArgumentException ("heaterName");
-            }
-        }
-
-        public static bool CheckHeaterKeyNoThrow (string heaterName) {
-            try {
-                CheckHeaterKey (heaterName);
-                return true;
-            } catch {
-                return false;
-            }
-        }
-
-        public static bool HeaterNameOk (string heaterName) {
-            return !CheckHeaterKeyNoThrow (heaterName);
-        }
-
-        /***Getters****************************************************************************************************/
-        /***Names***/
-        public static string[] GetAllHeaterNames () {
-            List<string> names = new List<string> ();
-            foreach (var heater in heaters.Values) {
-                names.Add (heater.name);
-            }
-            return names.ToArray ();
-        }
-
-        /***Individual Control***/
-        public static IndividualControl GetHeaterIndividualControl (string heaterName) {
-            CheckHeaterKey (heaterName);
-            return heaters[heaterName].plug;
-        }
-
-        /***Temperature group name***/
-        public static string GetHeaterTemperatureGroupName (string heaterName) {
-            CheckHeaterKey (heaterName);
-            return heaters[heaterName].temperatureGroupName;
-        }
-
-        /***Setters****************************************************************************************************/
-        /***Name***/
-        public static void SetHeaterName (string oldHeaterName, string newHeaterName) {
-            CheckHeaterKey (oldHeaterName);
-            if (!HeaterNameOk (newHeaterName)) {
-                throw new Exception (string.Format ("Heater: {0} already exists", newHeaterName));
-            }
-
-            var heater = heaters[oldHeaterName];
-            
-            heater.name = newHeaterName;
-            Power.SetOutletName (heater.plug, heater.name);
-            
-            heaters.Remove (oldHeaterName);
-            heaters[newHeaterName] = heater;
-        }
-
-        /***Individual Control***/
-        public static void SetHeaterIndividualControl (string heaterName, IndividualControl ic) {
-            CheckHeaterKey (heaterName);
-            Power.RemoveOutlet (heaters[heaterName].plug);
-            heaters[heaterName].plug = ic;
-            var coil = Power.AddOutlet (heaters[heaterName].plug, heaters[heaterName].name, MyState.On, "Temperature");
-            coil.ConditionGetter = heaters[heaterName].OnPlugControl;
-        }
-
-        /***Temperature group***/
-        public static void SetHeaterTemperatureGroupName (string heaterName, string temperatureGroupName) {
-            CheckHeaterKey (heaterName);
-            heaters[heaterName].temperatureGroupName = temperatureGroupName;
-        }
-        
-        /**************************************************************************************************************/
         /* Temperature Probes                                                                                         */
         /**************************************************************************************************************/
         public static void AddTemperatureProbe (
-            string name, 
-            int cardID, 
-            int channelID, 
-            float zeroActual, 
-            float zeroValue, 
-            float fullScaleActual, 
-            float fullScaleValue, 
+            string name,
+            IndividualControl channel,
+            float zeroActual,
+            float zeroValue,
+            float fullScaleActual,
+            float fullScaleValue,
             string temperatureGroupName
         ) {
             if (!TemperatureProbeNameOk (name)) {
@@ -586,12 +516,11 @@ namespace AquaPic.Modules
             }
 
             probes[name] = new TemperatureProbe (
-                name, 
-                cardID, 
-                channelID, 
-                zeroActual, 
-                zeroValue, 
-                fullScaleActual, 
+                name,
+                channel,
+                zeroActual,
+                zeroValue,
+                fullScaleActual,
                 fullScaleValue,
                 temperatureGroupName);
         }
@@ -691,9 +620,9 @@ namespace AquaPic.Modules
             }
 
             var probe = probes[oldProbeName];
-            
+
             probe.SetName (newProbeName);
-            
+
             probes.Remove (oldProbeName);
             probes[newProbeName] = probe;
         }
@@ -736,7 +665,6 @@ namespace AquaPic.Modules
 
             string json = File.ReadAllText (path);
             JObject jo = (JObject)JToken.Parse (json);
-
             JArray ja = jo["temperatureProbes"] as JArray;
 
             int arrIdx = -1;
@@ -760,6 +688,97 @@ namespace AquaPic.Modules
             File.WriteAllText (path, jo.ToString ());
 
             return true;
+        }
+
+        /**************************************************************************************************************/
+        /* Heaters                                                                                                    */
+        /**************************************************************************************************************/
+        public static void AddHeater (string name, int powerID, int plugID, string temperatureGroupName) {
+            if (!HeaterNameOk (name)) {
+                throw new Exception (string.Format ("Heater: {0} already exists", name));
+            }
+            
+            heaters [name] = new Heater (name, powerID, plugID, temperatureGroupName);
+        }
+
+        public static void RemoveHeater (string heaterName) {
+            CheckHeaterKey (heaterName);
+            Power.RemoveOutlet (heaters[heaterName].plug);
+            Power.RemoveHandlerOnStateChange (heaters[heaterName].plug, heaters[heaterName].OnStateChange);
+            heaters.Remove (heaterName);
+        }
+
+        public static void CheckHeaterKey (string heaterName) {
+            if (!heaters.ContainsKey (heaterName)) {
+                throw new ArgumentException ("heaterName");
+            }
+        }
+
+        public static bool CheckHeaterKeyNoThrow (string heaterName) {
+            try {
+                CheckHeaterKey (heaterName);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        public static bool HeaterNameOk (string heaterName) {
+            return !CheckHeaterKeyNoThrow (heaterName);
+        }
+
+        /***Getters****************************************************************************************************/
+        /***Names***/
+        public static string[] GetAllHeaterNames () {
+            List<string> names = new List<string> ();
+            foreach (var heater in heaters.Values) {
+                names.Add (heater.name);
+            }
+            return names.ToArray ();
+        }
+
+        /***Individual Control***/
+        public static IndividualControl GetHeaterIndividualControl (string heaterName) {
+            CheckHeaterKey (heaterName);
+            return heaters[heaterName].plug;
+        }
+
+        /***Temperature group name***/
+        public static string GetHeaterTemperatureGroupName (string heaterName) {
+            CheckHeaterKey (heaterName);
+            return heaters[heaterName].temperatureGroupName;
+        }
+
+        /***Setters****************************************************************************************************/
+        /***Name***/
+        public static void SetHeaterName (string oldHeaterName, string newHeaterName) {
+            CheckHeaterKey (oldHeaterName);
+            if (!HeaterNameOk (newHeaterName)) {
+                throw new Exception (string.Format ("Heater: {0} already exists", newHeaterName));
+            }
+
+            var heater = heaters[oldHeaterName];
+            
+            heater.name = newHeaterName;
+            Power.SetOutletName (heater.plug, heater.name);
+            
+            heaters.Remove (oldHeaterName);
+            heaters[newHeaterName] = heater;
+        }
+
+        /***Individual Control***/
+        public static void SetHeaterIndividualControl (string heaterName, IndividualControl ic) {
+            CheckHeaterKey (heaterName);
+            Power.RemoveOutlet (heaters[heaterName].plug);
+            heaters[heaterName].plug = ic;
+            var coil = Power.AddOutlet (heaters[heaterName].plug, heaters[heaterName].name, MyState.On, "Temperature");
+            coil.ConditionGetter = heaters[heaterName].OnPlugControl;
+        }
+
+        /***Temperature group***/
+        public static void SetHeaterTemperatureGroupName (string heaterName, string temperatureGroupName) {
+            CheckHeaterKey (heaterName);
+            heaters[heaterName].temperatureGroupName = temperatureGroupName;
         }
 
     }

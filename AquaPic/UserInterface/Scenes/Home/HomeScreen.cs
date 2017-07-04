@@ -114,9 +114,10 @@ namespace AquaPic.UserInterface
                             }
                         case "BarPlot": {
                                 string name = (string)jo["name"];
+                                var group = (string)jo["group"];
 
                                 if (HomeWindowWidgets.barPlots.ContainsKey (name)) {
-                                    var bp = HomeWindowWidgets.barPlots[name].CreateInstance ();
+                                    var bp = HomeWindowWidgets.barPlots[name].CreateInstance (group);
                                     Put (bp, x, y);
                                     bp.Show ();
 

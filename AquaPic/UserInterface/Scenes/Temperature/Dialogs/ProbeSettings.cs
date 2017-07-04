@@ -136,8 +136,7 @@ namespace AquaPic.UserInterface
 
                 Temperature.AddTemperatureProbe (
                     name, 
-                    ic.Group,
-                    ic.Individual, 
+                    ic,
                     32.0f, 
                     0.0f, 
                     100.0f,

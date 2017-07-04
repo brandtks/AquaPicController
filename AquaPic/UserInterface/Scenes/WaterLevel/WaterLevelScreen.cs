@@ -39,146 +39,87 @@ namespace AquaPic.UserInterface
     public class WaterLevelWindow : SceneBase
     {
         uint timerId;
-        TouchLabel atoStateTextBox;
-        TouchLabel reservoirLevelTextBox;
+
+        string groupName;
+        TouchLabel levelLabel;
+        TouchComboBox groupCombo;
+
+        string analogSensorName;
         TouchLabel analogLevelTextBox;
+        TouchComboBox analogCombo;
+
+        string switchName;
         TouchLabel switchStateTextBox;
         TouchLabel switchTypeLabel;
         TouchComboBox switchCombo;
-        TouchButton atoClearFailBtn;
-        string switchName;
 
         public WaterLevelWindow (params object[] options) : base () {
             sceneTitle = "Water Level";
 
             ExposeEvent += OnExpose;
 
-            /**************************************************************************************************************/
-            /* ATO                                                                                                        */
-            /**************************************************************************************************************/
+            /******************************************************************************************************/
+            /* Water Level Groups                                                                                 */
+            /******************************************************************************************************/
+            groupName = WaterLevel.defaultWaterLevelGroup;
+
             var label = new TouchLabel ();
-            label.text = "Auto Top Off";
-            label.WidthRequest = 329;
+            label.text = "Groups";
+            label.WidthRequest = 118;
             label.textColor = "seca";
             label.textSize = 12;
-            label.textAlignment = TouchAlignment.Right;
-            Put (label, 60, 80);
+            label.textAlignment = TouchAlignment.Left;
+            Put (label, 30, 80);
             label.Show ();
 
-            var stateLabel = new TouchLabel ();
-            stateLabel.text = "ATO State";
-            stateLabel.textColor = "grey3"; 
-            stateLabel.WidthRequest = 329;
-            stateLabel.textAlignment = TouchAlignment.Center;
-            Put (stateLabel, 60, 155);
-            stateLabel.Show ();
+            label = new TouchLabel ();
+            label.WidthRequest = 329;
+            label.text = "Level";
+            label.textColor = "grey3";
+            label.textAlignment = TouchAlignment.Center;
+            Put (label, 60, 185);
+            label.Show ();
 
-            atoStateTextBox = new TouchLabel ();
-            atoStateTextBox.WidthRequest = 329;
-            if (WaterLevel.atoEnabled) {
-                atoStateTextBox.text = string.Format ("{0} : {1}", 
-                    WaterLevel.atoState, 
-                    WaterLevel.atoTime.SecondsToString ());
-            } else {
-                atoStateTextBox.text = "ATO Disabled";
-            }
-            atoStateTextBox.textSize = 20;
-            atoStateTextBox.textAlignment = TouchAlignment.Center;
-            Put (atoStateTextBox, 60, 120);
-            atoStateTextBox.Show ();
+            levelLabel = new TouchLabel ();
+            levelLabel.SetSizeRequest (329, 50);
+            levelLabel.textSize = 36;
+            levelLabel.textAlignment = TouchAlignment.Center;
+            levelLabel.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
+            Put (levelLabel, 60, 130);
+            levelLabel.Show ();
 
-            var reservoirLevelLabel = new TouchLabel ();
-            reservoirLevelLabel.WidthRequest = 329;
-            reservoirLevelLabel.text = "Reservoir Level";
-            reservoirLevelLabel.textColor = "grey3";
-            reservoirLevelLabel.textAlignment = TouchAlignment.Center;
-            Put (reservoirLevelLabel, 60, 230);
-            reservoirLevelLabel.Show ();
-
-            reservoirLevelTextBox = new TouchLabel ();
-            reservoirLevelTextBox.SetSizeRequest (329, 50);
-            reservoirLevelTextBox.textSize = 20;
-            reservoirLevelTextBox.textAlignment = TouchAlignment.Center;
-            if (WaterLevel.atoReservoirLevelEnabled) {
-                float wl = WaterLevel.atoReservoirLevel;
-                if (wl < 0.0f) {
-                    reservoirLevelTextBox.text = "Probe Disconnected";
-                } else {
-                    reservoirLevelTextBox.text = wl.ToString ("F2");
-                    reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-                }
-            } else {
-                reservoirLevelTextBox.text = "Sensor disabled";
-            }
-            Put (reservoirLevelTextBox, 60, 195);
-            reservoirLevelTextBox.Show ();
-
-            var atoSettingsBtn = new TouchButton ();
-            atoSettingsBtn.text = "Settings";
-            atoSettingsBtn.SetSizeRequest (100, 60);
-            atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new AtoSettings ();
+            var globalSettingsBtn = new TouchButton ();
+            globalSettingsBtn.text = "Settings";
+            globalSettingsBtn.SetSizeRequest (100, 60);
+            globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
+                var s = new WaterGroupSettings (groupName, groupName.IsNotEmpty ());
                 s.Run ();
+                var newGroupName = s.waterLevelGroupName;
+                var outcome = s.outcome;
                 s.Destroy ();
                 s.Dispose ();
-            };
-            Put (atoSettingsBtn, 290, 405);
-            atoSettingsBtn.Show ();
 
-            var b = new TouchButton ();
-            b.text = "Calibrate";
-            b.SetSizeRequest (100, 60);
-            b.ButtonReleaseEvent += (o, args) => {
-                if (WaterLevel.atoReservoirLevelEnabled) {
-                    var cal = new CalibrationDialog (
-                        "ATO Reservoir Level Sensor",
-                        () => {
-                            return AquaPicDrivers.AnalogInput.GetChannelValue (WaterLevel.atoReservoirLevelChannel);
-                        });
-
-                    cal.CalibrationCompleteEvent += (aa) => {
-                        WaterLevel.SetAtoReservoirCalibrationData (
-                            (float)aa.zeroValue,
-                            (float)aa.fullScaleActual,
-                            (float)aa.fullScaleValue);
-                    };
-
-                    cal.calArgs.zeroValue = WaterLevel.atoReservoirLevelSensorZeroCalibrationValue;
-                    cal.calArgs.fullScaleActual = WaterLevel.atoReservoirLevelSensorFullScaleCalibrationActual;
-                    cal.calArgs.fullScaleValue = WaterLevel.atoReservoirLevelSensorFullScaleCalibrationValue;
-
-                    cal.Run ();
-                    cal.Destroy ();
-                    cal.Dispose ();
-                } else {
-                    MessageBox.Show ("ATO reservoir level sensor is disabled\n" +
-                                    "Can't perfom a calibration");
+                if (outcome == TouchSettingsOutcome.Added) {
+                    groupName = newGroupName;
+                    groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, groupName);
+                    groupCombo.activeText = groupName;
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
+                    groupCombo.comboList.Remove (groupName);
+                    groupName = WaterLevel.defaultWaterLevelGroup;
+                    groupCombo.activeText = groupName;
                 }
-            };
-            Put (b, 180, 405);
-            b.Show ();
 
-            atoClearFailBtn = new TouchButton ();
-            atoClearFailBtn.SetSizeRequest (100, 60);
-            atoClearFailBtn.text = "Reset ATO";
-            atoClearFailBtn.buttonColor = "compl";
-            atoClearFailBtn.ButtonReleaseEvent += (o, args) => {
-                if (!WaterLevel.ClearAtoAlarm ())
-                    MessageBox.Show ("Please acknowledge alarms first");
+                groupCombo.QueueDraw ();
+                GetGroupData ();
             };
-            Put (atoClearFailBtn, 70, 405);
-            if (Alarm.CheckAlarming (WaterLevel.atoFailedAlarmIndex)) {
-                atoClearFailBtn.Visible = true;
-                atoClearFailBtn.Show ();
-            } else {
-                atoClearFailBtn.Visible = false;
-            }
-
-            Alarm.AddAlarmHandler (WaterLevel.atoFailedAlarmIndex, OnAtoFailedAlarmEvent);
+            Put (globalSettingsBtn, 290, 405);
+            globalSettingsBtn.Show ();
 
             /**************************************************************************************************************/
             /* Analog water sensor                                                                                        */
             /**************************************************************************************************************/
+            analogSensorName = WaterLevel.defaultAnalogLevelSensor;
+
             label = new TouchLabel ();
             label.text = "Water Level Sensor";
             label.textColor = "seca";
@@ -196,17 +137,6 @@ namespace AquaPic.UserInterface
 
             analogLevelTextBox = new TouchLabel ();
             analogLevelTextBox.WidthRequest = 370;
-            if (WaterLevel.analogSensorEnabled) {
-                float wl = WaterLevel.analogWaterLevel;
-                if (wl < 0.0f)
-                    analogLevelTextBox.text = "Probe Disconnected";
-                else {
-                    analogLevelTextBox.text = wl.ToString ("F2");
-                    analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-                }
-            } else {
-                analogLevelTextBox.text = "Sensor disabled";
-            }
             analogLevelTextBox.textSize = 20;
             analogLevelTextBox.textAlignment = TouchAlignment.Center;
             Put (analogLevelTextBox, 415, 120);
@@ -215,42 +145,68 @@ namespace AquaPic.UserInterface
             settingsBtn.text = "Settings";
             settingsBtn.SetSizeRequest (100, 60);
             settingsBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new AnalogSensorSettings ();
+                var s = new AnalogSensorSettings (analogSensorName, analogSensorName.IsNotEmpty ());
                 s.Run ();
+                var newAnalogSensorName = s.newOrUpdatedAnalogSensorName;
+                var outcome = s.outcome;
                 s.Destroy ();
                 s.Dispose ();
+
+                if ((outcome == TouchSettingsOutcome.Modified) && (newAnalogSensorName != analogSensorName)) {
+                    var index = analogCombo.comboList.IndexOf (analogSensorName);
+                    analogCombo.comboList[index] = newAnalogSensorName;
+                    analogSensorName = newAnalogSensorName;
+                } else if (outcome == TouchSettingsOutcome.Added) {
+                    analogCombo.comboList.Insert (analogCombo.comboList.Count - 1, newAnalogSensorName);
+                    analogCombo.activeText = newAnalogSensorName;
+                    analogSensorName = newAnalogSensorName;
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
+                    analogCombo.comboList.Remove (analogSensorName);
+                    analogSensorName = WaterLevel.defaultAnalogLevelSensor;
+                    analogCombo.activeText = analogSensorName;
+                }
+
+                analogCombo.QueueDraw ();
+                GetAnalogSensorData ();
             };
             Put (settingsBtn, 415, 195);
             settingsBtn.Show ();
 
-            b = new TouchButton ();
+            var b = new TouchButton ();
             b.text = "Calibrate";
             b.SetSizeRequest (100, 60);
             b.ButtonReleaseEvent += (o, args) => {
-                if (WaterLevel.analogSensorEnabled) {
-                    var cal = new CalibrationDialog (
-                        "Water Level Sensor", 
-                        () => {
-                            return AquaPicDrivers.AnalogInput.GetChannelValue (WaterLevel.analogSensorChannel);
-                        });
+                if (analogSensorName.IsNotEmpty ()) {
+                    if (WaterLevel.GetAnalogLevelSensorEnable (analogSensorName)) {
+                        var cal = new CalibrationDialog (
+                            "Water Level Sensor",
+                            () => {
+                                return AquaPicDrivers.AnalogInput.GetChannelValue (
+                                    WaterLevel.GetAnalogLevelSensorIndividualControl (analogSensorName)
+                                );
+                            });
 
-                    cal.CalibrationCompleteEvent += (aa) => {
-                        WaterLevel.SetCalibrationData (
-                            (float)aa.zeroValue, 
-                            (float)aa.fullScaleActual, 
-                            (float)aa.fullScaleValue);
-                    };
+                        cal.CalibrationCompleteEvent += (aa) => {
+                            WaterLevel.SetCalibrationData (
+                                analogSensorName, 
+                                (float)aa.zeroValue,
+                                (float)aa.fullScaleActual,
+                                (float)aa.fullScaleValue);
+                        };
 
-                    cal.calArgs.zeroValue = WaterLevel.analogSensorZeroCalibrationValue;
-                    cal.calArgs.fullScaleActual = WaterLevel.analogSensorFullScaleCalibrationActual;
-                    cal.calArgs.fullScaleValue = WaterLevel.analogSensorFullScaleCalibrationValue;
+                        cal.calArgs.zeroValue = WaterLevel.GetAnalogLevelSensorZeroScaleValue (analogSensorName);
+                        cal.calArgs.fullScaleActual = WaterLevel.GetAnalogLevelSensorFullScaleActual (analogSensorName);
+                        cal.calArgs.fullScaleValue =WaterLevel.GetAnalogLevelSensorFullScaleValue (analogSensorName);
 
-                    cal.Run ();
-                    cal.Destroy ();
-                    cal.Dispose ();
+                        cal.Run ();
+                        cal.Destroy ();
+                        cal.Dispose ();
+                    } else {
+                        MessageBox.Show ("Analog water level sensor is disabled\n" +
+                                        "Can't perfom a calibration");
+                    }
                 } else {
-                    MessageBox.Show ("Analog water level sensor is disabled\n" +
-                                    "Can't perfom a calibration");
+                    MessageBox.Show ("Can't calibrate a none existent sensor");
                 }
             };
             Put (b, 525, 195);
@@ -322,8 +278,31 @@ namespace AquaPic.UserInterface
             Put (switchSetupBtn, 415, 405);
             switchSetupBtn.Show ();
 
-            string[] sNames = WaterLevel.GetAllFloatSwitches ();
-            switchCombo = new TouchComboBox (sNames);
+            groupCombo = new TouchComboBox (WaterLevel.GetAllWaterLevelGroupNames ());
+            if (groupName.IsNotEmpty ()) {
+                groupCombo.activeText = groupName;
+            } else {
+                groupCombo.activeIndex = 0;
+            }
+            groupCombo.WidthRequest = 235;
+            groupCombo.comboList.Add ("New group...");
+            groupCombo.ComboChangedEvent += OnGroupComboChanged;
+            Put (groupCombo, 153, 77);
+            groupCombo.Show ();
+
+            analogCombo = new TouchComboBox (WaterLevel.GetAllAnalogLevelSensors ());
+            if (analogSensorName.IsNotEmpty ()) {
+                analogCombo.activeText = analogSensorName;
+            } else {
+                analogCombo.activeIndex = 0;
+            }
+            analogCombo.WidthRequest = 235;
+            analogCombo.comboList.Add ("New level sensor...");
+            analogCombo.ComboChangedEvent += OnAnalogSensorComboChanged;
+            Put (analogCombo, 550, 77);
+            analogCombo.Show ();
+
+            switchCombo = new TouchComboBox (WaterLevel.GetAllFloatSwitches ());
             if (switchName.IsNotEmpty ()) {
                 switchCombo.activeText = switchName;
             } else {
@@ -335,6 +314,8 @@ namespace AquaPic.UserInterface
             Put (switchCombo, 550, 277);
             switchCombo.Show ();
 
+            GetGroupData ();
+            GetAnalogSensorData ();
             GetSwitchData ();
 
             timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
@@ -343,7 +324,6 @@ namespace AquaPic.UserInterface
         }
 
         public override void Dispose () {
-            Alarm.RemoveAlarmHandler (WaterLevel.atoFailedAlarmIndex, OnAtoFailedAlarmEvent);
             GLib.Source.Remove (timerId);
             base.Dispose ();
         }
@@ -366,49 +346,58 @@ namespace AquaPic.UserInterface
         }
 
         public bool OnUpdateTimer () {
-            if (WaterLevel.analogSensorEnabled) {
-                float wl = WaterLevel.analogWaterLevel;
-                if (wl < 0.0f) {
-                    analogLevelTextBox.text = "Probe Disconnected";
-                    analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-                } else {
-                    analogLevelTextBox.text = wl.ToString ("F2");
-                    analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-                }
-            } else {
-                analogLevelTextBox.text = "Sensor disabled";
-                reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-            }
-            analogLevelTextBox.QueueDraw ();
-
-            if (WaterLevel.atoEnabled) {
-                atoStateTextBox.text = string.Format ("{0} : {1}", 
-                    WaterLevel.atoState, 
-                    WaterLevel.atoTime.SecondsToString ());
-
-                if (WaterLevel.atoReservoirLevelEnabled) {
-                    float wl = WaterLevel.atoReservoirLevel;
-                    if (wl < 0.0f) {
-                        reservoirLevelTextBox.text = "Probe Disconnected";
-                        reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-                    } else {
-                        reservoirLevelTextBox.text = wl.ToString ("F2");
-                        reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-                    }
-                } else {
-                    reservoirLevelTextBox.text = "Sensor disabled";
-                    reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-                }
-                reservoirLevelTextBox.QueueDraw ();
-
-            } else {
-                atoStateTextBox.text = "ATO Disabled";
-            }
-            atoStateTextBox.QueueDraw ();
-
+            GetAnalogSensorData ();
             GetSwitchData ();
+            GetGroupData ();
 
             return true;
+        }
+
+        protected void OnGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            if (e.activeText == "New group...") {
+                var s = new WaterGroupSettings (string.Empty, false);
+                s.Run ();
+                var newGroupName = s.waterLevelGroupName;
+                var outcome = s.outcome;
+                s.Destroy ();
+                s.Dispose ();
+
+                if (outcome == TouchSettingsOutcome.Added) {
+                    groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, newGroupName);
+                    groupCombo.activeText = newGroupName;
+                    groupName = newGroupName;
+                } else {
+                    groupCombo.activeText = groupName;
+                }
+
+                groupCombo.QueueDraw ();
+            } else {
+                groupName = e.activeText;
+            }
+            GetGroupData ();
+        }
+
+        protected void OnAnalogSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            if (e.activeText == "New level sensor...") {
+                var s = new AnalogSensorSettings (string.Empty, false);
+                s.Run ();
+                var newAnalogSensorName = s.newOrUpdatedAnalogSensorName;
+                var outcome = s.outcome;
+                s.Destroy ();
+                s.Dispose ();
+
+                if (outcome == TouchSettingsOutcome.Added) {
+                    analogCombo.comboList.Insert (analogCombo.comboList.Count - 1, newAnalogSensorName);
+                    analogCombo.activeText = newAnalogSensorName;
+                    analogSensorName = newAnalogSensorName;
+                } else {
+                    analogCombo.activeText = analogSensorName;
+                }
+                analogCombo.QueueDraw ();
+            } else {
+                analogSensorName = e.activeText;
+            }
+            GetAnalogSensorData ();
         }
 
         protected void OnSwitchComboChanged (object sender, ComboBoxChangedEventArgs e) {
@@ -427,12 +416,43 @@ namespace AquaPic.UserInterface
                 } else {
                     switchCombo.activeText = switchName;
                 }
-
                 switchCombo.QueueDraw ();
-                GetSwitchData ();
             } else {
                 switchName = e.activeText;
             }
+            GetSwitchData ();
+        }
+
+        protected void GetGroupData () {
+            if (!groupName.IsEmpty ()) {
+                levelLabel.text = WaterLevel.GetWaterLevelGroupLevel (groupName).ToString ("F1");
+            } else {
+                levelLabel.text = "--";
+            }
+
+            levelLabel.QueueDraw ();
+        }
+
+        protected void GetAnalogSensorData () {
+            if (analogSensorName.IsNotEmpty ()) {
+                if (WaterLevel.GetAnalogLevelSensorEnable (analogSensorName)) {
+                    float wl = WaterLevel.GetAnalogLevelSensorLevel (analogSensorName);
+                    if (wl < 0.0f) {
+                        analogLevelTextBox.text = "Probe Disconnected";
+                        analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
+                    } else {
+                        analogLevelTextBox.text = wl.ToString ("F2");
+                        analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
+                    }
+                } else {
+                    analogLevelTextBox.text = "Sensor disabled";
+                }
+            } else {
+                analogLevelTextBox.text = "--";
+                analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
+            }
+
+            analogLevelTextBox.QueueDraw ();
         }
 
         protected void GetSwitchData () {
@@ -448,7 +468,7 @@ namespace AquaPic.UserInterface
                 }
 
                 SwitchType type = WaterLevel.GetFloatSwitchType (switchName);
-                switchTypeLabel.text = Utilites.Utils.GetDescription (type);
+                switchTypeLabel.text = Utils.GetDescription (type);
             } else {
                 switchTypeLabel.Visible = false;
                 switchStateTextBox.text = "Switch not available";
@@ -457,23 +477,6 @@ namespace AquaPic.UserInterface
 
             switchTypeLabel.QueueDraw ();
             switchStateTextBox.QueueDraw ();
-        }
-
-        protected double GetCalibrationValue () {
-            return AquaPicDrivers.AnalogInput.GetChannelValue (WaterLevel.analogSensorChannel);
-        }
-
-        protected void OnAtoFailedAlarmEvent (object sender, AlarmEventArgs args) {
-            Console.WriteLine ("Ato failed alarm event handler called");
-
-            if (args.type == AlarmEventType.Cleared)
-                atoClearFailBtn.Visible = false;
-            else if (args.type == AlarmEventType.Posted)
-                atoClearFailBtn.Visible = true;
-            else
-                return;
-
-            atoClearFailBtn.QueueDraw ();
         }
     }
 }
