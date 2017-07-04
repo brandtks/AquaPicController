@@ -81,7 +81,7 @@ namespace AquaPic.Sensors
             this.temperatureGroupName = temperatureGroupName;
             _temperature = this.zeroActual;
             Add (_channel);
-            probeDisconnectedAlarmIndex = Alarm.Subscribe (string.Format ("{0} temperature probe disconnected", name));
+            probeDisconnectedAlarmIndex = Alarm.Subscribe ("Temperature probe disconnected, " + name);
         }
 
         public void Add (IndividualControl channel) {

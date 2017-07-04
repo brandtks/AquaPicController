@@ -170,6 +170,18 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
+            c = new SettingsComboBox ();
+            c.text = "Water Level Group";
+            if (this.switchName.IsNotEmpty ()) {
+                c.combo.comboList.Add ("Current: " + WaterLevel.GetFloatSwitchWaterLevelGroupName (this.switchName));
+                c.combo.activeIndex = 0;
+            } else {
+                c.combo.nonActiveMessage = "Please select group";
+            }
+            c.combo.comboList.AddRange (WaterLevel.GetAllWaterLevelGroupNames ());
+            c.combo.comboList.Add ("None");
+            AddSetting (c);
+
             DrawSettings ();
         }
 
@@ -182,17 +194,71 @@ namespace AquaPic.UserInterface
 
         protected bool OnSave (object sender) {
             string name = (settings["Name"] as SettingsTextBox).textBox.text;
+            if (name == "Enter name") {
+                MessageBox.Show ("Invalid probe name");
+                return false;
+            }
 
-            string chName = (settings["Input"] as SettingsComboBox).combo.activeText;
+            string channelName = (settings["Input"] as SettingsComboBox).combo.activeText;
+            if (channelName.IsEmpty ()) {
+                MessageBox.Show ("Please select an channel");
+                return false;
+            }
+
             var ic = IndividualControl.Empty;
-
             float physicalLevel = Convert.ToSingle ((settings["Physical Level"] as SettingsTextBox).textBox.text);
 
             string typeString = (settings ["Type"] as SettingsComboBox).combo.activeText;
             SwitchType type;
+            if (typeString.IsNotEmpty ()) {
+                type = (SwitchType)Enum.Parse (typeof (SwitchType), typeString);
+            } else {
+                MessageBox.Show ("Please select switch type");
+                return false;
+            }
 
             string functionString = (settings["Function"] as SettingsComboBox).combo.activeText;
             SwitchFunction function;
+            if (functionString.IsNotEmpty ()) {
+                function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), functionString);
+            } else {
+                MessageBox.Show ("Please select switch function");
+                return false;
+            }
+
+            string message = string.Empty;
+            if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed)) {
+                message = "High level switch should be normally closed";
+            } else if ((function == SwitchFunction.LowLevel) && (type != SwitchType.NormallyClosed)) {
+                message = "Low level switch should be normally closed";
+            } else if ((function == SwitchFunction.ATO) && (type != SwitchType.NormallyOpened)) {
+                message = "ATO switch should be normally opened";
+            }
+
+            if (message.IsNotEmpty ()) {
+                var parent = Toplevel as Window;
+                if (parent != null) {
+                    if (!parent.IsTopLevel)
+                        parent = null;
+                }
+
+                var ms = new TouchDialog (message + "\n" +
+                    "Are you sure you want to use this configuration", parent);
+
+                bool confirmed = false;
+                ms.Response += (o, a) => {
+                    if (a.ResponseId == ResponseType.Yes) {
+                        confirmed = true;
+                    }
+                };
+
+                ms.Run ();
+                ms.Destroy ();
+
+                if (!confirmed) {
+                    return false;
+                }
+            }
 
             uint timeOffset = 0;
             string timeOffsetString = (settings["Time Offset"] as SettingsTextBox).textBox.text;
@@ -200,8 +266,16 @@ namespace AquaPic.UserInterface
                 int idx = timeOffsetString.IndexOf ("secs", StringComparison.InvariantCultureIgnoreCase);
                 if (idx != -1)
                     timeOffsetString = timeOffsetString.Substring (0, idx);
-                
+
                 timeOffset = Convert.ToUInt32 (timeOffsetString) * 1000;
+            } else {
+                MessageBox.Show ("Please enter delay time for float switch");
+                return false;
+            }
+
+            string groupName = (settings["Water Level Group"] as SettingsComboBox).combo.activeText;
+            if (groupName == "None") {
+                groupName = string.Empty;
             }
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
@@ -212,39 +286,9 @@ namespace AquaPic.UserInterface
             JObject jo = (JObject)JToken.Parse (json);
 
             if (switchName.IsEmpty ()) {
-                if (name == "Enter name") {
-                    MessageBox.Show ("Invalid probe name");
-                    return false;
-                }
-
-                if ((settings["Input"] as SettingsComboBox).combo.activeIndex == -1) {
-                    MessageBox.Show ("Please select an channel");
-                    return false;
-                }
-
-                ParseChannnel (chName, ref ic.Group, ref ic.Individual);
-
-                if (!string.IsNullOrWhiteSpace (typeString))
-                    type = (SwitchType)Enum.Parse (typeof(SwitchType), typeString);
-                else {
-                    MessageBox.Show ("Please select switch type");
-                    return false;
-                }
-
-                if (functionString.IsNotEmpty () || ((settings["Function"] as SettingsComboBox).combo.activeIndex == -1)) {
-                    function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), functionString);
-                } else {
-                    MessageBox.Show ("Please select switch function");
-                    return false;
-                }
-
-                if (timeOffsetString == "Enter time") {
-                    MessageBox.Show ("Please enter delay time for float switch");
-                    return false;
-                }
-
+                ParseChannnel (channelName, ref ic.Group, ref ic.Individual);
                 try {
-                    WaterLevel.AddFloatSwitch (name, ic, physicalLevel, type, function, timeOffset);
+                    WaterLevel.AddFloatSwitch (name, ic, physicalLevel, type, function, timeOffset, groupName);
                 } catch (Exception ex) {
                     MessageBox.Show (ex.Message);
                     return false;
@@ -259,6 +303,7 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("switchType", type.ToString ())); 
                 jobj.Add (new JProperty ("switchFuntion", function.ToString ()));
                 jobj.Add (new JProperty ("timeOffset", string.Format ("00:{0:D2}:{1:D2}", timeOffset / 1000, timeOffset % 1000)));
+                jobj.Add (new JProperty ("waterLevelGroupName", groupName));
 
                 ((JArray)jo ["floatSwitches"]).Add (jobj);
 
@@ -270,31 +315,25 @@ namespace AquaPic.UserInterface
                     switchName = name;
                 }
 
-                if (!chName.StartsWith ("Current:")) {
-                    ParseChannnel (chName, ref ic.Group, ref ic.Individual);
+                if (!channelName.StartsWith ("Current:")) {
+                    ParseChannnel (channelName, ref ic.Group, ref ic.Individual);
                     WaterLevel.SetFloatSwitchIndividualControl (switchName, ic);
                 } else {
                     ic = WaterLevel.GetFloatSwitchIndividualControl (switchName);
                 }
 
                 WaterLevel.SetFloatSwitchPhysicalLevel (switchName, physicalLevel);
-
-                type = (SwitchType)Enum.Parse (typeof(SwitchType), typeString);
                 WaterLevel.SetFloatSwitchType (switchName, type);
-
-                function = (SwitchFunction)Enum.Parse (typeof(SwitchFunction), functionString);
-                try {
-                    if (function != WaterLevel.GetFloatSwitchFunction (switchName))
-                        WaterLevel.SetFloatSwitchFunction (switchName, function);
-                } catch {
-                    MessageBox.Show ("Function already exists");
-                    return false;
-                }
-
+                WaterLevel.SetFloatSwitchFunction (switchName, function);
                 WaterLevel.SetFloatSwitchTimeOffset (switchName, timeOffset);
 
-                JArray ja = jo ["floatSwitches"] as JArray;
+                if (!groupName.StartsWith ("Current:")) {
+                    WaterLevel.SetFloatSwitchWaterLevelGroupName (switchName, groupName);
+                } else {
+                    groupName = WaterLevel.GetFloatSwitchWaterLevelGroupName (switchName);
+                }
 
+                JArray ja = jo ["floatSwitches"] as JArray;
                 int arrIdx = -1;
                 for (int i = 0; i < ja.Count; ++i) {
                     string n = (string)ja [i] ["name"];
@@ -316,6 +355,7 @@ namespace AquaPic.UserInterface
                 ((JArray)jo["floatSwitches"])[arrIdx]["switchType"] = type.ToString ();
                 ((JArray)jo["floatSwitches"])[arrIdx]["switchFuntion"] = function.ToString ();
                 ((JArray)jo["floatSwitches"])[arrIdx]["timeOffset"] = string.Format ("00:{0:D2}:{1:D2}", timeOffset / 1000, timeOffset % 1000);
+                ((JArray)jo["floatSwitches"])[arrIdx]["waterLevelGroupName"] = groupName;
             }
 
             File.WriteAllText (path, jo.ToString ());

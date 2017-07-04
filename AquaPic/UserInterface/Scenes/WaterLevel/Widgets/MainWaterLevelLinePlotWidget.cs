@@ -64,16 +64,12 @@ namespace AquaPic.UserInterface
 
             groupName = string.Empty;
             if (options.Length >= 1) {
-                groupName = options[0] as string;
-                if (groupName != null) {
-                    if (!WaterLevel.CheckWaterLevelGroupKeyNoThrow (groupName)) {
-                        groupName = Temperature.defaultTemperatureGroup;
+                var groupNameOption = options[0] as string;
+                if (groupNameOption != null) {
+                    if (WaterLevel.CheckWaterLevelGroupKeyNoThrow (groupNameOption)) {
+                        groupName = groupNameOption;
                     }
-                } else {
-                    groupName = Temperature.defaultTemperatureGroup;
                 }
-            } else {
-                groupName = Temperature.defaultTemperatureGroup;
             }
 
             if (groupName.IsNotEmpty ()) {
@@ -84,16 +80,16 @@ namespace AquaPic.UserInterface
                     linePlot.UnLinkDataLogger (dataLogger);
                 };
 
-                text = string.Format ("{0} Temperature", groupName);
+                text = string.Format ("{0} Water Level", groupName);
             }
 
             linePlot.rangeMargin = 1;
             linePlot.eventColors.Add ("probe disconnected", new TouchColor ("secb", 0.25));
             linePlot.eventColors.Add ("ato started", new TouchColor ("seca", 0.5));
             linePlot.eventColors.Add ("ato stopped", new TouchColor ("secc", 0.5));
-            linePlot.eventColors.Add ("disconnected alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("low alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("high alarm", new TouchColor ("compl", 0.25));
+            linePlot.eventColors.Add ("disconnected alarm", new TouchColor ("compl", 0.25));
 
             OnUpdate ();
         }
@@ -119,7 +115,8 @@ namespace AquaPic.UserInterface
             } 
 
             if (!usingLevel) {
-                label.text = "Probe Disabled";
+                textBox.text = "--";
+                label.text = "Disabled";
                 label.Visible = true;
             }
         }

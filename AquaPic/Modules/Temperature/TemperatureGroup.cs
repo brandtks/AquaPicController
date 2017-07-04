@@ -26,6 +26,7 @@
 
 ﻿using System;
 using AquaPic.Runtime;
+using AquaPic.Utilites;
 
 namespace AquaPic.Modules
 {
@@ -59,7 +60,7 @@ namespace AquaPic.Modules
                 this.temperatureDeadband = temperatureDeadband;
 
                 temperature = 0.0f;
-                dataLogger = new DataLogger (string.Format ("{0}Temperature", this.name));
+                dataLogger = new DataLogger (string.Format ("{0}Temperature", this.name.RemoveWhitespace ()));
 
                 highTemperatureAlarmIndex = Alarm.Subscribe (string.Format("{0} high temperature", name));
                 lowTemperatureAlarmIndex = Alarm.Subscribe (string.Format ("{0} low temperature", name));

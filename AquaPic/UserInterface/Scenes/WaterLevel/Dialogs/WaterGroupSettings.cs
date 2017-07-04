@@ -151,31 +151,6 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            if (groupName == WaterLevel.defaultWaterLevelGroup) {
-                var parent = Toplevel as Window;
-                if (parent != null) {
-                    if (!parent.IsTopLevel)
-                        parent = null;
-                }
-
-                var ms = new TouchDialog (groupName + " is the default temperature group.\n" +
-                    "Are you sure you want to delete this group", parent);
-
-                bool confirmed = false;
-                ms.Response += (o, a) => {
-                    if (a.ResponseId == ResponseType.Yes) {
-                        confirmed = true;
-                    }
-                };
-
-                ms.Run ();
-                ms.Destroy ();
-
-                if (!confirmed) {
-                    return false;
-                }
-            }
-
             var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
             path = System.IO.Path.Combine (path, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");

@@ -75,7 +75,7 @@ namespace AquaPic.Sensors
             }
             set {
                 if (value) {
-                    _highAlarmIndex = Alarm.Subscribe ("High level, " + name);
+                    _highAlarmIndex = Alarm.Subscribe ("High water level, " + name);
                 } else {
                     _highAlarmIndex = -1;
                 }
@@ -95,7 +95,7 @@ namespace AquaPic.Sensors
             }
             set {
                 if (value) {
-                    _lowAlarmIndex = Alarm.Subscribe ("Low level, " + name);
+                    _lowAlarmIndex = Alarm.Subscribe ("Low water level, " + name);
                 } else {
                     _lowAlarmIndex = -1;
                 }
@@ -115,13 +115,13 @@ namespace AquaPic.Sensors
             this.enable = enable;
 
             if (enableHighAlarm && enable) {
-                _highAlarmIndex = Alarm.Subscribe ("High level, " + name);
+                _highAlarmIndex = Alarm.Subscribe ("High water level, " + name);
             } else {
                 _highAlarmIndex = -1;
             }
 
             if (enableLowAlarm && enable) {
-                _lowAlarmIndex = Alarm.Subscribe ("Low level, " + name);
+                _lowAlarmIndex = Alarm.Subscribe ("Low water level, " + name);
             } else {
                 _lowAlarmIndex = -1;
             }
@@ -143,16 +143,20 @@ namespace AquaPic.Sensors
             if (enable) {
                 Get ();
 
-                if ((level <= lowAlarmSetpoint) && (connected)) {
-                    Alarm.Post (_lowAlarmIndex);
-                } else {
-                    Alarm.Clear (_lowAlarmIndex);
+                if ((_lowAlarmIndex != -1)  && connected) {
+                    if (level <= lowAlarmSetpoint) {
+                        Alarm.Post (_lowAlarmIndex);
+                    } else {
+                        Alarm.Clear (_lowAlarmIndex);
+                    }
                 }
 
-                if (level >= highAlarmSetpoint) {
-                    Alarm.Post (_highAlarmIndex);
-                } else {
-                    Alarm.Clear (_highAlarmIndex);
+                if ((_highAlarmIndex != -1) && connected) {
+                    if (level >= highAlarmSetpoint) {
+                        Alarm.Post (_highAlarmIndex);
+                    } else {
+                        Alarm.Clear (_highAlarmIndex);
+                    }
                 }
             } else {
                 _level = 0.0f;

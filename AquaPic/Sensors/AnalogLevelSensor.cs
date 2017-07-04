@@ -64,18 +64,6 @@ namespace AquaPic.Sensors
                 return _sensorDisconnectedAlarmIndex;
             }
         }
-        public bool enableDisconnectedAlarm {
-            get {
-                return disconnectedAlarmIndex != -1;
-            }
-            set {
-                if (value) {
-                    _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
-                } else {
-                    _sensorDisconnectedAlarmIndex = -1;
-                }
-            }
-        }
 
         public AnalogLevelSensor (string name, IndividualControl ic) {
             _channel = ic;
@@ -86,7 +74,7 @@ namespace AquaPic.Sensors
             fullScaleActual = 15.0f;
             fullScaleValue = 4096.0f;
 
-            _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Probe disconnected, " + name);
+            _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog level probe disconnected, " + name);
             Add (ic);
         }
 

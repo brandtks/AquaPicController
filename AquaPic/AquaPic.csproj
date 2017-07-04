@@ -220,7 +220,7 @@
     <None Include="UserInterface\Scenes\ATO\Dialogs\AtoSettings.cs" />
     <None Include="UserInterface\Scenes\ATO\AtoScreen.cs" />
     <None Include="Modules\ATO\AutoTopOff.cs" />
-    <None Include="UserInterface\Scenes\WaterLevel\Widgets\MainAtoReservoirLevelBarPlotWidget.cs" />
+    <None Include="UserInterface\Scenes\ATO\Widgets\MainAtoReservoirLevelBarPlotWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Operands\" />

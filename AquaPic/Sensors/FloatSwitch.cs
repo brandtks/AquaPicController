@@ -98,7 +98,8 @@ namespace AquaPic.Sensors
             SwitchFunction function,
             float physicalLevel,
             IndividualControl channel,
-            uint timeOffset
+            uint timeOffset,
+            string waterLevelGroupName
         ) {
             _activated = false;
             _name = name;
@@ -107,6 +108,7 @@ namespace AquaPic.Sensors
             this.physicalLevel = physicalLevel;
             _channel = channel;
             _onDelayTimer = new OnDelayTimer (timeOffset);
+            this.waterLevelGroupName = waterLevelGroupName;
 
             if (_channel.IsNotEmpty ()) {
                 Add (channel);

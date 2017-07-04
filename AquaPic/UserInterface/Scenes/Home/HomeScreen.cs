@@ -96,7 +96,7 @@ namespace AquaPic.UserInterface
                                 break;
                             }
                         case "LinePlot": {
-                                string name = (string)jo["name"];
+                                var name = (string)jo["name"];
                                 var group = (string)jo["group"];
 
                                 if (HomeWindowWidgets.linePlots.ContainsKey (name)) {
@@ -113,7 +113,7 @@ namespace AquaPic.UserInterface
                                 break;
                             }
                         case "BarPlot": {
-                                string name = (string)jo["name"];
+                                var name = (string)jo["name"];
                                 var group = (string)jo["group"];
 
                                 if (HomeWindowWidgets.barPlots.ContainsKey (name)) {

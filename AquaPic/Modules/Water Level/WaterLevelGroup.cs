@@ -47,28 +47,31 @@ namespace AquaPic.Modules
             public WaterLevelGroup (string name, string analogLevelSensorName) {
                 this.name = name;
                 level = 0.0f;
-                dataLogger = new DataLogger (string.Format ("{0}WaterLevel", this.name));
+                dataLogger = new DataLogger (string.Format ("{0}WaterLevel", this.name.RemoveWhitespace ()));
+
                 highSwitchAlarmIndex = Alarm.Subscribe ("High Water Level, Float Switch");
                 lowSwitchAlarmIndex = Alarm.Subscribe ("Low Water Level, Float Switch");
-                this.analogLevelSensorName = analogLevelSensorName;
+                Alarm.AddAlarmHandler (highSwitchAlarmIndex, OnHighAlarm);
+                Alarm.AddAlarmHandler (lowSwitchAlarmIndex, OnLowAlarm);
+
+                if (CheckAnalogLevelSensorKeyNoThrow (analogLevelSensorName)) {
+                    this.analogLevelSensorName = analogLevelSensorName;
+                } else {
+                    this.analogLevelSensorName = string.Empty;
+                }
+
+                ConnectAnalogSensorAlarmsToDataLogger ();
             }
 
             public void Run () {
                 if (analogLevelSensorName.IsNotEmpty ()) {
-                    WaterLevelSensor sensor = null;
-                    try {
-                        sensor = analogLevelSensors[analogLevelSensorName];
-                    } catch (KeyNotFoundException) {
-                        analogLevelSensorName = string.Empty;
-                    }
-
-                    if (sensor != null) {
-                        level = sensor.UpdateWaterLevel ();
-                        if (level < 0.0f) {
-                            dataLogger.AddEntry ("probe disconnected");
-                        } else {
-                            dataLogger.AddEntry (level);
-                        }
+                    var sensor = analogLevelSensors[analogLevelSensorName];
+                    if (sensor.connected) {
+                        level = sensor.level;
+                        dataLogger.AddEntry (level);
+                    } else {
+                        level = 0f;
+                        dataLogger.AddEntry ("probe disconnected");
                     }
                 } else {
                     dataLogger.AddEntry ("probe disconnected");
@@ -92,6 +95,42 @@ namespace AquaPic.Modules
                             }
                         }
                     }
+                }
+            }
+
+            public void ConnectAnalogSensorAlarmsToDataLogger () {
+                if (analogLevelSensorName.IsNotEmpty ()) {
+                    var sensor = analogLevelSensors[analogLevelSensorName];
+                    Alarm.AddAlarmHandler (sensor.highAlarmIndex, OnHighAlarm);
+                    Alarm.AddAlarmHandler (sensor.lowAlarmIndex, OnLowAlarm);
+                    Alarm.AddAlarmHandler (sensor.disconnectedAlarmIndex, OnDisconnectedAlarm);
+                }
+            }
+
+            public void DisconnectAnalogSensorAlarmsFromDataLogger () {
+                if (analogLevelSensorName.IsNotEmpty ()) {
+                    var sensor = analogLevelSensors[analogLevelSensorName];
+                    Alarm.RemoveAlarmHandler (sensor.highAlarmIndex, OnHighAlarm);
+                    Alarm.RemoveAlarmHandler (sensor.lowAlarmIndex, OnLowAlarm);
+                    Alarm.RemoveAlarmHandler (sensor.disconnectedAlarmIndex, OnDisconnectedAlarm);
+                }
+            }
+
+            protected void OnHighAlarm (object sender, AlarmEventArgs args) {
+                if (args.type == AlarmEventType.Posted) {
+                    dataLogger.AddEntry ("high alarm");
+                }
+            }
+
+            protected void OnLowAlarm (object sender, AlarmEventArgs args) {
+                if (args.type == AlarmEventType.Posted) {
+                    dataLogger.AddEntry ("low alarm");
+                }
+            }
+
+            protected void OnDisconnectedAlarm (object sender, AlarmEventArgs args) {
+                if (args.type == AlarmEventType.Posted) {
+                    dataLogger.AddEntry ("disconnected alarm");
                 }
             }
         }

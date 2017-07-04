@@ -56,7 +56,7 @@ namespace AquaPic.UserInterface
             var analogSensorNameNotEmpty = analogSensorName.IsNotEmpty ();
 
             var t = new SettingsTextBox ();
-            t.text = "Low Alarm";
+            t.text = "Name";
             if (analogSensorNameNotEmpty) {
                 t.textBox.text = analogSensorName;
             } else {
@@ -276,13 +276,17 @@ namespace AquaPic.UserInterface
                         highAlarmStpnt,
                         enableLowAlarm,
                         lowAlarmStpnt,
-                        ic);
+                        ic,
+                        819.2f,
+                        10f,
+                        3003.73f
+                    );
                 } catch (Exception ex) {
                     MessageBox.Show (ex.Message);
                     return false;
                 }
 
-                JObject jobj = new JObject ();
+                var jobj = new JObject ();
 
                 jobj.Add (new JProperty ("name", name));
                 jobj.Add (new JProperty ("enable", enable.ToString ()));
@@ -294,7 +298,7 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("channel", ic.Individual.ToString ()));
                 jobj.Add (new JProperty ("zeroScaleCalibrationValue", "819.2"));
                 jobj.Add (new JProperty ("fullScaleCalibrationActual", "10.0"));
-                jobj.Add (new JProperty ("zeroScaleCalibrationValue", "3003.73"));
+                jobj.Add (new JProperty ("fullScaleCalibrationValue", "3003.73"));
 
                 ((JArray)jo["analogSensors"]).Add (jobj);
 

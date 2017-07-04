@@ -224,7 +224,7 @@ namespace AquaPic.UserInterface
 
         protected bool OnDelete (object sender) {
             if (groupName == Temperature.defaultTemperatureGroup) {
-                var parent = this.Toplevel as Gtk.Window;
+                var parent = Toplevel as Window;
                 if (parent != null) {
                     if (!parent.IsTopLevel)
                         parent = null;

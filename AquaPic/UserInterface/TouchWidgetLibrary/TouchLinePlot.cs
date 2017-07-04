@@ -93,7 +93,6 @@ namespace TouchWidgetLibrary
             startingPoint = new TouchLinePlotStartingPoint ();
 
             ExposeEvent += OnExpose;
-            //ButtonReleaseEvent += OnButtonRelease;
 
             timerId = GLib.Timeout.Add (1000, OnTimer);
         }
@@ -204,10 +203,6 @@ namespace TouchWidgetLibrary
                     }
                 }
             }
-        }
-
-        protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
-
         }
 
         public void LinkDataLogger (DataLogger logger) {          

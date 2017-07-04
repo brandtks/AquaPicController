@@ -28,7 +28,6 @@
 using Gtk;
 using Cairo;
 using TouchWidgetLibrary;
-using AquaPic.Runtime;
 using AquaPic.Modules;
 using AquaPic.Drivers;
 using AquaPic.Utilites;
@@ -51,6 +50,7 @@ namespace AquaPic.UserInterface
         string switchName;
         TouchLabel switchStateTextBox;
         TouchLabel switchTypeLabel;
+        TouchLabel switchStateLabel;
         TouchComboBox switchCombo;
 
         public WaterLevelWindow (params object[] options) : base () {
@@ -61,7 +61,7 @@ namespace AquaPic.UserInterface
             /******************************************************************************************************/
             /* Water Level Groups                                                                                 */
             /******************************************************************************************************/
-            groupName = WaterLevel.defaultWaterLevelGroup;
+            groupName = WaterLevel.firstWaterLevelGroup;
 
             var label = new TouchLabel ();
             label.text = "Groups";
@@ -105,7 +105,7 @@ namespace AquaPic.UserInterface
                     groupCombo.activeText = groupName;
                 } else if (outcome == TouchSettingsOutcome.Deleted) {
                     groupCombo.comboList.Remove (groupName);
-                    groupName = WaterLevel.defaultWaterLevelGroup;
+                    groupName = WaterLevel.firstWaterLevelGroup;
                     groupCombo.activeText = groupName;
                 }
 
@@ -118,10 +118,10 @@ namespace AquaPic.UserInterface
             /**************************************************************************************************************/
             /* Analog water sensor                                                                                        */
             /**************************************************************************************************************/
-            analogSensorName = WaterLevel.defaultAnalogLevelSensor;
+            analogSensorName = WaterLevel.firstAnalogLevelSensor;
 
             label = new TouchLabel ();
-            label.text = "Water Level Sensor";
+            label.text = "Analog Sensor";
             label.textColor = "seca";
             label.textSize = 12;
             Put (label, 415, 80);
@@ -162,7 +162,7 @@ namespace AquaPic.UserInterface
                     analogSensorName = newAnalogSensorName;
                 } else if (outcome == TouchSettingsOutcome.Deleted) {
                     analogCombo.comboList.Remove (analogSensorName);
-                    analogSensorName = WaterLevel.defaultAnalogLevelSensor;
+                    analogSensorName = WaterLevel.firstAnalogLevelSensor;
                     analogCombo.activeText = analogSensorName;
                 }
 
@@ -215,7 +215,7 @@ namespace AquaPic.UserInterface
             /**************************************************************************************************************/
             /* Float Switches                                                                                             */
             /**************************************************************************************************************/
-            switchName = WaterLevel.defaultFloatSwitch;
+            switchName = WaterLevel.firstFloatSwitch;
 
             label = new TouchLabel ();
             label.text = "Probes";
@@ -224,13 +224,12 @@ namespace AquaPic.UserInterface
             Put (label, 415, 280);
             label.Show ();
 
-            var sLabel = new TouchLabel ();
-            sLabel.text = "Current Switch State";
-            sLabel.textAlignment = TouchAlignment.Center;
-            sLabel.textColor = "grey3";
-            sLabel.WidthRequest = 370;
-            Put (sLabel, 415, 355);
-            sLabel.Show ();
+            switchStateLabel = new TouchLabel ();
+            switchStateLabel.text = "Current Switch State";
+            switchStateLabel.textAlignment = TouchAlignment.Center;
+            switchStateLabel.textColor = "grey3";
+            switchStateLabel.WidthRequest = 370;
+            Put (switchStateLabel, 415, 355);
 
             switchStateTextBox = new TouchLabel ();
             switchStateTextBox.WidthRequest = 370;
@@ -268,7 +267,7 @@ namespace AquaPic.UserInterface
                     switchName = newSwitchName;
                 } else if (outcome == TouchSettingsOutcome.Deleted) {
                     switchCombo.comboList.Remove (switchName);
-                    switchName = WaterLevel.defaultFloatSwitch;
+                    switchName = WaterLevel.firstFloatSwitch;
                     switchCombo.activeText = switchName;
                 }
 
@@ -329,7 +328,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 TouchColor.SetSource (cr, "grey3", 0.75);
                 cr.LineWidth = 3;
 
@@ -367,6 +366,7 @@ namespace AquaPic.UserInterface
                     groupCombo.activeText = newGroupName;
                     groupName = newGroupName;
                 } else {
+                    Console.WriteLine ("Moving combo back to {0}", groupName);
                     groupCombo.activeText = groupName;
                 }
 
@@ -424,10 +424,12 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetGroupData () {
-            if (!groupName.IsEmpty ()) {
+            if (groupName.IsNotEmpty ()) {
                 levelLabel.text = WaterLevel.GetWaterLevelGroupLevel (groupName).ToString ("F1");
+                levelLabel.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
             } else {
                 levelLabel.text = "--";
+                levelLabel.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
             }
 
             levelLabel.QueueDraw ();
@@ -467,9 +469,13 @@ namespace AquaPic.UserInterface
                     switchStateTextBox.textColor = "seca";
                 }
 
+                switchStateLabel.Visible = true;
+                switchTypeLabel.Visible = true;
+
                 SwitchType type = WaterLevel.GetFloatSwitchType (switchName);
                 switchTypeLabel.text = Utils.GetDescription (type);
             } else {
+                switchStateLabel.Visible = false;
                 switchTypeLabel.Visible = false;
                 switchStateTextBox.text = "Switch not available";
                 switchStateTextBox.textColor = "white";
