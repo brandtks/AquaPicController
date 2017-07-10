@@ -39,7 +39,7 @@ namespace AquaPic.Modules
 {
     public partial class Lighting
     {
-        private static Dictionary<string,LightingFixture> fixtures;
+        static Dictionary<string,LightingFixture> fixtures;
         public static TimeDate sunRiseToday;
         public static TimeDate sunSetToday;
         public static TimeDate sunRiseTomorrow;
@@ -95,7 +95,11 @@ namespace AquaPic.Modules
             }
         }
 
-        static Lighting () {
+        static Lighting () { }
+
+        public static void Init () {
+            Logger.Add ("Initializing Lighting");
+
             fixtures = new Dictionary<string, LightingFixture> ();
 
             string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
@@ -106,30 +110,80 @@ namespace AquaPic.Modules
                 using (StreamReader reader = File.OpenText (path)) {
                     JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
-                    RiseSetCalc.latitude = Convert.ToDouble (jo["latitude"]);
-                    RiseSetCalc.longitude = Convert.ToDouble (jo["longitude"]);
+                    try {
+                        RiseSetCalc.latitude = Convert.ToDouble (jo["latitude"]);
+                    } catch {
+                        RiseSetCalc.latitude = 41.093842;
+                        Logger.AddWarning ("Error parsing latitude setting, using default");
+                    }
 
-                    defaultSunRise = new Time (
-                        Convert.ToByte (jo["defaultSunRise"]["hour"]),
-                        Convert.ToByte (jo["defaultSunRise"]["minute"]));
-                    defaultSunSet = new Time (
-                        Convert.ToByte (jo["defaultSunSet"]["hour"]),
-                        Convert.ToByte (jo["defaultSunSet"]["minute"]));
+                    try {
+                        RiseSetCalc.longitude = Convert.ToDouble (jo["longitude"]);
+                    } catch {
+                        RiseSetCalc.longitude = -85.139236;
+                        Logger.AddWarning ("Error parsing longitude setting, using default");
+                    }
 
-                    minSunRise = new Time (
-                        Convert.ToByte (jo["minSunRise"]["hour"]),
-                        Convert.ToByte (jo["minSunRise"]["minute"]));
-                    maxSunRise = new Time (
-                        Convert.ToByte (jo["maxSunRise"]["hour"]),
-                        Convert.ToByte (jo["maxSunRise"]["minute"]));
+                    try {
+                        defaultSunRise = new Time (
+                            Convert.ToByte (jo["defaultSunRise"]["hour"]), 
+                            Convert.ToByte (jo["defaultSunRise"]["minute"])
+                        );
+                    } catch {
+                        defaultSunRise = new Time (7, 30);
+                        Logger.AddWarning ("Error parsing default sun rise setting, using default");
+                    }
 
-                    minSunSet = new Time (
-                        Convert.ToByte (jo["minSunSet"]["hour"]),
-                        Convert.ToByte (jo["minSunSet"]["minute"]));
+                    try {
+                        defaultSunSet = new Time (
+                            Convert.ToByte (jo["defaultSunRise"]["hour"]),
+                            Convert.ToByte (jo["defaultSunRise"]["minute"])
+                        );
+                    } catch {
+                        defaultSunSet = new Time (20, 30);
+                        Logger.AddWarning ("Error parsing default sun set setting, using default");
+                    }
 
-                    maxSunSet = new Time (
-                        Convert.ToByte (jo["maxSunSet"]["hour"]),
-                        Convert.ToByte (jo["maxSunSet"]["minute"]));
+                    try {
+                        minSunRise = new Time (
+                            Convert.ToByte (jo["minSunRise"]["hour"]),
+                            Convert.ToByte (jo["minSunRise"]["minute"])
+                        );
+                    } catch {
+                        minSunRise = new Time (7, 15);
+                        Logger.AddWarning ("Error parsing min sun rise setting, using default");
+                    }
+
+                    try {
+                        maxSunRise = new Time (
+                            Convert.ToByte (jo["maxSunRise"]["hour"]),
+                            Convert.ToByte (jo["maxSunRise"]["minute"])
+                        );
+                    } catch {
+                        maxSunRise = new Time (8, 00);
+                        Logger.AddWarning ("Error parsing max sun rise setting, using default");
+                    }
+
+                    try {
+                        minSunSet = new Time (
+                            Convert.ToByte (jo["minSunSet"]["hour"]),
+                            Convert.ToByte (jo["minSunSet"]["minute"])
+                        );
+                    } catch {
+                        minSunSet = new Time (19, 30);
+                        Logger.AddWarning ("Error parsing min sun set setting, using default");
+                    }
+
+
+                    try {
+                        maxSunSet = new Time (
+                            Convert.ToByte (jo["maxSunSet"]["hour"]),
+                            Convert.ToByte (jo["maxSunSet"]["minute"])
+                        );
+                    } catch {
+                        maxSunSet = new Time (21, 00);
+                        Logger.AddWarning ("Error parsing max sun set setting, using default");
+                    }
 
                     // Very important to update rise/set times before we setup auto on/off for lighting fixtures
                     UpdateRiseSetTimes ();
@@ -160,21 +214,13 @@ namespace AquaPic.Modules
                             float minDimmingOutput = Convert.ToSingle (obj["minDimmingOutput"]);
                             float maxDimmingOutput = Convert.ToSingle (obj["maxDimmingOutput"]);
 
-                            string aType = (string)obj["analogType"];
-                            AnalogType analogType;
-                            if (string.Equals (aType, "ZeroTen", StringComparison.InvariantCultureIgnoreCase)) {
-                                analogType = AnalogType.ZeroTen;
-                            } else {
-                                analogType = AnalogType.PWM;
-                            }
-
                             AddLight (
                                 name,
                                 plug,
                                 channel,
                                 minDimmingOutput,
                                 maxDimmingOutput,
-                                analogType,
+                                AnalogType.ZeroTen,
                                 lightingTime,
                                 highTempLockout
                             );
@@ -195,8 +241,8 @@ namespace AquaPic.Modules
                     }
                 }
             } else {
-                RiseSetCalc.latitude = 41.181946;
-                RiseSetCalc.longitude = -85.063345;
+                RiseSetCalc.latitude = 41.093842;
+                RiseSetCalc.longitude = -85.139236;
                 defaultSunRise = new Time (7, 30);
                 defaultSunSet = new Time (20, 30);
                 minSunRise = new Time (7, 15);
@@ -245,10 +291,6 @@ namespace AquaPic.Modules
             }
 
             TaskManager.AddTimeOfDayInterrupt ("RiseSetUpdate", new Time (0, 0), () => UpdateRiseSetTimes ());
-        }
-
-        public static void Init () {
-            Logger.Add ("Initializing Lighting");
         }
 
         public static void UpdateRiseSetTimes () {

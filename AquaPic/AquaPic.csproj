@@ -107,7 +107,7 @@
     <Compile Include="Runtime\Hardware\Hardware.cs" />
     <Compile Include="Runtime\Timer\Timer.cs" />
     <Compile Include="Runtime\Timer\IntervalTimer.cs" />
-    <Compile Include="Modules\Water Level\WaterLevel.cs" />
+    <Compile Include="Modules\WaterLevel\WaterLevel.cs" />
     <Compile Include="Runtime\Script\Script.cs" />
     <Compile Include="Runtime\Timer\OffDelayTimer.cs" />
     <Compile Include="Runtime\Timer\OnDelayTimer.cs" />
@@ -200,7 +200,7 @@
     <Compile Include="Sensors\ISensor.cs" />
     <Compile Include="Equipment\IEquipment.cs" />
     <Compile Include="Equipment\Pump.cs" />
-    <Compile Include="Modules\Water Level\WaterLevelGroup.cs" />
+    <Compile Include="Modules\WaterLevel\WaterLevelGroup.cs" />
     <Compile Include="Sensors\WaterLevelSensor.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\WaterGroupSettings.cs" />
   </ItemGroup>
