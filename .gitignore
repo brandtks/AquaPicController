@@ -9,3 +9,4 @@ packages/
 *.xml
 *.suo
 .directory
+*.swp

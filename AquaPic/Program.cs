@@ -64,8 +64,10 @@ namespace AquaPic
             }
 
             if (aquaPicEnvironment.IsEmpty ()) {
-                Console.WriteLine ("Please add an environment variable or file in execution path");
-                Console.WriteLine ("with the path to the AquaPic directory environment");
+                Console.WriteLine ("Please add an environment variable, 'AquaPic' or file in execution path");
+                Console.WriteLine ("with the path to the AquaPicRuntime directory, not to include AquaPicRuntime");
+                Console.WriteLine ("Example: If the AquaPicRuntime directory is located at /home/user/AquaPicRuntime/");
+                Console.WriteLine ("Then run \"export AquaPic='/home/user/'\" prior to starting the application");
                 Application.Quit ();
                 return;
             }
