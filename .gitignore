@@ -10,3 +10,4 @@ packages/
 .directory
 *.swp
 .vs/
+PrePackage/
