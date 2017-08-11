@@ -27,7 +27,7 @@ fi
 
 if [ ! -f AquaPic/CSScriptLibrary.dll ]; then
     echo "Dependency CSSriptLibrary.dll not found"
-    if [ ! $allow ]; then
+    if [ $allow -eq 0]; then
         allow_download
         allow=1
     fi
@@ -38,7 +38,7 @@ fi
 
 if [ ! -f AquaPic/Newtonsoft.Json.dll ]; then
     echo "Dependency Newtonsoft.Json.dll not found"
-    if [ ! $allow ]; then
+    if [ $allow -eq 0 ]; then
         allow_download
         allow=1
     fi
