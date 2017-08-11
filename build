@@ -15,25 +15,24 @@ allow_download () {
 }
 
 allow=0
-
 if [ ! -f AquaPic/FileHelpers.dll ]; then
     echo "Dependency FileHelpers.dll not found"
     allow_download
     allow=1
     wget -O AquaPic/FileHelpers.dll "https://www.dropbox.com/s/385ljwkjq0960dv/FileHelpers.dll?dl=0" 
 else
-    echo "FileHelpers.dll found"
+    echo "Dependecy FileHelpers.dll found"
 fi
 
 if [ ! -f AquaPic/CSScriptLibrary.dll ]; then
     echo "Dependency CSSriptLibrary.dll not found"
-    if [ $allow -eq 0]; then
+    if [ $allow -eq 0 ]; then
         allow_download
         allow=1
     fi
     wget -O AquaPic/CSScriptLibrary.dll "https://www.dropbox.com/s/sjm8rdrkaq1sf4v/CSScriptLibrary.dll?dl=0"
 else
-    echo "CSSriptLibrary.dll found"
+    echo "Dependency CSSriptLibrary.dll found"
 fi
 
 if [ ! -f AquaPic/Newtonsoft.Json.dll ]; then
@@ -44,5 +43,9 @@ if [ ! -f AquaPic/Newtonsoft.Json.dll ]; then
     fi
     wget -O AquaPic/Newtonsoft.Json.dll "https://www.dropbox.com/s/z2amvvkqy5t642x/Newtonsoft.Json.dll?dl=0"
 else
-    echo "Newtonsoft.Json.dll found"
+    echo "Dependency Newtonsoft.Json.dll found"
 fi
+
+msbuild.exe /p:Configuration=Release AquaPic/AquaPic.csproj /m
+
+#rm AquaPic/bin/Release/

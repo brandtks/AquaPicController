@@ -2,7 +2,6 @@ bin/
 obj/
 gtk-gui/
 packages/
-*.config
 *.userprefs
 *.dll
 *.pdb
@@ -10,3 +9,4 @@ packages/
 *.suo
 .directory
 *.swp
+.vs/
