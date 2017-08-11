@@ -64,7 +64,7 @@ namespace AquaPic
             }
 
             if (aquaPicEnvironment.IsEmpty ()) {
-                Console.WriteLine ("Please edit the AquaPicEnvironment file to point to the path of the AquaPicRuntime directory,");
+                Console.WriteLine ("Please edit the AquaPicEnvironment.txt file to point to the path of the AquaPicRuntime directory,");
                 Console.WriteLine ("not to include AquaPicRuntime. For example if the AquaPicRuntime directory is located at");
                 Console.WriteLine ("/home/user/AquaPicRuntime/, then add \"/home/user\" to the first line of the file.");
                 Application.Quit ();
