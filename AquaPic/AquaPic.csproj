@@ -31,6 +31,7 @@
     <ConsolePause>false</ConsolePause>
     <DefineConstants>RPI_BUILD;</DefineConstants>
     <RunCodeAnalysis>false</RunCodeAnalysis>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
