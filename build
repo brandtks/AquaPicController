@@ -1,5 +1,22 @@
 #!/bin/bash
 
+usage() {
+    echo This build script only takes zero or one arugment. 
+    echo Running the script with no arguments builds the release configuration of the AquaPic Controller.
+    echo --debug, -d: Builds the debug configuration of the AquaPic Controller.
+    exit 2
+}
+
+if [ $# -ge 1 ]; then
+    if [ "$1" == "--debug" -o "$1" == "-d" ]; then
+        config=DEBUG
+    else
+        usage
+    fi
+else
+    config=Release
+fi
+
 . ./Makefile-defines.mk
 
 output=$($NUGET 2> /dev/null)
@@ -45,42 +62,26 @@ else
 fi
 
 echo Using \'$msbuild\' as the MSBuild command
+
 echo ----------------------------------------------------------------------------------
 echo Installing dependencies...
 $NUGET install AquaPic/packages.config -OutputDirectory packages
+
 echo ----------------------------------------------------------------------------------
 echo Building AquaPic...
-$msbuild /p:Configuration=Release AquaPic/AquaPic.csproj 
+$msbuild /p:Configuration=$config AquaPic/AquaPic.csproj 
 
 echo ----------------------------------------------------------------------------------
 echo Cleaning up...
+if [ $config == "Release" ]; then
+    output_directory='AquaPic/bin/Release'
+else
+    output_directory='AquaPic/bin/Debug'
+fi
+
 # Can't figure out how to prevent MSBuild from copying GTK libraries to the output directory. 
-# Leaving the *.dll in the direcotry  screws up mono's library lookup
-output_directory='AquaPic/bin/Release'
-rm -f $output_directory/atk-sharp.dll $output_directory/gdk-sharp.dll $output_directory/glade-sharp.dll $output_directory/glib-sharp.dll \
-    $output_directory/gtk-sharp.dll $output_directory/pango-sharp.dll
-
-if [ ! -f $output_directory/AquaPicEnvironment.txt ]; then 
-    echo -n "Enter the path to the settings directory (don't include AquaPicRuntimeProject/): "
-    read settings_dir
-    echo $settings_dir > $output_directory/AquaPicEnvironment.txt
-fi
-
-settings_dir=$(cat $output_directory/AquaPicEnvironment.txt)
-if [ ! -d $settings_dir/AquaPicRuntimeProject ]; then
-    loop=""
-    echo "$settings_dir/AquaPicRuntimeProject doesn't exist."
-    while [ -z $loop ]; do
-        echo -n "Create directory (y/n): "
-        read response
-        if [ $response == 'y' -o $response == 'Y' ]; then
-            mkdir $settings_dir/AquaPicRuntimeProject
-            loop="done"
-        elif [ $response == 'n' -o $response == 'N' ]; then
-            loop="skip"
-        fi
-    done
-fi
+# Leaving the *.dll in the direcotry screws up mono's library lookup
+rm -f $output_directory/atk-sharp.dll $output_directory/gdk-sharp.dll $output_directory/glib-sharp.dll $output_directory/gtk-sharp.dll $output_directory/pango-sharp.dll
 
 rm -f AquaPic.run
 cat << stop > AquaPic.run
