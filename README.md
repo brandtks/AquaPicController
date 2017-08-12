@@ -8,23 +8,32 @@ Handles all functionality for the AquaPic aquarium controller. Also provides a g
 All code is a work in progress. 
 
 ### Prerequisites
+  * Either [Mono](http://www.mono-project.com/). ```sudo apt install mono-complete```
+  * Or _.NET Core_ , however this has not been tested.
+  * Theoretically, .NET on Windows will also work. However, Windows isn't a real OS so that isn't tested or supported.
+
+### Toolchain
+NuGet is required to install all the dependecies and MSBuild. Recommend not installing NuGet though a package manager. 
+The version of NuGet in some repositories is too old to download all the required dependecies. Instead download nuget.exe 
+using wget ```wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe``` and use mono to execute. mono-complete 
+must be installed for this to work, ```mono /path/to/nuget.exe```. MSBuild is optional. The build script will install MSBuild 
+if it can't be found on the system. 
+
+Another option is to use a C# IDE:
+ * MonoDeveloper
+ * Xamarin Studio
+ * Visual Studio if you feel the need to use Windows
+
+###Building
+ * Edit Makefile-defines.mk to point to the NuGet _'executable'_.
+ * ```./build```
+ * Or just use one of the chunk graphical IDEs 
+
+### Dependencies
  * [GtkSharp](http://www.mono-project.com/docs/gui/gtksharp/) - The Mono Project
  * [cs-script](http://www.csscript.net/) - Oleg Shilo
  * [Json.NET](http://www.newtonsoft.com/json) - Newtonsoft
  * [FileHeloper](http://www.filehelpers.net/) - Devoo - Marcos Meli
- * Either [Mono](http://www.mono-project.com/), or [.NET](https://www.microsoft.com/net/download). _.NET Core_ has not been tested.
-
-### Toolchain
-Unfortunately xbuild has been deprecated by the Mono project and will be removed in future updates. Instead msbuild is supposed to be used. msbuild is available though the AUR if using Arch, but for other distros or MacOS, good luck.
-Another option is to use a C# IDE:
- * MonoDeveloper
- * Xamarin Studio
- * Visual Studio 
-
-###Building
- * Add CSScript.dll, FileHelper.dll, and Newtonsoft.Json.dll to the AquaPicController/AquaPic/ directory. Must be in the same directory as AquaPic.csproj.
- * ```msbuild.exe /p:Configuration=Release AquaPicController/AquaPic/AquaPic.csproj```
- * Or just use one of the chunk graphical IDEs 
 
 ### License
 The AquaPic main control code is released under the terms of the GNU General Public License (GPL), version 3 or later. See COPYING for details.

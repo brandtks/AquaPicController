@@ -89,4 +89,6 @@ mono $output_directory/AquaPic.exe "\$@"
 stop
 chmod +x AquaPic.run
 
-echo Finished building. The controller can be launched by running Aquapic.run.
+echo ----------------------------------------------------------------------------------
+echo Finished building the AquaPic Controller
+echo The application can be launched by running AquaPic.run
