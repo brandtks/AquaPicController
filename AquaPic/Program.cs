@@ -48,9 +48,11 @@ namespace AquaPic
             string aquaPicEnvironment = string.Empty;
             aquaPicEnvironment = Environment.GetEnvironmentVariable ("AquaPic");
             if (aquaPicEnvironment.IsEmpty ()) {
-                if (File.Exists ("AquaPicEnvironment.txt")) {
-                    var lines = File.ReadAllLines ("AquaPicEnvironment.txt");
-                    aquaPicEnvironment = lines [0];
+                var path = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+                path = Path.Combine(path, "AquaPicEnvironment.txt");
+                if (File.Exists(path)) {
+                    var lines = File.ReadAllLines(path);
+                    aquaPicEnvironment = lines[0];
                 }
             }
 
