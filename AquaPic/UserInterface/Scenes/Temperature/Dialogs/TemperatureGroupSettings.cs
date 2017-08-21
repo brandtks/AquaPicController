@@ -146,8 +146,7 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnSave (object sender) {
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
             string json = File.ReadAllText (path);
@@ -248,8 +247,7 @@ namespace AquaPic.UserInterface
                 }
             }
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
             string json = File.ReadAllText (path);

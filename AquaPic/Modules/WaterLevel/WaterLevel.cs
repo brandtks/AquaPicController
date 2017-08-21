@@ -115,8 +115,7 @@ namespace AquaPic.Modules
             analogLevelSensors = new Dictionary<string, WaterLevelSensor> ();
             floatSwitches = new Dictionary<string, FloatSwitch> ();
 
-            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
+            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "waterLevelProperties.json");
 
             if (File.Exists (path)) {
@@ -715,8 +714,7 @@ namespace AquaPic.Modules
             analogLevelSensors[name].fullScaleActual = fullScaleActual;
             analogLevelSensors[name].fullScaleValue = fullScaleValue;
 
-            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
+            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "waterLevelProperties.json");
 
             string json = File.ReadAllText (path);

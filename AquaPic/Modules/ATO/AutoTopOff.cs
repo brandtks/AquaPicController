@@ -117,8 +117,7 @@ namespace AquaPic.Modules
         }
 
         static AutoTopOff () {
-            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
+            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "autoTopOffProperties.json");
 
             if (File.Exists (path)) {
@@ -361,8 +360,7 @@ namespace AquaPic.Modules
             ato.reservoirLevel.fullScaleActual = fullScaleActual;
             ato.reservoirLevel.fullScaleValue = fullScaleValue;
 
-            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
+            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "waterLevelProperties.json");
 
             string jstring = File.ReadAllText (path);

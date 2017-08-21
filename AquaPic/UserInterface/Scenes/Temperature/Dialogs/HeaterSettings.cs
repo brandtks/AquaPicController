@@ -99,7 +99,7 @@ namespace AquaPic.UserInterface
         protected void ParseOutlet (string s, ref int g, ref int i) {
             int idx = s.IndexOf ('.');
             string psName = s.Substring (0, idx);
-            g = (byte)Power.GetPowerStripIndex (psName);
+            g = Power.GetPowerStripIndex (psName);
             i = Convert.ToByte (s.Substring (idx + 2));
         }
         
@@ -108,12 +108,11 @@ namespace AquaPic.UserInterface
             var name = (settings["Name"] as SettingsTextBox).textBox.text;
             var temperatureGroupName = (settings["Temperature Group"] as SettingsComboBox).combo.activeText;
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
             string json = File.ReadAllText (path);
-            JObject jo = (JObject)JToken.Parse (json);
+            var jo = (JObject)JToken.Parse (json);
 
             if (heaterName.IsEmpty ()) {
                 if (name == "Enter name") {
@@ -199,8 +198,7 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
             string json = File.ReadAllText (path);

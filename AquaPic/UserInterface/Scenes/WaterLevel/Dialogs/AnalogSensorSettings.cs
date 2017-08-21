@@ -246,8 +246,7 @@ namespace AquaPic.UserInterface
             string chName = (settings["Input"] as SettingsComboBox).combo.activeText;
             var ic = IndividualControl.Empty;
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");
 
             string jstring = File.ReadAllText (path);
@@ -357,8 +356,7 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");
 
             string json = File.ReadAllText (path);

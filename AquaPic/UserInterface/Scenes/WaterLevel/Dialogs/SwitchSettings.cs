@@ -278,8 +278,7 @@ namespace AquaPic.UserInterface
                 groupName = string.Empty;
             }
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");
 
             string json = File.ReadAllText (path);
@@ -364,14 +363,13 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");
 
             string json = File.ReadAllText (path);
-            JObject jo = (JObject)JToken.Parse (json);
+            var jo = (JObject)JToken.Parse (json);
 
-            JArray ja = jo ["floatSwitches"] as JArray;
+            var ja = jo ["floatSwitches"] as JArray;
 
             int arrIdx = -1;
             for (int i = 0; i < ja.Count; ++i) {

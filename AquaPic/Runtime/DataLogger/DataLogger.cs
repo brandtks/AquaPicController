@@ -57,8 +57,7 @@ namespace AquaPic.Runtime
 
         public DataLogger (string name) {
             _name = name;
-            currentFilePath = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            currentFilePath = Path.Combine (currentFilePath, "DataLogging");
+            currentFilePath = Path.Combine (Utils.AquaPicEnvironment, "DataLogging");
             currentFilePath = Path.Combine (currentFilePath, _name.RemoveWhitespace ());
 
             if (!Directory.Exists (currentFilePath)) {

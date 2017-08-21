@@ -28,9 +28,7 @@
 using System.IO.Ports; // for SerialPort
 using System.Collections.Generic;
 using Gtk;
-using Cairo;
 using TouchWidgetLibrary;
-using AquaPic.Drivers;
 using AquaPic.Modules;
 using AquaPic.Runtime;
 using AquaPic.SerialBus;
@@ -42,7 +40,6 @@ namespace AquaPic.UserInterface
     {
         SerialBusSlaveWidget[] slaves;
         TouchComboBox c;
-        uint timerId;
 
         public SerialBusWindow (params object[] options) : base () {
             sceneTitle = "AquaPic Bus";
@@ -108,7 +105,7 @@ namespace AquaPic.UserInterface
             if (!AquaPicBus.isOpen) {
                 string[] portNames = SerialPort.GetPortNames ();
                 if (Utils.ExecutingOperatingSystem == Platform.Linux) {
-                    List<string> sortedPortNames = new List<string> ();
+                    var sortedPortNames = new List<string> ();
                     foreach (var name in portNames) {
                         if (name.Contains ("USB")) {
                             sortedPortNames.Add (name);
@@ -139,15 +136,7 @@ namespace AquaPic.UserInterface
             addSlaveBtn.Show ();
 
             GetSlaveData ();
-
-            timerId = GLib.Timeout.Add (1000, OnTimer);
-
             Show ();
-        }
-
-        public override void Dispose () {
-            GLib.Source.Remove (timerId);
-            base.Dispose ();
         }
 
         protected void GetSlaveData () {
@@ -161,14 +150,13 @@ namespace AquaPic.UserInterface
             }
         }
 
-        protected bool OnTimer () {
+        protected override bool OnUpdateTimer () {
             GetSlaveData ();
-
             return true;
         }
 
         protected void OnOpenButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            TouchButton b = sender as TouchButton;
+            var b = sender as TouchButton;
 
             if (b != null) { 
                 if (c.activeIndex != -1) {

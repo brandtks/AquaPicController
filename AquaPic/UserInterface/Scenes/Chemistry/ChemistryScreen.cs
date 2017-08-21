@@ -50,17 +50,15 @@ namespace AquaPic.UserInterface
         int actionOption;
         int currentTime;
         int testIdx;
-        uint timerId;
         bool enableStepButton;
         bool timerRunning;
 
-        public ChemistryWindow (params object[] options) : base () {
+        public ChemistryWindow (params object[] options) : base (false) {
             sceneTitle = "Chemistry";
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "TestProcedures");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "TestProcedures");
 
-            DirectoryInfo d = new DirectoryInfo (path);
+            var d = new DirectoryInfo (path);
             FileInfo[] files = d.GetFiles ("*.json");
 
             testIdx = -1;
@@ -153,11 +151,6 @@ namespace AquaPic.UserInterface
             Show ();
         }
 
-        public override void Dispose () {
-            GLib.Source.Remove (timerId);
-            base.Dispose ();
-        }
-
         void EntryKeyPressEvent (object o, KeyPressEventArgs args) {
             Console.WriteLine("DEBUG: KeyValue: " + args.Event.KeyValue);
             if (args.Event.KeyValue == 32) {
@@ -241,7 +234,7 @@ namespace AquaPic.UserInterface
             }
         }
 
-        protected bool OnTimer () {
+        protected override bool OnUpdateTimer () {
             --currentTime;
 
             timerProgress.progress = (float)currentTime / (float)actionOption;
@@ -335,7 +328,7 @@ namespace AquaPic.UserInterface
             if (enableStepButton) {
                 if (stepButton.text == "Start Timer") {
                     timerRunning = true;
-                    timerId = GLib.Timeout.Add (200, OnTimer);
+                    timerId = GLib.Timeout.Add (200, OnUpdateTimer);
                     stepButton.text = "Next";
                     stepButton.buttonColor = "grey2";
                     enableStepButton = false;
@@ -404,7 +397,7 @@ namespace AquaPic.UserInterface
                 if (tests [testIdx].Done) {
                     restart = true;
                 } else {
-                    var parent = this.Toplevel as Gtk.Window;
+                    var parent = this.Toplevel as Window;
                     if (parent != null) {
                         if (!parent.IsTopLevel)
                             parent = null;

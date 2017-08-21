@@ -101,8 +101,7 @@ namespace AquaPic.UserInterface
                 analogSensorName = string.Empty;
             }
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");
 
             string json = File.ReadAllText (path);
@@ -116,7 +115,7 @@ namespace AquaPic.UserInterface
 
                 WaterLevel.AddWaterLevelGroup (name, analogSensorName);
 
-                JObject jobj = new JObject ();
+                var jobj = new JObject ();
 
                 jobj.Add (new JProperty ("name", name));
                 jobj.Add (new JProperty ("analogLevelSensorName", analogSensorName));
@@ -127,7 +126,7 @@ namespace AquaPic.UserInterface
             } else {
                 WaterLevel.SetWaterLevelGroupAnalogSensorName (groupName, analogSensorName);
 
-                JArray ja = jo["waterLevelGroups"] as JArray;
+                var ja = jo["waterLevelGroups"] as JArray;
                 int arrIdx = -1;
                 for (int i = 0; i < ja.Count; ++i) {
                     string n = (string)ja[i]["name"];
@@ -151,14 +150,13 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");
 
             string json = File.ReadAllText (path);
-            JObject jo = (JObject)JToken.Parse (json);
+            var jo = (JObject)JToken.Parse (json);
 
-            JArray ja = jo["waterLevelGroups"] as JArray;
+            var ja = jo["waterLevelGroups"] as JArray;
             int arrIdx = -1;
             for (int i = 0; i < ja.Count; ++i) {
                 string n = (string)ja[i]["name"];

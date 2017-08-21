@@ -37,8 +37,7 @@ namespace AquaPic.Runtime
     public class Hardware
     {
         public static void AddFromJson () {
-            var path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
+            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "equipment.json");
 
             if (File.Exists (path)) {
@@ -89,8 +88,7 @@ namespace AquaPic.Runtime
                 File.WriteAllText (path, ja.ToString ());
             }
 
-            path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
+            path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "generalProperties.json");
 
             if (File.Exists (path)) {

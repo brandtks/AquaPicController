@@ -37,7 +37,6 @@ namespace AquaPic.UserInterface
     {
         TouchComboBox combo;
         int cardId;
-        uint timerId;
 
         DigitalDisplay[] displays;
 
@@ -80,18 +79,14 @@ namespace AquaPic.UserInterface
             combo.Show ();
 
             GetCardData ();
-
-            timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
-
             Show ();
         }
 
-        public override void Dispose () {
-            GLib.Source.Remove (timerId);
-            base.Dispose ();
-        }
+        protected override bool OnUpdateTimer () {
+            if (cardId == -1) {
+                return false;
+            }
 
-        protected bool OnUpdateTimer () {
             bool[] states = AquaPicDrivers.DigitalInput.GetAllChannelValues (cardId);
 
             for (int i = 0; i < states.Length; ++i) {
@@ -118,7 +113,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnForceRelease (object sender, ButtonReleaseEventArgs args) {
-            DigitalDisplay d = sender as DigitalDisplay;
+            var d = sender as DigitalDisplay;
 
             var ic = IndividualControl.Empty;
             ic.Group = cardId;
@@ -140,7 +135,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnSelectorChanged (object sender, SelectorChangedEventArgs args) {
-            DigitalDisplay d = sender as DigitalDisplay;
+            var d = sender as DigitalDisplay;
 
             var ic = IndividualControl.Empty;
             ic.Group = cardId;

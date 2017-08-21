@@ -124,8 +124,7 @@ namespace AquaPic.UserInterface
 
         protected void SaveEvents () {
             if (!string.IsNullOrWhiteSpace (Logger.buffer.Text)) {
-                string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-                path = System.IO.Path.Combine (path, "Logs");
+                string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Logs");
                 path = System.IO.Path.Combine (path, DateTime.Now.ToString ("yy-MM-dd-HH-mm-ss") + ".txt");
 
                 List<string> lines = new List<string> ();

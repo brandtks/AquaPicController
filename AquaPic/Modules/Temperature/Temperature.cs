@@ -186,8 +186,7 @@ namespace AquaPic.Modules
             probes = new Dictionary<string, TemperatureProbe> ();
             temperatureGroups = new Dictionary<string, TemperatureGroup> ();
 
-            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
+            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "tempProperties.json");
 
             if (File.Exists (path)) {
@@ -659,8 +658,7 @@ namespace AquaPic.Modules
             probes[probeName].fullScaleActual = fullScaleActual;
             probes[probeName].fullScaleValue = fullScaleValue;
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
             string json = File.ReadAllText (path);

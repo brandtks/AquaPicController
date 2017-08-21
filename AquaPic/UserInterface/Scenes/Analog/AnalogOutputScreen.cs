@@ -38,7 +38,6 @@ namespace AquaPic.UserInterface
         TouchComboBox combo;
         int cardId;
         AnalogChannelDisplay[] displays;
-        uint timerId;
 
         public AnalogOutputWindow (params object[] options) : base () {
             sceneTitle = "Analog Output Cards";
@@ -75,20 +74,14 @@ namespace AquaPic.UserInterface
             combo.Show ();
 
             GetCardData ();
-
-            timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
-
             Show ();
         }
 
-        public override void Dispose () {
-            if (cardId != -1) {
-                GLib.Source.Remove (timerId);
+        protected override bool OnUpdateTimer () {
+            if (cardId == -1) {
+                return false;
             }
-            base.Dispose ();
-        }
 
-        protected bool OnUpdateTimer () {
             int[] values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (cardId);
 
             int i = 0;
@@ -111,7 +104,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnForceRelease (object sender, ButtonReleaseEventArgs args) {
-            AnalogChannelDisplay d = sender as AnalogChannelDisplay;
+            var d = sender as AnalogChannelDisplay;
 
             var ic = IndividualControl.Empty;
             ic.Group = cardId;
@@ -143,10 +136,10 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnValueChanged (object sender, float value) {
-            AnalogChannelDisplay d = sender as AnalogChannelDisplay;
+            var d = sender as AnalogChannelDisplay;
 
             var ic = IndividualControl.Empty;
-            ic.Group = (byte)cardId;
+            ic.Group = cardId;
             ic.Individual = AquaPicDrivers.AnalogOutput.GetChannelIndex (cardId, d.label.text);
 
             Mode m = AquaPicDrivers.AnalogOutput.GetChannelMode (ic);

@@ -41,8 +41,6 @@ namespace AquaPic.UserInterface
         List<BarPlotWidget> barPlots;
         List<CurvedBarPlotWidget> curvedBarPlots;
 
-        uint timerId;
-
         public HomeWindow (params object[] options) : base () {
             showTitle = false;
 
@@ -60,8 +58,7 @@ namespace AquaPic.UserInterface
                                             return Lighting.GetCurrentDimmingLevel (name);
                                         }
                                     );
-                                }
-                                )
+                                })
                             );
                         }
                     }
@@ -72,13 +69,12 @@ namespace AquaPic.UserInterface
             barPlots = new List<BarPlotWidget> ();
             curvedBarPlots = new List<CurvedBarPlotWidget> ();
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "mainScreen.json");
 
             if (File.Exists (path)) {
                 using (StreamReader reader = File.OpenText (path)) {
-                    JArray ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));
+                    var ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));
 
                     foreach (var jt in ja) {
                         var jo = jt as JObject;
@@ -164,41 +160,36 @@ namespace AquaPic.UserInterface
                 Logger.Add ("Home screen file did not exist, created new home screen file");
                 var file = File.Create (path);
                 file.Close ();
-
                 var ja = new JArray ();
                 File.WriteAllText (path, ja.ToString ());
             }
 
-            OnUpdateTimer ();
-
-            timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
-
+            Update ();
             Show ();
         }
 
-        public override void Dispose () {
-            GLib.Source.Remove (timerId);
-            base.Dispose ();
+        protected override bool OnUpdateTimer () {
+            Update();
+            return true;
         }
 
-        protected bool OnUpdateTimer () {
+        protected void Update () {
             foreach (var lp in linePlots) {
                 lp.OnUpdate ();
                 lp.QueueDraw ();
             }
-
+            
             foreach (var bp in barPlots) {
                 bp.OnUpdate ();
                 bp.QueueDraw ();
             }
-
+            
             foreach (var curvedBarPlot in curvedBarPlots) {
                 curvedBarPlot.OnUpdate ();
                 curvedBarPlot.QueueDraw ();
             }
-
-            return true;
         }
+
     }
 }
 

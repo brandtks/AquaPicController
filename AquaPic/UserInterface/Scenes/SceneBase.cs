@@ -36,6 +36,7 @@ namespace AquaPic.UserInterface
     {
         //Image background;
         TouchLabel label;
+        protected uint timerId;
 
         public string sceneTitle {
             get {
@@ -55,7 +56,7 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public SceneBase () {
+        public SceneBase (bool addTimer = true) {
             SetSizeRequest (800, 416);
 
             label = new TouchLabel ();
@@ -66,6 +67,10 @@ namespace AquaPic.UserInterface
             label.textAlignment = TouchAlignment.Center;
             Put (label, 50, 37);
             label.Show ();
+            
+            if (addTimer) {
+                timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
+            }
 
 //            Gdk.Pixbuf display = new Gdk.Pixbuf("images/background2.jpg");
 //            string bpath = "temp", tempname = "temp";
@@ -83,8 +88,13 @@ namespace AquaPic.UserInterface
 //            pic.Dispose ();
         }
 
+        protected virtual bool OnUpdateTimer () {
+            return false;
+        }
+
         public override void Dispose () {
-            foreach (var w in this.Children) {
+            GLib.Source.Remove (timerId);
+            foreach (var w in Children) {
                 w.Dispose ();
             }
             base.Dispose ();

@@ -167,12 +167,11 @@ namespace AquaPic.UserInterface
 
             jo.Add (new JProperty ("options", jao));
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
-            path = System.IO.Path.Combine (path, "Equipment.json");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
+            path = System.IO.Path.Combine (path, "equipment.json");
 
             string jstring = File.ReadAllText (path);
-            JArray ja = (JArray)JToken.Parse (jstring);
+            var ja = (JArray)JToken.Parse (jstring);
 
             ja.Add (jo);
 

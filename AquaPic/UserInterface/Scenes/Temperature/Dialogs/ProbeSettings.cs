@@ -108,8 +108,7 @@ namespace AquaPic.UserInterface
             string name = (settings["Name"] as SettingsTextBox).textBox.text;
             var temperatureGroupName = (settings["Temperature Group"] as SettingsComboBox).combo.activeText;
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
             string json = File.ReadAllText (path);
@@ -210,8 +209,7 @@ namespace AquaPic.UserInterface
         }
 
         protected bool OnDelete (object sender) {
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
             string text = File.ReadAllText (path);

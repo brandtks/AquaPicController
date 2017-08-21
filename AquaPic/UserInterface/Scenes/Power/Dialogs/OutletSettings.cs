@@ -57,8 +57,7 @@ namespace AquaPic.UserInterface
             tv.ModifyBase (StateType.Normal, TouchColor.NewGtkColor ("grey4"));
             tv.ModifyText (StateType.Normal, TouchColor.NewGtkColor ("black"));
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "powerProperties.json");
 
             string jstring = File.ReadAllText (path);
@@ -156,8 +155,7 @@ namespace AquaPic.UserInterface
             foreach (var cond in conditions)
                 jcond.Add (cond);
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "powerProperties.json");
 
             string jstring = File.ReadAllText (path);
@@ -224,8 +222,7 @@ namespace AquaPic.UserInterface
         protected bool OnDelete (object sender) {
             Power.RemoveOutlet (ic);
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "powerProperties.json");
 
             string jstring = File.ReadAllText (path);

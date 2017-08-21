@@ -192,8 +192,7 @@ namespace AquaPic.UserInterface
             widgets = new List<HomeSettingsWidget> ();
             board = new CheckerBoard ();
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = System.IO.Path.Combine (path, "Settings");
+            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "mainScreen.json");
 
             using (StreamReader reader = File.OpenText (path)) {
@@ -248,8 +247,7 @@ namespace AquaPic.UserInterface
                     ja.Add (jo);
                 }
 
-                string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-                path = System.IO.Path.Combine (path, "Settings");
+                string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
                 path = System.IO.Path.Combine (path, "mainScreen.json");
 
                 File.WriteAllText (path, ja.ToString ());

@@ -97,7 +97,7 @@ namespace AquaPic.SerialBus
 
         public static AquaPicBusStatus[] slaveStatus {
             get {
-                AquaPicBusStatus[] status = new AquaPicBusStatus[slaves.Count];
+                var status = new AquaPicBusStatus[slaves.Count];
                 int i = 0;
                 foreach (var s in slaves)
                     status [i++] = s.Status;

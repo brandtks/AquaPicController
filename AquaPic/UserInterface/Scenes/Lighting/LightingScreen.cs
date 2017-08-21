@@ -60,11 +60,10 @@ namespace AquaPic.UserInterface
         private TouchButton fixtureSettingBtn;
         private TouchButton modifyOnTime;
         private TouchButton modifyOffTime;
-        private uint timerId;
         private bool isDimmingFixture;
         private bool dimmingIsManual;
 
-        public LightingWindow (params object[] options) : base () {
+        public LightingWindow (params object[] options) : base (false) {
             sceneTitle = "Lighting";
 
             var fixtureLabel = new TouchLabel ();
@@ -476,7 +475,6 @@ namespace AquaPic.UserInterface
             }
 
             GetFixtureData ();
-
             Show ();
         }
 
@@ -484,7 +482,6 @@ namespace AquaPic.UserInterface
             if (fixtureName.IsNotEmpty ()) {
                 Power.RemoveHandlerOnStateChange (Lighting.GetFixtureOutletIndividualControl (fixtureName), OnOutletStateChange);
             }
-            GLib.Source.Remove (timerId);
             base.Dispose ();
         }
 
@@ -570,7 +567,7 @@ namespace AquaPic.UserInterface
                     combo.Visible = false;
                     combo.Visible = true;
 
-                    timerId = GLib.Timeout.Add (1000, OnTimer);
+                    timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
                 } else {
                     dimmingHeader.text = "Dimming not available";
                     dimmingIsManual = false;
@@ -634,7 +631,7 @@ namespace AquaPic.UserInterface
             GetFixtureData ();
         }
 
-        protected bool OnTimer () {
+        protected override bool OnUpdateTimer () {
             if (fixtureName.IsNotEmpty ()) {
                 if (isDimmingFixture) {
                     float level = Lighting.GetCurrentDimmingLevel (fixtureName);
@@ -657,9 +654,9 @@ namespace AquaPic.UserInterface
                 }
 
                 return isDimmingFixture;
-            } else {
-                return false;
-            }
+            } 
+            
+            return false;
         }
 
         protected void OnDimmingModeSelectorChanged (object sender, SelectorChangedEventArgs args) {

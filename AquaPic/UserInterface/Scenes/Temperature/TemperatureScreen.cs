@@ -49,8 +49,6 @@ namespace AquaPic.UserInterface
         string probeName;
         TouchLabel probeTempTextbox;
         TouchComboBox probeCombo;
-        
-        uint timerId;
 
         public TemperatureWindow (params object[] options) 
             : base () 
@@ -254,7 +252,7 @@ namespace AquaPic.UserInterface
                         },
                         CalibrationState.ZeroActual);
 
-                    cal.CalibrationCompleteEvent += (aa) => {
+                    cal.CalibrationCompleteEvent += aa => {
                         bool success = Temperature.SetTemperatureProbeCalibrationData (
                             probeName,
                             (float)aa.zeroActual,
@@ -338,18 +336,11 @@ namespace AquaPic.UserInterface
             GetProbeData ();
             GetGroupData ();
 
-            timerId = GLib.Timeout.Add (1000, OnTimer);
-
             Show ();
         }
 
-        public override void Dispose () {
-            GLib.Source.Remove (timerId);
-            base.Dispose ();
-        }
-
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 TouchColor.SetSource (cr, "grey3", 0.75);
                 cr.LineWidth = 3;
 
@@ -367,7 +358,7 @@ namespace AquaPic.UserInterface
 
         protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New heater...") {
-                int heaterCount = Temperature.heaterCount;
+                var heaterCount = Temperature.heaterCount;
 
                 var s = new HeaterSettings (string.Empty, false);
                 s.Run ();
@@ -419,7 +410,7 @@ namespace AquaPic.UserInterface
             if (e.activeText == "New group...") {
                 var s = new TemperatureGroupSettings (string.Empty, false);
                 s.Run ();
-                string newGroupName = s.temperatureGroupName;
+                var newGroupName = s.temperatureGroupName;
                 var outcome = s.outcome;
                 s.Destroy ();
                 s.Dispose ();
@@ -489,7 +480,7 @@ namespace AquaPic.UserInterface
             tempDeadband.QueueDraw ();
         }
 
-        protected bool OnTimer () {
+        protected override bool OnUpdateTimer () {
             GetGroupData ();
             GetProbeData ();
             GetHeaterData ();

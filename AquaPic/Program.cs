@@ -56,7 +56,7 @@ namespace AquaPic
                 }
 
                 if (aquaPicEnvironment.IsNotEmpty ()) {
-                    var path = Path.Combine (aquaPicEnvironment, "AquaPicRuntimeProject");
+                    var path = aquaPicEnvironment;
                     if (!Directory.Exists (path)) {
                         Console.WriteLine ("Path to AquaPic directory environment is incorrect");
                         Console.WriteLine("Incorrect path was {0}", path);
@@ -65,19 +65,19 @@ namespace AquaPic
                 }
 
                 if (aquaPicEnvironment.IsEmpty ()) {
-                    Console.WriteLine ("Please edit the AquaPicEnvironment.txt file to point to the path of the AquaPicRuntime directory,");
-                    Console.WriteLine ("not to include AquaPicRuntime. For example if the AquaPicRuntime directory is located at");
-                    Console.WriteLine ("/home/user/AquaPicRuntime/, then add \"/home/user\" to the first line of the file.");
+                    Console.WriteLine ("Please edit the AquaPicEnvironment.txt file to point to the path of the AquaPicRuntime directory.");
+                    Console.WriteLine ("For example if the AquaPicRuntime directory is located at /home/user/AquaPicRuntimeProject/,");
+                    Console.WriteLine ("then add \"/home/user/AquaPicRuntimeProject/\" to the first line of the file.");
                     return;
                 }
             } else {
                 aquaPicEnvironment = Environment.GetEnvironmentVariable("HOME");
                 aquaPicEnvironment = Path.Combine(aquaPicEnvironment, ".aquapic");
-                Console.WriteLine("AquaPic Environment {0}", aquaPicEnvironment);
                 if (!Directory.Exists(aquaPicEnvironment)) {
                     Directory.CreateDirectory(aquaPicEnvironment);
                 }
-                var path = Path.Combine(aquaPicEnvironment, "AquaPicRuntimeProject");
+                
+                var path = aquaPicEnvironment;
                 if (!Directory.Exists(path)) {
                     Directory.CreateDirectory(path);
                     Directory.CreateDirectory(path + "/Settings");

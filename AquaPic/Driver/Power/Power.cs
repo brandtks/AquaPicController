@@ -49,8 +49,7 @@ namespace AquaPic.Drivers
         }
 
         public static void Init () {
-            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
+            string path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "powerProperties.json");
 
             if (File.Exists (path)) {

@@ -37,7 +37,6 @@ namespace AquaPic.UserInterface
     public class AlarmWindow : SceneBase
     {
         public TextView tv;
-        private uint timerId;
 
         public AlarmWindow (params object[] options) : base () {
             sceneTitle = "Current Alarms";
@@ -48,7 +47,7 @@ namespace AquaPic.UserInterface
             acknowledgeButton.buttonColor = "compl";
             acknowledgeButton.ButtonReleaseEvent += (o, args) => {
                 Alarm.Acknowledge ();
-                OnTimer ();
+                Update ();
             };
 
             tv = new TextView ();
@@ -56,7 +55,7 @@ namespace AquaPic.UserInterface
             tv.ModifyBase (StateType.Normal, TouchColor.NewGtkColor ("grey4"));
             tv.CanFocus = false;
 
-            ScrolledWindow sw = new ScrolledWindow ();
+            var sw = new ScrolledWindow ();
             sw.SetSizeRequest (720, 340);
             sw.VScrollbar.WidthRequest = 30;
             sw.HScrollbar.HeightRequest = 30;
@@ -86,19 +85,11 @@ namespace AquaPic.UserInterface
             }
             acknowledgeButton.Show ();
 
-            OnTimer ();
-
-            timerId = GLib.Timeout.Add (1000, OnTimer);
-
+            Update ();
             Show ();
         }
 
-        public override void Dispose () {
-            GLib.Source.Remove (timerId);
-            base.Dispose ();
-        }
-
-        protected bool OnTimer () {
+        protected void Update () {
             List<AlarmData> alarming = Alarm.GetAllAlarming ();
             TextBuffer tb = tv.Buffer;
             tb.Text = string.Empty;
@@ -115,7 +106,10 @@ namespace AquaPic.UserInterface
                 var ti = tb.EndIter;
                 tb.InsertWithTags (ref ti, string.Format ("{0:MM/dd hh:mm:ss}: {1}\n", a.postTime, a.name), tag);
             }
+        }
 
+        protected override bool OnUpdateTimer () {
+            Update ();
             return true;
         }
     }

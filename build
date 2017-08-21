@@ -1,23 +1,12 @@
 #!/bin/bash
 
-usage() {
-    echo This build script only takes zero or one arugment. 
-    echo Running the script with no arguments builds the release configuration of the AquaPic Controller.
-    echo --debug, -d: Builds the debug configuration of the AquaPic Controller.
-    exit 2
-}
+. ./Makefile-defines.mk
 
-if [ $# -ge 1 ]; then
-    if [ "$1" == "--debug" -o "$1" == "-d" ]; then
-        config=DEBUG
-    else
-        usage
-    fi
+if [ $BUILD ]; then
+    config=$BUILD
 else
     config=Release
 fi
-
-. ./Makefile-defines.mk
 
 output=$($NUGET 2> /dev/null)
 regex="Version: ([3-9].|[1-9][0-9]|2.[1-9][2-9])"

@@ -37,8 +37,6 @@ namespace AquaPic.UserInterface
 {
     public class WaterLevelWindow : SceneBase
     {
-        uint timerId;
-
         string groupName;
         TouchLabel levelLabel;
         TouchComboBox groupCombo;
@@ -317,14 +315,7 @@ namespace AquaPic.UserInterface
             GetAnalogSensorData ();
             GetSwitchData ();
 
-            timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
-
             Show ();
-        }
-
-        public override void Dispose () {
-            GLib.Source.Remove (timerId);
-            base.Dispose ();
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
@@ -344,11 +335,10 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public bool OnUpdateTimer () {
+        protected override bool OnUpdateTimer () {
             GetAnalogSensorData ();
             GetSwitchData ();
             GetGroupData ();
-
             return true;
         }
 

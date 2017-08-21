@@ -102,25 +102,24 @@ namespace AquaPic.Modules
 
             fixtures = new Dictionary<string, LightingFixture> ();
 
-            string path = Path.Combine (Utils.AquaPicEnvironment, "AquaPicRuntimeProject");
-            path = Path.Combine (path, "Settings");
+            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "lightingProperties.json");
 
             if (File.Exists (path)) {
                 using (StreamReader reader = File.OpenText (path)) {
-                    JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
+                    var jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
                     try {
                         RiseSetCalc.latitude = Convert.ToDouble (jo["latitude"]);
                     } catch {
-                        RiseSetCalc.latitude = 41.093842;
+                        RiseSetCalc.latitude = 37.0902;
                         Logger.AddWarning ("Error parsing latitude setting, using default");
                     }
 
                     try {
                         RiseSetCalc.longitude = Convert.ToDouble (jo["longitude"]);
                     } catch {
-                        RiseSetCalc.longitude = -85.139236;
+                        RiseSetCalc.longitude = -95.7129;
                         Logger.AddWarning ("Error parsing longitude setting, using default");
                     }
 
@@ -241,8 +240,8 @@ namespace AquaPic.Modules
                     }
                 }
             } else {
-                RiseSetCalc.latitude = 41.093842;
-                RiseSetCalc.longitude = -85.139236;
+                RiseSetCalc.latitude = 37.0902;
+                RiseSetCalc.longitude = -95.7129;
                 defaultSunRise = new Time (7, 30);
                 defaultSunSet = new Time (20, 30);
                 minSunRise = new Time (7, 15);
