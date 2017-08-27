@@ -1,6 +1,8 @@
 BUILD="Release"
 #BUILD="Debug" 
 
+# Download nuget.exe using wget 'wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe'
+# and modify the line below to indicate the path to nuget.exe
 NUGET="mono /path/to/nuget.exe"
 #NUGET="nuget"
 
