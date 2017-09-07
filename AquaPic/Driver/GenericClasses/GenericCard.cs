@@ -31,17 +31,16 @@ using AquaPic.SerialBus;
 
 namespace AquaPic.Drivers
 {
-    public class GenericCard<T>
+    public class GenericCard<T> : AquaPicBus.Slave
     {
         public string name;
         public CardType cardType;
         public int cardId;
-        public AquaPicBus.Slave slave;
         public GenericChannel<T>[] channels;
 
         public bool AquaPicBusCommunicationOk {
             get {
-                return ((slave.Status == AquaPicBusStatus.CommunicationStart) || (slave.Status == AquaPicBusStatus.CommunicationSuccess));
+                return ((Status == AquaPicBusStatus.CommunicationStart) || (Status == AquaPicBusStatus.CommunicationSuccess));
             }
         }
 
@@ -51,16 +50,19 @@ namespace AquaPic.Drivers
             }
         }
 
-        protected GenericCard (string name, 
+        protected GenericCard (
+            string name, 
             CardType cardType, 
             int cardId, 
             int address, 
-            int numChannels)
+            int numChannels
+        )
+            : base (address, string.Format ("{0} ({1})", name, Utils.GetDescription (cardType)))
         {
             this.name = name;
             this.cardType = cardType;
             this.cardId = cardId;
-            slave = new AquaPicBus.Slave (address, string.Format ("{0} ({1})", this.name, Utils.GetDescription (cardType)));
+
             channels = new GenericChannel<T>[numChannels];
             for (int i = 0; i < channelCount; ++i) {
                 channels [i] = ChannelCreater (i);

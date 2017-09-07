@@ -82,7 +82,7 @@ namespace AquaPic.UserInterface
             sunRiseLabel.Show ();
 
             var sunRise = new TouchLabel ();
-            sunRise.text = Lighting.sunRiseToday.ToTimeString ();
+            sunRise.text = Lighting.sunRiseToday.TimeToString ();
             sunRise.textAlignment = TouchAlignment.Center;
             sunRise.textSize = 20;
             sunRise.WidthRequest = 150;
@@ -98,7 +98,7 @@ namespace AquaPic.UserInterface
             sunSetLabel.Show ();
 
             var sunSet = new TouchLabel ();
-            sunSet.text = Lighting.sunSetToday.ToTimeString ();
+            sunSet.text = Lighting.sunSetToday.TimeToString ();
             sunSet.textAlignment = TouchAlignment.Center;
             sunSet.textSize = 20;
             sunSet.WidthRequest = 150;
@@ -114,7 +114,7 @@ namespace AquaPic.UserInterface
             sunRiseTomorrowLabel.Show ();
 
             var sunRiseTomorrow = new TouchLabel ();
-            sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToTimeString ();
+            sunRiseTomorrow.text = Lighting.sunRiseTomorrow.TimeToString ();
             sunRiseTomorrow.textAlignment = TouchAlignment.Center;
             sunRiseTomorrow.textSize = 20;
             sunRiseTomorrow.WidthRequest = 150;
@@ -130,7 +130,7 @@ namespace AquaPic.UserInterface
             sunSetTomorrowLabel.Show ();
 
             var sunSetTomorrow = new TouchLabel ();
-            sunSetTomorrow.text = Lighting.sunSetTomorrow.ToTimeString ();
+            sunSetTomorrow.text = Lighting.sunSetTomorrow.TimeToString ();
             sunSetTomorrow.textAlignment = TouchAlignment.Center;
             sunSetTomorrow.textSize = 20;
             sunSetTomorrow.WidthRequest = 150;
@@ -312,7 +312,7 @@ namespace AquaPic.UserInterface
 
                         if (timeOk) {
                             var td = Lighting.GetFixtureOffTime (fixtureName);
-                            td.SetTime (t);
+                            td.UpdateTime (t);
                             onTimeTextBox.text = td.ToShortString ();
                             onTimeTextBox.QueueDraw ();
                         }
@@ -374,7 +374,7 @@ namespace AquaPic.UserInterface
 
                         if (timeOk) {
                             var td = Lighting.GetFixtureOffTime (fixtureName);
-                            td.SetTime (t);
+                            td.UpdateTime (t);
                             offTimeTextBox.text = td.ToShortString ();
                             offTimeTextBox.QueueDraw ();
                         }
@@ -398,10 +398,10 @@ namespace AquaPic.UserInterface
                 s.Destroy ();
                 s.Dispose ();
 
-                sunRise.text = Lighting.sunRiseToday.ToTimeString ();
-                sunSet.text = Lighting.sunSetToday.ToTimeString ();
-                sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToTimeString ();
-                sunSetTomorrow.text = Lighting.sunSetTomorrow.ToTimeString ();
+                sunRise.text = Lighting.sunRiseToday.TimeToString ();
+                sunSet.text = Lighting.sunSetToday.TimeToString ();
+                sunRiseTomorrow.text = Lighting.sunRiseTomorrow.TimeToString ();
+                sunSetTomorrow.text = Lighting.sunSetTomorrow.TimeToString ();
             };
             Put (settingsBtn, 290, 405);
             settingsBtn.Show ();

@@ -35,8 +35,8 @@ namespace AquaPic.Drivers
 {
     public partial class Power
     {
-        private class PowerStrip {
-            public AquaPicBus.Slave slave;
+        private class PowerStrip : AquaPicBus.Slave
+        {
             public byte powerID;
             public int powerLossAlarmIndex;
             public bool AcPowerAvailable;
@@ -45,12 +45,13 @@ namespace AquaPic.Drivers
 
             public bool AquaPicBusCommunicationOk {
                 get {
-                    return ((slave.Status == AquaPicBusStatus.CommunicationStart) || (slave.Status == AquaPicBusStatus.CommunicationSuccess));
+                    return ((Status == AquaPicBusStatus.CommunicationStart) || (Status == AquaPicBusStatus.CommunicationSuccess));
                 }
             }
 
-            public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) {
-                slave = new AquaPicBus.Slave (address, name + " (Power Strip)");
+            public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) 
+                : base (address, name + " (Power Strip)")
+            {
                 this.powerID = powerID;
 
                 if (alarmOnLossOfPower && (powerLossAlarmIndex == -1)) {
@@ -92,15 +93,15 @@ namespace AquaPic.Drivers
                 else
                     message [1] = 0x00;
 
-                slave.Write (2, message, true);
+                Write (2, message, true);
             }
 
             public void GetStatus () {
-                slave.Read (20, 3, GetStatusCallback);
+                Read (20, 3, GetStatusCallback);
             }
 
             protected void GetStatusCallback (CallbackArgs callArgs) {
-                if (slave.Status != AquaPicBusStatus.CommunicationSuccess)
+                if (Status != AquaPicBusStatus.CommunicationSuccess)
                     return;
 
                 AcPowerAvailable = callArgs.GetDataFromReadBuffer<bool> (0);
@@ -127,11 +128,11 @@ namespace AquaPic.Drivers
             }
 
             public void ReadOutletCurrent (byte outletId) {
-                slave.ReadWrite (10, outletId, 5, ReadOutletCurrentCallback);
+                ReadWrite (10, outletId, 5, ReadOutletCurrentCallback);
             }
 
             protected void ReadOutletCurrentCallback (CallbackArgs callArgs) {
-                if (slave.Status != AquaPicBusStatus.CommunicationSuccess)
+                if (Status != AquaPicBusStatus.CommunicationSuccess)
                     return;
 
                 int outletId = callArgs.GetDataFromReadBuffer<byte> (0);
@@ -151,7 +152,7 @@ namespace AquaPic.Drivers
                 else
                     message [1] = 0x00;
 
-                slave.ReadWrite (
+                ReadWrite (
                     30,
                     message,
                     0, // this just returns the default response so there is no data, ie 0

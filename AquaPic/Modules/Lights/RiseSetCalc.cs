@@ -39,38 +39,38 @@ namespace AquaPic.Modules
             timeZone = TimeZoneInfo.Local.BaseUtcOffset.Hours;
         }
 
-        public static void GetRiseSetTimes (out TimeDate rise, out TimeDate sSet) {
+        public static void GetRiseSetTimes (out DateSpan rise, out DateSpan sSet) {
             rise = GetRiseTime ();
             sSet = GetSetTime ();
 		}
 	    
-        public static TimeDate GetRiseTime () {
+        public static DateSpan GetRiseTime () {
             double julianDate = calcJD (DateTime.Today);
             double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
-            TimeDate rise = new TimeDate (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
+            DateSpan rise = new DateSpan (new Time (TimeSpan.FromMinutes (riseUTC + timeZone * 60)));
             if (TimeZoneInfo.Local.IsDaylightSavingTime (DateTime.Now))
                 rise.AddMinutes (60);
             return rise;
         }
 
-        public static TimeDate GetSetTime () {
+        public static DateSpan GetSetTime () {
             double julianDate = calcJD (DateTime.Today);
             double setUTC = calcSunSetUTC (julianDate, latitude, longitude);
-            TimeDate sSet = new TimeDate (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
+            DateSpan sSet = new DateSpan (new Time (TimeSpan.FromMinutes (setUTC + timeZone * 60)));
             if (TimeZoneInfo.Local.IsDaylightSavingTime (DateTime.Now))
                 sSet.AddMinutes (60);
             return sSet;
         }
 
-        public static TimeDate GetRiseTimeTomorrow () {
-            TimeDate riseTomorrow = GetRiseTime ();
-            riseTomorrow.AddDay (1);
+        public static DateSpan GetRiseTimeTomorrow () {
+            DateSpan riseTomorrow = GetRiseTime ();
+            riseTomorrow.AddDays (1);
             return riseTomorrow;
         }
 
-        public static TimeDate GetSetTimeTomorrow () {
-            TimeDate setTomorrow = GetSetTime ();
-            setTomorrow.AddDay (1);
+        public static DateSpan GetSetTimeTomorrow () {
+            DateSpan setTomorrow = GetSetTime ();
+            setTomorrow.AddDays (1);
             return setTomorrow;
         }
 

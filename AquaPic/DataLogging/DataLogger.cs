@@ -30,7 +30,7 @@ using System.Collections.Generic;
 using FileHelpers;
 using AquaPic.Utilites;
 
-namespace AquaPic.Runtime
+namespace AquaPic.DataLogging
 {
     public delegate void DataLogEntryAddedEventHandler (object sender, DataLogEntryAddedEventArgs args);
 

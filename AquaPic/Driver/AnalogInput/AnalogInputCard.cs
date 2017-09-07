@@ -27,7 +27,6 @@
 ﻿using System;
 using AquaPic.Utilites;
 using AquaPic.SerialBus;
-using AquaPic.Runtime;
 
 namespace AquaPic.Drivers
 {
@@ -36,7 +35,8 @@ namespace AquaPic.Drivers
         protected class AnalogInputCard<T> : GenericCard<T>
         {
             public AnalogInputCard (string name, int cardId, int address)
-                : base (name, 
+                : base (
+                    name, 
                     CardType.AnalogInputCard, 
                     cardId,
                     address,
@@ -50,7 +50,7 @@ namespace AquaPic.Drivers
                 CheckChannelRange (channel);
 
                 if (channels [channel].mode == Mode.Auto) {
-                    slave.ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback);
+                    ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback);
                 }
             }
 
@@ -61,7 +61,7 @@ namespace AquaPic.Drivers
             }
 
             public override void GetAllValuesCommunication () {
-                slave.Read (20, sizeof(short) * 4, GetAllValuesCommunicationCallback);
+                Read (20, sizeof(short) * 4, GetAllValuesCommunicationCallback);
             }
 
             protected void GetAllValuesCommunicationCallback (CallbackArgs args) {

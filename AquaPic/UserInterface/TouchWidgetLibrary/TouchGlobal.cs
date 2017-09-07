@@ -25,8 +25,6 @@
 #endregion // License
 
 ﻿using System;
-using Cairo;
-using Gtk;
 
 namespace TouchWidgetLibrary
 {

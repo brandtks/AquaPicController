@@ -30,10 +30,33 @@ namespace AquaPic.Utilites
 {
     public class Time
     {
-        public byte hour { get; set; }
-        public byte min { get; set; }
-        public byte sec { get; set; }
-        public byte millisec { get; set; }
+        protected int _hour;
+        public int hour {
+            get {
+                return _hour;
+            }
+        }
+
+        protected int _minute;
+        public int minute {
+            get {
+                return _minute;
+            }
+        }
+
+        protected int _second;
+        public int second {
+            get {
+                return _second;
+            }
+        }
+
+        protected int _millisecond;
+        public int millisecond {
+            get {
+                return _millisecond;
+            }
+        }
 
 		public static Time TimeZero {
             get {
@@ -41,53 +64,39 @@ namespace AquaPic.Utilites
             }
         }
 
-        public Time (byte hours, byte mins, byte secs, byte millisecs) {
-            this.hour = hours;
-            this.min = mins;
-            this.sec = secs;
-            this.millisec = millisecs;
+        public Time (int hour, int minute, int second, int millisecond) {
+            this._hour = hour;
+            this._minute = minute;
+            this._second = second;
+            this._millisecond = millisecond;
         }
 
-        public Time (byte hours, byte mins, byte secs) 
-            : this (hours, mins, secs, 0) {
+        public Time (int hour, int minute, int second) 
+            : this (hour, minute, second, 0) {
         }
 
-        public Time (byte hours, byte mins)
-            : this (hours, mins, 0, 0) {
+        public Time (int hours, int minute)
+            : this (hours, minute, 0, 0) {
         }
 
-        public Time (TimeSpan value) 
-            : this ((byte)value.Hours, (byte)value.Minutes, (byte)value.Seconds, (byte)value.Milliseconds) {
+        public Time (TimeSpan timeSpan) 
+            : this (timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds) {
         }
 
-        public Time (Time value)
-            : this (value.hour, value.min, value.sec, value.millisec) {
+        public Time (Time timeSpan)
+            : this (timeSpan._hour, timeSpan._minute, timeSpan._second, timeSpan._millisecond) {
         }
 
         public Time () {
             DateTime value = DateTime.Now;
-			this.hour = (byte)value.Hour;
-			this.min = (byte)value.Minute;
-			this.sec = (byte)value.Second;
-			this.millisec = (byte)value.Millisecond;
-        }
-
-        public void SetTime (TimeSpan value) {
-			this.hour = (byte)value.Hours;
-			this.min = (byte)value.Minutes;
-			this.sec = (byte)value.Seconds;
-			this.millisec = (byte)value.Milliseconds;
-        }
-
-        public void SetTime (Time value) {
-            this.hour = value.hour;
-            this.min = value.min;
-            this.sec = value.sec;
-            this.millisec = value.millisec;
+		    _hour = value.Hour;
+			_minute = value.Minute;
+			_second = value.Second;
+			_millisecond = value.Millisecond;
         }
 
         public TimeSpan ToTimeSpan () {
-            TimeSpan val = new TimeSpan (0, hour, min, sec, millisec);
+            TimeSpan val = new TimeSpan (0, _hour, _minute, _second, _millisecond);
             return val;
         }
 
@@ -96,24 +105,30 @@ namespace AquaPic.Utilites
         }
 
         public bool EqualsShortTime (DateTime value) {
-            if (value.Hour != hour)
+            if (value.Hour != _hour)
                 return false;
 
-            if (value.Minute != min)
+            if (value.Minute != _minute)
                 return false;
 
             return true;
         }
 
-        public void AddMinutes (int value) {
-            TimeSpan val2 = new TimeSpan (hour, min + value, sec);
-            SetTime (val2);
+        public void AddMinutes (int numberOfMinutes) {
+            TimeSpan timeSpan = new TimeSpan (_hour, _minute + numberOfMinutes, _second);
+            _hour = timeSpan.Hours;
+            _minute = timeSpan.Minutes;
+            _second = timeSpan.Seconds;
+            _millisecond = timeSpan.Milliseconds;
         }
 
         public void AddTimeToTime (Time value) {
-            TimeSpan val = ToTimeSpan ();
-            val.Add (value.ToTimeSpan ());
-            SetTime (val);
+            TimeSpan timeSpan = ToTimeSpan ();
+            timeSpan.Add (value.ToTimeSpan ());
+            _hour = timeSpan.Hours;
+            _minute = timeSpan.Minutes;
+            _second = timeSpan.Seconds;
+            _millisecond = timeSpan.Milliseconds;
         }
           
         public static Time Parse (string value) {
@@ -146,15 +161,15 @@ namespace AquaPic.Utilites
             return new Time ((byte)hour, (byte)min);
         }
 
-        public string ToTimeString () {
-            int h = hour;
+        public string TimeToString () {
+            int h = _hour;
             string t = "AM";
 
             if (h > 12) {
                 h %= 12;
                 t = "PM";
             }
-            return string.Format ("{0}:{1:00} {2}", h, min, t);
+            return string.Format ("{0}:{1:00} {2}", h, _minute, t);
         }
     }
 }

@@ -39,8 +39,8 @@ namespace AquaPic.Modules
             public string name;
             public int onTimeOffset;
             public int offTimeOffset;
-            public TimeDate onTime;
-            public TimeDate offTime;
+            public DateSpan onTime;
+            public DateSpan offTime;
             public LightingTime lightingTime;
             public MyState lightingOn;
             public bool highTempLockout;
@@ -59,8 +59,8 @@ namespace AquaPic.Modules
                 this.powerOutlet = plug;
 
                 // sets time to today and whatever onTime and offTime are
-                this.onTime = new TimeDate (onTime);
-                this.offTime = new TimeDate (offTime);
+                this.onTime = new DateSpan (onTime);
+                this.offTime = new DateSpan (offTime);
 
                 this.lightingTime = lightingTime;
 
@@ -82,40 +82,40 @@ namespace AquaPic.Modules
                 if (highTempLockout && Alarm.CheckAlarming (Temperature.highTemperatureAlarmIndex))
                     return false;
 
-                TimeDate now = TimeDate.Now;
-                if ((now.CompareTo (onTime) > 0) && (now.CompareTo (offTime) < 0)) {
-                    //now is after on time and before off time
+                DateSpan now = DateSpan.Now;
+                if (now.After (onTime) && now.Before (offTime)) {
                     return true;
-                } else {
-                    if (mode == Mode.Auto) { // only update times if mode is auto
-                        if (lightingOn == MyState.On) { // lights are on and are supposed to be off, update next on/off times
-                            if (lightingTime == LightingTime.Daytime) {
-                                // its dusk and daytime lighting on/off time is rise and set tomorrow respectfully
-                                SetOnTime (sunRiseTomorrow);
-                                SetOffTime (sunSetTomorrow);
-                            } else { // lighting time is nighttime
-                                // its dawn and nighttime lighting on/off time is set today because we're already on the current day,
-                                // and rise time tomorrow respectfully
-                                SetOnTime (sunSetToday);
-                                SetOffTime (sunRiseTomorrow);
-                            }
+                } 
+
+                if (mode == Mode.Auto) { // only update times if mode is auto
+                    if (lightingOn == MyState.On) { // lights are on and are supposed to be off, update next on/off times
+                        if (lightingTime == LightingTime.Daytime) {
+                            // its dusk and daytime lighting on/off time is rise and set tomorrow respectfully
+                            SetOnTime (sunRiseTomorrow);
+                            SetOffTime (sunSetTomorrow);
+                        } else { // lighting time is nighttime
+                            // its dawn and nighttime lighting on/off time is set today because we're already on the current day,
+                            // and rise time tomorrow respectfully
+                            SetOnTime (sunSetToday);
+                            SetOffTime (sunRiseTomorrow);
                         }
                     }
-                    return false;
                 }
+
+                return false;
             }
 
             public void OnLightingPlugStateChange (object sender, StateChangeEventArgs args) {
                 lightingOn = args.state;
             }
 
-            public void SetOnTime (TimeDate newOnTime) {
-                onTime.SetTimeDate (newOnTime);
+            public void SetOnTime (DateSpan newOnTime) {
+                onTime = newOnTime;
                 onTime.AddMinutes (onTimeOffset);
             }
 
-            public void SetOffTime (TimeDate newOffTime) {
-                offTime.SetTimeDate (newOffTime);
+            public void SetOffTime (DateSpan newOffTime) {
+                offTime = newOffTime;
                 offTime.AddMinutes (offTimeOffset);
             }
     	}

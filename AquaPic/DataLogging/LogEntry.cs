@@ -27,7 +27,7 @@
 ﻿using System;
 using FileHelpers;
 
-namespace AquaPic.Runtime
+namespace AquaPic.DataLogging
 {
     [DelimitedRecord(",")]
     public class LogEntry

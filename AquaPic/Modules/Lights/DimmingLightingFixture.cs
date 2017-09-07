@@ -83,7 +83,7 @@ namespace AquaPic.Modules
 
             public float CalculateDimmingLevel () {
                 if (lightingOn == MyState.On) {
-                    TimeDate now = TimeDate.Now;
+                    DateSpan now = DateSpan.Now;
 
                     autoDimmingLevel = Utils.CalcParabola (
                         onTime, 

@@ -70,11 +70,11 @@ namespace AquaPic.UserInterface
             t = new SettingsTextBox ();
             t.text = "Default Rise";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.defaultSunRise.ToTimeString ();
+            t.textBox.text = Lighting.defaultSunRise.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.ToTimeString ();
+                    args.text = time.TimeToString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -85,11 +85,11 @@ namespace AquaPic.UserInterface
             t = new SettingsTextBox ();
             t.text = "Default Set";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.defaultSunSet.ToTimeString ();
+            t.textBox.text = Lighting.defaultSunSet.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.ToTimeString ();
+                    args.text = time.TimeToString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -100,11 +100,11 @@ namespace AquaPic.UserInterface
             t = new SettingsTextBox ();
             t.text = "Min Sunrise";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.minSunRise.ToTimeString ();
+            t.textBox.text = Lighting.minSunRise.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.ToTimeString ();
+                    args.text = time.TimeToString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -115,11 +115,11 @@ namespace AquaPic.UserInterface
             t = new SettingsTextBox ();
             t.text = "Max Sunrise";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.maxSunRise.ToTimeString ();
+            t.textBox.text = Lighting.maxSunRise.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.ToTimeString ();
+                    args.text = time.TimeToString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -130,11 +130,11 @@ namespace AquaPic.UserInterface
             t = new SettingsTextBox ();
             t.text = "Min Sunset";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.minSunSet.ToTimeString ();
+            t.textBox.text = Lighting.minSunSet.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.ToTimeString ();
+                    args.text = time.TimeToString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -145,11 +145,11 @@ namespace AquaPic.UserInterface
             t = new SettingsTextBox ();
             t.text = "Max Sunset";
             t.textBox.includeTimeFunctions = true;
-            t.textBox.text = Lighting.maxSunSet.ToTimeString ();
+            t.textBox.text = Lighting.maxSunSet.TimeToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     Time time = Time.Parse (args.text);
-                    args.text = time.ToTimeString ();
+                    args.text = time.TimeToString ();
                 } catch {
                     MessageBox.Show ("Improper time format, ##:##");
                     args.keepText = false;
@@ -180,22 +180,22 @@ namespace AquaPic.UserInterface
             jo["longitude"] = Lighting.longitude.ToString ();
 
             jo["defaultSunRise"]["hour"] = Lighting.defaultSunRise.hour.ToString ();
-            jo["defaultSunRise"]["minute"] = Lighting.defaultSunRise.min.ToString ();
+            jo["defaultSunRise"]["minute"] = Lighting.defaultSunRise.minute.ToString ();
 
             jo["defaultSunSet"]["hour"] = Lighting.defaultSunSet.hour.ToString ();
-            jo["defaultSunSet"]["minute"] = Lighting.defaultSunSet.min.ToString ();
+            jo["defaultSunSet"]["minute"] = Lighting.defaultSunSet.minute.ToString ();
 
             jo["minSunRise"]["hour"] = Lighting.minSunRise.hour.ToString ();
-            jo["minSunRise"]["minute"] = Lighting.minSunRise.min.ToString ();
+            jo["minSunRise"]["minute"] = Lighting.minSunRise.minute.ToString ();
 
             jo["maxSunRise"]["hour"] = Lighting.maxSunRise.hour.ToString ();
-            jo["maxSunRise"]["minute"] = Lighting.maxSunRise.min.ToString ();
+            jo["maxSunRise"]["minute"] = Lighting.maxSunRise.minute.ToString ();
 
             jo["minSunSet"]["hour"] = Lighting.minSunSet.hour.ToString ();
-            jo["minSunSet"]["minute"] = Lighting.minSunSet.min.ToString ();
+            jo["minSunSet"]["minute"] = Lighting.minSunSet.minute.ToString ();
 
             jo["maxSunSet"]["hour"] = Lighting.maxSunSet.hour.ToString ();
-            jo["maxSunSet"]["minute"] = Lighting.maxSunSet.min.ToString ();
+            jo["maxSunSet"]["minute"] = Lighting.maxSunSet.minute.ToString ();
 
             File.WriteAllText (path, jo.ToString ());
 

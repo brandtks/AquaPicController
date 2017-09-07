@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Cairo;
 using Gtk;
-using AquaPic.Runtime;
+using AquaPic.DataLogging;
 using AquaPic.Utilites;
 
 namespace TouchWidgetLibrary

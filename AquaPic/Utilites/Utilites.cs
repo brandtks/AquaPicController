@@ -27,7 +27,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace AquaPic.Utilites
@@ -68,13 +67,13 @@ namespace AquaPic.Utilites
                 case PlatformID.Unix:
                     // Well, there are chances MacOSX is reported as Unix instead of MacOSX.
                     // Instead of platform check, we'll do a feature checks (Mac specific root folders)
-                    if (Directory.Exists("/Applications")
-                        & Directory.Exists("/System")
-                        & Directory.Exists("/Users")
-                        & Directory.Exists("/Volumes"))
+                    if (Directory.Exists ("/Applications")
+                        & Directory.Exists ("/System")
+                        & Directory.Exists ("/Users")
+                        & Directory.Exists ("/Volumes")) {
                         return Platform.Mac;
-                    else
-                        return Platform.Linux;
+                    }
+                    return Platform.Linux;
 
                 case PlatformID.MacOSX:
                     return Platform.Mac;
@@ -86,11 +85,11 @@ namespace AquaPic.Utilites
         }
 
 		public static string GetDescription (Enum en) {
-			Type type = en.GetType ();
-			MemberInfo[] memInfo = type.GetMember (en.ToString());
+			var type = en.GetType ();
+			var memInfo = type.GetMember (en.ToString());
 
 			if (memInfo != null && memInfo.Length > 0) {
-				object[] attrs = memInfo[0].GetCustomAttributes (typeof (Description), false);
+				var attrs = memInfo[0].GetCustomAttributes (typeof (Description), false);
 
 				if (attrs != null && attrs.Length > 0)
 					return ((Description)attrs[0]).Text;
@@ -109,15 +108,15 @@ namespace AquaPic.Utilites
 
         public static string RemoveWhitespace (this string value) {
             return new string (value.ToCharArray ()
-                .Where (c => !Char.IsWhiteSpace (c))
+                .Where (c => !char.IsWhiteSpace (c))
                 .ToArray ());
         }
         
-        public static float CalcParabola(TimeDate start, TimeDate end, TimeDate now, float min, float max) {
-            double period = end.DifferenceInTime(start);
-            double phase = now.DifferenceInTime(start);
-            double radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-            double delta = max - min;
+        public static float CalcParabola(DateSpan start, DateSpan end, DateSpan now, float min, float max) {
+            var period = end.DifferenceInMinutes(start);
+            var phase = now.DifferenceInMinutes(start);
+            var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+            var delta = max - min;
             return min + (float)(delta * Math.Sin(radian));
         }
 

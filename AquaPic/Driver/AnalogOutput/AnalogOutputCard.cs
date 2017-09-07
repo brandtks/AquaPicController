@@ -36,7 +36,8 @@ namespace AquaPic.Drivers
         protected class AnalogOutputCard<T> : GenericCard<T>
         {
             public AnalogOutputCard (string name, int cardId, int address)
-                : base (name, 
+                : base (
+                    name, 
                     CardType.AnalogOutputCard, 
                     cardId,
                     address,
@@ -48,26 +49,23 @@ namespace AquaPic.Drivers
 
             public override void GetValueCommunication (int channel) {
                 CheckChannelRange (channel);
-                slave.ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback); // byte channel id and int16 value, 3 bytes
+                ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback); // byte channel id and int16 value, 3 bytes
             }
 
             protected void GetValueCommunicationCallback (CallbackArgs args) {
-                byte ch = args.GetDataFromReadBuffer<byte> (0);
-                short value = args.GetDataFromReadBuffer<short> (1);
+                var ch = args.GetDataFromReadBuffer<byte> (0);
+                var value = args.GetDataFromReadBuffer<short> (1);
                 channels [ch].SetValue (value);
             }
 
             public override void SetValueCommunication<CommunicationType> (int channel, CommunicationType value) {
                 CheckChannelRange (channel);
-
                 channels [channel].SetValue (value);
-
-                short valueToSend = Convert.ToInt16 (value);
-                WriteBuffer buf = new WriteBuffer ();
+                var valueToSend = Convert.ToInt16 (value);
+                var buf = new WriteBuffer ();
                 buf.Add ((byte)channel, sizeof(byte));
-                buf.Add ((short)valueToSend, sizeof(short));
-
-                slave.Write (31, buf);
+                buf.Add (valueToSend, sizeof(short));
+                Write (31, buf);
             }
 
             public override void SetAllValuesCommunication<CommunicationType> (CommunicationType[] values) {
@@ -80,15 +78,15 @@ namespace AquaPic.Drivers
                     valuesToSend [i] = Convert.ToInt16 (values [i]);
                 }
 
-                WriteBuffer buf = new WriteBuffer ();
+                var buf = new WriteBuffer ();
                 foreach (var val in valuesToSend) {
                     buf.Add (val, sizeof(short));
                 }
-                slave.Write (30, buf);
+                Write (30, buf);
             }
 
             public override void GetAllValuesCommunication () {
-                slave.Read (20, sizeof(short) * 4, GetAllValuesCommunicationCallback);
+                Read (20, sizeof(short) * 4, GetAllValuesCommunicationCallback);
             }
 
             protected void GetAllValuesCommunicationCallback (CallbackArgs args) {
@@ -112,7 +110,7 @@ namespace AquaPic.Drivers
                 arr [0] = (byte)ch;
                 arr [1] = (byte)channels [ch].type;
 
-                slave.Write (2, arr);
+                Write (2, arr);
                 #else
                 if (type != AnalogType.ZeroTen)
                     throw new Exception ("Dimming card only does 0-10V");

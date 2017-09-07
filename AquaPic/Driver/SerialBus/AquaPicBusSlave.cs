@@ -62,11 +62,11 @@ namespace AquaPic.SerialBus
                     throw new Exception ("Address already in use");
 
                 this.address = (byte)address;
-                this.responeTime = 0;
-                this.timeQue = new int[10];
-                this.queIdx = 0;
-                this.status = AquaPicBusStatus.NotOpen;
-                this.Name = name;
+                responeTime = 0;
+                timeQue = new int[10];
+                queIdx = 0;
+                status = AquaPicBusStatus.NotOpen;
+                Name = name;
 
                 slaves.Add (this);
 
@@ -123,7 +123,7 @@ namespace AquaPic.SerialBus
                 status = stat;
 
                 if (OnStatusUpdate != null)
-                    Gtk.Application.Invoke ((sender, e) => OnStatusUpdate (this));
+                    Application.Invoke ((sender, e) => OnStatusUpdate (this));
             }
         }
     }

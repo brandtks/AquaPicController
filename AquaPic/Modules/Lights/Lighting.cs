@@ -40,10 +40,10 @@ namespace AquaPic.Modules
     public partial class Lighting
     {
         static Dictionary<string,LightingFixture> fixtures;
-        public static TimeDate sunRiseToday;
-        public static TimeDate sunSetToday;
-        public static TimeDate sunRiseTomorrow;
-        public static TimeDate sunSetTomorrow;
+        public static DateSpan sunRiseToday;
+        public static DateSpan sunSetToday;
+        public static DateSpan sunRiseTomorrow;
+        public static DateSpan sunSetTomorrow;
 
         public static Time minSunRise;
         public static Time maxSunRise;
@@ -261,27 +261,27 @@ namespace AquaPic.Modules
 
                 var jot = new JObject ();
                 jot.Add ("hour", defaultSunRise.hour.ToString ());
-                jot.Add ("minute", defaultSunRise.min.ToString ());
+                jot.Add ("minute", defaultSunRise.minute.ToString ());
                 jo.Add (new JProperty ("defaultSunRise", jot));
 
                 jot["hour"] = defaultSunSet.hour.ToString ();
-                jot["minute"] = defaultSunSet.min.ToString ();
+                jot["minute"] = defaultSunSet.minute.ToString ();
                 jo.Add (new JProperty ("defaultSunSet", jot));
 
                 jot["hour"] = minSunRise.hour.ToString ();
-                jot["minute"] = minSunRise.min.ToString ();
+                jot["minute"] = minSunRise.minute.ToString ();
                 jo.Add (new JProperty ("minSunRise", jot));
 
                 jot["hour"] = maxSunRise.hour.ToString ();
-                jot["minute"] = maxSunRise.min.ToString ();
+                jot["minute"] = maxSunRise.minute.ToString ();
                 jo.Add (new JProperty ("maxSunRise", jot));
 
                 jot["hour"] = minSunSet.hour.ToString ();
-                jot["minute"] = minSunSet.min.ToString ();
+                jot["minute"] = minSunSet.minute.ToString ();
                 jo.Add (new JProperty ("minSunSet", jot));
 
                 jot["hour"] = maxSunSet.hour.ToString ();
-                jot["minute"] = maxSunSet.min.ToString ();
+                jot["minute"] = maxSunSet.minute.ToString ();
                 jo.Add (new JProperty ("maxSunSet", jot));
 
                 jo.Add (new JProperty ("lightingFixtures", new JArray ()));
@@ -298,24 +298,24 @@ namespace AquaPic.Modules
             sunSetTomorrow = RiseSetCalc.GetSetTimeTomorrow ();
 
             if (sunRiseToday.CompareToTime (minSunRise) < 0) // sunrise is before minimum
-                sunRiseToday.SetTime (minSunRise);
+                sunRiseToday.UpdateTime (minSunRise);
             else if (sunRiseToday.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
-                sunRiseToday.SetTime (maxSunRise);
+                sunRiseToday.UpdateTime (maxSunRise);
 
             if (sunSetToday.CompareToTime (minSunSet) < 0) // sunset is before minimum
-                sunSetToday.SetTime (minSunSet);
+                sunSetToday.UpdateTime (minSunSet);
             else if (sunSetToday.CompareToTime (maxSunSet) > 0) // sunset is after maximum
-                sunSetToday.SetTime (maxSunSet);
+                sunSetToday.UpdateTime (maxSunSet);
 
             if (sunRiseTomorrow.CompareToTime (minSunRise) < 0) // sunrise is before minimum
-                sunRiseTomorrow.SetTime (minSunRise);
+                sunRiseTomorrow.UpdateTime (minSunRise);
             else if (sunRiseTomorrow.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
-                sunRiseTomorrow.SetTime (maxSunRise);
+                sunRiseTomorrow.UpdateTime (maxSunRise);
 
             if (sunSetTomorrow.CompareToTime (minSunSet) < 0) // sunset is before minimum
-                sunSetTomorrow.SetTime (minSunSet);
+                sunSetTomorrow.UpdateTime (minSunSet);
             else if (sunSetTomorrow.CompareToTime (maxSunSet) > 0) // sunset is after maximum
-                sunSetTomorrow.SetTime (maxSunSet);
+                sunSetTomorrow.UpdateTime (maxSunSet);
         }
 
         /**************************************************************************************************************/
@@ -408,8 +408,8 @@ namespace AquaPic.Modules
             light.offTimeOffset = offTimeOffset;
             light.mode = Mode.Auto;
 
-            TimeDate now = TimeDate.Now;
-            if ((now.CompareTo (sunRiseToday) > 0) && (now.CompareTo (sunSetToday) < 0)) {
+            DateSpan now = DateSpan.Now;
+            if (now.After (sunRiseToday) && now.Before (sunSetToday)) {
                 // time is after sunrise but before sunset so normal daytime
                 if (light.lightingTime == LightingTime.Daytime) { 
                     light.SetOnTime (sunRiseToday);
@@ -418,14 +418,14 @@ namespace AquaPic.Modules
                     light.SetOnTime (sunSetToday);
                     light.SetOffTime (sunRiseTomorrow);
                 }
-            } else if (now.CompareTo (sunRiseToday) < 0) { // time is before sunrise today
+            } else if (now.Before (sunRiseToday)) { // time is before sunrise today
                 if (light.lightingTime == LightingTime.Daytime) { 
                     // lights are supposed to be off, no special funny business required
                     light.SetOnTime (sunRiseToday);
                     light.SetOffTime (sunSetToday);
                 } else { // lights are supposed to be on, a little funny bussiness is required
-                    TimeDate sunSetYesterday = new TimeDate (sunSetToday);
-                    sunSetYesterday.AddDay (-1);
+                    DateSpan sunSetYesterday = new DateSpan (sunSetToday);
+                    sunSetYesterday.AddDays (-1);
                     light.SetOnTime (sunSetYesterday);
                     light.SetOffTime (sunRiseToday); // night time lighting turns off at sunrise
                 }
@@ -548,12 +548,12 @@ namespace AquaPic.Modules
             fixtures[fixtureName].lightingTime = lightingTime;
 
             if (fixtures[fixtureName].lightingTime == LightingTime.Daytime) {
-                fixtures[fixtureName].SetOnTime (new TimeDate (defaultSunRise));
-                fixtures[fixtureName].SetOffTime (new TimeDate (defaultSunSet));
+                fixtures[fixtureName].SetOnTime (new DateSpan (defaultSunRise));
+                fixtures[fixtureName].SetOffTime (new DateSpan (defaultSunSet));
             } else {
-                fixtures[fixtureName].SetOnTime (new TimeDate (defaultSunSet));
-                TimeDate defRiseTom = new TimeDate (defaultSunRise);
-                defRiseTom.AddDay (1);
+                fixtures[fixtureName].SetOnTime (new DateSpan (defaultSunSet));
+                DateSpan defRiseTom = new DateSpan (defaultSunRise);
+                defRiseTom.AddDays (1);
                 fixtures[fixtureName].SetOffTime (defRiseTom);
             }
         }
@@ -743,22 +743,22 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* On/Off Times                                                                                               */
         /**************************************************************************************************************/
-        public static TimeDate GetFixtureOnTime (string fixtureName) {
+        public static DateSpan GetFixtureOnTime (string fixtureName) {
             CheckFixtureKey (fixtureName);
             return fixtures[fixtureName].onTime;
         }
 
-        public static void SetFixtureOnTime (string fixtureName, TimeDate newOnTime) {
+        public static void SetFixtureOnTime (string fixtureName, DateSpan newOnTime) {
             CheckFixtureKey (fixtureName);
             fixtures[fixtureName].SetOnTime (newOnTime);
         }
 
-        public static TimeDate GetFixtureOffTime (string fixtureName) {
+        public static DateSpan GetFixtureOffTime (string fixtureName) {
             CheckFixtureKey (fixtureName);
             return fixtures[fixtureName].offTime;
         }
 
-        public static void SetFixtureOffTime (string fixtureName, TimeDate newOffTime) {
+        public static void SetFixtureOffTime (string fixtureName, DateSpan newOffTime) {
             CheckFixtureKey (fixtureName);
             fixtures[fixtureName].SetOffTime (newOffTime);
         }

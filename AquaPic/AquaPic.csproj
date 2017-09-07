@@ -81,7 +81,7 @@
     <Compile Include="Modules\Lights\LightingFixture.cs" />
     <Compile Include="Modules\Lights\RiseSetCalc.cs" />
     <Compile Include="Utilites\Time.cs" />
-    <Compile Include="Utilites\TimeDate.cs" />
+    <Compile Include="Utilites\DateSpan.cs" />
     <Compile Include="Utilites\Utilites.cs" />
     <Compile Include="Globals\GlobalEnums.cs" />
     <Compile Include="Globals\IndividualControl.cs" />
@@ -112,10 +112,7 @@
     <Compile Include="Driver\GenericClasses\GenericBase.cs" />
     <Compile Include="Driver\Driver.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputChannel.cs" />
-    <Compile Include="Runtime\DataLogger\DataLogger.cs" />
-    <Compile Include="Runtime\DataLogger\LogEntry.cs" />
     <Compile Include="Utilites\CircularBuffer.cs" />
-    <Compile Include="Utilites\RateOfChangeLimiter.cs" />
     <Compile Include="Operands\Bit\Bit.cs" />
     <Compile Include="Operands\Bit\BitState.cs" />
     <Compile Include="Operands\Coil\Coil.cs" />
@@ -191,6 +188,9 @@
     <Compile Include="Modules\WaterLevel\WaterLevelGroup.cs" />
     <Compile Include="Sensors\WaterLevelSensor.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\WaterGroupSettings.cs" />
+    <Compile Include="DataLogging\DataLogger.cs" />
+    <Compile Include="DataLogging\LogEntry.cs" />
+    <Compile Include="Utilites\RateOfChangeLimiter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -221,5 +221,6 @@
     <Folder Include="UserInterface\Scenes\ATO\" />
     <Folder Include="UserInterface\Scenes\ATO\Dialogs\" />
     <Folder Include="UserInterface\Scenes\ATO\Widgets\" />
+    <Folder Include="DataLogging\" />
   </ItemGroup>
 </Project>
