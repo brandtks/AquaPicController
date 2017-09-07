@@ -100,7 +100,16 @@ namespace AquaPic.Utilites
             return val;
         }
 
-        public int CompareToTime (Time value) {
+        public bool Before (Time time) {
+            return CompareToTime (time) == -1;
+        }
+
+        public bool After (Time time) {
+            return CompareToTime (time) == 1;
+        }
+
+        // returns 1 if after value, -1 if before value
+        protected int CompareToTime (Time value) {
             return TimeSpan.Compare (ToTimeSpan (), value.ToTimeSpan ());
         }
 
@@ -122,9 +131,8 @@ namespace AquaPic.Utilites
             _millisecond = timeSpan.Milliseconds;
         }
 
-        public void AddTimeToTime (Time value) {
-            TimeSpan timeSpan = ToTimeSpan ();
-            timeSpan.Add (value.ToTimeSpan ());
+        public void AddTime (Time time) {
+            var timeSpan = ToTimeSpan ().Add (time.ToTimeSpan ());
             _hour = timeSpan.Hours;
             _minute = timeSpan.Minutes;
             _second = timeSpan.Seconds;
@@ -158,10 +166,10 @@ namespace AquaPic.Utilites
                 }
             }
 
-            return new Time ((byte)hour, (byte)min);
+            return new Time (hour, min);
         }
 
-        public string TimeToString () {
+        public string ToShortTimeString () {
             int h = _hour;
             string t = "AM";
 
@@ -169,7 +177,33 @@ namespace AquaPic.Utilites
                 h %= 12;
                 t = "PM";
             }
+
             return string.Format ("{0}:{1:00} {2}", h, _minute, t);
+        }
+
+        public override string ToString () {
+            return string.Format ("{0}:{1}:{2}.{3}", hour, minute, second, millisecond);
+        }
+
+        public override bool Equals (object obj) {
+            if (this == obj) {
+                return true;
+            }
+
+            if (!(obj is Time)) {
+                return false;
+            }
+
+            var time = (Time)obj;
+            var equality = hour == time.hour;
+            equality &= minute == time.minute;
+            equality &= second == time.second;
+            equality &= millisecond == time.millisecond;
+            return equality;
+        }
+
+        public override int GetHashCode () {
+            return hour ^ minute ^ second ^ millisecond;
         }
     }
 }

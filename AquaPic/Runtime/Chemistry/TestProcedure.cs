@@ -86,7 +86,7 @@ namespace AquaPic.Runtime
         public TestProcedure (string path) {
             JObject jo = JObject.Parse (File.ReadAllText (path));
 
-            _name = (string)jo ["Testing"];
+            _name = (string)jo["Testing"];
 
             try {
                 JObject jpoints = (JObject)jo ["Points"];

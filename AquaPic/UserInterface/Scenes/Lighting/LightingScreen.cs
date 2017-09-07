@@ -82,7 +82,7 @@ namespace AquaPic.UserInterface
             sunRiseLabel.Show ();
 
             var sunRise = new TouchLabel ();
-            sunRise.text = Lighting.sunRiseToday.TimeToString ();
+            sunRise.text = Lighting.sunRiseToday.ToShortDateString ();
             sunRise.textAlignment = TouchAlignment.Center;
             sunRise.textSize = 20;
             sunRise.WidthRequest = 150;
@@ -98,7 +98,7 @@ namespace AquaPic.UserInterface
             sunSetLabel.Show ();
 
             var sunSet = new TouchLabel ();
-            sunSet.text = Lighting.sunSetToday.TimeToString ();
+            sunSet.text = Lighting.sunSetToday.ToShortDateString ();
             sunSet.textAlignment = TouchAlignment.Center;
             sunSet.textSize = 20;
             sunSet.WidthRequest = 150;
@@ -114,7 +114,7 @@ namespace AquaPic.UserInterface
             sunRiseTomorrowLabel.Show ();
 
             var sunRiseTomorrow = new TouchLabel ();
-            sunRiseTomorrow.text = Lighting.sunRiseTomorrow.TimeToString ();
+            sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToShortDateString ();
             sunRiseTomorrow.textAlignment = TouchAlignment.Center;
             sunRiseTomorrow.textSize = 20;
             sunRiseTomorrow.WidthRequest = 150;
@@ -130,7 +130,7 @@ namespace AquaPic.UserInterface
             sunSetTomorrowLabel.Show ();
 
             var sunSetTomorrow = new TouchLabel ();
-            sunSetTomorrow.text = Lighting.sunSetTomorrow.TimeToString ();
+            sunSetTomorrow.text = Lighting.sunSetTomorrow.ToShortDateString ();
             sunSetTomorrow.textAlignment = TouchAlignment.Center;
             sunSetTomorrow.textSize = 20;
             sunSetTomorrow.WidthRequest = 150;
@@ -300,12 +300,12 @@ namespace AquaPic.UserInterface
                         var t = Time.Parse (value);
 
                         bool timeOk = true;
-                        if (t.CompareToTime (new Time ()) == -1) {
+                        if (t.Before (new Time ())) {
                             timeOk = false;
                             MessageBox.Show ("Can't modify time to before current time");
                         }
 
-                        if (t.CompareToTime (Lighting.GetFixtureOffTime (fixtureName)) == 1) {
+                        if (t.After (Lighting.GetFixtureOffTime (fixtureName))) {
                             timeOk = false;
                             MessageBox.Show ("Can't modify on time to after off time");
                         }
@@ -313,7 +313,7 @@ namespace AquaPic.UserInterface
                         if (timeOk) {
                             var td = Lighting.GetFixtureOffTime (fixtureName);
                             td.UpdateTime (t);
-                            onTimeTextBox.text = td.ToShortString ();
+                            onTimeTextBox.text = td.ToShortDateString ();
                             onTimeTextBox.QueueDraw ();
                         }
                     } catch {
@@ -362,12 +362,12 @@ namespace AquaPic.UserInterface
                         var t = Time.Parse (value);
 
                         bool timeOk = true;
-                        if (t.CompareToTime (new Time ()) == -1) {
+                        if (t.Before (new Time ())) {
                             timeOk = false;
                             MessageBox.Show ("Can't modify time to before current time");
                         }
 
-                        if (t.CompareToTime (Lighting.GetFixtureOnTime (fixtureName)) == -1) {
+                        if (t.After (Lighting.GetFixtureOnTime (fixtureName))) {
                             timeOk = false;
                             MessageBox.Show ("Can't modify off time to before on time");
                         }
@@ -375,7 +375,7 @@ namespace AquaPic.UserInterface
                         if (timeOk) {
                             var td = Lighting.GetFixtureOffTime (fixtureName);
                             td.UpdateTime (t);
-                            offTimeTextBox.text = td.ToShortString ();
+                            offTimeTextBox.text = td.ToShortDateString ();
                             offTimeTextBox.QueueDraw ();
                         }
                     } catch {
@@ -398,10 +398,10 @@ namespace AquaPic.UserInterface
                 s.Destroy ();
                 s.Dispose ();
 
-                sunRise.text = Lighting.sunRiseToday.TimeToString ();
-                sunSet.text = Lighting.sunSetToday.TimeToString ();
-                sunRiseTomorrow.text = Lighting.sunRiseTomorrow.TimeToString ();
-                sunSetTomorrow.text = Lighting.sunSetTomorrow.TimeToString ();
+                sunRise.text = Lighting.sunRiseToday.ToShortDateString ();
+                sunSet.text = Lighting.sunSetToday.ToShortDateString ();
+                sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToShortDateString ();
+                sunSetTomorrow.text = Lighting.sunSetTomorrow.ToShortDateString ();
             };
             Put (settingsBtn, 290, 405);
             settingsBtn.Show ();
@@ -498,8 +498,8 @@ namespace AquaPic.UserInterface
                 modifyOnTime.Visible = true;
                 modifyOffTime.Visible = true;
 
-                onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureName).ToShortString ();
-                offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureName).ToShortString ();
+                onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureName).ToShortDateString ();
+                offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureName).ToShortDateString ();
 
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
                 Power.AddHandlerOnStateChange (ic, OnOutletStateChange);

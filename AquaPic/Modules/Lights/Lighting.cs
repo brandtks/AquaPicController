@@ -297,24 +297,24 @@ namespace AquaPic.Modules
             sunRiseTomorrow = RiseSetCalc.GetRiseTimeTomorrow ();
             sunSetTomorrow = RiseSetCalc.GetSetTimeTomorrow ();
 
-            if (sunRiseToday.CompareToTime (minSunRise) < 0) // sunrise is before minimum
+            if (sunRiseToday.Before (minSunRise))
                 sunRiseToday.UpdateTime (minSunRise);
-            else if (sunRiseToday.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
+            else if (sunRiseToday.After (maxSunRise))
                 sunRiseToday.UpdateTime (maxSunRise);
 
-            if (sunSetToday.CompareToTime (minSunSet) < 0) // sunset is before minimum
+            if (sunSetToday.Before (minSunSet))
                 sunSetToday.UpdateTime (minSunSet);
-            else if (sunSetToday.CompareToTime (maxSunSet) > 0) // sunset is after maximum
+            else if (sunSetToday.After (maxSunSet))
                 sunSetToday.UpdateTime (maxSunSet);
 
-            if (sunRiseTomorrow.CompareToTime (minSunRise) < 0) // sunrise is before minimum
+            if (sunRiseTomorrow.Before (minSunRise))
                 sunRiseTomorrow.UpdateTime (minSunRise);
-            else if (sunRiseTomorrow.CompareToTime (maxSunRise) > 0) // sunrise is after maximum
+            else if (sunRiseTomorrow.After (maxSunRise))
                 sunRiseTomorrow.UpdateTime (maxSunRise);
 
-            if (sunSetTomorrow.CompareToTime (minSunSet) < 0) // sunset is before minimum
+            if (sunSetTomorrow.Before (minSunSet))
                 sunSetTomorrow.UpdateTime (minSunSet);
-            else if (sunSetTomorrow.CompareToTime (maxSunSet) > 0) // sunset is after maximum
+            else if (sunSetTomorrow.After (maxSunSet))
                 sunSetTomorrow.UpdateTime (maxSunSet);
         }
 

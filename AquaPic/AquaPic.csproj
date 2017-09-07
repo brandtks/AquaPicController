@@ -56,6 +56,9 @@
     <Reference Include="Mono.Cairo" />
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modules\Temperature\TemperatureGroup.cs" />
@@ -191,6 +194,9 @@
     <Compile Include="DataLogging\DataLogger.cs" />
     <Compile Include="DataLogging\LogEntry.cs" />
     <Compile Include="Utilites\RateOfChangeLimiter.cs" />
+    <Compile Include="Tests\Utilites\RateOfChangeLimiterTest.cs" />
+    <Compile Include="Tests\Utilites\TimeTest.cs" />
+    <Compile Include="Tests\Utilites\DateSpanTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -222,5 +228,7 @@
     <Folder Include="UserInterface\Scenes\ATO\Dialogs\" />
     <Folder Include="UserInterface\Scenes\ATO\Widgets\" />
     <Folder Include="DataLogging\" />
+    <Folder Include="Tests\" />
+    <Folder Include="Tests\Utilites\" />
   </ItemGroup>
 </Project>

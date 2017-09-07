@@ -25,109 +25,16 @@
 #endregion // License
 
 using System;
+using NUnit.Framework;
 
-namespace AquaPic.Utilites
+namespace AquaPic.Utilites.Test
 {
-    public class DateSpan : Time
+    [TestFixture]
+    public class DateSpanTest
     {
-        protected int _year;
-        public int year {
-            get {
-                return _year;
-            }
-        }
+        [Test]
+        public void BeforeAfterTest () {
 
-        protected int _month;
-        public int month {
-            get {
-                return _month;
-            }
-        }
-
-        protected int _day;
-        public int day {
-            get {
-                return _day;
-            }
-        }
-
-		public static DateSpan Zero { 
-            get {
-				return new DateSpan (0, 0, 0, 0, 0, 0, 0);
-            }
-        }
-
-		public static DateSpan Now {
-            get {
-				return new DateSpan (DateTime.Now);
-            }
-        }
-
-        public DateSpan (int year, int month, int day, int hour, int minute, int second, int millisecond) {
-            _year = year;
-            _month = month;
-            _day = day;
-            _hour = hour;
-            _minute = minute;
-            _second = second;
-            _millisecond = millisecond;
-        }
-
-        public DateSpan (int year, int month, int day, int hour, int minute, int second)
-            : this (year, month, day, hour, minute, second, 0) {
-        }
-
-        public DateSpan (int year, int month, int day, int hour, int minute)
-            : this (year, month, day, hour, minute, 0, 0) {
-        }
-
-        public DateSpan (int hour, int minute, int second) 
-            : this (0, 0, 0, hour, minute, second, 0) 
-        {
-            DateTime now = DateTime.Now;
-            _year = now.Year;
-            _month = now.Month;
-            _day = now.Day;
-        }
-
-        public DateSpan (int hour, int minute, int second, int millisecond)
-            : this (0, 0, 0, hour, minute, second, millisecond) 
-        {
-            DateTime now = DateTime.Now;
-            _year = now.Year;
-            _month = now.Month;
-            _day = now.Day;
-        }
-          
-        public DateSpan (DateTime dateTime)
-            : this (dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond) {
-        }
-
-        public DateSpan (Time time)
-            : this (0, 0, 0, time.hour, time.minute, time.second, time.millisecond) 
-        {
-            DateTime now = DateTime.Now;
-            _year = now.Year;
-            _month = now.Month;
-            _day = now.Day;
-        }
-
-        public DateSpan () {
-			DateTime value = DateTime.Now;
-			_year = value.Year;
-			_month = value.Month;
-			_day = value.Day;
-			_hour = value.Hour;
-			_minute = value.Minute;
-			_second = value.Second;
-			_millisecond = value.Millisecond;
-        }
-
-        public void UpdateDateToToday () {
-            DateTime now = DateTime.Now;
-            _year = now.Year;
-            _month = now.Month;
-            _day = now.Day;
         }
 
         public bool Before (DateSpan dateSpan) {
