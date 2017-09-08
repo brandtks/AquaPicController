@@ -34,116 +34,101 @@ namespace AquaPic.Utilites.Test
     {
         [Test]
         public void BeforeAfterTest () {
-
+            var ds1 = new DateSpan (2017, 1, 1, 12, 30, 0, 0);
+            var ds2 = new DateSpan (2017, 1, 2, 12, 30, 0, 0);
+            Assert.True (ds1.Before (ds2));
+            Assert.True (ds2.After (ds1));
+            Assert.False (ds1.After (ds2));
         }
 
-        public bool Before (DateSpan dateSpan) {
-            return Before (dateSpan.ToDateTime ());
+        [Test]
+        public void BeforeAfterTimeTest () {
+            var ds1 = new DateSpan (2017, 1, 1, 11, 0, 0, 0);
+            var ds2 = new DateSpan (1940, 12, 25, 12, 0, 0, 0);
+            Assert.True (ds1.BeforeTime (ds2));
+            Assert.True (ds2.AfterTime (ds1));
+            Assert.False (ds1.AfterTime (ds2));
         }
 
-        public bool Before (DateTime dateTime) {
-            return CompareTo (dateTime) == -1;
+        [Test]
+        public void DifferenceInMintuesTest () {
+            var ds1 = new DateSpan (2017, 1, 1, 11, 0, 0, 0);
+            var ds2 = new DateSpan (2017, 1, 1, 12, 0, 0, 0);
+
+            var difference = ds1.DifferenceInMinutes (ds2);
+            Assert.AreEqual (-60d, difference);
+
+            difference = ds2.DifferenceInMinutes (ds1);
+            Assert.AreEqual (60d, difference);
+
+            difference = ds1.DifferenceInMinutes (ds1);
+            Assert.AreEqual (0d, difference);
         }
 
-        public bool After (DateSpan dateSpan) {
-            return After (dateSpan.ToDateTime ());
+        [Test]
+        public void DifferenceInSecondsTest () {
+            var ds1 = new DateSpan (2017, 1, 1, 12, 0, 0, 0);
+            var ds2 = new DateSpan (2017, 1, 1, 12, 1, 0, 0);
+
+            var difference = ds1.DifferenceInSeconds (ds2);
+            Assert.AreEqual (-60d, difference);
+
+            difference = ds2.DifferenceInSeconds (ds1);
+            Assert.AreEqual (60d, difference);
+
+            difference = ds1.DifferenceInSeconds (ds1);
+            Assert.AreEqual (0d, difference);
         }
 
-        public bool After (DateTime dateTime) {
-            return CompareTo (dateTime) == 1;
+        [Test]
+        public void AddDaysTest () {
+            var ds1 = new DateSpan (2017, 1, 1, 12, 0, 0, 0);
+            var ds2 = new DateSpan (2017, 1, 2, 12, 0, 0, 0);
+            ds1.AddDays (1);
+            Assert.AreEqual (ds2, ds1);
         }
 
-        public bool BeforeTime (DateSpan dateSpan) {
-            return CompareTo (dateSpan) == -1;
+        [Test]
+        public void UpdateTimeTest () {
+            var ds1 = new DateSpan (2017, 1, 1, 12, 0, 0, 0);
+            var ds2 = new DateSpan (2017, 1, 1, 13, 30, 30, 500);
+            var ds3 = new DateSpan (2017, 1, 1, 2, 45, 15, 250);
+            var t = new Time (13, 30, 30, 500);
+            var ts = new TimeSpan (0, 2, 45, 15, 250);
+
+            ds1.UpdateTime (t);
+            Assert.AreEqual (ds2, ds1);
+
+            ds1.UpdateTime (ts);
+            Assert.AreEqual (ds3, ds1);
         }
 
-        public bool AfterTime (DateSpan dateSpan) {
-            return CompareTo (dateSpan) == 1;
-        }
+        [Test]
+        public void EqualsTest () {
+            var ds1 = new DateSpan (2017, 1, 1, 12, 0, 0, 0);
+            var ds2 = new DateSpan (2017, 1, 1, 12, 0, 0, 0);
+            Assert.AreEqual (ds2, ds1);
 
-        // returns 1 if after value, -1 if before value
-        protected int CompareTo (DateSpan dateSpan) {
-            return ToDateTime ().CompareTo (dateSpan.ToDateTime ());
-        }
+            ds1 = new DateSpan (2016, 1, 1, 12, 0, 0, 0);
+            Assert.AreNotEqual (ds2, ds1);
 
-        // returns 1 if after value, -1 if before value
-        protected int CompareTo (DateTime value) {
-            return ToDateTime ().CompareTo (value);
-        }
+            ds1 = new DateSpan (2017, 2, 1, 12, 0, 0, 0);
+            Assert.AreNotEqual (ds2, ds1);
 
-        // returns 1 if after value, -1 if before value
-        protected int CompareToTime (DateSpan dateSpan) {
-            return TimeSpan.Compare (ToTimeSpan (), dateSpan.ToTimeSpan ());
-        }
+            ds1 = new DateSpan (2017, 1, 2, 12, 0, 0, 0);
+            Assert.AreNotEqual (ds2, ds1);
 
-        public double DifferenceInMinutes (DateSpan dateSpan) {
-            var span = ToDateTime ().Subtract (dateSpan.ToDateTime ());
-            return span.TotalMinutes;
-        }
+            ds1 = new DateSpan (2017, 1, 1, 11, 0, 0, 0);
+            Assert.AreNotEqual (ds2, ds1);
 
-        public double DifferenceInSeconds (DateSpan dateSpan) {
-            var span = ToDateTime ().Subtract (dateSpan.ToDateTime ());
-            return span.TotalSeconds;
-        }
+            ds1 = new DateSpan (2017, 1, 1, 12, 30, 0, 0);
+            Assert.AreNotEqual (ds2, ds1);
 
-        public DateTime ToDateTime () {
-            var val = new DateTime (_year, _month, _day, _hour, _minute, _second, _millisecond);
-            return val;
-        }
+            ds1 = new DateSpan (2017, 1, 1, 12, 0, 15, 0);
+            Assert.AreNotEqual (ds2, ds1);
 
-        public void AddDays (int numberOfDays) {
-            var val = ToDateTime ();
-            val = val.AddDays (numberOfDays);
-            _year = val.Year;
-            _month = val.Month;
-            _day = val.Day;
-        }
-
-        public void UpdateTime (TimeSpan value) {
-            _hour = value.Hours;
-            _minute = value.Minutes;
-            _second = value.Seconds;
-            _millisecond = value.Milliseconds;
-        }
-
-        public void UpdateTime (Time value) {
-            _hour = value.hour;
-            _minute = value.minute;
-            _second = value.second;
-            _millisecond = value.millisecond;
-        }
-
-		public override string ToString () {
-			return ToDateTime ().ToString ("M/dd/yy h:mm:ss.fff tt");
-		}
-
-        public string ToShortDateString () {
-            var val = ToDateTime ();
-            return val.ToString ("M/dd h:mm tt");
-        }
-
-        public override bool Equals (object obj) {
-            if (this == obj) {
-                return true;
-            }
-
-            if (!(obj is DateSpan)) {
-                return false;
-            }
-
-            var dateSpan = (DateSpan)obj;
-            var equality = year == dateSpan.year;
-            equality &= month == dateSpan.month;
-            equality &= day == dateSpan.day;
-            equality &= hour == dateSpan.hour;
-            equality &= minute == dateSpan.minute;
-            equality &= second == dateSpan.second;
-            equality &= millisecond == dateSpan.millisecond;
-            return equality;
-        }
-
-        public override int GetHashCode () {
-            return year ^ month ^ day ^ hour ^ minute ^ second ^ millisecond;
+            ds1 = new DateSpan (2017, 1, 1, 12, 0, 0, 500);
+            Assert.AreNotEqual (ds2, ds1);
         }
     }
 }

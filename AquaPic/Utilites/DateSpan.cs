@@ -147,11 +147,11 @@ namespace AquaPic.Utilites
         }
 
         public bool BeforeTime (DateSpan dateSpan) {
-            return CompareTo (dateSpan) == -1;
+            return CompareToTime (dateSpan) == -1;
         }
 
         public bool AfterTime (DateSpan dateSpan) {
-            return CompareTo (dateSpan) == 1;
+            return CompareToTime (dateSpan) == 1;
         }
 
         // returns 1 if after value, -1 if before value
@@ -176,7 +176,7 @@ namespace AquaPic.Utilites
 
         public double DifferenceInSeconds (DateSpan dateSpan) {
             var span = ToDateTime ().Subtract (dateSpan.ToDateTime ());
-            return span.TotalSeconds;
+            return span.TotalSeconds; 
         }
 
         public DateTime ToDateTime () {
