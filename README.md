@@ -23,7 +23,7 @@ MSBuild is optional. The build script will install MSBuild if it can't be found 
 
 Another option is to use a C# IDE: [MonoDevelop](http://www.monodevelop.com/download/) (Linux), or [Visual Studio](https://www.visualstudio.com/vs/) (Windows and Mac) 
 ### Building
-Edit Makefile-defines.mk to point to the NuGet _'executable'_, then execute ```./build```. Or just use one of the chunk graphical IDEs. 
+Edit defines.build to point to the NuGet _'executable'_, then execute ```./build```. Or just use one of the chunk graphical IDEs. 
 ### Dependencies
  * [cs-script](http://www.csscript.net/) - Oleg Shilo
  * [Json.NET](http://www.newtonsoft.com/json) - Newtonsoft

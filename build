@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./Makefile-defines.mk
+. ./defines.build
 
 if [ $BUILD ]; then
     config=$BUILD
@@ -19,7 +19,7 @@ Recommend not installing though a package manager. Instead, install mono-complet
 and directly download nuget using wget. 
   sudo apt install mono-complete
   wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
-Then edit Makefile-defines.mk to use the mono runtime to execute nuget.exe. 
+Then edit defines.build to use the mono runtime to execute nuget.exe. 
   NUGET="mono /home/user/bin/nuget.exe"
 nuget.exe doesn't need to be marked executable but mono does require the absolute
 path. The NUGET variable value should be incapsulated in double quoutes.
