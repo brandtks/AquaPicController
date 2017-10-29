@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>DataLogging</RootNamespace>
+    <RootNamespace>AquaPic.DataLogging</RootNamespace>
     <AssemblyName>DataLogging</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -37,8 +37,10 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\LogEntry.cs" />
-    <Compile Include="Service\DataLogger.cs" />
     <Compile Include="Domain\DataLogEntryAddedEvent.cs" />
+    <Compile Include="Service\IDataLogger.cs" />
+    <Compile Include="Service\DataLoggerIoImplementation.cs" />
+    <Compile Include="Service\Factory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

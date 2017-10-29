@@ -449,7 +449,7 @@ namespace AquaPic.Modules
         }
 
         /***Data logger***/
-        public static DataLogger GetWaterLevelGroupDataLogger (string name) {
+        public static IDataLogger GetWaterLevelGroupDataLogger (string name) {
             CheckWaterLevelGroupKey (name);
             return waterLevelGroups[name].dataLogger;
         }

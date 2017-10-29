@@ -38,7 +38,7 @@ namespace AquaPic.Modules
         {
             public string name;
             public float level;
-            public DataLogger dataLogger;
+            public IDataLogger dataLogger;
             public string analogLevelSensorName;
 
             public int highSwitchAlarmIndex;
@@ -47,7 +47,7 @@ namespace AquaPic.Modules
             public WaterLevelGroup (string name, string analogLevelSensorName) {
                 this.name = name;
                 level = 0.0f;
-                dataLogger = new DataLogger (string.Format ("{0}WaterLevel", this.name.RemoveWhitespace ()));
+                dataLogger = Factory.GetDataLogger (string.Format ("{0}WaterLevel", this.name.RemoveWhitespace ()));
 
                 highSwitchAlarmIndex = Alarm.Subscribe ("High Water Level, Float Switch");
                 lowSwitchAlarmIndex = Alarm.Subscribe ("Low Water Level, Float Switch");

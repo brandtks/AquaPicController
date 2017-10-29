@@ -62,10 +62,11 @@ namespace AquaPic.Runtime
             foreach (var rm in preprocess)
                 cond.Remove (rm);
 
-            StringBuilder sb = new StringBuilder ();
+            var sb = new StringBuilder ();
+            sb.AppendLine ("using GoodtimeDevelopment.Utilites;");
             sb.AppendLine ("using AquaPic.Runtime;");
             sb.AppendLine ("using AquaPic.Modules;");
-            sb.AppendLine ("using AquaPic.Utilites;");
+            sb.AppendLine ("using AquaPic.Globals;");
             sb.AppendLine ("using AquaPic.Drivers;");
             sb.AppendLine ("using AquaPic.SerialBus;");
             sb.AppendLine ("using AquaPic.Operands;");
@@ -77,9 +78,9 @@ namespace AquaPic.Runtime
             sb.AppendLine ("}");
             sb.AppendLine ("}");
 
-            string code = sb.ToString ();
+            var code = sb.ToString ();
 
-            IOutletScript outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
+            var outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
 
             //"preprocessor" conditions are ran after the code is compiled because these add actual real world stuff
             if (outletScript != null) {

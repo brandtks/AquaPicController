@@ -32,67 +32,53 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.DataLogging
 {
-    
-
-    public class DataLogger
+    public class DataLoggerIoImplementation : IDataLogger
     {
-        string currentFilePath, _name;
-        public string name {
-            get {
-                return _name;
-            }
-        }
+        readonly string _currentFilePath;
 
-        public event DataLogEntryAddedEventHandler ValueLogEntryAddedEvent;
-        public event DataLogEntryAddedEventHandler EventLogEntryAddedEvent;
-
-        public DataLogger (string name) {
+        public DataLoggerIoImplementation (string name) {
             _name = name;
-            currentFilePath = Path.Combine (Utils.AquaPicEnvironment, "DataLogging");
-            currentFilePath = Path.Combine (currentFilePath, _name.RemoveWhitespace ());
+            _currentFilePath = Path.Combine (Utils.AquaPicEnvironment, "DataLogging");
+            _currentFilePath = Path.Combine (_currentFilePath, _name.RemoveWhitespace ());
 
-            if (!Directory.Exists (currentFilePath)) {
-                Directory.CreateDirectory (currentFilePath);
+            if (!Directory.Exists (_currentFilePath)) {
+                Directory.CreateDirectory (_currentFilePath);
             }
         }
 
-        public void AddEntry (double value) {
+        public override void AddEntry (double value) {
             var entry = new LogEntry (value);
 
             var filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now);
             var writeEngine = new FileHelperEngine<LogEntry> ();
-            writeEngine.AppendToFile (Path.Combine (currentFilePath, filename), entry);
+            writeEngine.AppendToFile (Path.Combine (_currentFilePath, filename), entry);
 
-            if (ValueLogEntryAddedEvent != null) {
-                ValueLogEntryAddedEvent (this, new DataLogEntryAddedEventArgs (entry));
-            }
+            CallValueLogEntryAddedHandlers (entry);
         }
 
-        public void AddEntry (string eventType) {
+        public override void AddEntry (string eventType) {
             var entry = new LogEntry (eventType);
 
             var filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now);
             var writeEngine = new FileHelperEngine<LogEntry> ();
-            writeEngine.AppendToFile (Path.Combine (currentFilePath, filename), entry);
+            writeEngine.AppendToFile (Path.Combine (_currentFilePath, filename), entry);
 
-            if (EventLogEntryAddedEvent != null) {
-                EventLogEntryAddedEvent (this, new DataLogEntryAddedEventArgs (entry));
-            }
+            CallEventLogEntryAddedHandlers (entry);
         }
 
-        public LogEntry[] GetValueEntries (int maxEntries, DateTime endSearchTime) {
+        public override LogEntry[] GetValueEntries (int maxEntries, DateTime endSearchTime) {
             return GetValueEntries (maxEntries, 1, endSearchTime);
         }
 
-        public LogEntry[] GetValueEntries (int maxEntries, int secondTimeSpan, DateTime endSearchTime) {
-            List<LogEntry> entries = new List<LogEntry> ();
-            FileHelperEngine<LogEntry> readEngine = new FileHelperEngine<LogEntry> ();
+        public override LogEntry[] GetValueEntries (int maxEntries, int secondTimeSpan, DateTime endSearchTime) {
+            var entries = new List<LogEntry> ();
+            var readEngine = new FileHelperEngine<LogEntry> ();
             int hourIndex = 0;
 
-            if (Directory.GetFiles (currentFilePath).Length > 0) {
+            if (Directory.GetFiles (_currentFilePath).Length > 0) {
                 while (entries.Count < maxEntries) {
-                    string filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now.AddHours (hourIndex));
-                    string path = Path.Combine (currentFilePath, filename);
+                    var filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now.AddHours (hourIndex));
+                    var path = Path.Combine (_currentFilePath, filename);
                     --hourIndex;
 
                     if (File.Exists (path)) {
@@ -137,15 +123,15 @@ namespace AquaPic.DataLogging
             return returnArray;
         }
 
-        public LogEntry[] GetEventEntries (int maxEntries, DateTime endSearchTime) {
-            List<LogEntry> entries = new List<LogEntry> ();
-            FileHelperEngine<LogEntry> readEngine = new FileHelperEngine<LogEntry> ();
+        public override LogEntry[] GetEventEntries (int maxEntries, DateTime endSearchTime) {
+            var entries = new List<LogEntry> ();
+            var readEngine = new FileHelperEngine<LogEntry> ();
             int hourIndex = 0;
 
-            if (Directory.GetFiles (currentFilePath).Length > 0) {
+            if (Directory.GetFiles (_currentFilePath).Length > 0) {
                 while (entries.Count < maxEntries) {
-                    string filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now.AddHours (hourIndex));
-                    string path = Path.Combine (currentFilePath, filename);
+                    var filename = string.Format ("{0:MMddyyHH}.csv", DateTime.Now.AddHours (hourIndex));
+                    var path = Path.Combine (_currentFilePath, filename);
                     --hourIndex;
 
                     if (File.Exists (path)) {
@@ -183,7 +169,7 @@ namespace AquaPic.DataLogging
 
         #if DEBUG
         public void DeleteAllLogFiles () {           
-            var files = Directory.GetFiles (currentFilePath);
+            var files = Directory.GetFiles (_currentFilePath);
             foreach (var file in files) {
                 Console.WriteLine ("Deleting {0} for {1}", file, _name);
                 File.Delete (file);

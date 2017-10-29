@@ -470,7 +470,7 @@ namespace AquaPic.Modules
         }
 
         /***Data logger***/
-        public static DataLogger GetTemperatureGroupDataLogger (string name) {
+        public static IDataLogger GetTemperatureGroupDataLogger (string name) {
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].dataLogger;
         }

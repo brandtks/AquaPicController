@@ -28,6 +28,7 @@
 using System.IO;
 using Gtk;
 using GoodtimeDevelopment.Utilites;
+using AquaPic.DataLogging;
 using AquaPic.Runtime;
 using AquaPic.UserInterface;
 using AquaPic.Drivers;
@@ -122,11 +123,17 @@ namespace AquaPic
             //for some reason this doesn't like to be in the destroyed event
             var groups = Temperature.GetAllTemperatureGroupNames ();
             foreach (var group in groups) {
-                Temperature.GetTemperatureGroupDataLogger (group).DeleteAllLogFiles ();
+                var dataLogger = (DataLoggerIoImplementation)Temperature.GetTemperatureGroupDataLogger (group);
+                if (dataLogger != null) {
+                    dataLogger.DeleteAllLogFiles ();
+                }
             }
             groups = WaterLevel.GetAllWaterLevelGroupNames ();
             foreach (var group in groups) {
-                WaterLevel.GetWaterLevelGroupDataLogger (group).DeleteAllLogFiles ();
+                var dataLogger = (DataLoggerIoImplementation)WaterLevel.GetWaterLevelGroupDataLogger (group);
+                if (dataLogger != null) {
+                    dataLogger.DeleteAllLogFiles ();
+                }
             }
 #endif
         }

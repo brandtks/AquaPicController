@@ -205,7 +205,7 @@ namespace GoodtimeDevelopment.TouchWidget
             }
         }
 
-        public void LinkDataLogger (DataLogger logger) {          
+        public void LinkDataLogger (IDataLogger logger) {          
             var endSearchTime = DateTime.Now.Subtract (new TimeSpan (0, 0, maxDataPoints * PointTimeDifferenceToSeconds ()));
             
             logger.ValueLogEntryAddedEvent += OnValueLogEntryAdded;
@@ -217,7 +217,7 @@ namespace GoodtimeDevelopment.TouchWidget
             _eventPoints.AddRange (eventEntries);
         }
 
-        public void UnLinkDataLogger (DataLogger logger) {
+        public void UnLinkDataLogger (IDataLogger logger) {
             logger.ValueLogEntryAddedEvent -= OnValueLogEntryAdded;
             logger.EventLogEntryAddedEvent -= OnEventLogEntryAdded;
         }
