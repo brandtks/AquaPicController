@@ -42,11 +42,11 @@ namespace AquaPic.Runtime
 
             if (File.Exists (path)) {
                 using (StreamReader reader = File.OpenText (path)) {
-                    JArray ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));
+                    var ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));
 
                     foreach (var jt in ja) {
                         var jo = jt as JObject;
-                        string type = (string)jo["type"];
+                        var type = (string)jo["type"];
                         switch (type) {
                         case "power":
                             Logger.Add ("Adding power strip");
@@ -92,12 +92,12 @@ namespace AquaPic.Runtime
             path = Path.Combine (path, "generalProperties.json");
 
             if (File.Exists (path)) {
-                string jstring = File.ReadAllText (path);
-                JObject jobj = (JObject)JToken.Parse (jstring);
+                var jstring = File.ReadAllText (path);
+                var jobj = (JObject)JToken.Parse (jstring);
 
-                bool autoConnect = Convert.ToBoolean (jobj["autoConnectAquaPicBus"]);
+                var autoConnect = Convert.ToBoolean (jobj["autoConnectAquaPicBus"]);
                 if (autoConnect) {
-                    string port = (string)jobj["aquaPicBusPort"];
+                    var port = (string)jobj["aquaPicBusPort"];
                     if (!string.IsNullOrWhiteSpace (port)) {
                         Logger.Add ("Starting AquaPicBus on port " + port);
                         AquaPicBus.Open (port);

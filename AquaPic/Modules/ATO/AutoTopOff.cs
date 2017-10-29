@@ -225,6 +225,7 @@ namespace AquaPic.Modules
                     }
                 }
             }
+
             if (_enable) {
                 _state = AutoTopOffState.Standby;
             } else {

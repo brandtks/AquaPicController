@@ -37,25 +37,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchButton.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchColor.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchComboBox.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchCurvedProgressBar.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchDialogs.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchGlobal.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchGraphicalBox.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchLabel.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchLayeredProgressBar.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchLinePlot.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchNumberInput.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchProgressBar.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchSelectorSwitch.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchText.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchTextBox.cs" />
-    <Compile Include="TouchWidgetLibrary\TouchUpDownButtons.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TouchWidgetLibrary\" />
+    <Compile Include="TouchButton.cs" />
+    <Compile Include="TouchColor.cs" />
+    <Compile Include="TouchComboBox.cs" />
+    <Compile Include="TouchCurvedProgressBar.cs" />
+    <Compile Include="TouchDialogs.cs" />
+    <Compile Include="TouchGlobal.cs" />
+    <Compile Include="TouchGraphicalBox.cs" />
+    <Compile Include="TouchLabel.cs" />
+    <Compile Include="TouchLayeredProgressBar.cs" />
+    <Compile Include="TouchLinePlot.cs" />
+    <Compile Include="TouchNumberInput.cs" />
+    <Compile Include="TouchProgressBar.cs" />
+    <Compile Include="TouchSelectorSwitch.cs" />
+    <Compile Include="TouchText.cs" />
+    <Compile Include="TouchTextBox.cs" />
+    <Compile Include="TouchUpDownButtons.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">
