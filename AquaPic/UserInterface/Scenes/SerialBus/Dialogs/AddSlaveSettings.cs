@@ -30,8 +30,8 @@ using System.IO;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
 using Gtk;
-using TouchWidgetLibrary;
-using AquaPic.Utilites;
+using GoodtimeDevelopment.TouchWidget;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface

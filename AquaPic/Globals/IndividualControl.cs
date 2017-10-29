@@ -26,7 +26,7 @@
 
 using System;
 
-namespace AquaPic.Utilites
+namespace AquaPic.Globals
 {
     // This is a struct to force passing by value instead of by reference
     public struct IndividualControl

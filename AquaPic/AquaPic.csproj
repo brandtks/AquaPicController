@@ -47,9 +47,6 @@
     <Reference Include="CSScriptLibrary">
       <HintPath>..\packages\CS-Script.lib.3.27.2.0\lib\CSScriptLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="FileHelpers">
-      <HintPath>..\packages\FileHelpers.3.1.5\lib\net45\FileHelpers.dll</HintPath>
-    </Reference>
     <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
@@ -83,9 +80,6 @@
     <Compile Include="Modules\Lights\Lighting.cs" />
     <Compile Include="Modules\Lights\LightingFixture.cs" />
     <Compile Include="Modules\Lights\RiseSetCalc.cs" />
-    <Compile Include="Utilites\Time.cs" />
-    <Compile Include="Utilites\DateSpan.cs" />
-    <Compile Include="Utilites\Utilites.cs" />
     <Compile Include="Globals\GlobalEnums.cs" />
     <Compile Include="Globals\IndividualControl.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInput.cs" />
@@ -115,7 +109,6 @@
     <Compile Include="Driver\GenericClasses\GenericBase.cs" />
     <Compile Include="Driver\Driver.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputChannel.cs" />
-    <Compile Include="Utilites\CircularBuffer.cs" />
     <Compile Include="Operands\Bit\Bit.cs" />
     <Compile Include="Operands\Bit\BitState.cs" />
     <Compile Include="Operands\Coil\Coil.cs" />
@@ -167,22 +160,6 @@
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\SwitchSettings.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainWaterLevelBarPlotWidget.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainWaterLevelLinePlotWidget.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchButton.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchColor.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchComboBox.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchCurvedProgressBar.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchDialogs.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchGlobal.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchGraphicalBox.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchLabel.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchLayeredProgressBar.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchLinePlot.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchNumberInput.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchProgressBar.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchSelectorSwitch.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchText.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchTextBox.cs" />
-    <Compile Include="UserInterface\TouchWidgetLibrary\TouchUpDownButtons.cs" />
     <Compile Include="UserInterface\Widgets\MyNotificationBar.cs" />
     <Compile Include="UserInterface\Widgets\MySideBar.cs" />
     <Compile Include="Sensors\ISensor.cs" />
@@ -191,12 +168,6 @@
     <Compile Include="Modules\WaterLevel\WaterLevelGroup.cs" />
     <Compile Include="Sensors\WaterLevelSensor.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\WaterGroupSettings.cs" />
-    <Compile Include="DataLogging\DataLogger.cs" />
-    <Compile Include="DataLogging\LogEntry.cs" />
-    <Compile Include="Utilites\RateOfChangeLimiter.cs" />
-    <Compile Include="Tests\Utilites\RateOfChangeLimiterTest.cs" />
-    <Compile Include="Tests\Utilites\TimeTest.cs" />
-    <Compile Include="Tests\Utilites\DateSpanTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -227,8 +198,20 @@
     <Folder Include="UserInterface\Scenes\ATO\" />
     <Folder Include="UserInterface\Scenes\ATO\Dialogs\" />
     <Folder Include="UserInterface\Scenes\ATO\Widgets\" />
-    <Folder Include="DataLogging\" />
     <Folder Include="Tests\" />
-    <Folder Include="Tests\Utilites\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Utilities\Utilities.csproj">
+      <Project>{D16D7BCC-1475-4F6F-995F-815518E10A49}</Project>
+      <Name>Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">
+      <Project>{9F122E71-B510-4481-BC19-550C14250481}</Project>
+      <Name>TouchWidget</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataLogging\DataLogging.csproj">
+      <Project>{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}</Project>
+      <Name>DataLogging</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

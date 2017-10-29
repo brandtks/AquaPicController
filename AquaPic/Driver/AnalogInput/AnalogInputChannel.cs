@@ -25,7 +25,6 @@
 #endregion // License
 
 ﻿using System;
-using AquaPic.Utilites;
 
 namespace AquaPic.Drivers
 {

@@ -28,7 +28,7 @@
 using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.Runtime
 {

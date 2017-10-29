@@ -32,8 +32,8 @@ using Newtonsoft.Json.Linq;
 using Cairo;
 using Gtk;
 using AquaPic.Runtime;
-using AquaPic.Utilites;
-using TouchWidgetLibrary;
+using AquaPic.Globals;
+using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {

@@ -25,7 +25,8 @@
 #endregion // License
 
 ﻿using System;
-using AquaPic.Utilites;
+using GoodtimeDevelopment.Utilites;
+using AquaPic.Globals;
 using AquaPic.Runtime;
 using AquaPic.Drivers;
 

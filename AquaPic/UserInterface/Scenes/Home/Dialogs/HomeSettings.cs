@@ -27,12 +27,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Gtk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Cairo;
-using Gtk;
-using AquaPic.Utilites;
-using TouchWidgetLibrary;
+using GoodtimeDevelopment.Utilites;
+using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {

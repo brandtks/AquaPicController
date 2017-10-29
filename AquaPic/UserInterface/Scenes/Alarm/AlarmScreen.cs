@@ -29,7 +29,7 @@ using System.Collections.Generic;
 using System.Text;
 using Gtk;
 using Cairo;
-using TouchWidgetLibrary;
+using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface

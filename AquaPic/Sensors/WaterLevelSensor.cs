@@ -27,7 +27,7 @@
 ﻿using System;
 using AquaPic.Sensors;
 using AquaPic.Runtime;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.Sensors
 {

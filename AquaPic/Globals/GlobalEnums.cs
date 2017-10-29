@@ -25,23 +25,27 @@
 #endregion // License
 
 ﻿using System;
+using GoodtimeDevelopment.Utilites;
 
-namespace AquaPic.Utilites
+namespace AquaPic.Globals
 {
-    public enum Mode : byte {
+    public enum Mode : byte
+    {
         Manual = 1,
         Auto
     }
 
-    public enum AnalogType : byte {
-        [Description("0-10Vdc")]
+    public enum AnalogType : byte
+    {
+        [Description ("0-10Vdc")]
         ZeroTen = 0,
-        [Description("0-5Vdc")]
+        [Description ("0-5Vdc")]
         ZeroFive,
         PWM = 255
     }
 
-    public enum MyState : byte {
+    public enum MyState : byte
+    {
         Off = 0,
         On = 1,
         Set,
@@ -49,9 +53,29 @@ namespace AquaPic.Utilites
         Invalid
     }
 
-    public enum LightingTime : byte {
+    public enum LightingTime : byte
+    {
         Daytime = 1,
         Nighttime
+    }
+
+    public static class Globals 
+    {
+        public static MyState ToMyState (this bool value) {
+            if (value) {
+                return MyState.On;
+            }
+
+            return MyState.Off;
+        }
+
+        public static bool ToBool (this MyState value) {
+            if (value == MyState.On) {
+                return true;
+            }
+
+            return false;
+        }
     }
 }
 

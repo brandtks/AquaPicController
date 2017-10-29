@@ -26,7 +26,7 @@
 
 ﻿using System;
 using AquaPic.Operands;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 using AquaPic.SerialBus;
 
 namespace AquaPic.Drivers

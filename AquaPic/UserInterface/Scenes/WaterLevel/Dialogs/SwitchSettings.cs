@@ -25,15 +25,14 @@
 #endregion // License
 
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using Cairo;
 using Gtk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TouchWidgetLibrary;
+using GoodtimeDevelopment.TouchWidget;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 using AquaPic.Drivers;
 using AquaPic.Sensors;
 

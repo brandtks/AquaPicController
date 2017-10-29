@@ -30,9 +30,10 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Drivers;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 using AquaPic.Sensors;
 using AquaPic.DataLogging;
 

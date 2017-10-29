@@ -26,7 +26,7 @@
 
 ﻿using System;
 using AquaPic.Drivers;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 using AquaPic.Runtime;
 
 namespace AquaPic.Modules

@@ -27,7 +27,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AquaPic.Runtime;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.Drivers
 {

@@ -38,7 +38,7 @@ namespace AquaPic.UserInterface
 
         public DimmingLightBarPlot (string name, GetDimmingLevelHandler GetDimmingLevel) {
             text = name;
-            unitOfMeasurement = TouchWidgetLibrary.UnitsOfMeasurement.Percentage;
+            unitOfMeasurement = GoodtimeDevelopment.TouchWidget.UnitsOfMeasurement.Percentage;
             this.GetDimmingLevel = GetDimmingLevel;
 
             var eventbox = new EventBox ();

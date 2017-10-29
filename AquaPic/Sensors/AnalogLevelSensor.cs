@@ -25,9 +25,10 @@
 #endregion // License
 
 ﻿using System;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.Sensors
 {

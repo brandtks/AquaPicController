@@ -27,7 +27,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using AquaPic.Utilites; // for Description
+using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.SerialBus
 {

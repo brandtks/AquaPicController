@@ -25,12 +25,10 @@
 #endregion // License
 
 ﻿using System;
-using System.Linq;
 using Gtk;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
-using AquaPic.Runtime;
-using AquaPic.Utilites;
-using TouchWidgetLibrary;
+using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {

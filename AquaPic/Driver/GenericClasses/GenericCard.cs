@@ -26,7 +26,8 @@
 
 ﻿using System;
 using System.Collections.Generic;
-using AquaPic.Utilites;
+using GoodtimeDevelopment.Utilites;
+using AquaPic.Globals;
 using AquaPic.SerialBus;
 
 namespace AquaPic.Drivers

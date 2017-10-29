@@ -30,9 +30,9 @@ using Cairo;
 using Gtk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TouchWidgetLibrary;
+using GoodtimeDevelopment.TouchWidget;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
-using AquaPic.Utilites;
 
 namespace AquaPic.UserInterface
 {

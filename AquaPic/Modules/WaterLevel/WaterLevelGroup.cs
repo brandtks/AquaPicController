@@ -25,9 +25,8 @@
 #endregion // License
 
 using System;
-using System.Collections.Generic;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
-using AquaPic.Utilites;
 using AquaPic.Sensors;
 using AquaPic.DataLogging;
 

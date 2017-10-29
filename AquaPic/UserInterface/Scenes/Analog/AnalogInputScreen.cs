@@ -26,9 +26,9 @@
 
 ﻿using System;
 using Gtk;
-using TouchWidgetLibrary;
+using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Drivers;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.UserInterface
 {

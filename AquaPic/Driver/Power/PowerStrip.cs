@@ -25,11 +25,10 @@
 #endregion // License
 
 ﻿using System;
-using System.Collections.Generic;
-using AquaPic;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.SerialBus;
 using AquaPic.Runtime;
-using AquaPic.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.Drivers
 {

@@ -25,7 +25,7 @@
 #endregion // License
 
 ﻿using System;
-using AquaPic.Utilites;
+using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Modules
 {

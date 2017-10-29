@@ -28,7 +28,7 @@
 using System.Collections.Generic;
 using Gtk;
 using Cairo;
-using TouchWidgetLibrary;
+using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {

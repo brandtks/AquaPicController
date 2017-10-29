@@ -27,8 +27,8 @@
 ﻿﻿using System;
 using System.IO;
 using Gtk;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
-using AquaPic.Utilites;
 using AquaPic.UserInterface;
 using AquaPic.Drivers;
 using AquaPic.Modules;

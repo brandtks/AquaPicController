@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaPic", "AquaPic\AquaPic.csproj", "{5272A01C-4356-4F37-AF92-B53974F21B34}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{D16D7BCC-1475-4F6F-995F-815518E10A49}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TouchWidget", "TouchWidget\TouchWidget.csproj", "{9F122E71-B510-4481-BC19-550C14250481}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLogging", "DataLogging\DataLogging.csproj", "{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +19,18 @@ Global
 		{5272A01C-4356-4F37-AF92-B53974F21B34}.Debug|x86.Build.0 = Debug|x86
 		{5272A01C-4356-4F37-AF92-B53974F21B34}.Release|x86.ActiveCfg = Release|x86
 		{5272A01C-4356-4F37-AF92-B53974F21B34}.Release|x86.Build.0 = Release|x86
+		{D16D7BCC-1475-4F6F-995F-815518E10A49}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D16D7BCC-1475-4F6F-995F-815518E10A49}.Debug|x86.Build.0 = Debug|Any CPU
+		{D16D7BCC-1475-4F6F-995F-815518E10A49}.Release|x86.ActiveCfg = Release|Any CPU
+		{D16D7BCC-1475-4F6F-995F-815518E10A49}.Release|x86.Build.0 = Release|Any CPU
+		{9F122E71-B510-4481-BC19-550C14250481}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F122E71-B510-4481-BC19-550C14250481}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F122E71-B510-4481-BC19-550C14250481}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F122E71-B510-4481-BC19-550C14250481}.Release|x86.Build.0 = Release|Any CPU
+		{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}.Debug|x86.Build.0 = Debug|Any CPU
+		{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}.Release|x86.ActiveCfg = Release|Any CPU
+		{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

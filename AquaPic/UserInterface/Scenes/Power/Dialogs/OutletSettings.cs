@@ -29,11 +29,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Gtk;
-using Cairo;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TouchWidgetLibrary;
-using AquaPic.Utilites;
+using GoodtimeDevelopment.TouchWidget;
+using GoodtimeDevelopment.Utilites;
+using AquaPic.Globals;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
 

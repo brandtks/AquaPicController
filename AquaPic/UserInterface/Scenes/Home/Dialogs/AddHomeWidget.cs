@@ -27,8 +27,8 @@
 ﻿using System;
 using Cairo;
 using Gtk;
-using AquaPic.Utilites;
-using TouchWidgetLibrary;
+using GoodtimeDevelopment.Utilites;
+using GoodtimeDevelopment.TouchWidget;
 using System.Text.RegularExpressions;
 
 namespace AquaPic.UserInterface

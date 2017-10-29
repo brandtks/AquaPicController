@@ -28,11 +28,9 @@
 using System.IO.Ports; // for SerialPort
 using System.Collections.Generic;
 using Gtk;
-using TouchWidgetLibrary;
-using AquaPic.Modules;
-using AquaPic.Runtime;
+using GoodtimeDevelopment.TouchWidget;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.SerialBus;
-using AquaPic.Utilites;
 
 namespace AquaPic.UserInterface
 {
