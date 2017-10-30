@@ -2,7 +2,8 @@ README
 ======
 **AquaPic Main Control**
 
-Handles all functionality for the AquaPic aquarium controller. Also provides a graphical user interface.
+Handles all functionality for the AquaPic aquarium controller, and provides a graphical user interface. All input and output is handled by [seperate modules](https://github.com/brandtks/AquaPicModules)
+
 ### Status
 All code is a work in progress. 
 ### Prerequisites
