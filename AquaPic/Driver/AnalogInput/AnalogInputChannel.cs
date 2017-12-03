@@ -33,7 +33,7 @@ namespace AquaPic.Drivers
         protected class AnalogInputChannel<T> : GenericChannel<T>
         {
             public AnalogInputChannel (string name) 
-                : base (name, (T)(object)0.0f) { }
+                : base (name, (T)(object)0f) { }
         }
     }
 }

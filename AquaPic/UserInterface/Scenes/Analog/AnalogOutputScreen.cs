@@ -82,11 +82,11 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            int[] values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (cardId);
+            var values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (cardId);
 
             int i = 0;
             foreach (var d in displays) {
-                d.currentValue = (float)values [i];
+                d.currentValue = values [i];
                 d.QueueDraw ();
 
                 ++i;
@@ -168,10 +168,10 @@ namespace AquaPic.UserInterface
         #endif
 
         protected void GetCardData () {
-            string[] names = AquaPicDrivers.AnalogOutput.GetAllChannelNames (cardId);
-            int[] values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (cardId);
-            AnalogType[] types = AquaPicDrivers.AnalogOutput.GetAllChannelTypes (cardId);
-            Mode[] modes = AquaPicDrivers.AnalogOutput.GetAllChannelModes (cardId);
+            var names = AquaPicDrivers.AnalogOutput.GetAllChannelNames (cardId);
+            var values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (cardId);
+            var types = AquaPicDrivers.AnalogOutput.GetAllChannelTypes (cardId);
+            var modes = AquaPicDrivers.AnalogOutput.GetAllChannelModes (cardId);
 
             int i = 0;
             foreach (var d in displays) {

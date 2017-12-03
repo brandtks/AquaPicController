@@ -38,7 +38,7 @@ namespace AquaPic.Drivers
             public Value valueControl;
 
             public AnalogOutputChannel (string name)
-                : base (name, (T)(object)0) 
+                : base (name, (T)(object)0f) 
             {
                 type = AnalogType.ZeroTen;
                 valueControl = new Value ();
