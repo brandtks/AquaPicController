@@ -49,7 +49,8 @@ namespace AquaPic.UserInterface
                 "Power",
                 "Analog Input",
                 "Analog Output",
-                "Digital Input"
+                "Digital Input",
+                "pH/ORP"
             });
             c.combo.nonActiveMessage = "Select slave type";
             AddSetting (c);
@@ -64,7 +65,7 @@ namespace AquaPic.UserInterface
                     try {
                         int address;
                         if (args.text.StartsWith ("x", StringComparison.InvariantCultureIgnoreCase)) {
-                            string parseString = args.text.Substring (args.text.IndexOf ("x", StringComparison.InvariantCultureIgnoreCase) + 1); 
+                            var parseString = args.text.Substring (args.text.IndexOf ("x", StringComparison.InvariantCultureIgnoreCase) + 1); 
                             address = int.Parse (parseString, NumberStyles.HexNumber);
                         } else {
                             address = Convert.ToInt32 (args.text);
@@ -105,9 +106,9 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            string type = string.Empty;
-            string name = string.Empty;
-            List<string> optionTokens = new List<string> ();
+            var type = string.Empty;
+            var name = string.Empty;
+            var optionTokens = new List<string> ();
 
             switch (typeNumber) {
             case 0:
@@ -151,6 +152,11 @@ namespace AquaPic.UserInterface
                 type = "digitalInput";
                 name = string.Format ("DI{0}", AquaPicDrivers.DigitalInput.cardCount + 1);
                 AquaPicDrivers.DigitalInput.AddCard (address, name);
+                break;
+            case 4:
+                type = "phOrp";
+                name = string.Format ("PH{0}", AquaPicDrivers.DigitalInput.cardCount + 1);
+                AquaPicDrivers.PhOrp.AddCard (address, name);
                 break;
             }
 

@@ -231,18 +231,16 @@ namespace AquaPic.UserInterface
             };
             AddOptionalSetting (t);
 
-            #if SELECTABLE_ANALOG_OUTPUT_TYPE
             s = new SettingSelectorSwitch ("0-10", "PWM");
             s.text = "Dimming Type";
-            if ((fixtureIdx != -1) && (isDimming)) {
-                if (Lighting.GetDimmingType (fixtureIdx) == AnalogType.ZeroTen)
+            if ((this.fixtureName.IsNotEmpty ()) && (isDimming)) {
+                if (Lighting.GetDimmingType (fixtureName) == AnalogType.ZeroTen)
                     s.selectorSwitch.currentSelected = 0;
                 else
                     s.selectorSwitch.currentSelected = 1;
             } else
                 s.selectorSwitch.currentSelected = 0;
             AddOptionalSetting (s);
-            #endif
 
             DrawSettings ();
         }
@@ -306,22 +304,20 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            string chStr = ((SettingsComboBox)settings ["Dimming Channel"]).combo.activeText;
-            IndividualControl chIc = IndividualControl.Empty;
+            var chStr = ((SettingsComboBox)settings ["Dimming Channel"]).combo.activeText;
+            var chIc = IndividualControl.Empty;
 
-            float maxDimming = Convert.ToSingle (((SettingsTextBox)settings ["Max Dimming"]).textBox.text);
-            float minDimming = Convert.ToSingle (((SettingsTextBox)settings ["Min Dimming"]).textBox.text);
+            var maxDimming = Convert.ToSingle (((SettingsTextBox)settings ["Max Dimming"]).textBox.text);
+            var minDimming = Convert.ToSingle (((SettingsTextBox)settings ["Min Dimming"]).textBox.text);
 
             AnalogType aType = AnalogType.ZeroTen;
-            #if SELECTABLE_ANALOG_OUTPUT_TYPE
             try {
-                SettingSelectorSwitch s = settings ["Dimming Type"] as SettingSelectorSwitch;
+                var s = settings ["Dimming Type"] as SettingSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     aType = AnalogType.PWM;
             } catch {
                 return false;
             }
-            #endif
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "lightingProperties.json");

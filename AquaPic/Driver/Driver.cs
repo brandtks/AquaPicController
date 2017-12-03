@@ -32,5 +32,6 @@ namespace AquaPic.Drivers
         public static AnalogInputBase AnalogInput = AnalogInputBase.SharedAnalogInputInstance;
         public static AnalogOutputBase AnalogOutput = AnalogOutputBase.SharedAnalogOutputInstance;
         public static DigitalInputBase DigitalInput = DigitalInputBase.SharedDigitalInputInstance;
+        public static PhOrpBase PhOrp = PhOrpBase.SharedPhOrpInstance;
     }
 }

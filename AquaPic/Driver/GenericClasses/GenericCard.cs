@@ -189,16 +189,17 @@ namespace AquaPic.Drivers
             CheckChannelRange (channel);
             if (suffice == null) {
                 switch (cardType) {
-                case CardType.AnalogInputCard:
-                case CardType.DigitalInputCard:
-                    suffice = ".i";
-                    break;
-                case CardType.AnalogOutputCard:
-                    suffice = ".q";
-                    break;
-                case CardType.PowerStrip:
-                    suffice = ".p";
-                    break;
+                    case CardType.PhOrpCard:
+                    case CardType.AnalogInputCard:
+                    case CardType.DigitalInputCard:
+                        suffice = ".i";
+                        break;
+                    case CardType.AnalogOutputCard:
+                        suffice = ".q";
+                        break;
+                    case CardType.PowerStrip:
+                        suffice = ".p";
+                        break;
                 }
             }
             return string.Format ("{0}{1}{2}", name, suffice, channel);

@@ -168,6 +168,9 @@
     <Compile Include="Modules\WaterLevel\WaterLevelGroup.cs" />
     <Compile Include="Sensors\WaterLevelSensor.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\WaterGroupSettings.cs" />
+    <Compile Include="Driver\PhOrp\PhOrp.cs" />
+    <Compile Include="Driver\PhOrp\PhOrpCard.cs" />
+    <Compile Include="Driver\PhOrp\PhOrpChannel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -199,6 +202,7 @@
     <Folder Include="UserInterface\Scenes\ATO\Dialogs\" />
     <Folder Include="UserInterface\Scenes\ATO\Widgets\" />
     <Folder Include="Tests\" />
+    <Folder Include="Driver\PhOrp\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

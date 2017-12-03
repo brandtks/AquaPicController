@@ -103,18 +103,14 @@ namespace AquaPic.Drivers
 
             public void SetChannelType (int channel, AnalogType type) {
                 CheckChannelRange (channel);
-                #if SELECTABLE_ANALOG_OUTPUT_TYPE
-                channels [ch].type = type;
+                var analogOutputChannel = channels[channel] as AnalogOutputChannel<T>;
+                analogOutputChannel.type = type;
 
-                byte[] arr = new byte[2];
-                arr [0] = (byte)ch;
-                arr [1] = (byte)channels [ch].type;
+                var message = new byte[2];
+                message [0] = (byte)channel;
+                message [1] = (byte)analogOutputChannel.type;
 
-                Write (2, arr);
-                #else
-                if (type != AnalogType.ZeroTen)
-                    throw new Exception ("Dimming card only does 0-10V");
-                #endif
+                Write (2, message);
             }
 
             public AnalogType GetChannelType (int channel) {

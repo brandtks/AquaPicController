@@ -25,25 +25,23 @@
 #endregion // License
 
 ﻿using System;
-using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Drivers
 {
-    public enum CardType {
-        [Description("Analog Input Card")]
-        AnalogInputCard,
-
-        [Description("Analog Output Card")]
-        AnalogOutputCard,
-
-        [Description("Digital Input Card")]
-        DigitalInputCard,
-
-        [Description("Power Strip")]
-        PowerStrip,
-
-        [Description("pH ORP Card")]
-        PhOrpCard
+    public partial class PhOrpBase
+    {
+        protected class PhOrpChannel<T> : GenericChannel<T>
+        {
+            public bool enabled;
+            public int lowPassFilterFactor;
+            
+            public PhOrpChannel (string name) 
+                : base (name, (T)(object)0f) 
+            {
+                enabled = false;
+                lowPassFilterFactor = 5;
+            }
+        }
     }
 }
 

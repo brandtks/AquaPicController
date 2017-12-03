@@ -30,20 +30,20 @@ using AquaPic.SerialBus;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogInputBase
+    public partial class PhOrpBase
     {
-        protected class AnalogInputCard<T> : GenericCard<T>
+        protected class PhOrpCard<T> : GenericCard<T>
         {
-            public AnalogInputCard (string name, int cardId, int address)
+            public PhOrpCard (string name, int cardId, int address)
                 : base (
                     name, 
-                    CardType.AnalogInputCard, 
+                    CardType.PhOrpCard, 
                     cardId,
                     address,
-                    4) { }
+                    2) { }
 
             protected override GenericChannel<T> ChannelCreater (int index) {
-                return new AnalogInputChannel<T> (GetDefualtName (index));
+                return new PhOrpChannel<T> (GetDefualtName (index));
             }
 
             public override void GetValueCommunication (int channel) {
@@ -55,8 +55,8 @@ namespace AquaPic.Drivers
             }
 
             protected void GetValueCommunicationCallback (CallbackArgs args) {
-                byte ch = args.GetDataFromReadBuffer<byte> (0);
-                short value = args.GetDataFromReadBuffer<short> (1);
+                var ch = args.GetDataFromReadBuffer<byte> (0);
+                var value = args.GetDataFromReadBuffer<short> (1);
                 channels [ch].SetValue (value);
             }
 
@@ -65,7 +65,7 @@ namespace AquaPic.Drivers
             }
 
             protected void GetAllValuesCommunicationCallback (CallbackArgs args) {
-                short[] values = new short[4];
+                var values = new short[4];
 
                 for (int i = 0; i < values.Length; ++i) {
                     values [i] = args.GetDataFromReadBuffer<short> (i * 2);
@@ -83,13 +83,13 @@ namespace AquaPic.Drivers
                 if (channels [channel].mode == Mode.Manual) {
                     channels [channel].SetValue (value);
                 } else {
-                    throw new Exception ("Can only modify analong input value with channel forced");
+                    throw new Exception ("Can only modify pH/ORP value with channel forced");
                 }
             }
 
             public override void SetAllChannelValues (T[] values) {
                 if (values.Length != channels.Length)
-                    throw new ArgumentOutOfRangeException ("values length");
+                    throw new ArgumentOutOfRangeException (nameof (values), "values length");
 
                 for (int i = 0; i < channels.Length; ++i) {
                     if (channels [i].mode == Mode.Manual) {
@@ -98,17 +98,31 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public void SetupChannel (int channel, int lowPassFilterFactor) {
+            public void SetupChannel (int channel, bool enabled, int lowPassFilterFactor) {
                 CheckChannelRange (channel);
 
-                var analogInputChannel = channels[channel] as AnalogInputChannel<T>;
-                analogInputChannel.lowPassFilterFactor = lowPassFilterFactor;
+                var phOrpChannel = channels[channel] as PhOrpChannel<T>;
+                phOrpChannel.enabled = enabled;
+                phOrpChannel.lowPassFilterFactor = lowPassFilterFactor;
 
-                var message = new byte[2];
+                var message = new byte[3];
                 message[0] = (byte)channel;
-                message[1] = (byte)lowPassFilterFactor;
+                message[1] = Convert.ToByte (enabled);
+                message[2] = (byte)lowPassFilterFactor;
 
                 Write (2, message);
+            }
+
+            public int GetLowPassFilterFactor (int channel) {
+                CheckChannelRange (channel);
+                var phOrpChannel = channels[channel] as PhOrpChannel<T>;
+                return phOrpChannel.lowPassFilterFactor;
+            }
+
+            public bool GetChannelEnable (int channel) {
+                CheckChannelRange (channel);
+                var phOrpChannel = channels[channel] as PhOrpChannel<T>;
+                return phOrpChannel.enabled;
             }
         }
     }

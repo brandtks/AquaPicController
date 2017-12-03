@@ -73,6 +73,12 @@ namespace AquaPic.Runtime
                                 Convert.ToInt32 ((string)jo["options"][0], 16),
                                 (string)jo["options"][1]);
                             break;
+                        case "phOrp":
+                            Logger.Add ("Adding digital input card");
+                            AquaPicDrivers.PhOrp.AddCard (
+                                Convert.ToInt32 ((string)jo["options"][0], 16),
+                                (string)jo["options"][1]);
+                            break;
                         default:
                             Console.WriteLine ("Unknow equipment type: {0}", type);
                             break;

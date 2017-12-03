@@ -29,21 +29,21 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Drivers
 {
-    public enum CardType {
-        [Description("Analog Input Card")]
-        AnalogInputCard,
+    public partial class PhOrpBase : GenericBase<float>
+    {
+        public static PhOrpBase SharedPhOrpInstance = new PhOrpBase ();
 
-        [Description("Analog Output Card")]
-        AnalogOutputCard,
+        protected PhOrpBase () 
+            : base ("pH ORP") { }
+        
+        protected override void Run () {
+            foreach (var card in cards) {
+                card.GetAllValuesCommunication ();
+            }
+        }
 
-        [Description("Digital Input Card")]
-        DigitalInputCard,
-
-        [Description("Power Strip")]
-        PowerStrip,
-
-        [Description("pH ORP Card")]
-        PhOrpCard
+        protected override GenericCard<float> CardCreater (string cardName, int cardId, int address) {
+            return new PhOrpCard<float> (cardName, cardId, address);
+        }
     }
 }
-
