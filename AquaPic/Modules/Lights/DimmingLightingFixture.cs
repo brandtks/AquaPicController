@@ -99,7 +99,7 @@ namespace AquaPic.Modules
 
                     currentDimmingLevel = rocl.RateOfChange(requestedDimmingLevel);
 
-                    return currentDimmingLevel.Map (0.0f, 100.0f, 0, 1024); // PIC16F1936 has 10bit PWM
+                    return currentDimmingLevel;
                 }
                  
                 autoDimmingLevel = 0.0f;

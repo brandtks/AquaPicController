@@ -30,7 +30,7 @@ using AquaPic.Operands;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogOutputBase : GenericBase<int>
+    public partial class AnalogOutputBase : GenericBase<float>
     {
         public static AnalogOutputBase SharedAnalogOutputInstance = new AnalogOutputBase ();
 
@@ -41,26 +41,26 @@ namespace AquaPic.Drivers
             foreach (var card in cards) {
                 byte channelId = 0;
 
-                short[] values = new short[4];
+                var values = new float[4];
 
                 foreach (var genericChannel in card.channels) {
-                    var channel = genericChannel as AnalogOutputChannel<int>;
+                    var channel = genericChannel as AnalogOutputChannel<float>;
 
                     if (channel.mode == Mode.Auto) {
                         channel.valueControl.Execute ();
                     }
 
-                    values [channelId] = Convert.ToInt16 (channel.value);
+                    values[channelId] = channel.value;
 
                     ++channelId;
                 }
 
-                card.SetAllValuesCommunication<short> (values);
+                card.SetAllValuesCommunication<float> (values);
             }
         }
 
-        protected override GenericCard<int> CardCreater (string cardName, int cardId, int address) {
-            return new AnalogOutputCard<int> (cardName, cardId, address);
+        protected override GenericCard<float> CardCreater (string cardName, int cardId, int address) {
+            return new AnalogOutputCard<float> (cardName, cardId, address);
         }
 
         public AnalogType GetChannelType (string channelName) {
@@ -74,7 +74,7 @@ namespace AquaPic.Drivers
 
         public AnalogType GetChannelType (int card, int channel) {
             CheckCardRange (card);
-            var analogOutputCard = cards [card] as AnalogOutputCard<int>;
+            var analogOutputCard = cards[card] as AnalogOutputCard<float>;
             return analogOutputCard.GetChannelType (channel);
         }
 
@@ -85,7 +85,7 @@ namespace AquaPic.Drivers
 
         public AnalogType[] GetAllChannelTypes (int card) {
             CheckCardRange (card);
-            var analogOutputCard = cards [card] as AnalogOutputCard<int>;
+            var analogOutputCard = cards[card] as AnalogOutputCard<float>;
             return analogOutputCard.GetAllChannelTypes ();
         }
 
@@ -100,7 +100,7 @@ namespace AquaPic.Drivers
 
         public void SetChannelType (int card, int channel, AnalogType type) {
             CheckCardRange (card);
-            var analogOutputCard = cards [card] as AnalogOutputCard<int>;
+            var analogOutputCard = cards[card] as AnalogOutputCard<float>;
             analogOutputCard.SetChannelType (channel, type);
         }
 
@@ -115,7 +115,7 @@ namespace AquaPic.Drivers
 
         public Value GetChannelValueControl (int card, int channel) {
             CheckCardRange (card);
-            var analogOutputCard = cards [card] as AnalogOutputCard<int>;
+            var analogOutputCard = cards[card] as AnalogOutputCard<float>;
             return analogOutputCard.GetChannelValueControl (channel);
         }
     }

@@ -49,51 +49,51 @@ namespace AquaPic.Drivers
 
             public override void GetValueCommunication (int channel) {
                 CheckChannelRange (channel);
-                ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback); // byte channel id and int16 value, 3 bytes
+                ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback); // byte channel id and float value, 5 bytes
             }
 
             protected void GetValueCommunicationCallback (CallbackArgs args) {
-                var ch = args.GetDataFromReadBuffer<byte> (0);
-                var value = args.GetDataFromReadBuffer<short> (1);
-                channels [ch].SetValue (value);
+                var ch = args.GetDataFromReadBuffer<byte>(0);
+                var value = args.GetDataFromReadBuffer<float>(1);
+                channels[ch].SetValue (value);
             }
 
             public override void SetValueCommunication<CommunicationType> (int channel, CommunicationType value) {
                 CheckChannelRange (channel);
-                channels [channel].SetValue (value);
-                var valueToSend = Convert.ToInt16 (value);
+                channels[channel].SetValue (value);
+                var valueToSend = Convert.ToSingle (value);
                 var buf = new WriteBuffer ();
                 buf.Add ((byte)channel, sizeof(byte));
-                buf.Add (valueToSend, sizeof(short));
+                buf.Add (valueToSend, sizeof(float));
                 Write (31, buf);
             }
 
             public override void SetAllValuesCommunication<CommunicationType> (CommunicationType[] values) {
                 if (values.Length < channelCount)
-                    throw new ArgumentOutOfRangeException ("values length");
+                    throw new ArgumentOutOfRangeException (nameof (values), "values length");
 
-                short[] valuesToSend = new short[channelCount];
+                var valuesToSend = new float[channelCount];
                 for (int i = 0; i < 4; ++i) {
                     channels [i].SetValue (values [i]);
-                    valuesToSend [i] = Convert.ToInt16 (values [i]);
+                    valuesToSend [i] = Convert.ToSingle (values [i]);
                 }
 
                 var buf = new WriteBuffer ();
                 foreach (var val in valuesToSend) {
-                    buf.Add (val, sizeof(short));
+                    buf.Add (val, sizeof (float));
                 }
                 Write (30, buf);
             }
 
             public override void GetAllValuesCommunication () {
-                Read (20, sizeof(short) * 4, GetAllValuesCommunicationCallback);
+                Read (20, sizeof(float) * 4, GetAllValuesCommunicationCallback);
             }
 
             protected void GetAllValuesCommunicationCallback (CallbackArgs args) {
-                short[] values = new short[4];
+                var values = new float[4];
 
                 for (int i = 0; i < values.Length; ++i) {
-                    values [i] = args.GetDataFromReadBuffer<short> (i * 2);
+                    values [i] = args.GetDataFromReadBuffer<float> (i * 4);
                 }
 
                 for (int i = 0; i < channels.Length; ++i) {
