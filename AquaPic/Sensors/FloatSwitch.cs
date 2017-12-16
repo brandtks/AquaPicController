@@ -3,12 +3,12 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2017 Skyler Brandt
+    Copyright (c) 2017 Goodtime Development
 
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,15 +16,12 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-    Optionally you can also view the license at <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see http://www.gnu.org/licenses/
 */
 
 #endregion // License
 
-﻿using System;
+using System;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.Runtime;
@@ -148,6 +145,13 @@ namespace AquaPic.Sensors
         }
 
         public void SetName (string name) {
+            _name = name;
+            AquaPicDrivers.DigitalInput.SetChannelName (_channel, _name);
+        }
+    }
+}
+
+ublic void SetName (string name) {
             _name = name;
             AquaPicDrivers.DigitalInput.SetChannelName (_channel, _name);
         }

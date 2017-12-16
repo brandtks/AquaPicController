@@ -3,12 +3,12 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2017 Skyler Brandt
+    Copyright (c) 2017 Goodtime Development
 
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,33 +16,10 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-    Optionally you can also view the license at <http://www.gnu.org/licenses/>.
+    along with this program.  If not, see http://www.gnu.org/licenses/
 */
 
 #endregion // License
-
-﻿/* Message Structure
- * 
- * SENDING FROM MASTER
- *   At least a 10mSec delay
- *   0      : Address
- *   1      : Function Number
- *   2      : Number of Bytes to be sent
- *   3-n    : Message - if Any
- *   last 2 : CRC
- * 
- *  RECEIVEING FROM SLAVE
- *   0      : Address of slave
- *   1      : Function Number
- *   2      : Number of Bytes to be received
- *   3-n    : Message - if Any
- *   last 2 : CRC
- * */
-
-//#define DEBUG_SERIAL
 
 using System;
 using System.Threading;             // for Thread, AutoResetEvent
@@ -443,6 +420,30 @@ namespace AquaPic.SerialBus
 
                     if (CRCLSB == 1)
                         CRCFull = (ushort)(CRCFull ^ 0xA001);
+                }
+            }
+
+            crc[1] = (byte)((CRCFull >> 8) & 0xFF);
+            crc[0] = (byte)(CRCFull & 0xFF);
+        }
+
+        private class ReceiveBuffer {
+            public object SyncLock;
+            public int responseLength;
+            public List<byte> buffer;
+            public bool waitForResponse;
+
+            public ReceiveBuffer () {
+                SyncLock = new object ();
+                buffer = new List<byte> ();
+                responseLength = 0;
+                waitForResponse = false;
+            }
+        }
+    }
+}
+
+)(CRCFull ^ 0xA001);
                 }
             }
 
