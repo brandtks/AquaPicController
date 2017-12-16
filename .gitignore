@@ -2,6 +2,7 @@ bin/
 obj/
 gtk-gui/
 packages/
+Properties/
 *.userprefs
 *.dll
 *.pdb
