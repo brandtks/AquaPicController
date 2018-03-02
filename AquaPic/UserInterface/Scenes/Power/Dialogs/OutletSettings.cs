@@ -293,11 +293,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-{
-            IOutletScript script = null;
-            string[] conditions;
-            return CheckCode (out script, out conditions);
-        }
-    }
-}
-

@@ -134,17 +134,3 @@ namespace AquaPic.Runtime
     }
 }
 
-un (ref object rtnValue) {
-            if (flags.HasFlag (ScriptFlags.Compiled | ScriptFlags.Event)) {
-                try {
-                    var i = instance as IEventScript;
-                    i.OneShotRun (ref rtnValue);
-                } catch (Exception ex) {
-                    flags &= ~ScriptFlags.Compiled;
-                    errors.Add (new ScriptMessage ("RunPlugin", "  " + ex.ToString ()));
-                }
-            }
-        }
-    }
-}
-

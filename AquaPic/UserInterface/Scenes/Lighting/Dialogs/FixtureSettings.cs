@@ -494,14 +494,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-dx);
-
-            File.WriteAllText (path, jo.ToString ());
-
-            Lighting.RemoveLight (fixtureName);
-
-            return true;
-        }
-    }
-}
-

@@ -126,10 +126,3 @@ namespace AquaPic.SerialBus
     }
 }
 
-              if (OnStatusUpdate != null)
-                    Application.Invoke ((sender, e) => OnStatusUpdate (this));
-            }
-        }
-    }
-}
-

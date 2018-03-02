@@ -52,18 +52,3 @@ namespace AquaPic.Runtime
     }
 }
 
-nce (t) as ICyclicScript;
-
-                            if (instance == null)
-                                flags &= ~ScriptFlags.Compiled;
-                        } catch (Exception ex) {
-                            flags &= ~ScriptFlags.Compiled;
-                            errors.Add (new ScriptMessage ("CyclicScript Constructor", "  " + ex.ToString ()));
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-

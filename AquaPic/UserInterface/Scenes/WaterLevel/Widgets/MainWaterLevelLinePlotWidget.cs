@@ -118,12 +118,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-l) {
-                textBox.text = "--";
-                label.text = "Disabled";
-                label.Visible = true;
-            }
-        }
-    }
-}
-

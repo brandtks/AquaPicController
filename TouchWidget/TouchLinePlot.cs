@@ -327,11 +327,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
- }
-
-    public enum TouchLinePlotStartTime {
-        Now,
-        PastTimePoint
-    }
-}
-

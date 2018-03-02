@@ -170,9 +170,5 @@ namespace AquaPic.Drivers
             }
     	}
     }
-}ode;
-                OnModeChange (outlets [outletId], new ModeChangeEventArgs (outletId, powerID, outlets [outletId].mode));
-            }
-    	}
-    }
 }
+

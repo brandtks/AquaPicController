@@ -161,10 +161,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-olor = "white";
-            size = 11;
-            fontName = "Sans";
-        }
-    }
-}
-

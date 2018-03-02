@@ -86,11 +86,3 @@ namespace AquaPic.Runtime
     }
 }
 
-ll)
-                    TimerElapsedEvent (this, new TimerElapsedEventArgs ());
-            }
-            return _enabled & autoReset;
-        }
-    }
-}
-

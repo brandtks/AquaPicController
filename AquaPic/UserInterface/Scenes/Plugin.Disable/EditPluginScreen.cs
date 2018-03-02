@@ -123,20 +123,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-ors in script";
-            } else {
-                tb.Text = string.Empty;
-
-                foreach (var error in script.errors) {
-                    StringBuilder sb = new StringBuilder ();
-                    sb.AppendLine ("Script failed at " + error.errorLocation);
-                    sb.AppendLine (error.message);
-                    sb.AppendLine ();
-
-                    tb.Text += sb.ToString ();
-                }
-            }
-        }
-    }
-}
-

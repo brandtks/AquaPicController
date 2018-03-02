@@ -52,18 +52,3 @@ namespace AquaPic.Runtime
     }
 }
 
-eateInstance (t) as IEventScript;
-
-                            if (instance == null)
-                                flags &= ~ScriptFlags.Compiled;
-                        } catch (Exception ex) {
-                            flags &= ~ScriptFlags.Compiled;
-                            errors.Add (new ScriptMessage ("EventScript Constructor", ex.ToString ()));
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-

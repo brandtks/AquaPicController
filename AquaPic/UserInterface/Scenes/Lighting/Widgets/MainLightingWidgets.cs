@@ -55,13 +55,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-0);
-            eventbox.Show ();
-        }
-
-        public override void OnUpdate () {
-            currentValue = GetDimmingLevel ();
-        }
-    }
-}
-

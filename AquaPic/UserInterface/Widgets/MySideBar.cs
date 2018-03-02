@@ -359,15 +359,3 @@ namespace AquaPic.UserInterface
     }
 }
 
- windows.Length - 1;
-                    }
-                }
-
-                QueueDraw ();
-            }
-
-            return clicked;
-        }
-    }
-}
-

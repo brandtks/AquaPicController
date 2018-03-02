@@ -45,12 +45,3 @@ namespace AquaPic.Operands
     }
 }
 
-        }
-
-        public void Execute () {
-            value = (float)ValueGetter?.Invoke();
-            ValueSetter?.Invoke (value);
-        }
-    }
-}
-

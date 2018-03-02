@@ -34,11 +34,4 @@ namespace AquaPic.Sensors
         void SetName (string name);
     }
 }
-face ISensor<T>
-    {
-        void Add (IndividualControl channel);
-        void Remove ();
-        T Get ();
-        void SetName (string name);
-    }
-}
+

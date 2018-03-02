@@ -152,12 +152,4 @@ namespace AquaPic.UserInterface
         }
     }
 }
-textBox.text;
 
-                newWidget = new HomeSettingsWidget (name, group, type, 0, 0);
-
-                Destroy ();
-            }
-        }
-    }
-}

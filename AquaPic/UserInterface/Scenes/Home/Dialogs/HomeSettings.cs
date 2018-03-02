@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Gtk;
+using Cairo;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
@@ -500,12 +501,4 @@ namespace AquaPic.UserInterface
         }
     }
 }
-          return false;
-                }
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-}
+

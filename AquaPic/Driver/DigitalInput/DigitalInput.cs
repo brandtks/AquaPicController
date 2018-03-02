@@ -45,8 +45,5 @@ namespace AquaPic.Drivers
             return new DigitalInputCard<bool> (cardName, cardId, address);
         }
     }
-}ool> CardCreater (string cardName, int cardId, int address) {
-            return new DigitalInputCard<bool> (cardName, cardId, address);
-        }
-    }
 }
+

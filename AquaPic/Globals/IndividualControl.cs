@@ -56,11 +56,3 @@ namespace AquaPic.Globals
     }
 }
 
-ck = true;
-            check &= (Individual == ic.Individual);
-            check &= (Group == ic.Group);
-            return check; 
-        }
-    }
-}
-

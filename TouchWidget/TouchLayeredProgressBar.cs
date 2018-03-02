@@ -160,10 +160,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-ssSecondary.SetSource (cr);
-                cr.Fill ();
-            }
-        }
-    }
-}
-

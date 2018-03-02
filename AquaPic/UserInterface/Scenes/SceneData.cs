@@ -49,12 +49,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-ull) {
-                return CreateInstanceEvent (options);
-            }
-
-            throw new Exception ("No screen constructor");
-        }
-    }
-}
-

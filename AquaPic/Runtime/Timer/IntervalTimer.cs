@@ -170,12 +170,3 @@ namespace AquaPic.Runtime
     }
 }
 
-                 TimerElapsedEvent (this, new TimerElapsedEventArgs ());
-                }
-            }
-
-            return _enabled;
-        }
-    }
-}
-

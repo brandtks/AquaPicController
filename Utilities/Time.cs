@@ -205,9 +205,3 @@ namespace GoodtimeDevelopment.Utilites
     }
 }
 
-() {
-            return hour ^ minute ^ second ^ millisecond;
-        }
-    }
-}
-

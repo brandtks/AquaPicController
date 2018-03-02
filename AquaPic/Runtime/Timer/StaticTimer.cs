@@ -62,14 +62,3 @@ namespace AquaPic.Runtime
     }
 }
 
- 1000);
-
-                //minutes
-                time += (Convert.ToUInt32 (t [0]) * 60000);
-            }
-
-            return time;
-        }
-    }
-}
-

@@ -151,10 +151,3 @@ namespace AquaPic.Sensors
     }
 }
 
-ublic void SetName (string name) {
-            _name = name;
-            AquaPicDrivers.DigitalInput.SetChannelName (_channel, _name);
-        }
-    }
-}
-

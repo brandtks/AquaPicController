@@ -44,11 +44,3 @@ namespace AquaPic.Runtime
     public delegate void AlarmEventHandler (object sender, AlarmEventArgs args);
 }
 
-     this.type = type;
-            this.name = name;
-        }
-    }
-
-    public delegate void AlarmEventHandler (object sender, AlarmEventArgs args);
-}
-

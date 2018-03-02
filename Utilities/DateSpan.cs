@@ -238,8 +238,3 @@ namespace GoodtimeDevelopment.Utilites
     }
 }
 
-rn year ^ month ^ day ^ hour ^ minute ^ second ^ millisecond;
-        }
-    }
-}
-

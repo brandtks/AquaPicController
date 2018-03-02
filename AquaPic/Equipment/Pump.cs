@@ -101,12 +101,4 @@ namespace AquaPic.Equipment
         }
     }
 }
-tionCheck (_outlet, OnGetter);
-            }
-        }
 
-        protected virtual bool OnConditionGetter () {
-            return false;
-        }
-    }
-}

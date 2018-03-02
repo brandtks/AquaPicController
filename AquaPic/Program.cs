@@ -178,11 +178,4 @@ namespace AquaPic
         }
     }
 }
- unless something is weird in Windows
-            Console.WriteLine ("Unable to set GTK# dll directory");
-            return true;
-        }
-    }
-}
-  }
-}
+

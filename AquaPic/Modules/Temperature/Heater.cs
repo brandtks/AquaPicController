@@ -88,11 +88,3 @@ namespace AquaPic.Modules
     }
 }
 
-   GetTemperatureGroupDataLogger (temperatureGroupName).AddEntry ("heater off");
-                    }
-                }
-            }
-        }
-    }
-}
-

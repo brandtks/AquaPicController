@@ -34,15 +34,3 @@ namespace AquaPic.Runtime
     }
 }
 
-g System.Collections.Generic;
-
-namespace AquaPic.Runtime
-{
-    public class Chemistry
-    {
-        static Chemistry () {
-            
-        }
-    }
-}
-

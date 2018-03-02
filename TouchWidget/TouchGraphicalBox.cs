@@ -54,10 +54,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
- (cr, color, transparency);
-                cr.Fill ();
-            }
-        }
-    }
-}
-

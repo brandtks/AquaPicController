@@ -105,13 +105,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-onseId == ResponseType.Yes)
-                    Application.Quit ();
-            };
-
-            ms.Run ();
-            ms.Destroy ();
-        }
-    }
-}
-

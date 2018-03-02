@@ -118,10 +118,3 @@ namespace AquaPic.Sensors
     }
 }
 
- public void SetName (string name) {
-            _name = name;
-            AquaPicDrivers.AnalogInput.SetChannelName (_channel, name);
-        }
-    }
-}
-

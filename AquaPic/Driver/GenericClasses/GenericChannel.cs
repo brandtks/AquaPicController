@@ -48,11 +48,3 @@ namespace AquaPic.Drivers
     }
 }
 
-   this.value = (T)Convert.ChangeType (value, typeof(T));
-            } catch {
-                this.value = default(T);
-            }
-        }
-    }
-}
-

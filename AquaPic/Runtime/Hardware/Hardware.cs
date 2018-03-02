@@ -120,10 +120,3 @@ namespace AquaPic.Runtime
     }
 }
 
-      jo.Add (new JProperty ("aquaPicBusPort", string.Empty));
-                File.WriteAllText (path, jo.ToString ());
-            }
-        }
-    }
-}
-

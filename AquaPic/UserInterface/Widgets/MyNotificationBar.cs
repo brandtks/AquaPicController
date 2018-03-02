@@ -141,10 +141,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-    protected void OnAllAlarmsUpdated (object sender, AlarmEventArgs args) {
-            UpdateAlarmText ();
-            QueueDraw ();
-        }
-    }
-}
-

@@ -44,9 +44,5 @@ namespace AquaPic.Drivers
             }
         }
     }
-}            valueControl.ValueGetter = () => 0.0f;
-                valueControl.ValueSetter = (value) => SetValue (value);
-            }
-        }
-    }
 }
+

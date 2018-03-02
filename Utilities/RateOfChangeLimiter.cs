@@ -64,11 +64,3 @@ namespace GoodtimeDevelopment.Utilites
     }
 }
 
-  }
-
-        public void Reset () {
-            oldValue = 0.0f;
-        }
-    }
-}
-

@@ -112,12 +112,3 @@ namespace AquaPic.Modules
     }
 }
 
-ddEntry (temperature);
-                } else {
-                    dataLogger.AddEntry ("no probes");
-                }
-            }
-        }
-    }
-}
-

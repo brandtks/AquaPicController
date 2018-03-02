@@ -190,12 +190,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-rvedBarPlot in curvedBarPlots) {
-                curvedBarPlot.OnUpdate ();
-                curvedBarPlot.QueueDraw ();
-            }
-        }
-
-    }
-}
-

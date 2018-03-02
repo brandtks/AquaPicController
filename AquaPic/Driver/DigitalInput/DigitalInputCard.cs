@@ -69,11 +69,3 @@ namespace AquaPic.Drivers
     }
 }
 
-e> (0);
-                var value = args.GetDataFromReadBuffer<bool> (1);
-                channels [ch].SetValue(value);
-            }
-        }
-    }
-}
-

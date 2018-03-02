@@ -47,11 +47,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-{return new WaterLevelWidget (options);}) }
-            };
-
-            curvedBarPlots = new Dictionary<string, CurvedBarPlotData> ();
-        }
-    }
-}
-

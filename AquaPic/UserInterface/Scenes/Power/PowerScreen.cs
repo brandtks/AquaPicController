@@ -230,12 +230,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-Label.textColor = "grey4";
-                }
-                   
-                selectors [args.outletID].QueueDraw ();
-            }
-        }
-    }
-}
-

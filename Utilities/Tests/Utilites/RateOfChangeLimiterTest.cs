@@ -52,11 +52,3 @@ namespace GoodtimeDevelopment.Utilites.Test
     }
 }
 
-ngeLimiter (5f);
-            Thread.Sleep (1000);
-            var val = rocl.RateOfChange (100f);
-            Assert.AreEqual (5, val);
-        }
-    }
-}
-

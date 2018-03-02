@@ -93,10 +93,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-ngedEvent (this, args);
-            else
-                throw new NotImplementedException ("State selector changed not implemented");
-        }
-    }
-}
-

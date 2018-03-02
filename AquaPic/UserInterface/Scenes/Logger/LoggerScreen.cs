@@ -137,14 +137,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-true));
-                }
-
-                string[] l = lines.ToArray ();
-
-                File.WriteAllLines (path, l);
-            }
-        }
-    }
-}
-

@@ -142,18 +142,3 @@ namespace AquaPic.Runtime
     }
 }
 
-ngBuilder e = new StringBuilder ();
-                    e.AppendLine (string.Format ("  Error ({0}): {1} ", error.ErrorNumber, error.ErrorText));
-                    e.Append (string.Format ("  File {0}, Line {1} ", error.FileName, error.Line));
-
-                    script.errors.Add (new ScriptMessage ("CompileCode", e.ToString ()));
-                }
-                
-                return false;
-            }
-
-            return true;
-        }
-    }
-}
-

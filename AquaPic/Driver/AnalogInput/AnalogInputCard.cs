@@ -111,12 +111,3 @@ namespace AquaPic.Drivers
     }
 }
 
-message[0] = (byte)channel;
-                message[1] = (byte)lowPassFilterFactor;
-
-                Write (2, message);
-            }
-        }
-    }
-}
-

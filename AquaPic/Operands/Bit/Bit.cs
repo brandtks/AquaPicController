@@ -66,11 +66,3 @@ namespace AquaPic.Operands
     }
 }
 
- (states.ContainsKey (name))
-                return states [name].state == MyState.Set;
-            else
-                return false;
-        }
-    }
-}
-

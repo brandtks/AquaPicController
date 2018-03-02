@@ -495,10 +495,3 @@ namespace AquaPic.Drivers
     }
 }
 
-(string name) {
-            int powerId = GetPowerStripIndex (name);
-            return pwrStrips [powerId].AquaPicBusCommunicationOk;
-        }
-    }
-}
-

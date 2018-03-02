@@ -762,9 +762,4 @@ namespace AquaPic.Modules
         }
     }
 }
-xtureName, DateSpan newOffTime) {
-            CheckFixtureKey (fixtureName);
-            fixtures[fixtureName].SetOffTime (newOffTime);
-        }
-    }
-}
+

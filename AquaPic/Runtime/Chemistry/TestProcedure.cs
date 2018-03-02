@@ -139,15 +139,4 @@ namespace AquaPic.Runtime
         }
     }
 }
-    
-
-
-uble CalculateResults () {
-            double difference = level1 - level2;
-            return (slope * difference) + intercept;
-        }
-    }
-}
-    
-
 

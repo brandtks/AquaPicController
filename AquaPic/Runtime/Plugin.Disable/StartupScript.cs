@@ -53,18 +53,3 @@ namespace AquaPic.Runtime
     }
 }
 
-e (t) as IStartupScript;
-
-                            if (instance == null)
-                                flags &= ~ScriptFlags.Compiled;
-                        } catch (Exception ex) {
-                            flags &= ~ScriptFlags.Compiled;
-                            errors.Add (new ScriptMessage ("StartupScript Constructor", "  " + ex.ToString ()));
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-

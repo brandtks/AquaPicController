@@ -63,29 +63,4 @@ namespace AquaPic.Runtime
 
     public interface IScript
     { }
-}pe) {
-            this.scriptType = scriptType;
-        }
-    }
-
-    public interface ICyclicScript : IStartupScript
-    { 
-        void CyclicRun ();
-    }
-
-    public interface IStartupScript : IScript
-    {
-        void Initialize ();
-    }
-
-    public interface IEventScript : IScript
-    {
-        void OneShotRun (ref object rtnValue);
-    }
-
-    public interface IModuleScript : ICyclicScript, IEventScript
-    { }
-
-    public interface IScript
-    { }
 }

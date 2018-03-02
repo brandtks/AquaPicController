@@ -159,12 +159,3 @@ namespace AquaPic.Runtime
     }
 }
 
- (var a in alarms) {
-                if (!a.acknowledged)
-                    notAck.Add (a);
-            }
-            return notAck;
-        }
-    }
-}
-

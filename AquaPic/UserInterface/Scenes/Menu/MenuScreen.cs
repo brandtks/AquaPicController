@@ -72,9 +72,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-= this.Toplevel;
-            AquaPicGui.AquaPicUserInterface.ChangeScreens (b.text, tl, AquaPicGui.AquaPicUserInterface.currentScene);
-        }
-    }
-}
-

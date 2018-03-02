@@ -501,11 +501,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-oList.Count - maxListHeight;
-            }
-
-            QueueDraw ();
-        }
-    }
-}
-

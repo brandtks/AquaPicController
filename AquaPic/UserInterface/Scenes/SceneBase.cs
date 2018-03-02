@@ -99,12 +99,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-e.Remove (timerId);
-            foreach (var w in Children) {
-                w.Dispose ();
-            }
-            base.Dispose ();
-        }
-    }
-}
-

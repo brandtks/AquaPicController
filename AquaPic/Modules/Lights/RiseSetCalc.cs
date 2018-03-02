@@ -670,12 +670,4 @@ namespace AquaPic.Modules
         }
     }
 }
-te.Day, (int)hour, (int)minute, (int)second);
-            }
-            else
-            {
-                return retVal;
-            }
-        }
-    }
-}
+

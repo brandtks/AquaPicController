@@ -731,10 +731,4 @@ namespace AquaPic.UserInterface
         }
     }
 }
-tateLabel.text = "On";
-                outletStateLabel.textColor = "secb";
-            }
-            outletStateLabel.QueueDraw ();
-        }
-    }
-}
+

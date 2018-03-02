@@ -134,10 +134,3 @@ namespace AquaPic.Drivers
     }
 }
 
-ogOutputChannel = channels [channel] as AnalogOutputChannel<T>;
-                return analogOutputChannel.valueControl;
-            }
-        }
-    }
-}
-

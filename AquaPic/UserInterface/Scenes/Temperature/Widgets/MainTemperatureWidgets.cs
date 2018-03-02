@@ -107,12 +107,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-el.text = "Disconnected";
-                }
-            } else {
-                currentValue = Temperature.temperature;
-            }
-        }
-    }
-}
-

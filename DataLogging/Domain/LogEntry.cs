@@ -63,11 +63,3 @@ namespace AquaPic.DataLogging
     }
 }
 
-entType, double value) {
-            this.dateTime = dateTime;
-            this.eventType = eventType;
-            this.value = value;
-        }
-    }
-}
-

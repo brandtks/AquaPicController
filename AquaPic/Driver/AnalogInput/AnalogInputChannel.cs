@@ -40,12 +40,3 @@ namespace AquaPic.Drivers
     }
 }
 
-nel (string name) 
-                : base (name, (T)(object)0f) 
-            { 
-                lowPassFilterFactor = 5;
-            }
-        }
-    }
-}
-

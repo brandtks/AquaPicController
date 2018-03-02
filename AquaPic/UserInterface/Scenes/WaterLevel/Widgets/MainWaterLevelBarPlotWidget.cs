@@ -109,12 +109,5 @@ namespace AquaPic.UserInterface
             }
         }
     }
-}    }
-
-            if (!usingLevel) {
-                label.text = "Probe Disabled";
-                label.Visible = true;
-            }
-        }
-    }
 }
+

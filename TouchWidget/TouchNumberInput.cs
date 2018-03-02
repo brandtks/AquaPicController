@@ -416,10 +416,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-               row3 [i].QueueDraw ();
-                }
-            }
-        }
-    }
-}
-

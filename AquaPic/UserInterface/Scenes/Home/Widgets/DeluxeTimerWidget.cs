@@ -386,12 +386,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-etSource (cr, "grey2", 1.0);
-                    cr.LineWidth = 2.0;
-                    cr.Stroke ();
-                }
-            }
-        }
-    }
-}
-

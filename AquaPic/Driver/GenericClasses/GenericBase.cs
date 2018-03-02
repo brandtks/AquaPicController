@@ -304,10 +304,3 @@ namespace AquaPic.Drivers
     }
 }
 
-lMode (int card, int channel, Mode mode) {
-            CheckCardRange (card);
-            cards [card].SetChannelMode (channel, mode);
-        }
-    }
-}
-

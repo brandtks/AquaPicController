@@ -84,10 +84,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-dthRequest = 95;
-            responseTimeTextBox.textAlignment = TouchAlignment.Center;
-            Put (responseTimeTextBox, 620, 0);
-        }
-    }
-}
-

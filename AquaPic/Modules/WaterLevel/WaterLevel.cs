@@ -899,8 +899,4 @@ namespace AquaPic.Modules
         }
     }
 }
-          CheckFloatSwitchKey (floatSwitchName);
-            floatSwitches[floatSwitchName].onDelayTimer.timerInterval = timeOffset;
-        }
-    }
-}
+

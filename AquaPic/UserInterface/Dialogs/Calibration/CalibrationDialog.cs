@@ -23,6 +23,7 @@
 
 using System;
 using Gtk;
+using Cairo;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 
@@ -443,15 +444,6 @@ namespace AquaPic.UserInterface
 
         protected void OnValueTextBoxTextChanged (object sender, TextChangedEventArgs args) {
             try {
-                Convert.ToDouble (args.text);
-            } catch {
-                args.keepText = false;
-            }
-        }
-    }
-}
-
-      try {
                 Convert.ToDouble (args.text);
             } catch {
                 args.keepText = false;

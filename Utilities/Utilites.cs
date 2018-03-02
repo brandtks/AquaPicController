@@ -28,13 +28,13 @@ using System.Text;
 
 namespace GoodtimeDevelopment.Utilites
 {
-	public class Description : Attribute {
-		public string Text;
+    public class Description : Attribute {
+        public string Text;
 
-		public Description (string text) {
-			Text = text;
-		}
-	}
+        public Description (string text) {
+            Text = text;
+        }
+    }
 
     public enum Platform {
         Windows,
@@ -42,8 +42,8 @@ namespace GoodtimeDevelopment.Utilites
         Mac
     }
 
-	public static class Utils
-	{
+    public static class Utils
+    {
         private static string _aquaPicEnvironment = string.Empty;
         public static string AquaPicEnvironment {
             get {
@@ -81,19 +81,19 @@ namespace GoodtimeDevelopment.Utilites
             }
         }
 
-		public static string GetDescription (Enum en) {
-			var type = en.GetType ();
-			var memInfo = type.GetMember (en.ToString());
+        public static string GetDescription (Enum en) {
+            var type = en.GetType ();
+            var memInfo = type.GetMember (en.ToString());
 
-			if (memInfo != null && memInfo.Length > 0) {
-				var attrs = memInfo[0].GetCustomAttributes (typeof (Description), false);
+            if (memInfo != null && memInfo.Length > 0) {
+                var attrs = memInfo[0].GetCustomAttributes (typeof (Description), false);
 
-				if (attrs != null && attrs.Length > 0)
-					return ((Description)attrs[0]).Text;
-			}
+                if (attrs != null && attrs.Length > 0)
+                    return ((Description)attrs[0]).Text;
+            }
 
-			return en.ToString();
-		}
+            return en.ToString();
+        }
 
         public static bool IsEmpty (this string value) {
             return string.IsNullOrWhiteSpace (value);
@@ -223,14 +223,6 @@ namespace GoodtimeDevelopment.Utilites
             string ts = sb.ToString ();
 
             if (string.IsNullOrWhiteSpace (ts))
-                ts = "0s";
-
-            return ts;
-        }
-	}
-}
-
-WhiteSpace (ts))
                 ts = "0s";
 
             return ts;

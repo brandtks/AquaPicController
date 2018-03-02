@@ -120,11 +120,3 @@ namespace AquaPic.Modules
     }
 }
 
-etOffTime (DateSpan newOffTime) {
-                offTime = newOffTime;
-                offTime.AddMinutes (offTimeOffset);
-            }
-    	}
-    }
-}
-

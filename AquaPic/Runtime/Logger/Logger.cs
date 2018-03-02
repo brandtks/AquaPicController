@@ -122,9 +122,3 @@ namespace AquaPic.Runtime
     }
 }
 
-       var ti = buffer.EndIter;
-            buffer.InsertWithTags (ref ti, string.Format ("{0:MM/dd HH:mm:ss}: ", DateTime.Now), tag);
-        }
-    }
-}
-

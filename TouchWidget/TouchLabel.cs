@@ -99,8 +99,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-llocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
-        }
-    }
-}
-

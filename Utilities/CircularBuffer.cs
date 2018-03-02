@@ -82,9 +82,3 @@ namespace GoodtimeDevelopment.Utilites
     }
 }
 
-  public T[] ToArray () {
-            return _buffer.ToArray ();
-        }
-    }
-}
-

@@ -143,12 +143,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-0) || (evnt.Y > Allocation.Height)) {
-                return true;
-            }
-
-            return base.OnButtonReleaseEvent (evnt);
-        }
-    }
-}
-

@@ -78,10 +78,3 @@ namespace AquaPic.Drivers
     }
 }
 
-ject sender, StateChangeEventArgs args) {
-            if (StateChangedEvent != null)
-                StateChangedEvent (sender, args);
-        }
-    }
-}
-

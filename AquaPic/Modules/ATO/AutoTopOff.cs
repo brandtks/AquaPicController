@@ -373,10 +373,3 @@ namespace AquaPic.Modules
     }
 }
 
-FullScaleCalibrationValue"] = ato.reservoirLevel.fullScaleValue.ToString ();
-
-            File.WriteAllText (path, jo.ToString ());
-        }
-    }
-}
-

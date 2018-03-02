@@ -447,12 +447,4 @@ namespace AquaPic.UserInterface
         }
     }
 }
-   stepButton.QueueDraw ();
-                    skipBtn.QueueDraw ();
 
-                    NextStep ();
-                }
-            }
-        }
-    }
-}

@@ -392,14 +392,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-
-          File.WriteAllText (path, jo.ToString ());
-
-            WaterLevel.RemoveFloatSwitch (switchName);
-
-            return true;
-        }
-    }
-}
-
-

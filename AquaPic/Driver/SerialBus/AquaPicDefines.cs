@@ -110,11 +110,4 @@ namespace AquaPic.SerialBus
         }
     }
 }
-mp, maxLength);
-                _buffer.AddRange (temp);
-            } else {
-                _buffer.AddRange (rawdata);
-            }
-        }
-    }
-}
+

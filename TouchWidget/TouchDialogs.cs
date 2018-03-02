@@ -129,10 +129,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-oid Destroy () {
-            base.Destroy ();
-            Dispose ();
-        }
-    }
-}
-

@@ -118,12 +118,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-   ShowAll ();
-        }
-
-        public virtual void OnUpdate () {
-            throw new Exception ("Update method not implemented");
-        }
-    }
-}
-

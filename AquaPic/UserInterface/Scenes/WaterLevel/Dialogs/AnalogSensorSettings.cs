@@ -380,9 +380,4 @@ namespace AquaPic.UserInterface
         }
     }
 }
-  File.WriteAllText (path, jo.ToString ());
-            WaterLevel.RemoveAnalogLevelSensor (analogSensorName);
-            return true;
-        }
-    }
-}
+

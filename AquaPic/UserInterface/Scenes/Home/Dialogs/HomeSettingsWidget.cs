@@ -155,11 +155,4 @@ namespace AquaPic.UserInterface
         }
     }
 }
-      }
-                    pairs[i].column = columnOrigin + (i % width);
-                }
-                return pairs;
-            }
-        }
-    }
-}
+

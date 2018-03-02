@@ -168,12 +168,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-();
-                    }
-                } else
-                    MessageBox.Show ("No communication port selected");
-            }
-        }
-    }
-}
-

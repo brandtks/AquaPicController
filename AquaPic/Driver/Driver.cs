@@ -31,7 +31,5 @@ namespace AquaPic.Drivers
         public static DigitalInputBase DigitalInput = DigitalInputBase.SharedDigitalInputInstance;
         public static PhOrpBase PhOrp = PhOrpBase.SharedPhOrpInstance;
     }
-}igitalInputBase DigitalInput = DigitalInputBase.SharedDigitalInputInstance;
-        public static PhOrpBase PhOrp = PhOrpBase.SharedPhOrpInstance;
-    }
 }
+

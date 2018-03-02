@@ -112,14 +112,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-me), tag);
-            }
-        }
-
-        protected override bool OnUpdateTimer () {
-            Update ();
-            return true;
-        }
-    }
-}
-

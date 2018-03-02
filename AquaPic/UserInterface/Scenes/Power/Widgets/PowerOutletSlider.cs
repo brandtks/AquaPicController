@@ -139,10 +139,5 @@ namespace AquaPic.UserInterface
             }
         }
     }
-}          UpdateScreen ();
-            } else {
-                MessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
-            }
-        }
-    }
 }
+

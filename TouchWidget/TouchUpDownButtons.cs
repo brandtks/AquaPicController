@@ -68,11 +68,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-0);
-            down.QueueDraw ();
-
-            buttonsPlaced = true;
-        }
-    }
-}
-

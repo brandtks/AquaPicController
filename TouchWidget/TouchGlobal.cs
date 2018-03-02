@@ -79,8 +79,5 @@ namespace GoodtimeDevelopment.TouchWidget
             return originY + radius * Math.Sin (radians);
         }
     }
-}le radians) {
-            return originY + radius * Math.Sin (radians);
-        }
-    }
 }
+

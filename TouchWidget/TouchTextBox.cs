@@ -162,10 +162,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-            t.Destroy ();
-                QueueDraw ();
-            }
-        }
-    }
-}
-

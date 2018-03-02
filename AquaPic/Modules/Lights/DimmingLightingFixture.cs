@@ -115,11 +115,5 @@ namespace AquaPic.Modules
             }
         }
     }
-}ode.Auto)
-                    dimmingMode = Mode.Auto;
-                else
-                    dimmingMode = Mode.Manual;
-            }
-        }
-    }
 }
+

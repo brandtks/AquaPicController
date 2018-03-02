@@ -185,14 +185,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-ray)JToken.Parse (jstring);
-
-            ja.Add (jo);
-
-            File.WriteAllText (path, ja.ToString ());
-
-            return true;
-        }
-    }
-}
-

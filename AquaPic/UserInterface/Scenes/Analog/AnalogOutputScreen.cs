@@ -196,14 +196,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-                      d.ss.currentSelected = 1;
-                }
-
-                d.QueueDraw ();
-
-                ++i;
-            }
-        }
-    }
-}
-

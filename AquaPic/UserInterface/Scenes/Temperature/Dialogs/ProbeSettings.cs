@@ -238,14 +238,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-
-     File.WriteAllText (path, jo.ToString ());
-
-            Temperature.RemoveTemperatureProbe (probeName);
-
-            return true;
-        }
-    }
-}
-
-

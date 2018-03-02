@@ -116,8 +116,5 @@ namespace AquaPic.Drivers
             return analogOutputCard.GetChannelValueControl (channel);
         }
     }
-}    var analogOutputCard = cards[card] as AnalogOutputCard<float>;
-            return analogOutputCard.GetChannelValueControl (channel);
-        }
-    }
 }
+

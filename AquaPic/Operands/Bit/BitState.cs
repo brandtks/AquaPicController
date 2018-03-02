@@ -43,13 +43,3 @@ namespace AquaPic.Operands
     }
 }
 
-state = MyState.Off;
-            }
-
-            public BitState (MyState initState) {
-                state = initState;
-            }
-        }
-    }
-}
-

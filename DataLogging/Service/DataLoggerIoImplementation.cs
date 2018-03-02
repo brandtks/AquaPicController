@@ -176,11 +176,3 @@ namespace AquaPic.DataLogging
     }
 }
 
-             Console.WriteLine ("Deleting {0} for {1}", file, _name);
-                File.Delete (file);
-            }
-        }
-        #endif
-    }
-}
-

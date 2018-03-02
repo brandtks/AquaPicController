@@ -133,11 +133,3 @@ namespace AquaPic.Runtime
     }
 }
 
-t.ToInt32 (args [1]);
-                    AquaPicDrivers.DigitalInput.RemoveChannel (cardId, inputId);
-                }
-            }
-        }
-    }
-}
-

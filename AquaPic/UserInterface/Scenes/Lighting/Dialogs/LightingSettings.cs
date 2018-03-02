@@ -201,14 +201,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-ring ();
-
-            File.WriteAllText (path, jo.ToString ());
-
-            Lighting.UpdateRiseSetTimes ();
-
-            return true;
-        }
-    }
-}
-

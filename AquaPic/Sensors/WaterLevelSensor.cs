@@ -163,14 +163,4 @@ namespace AquaPic.Sensors
         }
     }
 }
-);
-                    }
-                }
-            } else {
-                _level = 0.0f;
-            }
 
-            return level;
-        }
-    }
-}

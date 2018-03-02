@@ -474,12 +474,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-tateTextBox.textColor = "white";
-            }
-
-            switchTypeLabel.QueueDraw ();
-            switchStateTextBox.QueueDraw ();
-        }
-    }
-}
-

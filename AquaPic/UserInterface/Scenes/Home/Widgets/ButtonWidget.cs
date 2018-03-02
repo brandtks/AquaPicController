@@ -75,12 +75,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-b.buttonColor = "seca";
-            } else {
-                Bit.Set (stateText);
-                b.buttonColor = "pri";
-            }
-        }
-    }
-}
-

@@ -156,11 +156,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-(cr);
-                    cr.Fill ();
-                }
-            }
-        }
-    }
-}
-

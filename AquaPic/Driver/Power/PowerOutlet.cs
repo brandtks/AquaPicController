@@ -69,11 +69,3 @@ namespace AquaPic.Drivers
     }
 }
 
-etAmpCurrent (float c) {
-                ampCurrent = c;
-                wattPower = ampCurrent * Voltage * powerFactor;
-            }
-        }
-    }
-}
-

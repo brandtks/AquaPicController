@@ -442,12 +442,4 @@ namespace AquaPic.UserInterface
         }
     }
 }
-["AutoTopOff"]["reservoirChannel"] = "";
-            }
 
-            File.WriteAllText (path, jo.ToString ());
-
-            return true;
-        }
-    }
-}

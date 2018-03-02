@@ -189,14 +189,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-                  d.button.buttonColor = "pri";
-                }
-
-                d.QueueDraw ();
-
-                ++i;
-            }
-        }
-    }
-}
-

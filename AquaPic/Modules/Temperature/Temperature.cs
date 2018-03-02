@@ -781,11 +781,3 @@ namespace AquaPic.Modules
     }
 }
 
-ureGroupName) {
-            CheckHeaterKey (heaterName);
-            heaters[heaterName].temperatureGroupName = temperatureGroupName;
-        }
-
-    }
-}
-

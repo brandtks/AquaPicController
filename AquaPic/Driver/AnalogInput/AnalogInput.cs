@@ -43,8 +43,5 @@ namespace AquaPic.Drivers
             return new AnalogInputCard<float> (cardName, cardId, address);
         }
     }
-}oat> CardCreater (string cardName, int cardId, int address) {
-            return new AnalogInputCard<float> (cardName, cardId, address);
-        }
-    }
 }
+

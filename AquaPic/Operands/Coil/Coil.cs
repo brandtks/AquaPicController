@@ -45,9 +45,3 @@ namespace AquaPic.Operands
     }
 }
 
-);  // do we have a condition check method, if yes, lets run it to find out the new state
-            ConditionSetter?.Invoke (state);
-        }
-    }
-}
-

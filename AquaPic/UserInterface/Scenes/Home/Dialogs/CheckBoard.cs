@@ -154,12 +154,4 @@ namespace AquaPic.UserInterface
         }
     }
 }
-           public int column;
 
-            public RowColumnPair () {
-                row = 0;
-                column = 0;
-            }
-        }
-    }
-}

@@ -487,12 +487,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-ol OnUpdateTimer () {
-            GetGroupData ();
-            GetProbeData ();
-            GetHeaterData ();
-            return true;
-        }
-    }
-}
-

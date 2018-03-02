@@ -76,13 +76,3 @@ namespace AquaPic.Globals
     }
 }
 
-ol (this MyState value) {
-            if (value == MyState.On) {
-                return true;
-            }
-
-            return false;
-        }
-    }
-}
-

@@ -55,12 +55,3 @@ namespace AquaPic.Runtime
     }
 }
 
-hed;
-        }
-
-        protected void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
-            timerFinished = false;
-        }
-    }
-}
-

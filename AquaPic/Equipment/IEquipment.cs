@@ -35,10 +35,4 @@ namespace AquaPic.Equipment
         void SetGetter (T OnGetter);
     }
 }
- {
-        void Add (IndividualControl channel);
-        void Remove ();
-        void SetName (string name);
-        void SetGetter (T OnGetter);
-    }
-}
+

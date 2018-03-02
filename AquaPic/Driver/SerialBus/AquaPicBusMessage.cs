@@ -64,10 +64,3 @@ namespace AquaPic.SerialBus
     }
 }
 
-uffer [this.writeBuffer.Length - 2] = crc [0];
-                this.writeBuffer [this.writeBuffer.Length - 1] = crc [1];
-            }
-        }
-    }
-}
-

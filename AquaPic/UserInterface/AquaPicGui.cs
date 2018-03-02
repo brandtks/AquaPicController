@@ -215,12 +215,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-ation = new MyNotificationBar ();
-            f.Put (notification, 0, 0);
-            notification.Show ();
-
-            QueueDraw ();
-        }
-    }
-}
-

@@ -130,11 +130,3 @@ namespace GoodtimeDevelopment.Utilites.Test
     }
 }
 
-ert.AreNotEqual (ds2, ds1);
-
-            ds1 = new DateSpan (2017, 1, 1, 12, 0, 0, 500);
-            Assert.AreNotEqual (ds2, ds1);
-        }
-    }
-}
-

@@ -36,11 +36,3 @@ namespace AquaPic.Drivers
     }
 }
 
-GenericChannel<T> 
-        {
-            public DigitalInputChannel (string name) 
-                : base (name, (T)(object)false) { }
-        }
-    }
-}
-

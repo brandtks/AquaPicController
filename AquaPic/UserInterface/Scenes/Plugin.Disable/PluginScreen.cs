@@ -63,23 +63,5 @@ namespace AquaPic.UserInterface
             GuiGlobal.ChangeScreens ("Edit Plugin", Plugin.AllPlugins [b.text]);
         }
     }
-}uttonClick;
-                Put (b, x, y);
-
-                x += 260;
-
-                if (x >= 795) {
-                    x = 15;
-                    y += 40;
-                }
-            }
-
-            ShowAll ();
-        }
-
-        protected void OnButtonClick (object sender, ButtonReleaseEventArgs args) {
-            TouchButton b = sender as TouchButton;
-            GuiGlobal.ChangeScreens ("Edit Plugin", Plugin.AllPlugins [b.text]);
-        }
-    }
 }
+

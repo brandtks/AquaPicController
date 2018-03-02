@@ -168,13 +168,3 @@ namespace AquaPic.Runtime
     }
 }
 
-                   Logger.AddError(ex.ToString());
-                    }
-                }
-
-                return true;
-            }
-        }
-    }
-}
-

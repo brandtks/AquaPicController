@@ -44,14 +44,3 @@ namespace AquaPic.Drivers
     }
 }
 
-d")]
-        DigitalInputCard,
-
-        [Description("Power Strip")]
-        PowerStrip,
-
-        [Description("pH ORP Card")]
-        PhOrpCard
-    }
-}
-

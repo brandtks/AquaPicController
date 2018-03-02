@@ -112,11 +112,3 @@ namespace AquaPic.Runtime
     }
 }
 
-) {
-                    AlarmEvent?.Invoke (this, new AlarmEventArgs (AlarmEventType.Cleared, _name));
-                }
-            }
-        }
-    }
-}
-

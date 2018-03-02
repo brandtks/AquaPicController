@@ -175,9 +175,4 @@ namespace AquaPic.UserInterface
         }
     }
 }
-        File.WriteAllText (path, jo.ToString ());
-            WaterLevel.RemoveWaterLevelGroup (groupName);
-            return true;
-        }
-    }
-}
+

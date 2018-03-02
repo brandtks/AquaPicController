@@ -443,27 +443,3 @@ namespace AquaPic.SerialBus
     }
 }
 
-)(CRCFull ^ 0xA001);
-                }
-            }
-
-            crc[1] = (byte)((CRCFull >> 8) & 0xFF);
-            crc[0] = (byte)(CRCFull & 0xFF);
-        }
-
-        private class ReceiveBuffer {
-            public object SyncLock;
-            public int responseLength;
-            public List<byte> buffer;
-            public bool waitForResponse;
-
-            public ReceiveBuffer () {
-                SyncLock = new object ();
-                buffer = new List<byte> ();
-                responseLength = 0;
-                waitForResponse = false;
-            }
-        }
-    }
-}
-

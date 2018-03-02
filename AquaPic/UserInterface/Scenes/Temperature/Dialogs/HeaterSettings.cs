@@ -227,14 +227,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-;
-
-            File.WriteAllText (path, jo.ToString ());
-
-            Temperature.RemoveHeater (heaterName);
-
-            return true;
-        }
-    }
-}
-

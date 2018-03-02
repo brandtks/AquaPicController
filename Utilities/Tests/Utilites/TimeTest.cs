@@ -109,12 +109,3 @@ namespace GoodtimeDevelopment.Utilites.Test
     }
 }
 
-);
-            Assert.False (t1.Equals (t2));
-
-            t2 = new Time (8, 0, 0, 500);
-            Assert.False (t1.Equals (t2));
-        }
-    }
-}
-

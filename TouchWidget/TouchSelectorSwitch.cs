@@ -305,10 +305,5 @@ namespace GoodtimeDevelopment.TouchWidget
             return clicked;
         }
     }
-}               QueueDraw ();
-            }
-
-            return clicked;
-        }
-    }
 }
+

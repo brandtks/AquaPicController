@@ -189,10 +189,3 @@ namespace GoodtimeDevelopment.TouchWidget
     }
 }
 
-     } catch {
-                return new Gdk.Color ();
-            }
-        }
-    }
-}
-

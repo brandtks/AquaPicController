@@ -238,10 +238,3 @@ namespace AquaPic.Drivers
     }
 }
 
-al void SetChannelMode (int channel, Mode mode) {
-            CheckChannelRange (channel);
-            channels [channel].mode = mode;
-        }
-    }
-}
-

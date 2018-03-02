@@ -152,10 +152,3 @@ namespace AquaPic.UserInterface
     }
 }
 
-            render.Render (ss, x, ss.Allocation.Top, seperation, ss.Allocation.Height);
-                x += seperation;
-            }
-        }
-    }
-}
-

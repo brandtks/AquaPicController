@@ -80,11 +80,5 @@ namespace AquaPic.UserInterface
             }
         }
     }
-}else {
-                textBox.text = "--";
-                label.Visible = true;
-                label.text = "Disabled";
-            }
-        }
-    }
 }
+
