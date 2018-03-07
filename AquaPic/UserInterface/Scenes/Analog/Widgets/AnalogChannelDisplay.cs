@@ -42,7 +42,7 @@ namespace AquaPic.UserInterface
         public TouchProgressBar progressBar;
         public TouchLabel typeLabel;
         public TouchButton button;
-        public TouchSelectorSwitch ss;
+        public TouchSelectorSwitch selectorSwitch;
 
         public int divisionSteps;
 
@@ -98,14 +98,14 @@ namespace AquaPic.UserInterface
             Put (button, 610, 35);
             button.Show ();
 
-            ss = new TouchSelectorSwitch (2);
-            ss.SetSizeRequest (100, 30);
-            ss.sliderColorOptions [0] = "pri";
-            ss.sliderColorOptions [1] = "seca";
-            ss.SelectorChangedEvent += OnSelectorSwitchChanged;
-            ss.ExposeEvent += OnExpose;
-            ss.Visible = false;
-            Put (ss, 610, 0);
+            selectorSwitch = new TouchSelectorSwitch (2);
+            selectorSwitch.SetSizeRequest (100, 30);
+            selectorSwitch.sliderColorOptions [0] = "pri";
+            selectorSwitch.sliderColorOptions [1] = "seca";
+            selectorSwitch.SelectorChangedEvent += OnSelectorSwitchChanged;
+            selectorSwitch.ExposeEvent += OnExpose;
+            selectorSwitch.Visible = false;
+            Put (selectorSwitch, 610, 0);
 
             Show ();
         }
@@ -132,9 +132,9 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            TouchSelectorSwitch ss = sender as TouchSelectorSwitch;
-            int seperation = ss.Allocation.Width / ss.selectionCount;
-            int x = ss.Allocation.Left;
+            var selector = sender as TouchSelectorSwitch;
+            int seperation = selector.Allocation.Width / selector.selectionCount;
+            int x = selector.Allocation.Left;
 
             TouchText render = new TouchText ();
             render.textWrap = TouchTextWrap.Shrink;
@@ -145,7 +145,7 @@ namespace AquaPic.UserInterface
 
             foreach (var l in labels) {
                 render.text = l;
-                render.Render (ss, x, ss.Allocation.Top, seperation, ss.Allocation.Height);
+                render.Render (selector, x, selector.Allocation.Top, seperation, selector.Allocation.Height);
                 x += seperation;
             }
         }

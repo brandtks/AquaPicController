@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using AquaPic.Globals;
 using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Drivers
@@ -41,6 +42,47 @@ namespace AquaPic.Drivers
 
         protected override GenericCard<float> CardCreater (string cardName, int cardId, int address) {
             return new AnalogInputCard<float> (cardName, cardId, address);
+        }
+
+        public int GetChannelLowPassFilterFactor (string channelName) {
+            IndividualControl channel = GetChannelIndividualControl (channelName);
+            return GetChannelLowPassFilterFactor (channel);
+        }
+
+        public int GetChannelLowPassFilterFactor (IndividualControl channel) {
+            return GetChannelLowPassFilterFactor (channel.Group, channel.Individual);
+        }
+
+        public int GetChannelLowPassFilterFactor (int card, int channel) {
+            CheckCardRange (card);
+            var analogInputCard = cards[card] as AnalogInputCard<float>;
+            return analogInputCard.GetChannelLowPassFilterFactor (channel);
+        }
+
+        public int[] GetAllChannelLowPassFilterFactors (string cardName) {
+            var card = GetCardIndex (cardName);
+            return GetAllChannelLowPassFilterFactors (card);
+        }
+
+        public int[] GetAllChannelLowPassFilterFactors (int card) {
+            CheckCardRange (card);
+            var analogInputCard = cards[card] as AnalogInputCard<float>;
+            return analogInputCard.GetAllChannelLowPassFilterFactors ();
+        }
+
+        public void SetChannelLowPassFilterFactor (string channelName, int lowPassFilterFactor) {
+            IndividualControl channel = GetChannelIndividualControl (channelName);
+            SetChannelLowPassFilterFactor (channel, lowPassFilterFactor);
+        }
+
+        public void SetChannelLowPassFilterFactor (IndividualControl channel, int lowPassFilterFactor) {
+            SetChannelLowPassFilterFactor (channel.Group, channel.Individual, lowPassFilterFactor);
+        }
+
+        public void SetChannelLowPassFilterFactor (int card, int channel, int lowPassFilterFactor) {
+            CheckCardRange (card);
+            var analogInputCard = cards[card] as AnalogInputCard<float>;
+            analogInputCard.SetChannelLowPassFilterFactor (channel, lowPassFilterFactor);
         }
     }
 }

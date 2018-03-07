@@ -86,7 +86,7 @@ namespace AquaPic.Drivers
 
             public override void SetAllChannelValues (T[] values) {
                 if (values.Length != channels.Length)
-                    throw new ArgumentOutOfRangeException ("values length");
+                    throw new ArgumentOutOfRangeException ("values.Length");
 
                 for (int i = 0; i < channels.Length; ++i) {
                     if (channels [i].mode == Mode.Manual) {
@@ -95,7 +95,22 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public void SetupChannel (int channel, int lowPassFilterFactor) {
+            public int GetChannelLowPassFilterFactor (int channel) {
+                CheckChannelRange (channel);
+                var analogInputChannel = channels[channel] as AnalogInputChannel<T>;
+                return analogInputChannel.lowPassFilterFactor;
+            }
+
+            public int[] GetAllChannelLowPassFilterFactors () {
+                int[] lowPassFilterFactors = new int[channelCount];
+                for (int i = 0; i < channelCount; ++i) {
+                    var analogInputCard = channels[i] as AnalogInputChannel<T>;
+                    lowPassFilterFactors[i] = analogInputCard.lowPassFilterFactor;
+                }
+                return lowPassFilterFactors;
+            }
+
+            public void SetChannelLowPassFilterFactor (int channel, int lowPassFilterFactor) {
                 CheckChannelRange (channel);
 
                 var analogInputChannel = channels[channel] as AnalogInputChannel<T>;

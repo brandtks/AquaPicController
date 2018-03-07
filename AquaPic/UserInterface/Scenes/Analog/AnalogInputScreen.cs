@@ -53,6 +53,7 @@ namespace AquaPic.UserInterface
                 displays [i].divisionSteps = 4096;
                 displays [i].ForceButtonReleaseEvent += OnForceRelease;
                 displays [i].ValueChangedEvent += OnValueChanged;
+                displays [i].typeLabel.Visible = true;
                 Put (displays [i], 70, 90 + (i * 75));
             }
 
@@ -138,11 +139,13 @@ namespace AquaPic.UserInterface
             string[] names = AquaPicDrivers.AnalogInput.GetAllChannelNames (cardId);
             float[] values = AquaPicDrivers.AnalogInput.GetAllChannelValues (cardId);
             Mode[] modes = AquaPicDrivers.AnalogInput.GetAllChannelModes (cardId);
+            int[] factors = AquaPicDrivers.AnalogInput.GetAllChannelLowPassFilterFactors (cardId);
 
             int i = 0;
             foreach (var d in displays) {
                 d.label.text = names [i];
                 d.currentValue = values [i];
+                d.typeLabel.text = string.Format ("LPF: {0}", factors[i]);
 
                 if (modes [i] == Mode.Auto) {
                     d.progressBar.enableTouch = false;

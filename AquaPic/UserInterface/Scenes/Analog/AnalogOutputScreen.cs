@@ -112,14 +112,14 @@ namespace AquaPic.UserInterface
                 d.progressBar.enableTouch = true;
                 d.textBox.enableTouch = true;
                 d.button.buttonColor = "pri";
-                d.ss.Visible = true;
+                d.selectorSwitch.Visible = true;
                 d.typeLabel.Visible = false;
             } else {
                 AquaPicDrivers.AnalogOutput.SetChannelMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;
                 d.textBox.enableTouch = false;
                 d.button.buttonColor = "grey4";
-                d.ss.Visible = false;
+                d.selectorSwitch.Visible = false;
                 d.typeLabel.Visible = true;
             }
 
@@ -175,17 +175,17 @@ namespace AquaPic.UserInterface
                     d.progressBar.enableTouch = false;
                     d.textBox.enableTouch = false;
                     d.button.buttonColor = "grey4";
-                    d.ss.Visible = false;
+                    d.selectorSwitch.Visible = false;
                 } else {
                     d.progressBar.enableTouch = true;
                     d.textBox.enableTouch = true;
                     d.button.buttonColor = "pri";
-                    d.ss.Visible = true;
+                    d.selectorSwitch.Visible = true;
 
                     if (types [i] == AnalogType.ZeroTen)
-                        d.ss.currentSelected = 0;
+                        d.selectorSwitch.currentSelected = 0;
                     else
-                        d.ss.currentSelected = 1;
+                        d.selectorSwitch.currentSelected = 1;
                 }
 
                 d.QueueDraw ();
