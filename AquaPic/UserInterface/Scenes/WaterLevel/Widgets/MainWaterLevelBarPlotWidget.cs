@@ -79,33 +79,20 @@ namespace AquaPic.UserInterface
         }
 
         public override void OnUpdate () {
-            bool usingLevel = false;
             if (groupName.IsNotEmpty ()) {
-                var analogSensorName = WaterLevel.GetWaterLevelGroupAnalogSensorName (groupName);
-                if (analogSensorName.IsNotEmpty ()) {
-                    if (WaterLevel.GetAnalogLevelSensorEnable (analogSensorName)) {
-                        usingLevel = true;
-                        var level = WaterLevel.GetAnalogLevelSensorLevel (analogSensorName);
-                        if (level < 0.0f) {
-                            currentValue = 0.0f;
+                if (WaterLevel.AreAllWaterLevelGroupAnalogSensorsConnected (groupName)) {
+                    currentValue = 0.0f;
 
-                            flashUpdate = ++flashUpdate % 4;
-                            if (flashUpdate <= 1)
-                                label.Visible = true;
-                            else
-                                label.Visible = false;
-                        } else {
-                            currentValue = level;
-                            label.Visible = false;
-                            flashUpdate = 0;
-                        }
-                    }
+                    flashUpdate = ++flashUpdate % 4;
+                    if (flashUpdate <= 1)
+                        label.Visible = true;
+                    else
+                        label.Visible = false;
+                } else {
+                    currentValue = WaterLevel.GetWaterLevelGroupLevel (groupName);
+                    label.Visible = false;
+                    flashUpdate = 0;
                 }
-            }
-
-            if (!usingLevel) {
-                label.text = "Probe Disabled";
-                label.Visible = true;
             }
         }
     }

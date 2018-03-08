@@ -36,39 +36,86 @@ namespace AquaPic.Modules
             public string name;
             public float level;
             public IDataLogger dataLogger;
-            public string analogLevelSensorName;
+
+            public float highAnalogAlarmSetpoint;
+            public bool enableHighAnalogAlarm;
+            public int highAnalogAlarmIndex;
+
+            public float lowAnalogAlarmSetpoint;
+            public bool enableLowAnalogAlarm;
+            public int lowAnalogAlarmIndex;
 
             public int highSwitchAlarmIndex;
             public int lowSwitchAlarmIndex;
 
-            public WaterLevelGroup (string name, string analogLevelSensorName) {
+            public WaterLevelGroup (
+                string name, 
+                float highAnalogAlarmSetpoint, 
+                bool enableHighAnalogAlarm, 
+                float lowAnalogAlarmSetpoint,
+                bool enableLowAnalogAlarm
+            ) {
                 this.name = name;
                 level = 0.0f;
                 dataLogger = Factory.GetDataLogger (string.Format ("{0}WaterLevel", this.name.RemoveWhitespace ()));
 
-                highSwitchAlarmIndex = Alarm.Subscribe ("High Water Level, Float Switch");
-                lowSwitchAlarmIndex = Alarm.Subscribe ("Low Water Level, Float Switch");
+                this.highAnalogAlarmSetpoint = highAnalogAlarmSetpoint;
+                this.enableHighAnalogAlarm = enableHighAnalogAlarm;
+                if (this.enableHighAnalogAlarm) {
+                    highAnalogAlarmIndex = Alarm.Subscribe (string.Format ("{0} High Water Level (Analog)", this.name));
+                }
+                Alarm.AddAlarmHandler (highAnalogAlarmIndex, OnHighAlarm);
+
+                this.lowAnalogAlarmSetpoint = lowAnalogAlarmSetpoint;
+                this.enableLowAnalogAlarm = enableLowAnalogAlarm;
+                if (this.enableLowAnalogAlarm) {
+                    lowAnalogAlarmIndex = Alarm.Subscribe (string.Format ("{0} Low Water Level (Analog)", this.name));
+                }
+                Alarm.AddAlarmHandler (lowAnalogAlarmIndex, OnLowAlarm);
+
+                highSwitchAlarmIndex = Alarm.Subscribe (string.Format ("{0} High Water Level (Switch)", this.name));
+                lowSwitchAlarmIndex = Alarm.Subscribe (string.Format ("{0} High Water Level (Switch)", this.name));
                 Alarm.AddAlarmHandler (highSwitchAlarmIndex, OnHighAlarm);
                 Alarm.AddAlarmHandler (lowSwitchAlarmIndex, OnLowAlarm);
-
-                if (CheckAnalogLevelSensorKeyNoThrow (analogLevelSensorName)) {
-                    this.analogLevelSensorName = analogLevelSensorName;
-                } else {
-                    this.analogLevelSensorName = string.Empty;
-                }
-
-                ConnectAnalogSensorAlarmsToDataLogger ();
             }
 
-            public void Run () {
-                if (analogLevelSensorName.IsNotEmpty ()) {
-                    var sensor = analogLevelSensors[analogLevelSensorName];
-                    if (sensor.connected) {
-                        level = sensor.level;
-                        dataLogger.AddEntry (level);
+            public void GroupRun () {
+                var analogSensorCount = 0;
+                level = 0;
+                foreach (var s in analogLevelSensors.Values) {
+                    if (s.waterLevelGroupName == name) {
+                        s.Get ();
+                        if (s.connected) {
+                            level += s.level;
+                            analogSensorCount++;
+                        } else {
+                            dataLogger.AddEntry ("probe disconnected");
+                        }
+                    }
+                }
+
+                if (analogSensorCount > 0) {
+                    level /= analogSensorCount;
+                    dataLogger.AddEntry (level);
+
+                    if (enableHighAnalogAlarm && (level > highAnalogAlarmSetpoint)) {
+                        if (!Alarm.CheckAlarming (highAnalogAlarmIndex)) {
+                            Alarm.Post (highAnalogAlarmIndex);
+                        }
                     } else {
-                        level = 0f;
-                        dataLogger.AddEntry ("probe disconnected");
+                        if (Alarm.CheckAlarming (highAnalogAlarmIndex)) {
+                            Alarm.Clear (highAnalogAlarmIndex);
+                        }
+                    }
+
+                    if (enableLowAnalogAlarm && (level < lowAnalogAlarmSetpoint)) {
+                        if (!Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
+                            Alarm.Post (lowAnalogAlarmIndex);
+                        }
+                    } else {
+                        if (Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
+                            Alarm.Clear (lowAnalogAlarmIndex);
+                        }
                     }
                 } else {
                     dataLogger.AddEntry ("probe disconnected");
@@ -95,24 +142,6 @@ namespace AquaPic.Modules
                 }
             }
 
-            public void ConnectAnalogSensorAlarmsToDataLogger () {
-                if (analogLevelSensorName.IsNotEmpty ()) {
-                    var sensor = analogLevelSensors[analogLevelSensorName];
-                    Alarm.AddAlarmHandler (sensor.highAlarmIndex, OnHighAlarm);
-                    Alarm.AddAlarmHandler (sensor.lowAlarmIndex, OnLowAlarm);
-                    Alarm.AddAlarmHandler (sensor.disconnectedAlarmIndex, OnDisconnectedAlarm);
-                }
-            }
-
-            public void DisconnectAnalogSensorAlarmsFromDataLogger () {
-                if (analogLevelSensorName.IsNotEmpty ()) {
-                    var sensor = analogLevelSensors[analogLevelSensorName];
-                    Alarm.RemoveAlarmHandler (sensor.highAlarmIndex, OnHighAlarm);
-                    Alarm.RemoveAlarmHandler (sensor.lowAlarmIndex, OnLowAlarm);
-                    Alarm.RemoveAlarmHandler (sensor.disconnectedAlarmIndex, OnDisconnectedAlarm);
-                }
-            }
-
             protected void OnHighAlarm (object sender, AlarmEventArgs args) {
                 if (args.type == AlarmEventType.Posted) {
                     dataLogger.AddEntry ("high alarm");
@@ -122,12 +151,6 @@ namespace AquaPic.Modules
             protected void OnLowAlarm (object sender, AlarmEventArgs args) {
                 if (args.type == AlarmEventType.Posted) {
                     dataLogger.AddEntry ("low alarm");
-                }
-            }
-
-            protected void OnDisconnectedAlarm (object sender, AlarmEventArgs args) {
-                if (args.type == AlarmEventType.Posted) {
-                    dataLogger.AddEntry ("disconnected alarm");
                 }
             }
         }

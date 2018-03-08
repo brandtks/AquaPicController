@@ -90,30 +90,16 @@ namespace AquaPic.UserInterface
         }
 
         public override void OnUpdate () {
-            bool usingLevel = false;
             if (groupName.IsNotEmpty ()) {
-                var analogSensorName = WaterLevel.GetWaterLevelGroupAnalogSensorName (groupName);
-                if (analogSensorName.IsNotEmpty ()) {
-                    if (WaterLevel.GetAnalogLevelSensorEnable (analogSensorName)) {
-                        usingLevel = true;
-                        var level = WaterLevel.GetAnalogLevelSensorLevel (analogSensorName);
-                        if (level < 0.0f) {
-                            textBox.text = "--";
-                            label.Visible = true;
-                            label.text = "Disconnected";
-                        } else {
-                            currentValue = level;
-                            label.Visible = false;
-                        }
-                    }
+                if (WaterLevel.AreAllWaterLevelGroupAnalogSensorsConnected (groupName)) {
+                    textBox.text = "--";
+                    label.Visible = true;
+                    label.text = "Disconnected";
+                } else {
+                    currentValue = WaterLevel.GetWaterLevelGroupLevel (groupName);;
+                    label.Visible = false;
                 }
             } 
-
-            if (!usingLevel) {
-                textBox.text = "--";
-                label.text = "Disabled";
-                label.Visible = true;
-            }
         }
     }
 }

@@ -103,7 +103,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static float temperature {
+        public static float defaultTemperature {
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].temperature;
@@ -113,7 +113,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static float temperatureSetpoint {
+        public static float defaultTemperatureSetpoint {
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].temperatureSetpoint;
@@ -123,7 +123,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static float temperatureDeadband {
+        public static float defaultTemperatureDeadband {
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].temperatureDeadband;
@@ -133,7 +133,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static float highTemperatureAlarmSetpoint {
+        public static float defaultHighTemperatureAlarmSetpoint {
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].highTemperatureAlarmSetpoint;
@@ -143,7 +143,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static float lowTemperatureAlarmSetpoint {
+        public static float defaultLowTemperatureAlarmSetpoint {
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].lowTemperatureAlarmSetpoint;
@@ -153,7 +153,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static int highTemperatureAlarmIndex {
+        public static int defaultHighTemperatureAlarmIndex {
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].highTemperatureAlarmIndex;
@@ -163,7 +163,7 @@ namespace AquaPic.Modules
             }
         }
 
-        public static int lowTemperatureAlarmIndex {
+        public static int defaultLowTemperatureAlarmIndex {
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].lowTemperatureAlarmIndex;
@@ -333,7 +333,7 @@ namespace AquaPic.Modules
 
         public static void Run () {
             foreach (var tempGroup in temperatureGroups.Values) {
-                tempGroup.Run ();
+                tempGroup.GroupRun ();
             }
 
             // Get the value of the all the temperature probes no assigned to a group

@@ -29,6 +29,7 @@ using AquaPic.Globals;
 
 namespace AquaPic.Sensors
 {
+    /*
     public class AnalogLevelSensor : ISensor<float>
     {
         protected float _level;
@@ -116,5 +117,6 @@ namespace AquaPic.Sensors
             AquaPicDrivers.AnalogInput.SetChannelName (_channel, name);
         }
     }
+    */
 }
 

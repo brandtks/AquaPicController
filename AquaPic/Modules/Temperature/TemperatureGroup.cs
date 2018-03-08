@@ -64,7 +64,7 @@ namespace AquaPic.Modules
                 lowTemperatureAlarmIndex = Alarm.Subscribe (string.Format ("{0} low temperature", name));
             }
 
-            public void Run () {
+            public void GroupRun () {
                 var probeCount = 0;
 
                 temperature = 0.0f;

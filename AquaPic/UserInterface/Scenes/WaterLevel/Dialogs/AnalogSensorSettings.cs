@@ -91,95 +91,16 @@ namespace AquaPic.UserInterface
             };
             AddSetting (s);
 
-            s = new SettingSelectorSwitch ();
-            s.text = "Enable High Alarm";
-            if (analogSensorNameNotEmpty) {
-                if (WaterLevel.GetAnalogLevelSensorHighLevelAlarmEnable (analogSensorName)) {
-                    s.selectorSwitch.currentSelected = 0;
-                } else {
-                    s.selectorSwitch.currentSelected = 1;
-                }
-            } else {
-                s.selectorSwitch.currentSelected = 1;
-            }
-            AddOptionalSetting (s);
-
-            t = new SettingsTextBox ();
-            t.text = "High Alarm";
-            if (analogSensorNameNotEmpty) {
-                t.textBox.text = WaterLevel.GetAnalogLevelSensorHighLevelAlarmSetpoint (analogSensorName).ToString ();
-            } else {
-                t.textBox.text = "0.0";
-            }
-            t.textBox.TextChangedEvent += (sender, args) => {
-                try {
-                    float highAlarmStpnt = Convert.ToSingle (args.text);
-
-                    if (highAlarmStpnt < 0.0f) {
-                        MessageBox.Show ("High alarm setpoint can't be negative");
-                        args.keepText = false;
-                        return;
-                    }
-
-                    float lowAlarmStpnt = Convert.ToSingle (((SettingsTextBox)settings["Low Alarm"]).textBox.text);
-
-                    if (lowAlarmStpnt >= highAlarmStpnt) {
-                        MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
-                        args.keepText = false;
-                        return;
-                    }
-                } catch {
-                    MessageBox.Show ("Improper high alarm setpoint format");
-                    args.keepText = false;
-                }
-            };
-            AddOptionalSetting (t);
-
-            s = new SettingSelectorSwitch ();
-            s.text = "Enable Low Alarm";
-            if (analogSensorNameNotEmpty) {
-                if (WaterLevel.GetAnalogLevelSensorLowLevelAlarmEnable (analogSensorName)) {
-                    s.selectorSwitch.currentSelected = 0;
-                } else {
-                    s.selectorSwitch.currentSelected = 1;
-                }
-            } else {
-                s.selectorSwitch.currentSelected = 1;
-            }
-            AddOptionalSetting (s);
-
-            t = new SettingsTextBox ();
-            t.text = "Low Alarm";
-            if (analogSensorNameNotEmpty) {
-                t.textBox.text = WaterLevel.GetAnalogLevelSensorLowLevelAlarmSetpoint (analogSensorName).ToString ();
-            } else {
-                t.textBox.text = "0.0";
-            }
-            t.textBox.TextChangedEvent += (sender, args) => {
-                try {
-                    float lowAlarmStpnt = Convert.ToSingle (args.text);
-
-                    if (lowAlarmStpnt < 0.0f) {
-                        MessageBox.Show ("Low alarm setpoint can't be negative");
-                        args.keepText = false;
-                        return;
-                    }
-
-                    float highAlarmStpnt = Convert.ToSingle (((SettingsTextBox)settings["High Alarm"]).textBox.text);
-
-                    if (lowAlarmStpnt >= highAlarmStpnt) {
-                        MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
-                        args.keepText = false;
-                        return;
-                    }
-                } catch {
-                    MessageBox.Show ("Improper low alarm setpoint format");
-                    args.keepText = false;
-                }
-            };
-            AddOptionalSetting (t);
-
             var c = new SettingsComboBox ();
+            c.label.text = "Water Level Group";
+            c.combo.comboList.AddRange (WaterLevel.GetAllWaterLevelGroupNames ());
+            c.combo.nonActiveMessage = "Select group";
+            if (analogSensorNameNotEmpty) {
+                c.combo.activeText = WaterLevel.GetAnalogLevelSensorWaterLevelGroupName (analogSensorName);
+            }
+            AddOptionalSetting (c);
+
+            c = new SettingsComboBox ();
             c.text = "Input";
             string[] availCh = AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ();
             if (analogSensorNameNotEmpty) {
@@ -208,35 +129,10 @@ namespace AquaPic.UserInterface
         protected bool OnSave (object sender) {
             string name = (settings["Name"] as SettingsTextBox).textBox.text;
 
-            bool enable;
-            SettingSelectorSwitch s = settings["Enable"] as SettingSelectorSwitch;
-            if (s.selectorSwitch.currentSelected == 0) {
-                enable = true;
-            } else {
-                enable = false;
-            }
+            var s = settings["Enable"] as SettingSelectorSwitch;
+            var enable = s.selectorSwitch.currentSelected == 0;
 
-            bool enableHighAlarm;
-            s = settings["Enable High Alarm"] as SettingSelectorSwitch;
-            if (s.selectorSwitch.currentSelected == 0) {
-                enableHighAlarm = true;
-            } else {
-                enableHighAlarm = false;
-            }
-
-            SettingsTextBox t = settings["High Alarm"] as SettingsTextBox;
-            float highAlarmStpnt = Convert.ToSingle (t.textBox.text);
-
-            bool enableLowAlarm;
-            s = settings["Enable Low Alarm"] as SettingSelectorSwitch;
-            if (s.selectorSwitch.currentSelected == 0) {
-                enableLowAlarm = true;
-            } else {
-                enableLowAlarm = false;
-            }
-
-            t = settings["Low Alarm"] as SettingsTextBox;
-            float lowAlarmStpnt = Convert.ToSingle (t.textBox.text);
+            var waterLevelGroupName = (settings["Water Level Group"] as SettingsComboBox).combo.activeText;
 
             string chName = (settings["Input"] as SettingsComboBox).combo.activeText;
             var ic = IndividualControl.Empty;
@@ -254,6 +150,11 @@ namespace AquaPic.UserInterface
                 }
 
                 if (enable) {
+                    if ((settings["Water Level Group"] as SettingsComboBox).combo.activeIndex == -1) {
+                        MessageBox.Show ("Please select an water level group");
+                        return false;
+                    }
+
                     if ((settings["Input"] as SettingsComboBox).combo.activeIndex == -1) {
                         MessageBox.Show ("Please select an channel");
                         return false;
@@ -266,10 +167,7 @@ namespace AquaPic.UserInterface
                     WaterLevel.AddAnalogLevelSensor (
                         name,
                         enable,
-                        enableHighAlarm,
-                        highAlarmStpnt,
-                        enableLowAlarm,
-                        lowAlarmStpnt,
+                        waterLevelGroupName, 
                         ic,
                         819.2f,
                         10f,
@@ -284,10 +182,7 @@ namespace AquaPic.UserInterface
 
                 jobj.Add (new JProperty ("name", name));
                 jobj.Add (new JProperty ("enable", enable.ToString ()));
-                jobj.Add (new JProperty ("enableHighLevelAlarm", enableHighAlarm.ToString ()));
-                jobj.Add (new JProperty ("highLevelAlarmSetpoint", highAlarmStpnt.ToString ()));
-                jobj.Add (new JProperty ("enableLowLevelAlarm", enableLowAlarm.ToString ()));
-                jobj.Add (new JProperty ("lowLevelAlarmSetpoint", lowAlarmStpnt.ToString ()));
+                jobj.Add (new JProperty ("waterLevelGroupName", waterLevelGroupName));
                 jobj.Add (new JProperty ("inputCard", AquaPicDrivers.AnalogInput.GetCardName (ic.Group)));
                 jobj.Add (new JProperty ("channel", ic.Individual.ToString ()));
                 jobj.Add (new JProperty ("zeroScaleCalibrationValue", "819.2"));
@@ -304,12 +199,8 @@ namespace AquaPic.UserInterface
                     analogSensorName = name;
                 }
 
-                WaterLevel.SetAnalogLevelSensorHighLevelAlarmEnable (analogSensorName, enableHighAlarm);
-                WaterLevel.SetAnalogLevelSensorHighLevelAlarmSetpoint (analogSensorName, highAlarmStpnt);
-                WaterLevel.SetAnalogLevelSensorLowLevelAlarmEnable (analogSensorName, enableLowAlarm);
-                WaterLevel.SetAnalogLevelSensorLowLevelAlarmSetpoint (analogSensorName, lowAlarmStpnt);
-
                 if (enable) {
+                    WaterLevel.SetAnalogLevelSensorWaterLevelGroupName (analogSensorName, waterLevelGroupName);
                     var str = ((SettingsComboBox)settings["Sensor Channel"]).combo.activeText;
                     if (!str.StartsWith ("Current:")) {
                         ParseChannnel (chName, ref ic.Group, ref ic.Individual);
@@ -335,14 +226,11 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                ((JArray)jo["analogSensors"])[arrIdx]["name"] = analogSensorName;
-                ((JArray)jo["analogSensors"])[arrIdx]["enable"] = enable.ToString ();
-                ((JArray)jo["analogSensors"])[arrIdx]["enableHighLevelAlarm"] = enableHighAlarm.ToString ();
-                ((JArray)jo["analogSensors"])[arrIdx]["highLevelAlarmSetpoint"] = highAlarmStpnt.ToString ();
-                ((JArray)jo["analogSensors"])[arrIdx]["enableLowLevelAlarm"] = enableLowAlarm.ToString ();
-                ((JArray)jo["analogSensors"])[arrIdx]["lowLevelAlarmSetpoint"] = lowAlarmStpnt.ToString ();
-                ((JArray)jo["analogSensors"])[arrIdx]["inputCard"] = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
-                ((JArray)jo["analogSensors"])[arrIdx]["channel"] = ic.Individual.ToString ();
+                ja[arrIdx]["name"] = analogSensorName;
+                ja[arrIdx]["enable"] = enable.ToString ();
+                ja[arrIdx]["waterLevelGroupName"] = waterLevelGroupName;
+                ja[arrIdx]["inputCard"] = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
+                ja[arrIdx]["channel"] = ic.Individual.ToString ();
             }
 
             File.WriteAllText (path, jo.ToString ());

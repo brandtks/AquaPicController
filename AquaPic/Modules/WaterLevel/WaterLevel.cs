@@ -140,45 +140,7 @@ namespace AquaPic.Modules
                             }
                         }
 
-                        bool enableHighLevelAlarm = true;
-                        text = (string)obj["enableHighLevelAlarm"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                enableHighLevelAlarm = Convert.ToBoolean (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        float highLevelAlarmSetpoint = 0.0f;
-                        text = (string)obj["highLevelAlarmSetpoint"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                highLevelAlarmSetpoint = Convert.ToSingle (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        bool enableLowLevelAlarm = true;
-                        text = (string)obj["enableLowLevelAlarm"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                enableLowLevelAlarm = Convert.ToBoolean (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        float lowLevelAlarmSetpoint = 0.0f;
-                        text = (string)obj["lowLevelAlarmSetpoint"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                lowLevelAlarmSetpoint = Convert.ToSingle (text);
-                            } catch {
-                                //
-                            }
-                        }
+                        var waterLevelGroupName = (string)obj["waterLevelGroupName"];
 
                         var ic = IndividualControl.Empty;
                         text = (string)obj["inputCard"];
@@ -239,10 +201,7 @@ namespace AquaPic.Modules
                         AddAnalogLevelSensor (
                             name,
                             enable,
-                            enableHighLevelAlarm,
-                            highLevelAlarmSetpoint,
-                            enableLowLevelAlarm,
-                            lowLevelAlarmSetpoint,
+                            waterLevelGroupName,
                             ic,
                             zeroScaleCalibrationValue,
                             fullScaleCalibrationActual,
@@ -258,9 +217,53 @@ namespace AquaPic.Modules
                         JObject obj = jt as JObject;
 
                         var name = (string)obj["name"];
-                        var analogLevelSensorName = (string)obj["analogLevelSensorName"];
 
-                        AddWaterLevelGroup (name, analogLevelSensorName);
+                        var highAnalogAlarmSetpoint = 0f;
+                        var text = (string)obj["highAnalogAlarmSetpoint"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                highAnalogAlarmSetpoint = Convert.ToSingle (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var enableHighAnalogAlarm = true;
+                        text = (string)obj["enableHighAnalogAlarm"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                enableHighAnalogAlarm = Convert.ToBoolean (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var lowAnalogAlarmSetpoint = 0f;
+                        text = (string)obj["lowAnalogAlarmSetpoint"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                lowAnalogAlarmSetpoint = Convert.ToSingle (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var enableLowAnalogAlarm = true;
+                        text = (string)obj["enableLowAnalogAlarm"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                enableLowAnalogAlarm = Convert.ToBoolean (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        AddWaterLevelGroup (
+                            name, 
+                            highAnalogAlarmSetpoint,
+                            enableHighAnalogAlarm,
+                            lowAnalogAlarmSetpoint,
+                            enableLowAnalogAlarm);
                     }
 
                     /**************************************************************************************************/
@@ -366,29 +369,44 @@ namespace AquaPic.Modules
         }
 
         public static void Run () {
-            foreach (var analogSensor in analogLevelSensors.Values) {
-                analogSensor.UpdateWaterLevel ();
+            foreach (var waterLevelGroup in waterLevelGroups.Values) {
+                waterLevelGroup.GroupRun ();
             }
 
-            foreach (var waterLevelGroup in waterLevelGroups.Values) {
-                waterLevelGroup.Run ();
+            // Get the value of the all the temperature probes no assigned to a group
+            foreach (var analogSensor in analogLevelSensors.Values) {
+                if (!CheckWaterLevelGroupKeyNoThrow (analogSensor.waterLevelGroupName)) {
+                    analogSensor.Get ();
+                }
             }
         }
 
         /**************************************************************************************************************/
         /* Water Level Groups                                                                                         */
         /**************************************************************************************************************/
-        public static void AddWaterLevelGroup (string name, string analogLevelSensorName) {
+        public static void AddWaterLevelGroup (
+            string name, 
+            float highAnalogAlarmSetpoint,
+            bool enableHighAnalogAlarm,
+            float lowAnalogAlarmSetpoint,
+            bool enableLowAnalogAlarm
+        ) {
             if (!WaterLevelGroupNameOk (name)) {
                 throw new Exception (string.Format ("Water Level Group: {0} already exists", name));
             }
 
-            waterLevelGroups.Add (name, new WaterLevelGroup (name, analogLevelSensorName));
+            waterLevelGroups.Add (
+                name, 
+                new WaterLevelGroup (
+                    name, 
+                    highAnalogAlarmSetpoint,
+                    enableHighAnalogAlarm,
+                    lowAnalogAlarmSetpoint,
+                    enableLowAnalogAlarm));
         }
 
         public static void RemoveWaterLevelGroup (string name) {
             CheckWaterLevelGroupKey (name);
-            waterLevelGroups[name].DisconnectAnalogSensorAlarmsFromDataLogger ();
             waterLevelGroups.Remove (name);
         }
 
@@ -411,6 +429,17 @@ namespace AquaPic.Modules
             return !CheckWaterLevelGroupKeyNoThrow (name);
         }
 
+        public static bool AreAllWaterLevelGroupAnalogSensorsConnected (string name) {
+            CheckWaterLevelGroupKey (name);
+            bool connected = false;
+            foreach (var sensor in analogLevelSensors.Values) {
+                if (sensor.waterLevelGroupName == name) {
+                    connected |= sensor.connected;
+                }
+            }
+            return connected;
+        }
+
         /***Getters****************************************************************************************************/
         /***Names***/
         public static string[] GetAllWaterLevelGroupNames () {
@@ -427,16 +456,46 @@ namespace AquaPic.Modules
             return waterLevelGroups[name].level;
         }
 
-        /***Analog Sensor Name***/
-        public static string GetWaterLevelGroupAnalogSensorName (string name) {
+        /***High analog alarm setpoint**/
+        public static float GetWaterLevelGroupHighAnalogAlarmSetpoint (string name) {
             CheckWaterLevelGroupKey (name);
-            return waterLevelGroups[name].analogLevelSensorName;
+            return waterLevelGroups[name].highAnalogAlarmSetpoint;
+        }
+
+        /***High analog alarm enable**/
+        public static bool GetWaterLevelGroupHighAnalogAlarmEnable (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].enableHighAnalogAlarm;
+        }
+
+        /***High analog alarm index**/
+        public static int GetWaterLevelGroupHighAnalogAlarmIndex (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].highAnalogAlarmIndex;
         }
 
         /***High switch alarm index***/
         public static int GetWaterLevelGroupHighSwitchAlarmIndex (string name) {
             CheckWaterLevelGroupKey (name);
             return waterLevelGroups[name].highSwitchAlarmIndex;
+        }
+
+        /***Low analog alarm setpoint**/
+        public static float GetWaterLevelGroupLowAnalogAlarmSetpoint (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].lowAnalogAlarmSetpoint;
+        }
+
+        /***Low analog alarm enable**/
+        public static bool GetWaterLevelGroupLowAnalogAlarmEnable (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].enableLowAnalogAlarm;
+        }
+
+        /***Low analog alarm index**/
+        public static int GetWaterLevelGroupLowAnalogAlarmIndex (string name) {
+            CheckWaterLevelGroupKey (name);
+            return waterLevelGroups[name].lowAnalogAlarmIndex;
         }
 
         /***Low switch alarm index***/
@@ -452,15 +511,28 @@ namespace AquaPic.Modules
         }
 
         /***Setters****************************************************************************************************/
-        /***Analog Sensor***/
-        public static void SetWaterLevelGroupAnalogSensorName (string name, string analogSensorName) {
+        /***High analog alarm setpoint**/
+        public static void SetWaterLevelGroupHighAnalogAlarmSetpoint (string name, float highAnalogAlarmSetpoint) {
             CheckWaterLevelGroupKey (name);
-            if (analogSensorName.IsNotEmpty ()) {
-                CheckAnalogLevelSensorKey (analogSensorName);
-            }
-            waterLevelGroups[name].DisconnectAnalogSensorAlarmsFromDataLogger ();
-            waterLevelGroups[name].analogLevelSensorName = analogSensorName;
-            waterLevelGroups[name].ConnectAnalogSensorAlarmsToDataLogger ();
+            waterLevelGroups[name].highAnalogAlarmSetpoint = highAnalogAlarmSetpoint;
+        }
+
+        /***High analog alarm enable**/
+        public static void SetWaterLevelGroupHighAnalogAlarmEnable (string name, bool enableHighAnalogAlarm) {
+            CheckWaterLevelGroupKey (name);
+            waterLevelGroups[name].enableHighAnalogAlarm = enableHighAnalogAlarm;
+        }
+
+        /***Low analog alarm setpoint**/
+        public static void SetWaterLevelGroupLowAnalogAlarmSetpoint (string name, float lowAnalogAlarmSetpoint) {
+            CheckWaterLevelGroupKey (name);
+            waterLevelGroups[name].lowAnalogAlarmSetpoint = lowAnalogAlarmSetpoint;
+        }
+
+        /***Low analog alarm enable**/
+        public static void SetWaterLevelGroupLowAnalogAlarmEnable (string name, bool enableLowAnalogAlarm) {
+            CheckWaterLevelGroupKey (name);
+            waterLevelGroups[name].enableLowAnalogAlarm = enableLowAnalogAlarm;
         }
 
         /**************************************************************************************************************/
@@ -469,10 +541,7 @@ namespace AquaPic.Modules
         public static void AddAnalogLevelSensor (
             string name,
             bool enable,
-            bool enableHighLevelAlarm,
-            float highLevelAlarmSetpoint,
-            bool enableLowLevelAlarm,
-            float lowLevelAlarmSetpoint,
+            string waterLevelGroupName, 
             IndividualControl ic,
             float zeroScaleCalibrationValue,
             float fullScaleCalibrationActual,
@@ -485,11 +554,8 @@ namespace AquaPic.Modules
             analogLevelSensors.Add (name, new WaterLevelSensor (
                 name,
                 ic,
-                highLevelAlarmSetpoint,
-                lowLevelAlarmSetpoint,
-                enable,
-                enableHighLevelAlarm,
-                enableLowLevelAlarm
+                waterLevelGroupName,
+                enable
             ));
 
             analogLevelSensors[name].zeroScaleValue = zeroScaleCalibrationValue;
@@ -500,10 +566,7 @@ namespace AquaPic.Modules
         public static void AddAnalogLevelSensor (
             string name,
             bool enable,
-            bool enableHighLevelAlarm,
-            float highLevelAlarmSetpoint,
-            bool enableLowLevelAlarm,
-            float lowLevelAlarmSetpoint,
+            string waterLevelGroupName, 
             IndividualControl ic
         ) {
             if (!AnalogLevelSensorNameOk (name)) {
@@ -513,21 +576,13 @@ namespace AquaPic.Modules
             analogLevelSensors.Add (name, new WaterLevelSensor (
                 name,
                 ic,
-                highLevelAlarmSetpoint,
-                lowLevelAlarmSetpoint,
-                enable,
-                enableHighLevelAlarm,
-                enableLowLevelAlarm
+                waterLevelGroupName,
+                enable
             ));
         }
 
         public static void RemoveAnalogLevelSensor (string analogLevelSensorName) {
             CheckAnalogLevelSensorKey (analogLevelSensorName);
-            foreach (var waterGroup in waterLevelGroups.Values) {
-                if (waterGroup.analogLevelSensorName == analogLevelSensorName) {
-                    waterGroup.analogLevelSensorName = string.Empty;
-                }
-            }
             analogLevelSensors[analogLevelSensorName].Remove ();
             analogLevelSensors.Remove (analogLevelSensorName);
         }
@@ -579,40 +634,10 @@ namespace AquaPic.Modules
             return analogLevelSensors[analogLevelSensorName].enable;
         }
 
-        /***High level alarm enable***/
-        public static bool GetAnalogLevelSensorHighLevelAlarmEnable (string analogLevelSensorName) {
+        /***Water Level Group Name***/
+        public static string GetAnalogLevelSensorWaterLevelGroupName (string analogLevelSensorName) {
             CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].enableHighAlarm;
-        }
-
-        /***High level alarm setpoint***/
-        public static float GetAnalogLevelSensorHighLevelAlarmSetpoint (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].highAlarmSetpoint;
-        }
-
-        /***High level alarm index***/
-        public static int GetAnalogLevelSensorHighLevelAlarmIndex (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].highAlarmIndex;
-        }
-
-        /***Low level alarm enable***/
-        public static bool GetAnalogLevelSensorLowLevelAlarmEnable (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].enableLowAlarm;
-        }
-
-        /***Low level alarm setpoint***/
-        public static float GetAnalogLevelSensorLowLevelAlarmSetpoint (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].lowAlarmSetpoint;
-        }
-
-        /***Low level alarm index***/
-        public static int GetAnalogLevelSensorLowLevelAlarmIndex (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].lowAlarmIndex;
+            return analogLevelSensors[analogLevelSensorName].waterLevelGroupName;
         }
 
         /***Connected***/
@@ -665,35 +690,17 @@ namespace AquaPic.Modules
             analogLevelSensors[analogLevelSensorName].enable = enable;
         }
 
+        /***Water Level Group Name***/
+        public static void SetAnalogLevelSensorWaterLevelGroupName (string analogLevelSensorName, string waterLevelGroupName) {
+            CheckAnalogLevelSensorKey (analogLevelSensorName);
+            analogLevelSensors[analogLevelSensorName].waterLevelGroupName = waterLevelGroupName;
+        }
+
         /***Individual Control***/
         public static void SetAnalogLevelSensorIndividualControl (string analogLevelSensorName, IndividualControl channel) {
             CheckAnalogLevelSensorKey (analogLevelSensorName);
             analogLevelSensors[analogLevelSensorName].Remove ();
             analogLevelSensors[analogLevelSensorName].Add (channel);
-        }
-
-        /***High level alarm enable***/
-        public static void SetAnalogLevelSensorHighLevelAlarmEnable (string analogLevelSensorName, bool enableHighLevelAlarm) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            analogLevelSensors[analogLevelSensorName].enableHighAlarm = enableHighLevelAlarm;
-        }
-
-        /***High level alarm setpoint***/
-        public static void SetAnalogLevelSensorHighLevelAlarmSetpoint (string analogLevelSensorName, float highLevelAlarmSetpoint) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            analogLevelSensors[analogLevelSensorName].highAlarmSetpoint = highLevelAlarmSetpoint;
-        }
-
-        /***Low level alarm enable***/
-        public static void SetAnalogLevelSensorLowLevelAlarmEnable (string analogLevelSensorName, bool enableLowLevelAlarm) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            analogLevelSensors[analogLevelSensorName].enableLowAlarm = enableLowLevelAlarm;
-        }
-
-        /***Low level alarm setpoint***/
-        public static void SetAnalogLevelSensorLowLevelAlarmSetpoint (string analogLevelSensorName, float lowLevelAlarmSetpoint) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            analogLevelSensors[analogLevelSensorName].lowAlarmSetpoint = lowLevelAlarmSetpoint;
         }
 
         /***Calibration data***/

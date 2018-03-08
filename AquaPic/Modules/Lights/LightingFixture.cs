@@ -77,7 +77,7 @@ namespace AquaPic.Modules
             }
 
             public bool OnPlugControl () {
-                if (highTempLockout && Alarm.CheckAlarming (Temperature.highTemperatureAlarmIndex))
+                if (highTempLockout && Alarm.CheckAlarming (Temperature.defaultHighTemperatureAlarmIndex))
                     return false;
 
                 DateSpan now = DateSpan.Now;

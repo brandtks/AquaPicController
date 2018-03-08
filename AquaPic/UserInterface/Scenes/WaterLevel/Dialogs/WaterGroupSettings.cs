@@ -71,32 +71,104 @@ namespace AquaPic.UserInterface
             }
             AddSetting (t);
 
-            var c = new SettingsComboBox ();
-            c.text = "Analog Sensor Name";
-            c.combo.comboList.Add ("None");
-            c.combo.activeIndex = 0;
-            string[] analogSensorNames = WaterLevel.GetAllAnalogLevelSensors ();
-            c.combo.comboList.AddRange (analogSensorNames);
+            var s = new SettingSelectorSwitch ();
+            s.text = "Enable High Alarm";
             if (groupName.IsNotEmpty ()) {
-                var analogSensorName = WaterLevel.GetWaterLevelGroupAnalogSensorName (groupName);
-                for (int i = 0; i < c.combo.comboList.Count; ++i) {
-                    if (analogSensorName == c.combo.comboList[i]) {
-                        c.combo.activeIndex = i;
-                        break;
-                    }
+                if (WaterLevel.GetWaterLevelGroupHighAnalogAlarmEnable (groupName)) {
+                    s.selectorSwitch.currentSelected = 0;
+                } else {
+                    s.selectorSwitch.currentSelected = 1;
                 }
+            } else {
+                s.selectorSwitch.currentSelected = 1;
             }
-            AddSetting (c);
+            AddSetting (s);
+
+            t = new SettingsTextBox ();
+            t.text = "High Alarm";
+            if (groupName.IsNotEmpty ()) {
+                t.textBox.text = WaterLevel.GetWaterLevelGroupHighAnalogAlarmSetpoint (groupName).ToString ();
+            } else {
+                t.textBox.text = "0.0";
+            }
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    float highAlarmStpnt = Convert.ToSingle (args.text);
+
+                    if (highAlarmStpnt < 0.0f) {
+                        MessageBox.Show ("High alarm setpoint can't be negative");
+                        args.keepText = false;
+                        return;
+                    }
+
+                    float lowAlarmStpnt = Convert.ToSingle (((SettingsTextBox)settings["Low Alarm"]).textBox.text);
+
+                    if (lowAlarmStpnt >= highAlarmStpnt) {
+                        MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
+                        args.keepText = false;
+                        return;
+                    }
+                } catch {
+                    MessageBox.Show ("Improper high alarm setpoint format");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
+
+            s = new SettingSelectorSwitch ();
+            s.text = "Enable Low Alarm";
+            if (groupName.IsNotEmpty ()) {
+                if (WaterLevel.GetWaterLevelGroupLowAnalogAlarmEnable (groupName)) {
+                    s.selectorSwitch.currentSelected = 0;
+                } else {
+                    s.selectorSwitch.currentSelected = 1;
+                }
+            } else {
+                s.selectorSwitch.currentSelected = 1;
+            }
+            AddSetting (s);
+
+            t = new SettingsTextBox ();
+            t.text = "Low Alarm";
+            if (groupName.IsNotEmpty ()) {
+                t.textBox.text = WaterLevel.GetWaterLevelGroupLowAnalogAlarmSetpoint (groupName).ToString ();
+            } else {
+                t.textBox.text = "0.0";
+            }
+            t.textBox.TextChangedEvent += (sender, args) => {
+                try {
+                    float lowAlarmStpnt = Convert.ToSingle (args.text);
+
+                    if (lowAlarmStpnt < 0.0f) {
+                        MessageBox.Show ("Low alarm setpoint can't be negative");
+                        args.keepText = false;
+                        return;
+                    }
+
+                    float highAlarmStpnt = Convert.ToSingle (((SettingsTextBox)settings["High Alarm"]).textBox.text);
+
+                    if (lowAlarmStpnt >= highAlarmStpnt) {
+                        MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
+                        args.keepText = false;
+                        return;
+                    }
+                } catch {
+                    MessageBox.Show ("Improper low alarm setpoint format");
+                    args.keepText = false;
+                }
+            };
+            AddSetting (t);
 
             DrawSettings ();
         }
 
         protected bool OnSave (object sender) {
             var name = (settings["Name"] as SettingsTextBox).textBox.text;
-            var analogSensorName = (settings["Analog Sensor Name"] as SettingsComboBox).combo.activeText;
-            if (analogSensorName == "None") {
-                analogSensorName = string.Empty;
-            }
+
+            var highAnalogAlarmSetpoint = Convert.ToSingle ((settings["High Alarm"] as SettingsTextBox).textBox.text);
+            var enableHighAnalogAlarm = (settings["Enable High Alarm"] as SettingSelectorSwitch).selectorSwitch.currentSelected == 0;
+            var lowAnalogAlarmSetpoint = Convert.ToSingle ((settings["Low Alarm"] as SettingsTextBox).textBox.text);
+            var enableLowAnalogAlarm = (settings["Enable Low Alarm"] as SettingSelectorSwitch).selectorSwitch.currentSelected == 0;
 
             var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "waterLevelProperties.json");
@@ -110,18 +182,29 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                WaterLevel.AddWaterLevelGroup (name, analogSensorName);
+                WaterLevel.AddWaterLevelGroup (
+                    name,
+                    highAnalogAlarmSetpoint,
+                    enableHighAnalogAlarm,
+                    lowAnalogAlarmSetpoint,
+                    enableLowAnalogAlarm);
 
                 var jobj = new JObject ();
 
                 jobj.Add (new JProperty ("name", name));
-                jobj.Add (new JProperty ("analogLevelSensorName", analogSensorName));
+                jobj.Add (new JProperty ("highAnalogAlarmSetpoint", highAnalogAlarmSetpoint.ToString ()));
+                jobj.Add (new JProperty ("enableHighAnalogAlarm", enableHighAnalogAlarm.ToString ()));
+                jobj.Add (new JProperty ("lowAnalogAlarmSetpoint", lowAnalogAlarmSetpoint.ToString ()));
+                jobj.Add (new JProperty ("enableLowAnalogAlarm", enableLowAnalogAlarm.ToString ()));
 
                 (jo["waterLevelGroups"] as JArray).Add (jobj);
 
                 groupName = name;
             } else {
-                WaterLevel.SetWaterLevelGroupAnalogSensorName (groupName, analogSensorName);
+                WaterLevel.SetWaterLevelGroupHighAnalogAlarmSetpoint (groupName, highAnalogAlarmSetpoint);
+                WaterLevel.SetWaterLevelGroupHighAnalogAlarmEnable (groupName, enableHighAnalogAlarm);
+                WaterLevel.SetWaterLevelGroupLowAnalogAlarmSetpoint (groupName, lowAnalogAlarmSetpoint);
+                WaterLevel.SetWaterLevelGroupLowAnalogAlarmEnable (groupName, enableLowAnalogAlarm);
 
                 var ja = jo["waterLevelGroups"] as JArray;
                 int arrIdx = -1;
@@ -138,7 +221,10 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                ((JArray)jo["waterLevelGroups"])[arrIdx]["analogLevelSensorName"] = analogSensorName;
+                ja[arrIdx]["highAnalogAlarmSetpoint"] = highAnalogAlarmSetpoint.ToString ();
+                ja[arrIdx]["enableHighAnalogAlarm"] = enableHighAnalogAlarm.ToString ();
+                ja[arrIdx]["lowAnalogAlarmSetpoint"] = lowAnalogAlarmSetpoint.ToString ();
+                ja[arrIdx]["enableLowAnalogAlarm"] = enableLowAnalogAlarm.ToString ();
             }
 
             File.WriteAllText (path, jo.ToString ());

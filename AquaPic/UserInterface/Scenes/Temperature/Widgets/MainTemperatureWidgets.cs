@@ -101,7 +101,7 @@ namespace AquaPic.UserInterface
                     label.text = "Disconnected";
                 }
             } else {
-                currentValue = Temperature.temperature;
+                currentValue = Temperature.defaultTemperature;
             }
         }
     }
