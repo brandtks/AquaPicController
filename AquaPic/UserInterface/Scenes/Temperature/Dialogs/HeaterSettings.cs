@@ -47,9 +47,6 @@ namespace AquaPic.UserInterface
         {
             this.heaterName = heaterName;
 
-            SaveEvent += OnSave;
-            DeleteButtonEvent += OnDelete;
-
             var t = new SettingsTextBox ("Name");
             if (this.heaterName.IsNotEmpty ()) {
                 t.textBox.text = this.heaterName;
@@ -96,7 +93,7 @@ namespace AquaPic.UserInterface
             i = Convert.ToByte (s.Substring (idx + 2));
         }
         
-        protected bool OnSave (object sender) {
+        protected override bool OnSave (object sender) {
             var unparseOutletString = (settings ["Outlet"] as SettingsComboBox).combo.activeText;
             var name = (settings["Name"] as SettingsTextBox).textBox.text;
             var temperatureGroupName = (settings["Temperature Group"] as SettingsComboBox).combo.activeText;
@@ -190,7 +187,7 @@ namespace AquaPic.UserInterface
             return true;
         }
 
-        protected bool OnDelete (object sender) {
+        protected override bool OnDelete (object sender) {
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 

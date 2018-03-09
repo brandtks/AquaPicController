@@ -38,8 +38,6 @@ namespace AquaPic.UserInterface
         public AddSlaveSettings ()
             : base ("Add Slave Module", false, 400)
         {
-            SaveEvent += OnSave;
-
             var c = new SettingsComboBox ("Type");
             c.combo.comboList.AddRange (new string[] {
                 "Power",
@@ -78,7 +76,7 @@ namespace AquaPic.UserInterface
             DrawSettings ();
         }
 
-        protected bool OnSave (object sender) {
+        protected override bool OnSave (object sender) {
             var typeNumber = (settings["Type"] as SettingsComboBox).combo.activeIndex;
             if (typeNumber == -1) {
                 MessageBox.Show ("Please select a slave type");

@@ -74,7 +74,7 @@ namespace AquaPic.Modules
                 Alarm.AddAlarmHandler (lowAnalogAlarmIndex, OnLowAlarm);
 
                 highSwitchAlarmIndex = Alarm.Subscribe (string.Format ("{0} High Water Level (Switch)", this.name));
-                lowSwitchAlarmIndex = Alarm.Subscribe (string.Format ("{0} High Water Level (Switch)", this.name));
+                lowSwitchAlarmIndex = Alarm.Subscribe (string.Format ("{0} Low Water Level (Switch)", this.name));
                 Alarm.AddAlarmHandler (highSwitchAlarmIndex, OnHighAlarm);
                 Alarm.AddAlarmHandler (lowSwitchAlarmIndex, OnLowAlarm);
             }
@@ -97,23 +97,15 @@ namespace AquaPic.Modules
                     dataLogger.AddEntry (level);
 
                     if (enableHighAnalogAlarm && (level > highAnalogAlarmSetpoint)) {
-                        if (!Alarm.CheckAlarming (highAnalogAlarmIndex)) {
-                            Alarm.Post (highAnalogAlarmIndex);
-                        }
+                        Alarm.Post (highAnalogAlarmIndex);
                     } else {
-                        if (Alarm.CheckAlarming (highAnalogAlarmIndex)) {
-                            Alarm.Clear (highAnalogAlarmIndex);
-                        }
+                        Alarm.Clear (highAnalogAlarmIndex);
                     }
 
                     if (enableLowAnalogAlarm && (level < lowAnalogAlarmSetpoint)) {
-                        if (!Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
-                            Alarm.Post (lowAnalogAlarmIndex);
-                        }
+                        Alarm.Post (lowAnalogAlarmIndex);
                     } else {
-                        if (Alarm.CheckAlarming (lowAnalogAlarmIndex)) {
-                            Alarm.Clear (lowAnalogAlarmIndex);
-                        }
+                        Alarm.Clear (lowAnalogAlarmIndex);
                     }
                 } else {
                     dataLogger.AddEntry ("probe disconnected");

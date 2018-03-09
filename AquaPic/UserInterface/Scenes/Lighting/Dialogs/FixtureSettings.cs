@@ -22,14 +22,13 @@
 #endregion // License
 
 using System;
-using System.IO;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
 using AquaPic.Globals;
 using AquaPic.Drivers;
+using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
@@ -45,9 +44,6 @@ namespace AquaPic.UserInterface
         public FixtureSettings (string fixtureName, bool includeDelete)
             : base (fixtureName, includeDelete) 
         {
-            SaveEvent += OnSave;
-            DeleteButtonEvent += OnDelete;
-
             this.fixtureName = fixtureName;
 
             var t = new SettingsTextBox ("Name");
@@ -244,7 +240,7 @@ namespace AquaPic.UserInterface
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
-        protected bool OnSave (object sender) {
+        protected override bool OnSave (object sender) {
             string name = ((SettingsTextBox)settings ["Name"]).textBox.text;
 
             string outletStr = ((SettingsComboBox)settings ["Outlet"]).combo.activeText;
@@ -304,11 +300,8 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = System.IO.Path.Combine (path, "lightingProperties.json");
-
-            string json = File.ReadAllText (path);
-            JObject jo = (JObject)JToken.Parse (json);
+            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties");
+            var ja = jo["lightingFixtures"] as JArray;
 
             if (fixtureName.IsEmpty ()) {
                 if (name == "Enter name") {
@@ -363,7 +356,7 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("onTimeOffset", onOffset.ToString ()));
                 jobj.Add (new JProperty ("offTimeOffset", offOffset.ToString ()));
 
-                ((JArray)jo ["lightingFixtures"]).Add (jobj);
+                ja.Add (jobj);
 
                 fixtureName = name;
             } else {
@@ -402,40 +395,30 @@ namespace AquaPic.UserInterface
                         chIc = Lighting.GetDimmingChannelIndividualControl (fixtureName);
                     }
 
-                    JArray ja = jo ["lightingFixtures"] as JArray;
-
-                    int arrIdx = -1;
-                    for (int i = 0; i < ja.Count; ++i) {
-                        string n = (string)ja [i] ["name"];
-                        if (oldName == n) {
-                            arrIdx = i;
-                            break;
-                        }
-                    }
-
+                    int arrIdx = SettingsHelper.FindSettingsInArray (ja, oldName);
                     if (arrIdx == -1) {
                         MessageBox.Show ("Something went wrong");
                         return false;
                     }
 
-                    ((JArray)jo["lightingFixtures"])[arrIdx]["name"] = name;
-                    ((JArray)jo["lightingFixtures"])[arrIdx]["powerStrip"] = Power.GetPowerStripName (outletIc.Group);
-                    ((JArray)jo["lightingFixtures"])[arrIdx]["outlet"] = outletIc.Individual.ToString ();
+                    ja[arrIdx]["name"] = name;
+                    ja[arrIdx]["powerStrip"] = Power.GetPowerStripName (outletIc.Group);
+                    ja[arrIdx]["outlet"] = outletIc.Individual.ToString ();
                     if (lTime == LightingTime.Daytime)
-                        ((JArray)jo["lightingFixtures"])[arrIdx]["lightingTime"] = "day";
+                        ja[arrIdx]["lightingTime"] = "day";
                     else
-                        ((JArray)jo["lightingFixtures"])[arrIdx]["lightingTime"] = "night";
-                    ((JArray)jo["lightingFixtures"])[arrIdx]["highTempLockout"] = highTempLockout.ToString ();
-                    ((JArray)jo["lightingFixtures"])[arrIdx]["autoTimeUpdate"] = autoTimeUpdate.ToString ();
-                    ((JArray)jo["lightingFixtures"])[arrIdx]["onTimeOffset"] = onOffset.ToString ();
-                    ((JArray)jo["lightingFixtures"])[arrIdx]["offTimeOffset"] = offOffset.ToString ();
+                        ja[arrIdx]["lightingTime"] = "night";
+                    ja[arrIdx]["highTempLockout"] = highTempLockout.ToString ();
+                    ja[arrIdx]["autoTimeUpdate"] = autoTimeUpdate.ToString ();
+                    ja[arrIdx]["onTimeOffset"] = onOffset.ToString ();
+                    ja[arrIdx]["offTimeOffset"] = offOffset.ToString ();
 
                     if (dimmingFixture) {
-                        ((JArray)jo["lightingFixtures"])[arrIdx]["dimmingCard"] = AquaPicDrivers.AnalogOutput.GetCardName (chIc.Group);
-                        ((JArray)jo["lightingFixtures"])[arrIdx]["channel"] = chIc.Individual.ToString ();
-                        ((JArray)jo["lightingFixtures"])[arrIdx]["minDimmingOutput"] = minDimming.ToString ();
-                        ((JArray)jo["lightingFixtures"])[arrIdx]["maxDimmingOutput"] = maxDimming.ToString ();
-                        ((JArray)jo["lightingFixtures"])[arrIdx]["analogType"] = aType.ToString ();
+                        ja[arrIdx]["dimmingCard"] = AquaPicDrivers.AnalogOutput.GetCardName (chIc.Group);
+                        ja[arrIdx]["channel"] = chIc.Individual.ToString ();
+                        ja[arrIdx]["minDimmingOutput"] = minDimming.ToString ();
+                        ja[arrIdx]["maxDimmingOutput"] = maxDimming.ToString ();
+                        ja[arrIdx]["analogType"] = aType.ToString ();
                     }
                 } else {
                     MessageBox.Show ("Can't change dimmablility");
@@ -443,40 +426,23 @@ namespace AquaPic.UserInterface
                 }
             }
 
-            File.WriteAllText (path, jo.ToString ());
-
+            SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
             return true;
         }
 
-        protected bool OnDelete (object sender) {
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = System.IO.Path.Combine (path, "lightingProperties.json");
+        protected override bool OnDelete (object sender) {
+            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties");
+            var ja = jo["lightingFixtures"] as JArray;
 
-            string json = File.ReadAllText (path);
-
-            JObject jo = (JObject)JToken.Parse (json);
-            JArray ja = jo ["lightingFixtures"] as JArray;
-
-            int arrIdx = -1;
-            for (int i = 0; i < ja.Count; ++i) {
-                string n = (string)ja [i] ["name"];
-                if (fixtureName == n) {
-                    arrIdx = i;
-                    break;
-                }
-            }
-
+            int arrIdx = SettingsHelper.FindSettingsInArray (ja, fixtureName);
             if (arrIdx == -1) {
                 MessageBox.Show ("Something went wrong");
                 return false;
             }
 
-            ((JArray)jo ["lightingFixtures"]).RemoveAt (arrIdx);
-
-            File.WriteAllText (path, jo.ToString ());
-
+            ja.RemoveAt (arrIdx);
+            SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
             Lighting.RemoveLight (fixtureName);
-
             return true;
         }
     }

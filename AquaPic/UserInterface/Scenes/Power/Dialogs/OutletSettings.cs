@@ -44,9 +44,6 @@ namespace AquaPic.UserInterface
         public OutletSettings (string name, bool includeDelete, IndividualControl ic)
             : base (name, includeDelete, 400)
         {
-            SaveEvent += OnSave;
-            DeleteButtonEvent += OnDelete;
-
             this.ic = ic;
 
             tv = new TextView ();
@@ -127,7 +124,7 @@ namespace AquaPic.UserInterface
             DrawSettings ();
         }
 
-        protected bool OnSave (object sender) {
+        protected override bool OnSave (object sender) {
             string name = ((SettingsTextBox)settings ["Name"]).textBox.text;
 
             MyState fallback = MyState.Off;
@@ -214,7 +211,7 @@ namespace AquaPic.UserInterface
             return true;
         }
 
-        protected bool OnDelete (object sender) {
+        protected override bool OnDelete (object sender) {
             Power.RemoveOutlet (ic);
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");

@@ -22,20 +22,17 @@
 #endregion // License
 
 using System;
-using System.IO;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
+using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
     public class LightingSettings : TouchSettingsDialog
     {
         public LightingSettings () : base ("Lighting") {
-            SaveEvent += OnSave;
-
             var t = new SettingsTextBox ("Latitude");
             t.textBox.text = Lighting.latitude.ToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -147,21 +144,17 @@ namespace AquaPic.UserInterface
             DrawSettings ();
         }
 
-        protected bool OnSave (object sender) {
-            Lighting.latitude = Convert.ToDouble ((settings["Latitude"] as SettingsTextBox).textBox.text);
-            Lighting.longitude = Convert.ToDouble ((settings["Longitude"] as SettingsTextBox).textBox.text);
-            Lighting.defaultSunRise = Time.Parse ((settings["Default Rise"] as SettingsTextBox).textBox.text);
-            Lighting.defaultSunSet = Time.Parse ((settings["Default Set"] as SettingsTextBox).textBox.text);
-            Lighting.minSunRise = Time.Parse ((settings ["Min Sunrise"] as SettingsTextBox).textBox.text);
-            Lighting.maxSunRise = Time.Parse ((settings["Max Sunrise"] as SettingsTextBox).textBox.text);
-            Lighting.minSunSet = Time.Parse ((settings["Min Sunset"] as SettingsTextBox).textBox.text);
-            Lighting.maxSunSet = Time.Parse ((settings["Max Sunset"] as SettingsTextBox).textBox.text);
+        protected override bool OnSave (object sender) {
+            Lighting.latitude = Convert.ToDouble (settings["Latitude"].setting);
+            Lighting.longitude = Convert.ToDouble (settings["Longitude"].setting);
+            Lighting.defaultSunRise = Time.Parse ((string)settings["Default Rise"].setting);
+            Lighting.defaultSunSet = Time.Parse ((string)settings["Default Set"].setting);
+            Lighting.minSunRise = Time.Parse ((string)settings ["Min Sunrise"].setting);
+            Lighting.maxSunRise = Time.Parse ((string)settings["Max Sunrise"].setting);
+            Lighting.minSunSet = Time.Parse ((string)settings["Min Sunset"].setting);
+            Lighting.maxSunSet = Time.Parse ((string)settings["Max Sunset"].setting);
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = System.IO.Path.Combine (path, "lightingProperties.json");
-
-            string json = File.ReadAllText (path);
-            var jo = (JObject)JToken.Parse (json);
+            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties");
 
             jo["latitude"] = Lighting.latitude.ToString ();
             jo["longitude"] = Lighting.longitude.ToString ();
@@ -184,10 +177,8 @@ namespace AquaPic.UserInterface
             jo["maxSunSet"]["hour"] = Lighting.maxSunSet.hour.ToString ();
             jo["maxSunSet"]["minute"] = Lighting.maxSunSet.minute.ToString ();
 
-            File.WriteAllText (path, jo.ToString ());
-
+            SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
             Lighting.UpdateRiseSetTimes ();
-
             return true;
         }
     }

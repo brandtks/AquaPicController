@@ -45,9 +45,6 @@ namespace AquaPic.UserInterface
             : base (name + " Temperature", includeDelete) {
             groupName = name;
 
-            SaveEvent += OnSave;
-            DeleteButtonEvent += OnDelete;
-
             var t = new SettingsTextBox ("Name");
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = groupName;
@@ -136,7 +133,7 @@ namespace AquaPic.UserInterface
             DrawSettings ();
         }
 
-        protected bool OnSave (object sender) {
+        protected override bool OnSave (object sender) {
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "tempProperties.json");
 
@@ -212,7 +209,7 @@ namespace AquaPic.UserInterface
             return true;
         }
 
-        protected bool OnDelete (object sender) {
+        protected override bool OnDelete (object sender) {
             if (groupName == Temperature.defaultTemperatureGroup) {
                 var parent = Toplevel as Window;
                 if (parent != null) {
