@@ -99,8 +99,7 @@ namespace AquaPic.UserInterface
             };
             fix.Put (verifyBtn, 275, 365);
 
-            var t = new SettingsTextBox ();
-            t.text = "Name";
+            var t = new SettingsTextBox ("Name");
             if (includeDelete)
                 t.textBox.text = Power.GetOutletName (ic);
             else
@@ -115,8 +114,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            var s = new SettingSelectorSwitch ("On", "Off");
-            s.text = "Fallback";
+            var s = new SettingsSelectorSwitch ("Fallback", "On", "Off");
             if (includeDelete) {
                 if (Power.GetOutletFallback (ic) == MyState.On)
                     s.selectorSwitch.currentSelected = 0;
@@ -134,7 +132,7 @@ namespace AquaPic.UserInterface
 
             MyState fallback = MyState.Off;
             try {
-                SettingSelectorSwitch s = settings ["Fallback"] as SettingSelectorSwitch;
+                SettingsSelectorSwitch s = settings ["Fallback"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected == 0)
                     fallback = MyState.On;
                 else

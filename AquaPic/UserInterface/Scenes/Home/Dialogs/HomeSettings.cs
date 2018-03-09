@@ -102,8 +102,7 @@ namespace AquaPic.UserInterface
             fix.Put (widgetLabel, 5, 11);
             widgetLabel.Show ();
 
-            rowTextBox = new SettingsTextBox ();
-            rowTextBox.text = "Row Origin";
+            rowTextBox = new SettingsTextBox ("Row Origin");
             rowTextBox.textBox.TextChangedEvent += (o, a) => {
                 if (widgetCombo.activeIndex != -1) {
                     var newRow = widgets[widgetCombo.activeIndex].rowOrigin;
@@ -144,8 +143,7 @@ namespace AquaPic.UserInterface
             fix.Put (rowUpDownBtn, 125, 72);
             rowUpDownBtn.Show ();
 
-            columnTextBox = new SettingsTextBox ();
-            columnTextBox.text = "Column Origin";
+            columnTextBox = new SettingsTextBox ("Column Origin");
             columnTextBox.textBox.TextChangedEvent += (o, a) => {
                 if (widgetCombo.activeIndex != -1) {
                     var newColumn = widgets[widgetCombo.activeIndex].columnOrigin;

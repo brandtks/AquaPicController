@@ -172,34 +172,30 @@ namespace AquaPic.UserInterface
             b.SetSizeRequest (100, 60);
             b.ButtonReleaseEvent += (o, args) => {
                 if (analogSensorName.IsNotEmpty ()) {
-                    if (WaterLevel.GetAnalogLevelSensorEnable (analogSensorName)) {
-                        var cal = new CalibrationDialog (
-                            "Water Level Sensor",
-                            () => {
-                                return AquaPicDrivers.AnalogInput.GetChannelValue (
-                                    WaterLevel.GetAnalogLevelSensorIndividualControl (analogSensorName)
-                                );
-                            });
+                    var cal = new CalibrationDialog (
+                        "Water Level Sensor",
+                        () => {
+                            return AquaPicDrivers.AnalogInput.GetChannelValue (
+                                WaterLevel.GetAnalogLevelSensorIndividualControl (analogSensorName)
+                            );
+                        });
 
-                        cal.CalibrationCompleteEvent += (aa) => {
-                            WaterLevel.SetCalibrationData (
-                                analogSensorName, 
-                                (float)aa.zeroValue,
-                                (float)aa.fullScaleActual,
-                                (float)aa.fullScaleValue);
-                        };
+                    cal.CalibrationCompleteEvent += (aa) => {
+                        WaterLevel.SetCalibrationData (
+                            analogSensorName, 
+                            (float)aa.zeroValue,
+                            (float)aa.fullScaleActual,
+                            (float)aa.fullScaleValue);
+                    };
 
-                        cal.calArgs.zeroValue = WaterLevel.GetAnalogLevelSensorZeroScaleValue (analogSensorName);
-                        cal.calArgs.fullScaleActual = WaterLevel.GetAnalogLevelSensorFullScaleActual (analogSensorName);
-                        cal.calArgs.fullScaleValue =WaterLevel.GetAnalogLevelSensorFullScaleValue (analogSensorName);
+                    cal.calArgs.zeroValue = WaterLevel.GetAnalogLevelSensorZeroScaleValue (analogSensorName);
+                    cal.calArgs.fullScaleActual = WaterLevel.GetAnalogLevelSensorFullScaleActual (analogSensorName);
+                    cal.calArgs.fullScaleValue =WaterLevel.GetAnalogLevelSensorFullScaleValue (analogSensorName);
 
-                        cal.Run ();
-                        cal.Destroy ();
-                        cal.Dispose ();
-                    } else {
-                        MessageBox.Show ("Analog water level sensor is disabled\n" +
-                                        "Can't perfom a calibration");
-                    }
+                    cal.Run ();
+                    cal.Destroy ();
+                    cal.Dispose ();
+
                 } else {
                     MessageBox.Show ("Can't calibrate a none existent sensor");
                 }
@@ -424,17 +420,13 @@ namespace AquaPic.UserInterface
 
         protected void GetAnalogSensorData () {
             if (analogSensorName.IsNotEmpty ()) {
-                if (WaterLevel.GetAnalogLevelSensorEnable (analogSensorName)) {
-                    float wl = WaterLevel.GetAnalogLevelSensorLevel (analogSensorName);
-                    if (wl < 0.0f) {
-                        analogLevelTextBox.text = "Probe Disconnected";
-                        analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-                    } else {
-                        analogLevelTextBox.text = wl.ToString ("F2");
-                        analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-                    }
+                float wl = WaterLevel.GetAnalogLevelSensorLevel (analogSensorName);
+                if (wl < 0.0f) {
+                    analogLevelTextBox.text = "Probe Disconnected";
+                    analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
                 } else {
-                    analogLevelTextBox.text = "Sensor disabled";
+                    analogLevelTextBox.text = wl.ToString ("F2");
+                    analogLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
                 }
             } else {
                 analogLevelTextBox.text = "--";

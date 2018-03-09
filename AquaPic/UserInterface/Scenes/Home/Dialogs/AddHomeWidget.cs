@@ -99,13 +99,11 @@ namespace AquaPic.UserInterface
                 fix.Put (widgetLabel, 5, 11);
                 widgetLabel.Show ();
 
-                nameTextBox = new SettingsTextBox ();
-                nameTextBox.text = "Name";
+                nameTextBox = new SettingsTextBox ("Name");
                 fix.Put (nameTextBox, 5, 40);
                 nameTextBox.Show ();
 
-                groupTextBox = new SettingsTextBox ();
-                groupTextBox.text = "Group";
+                groupTextBox = new SettingsTextBox ("Group");
                 fix.Put (groupTextBox, 305, 40);
                 groupTextBox.Show ();
 

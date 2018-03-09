@@ -63,24 +63,9 @@ namespace AquaPic.Sensors
             }
         }
 
-        private bool _enable;
-        public bool enable {
-            get {
-                return _enable;
-            }
-            set {
-                _enable = value;
-                if (!_enable) {
-                    if (disconnectedAlarmIndex != -1) {
-                        Alarm.Clear (disconnectedAlarmIndex);
-                    }
-                }
-            }
-        }
-
         public bool connected {
             get {
-                return !Alarm.CheckAlarming (disconnectedAlarmIndex);
+                return !Alarm.CheckAlarming (_sensorDisconnectedAlarmIndex);
             }
         }
 
@@ -89,9 +74,8 @@ namespace AquaPic.Sensors
         public WaterLevelSensor (
             string name,
             IndividualControl ic,
-            string waterLevelGroupName, 
-            bool enable)
-        {
+            string waterLevelGroupName
+        ) {
             _channel = ic;
             _name = name;
             _level = 0.0f;
@@ -103,13 +87,11 @@ namespace AquaPic.Sensors
             _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog level probe disconnected, " + name);
             Add (ic);
 
-            _enable = enable;
-
             this.waterLevelGroupName = waterLevelGroupName;
         }
 
         public WaterLevelSensor (string name, IndividualControl ic)
-            : this (name, ic, string.Empty, false) { }
+            : this (name, ic, string.Empty) { }
 
         public void Add (IndividualControl channel) {
             if (!_channel.Equals (channel)) {

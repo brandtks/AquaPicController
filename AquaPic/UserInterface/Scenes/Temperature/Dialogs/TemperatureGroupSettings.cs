@@ -48,8 +48,7 @@ namespace AquaPic.UserInterface
             SaveEvent += OnSave;
             DeleteButtonEvent += OnDelete;
 
-            var t = new SettingsTextBox ();
-            t.text = "Name";
+            var t = new SettingsTextBox ("Name");
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = groupName;
                 t.textBox.enableTouch = false;
@@ -70,8 +69,7 @@ namespace AquaPic.UserInterface
             }
             AddSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Setpoint";
+            t = new SettingsTextBox ("Setpoint");
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupTemperatureSetpoint (groupName).ToString ();
             } else {
@@ -87,8 +85,7 @@ namespace AquaPic.UserInterface
             };
             settings.Add (t.label.text, t);
 
-            t = new SettingsTextBox ();
-            t.text = "Deadband";
+            t = new SettingsTextBox ("Deadband");
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupTemperatureDeadband (groupName).ToString ();
             } else {
@@ -104,8 +101,7 @@ namespace AquaPic.UserInterface
             };
             settings.Add (t.label.text, t);
 
-            t = new SettingsTextBox ();
-            t.text = "High Alarm";
+            t = new SettingsTextBox ("High Alarm");
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupHighTemperatureAlarmSetpoint (groupName).ToString ();
             } else {
@@ -121,8 +117,7 @@ namespace AquaPic.UserInterface
             };
             settings.Add (t.label.text, t);
 
-            t = new SettingsTextBox ();
-            t.text = "Low Alarm";
+            t = new SettingsTextBox ("Low Alarm");
             if (groupName.IsNotEmpty ()) {
                 t.textBox.text = Temperature.GetTemperatureGroupLowTemperatureAlarmSetpoint (groupName).ToString ();
             } else {

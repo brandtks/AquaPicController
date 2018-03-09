@@ -34,28 +34,21 @@ namespace AquaPic.UserInterface
         public bool optionalSetting;
         public TouchLabel label;
 
-        public virtual string text {
-            get {
-                return label.text;
-            }
-            set {
-                label.text = value;
-            }
-        }
+        public string text => label.text;
+        public virtual object setting => text;
 
-        public SettingsWidget () {
+        public SettingsWidget (string name) {
             SetSizeRequest (290, 30);
 
             optionalSetting = false;
 
             label = new TouchLabel ();
-            label = new TouchLabel ();
             label.SetSizeRequest (115,30);
             label.textAlignment = TouchAlignment.Right;
-            label.textColor = "white";
+            //label.textColor = "white";
             label.textRender.textWrap = TouchTextWrap.Shrink;
             label.textHorizontallyCentered = true;
-            label.text = "Error: No Title";
+            label.text = name;
             Put (label, 0, 0);
             label.Show ();
 
@@ -67,20 +60,13 @@ namespace AquaPic.UserInterface
     {
         public TouchTextBox textBox;
 
-        public override string text {
-            get {
-                return label.text;
-            }
-            set {
-                textBox.name = value;
-                label.text = value;
-            }
-        }
-        
-        public SettingsTextBox () : base () {
+        public override object setting => textBox.text;
+
+		public SettingsTextBox (string name) : base (name) {
             textBox = new TouchTextBox ();
             textBox.SetSizeRequest (170, 30);
             textBox.enableTouch = true;
+            textBox.name = name;
             Put (textBox, 120, 0);
             textBox.Show ();
         }
@@ -90,7 +76,9 @@ namespace AquaPic.UserInterface
     {
         public TouchComboBox combo;
 
-        public SettingsComboBox () : base () {
+        public override object setting => combo.activeText;
+
+		public SettingsComboBox (string name) : base (name) {
             combo = new TouchComboBox ();
             combo.SetSizeRequest (170, 30);
             combo.ButtonPressEvent += OnComboButtonPressed;
@@ -109,12 +97,14 @@ namespace AquaPic.UserInterface
         }
     }
 
-    public class SettingSelectorSwitch : SettingsWidget
+    public class SettingsSelectorSwitch : SettingsWidget
     {
         public TouchSelectorSwitch selectorSwitch;
         public string[] labels;
 
-        public SettingSelectorSwitch (string label1, string label2) : base () {
+        public override object setting => selectorSwitch.currentSelected;
+
+		public SettingsSelectorSwitch (string name, string label1, string label2) : base (name) {
             selectorSwitch = new TouchSelectorSwitch (2);
             selectorSwitch.currentSelected = 0;
             selectorSwitch.sliderSize = MySliderSize.Large;
@@ -131,7 +121,7 @@ namespace AquaPic.UserInterface
             labels [1] = label2;
         }
 
-        public SettingSelectorSwitch () : this ("True", "False") { }
+        public SettingsSelectorSwitch (string name) : this (name, "True", "False") { }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
             TouchSelectorSwitch ss = sender as TouchSelectorSwitch;
@@ -148,6 +138,13 @@ namespace AquaPic.UserInterface
                 render.Render (ss, x, ss.Allocation.Top, seperation, ss.Allocation.Height);
                 x += seperation;
             }
+        }
+    }
+
+    public class SettingsBlank : SettingsWidget
+    {
+        public SettingsBlank (string name) : base (name) {
+            label.Visible = false;
         }
     }
 }

@@ -184,6 +184,7 @@
     <Compile Include="Driver\pHOrp\PhOrpCard.cs" />
     <Compile Include="Driver\pHOrp\PhOrpChannel.cs" />
     <Compile Include="Modules\ATO\AutoTopOffGroup.cs" />
+    <Compile Include="Runtime\SettingsHelper\SettingsHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -216,6 +217,7 @@
     <Folder Include="UserInterface\Scenes\ATO\Widgets\" />
     <Folder Include="Tests\" />
     <Folder Include="Driver\pHOrp\" />
+    <Folder Include="Runtime\SettingsHelper\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

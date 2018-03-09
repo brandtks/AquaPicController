@@ -40,8 +40,7 @@ namespace AquaPic.UserInterface
         {
             SaveEvent += OnSave;
 
-            var c = new SettingsComboBox ();
-            c.text = "Type";
+            var c = new SettingsComboBox ("Type");
             c.combo.comboList.AddRange (new string[] {
                 "Power",
                 "Analog Input",
@@ -52,8 +51,7 @@ namespace AquaPic.UserInterface
             c.combo.nonActiveMessage = "Select slave type";
             AddSetting (c);
 
-            var t = new SettingsTextBox ();
-            t.text = "Address";
+            var t = new SettingsTextBox ("Address");
             t.textBox.text = "Enter AquaPicBus Address";
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text)) {

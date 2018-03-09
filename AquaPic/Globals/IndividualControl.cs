@@ -51,7 +51,7 @@ namespace AquaPic.Globals
             bool check = true;
             check &= (Individual == ic.Individual);
             check &= (Group == ic.Group);
-            return check; 
+            return check;
         }
     }
 }

@@ -62,6 +62,9 @@ namespace AquaPic.UserInterface
             WindowPosition = (WindowPosition)4;
             SetSizeRequest (600, height);
 
+            SaveEvent += OnSave;
+            DeleteButtonEvent += OnDelete;
+
 #if RPI_BUILD
             Decorated = false;
 
@@ -213,6 +216,14 @@ namespace AquaPic.UserInterface
         protected void AddOptionalSetting (SettingsWidget w) {
             w.optionalSetting = true;
             settings.Add (w.label.text, w);
+        }
+
+        protected virtual bool OnSave (object sender) {
+            throw new NotImplementedException ();
+        }
+
+        protected virtual bool OnDelete (object sender) {
+            throw new NotImplementedException ();
         }
     }
 }

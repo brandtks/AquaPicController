@@ -50,8 +50,7 @@ namespace AquaPic.UserInterface
             SaveEvent += OnSave;
             DeleteButtonEvent += OnDelete;
 
-            var t = new SettingsTextBox ();
-            t.text = "Name";
+            var t = new SettingsTextBox ("Name");
             if (this.heaterName.IsNotEmpty ()) {
                 t.textBox.text = this.heaterName;
             } else {
@@ -67,8 +66,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            var c = new SettingsComboBox ();
-            c.label.text = "Outlet";
+            var c = new SettingsComboBox ("Outlet");
             if (this.heaterName.IsNotEmpty ()) {
                 IndividualControl ic = Temperature.GetHeaterIndividualControl (this.heaterName);
                 string psName = Power.GetPowerStripName (ic.Group);
@@ -80,8 +78,7 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (Power.GetAllAvaiblableOutlets ());
             AddSetting (c);
 
-            c = new SettingsComboBox ();
-            c.label.text = "Temperature Group";
+            c = new SettingsComboBox ("Temperature Group");
             c.combo.comboList.AddRange (Temperature.GetAllTemperatureGroupNames ());
             c.combo.nonActiveMessage = "Select group";
             if (this.heaterName.IsNotEmpty ()) {

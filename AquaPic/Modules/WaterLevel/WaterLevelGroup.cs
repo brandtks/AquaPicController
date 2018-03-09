@@ -88,8 +88,6 @@ namespace AquaPic.Modules
                         if (s.connected) {
                             level += s.level;
                             analogSensorCount++;
-                        } else {
-                            dataLogger.AddEntry ("probe disconnected");
                         }
                     }
                 }

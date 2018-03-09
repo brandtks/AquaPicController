@@ -36,8 +36,7 @@ namespace AquaPic.UserInterface
         public LightingSettings () : base ("Lighting") {
             SaveEvent += OnSave;
 
-            var t = new SettingsTextBox ();
-            t.text = "Latitude";
+            var t = new SettingsTextBox ("Latitude");
             t.textBox.text = Lighting.latitude.ToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
@@ -49,8 +48,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Longitude";
+            t = new SettingsTextBox ("Longitude");
             t.textBox.text = Lighting.longitude.ToString ();
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
@@ -62,8 +60,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Default Rise";
+            t = new SettingsTextBox ("Default Rise");
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.defaultSunRise.ToShortTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -77,8 +74,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Default Set";
+            t = new SettingsTextBox ("Default Set");
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.defaultSunSet.ToShortTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -92,8 +88,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Min Sunrise";
+            t = new SettingsTextBox ("Min Sunrise");
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.minSunRise.ToShortTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -107,8 +102,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Max Sunrise";
+            t = new SettingsTextBox ("Max Sunrise");
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.maxSunRise.ToShortTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -122,8 +116,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Min Sunset";
+            t = new SettingsTextBox ("Min Sunset");
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.minSunSet.ToShortTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -137,8 +130,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Max Sunset";
+            t = new SettingsTextBox ("Max Sunset");
             t.textBox.includeTimeFunctions = true;
             t.textBox.text = Lighting.maxSunSet.ToShortTimeString ();
             t.textBox.TextChangedEvent += (sender, args) => {

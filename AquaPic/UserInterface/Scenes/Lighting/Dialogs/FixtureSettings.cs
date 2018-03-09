@@ -50,8 +50,7 @@ namespace AquaPic.UserInterface
 
             this.fixtureName = fixtureName;
 
-            var t = new SettingsTextBox ();
-            t.text = "Name";
+            var t = new SettingsTextBox ("Name");
             if (this.fixtureName.IsNotEmpty ()) {
                 t.textBox.text = this.fixtureName;
             } else {
@@ -67,8 +66,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            var c = new SettingsComboBox ();
-            c.label.text = "Outlet";
+            var c = new SettingsComboBox ("Outlet");
             if (this.fixtureName.IsNotEmpty ()) {
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (this.fixtureName);
                 string psName = Power.GetPowerStripName (ic.Group);
@@ -80,8 +78,7 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (Power.GetAllAvaiblableOutlets ());
             AddSetting (c);
 
-            var s = new SettingSelectorSwitch ("Day", "Night");
-            s.text = "Lighting Time";
+            var s = new SettingsSelectorSwitch ("Lighting Time", "Day", "Night");
             if (this.fixtureName.IsNotEmpty ()) {
                 if (Lighting.GetFixtureLightingTime (this.fixtureName) == LightingTime.Daytime)
                     s.selectorSwitch.currentSelected = 0;
@@ -91,8 +88,7 @@ namespace AquaPic.UserInterface
                 s.selectorSwitch.currentSelected = 0;
             AddSetting (s);
 
-            s = new SettingSelectorSwitch ();
-            s.text = "Temp Lockout";
+            s = new SettingsSelectorSwitch ("Temp Lockout");
             if (this.fixtureName.IsNotEmpty ()) {
                 if (Lighting.GetFixtureTemperatureLockout (this.fixtureName))
                     s.selectorSwitch.currentSelected = 0;
@@ -102,8 +98,7 @@ namespace AquaPic.UserInterface
                 s.selectorSwitch.currentSelected = 0;
             AddSetting (s);
 
-            s = new SettingSelectorSwitch ();
-            s.text = "Auto Time Update";
+            s = new SettingsSelectorSwitch ("Auto Time Update");
             if (this.fixtureName.IsNotEmpty ()) {
                 if (Lighting.GetFixtureMode (this.fixtureName) == Mode.Auto)
                     s.selectorSwitch.currentSelected = 0;
@@ -113,8 +108,7 @@ namespace AquaPic.UserInterface
                 s.selectorSwitch.currentSelected = 1;
             AddSetting (s);
 
-            t = new SettingsTextBox ();
-            t.text = "On Time Offset";
+            t = new SettingsTextBox ("On Time Offset");
             if (this.fixtureName.IsNotEmpty ())
                 t.textBox.text = Lighting.GetFixtureOnTimeOffset (this.fixtureName).ToString ();
             else
@@ -129,8 +123,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Off Time Offset";
+            t = new SettingsTextBox ("Off Time Offset");
             t.textBox.includeTimeFunctions = true;
             if (this.fixtureName.IsNotEmpty ())
                 t.textBox.text = Lighting.GetFixtureOffTimeOffset (this.fixtureName).ToString ();
@@ -152,8 +145,7 @@ namespace AquaPic.UserInterface
             else
                 isDimming = false;
 
-            s = new SettingSelectorSwitch ("Yes", "No");
-            s.text = "Dimming Fixture";
+            s = new SettingsSelectorSwitch ("Dimming Fixture", "Yes", "No");
             if (isDimming) {
                 s.selectorSwitch.currentSelected = 0;
                 showOptional = true;
@@ -171,8 +163,7 @@ namespace AquaPic.UserInterface
             };
             AddSetting (s);
 
-            c = new SettingsComboBox ();
-            c.label.text = "Dimming Channel";
+            c = new SettingsComboBox ("Dimming Channel");
             if ((this.fixtureName.IsNotEmpty ()) && (isDimming)) {
                 IndividualControl ic = Lighting.GetDimmingChannelIndividualControl (this.fixtureName);
                 string cardName = AquaPicDrivers.AnalogOutput.GetCardName (ic.Group);
@@ -184,8 +175,7 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (AquaPicDrivers.AnalogOutput.GetAllAvaiableChannels ());
             AddOptionalSetting (c);
 
-            t = new SettingsTextBox ();
-            t.text = "Max Dimming";
+            t = new SettingsTextBox ("Max Dimming");
             if ((this.fixtureName.IsNotEmpty ()) && (isDimming))
                 t.textBox.text = Lighting.GetMaxDimmingLevel (this.fixtureName).ToString ();
             else
@@ -206,8 +196,7 @@ namespace AquaPic.UserInterface
             };
             AddOptionalSetting (t);
 
-            t = new SettingsTextBox ();
-            t.text = "Min Dimming";
+            t = new SettingsTextBox ("Min Dimming");
             if ((this.fixtureName.IsNotEmpty ()) && (isDimming))
                 t.textBox.text = Lighting.GetMinDimmingLevel (this.fixtureName).ToString ();
             else
@@ -228,8 +217,7 @@ namespace AquaPic.UserInterface
             };
             AddOptionalSetting (t);
 
-            s = new SettingSelectorSwitch ("0-10", "PWM");
-            s.text = "Dimming Type";
+            s = new SettingsSelectorSwitch ("Dimming Type", "0-10V", "PWM");
             if ((this.fixtureName.IsNotEmpty ()) && (isDimming)) {
                 if (Lighting.GetDimmingType (fixtureName) == AnalogType.ZeroTen)
                     s.selectorSwitch.currentSelected = 0;
@@ -264,7 +252,7 @@ namespace AquaPic.UserInterface
 
             LightingTime lTime = LightingTime.Daytime;
             try {
-                SettingSelectorSwitch s = settings ["Lighting Time"] as SettingSelectorSwitch;
+                SettingsSelectorSwitch s = settings ["Lighting Time"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     lTime = LightingTime.Nighttime;
             } catch {
@@ -273,7 +261,7 @@ namespace AquaPic.UserInterface
 
             bool highTempLockout = true;
             try {
-                SettingSelectorSwitch s = settings ["Temp Lockout"] as SettingSelectorSwitch;
+                SettingsSelectorSwitch s = settings ["Temp Lockout"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     highTempLockout = false;
             } catch {
@@ -282,7 +270,7 @@ namespace AquaPic.UserInterface
 
             bool autoTimeUpdate = true;
             try {
-                SettingSelectorSwitch s = settings ["Auto Time Update"] as SettingSelectorSwitch;
+                SettingsSelectorSwitch s = settings ["Auto Time Update"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     autoTimeUpdate = false;
             } catch {
@@ -294,7 +282,7 @@ namespace AquaPic.UserInterface
 
             bool dimmingFixture = true;
             try {
-                SettingSelectorSwitch s = settings ["Dimming Fixture"] as SettingSelectorSwitch;
+                SettingsSelectorSwitch s = settings ["Dimming Fixture"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     dimmingFixture = false;
             } catch {
@@ -309,7 +297,7 @@ namespace AquaPic.UserInterface
 
             AnalogType aType = AnalogType.ZeroTen;
             try {
-                var s = settings ["Dimming Type"] as SettingSelectorSwitch;
+                var s = settings ["Dimming Type"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     aType = AnalogType.PWM;
             } catch {

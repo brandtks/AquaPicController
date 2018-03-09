@@ -129,24 +129,11 @@ namespace AquaPic.Modules
                         JObject obj = jt as JObject;
 
                         var name = (string)obj["name"];
-
-                        bool enable = false;
-                        string text = (string)obj["enable"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                enable = Convert.ToBoolean (text);
-                            } catch {
-                                //
-                            }
-                        }
-
                         var waterLevelGroupName = (string)obj["waterLevelGroupName"];
 
                         var ic = IndividualControl.Empty;
-                        text = (string)obj["inputCard"];
-                        if (text.IsEmpty ()) {
-                            enable = false;
-                        } else {
+                        var text = (string)obj["inputCard"];
+                        if (text.IsNotEmpty ()) {
                             try {
                                 ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
                             } catch {
@@ -158,7 +145,6 @@ namespace AquaPic.Modules
                             text = (string)obj["channel"];
                             if (text.IsEmpty ()) {
                                 ic = IndividualControl.Empty;
-                                enable = false;
                             } else {
                                 try {
                                     ic.Individual = Convert.ToInt32 (text);
@@ -200,7 +186,6 @@ namespace AquaPic.Modules
 
                         AddAnalogLevelSensor (
                             name,
-                            enable,
                             waterLevelGroupName,
                             ic,
                             zeroScaleCalibrationValue,
@@ -540,7 +525,6 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         public static void AddAnalogLevelSensor (
             string name,
-            bool enable,
             string waterLevelGroupName, 
             IndividualControl ic,
             float zeroScaleCalibrationValue,
@@ -554,8 +538,7 @@ namespace AquaPic.Modules
             analogLevelSensors.Add (name, new WaterLevelSensor (
                 name,
                 ic,
-                waterLevelGroupName,
-                enable
+                waterLevelGroupName
             ));
 
             analogLevelSensors[name].zeroScaleValue = zeroScaleCalibrationValue;
@@ -576,15 +559,16 @@ namespace AquaPic.Modules
             analogLevelSensors.Add (name, new WaterLevelSensor (
                 name,
                 ic,
-                waterLevelGroupName,
-                enable
+                waterLevelGroupName
             ));
         }
 
         public static void RemoveAnalogLevelSensor (string analogLevelSensorName) {
             CheckAnalogLevelSensorKey (analogLevelSensorName);
             analogLevelSensors[analogLevelSensorName].Remove ();
+            Alarm.Clear (analogLevelSensors[analogLevelSensorName].disconnectedAlarmIndex);
             analogLevelSensors.Remove (analogLevelSensorName);
+
         }
 
         public static void CheckAnalogLevelSensorKey (string analogLevelSensorName) {
@@ -626,12 +610,6 @@ namespace AquaPic.Modules
         public static float GetAnalogLevelSensorLevel (string analogLevelSensorName) {
             CheckAnalogLevelSensorKey (analogLevelSensorName);
             return analogLevelSensors[analogLevelSensorName].level;
-        }
-
-        /***Enable***/
-        public static bool GetAnalogLevelSensorEnable (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].enable;
         }
 
         /***Water Level Group Name***/
@@ -682,12 +660,6 @@ namespace AquaPic.Modules
             analogLevelSensor.SetName (newAnalogLevelSensorName);
             analogLevelSensors.Remove (oldAnalogLevelSensorName);
             analogLevelSensors.Add(newAnalogLevelSensorName, analogLevelSensor);
-        }
-
-        /***Enable***/
-        public static void SetAnalogLevelSensorEnable (string analogLevelSensorName, bool enable) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            analogLevelSensors[analogLevelSensorName].enable = enable;
         }
 
         /***Water Level Group Name***/
