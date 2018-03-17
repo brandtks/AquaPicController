@@ -34,23 +34,35 @@ namespace AquaPic.UserInterface
     public class LoggerWindow : SceneBase
     {
         public TextView tv;
+        public TextBuffer buffer;
 
         public LoggerWindow (params object[] options) : base () {
             sceneTitle = "Logger";
 
-            var b = new TouchButton ();
-            b.SetSizeRequest (100, 60);
-            b.text = "Clear Logger";
-            b.ButtonReleaseEvent += OnClearButtonRelease;
-            Put (b, 685, 405);
+            TextTagTable ttt = new TextTagTable ();
+            buffer = new TextBuffer (ttt);
 
-            b = new TouchButton ();
-            b.SetSizeRequest (100, 60);
-            b.text = "Save Logger";
-            b.ButtonReleaseEvent += (o, args) => SaveEvents ();
-            Put (b, 575, 405);
+            var tag = new TextTag ("DateTimeTag");
+            tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
+            buffer.TagTable.Add (tag);
 
-            tv = new TextView (Logger.buffer);
+            tag = new TextTag ("InfoTag");
+            tag.ForegroundGdk = TouchColor.NewGtkColor ("pri");
+            buffer.TagTable.Add (tag);
+
+            tag = new TextTag ("WarningTag");
+            tag.ForegroundGdk = TouchColor.NewGtkColor ("secb");
+            buffer.TagTable.Add (tag);
+
+            tag = new TextTag ("ErrorTag");
+            tag.ForegroundGdk = TouchColor.NewGtkColor ("compl");
+            buffer.TagTable.Add (tag);
+
+            foreach (var log in Logger.logs) {
+                AddLogToBuffer (log);
+            }
+
+            tv = new TextView (buffer);
             tv.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
             tv.ModifyBase (StateType.Normal, TouchColor.NewGtkColor ("grey4"));
             tv.ModifyText (StateType.Normal, TouchColor.NewGtkColor ("black"));
@@ -66,6 +78,18 @@ namespace AquaPic.UserInterface
             sw.Show ();
             tv.Show ();
 
+            var b = new TouchButton ();
+            b.SetSizeRequest (100, 60);
+            b.text = "Clear Logger";
+            b.ButtonReleaseEvent += OnClearButtonRelease;
+            Put (b, 685, 405);
+
+            b = new TouchButton ();
+            b.SetSizeRequest (100, 60);
+            b.text = "Save Logger";
+            b.ButtonReleaseEvent += (o, args) => SaveEvents ();
+            Put (b, 575, 405);
+
             Logger.EventAddedEvent += OnEventAdded;
             Show ();
         }
@@ -75,13 +99,45 @@ namespace AquaPic.UserInterface
             base.Dispose ();
         }
 
-        protected void OnEventAdded () {
-            tv.Buffer = Logger.buffer;
+        protected void OnEventAdded (LogItem log) {
+            AddLogToBuffer (log);
             tv.QueueDraw ();
         }
 
+        protected void AddLogToBuffer (LogItem log) {
+            // Get the text tag for the time stamp
+            var tag = buffer.TagTable.Lookup ("DateTimeTag");
+            var ti = buffer.EndIter;
+            // Add the time stamp to the text buffer with the appropriate tag
+            buffer.InsertWithTags (ref ti, string.Format ("{0:MM/dd HH:mm:ss}: ", log.timeStamp), tag);
+
+            switch (log.type) {
+            case LogType.General:
+                ti = buffer.EndIter;
+                buffer.Insert (ref ti, string.Format ("{0}\n", log.message));
+                break;
+            case LogType.Info:
+                tag = buffer.TagTable.Lookup ("InfoTag");
+                ti = buffer.EndIter;
+                buffer.InsertWithTags (ref ti, string.Format ("{0}\n", log.message), tag);
+                break;
+            case LogType.Warning:
+                tag = buffer.TagTable.Lookup ("WarningTag");
+                ti = buffer.EndIter;
+                buffer.InsertWithTags (ref ti, string.Format ("{0}\n", log.message), tag);
+                break;
+            case LogType.Error:
+                tag = buffer.TagTable.Lookup ("ErrorTag");
+                ti = buffer.EndIter;
+                buffer.InsertWithTags (ref ti, string.Format ("{0}\n", log.message), tag);
+                break;
+            default:
+                break;
+            }
+        }
+
         protected void OnClearButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            var parent = this.Toplevel as Gtk.Window;
+            var parent = Toplevel as Window;
             if (parent != null) {
                 if (!parent.IsTopLevel)
                     parent = null;
@@ -92,7 +148,7 @@ namespace AquaPic.UserInterface
             ms.Response += (o, a) => {
                 if (a.ResponseId == ResponseType.Yes) {
                     SaveEvents ();
-                    Logger.buffer.Clear ();
+                    buffer.Clear ();
                 } else if (a.ResponseId == ResponseType.No) {
                     ms.Destroy ();
 
@@ -105,7 +161,7 @@ namespace AquaPic.UserInterface
 
                     d.Response += (obj, arg) => {
                         if (arg.ResponseId == ResponseType.Yes)
-                            Logger.buffer.Clear ();
+                            buffer.Clear ();
                     };
 
                     d.Run ();
@@ -118,15 +174,15 @@ namespace AquaPic.UserInterface
         }
 
         protected void SaveEvents () {
-            if (!string.IsNullOrWhiteSpace (Logger.buffer.Text)) {
+            if (!string.IsNullOrWhiteSpace (buffer.Text)) {
                 string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Logs");
                 path = System.IO.Path.Combine (path, DateTime.Now.ToString ("yy-MM-dd-HH-mm-ss") + ".txt");
 
                 List<string> lines = new List<string> ();
-                for (int i = 0; i < Logger.buffer.LineCount; ++i) {
-                    TextIter tis = Logger.buffer.GetIterAtLine (i);
-                    TextIter tie = Logger.buffer.GetIterAtLine (i + 1);
-                    lines.Add (Logger.buffer.GetText (tis, tie, true));
+                for (int i = 0; i < buffer.LineCount; ++i) {
+                    TextIter tis = buffer.GetIterAtLine (i);
+                    TextIter tie = buffer.GetIterAtLine (i + 1);
+                    lines.Add (buffer.GetText (tis, tie, true));
                 }
 
                 string[] l = lines.ToArray ();

@@ -188,6 +188,7 @@
     <Compile Include="Modules\ATO\AutoTopOff.cs" />
     <Compile Include="Modules\GenericModule\GenericModule.cs" />
     <Compile Include="Modules\GenericModule\GenericGroup.cs" />
+    <Compile Include="Runtime\Logger\LogItem.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

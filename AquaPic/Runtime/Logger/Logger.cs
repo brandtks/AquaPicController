@@ -22,21 +22,19 @@
 #endregion // License
 
 using System;
-using Gtk;
-using GoodtimeDevelopment.TouchWidget;
+using System.Collections.Generic;
 
 namespace AquaPic.Runtime
 {
-    public delegate void EventAddedHandler ();
+    public delegate void EventAddedHandler (LogItem log);
 
     public class Logger
     {
-        public static TextBuffer buffer;
         public static event EventAddedHandler EventAddedEvent;
+        public static List<LogItem> logs;
 
         static Logger () {
-            TextTagTable ttt = new TextTagTable ();
-            buffer = new TextBuffer (ttt);
+            logs = new List<LogItem> ();
         }
 
         public static void Add (string message) {
@@ -45,16 +43,14 @@ namespace AquaPic.Runtime
 
         public static void Add (string message, params object[] args) {
             message = string.Format (message, args);
-            AppendTime ();
+            var log = new LogItem (DateTime.Now, LogType.General, message);
+            logs.Add (log);
 
-            var ti = buffer.EndIter;
-            buffer.Insert (ref ti, string.Format ("{0}\n", message));
-
-            #if DEBUG
+#if DEBUG
             Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
-            #endif
+#endif
 
-            EventAddedEvent?.Invoke ();
+            EventAddedEvent?.Invoke (log);
         }
 
         public static void AddInfo (string message) {
@@ -63,42 +59,14 @@ namespace AquaPic.Runtime
 
         public static void AddInfo (string message, params object[] args) {
             message = string.Format (message, args);
-            AppendTime ();
+            var log = new LogItem (DateTime.Now, LogType.Info, message);
+            logs.Add (log);
 
-            var tag = new TextTag (null);
-            tag.ForegroundGdk = TouchColor.NewGtkColor ("pri");
-            buffer.TagTable.Add (tag);
-
-            var ti = buffer.EndIter;
-            buffer.InsertWithTags (ref ti, string.Format ("{0}\n", message), tag);
-
-            #if DEBUG
+#if DEBUG
             Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
-            #endif
+#endif
 
-            EventAddedEvent?.Invoke ();
-        }
-
-        public static void AddError (string message) {
-            AddError (message, new object[0]);
-        }
-
-        public static void AddError (string message, params object[] args) {
-            message = string.Format (message, args);
-            AppendTime ();
-
-            var tag = new TextTag (null);
-            tag.ForegroundGdk = TouchColor.NewGtkColor ("compl");
-            buffer.TagTable.Add (tag);
-
-            var ti = buffer.EndIter;
-            buffer.InsertWithTags (ref ti, string.Format ("{0}\n", message), tag);
-
-            #if DEBUG
-            Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
-            #endif
-
-            EventAddedEvent?.Invoke ();
+            EventAddedEvent?.Invoke (log);
         }
 
         public static void AddWarning (string message) {
@@ -107,29 +75,30 @@ namespace AquaPic.Runtime
 
         public static void AddWarning (string message, params object[] args) {
             message = string.Format (message, args);
-            AppendTime ();
+            var log = new LogItem (DateTime.Now, LogType.Warning, message);
+            logs.Add (log);
 
-            var tag = new TextTag (null);
-            tag.ForegroundGdk = TouchColor.NewGtkColor ("secb");
-            buffer.TagTable.Add (tag);
-
-            var ti = buffer.EndIter;
-            buffer.InsertWithTags (ref ti, string.Format ("{0}\n", message), tag);
-
-            #if DEBUG
+#if DEBUG
             Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
-            #endif
+#endif
 
-            EventAddedEvent?.Invoke ();
+            EventAddedEvent?.Invoke (log);
         }
 
-        protected static void AppendTime () {
-            var tag = new TextTag (null);
-            tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");
-            buffer.TagTable.Add (tag);
+        public static void AddError (string message) {
+            AddError (message, new object[0]);
+        }
 
-            var ti = buffer.EndIter;
-            buffer.InsertWithTags (ref ti, string.Format ("{0:MM/dd HH:mm:ss}: ", DateTime.Now), tag);
+        public static void AddError (string message, params object[] args) {
+            message = string.Format (message, args);
+            var log = new LogItem (DateTime.Now, LogType.Error, message);
+            logs.Add (log);
+
+#if DEBUG
+            Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
+#endif
+
+            EventAddedEvent?.Invoke (log);
         }
     }
 }
