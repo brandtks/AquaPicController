@@ -91,7 +91,7 @@ namespace AquaPic.UserInterface
 
         public override void OnUpdate () {
             if (groupName.IsNotEmpty ()) {
-                if (!WaterLevel.AreAllWaterLevelGroupAnalogSensorsConnected (groupName)) {
+                if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (groupName)) {
                     textBox.text = "--";
                     label.Visible = true;
                     label.text = "Disconnected";

@@ -111,7 +111,6 @@
     <Compile Include="Runtime\Timer\StaticTimer.cs" />
     <Compile Include="Sensors\TemperatureProbe.cs" />
     <Compile Include="Runtime\Logger\Logger.cs" />
-    <Compile Include="Sensors\AnalogLevelSensor.cs" />
     <Compile Include="Sensors\FloatSwitch.cs" />
     <Compile Include="Runtime\Chemistry\Chemistry.cs" />
     <Compile Include="Runtime\Chemistry\TestProcedure.cs" />
@@ -185,6 +184,10 @@
     <Compile Include="Driver\pHOrp\PhOrpChannel.cs" />
     <Compile Include="Modules\ATO\AutoTopOffGroup.cs" />
     <Compile Include="Runtime\SettingsHelper\SettingsHelper.cs" />
+    <Compile Include="Sensors\PhProbe.cs" />
+    <Compile Include="Modules\ATO\AutoTopOff.cs" />
+    <Compile Include="Modules\GenericModule\GenericModule.cs" />
+    <Compile Include="Modules\GenericModule\GenericGroup.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -201,7 +204,6 @@
     <None Include="UserInterface\Scenes\Plugin.Disable\PluginScreen.cs" />
     <None Include="UserInterface\Scenes\ATO\Dialogs\AtoSettings.cs" />
     <None Include="UserInterface\Scenes\ATO\AtoScreen.cs" />
-    <None Include="Modules\ATO\AutoTopOff.cs" />
     <None Include="UserInterface\Scenes\ATO\Widgets\MainAtoReservoirLevelBarPlotWidget.cs" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -218,6 +220,7 @@
     <Folder Include="Tests\" />
     <Folder Include="Driver\pHOrp\" />
     <Folder Include="Runtime\SettingsHelper\" />
+    <Folder Include="Modules\GenericModule\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

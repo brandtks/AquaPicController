@@ -80,7 +80,7 @@ namespace AquaPic.UserInterface
 
         public override void OnUpdate () {
             if (groupName.IsNotEmpty ()) {
-                if (WaterLevel.AreAllWaterLevelGroupAnalogSensorsConnected (groupName)) {
+                if (WaterLevel.GetWaterLevelGroupAnalogSensorConnected (groupName)) {
                     currentValue = 0.0f;
 
                     flashUpdate = ++flashUpdate % 4;

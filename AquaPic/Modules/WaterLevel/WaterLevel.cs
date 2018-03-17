@@ -358,10 +358,17 @@ namespace AquaPic.Modules
                 waterLevelGroup.GroupRun ();
             }
 
-            // Get the value of the all the temperature probes no assigned to a group
+            // Get the value of the all the analog sensors no assigned to a group
             foreach (var analogSensor in analogLevelSensors.Values) {
                 if (!CheckWaterLevelGroupKeyNoThrow (analogSensor.waterLevelGroupName)) {
                     analogSensor.Get ();
+                }
+            }
+
+            // Get the value of the all the float switches no assigned to a group
+            foreach (var floatSwitch in floatSwitches.Values) {
+                if (!CheckWaterLevelGroupKeyNoThrow (floatSwitch.waterLevelGroupName)) {
+                    floatSwitch.Get ();
                 }
             }
         }
@@ -414,17 +421,6 @@ namespace AquaPic.Modules
             return !CheckWaterLevelGroupKeyNoThrow (name);
         }
 
-        public static bool AreAllWaterLevelGroupAnalogSensorsConnected (string name) {
-            CheckWaterLevelGroupKey (name);
-            bool connected = false;
-            foreach (var sensor in analogLevelSensors.Values) {
-                if (sensor.waterLevelGroupName == name) {
-                    connected |= sensor.connected;
-                }
-            }
-            return connected;
-        }
-
         /***Getters****************************************************************************************************/
         /***Names***/
         public static string[] GetAllWaterLevelGroupNames () {
@@ -439,6 +435,31 @@ namespace AquaPic.Modules
         public static float GetWaterLevelGroupLevel (string name) {
             CheckWaterLevelGroupKey (name);
             return waterLevelGroups[name].level;
+        }
+
+        public static bool GetWaterLevelGroupAtoSwitchesActivated (string name) {
+            CheckWaterLevelGroupKey (name);
+            bool activated = false;
+            foreach (var s in floatSwitches.Values) {
+                if (s.waterLevelGroupName == name) {
+                    // Using AND because we want all the switches to be activated
+                    activated &= s.activated;
+                }
+            }
+            return activated;
+        }
+
+        /***Analog sensors connected***/
+        public static bool GetWaterLevelGroupAnalogSensorConnected (string name) {
+            CheckWaterLevelGroupKey (name);
+            bool connected = false;
+            foreach (var sensor in analogLevelSensors.Values) {
+                if (sensor.waterLevelGroupName == name) {
+                    // Using OR because we really only care that at least one sensor is connected
+                    connected |= sensor.connected;
+                }
+            }
+            return connected;
         }
 
         /***High analog alarm setpoint**/

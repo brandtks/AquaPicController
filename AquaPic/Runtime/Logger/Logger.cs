@@ -39,6 +39,10 @@ namespace AquaPic.Runtime
             buffer = new TextBuffer (ttt);
         }
 
+        public static void Add (string message) {
+            Add (message, new object[0]);
+        }
+
         public static void Add (string message, params object[] args) {
             message = string.Format (message, args);
             AppendTime ();
@@ -50,8 +54,11 @@ namespace AquaPic.Runtime
             Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
             #endif
 
-            if (EventAddedEvent != null)
-                EventAddedEvent ();
+            EventAddedEvent?.Invoke ();
+        }
+
+        public static void AddInfo (string message) {
+            AddInfo (message, new object[0]);
         }
 
         public static void AddInfo (string message, params object[] args) {
@@ -69,8 +76,11 @@ namespace AquaPic.Runtime
             Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
             #endif
 
-            if (EventAddedEvent != null)
-                EventAddedEvent ();
+            EventAddedEvent?.Invoke ();
+        }
+
+        public static void AddError (string message) {
+            AddError (message, new object[0]);
         }
 
         public static void AddError (string message, params object[] args) {
@@ -88,8 +98,11 @@ namespace AquaPic.Runtime
             Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
             #endif
 
-            if (EventAddedEvent != null)
-                EventAddedEvent ();
+            EventAddedEvent?.Invoke ();
+        }
+
+        public static void AddWarning (string message) {
+            AddWarning (message, new object[0]);
         }
 
         public static void AddWarning (string message, params object[] args) {
@@ -107,8 +120,7 @@ namespace AquaPic.Runtime
             Console.WriteLine ("{0:MM/dd HH:mm:ss}: {1}", DateTime.Now, message);
             #endif
 
-            if (EventAddedEvent != null)
-                EventAddedEvent ();
+            EventAddedEvent?.Invoke ();
         }
 
         protected static void AppendTime () {

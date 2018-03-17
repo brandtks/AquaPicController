@@ -22,18 +22,18 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using AquaPic.Drivers;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
-using AquaPic.Utilites;
-using AquaPic.Sensors;
-using AquaPic.Equipment;
 
 namespace AquaPic.Modules
 {
-    public enum AutoTopOffState {
+    public enum AutoTopOffState
+    {
         Off,
         Standby,
         Filling,
@@ -41,79 +41,32 @@ namespace AquaPic.Modules
         Error
     }
 
-    public class AutoTopOff
+    public partial class AutoTopOff
     {
-        public static bool _enable;
-        public static bool enabled {
-            get {
-                return _enable;
-            }
-            set {
-                _enable = value;
+        private static Dictionary<string, AutoTopOffGroup> atoGroups;
 
-                if (!pump.outlet.IsNotEmpty ()) {
-                    _enable = false;
+        public static int atoGroupCount {
+            get {
+                return atoGroups.Count;
+            }
+        }
+
+        public static string firstAtoGroup {
+            get {
+                if (atoGroups.Count > 0) {
+                    var first = atoGroups.First ();
+                    return first.Key;
                 }
 
-                if (!_enable) {
-                    Alarm.Clear (_failAlarmIndex);
-                }
-            }
-        }
-
-        public static bool useAnalogSensor;
-        public static float analogOnSetpoint;
-        public static float analogOffSetpoint;
-
-        public static bool useFloatSwitch;
-        public static bool floatSwitchActivated;
-
-        public static Pump pump;
-        public static IndividualControl pumpOutlet {
-            get {
-                return pump.outlet;
-            }
-            set {
-                pump.Add (value);
-                if (pump.outlet.IsNotEmpty ()) {
-                    pump.SetGetter (() => pumpOnRequest);
-                } else {
-                    _enable = false;
-                }
-            }
-        }
-
-        public static bool pumpOnRequest;
-        public static uint maximumRuntime;
-        public static uint minimumCooldown;
-
-        private static IntervalTimer timer;
-        public static uint atoTime {
-            get {
-                if (_state == AutoTopOffState.Filling)
-                    return maximumRuntime - timer.secondsRemaining;
-                if (_state == AutoTopOffState.Cooldown)
-                    return timer.secondsRemaining;
-
-                return 0;
-            }
-        }
-
-        private static AutoTopOffState _state;
-        public static AutoTopOffState state {
-            get {
-                return _state;
-            }
-        }
-
-        private static int _failAlarmIndex;
-        public static int failedAlarmIndex {
-            get {
-                return _failAlarmIndex;
+                return string.Empty;
             }
         }
 
         static AutoTopOff () {
+            Logger.Add ("Initializing Auto Top Off");
+
+            atoGroups = new Dictionary<string, AutoTopOffGroup> ();
+
             var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "autoTopOffProperties.json");
 
@@ -121,255 +74,199 @@ namespace AquaPic.Modules
                 using (StreamReader reader = File.OpenText (path)) {
                     JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
-                    try {
-                        _enable = Convert.ToBoolean (jo["enable"]);
-                    } catch {
-                        _enable = false;
-                    }
+                    var ja = (JArray)jo["atoGroups"];
+                    foreach (var jt in ja) {
+                        var name = (string)jt["name"];
 
-                    try {
-                        useAnalogSensor = Convert.ToBoolean (jo["useAnalogSensor"]);
-                    } catch {
-                        useAnalogSensor = false;
-                    }
-
-                    string text = (string)jo["analogOnSetpoint"];
-                    if (text.IsEmpty ()) {
-                        analogOnSetpoint = 0.0f;
-                        useAnalogSensor = false;
-                    } else {
+                        bool enable;
                         try {
-                            analogOnSetpoint = Convert.ToSingle (text);
+                            enable = Convert.ToBoolean (jt["enable"]);
                         } catch {
-                            analogOnSetpoint = 0.0f;
-                            useAnalogSensor = false;
+                            enable = false;
                         }
-                    }
 
-                    text = (string)jo["analogOffSetpoint"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        analogOffSetpoint = 0.0f;
-                        useAnalogSensor = false;
-                    } else {
+                        var requestBitName = (string)jt["requestBitName"];
+                        var waterLevelGroupName = (string)jt["waterLevelGroupName"];
+
+                        uint maximumRuntime;
+                        var text = (string)jt["maximumRuntime"];
+                        if (text.IsNotEmpty ()) {
+                            maximumRuntime = 0U;
+                            enable = false;
+                        } else {
+                            try {
+                                maximumRuntime = Timer.ParseTime (text) / 1000;
+                            } catch {
+                                maximumRuntime = 0U;
+                                enable = false;
+                            }
+                        }
+
+                        uint minimumCooldown;
+                        text = (string)jt["minimumCooldown"];
+                        if (string.IsNullOrWhiteSpace (text)) {
+                            minimumCooldown = uint.MaxValue;
+                            enable = false;
+                        } else {
+                            try {
+                                minimumCooldown = Timer.ParseTime (text) / 1000;
+                            } catch {
+                                minimumCooldown = uint.MaxValue;
+                                enable = false;
+                            }
+                        }
+
+                        bool useAnalogSensors;
                         try {
-                            analogOffSetpoint = Convert.ToSingle (text);
+                            useAnalogSensors = Convert.ToBoolean (jt["useAnalogSensors"]);
                         } catch {
-                            analogOnSetpoint = 0.0f;
-                            useAnalogSensor = false;
+                            useAnalogSensors = false;
                         }
-                    }
 
-                    try {
-                        useFloatSwitch = Convert.ToBoolean (jo["useFloatSwitch"]);
-                    } catch {
-                        useFloatSwitch = false;
-                    }
 
-                    if (!useFloatSwitch && !useAnalogSensor)
-                        _enable = false;
+                        float analogOnSetpoint;
+                        text = (string)jt["analogOnSetpoint"];
+                        if (text.IsEmpty ()) {
+                            analogOnSetpoint = 0f;
+                            useAnalogSensors = false;
+                        } else {
+                            try {
+                                analogOnSetpoint = Convert.ToSingle (text);
+                            } catch {
+                                analogOnSetpoint = 0f;
+                                useAnalogSensors = false;
+                            }
+                        }
 
-                    var ic = IndividualControl.Empty;
-                    text = (string)jo["powerStrip"];
-                    if (text.IsEmpty ()) {
-                        _enable = false;
-                    } else {
+                        float analogOffSetpoint;
+                        text = (string)jt["analogOffSetpoint"];
+                        if (string.IsNullOrWhiteSpace (text)) {
+                            analogOffSetpoint = 0.0f;
+                            useAnalogSensors = false;
+                        } else {
+                            try {
+                                analogOffSetpoint = Convert.ToSingle (text);
+                            } catch {
+                                analogOffSetpoint = 0.0f;
+                                useAnalogSensors = false;
+                            }
+                        }
+
+                        bool useFloatSwitches;
                         try {
-                            ic.Group = Power.GetPowerStripIndex (text);
+                            useFloatSwitches = Convert.ToBoolean (jt["useFloatSwitches"]);
                         } catch {
-                            ;
+                            useFloatSwitches = false;
                         }
-                    }
 
-                    text = (string)jo["outlet"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        ic = IndividualControl.Empty;
-                        _enable = false;
-                    } else {
-                        try {
-                            ic.Individual = Convert.ToInt32 (text);
-                        } catch {
-                            ic = IndividualControl.Empty;
-                            _enable = false;
-                        }
-                    }
+                        if (!useFloatSwitches && !useAnalogSensors)
+                            enable = false;
 
-                    uint maxPumpOnTime;
-                    text = (string)jo["maxPumpOnTime"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        maxPumpOnTime = 0U;
-                        _enable = false;
-                    } else {
-                        try {
-                            maxPumpOnTime = Timer.ParseTime (text) / 1000;
-                        } catch {
-                            maxPumpOnTime = 0U;
-                            _enable = false;
-                        }
-                    }
-
-                    uint minPumpOffTime;
-                    text = (string)jo["minPumpOffTime"];
-                    if (string.IsNullOrWhiteSpace (text)) {
-                        minPumpOffTime = uint.MaxValue;
-                        _enable = false;
-                    } else {
-                        try {
-                            minPumpOffTime = Timer.ParseTime (text) / 1000;
-                        } catch {
-                            minPumpOffTime = uint.MaxValue;
-                            _enable = false;
-                        }
+                        AddAtoGroup (
+                            name,
+                            enable,
+                            requestBitName,
+                            waterLevelGroupName,
+                            maximumRuntime,
+                            minimumCooldown,
+                            useAnalogSensors,
+                            analogOnSetpoint,
+                            analogOffSetpoint,
+                            useFloatSwitches);
                     }
                 }
-            }
-
-            if (_enable) {
-                _state = AutoTopOffState.Standby;
             } else {
-                _state = AutoTopOffState.Off;
+                Logger.Add ("ATO settings file did not exist, created new ATO settings");
+                var file = File.Create (path);
+                file.Close ();
+
+                var jo = new JObject ();
+                jo.Add (new JProperty ("atoGroups", new JArray ()));
+
+                File.WriteAllText (path, jo.ToString ());
             }
-
-            _failAlarmIndex = Alarm.Subscribe ("Auto top off failed");
-
-            floatSwitchActivated = false;
-
-            timer = IntervalTimer.GetTimer ("ATO");
-            timer.TimerElapsedEvent += OnTimerElapsed;
-
-            pump = new Pump (pumpOutlet, "ATO pump", MyState.Off, "ATO");
-            if (pump.outlet.IsNotEmpty ()) {
-                pump.SetGetter (() => pumpOnRequest);
-            }
-            pumpOnRequest = false;
         }
 
         public static void Run () {
-            if (_enable) {
-                switch (state) {
-                case AutoTopOffState.Standby: 
-                    {
-                        pumpOnRequest = false;
-                        bool usedAnalog = false;
-
-                        if ((WaterLevel.analogSensorEnabled) && (useAnalogSensor)) {
-                            if (analogSensor.connected) {
-                                usedAnalog = true;
-
-                                if (analogSensor.level < analogOnSetpoint) {
-                                    pumpOnRequest = true;
-                                }
-                            }
-                        } 
-
-                        if (useFloatSwitch) {
-                            // floatSwitchActivated is set by water level run function
-                            if (usedAnalog) {
-                                pumpOnRequest &= floatSwitchActivated; 
-                            } else {
-                                pumpOnRequest = floatSwitchActivated;
-                            }
-                        }
-
-                        if (pumpOnRequest) {
-                            _state = AutoTopOffState.Filling;
-                            Logger.Add ("Starting auto top off");
-                            WaterLevel.dataLogger.AddEntry ("ato started"); 
-                            timer.Reset ();
-                            timer.totalSeconds = maximumRuntime;
-                            timer.Start ();
-                        }
-
-                        break;
-                    }
-                case AutoTopOffState.Filling:
-                    pumpOnRequest = true;
-
-                    // check analog sensor
-                    if ((analogSensor.enable) && (useAnalogSensor)) {
-                        if (!Alarm.CheckAlarming (analogSensor.sensorDisconnectedAlarmIndex)) { 
-                            if (analogSensor.level > analogOffSetpoint)
-                                pumpOnRequest = false;
-                        }
-                    }
-
-                    // check float switch
-                    if ((useFloatSwitch) && (!floatSwitchActivated)) {
-                        pumpOnRequest = false;
-                    }
-                    
-                    if (!pumpOnRequest) {
-                        state = AutoTopOffState.Cooldown;
-                        atoTimer.Reset ();
-                        Logger.Add ("Stopping auto top off. Runtime: {0} secs", atoTimer.totalSeconds - atoTimer.secondsRemaining);
-                        dataLogger.AddEntry ("ato stopped"); 
-                        atoTimer.totalSeconds = minPumpOffTime;
-                        atoTimer.Start ();
-                    }
-
-                    break;
-                case AutoTopOffState.Cooldown:
-                case AutoTopOffState.Error:
-                default:
-                    pumpOnRequest = false;
-                    break;
-                }
-            } else {
-                _state = AutoTopOffState.Off;
-                pumpOnRequest = false;
-            }
-        }
-
-        protected static void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
-            if (state == AutoTopOffState.Filling) {
-                pumpOnRequest = false;
-                _state = AutoTopOffState.Error;
-                Alarm.Post (_failAlarmIndex);
-            } else if (state == AutoTopOffState.Cooldown) {
-                _state = AutoTopOffState.Standby;
+            foreach (var group in atoGroups.Values) {
+                group.GroupRun ();
             }
         }
 
         /**************************************************************************************************************/
-        /* Auto Topoff                                                                                                */
+        /* Auto Top Off Groups                                                                                        */
         /**************************************************************************************************************/
-        public static bool ClearAtoAlarm () {
-            if (ato.state == AutoTopOffState.Error) {
-                if (Alarm.CheckAcknowledged (atoFailedAlarmIndex)) {
-                    Alarm.Clear (atoFailedAlarmIndex);
-                    ato.state = AutoTopOffState.Standby;
-                    return true;
-                }
+        public static void AddAtoGroup (
+            string name,
+            bool enable,
+            string requestBitName,
+            string waterLevelGroupName,
+            uint maximumRuntime,
+            uint minimumCooldown,
+            bool useAnalogSensors,
+            float analogOnSetpoint,
+            float analogOffSetpoint,
+            bool useFloatSwitches
+        ) {
+            if (!AtoGroupNameOk (name)) {
+                throw new Exception (string.Format ("ATO Group: {0} already exists", name));
             }
 
-            return false;
+            var atoGroup = new AutoTopOffGroup (
+                name,
+                enable,
+                requestBitName,
+                waterLevelGroupName,
+                maximumRuntime,
+                minimumCooldown,
+                useAnalogSensors,
+                analogOnSetpoint,
+                analogOffSetpoint,
+                useFloatSwitches);
+
+            atoGroups.Add (name, atoGroup);
         }
 
-        public static void SetAtoReservoirCalibrationData (float zeroValue, float fullScaleActual, float fullScaleValue) {
-            if (fullScaleValue <= zeroValue)
-                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
-
-            if (fullScaleActual < 0.0f)
-                throw new ArgumentException ("Full scale actual can't be less than zero");
-
-            if (fullScaleActual > 15.0f)
-                throw new ArgumentException ("Full scale actual can't be greater than 15");
-
-            ato.reservoirLevel.zeroValue = zeroValue;
-            ato.reservoirLevel.fullScaleActual = fullScaleActual;
-            ato.reservoirLevel.fullScaleValue = fullScaleValue;
-
-            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = Path.Combine (path, "waterLevelProperties.json");
-
-            string jstring = File.ReadAllText (path);
-            JObject jo = (JObject)JToken.Parse (jstring);
-
-            jo["AutoTopOff"]["reservoirZeroCalibrationValue"] = ato.reservoirLevel.zeroValue.ToString ();
-            jo["AutoTopOff"]["reservoirFullScaleCalibrationActual"] = ato.reservoirLevel.fullScaleActual.ToString ();
-            jo["AutoTopOff"]["reservoirFullScaleCalibrationValue"] = ato.reservoirLevel.fullScaleValue.ToString ();
-
-            File.WriteAllText (path, jo.ToString ());
+        public static void RemoveAtoGroup (string name) {
+            CheckAtoGroupKey (name);
+            atoGroups.Remove (name);
         }
+
+        public static void CheckAtoGroupKey (string name) {
+            if (!atoGroups.ContainsKey (name)) {
+                throw new ArgumentException ("name");
+            }
+        }
+
+        public static bool CheckAtoGroupKeyNoThrow (string name) {
+            try {
+                CheckAtoGroupKey (name);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        public static bool AtoGroupNameOk (string name) {
+            return !CheckAtoGroupKeyNoThrow (name);
+        }
+
+        public static bool ClearAtoAlarm (string name) {
+            CheckAtoGroupKey (name);
+            return atoGroups[name].ClearAtoAlarm ();
+        }
+
+        /***Getters****************************************************************************************************/
+        /***Names***/
+        public static string[] GetAllAtoGroupNames () {
+            List<string> names = new List<string> ();
+            foreach (var waterLevelGroup in atoGroups.Values) {
+                names.Add (waterLevelGroup.name);
+            }
+            return names.ToArray ();
+        }
+
+
     }
 }
 

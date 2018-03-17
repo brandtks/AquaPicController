@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
@@ -24,18 +24,17 @@
 using System;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
-using AquaPic.Runtime;
 using AquaPic.Globals;
+using AquaPic.Runtime;
 
 namespace AquaPic.Sensors
 {
-    /*
-    public class AnalogLevelSensor : ISensor<float>
+    public class PhProbe : ISensor<float>
     {
-        protected float _level;
-        public float level {
+        protected IndividualControl _channel;
+        public IndividualControl channel {
             get {
-                return _level;
+                return _channel;
             }
         }
 
@@ -46,77 +45,74 @@ namespace AquaPic.Sensors
             }
         }
 
-        public IndividualControl _channel;
-        public IndividualControl channel {
+        protected float _level;
+        public float level {
             get {
-                return _channel;
+                return _level;
             }
         }
 
-        public float zeroScaleValue;
+        public float zeroActual;
+        public float zeroValue;
         public float fullScaleActual;
         public float fullScaleValue;
 
-        private int _sensorDisconnectedAlarmIndex;
-        public int disconnectedAlarmIndex {
-            get {
-                return _sensorDisconnectedAlarmIndex;
-            }
-        }
+        public int probeDisconnectedAlarmIndex;
 
-        public AnalogLevelSensor (string name, IndividualControl ic) {
-            _channel = ic;
+        public PhProbe (
+            string name,
+            IndividualControl channel,
+            float zeroActual,
+            float zeroValue,
+            float fullScaleActual,
+            float fullScaleValue
+        ) {
             _name = name;
-            _level = 0.0f;
-
-            zeroScaleValue = 819.2f;
-            fullScaleActual = 15.0f;
-            fullScaleValue = 4096.0f;
-
-            _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog level probe disconnected, " + name);
-            Add (ic);
+            _channel = channel;
+            this.zeroActual = zeroActual;
+            this.zeroValue = zeroValue;
+            this.fullScaleActual = fullScaleActual;
+            this.fullScaleValue = fullScaleValue;
+            _level = this.zeroActual;
+            Add (_channel);
+            probeDisconnectedAlarmIndex = Alarm.Subscribe ("pH probe disconnected, " + name);
         }
 
         public void Add (IndividualControl channel) {
-            if (!_channel.Equals (channel)) {
+            if (_channel.IsNotEmpty ()) {
                 Remove ();
             }
-            
+
             _channel = channel;
 
             if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.AnalogInput.AddChannel (_channel, name);
+                AquaPicDrivers.PhOrp.AddChannel (_channel, name);
             }
         }
 
         public void Remove () {
             if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.AnalogInput.RemoveChannel (_channel);
+                AquaPicDrivers.PhOrp.RemoveChannel (_channel);
             }
         }
 
         public float Get () {
-            _level = AquaPicDrivers.AnalogInput.GetChannelValue (_channel);
-            _level = _level.Map (zeroScaleValue, fullScaleValue, 0.0f, fullScaleActual);
+            _level = AquaPicDrivers.PhOrp.GetChannelValue (_channel);
+            _level = _level.Map (zeroValue, fullScaleValue, zeroActual, fullScaleActual);
 
-            if (_level < 0.0f) {
-                if (!Alarm.CheckAlarming (_sensorDisconnectedAlarmIndex)) {
-                    Alarm.Post (_sensorDisconnectedAlarmIndex);
-                }
+            if (_level < zeroActual) {
+                Alarm.Post (probeDisconnectedAlarmIndex);
             } else {
-                if (Alarm.CheckAlarming (_sensorDisconnectedAlarmIndex)) {
-                    Alarm.Clear (_sensorDisconnectedAlarmIndex);
-                }
+                Alarm.Clear (probeDisconnectedAlarmIndex);
             }
 
-            return level;
+            return _level;
         }
 
         public void SetName (string name) {
             _name = name;
-            AquaPicDrivers.AnalogInput.SetChannelName (_channel, name);
+            AquaPicDrivers.PhOrp.SetChannelName (_channel, _name);
         }
     }
-    */
 }
 
