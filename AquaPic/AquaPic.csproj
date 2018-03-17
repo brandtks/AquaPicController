@@ -120,8 +120,6 @@
     <Compile Include="Driver\GenericClasses\GenericBase.cs" />
     <Compile Include="Driver\Driver.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputChannel.cs" />
-    <Compile Include="Operands\Bit\Bit.cs" />
-    <Compile Include="Operands\Bit\BitState.cs" />
     <Compile Include="Operands\Coil\Coil.cs" />
     <Compile Include="Operands\Value\Value.cs" />
     <Compile Include="UserInterface\AquaPicGui.cs" />
@@ -189,6 +187,8 @@
     <Compile Include="Modules\GenericModule\GenericModule.cs" />
     <Compile Include="Modules\GenericModule\GenericGroup.cs" />
     <Compile Include="Runtime\Logger\LogItem.cs" />
+    <Compile Include="Runtime\Bit\Bit.cs" />
+    <Compile Include="Runtime\Bit\BitState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -210,7 +210,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Operands\" />
-    <Folder Include="Operands\Bit\" />
     <Folder Include="Operands\Coil\" />
     <Folder Include="Operands\Value\" />
     <Folder Include="Equipment\" />
@@ -222,6 +221,7 @@
     <Folder Include="Driver\pHOrp\" />
     <Folder Include="Runtime\SettingsHelper\" />
     <Folder Include="Modules\GenericModule\" />
+    <Folder Include="Runtime\Bit\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

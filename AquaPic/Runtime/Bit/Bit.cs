@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 using AquaPic.Globals;
 
-namespace AquaPic.Operands
+namespace AquaPic.Runtime
 {
     public partial class Bit
     {
@@ -60,8 +60,8 @@ namespace AquaPic.Operands
         public static bool Check (string name) {
             if (states.ContainsKey (name))
                 return states [name].state == MyState.Set;
-            else
-                return false;
+            
+            return false;
         }
     }
 }
