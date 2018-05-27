@@ -63,6 +63,19 @@ namespace AquaPic.Runtime
             
             return false;
         }
+
+		public static MyState Get (string name) {
+			if (states.ContainsKey (name))
+                return states[name].state;
+
+			return MyState.Invalid;
+		}
+
+		public static void Remove (string name) {
+			if (states.ContainsKey (name)) {
+				states.Remove (name);
+			}
+		}
     }
 }
 

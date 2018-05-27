@@ -75,7 +75,7 @@ namespace AquaPic.UserInterface
                     linePlot.UnLinkDataLogger (dataLogger);
                 };
 
-                text = string.Format ("{0} Water Level", groupName);
+				text = string.Format ("{0} Water Level", groupName);
             }
 
             linePlot.rangeMargin = 1;

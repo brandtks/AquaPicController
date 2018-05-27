@@ -437,11 +437,11 @@ namespace AquaPic.Modules
             return waterLevelGroups[name].level;
         }
 
-        public static bool GetWaterLevelGroupAtoSwitchesActivated (string name) {
+		public static bool GetWaterLevelGroupSwitchesActivated (string name, SwitchFunction function = SwitchFunction.ATO) {
             CheckWaterLevelGroupKey (name);
-            bool activated = false;
+            bool activated = true;
             foreach (var s in floatSwitches.Values) {
-                if (s.waterLevelGroupName == name) {
+				if ((s.waterLevelGroupName == name) && (s.function == function)){
                     // Using AND because we want all the switches to be activated
                     activated &= s.activated;
                 }
@@ -478,12 +478,23 @@ namespace AquaPic.Modules
         public static int GetWaterLevelGroupHighAnalogAlarmIndex (string name) {
             CheckWaterLevelGroupKey (name);
             return waterLevelGroups[name].highAnalogAlarmIndex;
-        }
+        }      
 
         /***High switch alarm index***/
         public static int GetWaterLevelGroupHighSwitchAlarmIndex (string name) {
             CheckWaterLevelGroupKey (name);
             return waterLevelGroups[name].highSwitchAlarmIndex;
+        }
+
+		/***High alarming***/
+		public static bool GetWaterLevelGroupHighAlarming (string name) {
+            CheckWaterLevelGroupKey (name);
+            bool alarming = false;
+            if (waterLevelGroups[name].enableHighAnalogAlarm) {
+                alarming = Alarm.CheckAlarming (waterLevelGroups[name].highAnalogAlarmIndex);
+            }
+            alarming |= Alarm.CheckAlarming (waterLevelGroups[name].highSwitchAlarmIndex);
+            return alarming;
         }
 
         /***Low analog alarm setpoint**/
@@ -508,6 +519,17 @@ namespace AquaPic.Modules
         public static int GetWaterLevelGroupLowSwitchAlarmIndex (string name) {
             CheckWaterLevelGroupKey (name);
             return waterLevelGroups[name].lowSwitchAlarmIndex;
+        }
+
+		/***Low alarming***/
+        public static bool GetWaterLevelGroupLowAlarming (string name) {
+            CheckWaterLevelGroupKey (name);
+            bool alarming = false;
+			if (waterLevelGroups[name].enableLowAnalogAlarm) {
+				alarming = Alarm.CheckAlarming (waterLevelGroups[name].lowAnalogAlarmIndex);
+            }
+            alarming |= Alarm.CheckAlarming (waterLevelGroups[name].lowSwitchAlarmIndex);
+            return alarming;
         }
 
         /***Data logger***/

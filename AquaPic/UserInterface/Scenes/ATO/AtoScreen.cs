@@ -24,34 +24,27 @@
 ﻿using System;
 using Gtk;
 using Cairo;
-using TouchWidgetLibrary;
-using AquaPic.Runtime;
+using GoodtimeDevelopment.TouchWidget;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
-using AquaPic.Drivers;
-using AquaPic.Utilites;
-using AquaPic.Sensors;
+using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
-    public class AtoScreen : SceneBase
+    public class AtoWindow : SceneBase
     {
-        uint timerId;
-        TouchLabel atoStateTextBox;
-        TouchLabel reservoirLevelTextBox;
+		string atoGroupName;
+		TouchLabel atoStateTextBox;
         TouchButton atoClearFailBtn;
+		TouchComboBox atoGroupCombo;
 
-        public AtoScreen (params object[] options) : base () {
+		public AtoWindow (params object[] options) : base () {
+			sceneTitle = "Auto Top Off";         
+
             /**************************************************************************************************************/
             /* ATO                                                                                                        */
             /**************************************************************************************************************/
-            var label = new TouchLabel ();
-            label.text = "Auto Top Off";
-            label.WidthRequest = 329;
-            label.textColor = "seca";
-            label.textSize = 12;
-            label.textAlignment = TouchAlignment.Right;
-            Put (label, 60, 80);
-            label.Show ();
+			atoGroupName = AutoTopOff.firstAtoGroup;
 
             var stateLabel = new TouchLabel ();
             stateLabel.text = "ATO State";
@@ -63,142 +56,123 @@ namespace AquaPic.UserInterface
 
             atoStateTextBox = new TouchLabel ();
             atoStateTextBox.WidthRequest = 329;
-            if (WaterLevel.atoEnabled) {
-                atoStateTextBox.text = string.Format ("{0} : {1}",
-                    WaterLevel.atoState,
-                    WaterLevel.atoTime.SecondsToString ());
-            } else {
-                atoStateTextBox.text = "ATO Disabled";
-            }
             atoStateTextBox.textSize = 20;
             atoStateTextBox.textAlignment = TouchAlignment.Center;
             Put (atoStateTextBox, 60, 120);
             atoStateTextBox.Show ();
 
-            var reservoirLevelLabel = new TouchLabel ();
-            reservoirLevelLabel.WidthRequest = 329;
-            reservoirLevelLabel.text = "Reservoir Level";
-            reservoirLevelLabel.textColor = "grey3";
-            reservoirLevelLabel.textAlignment = TouchAlignment.Center;
-            Put (reservoirLevelLabel, 60, 230);
-            reservoirLevelLabel.Show ();
-
-            reservoirLevelTextBox = new TouchLabel ();
-            reservoirLevelTextBox.SetSizeRequest (329, 50);
-            reservoirLevelTextBox.textSize = 20;
-            reservoirLevelTextBox.textAlignment = TouchAlignment.Center;
-            if (WaterLevel.atoReservoirLevelEnabled) {
-                float wl = WaterLevel.atoReservoirLevel;
-                if (wl < 0.0f) {
-                    reservoirLevelTextBox.text = "Probe Disconnected";
-                } else {
-                    reservoirLevelTextBox.text = wl.ToString ("F2");
-                    reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-                }
-            } else {
-                reservoirLevelTextBox.text = "Sensor disabled";
-            }
-            Put (reservoirLevelTextBox, 60, 195);
-            reservoirLevelTextBox.Show ();
-
             var atoSettingsBtn = new TouchButton ();
             atoSettingsBtn.text = "Settings";
             atoSettingsBtn.SetSizeRequest (100, 60);
             atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new AtoSettings ();
+				var s = new AtoSettings (atoGroupName, atoGroupName.IsNotEmpty ());
                 s.Run ();
+				var newGroupName = s.atoGroupName;
+                var outcome = s.outcome;
                 s.Destroy ();
                 s.Dispose ();
+
+                if (outcome == TouchSettingsOutcome.Added) {
+                    atoGroupName = newGroupName;
+                    atoGroupCombo.comboList.Insert (atoGroupCombo.comboList.Count - 1, atoGroupName);
+                    atoGroupCombo.activeText = atoGroupName;
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
+                    atoGroupCombo.comboList.Remove (atoGroupName);
+                    atoGroupName = WaterLevel.firstWaterLevelGroup;
+                    atoGroupCombo.activeText = atoGroupName;
+                }
+
+                atoGroupCombo.QueueDraw ();
+                GetAtoGroupData ();
             };
             Put (atoSettingsBtn, 290, 405);
             atoSettingsBtn.Show ();
-
-            var b = new TouchButton ();
-            b.text = "Calibrate";
-            b.SetSizeRequest (100, 60);
-            b.ButtonReleaseEvent += (o, args) => {
-                if (WaterLevel.atoReservoirLevelEnabled) {
-                    var cal = new CalibrationDialog (
-                        "ATO Reservoir Level Sensor",
-                        () => {
-                            return AquaPicDrivers.AnalogInput.GetChannelValue (WaterLevel.atoReservoirLevelChannel);
-                        });
-
-                    cal.CalibrationCompleteEvent += (aa) => {
-                        WaterLevel.SetAtoReservoirCalibrationData (
-                            (float)aa.zeroValue,
-                            (float)aa.fullScaleActual,
-                            (float)aa.fullScaleValue);
-                    };
-
-                    cal.calArgs.zeroValue = WaterLevel.atoReservoirLevelSensorZeroCalibrationValue;
-                    cal.calArgs.fullScaleActual = WaterLevel.atoReservoirLevelSensorFullScaleCalibrationActual;
-                    cal.calArgs.fullScaleValue = WaterLevel.atoReservoirLevelSensorFullScaleCalibrationValue;
-
-                    cal.Run ();
-                    cal.Destroy ();
-                    cal.Dispose ();
-                } else {
-                    MessageBox.Show ("ATO reservoir level sensor is disabled\n" +
-                                    "Can't perfom a calibration");
-                }
-            };
-            Put (b, 180, 405);
-            b.Show ();
 
             atoClearFailBtn = new TouchButton ();
             atoClearFailBtn.SetSizeRequest (100, 60);
             atoClearFailBtn.text = "Reset ATO";
             atoClearFailBtn.buttonColor = "compl";
             atoClearFailBtn.ButtonReleaseEvent += (o, args) => {
-                if (!WaterLevel.ClearAtoAlarm ())
-                    MessageBox.Show ("Please acknowledge alarms first");
+				if (atoGroupName.IsNotEmpty ()) {
+					if (!AutoTopOff.ClearAtoAlarm (atoGroupName))
+						MessageBox.Show ("Please acknowledge alarms first");
+				}
             };
             Put (atoClearFailBtn, 70, 405);
-            if (Alarm.CheckAlarming (WaterLevel.atoFailedAlarmIndex)) {
-                atoClearFailBtn.Visible = true;
-                atoClearFailBtn.Show ();
-            } else {
-                atoClearFailBtn.Visible = false;
-            }
 
-            Alarm.AddAlarmHandler (WaterLevel.atoFailedAlarmIndex, OnAtoFailedAlarmEvent);
+			atoGroupCombo = new TouchComboBox (AutoTopOff.GetAllAtoGroupNames ());
+            if (atoGroupName.IsNotEmpty ()) {
+                atoGroupCombo.activeText = atoGroupName;
+            } else {
+                atoGroupCombo.activeIndex = 0;
+            }
+            atoGroupCombo.WidthRequest = 235;
+            atoGroupCombo.comboList.Add ("New group...");
+            atoGroupCombo.ComboChangedEvent += OnGroupComboChanged;
+            Put (atoGroupCombo, 153, 77);
+            atoGroupCombo.Show ();
+
+			GetAtoGroupData ();
+
+			Show ();
         }
 
-        public override void Dispose () {
-            Alarm.RemoveAlarmHandler (WaterLevel.atoFailedAlarmIndex, OnAtoFailedAlarmEvent);
-            GLib.Source.Remove (timerId);
-            base.Dispose ();
-        }
-
-        public bool OnUpdateTimer () {
-            if (WaterLevel.atoEnabled) {
-                atoStateTextBox.text = string.Format ("{0} : {1}",
-                    WaterLevel.atoState,
-                    WaterLevel.atoTime.SecondsToString ());
-
-                if (WaterLevel.atoReservoirLevelEnabled) {
-                    float wl = WaterLevel.atoReservoirLevel;
-                    if (wl < 0.0f) {
-                        reservoirLevelTextBox.text = "Probe Disconnected";
-                        reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-                    } else {
-                        reservoirLevelTextBox.text = wl.ToString ("F2");
-                        reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-                    }
-                } else {
-                    reservoirLevelTextBox.text = "Sensor disabled";
-                    reservoirLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-                }
-                reservoirLevelTextBox.QueueDraw ();
-
-            } else {
-                atoStateTextBox.text = "ATO Disabled";
-            }
-            atoStateTextBox.QueueDraw ();
-
+		protected override bool OnUpdateTimer () {
+			GetAtoGroupData ();
             return true;
         }
+
+        
+		protected void OnGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            if (e.activeText == "New group...") {
+				var s = new AtoSettings (string.Empty, false);
+                s.Run ();
+				var newGroupName = s.atoGroupName;
+                var outcome = s.outcome;
+                s.Destroy ();
+                s.Dispose ();
+
+                if (outcome == TouchSettingsOutcome.Added) {
+                    atoGroupCombo.comboList.Insert (atoGroupCombo.comboList.Count - 1, newGroupName);
+                    atoGroupCombo.activeText = newGroupName;
+                    atoGroupName = newGroupName;
+                } else {
+                    Console.WriteLine ("Moving combo back to {0}", atoGroupName);
+                    atoGroupCombo.activeText = atoGroupName;
+                }
+
+                atoGroupCombo.QueueDraw ();
+            } else {
+                atoGroupName = e.activeText;
+            }
+			GetAtoGroupData ();
+        }
+
+		protected void GetAtoGroupData () {
+			if (atoGroupName.IsNotEmpty ()) {
+				if (AutoTopOff.GetAtoGroupEnable (atoGroupName)) {
+					atoStateTextBox.text = string.Format ("{0} : {1}",
+						AutoTopOff.GetAtoGroupState (atoGroupName),
+						AutoTopOff.GetAtoGroupAtoTime (atoGroupName).SecondsToString ());
+
+					if (Alarm.CheckAlarming (AutoTopOff.GetAtoGroupFailAlarmIndex (atoGroupName))) {
+						atoClearFailBtn.Visible = true;
+						atoClearFailBtn.Show ();
+					} else {
+						atoClearFailBtn.Visible = false;
+					}
+
+				} else {
+					atoStateTextBox.text = "ATO Disabled";
+					atoClearFailBtn.Visible = false;
+				}
+			} else {
+				atoStateTextBox.text = "ATO Disabled";
+                atoClearFailBtn.Visible = false;
+			}
+
+			atoStateTextBox.QueueDraw ();
+		}
     }
 }
 

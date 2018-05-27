@@ -29,6 +29,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
+using AquaPic.Globals;
 
 namespace AquaPic.Modules
 {
@@ -62,7 +63,9 @@ namespace AquaPic.Modules
             }
         }
 
-        static AutoTopOff () {
+		static AutoTopOff () { }
+
+		public static void Init () {
             Logger.Add ("Initializing Auto Top Off");
 
             atoGroups = new Dictionary<string, AutoTopOffGroup> ();
@@ -90,12 +93,12 @@ namespace AquaPic.Modules
 
                         uint maximumRuntime;
                         var text = (string)jt["maximumRuntime"];
-                        if (text.IsNotEmpty ()) {
+                        if (text.IsEmpty ()) {
                             maximumRuntime = 0U;
                             enable = false;
                         } else {
                             try {
-                                maximumRuntime = Timer.ParseTime (text) / 1000;
+								maximumRuntime = Convert.ToUInt32 (text);
                             } catch {
                                 maximumRuntime = 0U;
                                 enable = false;
@@ -104,12 +107,12 @@ namespace AquaPic.Modules
 
                         uint minimumCooldown;
                         text = (string)jt["minimumCooldown"];
-                        if (string.IsNullOrWhiteSpace (text)) {
+						if (text.IsEmpty ()) {
                             minimumCooldown = uint.MaxValue;
                             enable = false;
                         } else {
                             try {
-                                minimumCooldown = Timer.ParseTime (text) / 1000;
+								minimumCooldown = Convert.ToUInt32 (text);
                             } catch {
                                 minimumCooldown = uint.MaxValue;
                                 enable = false;
@@ -159,8 +162,7 @@ namespace AquaPic.Modules
                             useFloatSwitches = false;
                         }
 
-                        if (!useFloatSwitches && !useAnalogSensors)
-                            enable = false;
+                        enable &= (useFloatSwitches || useAnalogSensors);
 
                         AddAtoGroup (
                             name,
@@ -185,6 +187,8 @@ namespace AquaPic.Modules
 
                 File.WriteAllText (path, jo.ToString ());
             }
+
+			TaskManager.AddCyclicInterrupt ("Auto Top Off", 1000, Run);
         }
 
         public static void Run () {
@@ -253,7 +257,7 @@ namespace AquaPic.Modules
 
         public static bool ClearAtoAlarm (string name) {
             CheckAtoGroupKey (name);
-            return atoGroups[name].ClearAtoAlarm ();
+            return atoGroups[name].ClearAlarm ();
         }
 
         /***Getters****************************************************************************************************/
@@ -266,7 +270,139 @@ namespace AquaPic.Modules
             return names.ToArray ();
         }
 
+		/***Enable***/
+		public static bool GetAtoGroupEnable (string name) {
+			CheckAtoGroupKey (name);
+			return atoGroups[name].enable;
+		}
 
+		/***State***/
+		public static AutoTopOffState GetAtoGroupState (string name) {
+			CheckAtoGroupKey (name);
+			return atoGroups[name].state;
+		}
+
+		/***Request Bit Name***/
+		public static string GetAtoGroupRequestBitName (string name) {
+            CheckAtoGroupKey (name);
+			return atoGroups[name].requestBitName;
+        }
+
+		/***Water Level Group Name***/
+		public static string GetAtoGroupWaterLevelGroupName (string name) {
+            CheckAtoGroupKey (name);
+            return atoGroups[name].waterLevelGroupName;
+        }
+
+		/***ATO Time***/
+		public static uint GetAtoGroupAtoTime (string name) {
+            CheckAtoGroupKey (name);
+			return atoGroups[name].atoTime;
+        }
+
+		/***Maximum Runtime***/
+		public static uint GetAtoGroupMaximumRuntime (string name) {
+            CheckAtoGroupKey (name);
+			return atoGroups[name].maximumRuntime;
+        }
+
+		/***Minimum Cooldown***/
+		public static uint GetAtoGroupMinimumCooldown (string name) {
+            CheckAtoGroupKey (name);
+			return atoGroups[name].minimumCooldown;
+        }
+        
+		/***Use Analog Sensor***/
+		public static bool GetAtoGroupUseAnalogSensor (string name) {
+            CheckAtoGroupKey (name);
+            return atoGroups[name].useAnalogSensors;
+        }
+
+		/***Analog On Setpoint***/
+        public static float GetAtoGroupAnalogOnSetpoint (string name) {
+            CheckAtoGroupKey (name);
+            return atoGroups[name].analogOnSetpoint;
+        }
+
+		/***Analog Off Setpoint***/
+        public static float GetAtoGroupAnalogOffSetpoint (string name) {
+            CheckAtoGroupKey (name);
+            return atoGroups[name].analogOffSetpoint;
+        }
+
+		/***Use Float Switches***/
+		public static bool GetAtoGroupUseFloatSwitches (string name) {
+            CheckAtoGroupKey (name);
+			return atoGroups[name].useFloatSwitches;
+        }
+
+		/***Failed Alarm Index***/
+		public static int GetAtoGroupFailAlarmIndex (string name) {
+            CheckAtoGroupKey (name);
+			return atoGroups[name].failAlarmIndex;
+        }
+
+		/***Setters****************************************************************************************************/
+		/***Enable***/
+        public static void SetAtoGroupEnable (string name, bool enable) {
+            CheckAtoGroupKey (name);
+            atoGroups[name].enable = enable;
+        }
+
+		/***Request Bit Name***/
+		public static void SetAtoGroupRequestBitName (string name, string requestBitName) {
+            CheckAtoGroupKey (name);
+			var state = Bit.Get (atoGroups[name].requestBitName);
+			Bit.Remove (atoGroups[name].requestBitName);
+			atoGroups[name].requestBitName = requestBitName;
+			if (state == MyState.Set) {
+				Bit.Set (atoGroups[name].requestBitName);
+			} else {
+				Bit.Reset (atoGroups[name].requestBitName);
+			}
+        }
+
+        /***Water Level Group Name***/
+		public static void SetAtoGroupWaterLevelGroupName (string name, string waterLevelGroupName) {
+            CheckAtoGroupKey (name);
+			atoGroups[name].waterLevelGroupName = waterLevelGroupName;
+        }
+
+		/***Maximum Runtime***/
+		public static void SetAtoGroupMaximumRuntime (string name, uint maximumRuntime) {
+            CheckAtoGroupKey (name);
+			atoGroups[name].maximumRuntime = maximumRuntime;
+        }
+
+        /***Minimum Cooldown***/
+		public static void SetAtoGroupMinimumCooldown (string name, uint minimumCooldown) {
+            CheckAtoGroupKey (name);
+			atoGroups[name].minimumCooldown = minimumCooldown;
+        }
+
+        /***Use Analog Sensor***/
+		public static void SetAtoGroupUseAnalogSensor (string name, bool useAnalogSensors) {
+            CheckAtoGroupKey (name);
+			atoGroups[name].useAnalogSensors = useAnalogSensors;
+        }
+
+        /***Analog On Setpoint***/
+		public static void SetAtoGroupAnalogOnSetpoint (string name, float analogOnSetpoint) {
+            CheckAtoGroupKey (name);
+			atoGroups[name].analogOnSetpoint = analogOnSetpoint;
+        }
+
+        /***Analog Off Setpoint***/
+		public static void SetAtoGroupAnalogOffSetpoint (string name, float analogOffSetpoint) {
+            CheckAtoGroupKey (name);
+			atoGroups[name].analogOffSetpoint = analogOffSetpoint;
+        }
+
+        /***Use Float Switches***/
+		public static void SetAtoGroupUseFloatSwitches (string name, bool useFloatSwitches) {
+            CheckAtoGroupKey (name);
+			atoGroups[name].useFloatSwitches = useFloatSwitches;
+        }
     }
 }
 

@@ -29,6 +29,7 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
 using AquaPic.Drivers;
 using AquaPic.Sensors;
+using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
@@ -37,6 +38,11 @@ namespace AquaPic.UserInterface
         string groupName;
         TouchLabel levelLabel;
         TouchComboBox groupCombo;
+
+		string atoGroupName;
+		TouchLabel atoStateTextBox;
+        TouchButton atoClearFailBtn;
+		TouchComboBox atoGroupCombo;
 
         string analogSensorName;
         TouchLabel analogLevelTextBox;
@@ -107,8 +113,74 @@ namespace AquaPic.UserInterface
                 groupCombo.QueueDraw ();
                 GetGroupData ();
             };
-            Put (globalSettingsBtn, 290, 405);
+			Put (globalSettingsBtn, 290, 195);
             globalSettingsBtn.Show ();
+
+			/******************************************************************************************************/
+            /* ATO Groups                                                                                         */
+            /******************************************************************************************************/
+			atoGroupName = AutoTopOff.firstAtoGroup;
+
+			label = new TouchLabel ();
+            label.text = "ATO";
+            label.textColor = "seca";
+            label.textSize = 12;
+			Put (label, 30, 280);
+            label.Show ();
+
+            var stateLabel = new TouchLabel ();
+            stateLabel.text = "ATO State";
+            stateLabel.textColor = "grey3";
+            stateLabel.WidthRequest = 329;
+            stateLabel.textAlignment = TouchAlignment.Center;
+            Put (stateLabel, 60, 355);
+            stateLabel.Show ();
+
+            atoStateTextBox = new TouchLabel ();
+            atoStateTextBox.WidthRequest = 329;
+            atoStateTextBox.textSize = 20;
+            atoStateTextBox.textAlignment = TouchAlignment.Center;
+			Put (atoStateTextBox, 60, 320);
+            atoStateTextBox.Show ();
+
+            var atoSettingsBtn = new TouchButton ();
+            atoSettingsBtn.text = "Settings";
+            atoSettingsBtn.SetSizeRequest (100, 60);
+            atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
+                var s = new AtoSettings (atoGroupName, atoGroupName.IsNotEmpty ());
+                s.Run ();
+                var newGroupName = s.atoGroupName;
+                var outcome = s.outcome;
+                s.Destroy ();
+                s.Dispose ();
+
+                if (outcome == TouchSettingsOutcome.Added) {
+                    atoGroupName = newGroupName;
+                    atoGroupCombo.comboList.Insert (atoGroupCombo.comboList.Count - 1, atoGroupName);
+                    atoGroupCombo.activeText = atoGroupName;
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
+                    atoGroupCombo.comboList.Remove (atoGroupName);
+                    atoGroupName = WaterLevel.firstWaterLevelGroup;
+                    atoGroupCombo.activeText = atoGroupName;
+                }
+
+                atoGroupCombo.QueueDraw ();
+                GetAtoGroupData ();
+            };
+            Put (atoSettingsBtn, 290, 405);
+            atoSettingsBtn.Show ();
+
+            atoClearFailBtn = new TouchButton ();
+            atoClearFailBtn.SetSizeRequest (100, 60);
+            atoClearFailBtn.text = "Reset ATO";
+            atoClearFailBtn.buttonColor = "compl";
+            atoClearFailBtn.ButtonReleaseEvent += (o, args) => {
+                if (atoGroupName.IsNotEmpty ()) {
+                    if (!AutoTopOff.ClearAtoAlarm (atoGroupName))
+                        MessageBox.Show ("Please acknowledge alarms first");
+                }
+            };
+            Put (atoClearFailBtn, 70, 405);
 
             /**************************************************************************************************************/
             /* Analog water sensor                                                                                        */
@@ -280,6 +352,18 @@ namespace AquaPic.UserInterface
             Put (groupCombo, 153, 77);
             groupCombo.Show ();
 
+			atoGroupCombo = new TouchComboBox (AutoTopOff.GetAllAtoGroupNames ());
+            if (atoGroupName.IsNotEmpty ()) {
+                atoGroupCombo.activeText = atoGroupName;
+            } else {
+                atoGroupCombo.activeIndex = 0;
+            }
+            atoGroupCombo.WidthRequest = 235;
+            atoGroupCombo.comboList.Add ("New group...");
+            atoGroupCombo.ComboChangedEvent += OnGroupComboChanged;
+			Put (atoGroupCombo, 153, 277);
+            atoGroupCombo.Show ();
+
             analogCombo = new TouchComboBox (WaterLevel.GetAllAnalogLevelSensors ());
             if (analogSensorName.IsNotEmpty ()) {
                 analogCombo.activeText = analogSensorName;
@@ -305,6 +389,7 @@ namespace AquaPic.UserInterface
             switchCombo.Show ();
 
             GetGroupData ();
+			GetAtoGroupData ();
             GetAnalogSensorData ();
             GetSwitchData ();
 
@@ -321,6 +406,11 @@ namespace AquaPic.UserInterface
                 cr.ClosePath ();
                 cr.Stroke ();
 
+				cr.MoveTo (40, 267.5);
+                cr.LineTo (387.5, 267.5);
+                cr.ClosePath ();
+                cr.Stroke ();
+
                 cr.MoveTo (417.5, 267.5);
                 cr.LineTo (780, 267.5);
                 cr.ClosePath ();
@@ -329,9 +419,10 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnUpdateTimer () {
+			GetGroupData ();
+			GetAtoGroupData ();
             GetAnalogSensorData ();
             GetSwitchData ();
-            GetGroupData ();
             return true;
         }
 
@@ -358,6 +449,31 @@ namespace AquaPic.UserInterface
                 groupName = e.activeText;
             }
             GetGroupData ();
+        }
+
+		protected void OnAtoGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            if (e.activeText == "New group...") {
+                var s = new AtoSettings (string.Empty, false);
+                s.Run ();
+                var newGroupName = s.atoGroupName;
+                var outcome = s.outcome;
+                s.Destroy ();
+                s.Dispose ();
+
+                if (outcome == TouchSettingsOutcome.Added) {
+                    atoGroupCombo.comboList.Insert (atoGroupCombo.comboList.Count - 1, newGroupName);
+                    atoGroupCombo.activeText = newGroupName;
+                    atoGroupName = newGroupName;
+                } else {
+                    Console.WriteLine ("Moving combo back to {0}", atoGroupName);
+                    atoGroupCombo.activeText = atoGroupName;
+                }
+
+                atoGroupCombo.QueueDraw ();
+            } else {
+                atoGroupName = e.activeText;
+            }
+            GetAtoGroupData ();
         }
 
         protected void OnAnalogSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
@@ -416,6 +532,32 @@ namespace AquaPic.UserInterface
             }
 
             levelLabel.QueueDraw ();
+        }
+
+		protected void GetAtoGroupData () {
+            if (atoGroupName.IsNotEmpty ()) {
+                if (AutoTopOff.GetAtoGroupEnable (atoGroupName)) {
+                    atoStateTextBox.text = string.Format ("{0} : {1}",
+                        AutoTopOff.GetAtoGroupState (atoGroupName),
+                        AutoTopOff.GetAtoGroupAtoTime (atoGroupName).SecondsToString ());
+
+                    if (Alarm.CheckAlarming (AutoTopOff.GetAtoGroupFailAlarmIndex (atoGroupName))) {
+                        atoClearFailBtn.Visible = true;
+                        atoClearFailBtn.Show ();
+                    } else {
+                        atoClearFailBtn.Visible = false;
+                    }
+
+                } else {
+                    atoStateTextBox.text = "ATO Disabled";
+                    atoClearFailBtn.Visible = false;
+                }
+            } else {
+                atoStateTextBox.text = "ATO Disabled";
+                atoClearFailBtn.Visible = false;
+            }
+
+            atoStateTextBox.QueueDraw ();
         }
 
         protected void GetAnalogSensorData () {

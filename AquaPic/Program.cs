@@ -38,7 +38,7 @@ namespace AquaPic
     {
         public static void Main (string[] args) {
             string aquaPicEnvironment = string.Empty;
-            //Call the Gtk library hack because Windows sucks at everything
+            // Call the Gtk library hack because Windows sucks at everything
             if (Utils.ExecutingOperatingSystem == Platform.Windows) {
                 CheckWindowsGtk ();
                 
@@ -69,19 +69,15 @@ namespace AquaPic
                     return;
                 }
             } else {
-                aquaPicEnvironment = Environment.GetEnvironmentVariable("HOME");
-                aquaPicEnvironment = Path.Combine(aquaPicEnvironment, ".aquapic");
-                if (!Directory.Exists(aquaPicEnvironment)) {
-                    Directory.CreateDirectory(aquaPicEnvironment);
-                }
-                
-                var path = aquaPicEnvironment;
-                if (!Directory.Exists(path)) {
-                    Directory.CreateDirectory(path);
-                    Directory.CreateDirectory(path + "/Settings");
-                    Directory.CreateDirectory(path + "/DataLogging");
-                    Directory.CreateDirectory(path + "/Logs");
-                    Directory.CreateDirectory(path + "/TestProcedures");
+                aquaPicEnvironment = Environment.GetEnvironmentVariable ("HOME");
+                aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic");
+
+				if (!Directory.Exists (aquaPicEnvironment)) {
+					Directory.CreateDirectory (aquaPicEnvironment);
+					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "/Settings"));
+					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "/DataLogging"));
+					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "/Logs"));
+					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "/TestProcedures"));
                 }
             }
 
@@ -97,6 +93,7 @@ namespace AquaPic
                 Temperature.Init ();
                 Lighting.Init ();
                 WaterLevel.Init ();
+				AutoTopOff.Init ();
                 Power.Init ();
 #if DEBUG
             } catch (Exception ex) {
@@ -105,19 +102,19 @@ namespace AquaPic
             }
 #endif
 
-            //Run the control
+            // Run the control
             var win = AquaPicGui.CreateInstance ();
             win.Show ();
 
             Application.Run ();
 
-            //Cleanup
+            // Cleanup
             if (AquaPicBus.isOpen) {
                 AquaPicBus.Close ();
             }
 
 #if DEBUG
-            //for some reason this doesn't like to be in the destroyed event
+            // For some reason this doesn't like to be in the destroyed event
             var groups = Temperature.GetAllTemperatureGroupNames ();
             foreach (var group in groups) {
                 var dataLogger = (DataLoggerIoImplementation)Temperature.GetTemperatureGroupDataLogger (group);
@@ -135,7 +132,7 @@ namespace AquaPic
 #endif
         }
 
-        //Gtk library hack because Windows
+        // Gtk library hack because Windows
         [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
         [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
         static extern bool SetDllDirectory (string lpPathName);

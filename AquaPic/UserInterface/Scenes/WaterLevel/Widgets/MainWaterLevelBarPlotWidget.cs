@@ -49,18 +49,18 @@ namespace AquaPic.UserInterface
             Put (label, 3, 55);
             label.Show ();
 
-            groupName = string.Empty;
+			groupName = string.Empty;
             if (options.Length >= 1) {
-                groupName = options[0] as string;
-                if (groupName != null) {
-                    if (!WaterLevel.CheckWaterLevelGroupKeyNoThrow (groupName)) {
-                        groupName = Temperature.defaultTemperatureGroup;
+                var groupNameOption = options[0] as string;
+                if (groupNameOption != null) {
+                    if (WaterLevel.CheckWaterLevelGroupKeyNoThrow (groupNameOption)) {
+                        groupName = groupNameOption;
                     }
-                } else {
-                    groupName = Temperature.defaultTemperatureGroup;
                 }
-            } else {
-                groupName = Temperature.defaultTemperatureGroup;
+            }
+
+            if (groupName.IsNotEmpty ()) {            
+				text = groupName;
             }
 
             var eventbox = new EventBox ();
@@ -80,7 +80,7 @@ namespace AquaPic.UserInterface
 
         public override void OnUpdate () {
             if (groupName.IsNotEmpty ()) {
-                if (WaterLevel.GetWaterLevelGroupAnalogSensorConnected (groupName)) {
+                if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (groupName)) {
                     currentValue = 0.0f;
 
                     flashUpdate = ++flashUpdate % 4;

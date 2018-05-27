@@ -158,9 +158,9 @@ namespace AquaPic.UserInterface
         protected override bool OnSave (object sender) {
             var name = (string)settings["Name"].setting;
 
-            var highAnalogAlarmSetpoint = Convert.ToSingle (settings["High Alarm"].setting);
+			var highAnalogAlarmSetpoint = Convert.ToSingle (settings["High Alarm"].setting);
             var enableHighAnalogAlarm = (int)settings["Enable High Alarm"].setting == 0;
-            var lowAnalogAlarmSetpoint = Convert.ToSingle (settings["Low Alarm"].setting);
+			var lowAnalogAlarmSetpoint = Convert.ToSingle (settings["Low Alarm"].setting);
             var enableLowAnalogAlarm = (int)settings["Enable Low Alarm"].setting == 0;
 
             JObject jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties");
@@ -201,6 +201,7 @@ namespace AquaPic.UserInterface
                     MessageBox.Show ("Something went wrong");
                     return false;
                 }
+
                 ja[arrIdx]["highAnalogAlarmSetpoint"] = highAnalogAlarmSetpoint.ToString ();
                 ja[arrIdx]["enableHighAnalogAlarm"] = enableHighAnalogAlarm.ToString ();
                 ja[arrIdx]["lowAnalogAlarmSetpoint"] = lowAnalogAlarmSetpoint.ToString ();

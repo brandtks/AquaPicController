@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit.3.10.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -60,13 +61,13 @@
       <Package>gtk-sharp-2.0</Package>
     </Reference>
     <Reference Include="CSScriptLibrary">
-      <HintPath>..\packages\CS-Script.lib.3.28.0.1\lib\CSScriptLibrary.dll</HintPath>
+      <HintPath>..\packages\CS-Script.lib.3.28.2.0\lib\CSScriptLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
+      <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -189,6 +190,8 @@
     <Compile Include="Runtime\Logger\LogItem.cs" />
     <Compile Include="Runtime\Bit\Bit.cs" />
     <Compile Include="Runtime\Bit\BitState.cs" />
+    <Compile Include="UserInterface\Scenes\ATO\AtoScreen.cs" />
+    <Compile Include="UserInterface\Scenes\ATO\Dialogs\AtoSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -203,8 +206,6 @@
     <None Include="Runtime\Plugin.Disable\ModuleScript.cs" />
     <None Include="UserInterface\Scenes\Plugin.Disable\EditPluginScreen.cs" />
     <None Include="UserInterface\Scenes\Plugin.Disable\PluginScreen.cs" />
-    <None Include="UserInterface\Scenes\ATO\Dialogs\AtoSettings.cs" />
-    <None Include="UserInterface\Scenes\ATO\AtoScreen.cs" />
     <None Include="UserInterface\Scenes\ATO\Widgets\MainAtoReservoirLevelBarPlotWidget.cs" />
     <None Include="packages.config" />
   </ItemGroup>
