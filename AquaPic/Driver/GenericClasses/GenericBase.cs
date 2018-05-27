@@ -124,6 +124,9 @@ namespace AquaPic.Drivers
 
         public virtual void AddChannel (int card, int channel, string channelName) {
             CheckCardRange (card);
+			if (!ChannelNameOk (card, name)) {
+                throw new Exception (string.Format ("Channel name {0} already exists", name));
+            }
             cards [card].AddChannel (channel, channelName);
         }
 
@@ -229,6 +232,26 @@ namespace AquaPic.Drivers
             cards [card].SetAllChannelValues (values);
         }
 
+		/**************************************************************************************************************/
+		/* Channel Name Check                                                                                         */
+		/**************************************************************************************************************/
+		public virtual bool ChannelNameOk (string cardName, string channelName) {
+			int card = GetCardIndex (cardName);
+			return ChannelNameOk (card, channelName);
+        }
+
+		public virtual bool ChannelNameOk (int card, string channelName) {
+			CheckCardRange (card);
+			bool nameOk;
+			try {
+				GetChannelIndex (card, channelName);
+				nameOk = false;
+			} catch (ArgumentException) {
+				nameOk = true;
+			}
+			return nameOk;
+		}
+
         /**************************************************************************************************************/
         /* Channel Name Getters                                                                                       */
         /**************************************************************************************************************/
@@ -255,6 +278,9 @@ namespace AquaPic.Drivers
 
         public virtual void SetChannelName (int card, int channel, string name) {
             CheckCardRange (card);
+			if (!ChannelNameOk (card, name)) {
+				throw new Exception (string.Format ("Channel name {0} already exists", name));
+			}
             cards[card].SetChannelName (channel, name);
         }
 

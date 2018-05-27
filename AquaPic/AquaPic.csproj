@@ -138,7 +138,7 @@
     <Compile Include="UserInterface\Scenes\Digital\Widgets\DigitalDisplay.cs" />
     <Compile Include="UserInterface\Scenes\Home\HomeScreen.cs" />
     <Compile Include="UserInterface\Scenes\Home\Dialogs\AddHomeWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Dialogs\CheckBoard.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Dialogs\CheckerBoard.cs" />
     <Compile Include="UserInterface\Scenes\Home\Dialogs\HomeSettings.cs" />
     <Compile Include="UserInterface\Scenes\Home\Dialogs\HomeSettingsWidget.cs" />
     <Compile Include="UserInterface\Scenes\Home\Widgets\BarPlotWidget.cs" />

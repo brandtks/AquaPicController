@@ -609,7 +609,7 @@ namespace AquaPic.Modules
         public static void RemoveAnalogLevelSensor (string analogLevelSensorName) {
             CheckAnalogLevelSensorKey (analogLevelSensorName);
             analogLevelSensors[analogLevelSensorName].Remove ();
-            Alarm.Clear (analogLevelSensors[analogLevelSensorName].disconnectedAlarmIndex);
+            Alarm.Clear (analogLevelSensors[analogLevelSensorName].sensorDisconnectedAlarmIndex);
             analogLevelSensors.Remove (analogLevelSensorName);
 
         }
@@ -670,7 +670,7 @@ namespace AquaPic.Modules
         /***Disconnected alarm index***/
         public static int GetAnalogLevelSensorDisconnectedAlarmIndex (string analogLevelSensorName) {
             CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].disconnectedAlarmIndex;
+            return analogLevelSensors[analogLevelSensorName].sensorDisconnectedAlarmIndex;
         }
 
         /***Zero scale value***/

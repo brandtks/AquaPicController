@@ -53,9 +53,9 @@ namespace AquaPic.UserInterface
                 displays [i] = new AnalogChannelDisplay ();
                 displays [i].divisionSteps = 1000;
                 displays [i].typeLabel.Visible = true;
-                displays [i].TypeSelectorChangedEvent += OnSelectorSwitchChanged;
                 displays [i].ForceButtonReleaseEvent += OnForceRelease;
                 displays [i].ValueChangedEvent += OnValueChanged;
+				displays[i].settingsButton.buttonColor = "grey1";
                 Put (displays [i], 70, 90 + (i * 75));
                 displays [i].Show ();
             }
@@ -111,15 +111,13 @@ namespace AquaPic.UserInterface
                 AquaPicDrivers.AnalogOutput.SetChannelMode (ic, Mode.Manual);
                 d.progressBar.enableTouch = true;
                 d.textBox.enableTouch = true;
-                d.button.buttonColor = "pri";
-                d.selectorSwitch.Visible = true;
+                d.forceButton.buttonColor = "pri";
                 d.typeLabel.Visible = false;
             } else {
                 AquaPicDrivers.AnalogOutput.SetChannelMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;
                 d.textBox.enableTouch = false;
-                d.button.buttonColor = "grey4";
-                d.selectorSwitch.Visible = false;
+                d.forceButton.buttonColor = "grey4";
                 d.typeLabel.Visible = true;
             }
 
@@ -144,21 +142,6 @@ namespace AquaPic.UserInterface
             d.QueueDraw ();
         }
 
-        // This doesn't work with the current Analog Output Cards
-        protected void OnSelectorSwitchChanged (object sender, SelectorChangedEventArgs args) {
-            AnalogChannelDisplay d = sender as AnalogChannelDisplay;
-
-            IndividualControl ic = IndividualControl.Empty;
-            ic.Group = cardId;
-            ic.Individual = AquaPicDrivers.AnalogOutput.GetChannelIndex (cardId, d.label.text);
-
-            if (args.currentSelectedIndex == 0) {
-                AquaPicDrivers.AnalogOutput.SetChannelType (ic, AnalogType.ZeroTen);
-            } else {
-                AquaPicDrivers.AnalogOutput.SetChannelType (ic, AnalogType.PWM);
-            }
-        }
-
         protected void GetCardData () {
             var names = AquaPicDrivers.AnalogOutput.GetAllChannelNames (cardId);
             var values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (cardId);
@@ -174,18 +157,11 @@ namespace AquaPic.UserInterface
                 if (modes [i] == Mode.Auto) {
                     d.progressBar.enableTouch = false;
                     d.textBox.enableTouch = false;
-                    d.button.buttonColor = "grey4";
-                    d.selectorSwitch.Visible = false;
+                    d.forceButton.buttonColor = "grey4";
                 } else {
                     d.progressBar.enableTouch = true;
                     d.textBox.enableTouch = true;
-                    d.button.buttonColor = "pri";
-                    d.selectorSwitch.Visible = true;
-
-                    if (types [i] == AnalogType.ZeroTen)
-                        d.selectorSwitch.currentSelected = 0;
-                    else
-                        d.selectorSwitch.currentSelected = 1;
+                    d.forceButton.buttonColor = "pri";
                 }
 
                 d.QueueDraw ();

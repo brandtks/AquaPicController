@@ -74,10 +74,10 @@ namespace AquaPic
 
 				if (!Directory.Exists (aquaPicEnvironment)) {
 					Directory.CreateDirectory (aquaPicEnvironment);
-					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "/Settings"));
-					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "/DataLogging"));
-					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "/Logs"));
-					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "/TestProcedures"));
+					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "Settings"));
+					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "DataLogging"));
+					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "Logs"));
+					Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "TestProcedures"));
                 }
             }
 

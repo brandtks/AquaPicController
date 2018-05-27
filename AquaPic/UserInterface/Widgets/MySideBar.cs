@@ -117,9 +117,10 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey4", 0.80);
                     cr.Fill ();
 
+                    // Home Button
                     cr.MoveTo (right + 5, bottom + 5);
-                    cr.LineTo (right - 120, bottom + 5);
-                    cr.Arc (right - 80, bottom, 40, 0, -Math.PI / 2);
+                    cr.LineTo (right - 165, bottom + 5);
+                    cr.Arc (right - 125, bottom, 40, 0, -Math.PI / 2);
                     cr.LineTo (right + 5, bottom - 40);
                     cr.ClosePath ();
                     TouchColor.SetSource (cr, "grey4", 0.80);
@@ -175,13 +176,20 @@ namespace AquaPic.UserInterface
                             50);
                     }
 
+                    // Menu Text
                     t.text = "Menu";
                     t.font.size = 18;
                     t.alignment = TouchAlignment.Right;
                     t.Render (this, right - 120, top, 115, 40);
 
+                    // Home Text
                     t.text = "Home";
                     t.Render (this, right - 120, bottom - 40, 115, 40);
+
+                    // Settings Text
+					t.text = Convert.ToChar (0x2699).ToString ();
+					t.alignment = TouchAlignment.Center;
+					t.Render (this, right - 160, bottom - 40, 40, 40);
                 } else {
                     cr.Arc (originX - 208, originY, radius, 0, 2 * Math.PI);
                     cr.ClosePath ();

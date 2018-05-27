@@ -71,7 +71,7 @@ namespace AquaPic.Runtime
                                 (string)jo["options"][1]);
                             break;
                         case "phOrp":
-                            Logger.Add ("Adding digital input card");
+                            Logger.Add ("Adding pH/ORP card");
                             AquaPicDrivers.PhOrp.AddCard (
                                 Convert.ToInt32 ((string)jo["options"][0], 16),
                                 (string)jo["options"][1]);
@@ -98,7 +98,13 @@ namespace AquaPic.Runtime
                 var jstring = File.ReadAllText (path);
                 var jobj = (JObject)JToken.Parse (jstring);
 
-                var autoConnect = Convert.ToBoolean (jobj["autoConnectAquaPicBus"]);
+				bool autoConnect;
+				try {
+					autoConnect = Convert.ToBoolean (jobj["autoConnectAquaPicBus"]);
+				} catch {
+					autoConnect = false;
+				}
+
                 if (autoConnect) {
                     var port = (string)jobj["aquaPicBusPort"];
                     if (!string.IsNullOrWhiteSpace (port)) {

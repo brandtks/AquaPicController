@@ -240,11 +240,11 @@ namespace AquaPic.Modules
             } else {
                 RiseSetCalc.latitude = 37.0902;
                 RiseSetCalc.longitude = -95.7129;
-                defaultSunRise = new Time (7, 30);
-                defaultSunSet = new Time (20, 30);
+                defaultSunRise = new Time (7, 45);
+                defaultSunSet = new Time (21, 00);
                 minSunRise = new Time (7, 15);
                 maxSunRise = new Time (8, 00);
-                minSunSet = new Time (19, 30);
+                minSunSet = new Time (20, 15);
                 maxSunSet = new Time (21, 00);
 
                 UpdateRiseSetTimes ();

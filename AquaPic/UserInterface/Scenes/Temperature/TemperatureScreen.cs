@@ -46,6 +46,7 @@ namespace AquaPic.UserInterface
 
         string probeName;
         TouchLabel probeTempTextbox;
+		TouchLabel probeTempLabel;
         TouchComboBox probeCombo;
 
         public TemperatureWindow (params object[] options) 
@@ -278,13 +279,13 @@ namespace AquaPic.UserInterface
             };
             Put (b, 525, 405);
 
-            var tLabel = new TouchLabel ();
-            tLabel.text = "Temperature";
-            tLabel.textAlignment = TouchAlignment.Center;
-            tLabel.textColor = "grey3";
-            tLabel.WidthRequest = 370;
-            Put (tLabel, 415, 355);
-            tLabel.Show ();
+			probeTempLabel = new TouchLabel ();
+            probeTempLabel.text = "Temperature";
+            probeTempLabel.textAlignment = TouchAlignment.Center;
+            probeTempLabel.textColor = "grey3";
+            probeTempLabel.WidthRequest = 370;
+            Put (probeTempLabel, 415, 355);
+            probeTempLabel.Show ();
 
             probeTempTextbox = new TouchLabel ();
             probeTempTextbox.WidthRequest = 370;
@@ -450,13 +451,16 @@ namespace AquaPic.UserInterface
                 if (Temperature.IsTemperatureProbeConnected (probeName)) {
                     probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeName).ToString ("F2");
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
+					probeTempLabel.Visible = true;
                 } else {
                     probeTempTextbox.text = "Probe disconnected";
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
+					probeTempLabel.Visible = false;
                 }
             } else {
                 probeTempTextbox.text = "Probe not available";
                 probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
+				probeTempLabel.Visible = false;
             }
 
             probeTempTextbox.QueueDraw ();

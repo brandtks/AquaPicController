@@ -34,15 +34,15 @@ namespace AquaPic.UserInterface
     public class AnalogChannelDisplay : Fixed
     {
         public event ButtonReleaseEventHandler ForceButtonReleaseEvent;
+		public event ButtonReleaseEventHandler SettingsButtonReleaseEvent;
         public event ValueChangedHandler ValueChangedEvent;
-        public event SelectorChangedEventHandler TypeSelectorChangedEvent;
 
         public TouchLabel label;
         public TouchTextBox textBox;
         public TouchProgressBar progressBar;
         public TouchLabel typeLabel;
-        public TouchButton button;
-        public TouchSelectorSwitch selectorSwitch;
+        public TouchButton forceButton;
+		public TouchButton settingsButton;
 
         public int divisionSteps;
 
@@ -56,10 +56,11 @@ namespace AquaPic.UserInterface
         }
 
         public AnalogChannelDisplay () {
-            SetSizeRequest (710, 65);
+            SetSizeRequest (710, 50);
 
             label = new TouchLabel ();
-            Put (label, 5, 15);
+			label.WidthRequest = 490;
+            Put (label, 5, 0);
             label.Show ();
 
             textBox = new TouchTextBox ();
@@ -72,40 +73,39 @@ namespace AquaPic.UserInterface
                     ;
                 }
             };
-            Put (textBox, 0, 35);
+            Put (textBox, 0, 20);
             textBox.Show ();
 
             progressBar = new TouchProgressBar (TouchOrientation.Horizontal);
-            progressBar.WidthRequest = 415;
+            progressBar.WidthRequest = 395;
             progressBar.ProgressChangedEvent += (sender, args) => {
-                currentValue = args.currentProgress * (float)divisionSteps;
+                currentValue = args.currentProgress * divisionSteps;
                 ValueChanged ();
             };
-            Put (progressBar, 185, 35);
+            Put (progressBar, 185, 20);
             progressBar.Show ();
 
             typeLabel = new TouchLabel ();
             typeLabel.Visible = false;
             typeLabel.WidthRequest = 200;
             typeLabel.textAlignment = TouchAlignment.Right;
-            Put (typeLabel, 500, 15);
+            Put (typeLabel, 500, 0);
 
-            button = new TouchButton ();
-            button.SetSizeRequest (100, 30);
-            button.buttonColor = "grey3";
-            button.text = "Force";
-            button.ButtonReleaseEvent += OnForceReleased;
-            Put (button, 610, 35);
-            button.Show ();
+            forceButton = new TouchButton ();
+            forceButton.SetSizeRequest (85, 30);
+			forceButton.buttonColor = "grey4";
+            forceButton.text = "Force";
+            forceButton.ButtonReleaseEvent += OnForceReleased;
+            Put (forceButton, 590, 20);
+            forceButton.Show ();
 
-            selectorSwitch = new TouchSelectorSwitch (2);
-            selectorSwitch.SetSizeRequest (100, 30);
-            selectorSwitch.sliderColorOptions [0] = "pri";
-            selectorSwitch.sliderColorOptions [1] = "seca";
-            selectorSwitch.SelectorChangedEvent += OnSelectorSwitchChanged;
-            selectorSwitch.ExposeEvent += OnExpose;
-            selectorSwitch.Visible = false;
-            Put (selectorSwitch, 610, 0);
+			settingsButton = new TouchButton ();
+			settingsButton.SetSizeRequest (30, 30);
+			settingsButton.buttonColor = "grey4";
+			settingsButton.text = Convert.ToChar (0x2699).ToString ();
+			settingsButton.ButtonReleaseEvent += OnSettingsRelease;
+			Put (settingsButton, 680, 20);
+			settingsButton.Show ();
 
             Show ();
         }
@@ -117,37 +117,18 @@ namespace AquaPic.UserInterface
                 throw new NotImplementedException ("Force button release not implemented");
         }
 
+		protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
+			if (SettingsButtonReleaseEvent != null)
+				SettingsButtonReleaseEvent (this, args);
+            else
+                throw new NotImplementedException ("Settings button release not implemented");
+        }
+
         protected void ValueChanged () {
             if (ValueChangedEvent != null)
                 ValueChangedEvent (this, progressBar.currentProgress * (float)divisionSteps);
             else
                 throw new NotImplementedException ("Value changed not implemented");
-        }
-
-        protected void OnSelectorSwitchChanged (object sender, SelectorChangedEventArgs args) {
-            if (TypeSelectorChangedEvent != null)
-                TypeSelectorChangedEvent (this, args);
-            else
-                throw new NotImplementedException ("Type selector not impletemented");
-        }
-
-        protected void OnExpose (object sender, ExposeEventArgs args) {
-            var selector = sender as TouchSelectorSwitch;
-            int seperation = selector.Allocation.Width / selector.selectionCount;
-            int x = selector.Allocation.Left;
-
-            TouchText render = new TouchText ();
-            render.textWrap = TouchTextWrap.Shrink;
-            render.alignment = TouchAlignment.Center;
-            render.font.color = "white";
-
-            string[] labels = {"0-10V", "PWM"};
-
-            foreach (var l in labels) {
-                render.text = l;
-                render.Render (selector, x, selector.Allocation.Top, seperation, selector.Allocation.Height);
-                x += seperation;
-            }
         }
     }
 }

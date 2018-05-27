@@ -38,6 +38,7 @@ namespace AquaPic.UserInterface
         private Fixed fix;
         private TouchButton saveBtn;
         private TouchButton cancelButton;
+		private TouchButton deleteButton;
         private TouchComboBox widgetCombo;
         private CheckerBoard board;
         private SettingsTextBox rowTextBox;
@@ -94,6 +95,13 @@ namespace AquaPic.UserInterface
             };
             fix.Put (cancelButton, 385, 285);
             cancelButton.Show ();
+
+			deleteButton = new TouchButton ();
+			deleteButton.SetSizeRequest (100, 30);
+			deleteButton.text = "Delete";
+			deleteButton.ButtonReleaseEvent += OnDeleteButtonRelease;
+			deleteButton.buttonColor = "compl";
+			fix.Put (deleteButton, 5, 285);
 
             var widgetLabel = new TouchLabel ();
             widgetLabel.text = "Home Screen Widgets";
@@ -251,6 +259,38 @@ namespace AquaPic.UserInterface
                 MessageBox.Show ("Please fix conflict tiles");
             }
         }
+
+		protected void OnDeleteButtonRelease (object sender, ButtonReleaseEventArgs args) {
+			if (widgetCombo.activeIndex >= 0) {
+				var parent = Toplevel as Window;
+				if (parent != null) {
+					if (!parent.IsTopLevel)
+						parent = null;
+				}
+
+				var ms = new TouchDialog ("Are you sure you with to delete " + widgetCombo.activeText, parent);
+
+				ms.Response += (o, a) => {
+					if (a.ResponseId == ResponseType.Yes) {
+						board.FreeTile (widgets[widgetCombo.activeIndex]);
+						widgets.RemoveAt (widgetCombo.activeIndex);
+						widgetCombo.activeIndex = -1;
+						rowTextBox.textBox.text = string.Empty;
+						columnTextBox.textBox.text = string.Empty;
+						SetColorOfRowUpDownButtons (-1);
+						SetColorOfColumnUpDownButtons (-1);
+
+						rowTextBox.QueueDraw ();
+						columnTextBox.QueueDraw ();
+						board.QueueDraw ();
+						widgetCombo.QueueDraw ();
+					}
+				};
+
+				ms.Run ();
+				ms.Destroy ();
+			}
+		}
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs args) {
             if (board.containsNoConflictTiles) {

@@ -24,6 +24,7 @@
 using System;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Globals;
 
@@ -49,12 +50,13 @@ namespace AquaPic.UserInterface
 
             displays = new AnalogChannelDisplay[4];
             for (int i = 0; i < 4; ++i) {
-                displays [i] = new AnalogChannelDisplay ();
-                displays [i].divisionSteps = 4096;
-                displays [i].ForceButtonReleaseEvent += OnForceRelease;
-                displays [i].ValueChangedEvent += OnValueChanged;
-                displays [i].typeLabel.Visible = true;
-                Put (displays [i], 70, 90 + (i * 75));
+				displays[i] = new AnalogChannelDisplay ();
+				displays[i].divisionSteps = 4096;
+				displays[i].ForceButtonReleaseEvent += OnForceRelease;
+				displays[i].SettingsButtonReleaseEvent += OnSettingsRelease;
+				displays[i].ValueChangedEvent += OnValueChanged;
+				displays[i].typeLabel.Visible = true;
+				Put (displays[i], 70, 90 + (i * 75));
             }
 
             string[] names = AquaPicDrivers.AnalogInput.GetAllCardNames ();
@@ -108,14 +110,55 @@ namespace AquaPic.UserInterface
                 AquaPicDrivers.AnalogInput.SetChannelMode (ic, Mode.Manual);
                 d.progressBar.enableTouch = true;
                 d.textBox.enableTouch = true;
-                d.button.buttonColor = "pri";
+                d.forceButton.buttonColor = "pri";
             } else {
                 AquaPicDrivers.AnalogInput.SetChannelMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;
                 d.textBox.enableTouch = false;
-                d.button.buttonColor = "grey4";
+                d.forceButton.buttonColor = "grey4";
 
             }
+
+            d.QueueDraw ();
+        }
+
+		protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
+            var d = sender as AnalogChannelDisplay;
+
+            var ic = IndividualControl.Empty;
+            ic.Group = cardId;
+            ic.Individual = AquaPicDrivers.AnalogInput.GetChannelIndex (cardId, d.label.text);
+
+			TouchNumberInput numberInput;
+            
+			var parent = Toplevel as Window;
+			if (parent != null) {
+				if (parent.IsTopLevel)
+					numberInput = new TouchNumberInput (false, parent);
+				else
+					numberInput = new TouchNumberInput (false);
+			} else {
+				numberInput = new TouchNumberInput (false);
+			}
+            
+			numberInput.Title = "LPF";
+
+            numberInput.NumberSetEvent += (value) => {
+				if (value.IsNotEmpty ()) {
+					try {
+						var lpf = Convert.ToInt32 (value);
+						AquaPicDrivers.AnalogInput.SetChannelLowPassFilterFactor (ic, lpf);
+						d.typeLabel.text = string.Format ("LPF: {0}", lpf);
+					} catch {
+						MessageBox.Show ("Invalid number format");
+					}
+				} else {
+					MessageBox.Show ("Low pass filter can't be empty");
+				}
+            };
+
+            numberInput.Run ();
+            numberInput.Destroy ();
 
             d.QueueDraw ();
         }
@@ -133,7 +176,7 @@ namespace AquaPic.UserInterface
                 AquaPicDrivers.AnalogInput.SetChannelValue (ic, value);
 
             d.QueueDraw ();
-        }
+        }      
 
         protected void GetCardData () {
             string[] names = AquaPicDrivers.AnalogInput.GetAllChannelNames (cardId);
@@ -150,11 +193,11 @@ namespace AquaPic.UserInterface
                 if (modes [i] == Mode.Auto) {
                     d.progressBar.enableTouch = false;
                     d.textBox.enableTouch = false;
-                    d.button.buttonColor = "grey4";
+                    d.forceButton.buttonColor = "grey4";
                 } else {
                     d.progressBar.enableTouch = true;
                     d.textBox.enableTouch = true;
-                    d.button.buttonColor = "pri";
+                    d.forceButton.buttonColor = "pri";
                 }
 
                 d.QueueDraw ();

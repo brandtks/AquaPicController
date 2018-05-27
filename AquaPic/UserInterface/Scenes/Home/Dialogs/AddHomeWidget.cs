@@ -22,11 +22,11 @@
 #endregion // License
 
 using System;
-using Cairo;
+using System.Text.RegularExpressions;
 using Gtk;
 using GoodtimeDevelopment.Utilites;
 using GoodtimeDevelopment.TouchWidget;
-using System.Text.RegularExpressions;
+using AquaPic.Modules;
 
 namespace AquaPic.UserInterface
 {
@@ -39,7 +39,11 @@ namespace AquaPic.UserInterface
             private TouchButton cancelButton;
             private TouchComboBox typeCombo;
             private SettingsTextBox nameTextBox;
-            private SettingsTextBox groupTextBox;
+
+			private SettingsComboBox moduleComboBox;
+			private SettingsComboBox groupComboBox;
+
+			private SettingsComboBox nameComboBox;
 
             public HomeSettingsWidget newWidget;
 
@@ -47,7 +51,7 @@ namespace AquaPic.UserInterface
                 Name = "Add Home Screen Widget";
                 Title = "Add Home Screen Widget";
                 WindowPosition = (WindowPosition)4;
-                SetSizeRequest (600, 110);
+                SetSizeRequest (600, 160);
 
 #if RPI_BUILD
                 Decorated = false;
@@ -74,13 +78,13 @@ namespace AquaPic.UserInterface
                 }
 
                 fix = new Fixed ();
-                fix.SetSizeRequest (600, 110);
+                fix.SetSizeRequest (600, 150);
 
                 addBtn = new TouchButton ();
                 addBtn.SetSizeRequest (100, 30);
                 addBtn.text = "Add";
                 addBtn.ButtonReleaseEvent += OnAddButtonReleased;
-                fix.Put (addBtn, 495, 75);
+                fix.Put (addBtn, 495, 125);
                 addBtn.Show ();
 
                 cancelButton = new TouchButton ();
@@ -89,7 +93,7 @@ namespace AquaPic.UserInterface
                 cancelButton.ButtonReleaseEvent += (o, args) => {
                     Destroy ();
                 };
-                fix.Put (cancelButton, 385, 75);
+                fix.Put (cancelButton, 385, 125);
                 cancelButton.Show ();
 
                 var widgetLabel = new TouchLabel ();
@@ -100,12 +104,25 @@ namespace AquaPic.UserInterface
                 widgetLabel.Show ();
 
                 nameTextBox = new SettingsTextBox ("Name");
+				nameTextBox.Visible = false;
                 fix.Put (nameTextBox, 5, 40);
-                nameTextBox.Show ();
+                
+				moduleComboBox = new SettingsComboBox ("Module");
+				moduleComboBox.combo.nonActiveMessage = "Please select module";
+				moduleComboBox.combo.ComboChangedEvent += OnModuleComboChanged;
+				moduleComboBox.Visible = false;
+				fix.Put (moduleComboBox, 5, 40);
 
-                groupTextBox = new SettingsTextBox ("Group");
-                fix.Put (groupTextBox, 305, 40);
-                groupTextBox.Show ();
+				nameComboBox = new SettingsComboBox ("Name");
+				nameComboBox.combo.nonActiveMessage = "Please select name";
+				nameComboBox.combo.ComboChangedEvent += OnModuleComboChanged;
+				nameComboBox.Visible = false;
+				fix.Put (nameComboBox, 5, 40);
+
+				groupComboBox = new SettingsComboBox ("Group");
+				groupComboBox.combo.nonActiveMessage = "Please select group";
+				groupComboBox.Visible = false;
+				fix.Put (groupComboBox, 305, 40);
 
                 typeCombo = new TouchComboBox ();
                 typeCombo.comboList.Add ("Line Plot");
@@ -115,7 +132,8 @@ namespace AquaPic.UserInterface
                 typeCombo.comboList.Add ("Bar Plot");
                 typeCombo.nonActiveMessage = "Select type";
                 typeCombo.WidthRequest = 400;
-                typeCombo.maxListHeight = 2;
+                typeCombo.maxListHeight = 3;
+				typeCombo.ComboChangedEvent += OnTypeComboChanged;
                 fix.Put (typeCombo, 195, 5);
                 typeCombo.Show ();
 
@@ -128,25 +146,114 @@ namespace AquaPic.UserInterface
                 fix.Show ();
             }
 
+			protected void OnTypeComboChanged (object sender, ComboBoxChangedEventArgs args) {
+				switch (args.activeText) {
+				case "Line Plot":
+					nameTextBox.Visible = false;
+                    moduleComboBox.Visible = true;
+					groupComboBox.Visible = false;
+                    nameComboBox.Visible = false;
+
+					moduleComboBox.combo.comboList.Clear ();
+					moduleComboBox.combo.comboList.AddRange (HomeWindowWidgets.linePlots.Keys);
+					moduleComboBox.combo.activeIndex = -1;
+
+					break;
+				case "Bar Plot":
+					nameTextBox.Visible = false;
+                    moduleComboBox.Visible = true;
+					groupComboBox.Visible = false;
+                    nameComboBox.Visible = false;
+
+					moduleComboBox.combo.comboList.Clear ();
+                    moduleComboBox.combo.comboList.AddRange (HomeWindowWidgets.barPlots.Keys);
+                    moduleComboBox.combo.activeIndex = -1;
+
+					break;
+				case "Curved Bar Plot":
+                    nameTextBox.Visible = false;
+					moduleComboBox.Visible = false;
+					groupComboBox.Visible = false;
+					nameComboBox.Visible = true;
+
+					nameComboBox.combo.comboList.Clear ();
+					nameComboBox.combo.comboList.AddRange (HomeWindowWidgets.curvedBarPlots.Keys);
+					moduleComboBox.combo.activeIndex = -1;
+
+                    break;
+				default:
+					nameTextBox.Visible = true;
+                    moduleComboBox.Visible = false;
+                    groupComboBox.Visible = false;
+					nameComboBox.Visible = false;
+					break;
+				}
+			}
+
+			protected void OnModuleComboChanged (object sender, ComboBoxChangedEventArgs args) {
+				if (args.activeIndex != -1) {
+                    if (args.activeText == "Temperature") {
+						groupComboBox.Visible = true;
+						groupComboBox.combo.comboList.Clear ();
+						groupComboBox.combo.comboList.AddRange (Temperature.GetAllTemperatureGroupNames ());
+						groupComboBox.combo.activeIndex = -1;
+					} else if (args.activeText == "Water Level") {
+						groupComboBox.Visible = true;
+						groupComboBox.combo.comboList.Clear ();
+						groupComboBox.combo.comboList.AddRange (WaterLevel.GetAllWaterLevelGroupNames ());
+						groupComboBox.combo.activeIndex = -1;
+					} else {
+						groupComboBox.Visible = false;
+					}
+				}
+			}
+
             protected void OnAddButtonReleased (object sender, ButtonReleaseEventArgs args) {
                 if (typeCombo.activeIndex == -1) {
                     MessageBox.Show ("Please select a widget type");
                     return;
                 }
 
-                if (nameTextBox.textBox.text.IsEmpty ()) {
-                    MessageBox.Show ("Please enter name of widget");
-                    return;
-                }
+				string name, group;
 
                 var type = Regex.Replace (typeCombo.activeText, @"\s+", "");
-                var name = nameTextBox.textBox.text;
-                var group = groupTextBox.textBox.text;
+				switch (type) {
+                case "LinePlot":
+				case "BarPlot":
+					if (moduleComboBox.combo.activeIndex < 0) {
+                        MessageBox.Show ("Please select a module");
+                        return;
+                    }
+					name = (string)moduleComboBox.setting;
+
+					if (groupComboBox.combo.activeIndex < 0) 
+					if (groupComboBox.Visible) {
+                        MessageBox.Show ("Please select a group");
+                        return;
+                    }
+					group = (string)groupComboBox.setting;
+
+                    break;
+                case "CurvedBarPlot":
+                    if (nameComboBox.combo.activeIndex < 0) {
+                        MessageBox.Show ("Please select a name");
+                        return;
+                    }
+					name = (string)nameComboBox.setting;
+					group = string.Empty;
+                    break;
+                default:
+					name = nameTextBox.textBox.text;
+					group = string.Empty;
+                    break;
+                }
 
                 newWidget = new HomeSettingsWidget (name, group, type, 0, 0);
 
                 Destroy ();
             }
+
+
         }
     }
 }
