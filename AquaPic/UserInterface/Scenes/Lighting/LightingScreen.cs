@@ -80,6 +80,7 @@ namespace AquaPic.UserInterface
             var sunRise = new TouchLabel ();
             sunRise.text = Lighting.sunRiseToday.ToShortDateString ();
             sunRise.textAlignment = TouchAlignment.Center;
+			sunRise.textRender.textWrap = TouchTextWrap.Shrink;
             sunRise.textSize = 20;
             sunRise.WidthRequest = 150;
             Put (sunRise, 60, 90);
@@ -96,6 +97,7 @@ namespace AquaPic.UserInterface
             var sunSet = new TouchLabel ();
             sunSet.text = Lighting.sunSetToday.ToShortDateString ();
             sunSet.textAlignment = TouchAlignment.Center;
+			sunSet.textRender.textWrap = TouchTextWrap.Shrink;
             sunSet.textSize = 20;
             sunSet.WidthRequest = 150;
             Put (sunSet, 220, 90);
@@ -112,6 +114,7 @@ namespace AquaPic.UserInterface
             var sunRiseTomorrow = new TouchLabel ();
             sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToShortDateString ();
             sunRiseTomorrow.textAlignment = TouchAlignment.Center;
+			sunRiseTomorrow.textRender.textWrap = TouchTextWrap.Shrink;
             sunRiseTomorrow.textSize = 20;
             sunRiseTomorrow.WidthRequest = 150;
             Put (sunRiseTomorrow, 60, 190);
@@ -128,6 +131,7 @@ namespace AquaPic.UserInterface
             var sunSetTomorrow = new TouchLabel ();
             sunSetTomorrow.text = Lighting.sunSetTomorrow.ToShortDateString ();
             sunSetTomorrow.textAlignment = TouchAlignment.Center;
+			sunSetTomorrow.textRender.textWrap = TouchTextWrap.Shrink;
             sunSetTomorrow.textSize = 20;
             sunSetTomorrow.WidthRequest = 150;
             Put (sunSetTomorrow, 220, 190);

@@ -65,7 +65,6 @@ namespace AquaPic.Runtime
             sb.AppendLine ("using AquaPic.Modules;");
             sb.AppendLine ("using AquaPic.Globals;");
             sb.AppendLine ("using AquaPic.Drivers;");
-            sb.AppendLine ("using AquaPic.SerialBus;");
             sb.AppendLine ("using AquaPic.Operands;");
             sb.AppendLine ("public class MyOutletScipt : IOutletScript {");
             sb.AppendLine ("public bool OutletConditionCheck () {");

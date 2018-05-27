@@ -46,23 +46,18 @@ namespace AquaPic.UserInterface
               
 			var t = new SettingsTextBox ("Name");
             if (groupName.IsNotEmpty ()) {
-                t.textBox.text = groupName;
-                t.textBox.enableTouch = false;
-                t.textBox.TextChangedEvent += (sender, args) => {
-                    MessageBox.Show ("Can not change ATO group name during runtime");
-                    args.keepText = false;
-                };
+                t.textBox.text = groupName; 
             } else {
                 t.textBox.text = "Enter name";
-                t.textBox.TextChangedEvent += (sender, args) => {
-                    if (string.IsNullOrWhiteSpace (args.text))
-                        args.keepText = false;
-					else if (!AutoTopOff.AtoGroupNameOk (args.text)) {
-                        MessageBox.Show ("ATO group name already exists");
-                        args.keepText = false;
-                    }
-                };
             }
+			t.textBox.TextChangedEvent += (sender, args) => {
+                if (string.IsNullOrWhiteSpace (args.text))
+                    args.keepText = false;
+                else if (!AutoTopOff.AtoGroupNameOk (args.text)) {
+                    MessageBox.Show ("ATO group name already exists");
+                    args.keepText = false;
+                }
+            };
             AddSetting (t);
 
 			var s = new SettingsSelectorSwitch ("Enable");
@@ -245,9 +240,18 @@ namespace AquaPic.UserInterface
 
 		protected override bool OnSave (object sender) {
 			var name = (string)settings["Name"].setting;
+			if (name == "Enter name") {
+                MessageBox.Show ("Invalid water group name");
+                return false;
+            }
+
             var enable = (int)settings["Enable"].setting == 0;
 			var waterLevelGroup = (string)settings["Water Group"].setting;
 			var requestBitName = (string)settings["Request Bit Name"].setting;
+			if (requestBitName == "Enter name") {
+                MessageBox.Show ("Invalid request bit name");
+                return false;
+            }
 
 			var useAnalogSensors = (int)settings["Use Analog"].setting == 0;
 			var analogOnSetpoint = Convert.ToSingle (settings["Analog On"].setting);
@@ -261,17 +265,7 @@ namespace AquaPic.UserInterface
 			JObject jo = SettingsHelper.OpenSettingsFile ("autoTopOffProperties");
 			var ja = jo["atoGroups"] as JArray;
 
-			if (groupName.IsEmpty ()) {
-				if (name == "Enter name") {
-					MessageBox.Show ("Invalid water group name");
-					return false;
-				}
-
-				if (requestBitName == "Enter name") {
-					MessageBox.Show ("Invalid request bit name");
-					return false;
-				}
-
+			if (groupName.IsEmpty ()) {          
 				AutoTopOff.AddAtoGroup (
 					name,
 					enable,
@@ -300,6 +294,10 @@ namespace AquaPic.UserInterface
 				ja.Add (jobj);
 				groupName = name;
 			} else {
+				if (groupName != name) {
+					AutoTopOff.SetAtoGroupName (groupName, name);
+					groupName = name;
+				}
 				AutoTopOff.SetAtoGroupEnable (groupName, enable);
 				AutoTopOff.SetAtoGroupWaterLevelGroupName (groupName, waterLevelGroup);
 				AutoTopOff.SetAtoGroupRequestBitName (groupName, requestBitName);

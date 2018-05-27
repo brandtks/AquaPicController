@@ -341,10 +341,23 @@ namespace AquaPic.Modules
             CheckAtoGroupKey (name);
 			return atoGroups[name].failAlarmIndex;
         }
-
+        
 		/***Setters****************************************************************************************************/
-		/***Enable***/
-        public static void SetAtoGroupEnable (string name, bool enable) {
+		/***Names***/
+        public static void SetAtoGroupName (string oldName, string newName) {
+            CheckAtoGroupKey (oldName);
+			if (!AtoGroupNameOk (newName)) {
+				throw new Exception (string.Format ("ATO Group: {0} already exists", newName));
+            }
+
+			var atoGroup = atoGroups[oldName];
+			atoGroups[oldName].name = newName;
+			atoGroups.Remove (oldName);
+			atoGroups.Add (newName, atoGroup);
+        }
+
+		/***Enable***/      
+		public static void SetAtoGroupEnable (string name, bool enable) {
             CheckAtoGroupKey (name);
             atoGroups[name].enable = enable;
         }

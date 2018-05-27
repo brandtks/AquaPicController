@@ -33,7 +33,6 @@ namespace AquaPic.UserInterface
     {
         string groupName;
         TouchLabel label;
-        int flashUpdate;
 
         public WaterLevelWidget (params object[] options)
             : base () 
@@ -43,10 +42,11 @@ namespace AquaPic.UserInterface
 
             label = new TouchLabel ();
             label.textColor = "compl";
-            label.text = "Probe Disconnected";
+            label.text = "Disconnected";
             label.WidthRequest = 199;
             label.textAlignment = TouchAlignment.Center;
-            Put (label, 3, 55);
+			label.textRender.orientation = TouchOrientation.Vertical;
+            Put (label, 60, 9);
             label.Show ();
 
 			groupName = string.Empty;
@@ -74,24 +74,17 @@ namespace AquaPic.UserInterface
             eventbox.Show ();
 
             fullScale = 15.0f;
-            flashUpdate = 0;
             OnUpdate ();
         }
 
         public override void OnUpdate () {
             if (groupName.IsNotEmpty ()) {
                 if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (groupName)) {
-                    currentValue = 0.0f;
-
-                    flashUpdate = ++flashUpdate % 4;
-                    if (flashUpdate <= 1)
-                        label.Visible = true;
-                    else
-                        label.Visible = false;
+					textBox.text = "--";
+                    label.Visible = true;
                 } else {
                     currentValue = WaterLevel.GetWaterLevelGroupLevel (groupName);
                     label.Visible = false;
-                    flashUpdate = 0;
                 }
             }
         }

@@ -190,8 +190,7 @@
     <Compile Include="Runtime\Logger\LogItem.cs" />
     <Compile Include="Runtime\Bit\Bit.cs" />
     <Compile Include="Runtime\Bit\BitState.cs" />
-    <Compile Include="UserInterface\Scenes\ATO\AtoScreen.cs" />
-    <Compile Include="UserInterface\Scenes\ATO\Dialogs\AtoSettings.cs" />
+    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AtoSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -206,7 +205,6 @@
     <None Include="Runtime\Plugin.Disable\ModuleScript.cs" />
     <None Include="UserInterface\Scenes\Plugin.Disable\EditPluginScreen.cs" />
     <None Include="UserInterface\Scenes\Plugin.Disable\PluginScreen.cs" />
-    <None Include="UserInterface\Scenes\ATO\Widgets\MainAtoReservoirLevelBarPlotWidget.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -215,9 +213,6 @@
     <Folder Include="Operands\Value\" />
     <Folder Include="Equipment\" />
     <Folder Include="Modules\ATO\" />
-    <Folder Include="UserInterface\Scenes\ATO\" />
-    <Folder Include="UserInterface\Scenes\ATO\Dialogs\" />
-    <Folder Include="UserInterface\Scenes\ATO\Widgets\" />
     <Folder Include="Tests\" />
     <Folder Include="Driver\pHOrp\" />
     <Folder Include="Runtime\SettingsHelper\" />

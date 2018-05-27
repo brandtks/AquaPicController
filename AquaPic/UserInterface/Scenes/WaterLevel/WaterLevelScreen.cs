@@ -474,6 +474,7 @@ namespace AquaPic.UserInterface
                 atoGroupName = e.activeText;
             }
             GetAtoGroupData ();
+
         }
 
         protected void OnAnalogSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
