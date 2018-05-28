@@ -33,7 +33,7 @@ using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class HeaterSettings : TouchSettingsDialog
+    public class PowerSettings : TouchSettingsDialog
     {
         string heaterName;
         public string newOrUpdatedHeaterName {
@@ -42,7 +42,7 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public HeaterSettings (string heaterName, bool includeDelete)
+        public PowerSettings (string heaterName, bool includeDelete)
             : base (heaterName, includeDelete) 
         {
             this.heaterName = heaterName;
