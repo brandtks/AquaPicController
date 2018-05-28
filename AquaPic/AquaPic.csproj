@@ -191,6 +191,7 @@
     <Compile Include="Runtime\Bit\Bit.cs" />
     <Compile Include="Runtime\Bit\BitState.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AtoSettings.cs" />
+    <Compile Include="UserInterface\Scenes\Power\Dialogs\PowerSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

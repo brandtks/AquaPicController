@@ -55,7 +55,7 @@ namespace AquaPic.SerialBus
             }
 
             public Slave (int address, string name) {
-                if (!IsAddressOk ((byte)address))
+				if (!SlaveAddressOk ((byte)address))
                     throw new Exception ("Address already in use");
 
                 this.address = (byte)address;

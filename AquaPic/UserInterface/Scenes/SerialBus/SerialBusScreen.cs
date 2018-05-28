@@ -118,18 +118,6 @@ namespace AquaPic.UserInterface
             Put (c, 380, 70);
             c.Show ();
 
-            var addSlaveBtn = new TouchButton ();
-            addSlaveBtn.text = "Add Slave";
-            addSlaveBtn.SetSizeRequest (100, 30);
-            addSlaveBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new AddSlaveSettings ();
-                s.Run ();
-                s.Destroy ();
-                s.Dispose ();
-            };
-            Put (addSlaveBtn, 65, 70);
-            addSlaveBtn.Show ();
-
             GetSlaveData ();
             Show ();
         }

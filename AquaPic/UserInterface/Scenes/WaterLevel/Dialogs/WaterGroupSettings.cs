@@ -163,7 +163,7 @@ namespace AquaPic.UserInterface
 			var lowAnalogAlarmSetpoint = Convert.ToSingle (settings["Low Alarm"].setting);
             var enableLowAnalogAlarm = (int)settings["Enable Low Alarm"].setting == 0;
 
-            JObject jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties");
+			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["waterLevelGroups"] as JArray;
 
             if (groupName.IsEmpty ()) {
@@ -213,7 +213,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties");
+			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["waterLevelGroups"] as JArray;
 
             int arrIdx = SettingsHelper.FindSettingsInArray (ja, groupName);

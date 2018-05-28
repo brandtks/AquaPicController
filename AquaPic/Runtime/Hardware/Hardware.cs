@@ -44,37 +44,39 @@ namespace AquaPic.Runtime
                     foreach (var jt in ja) {
                         var jo = jt as JObject;
                         var type = (string)jo["type"];
+						var address = Convert.ToInt32((string)jo["address"], 16);
+						var name = (string)jo["name"];
                         switch (type) {
                         case "power":
                             Logger.Add ("Adding power strip");
                             Power.AddPowerStrip (
-                                Convert.ToInt32 ((string)jo["options"][0], 16),
-                                (string)jo["options"][1],
-                                Convert.ToBoolean (jo["options"][2]));
+								name,
+								address,
+                                Convert.ToBoolean (jo["options"][0]));
                             break;
                         case "analogInput":
                             Logger.Add ("Adding analog input card");
                             AquaPicDrivers.AnalogInput.AddCard (
-                                Convert.ToInt32 ((string)jo["options"][0], 16),
-                                (string)jo["options"][1]);
+                                address,
+								name);
                             break;
                         case "analogOutput":
                             Logger.Add ("Adding analog output card");
                             AquaPicDrivers.AnalogOutput.AddCard (
-                                Convert.ToInt32 ((string)jo["options"][0], 16),
-                                (string)jo["options"][1]);
+								address,
+                                name);
                             break;
                         case "digitalInput":
                             Logger.Add ("Adding digital input card");
                             AquaPicDrivers.DigitalInput.AddCard (
-                                Convert.ToInt32 ((string)jo["options"][0], 16),
-                                (string)jo["options"][1]);
+								address,
+                                name);
                             break;
                         case "phOrp":
                             Logger.Add ("Adding pH/ORP card");
                             AquaPicDrivers.PhOrp.AddCard (
-                                Convert.ToInt32 ((string)jo["options"][0], 16),
-                                (string)jo["options"][1]);
+								address,
+                                name);
                             break;
                         default:
                             Console.WriteLine ("Unknow equipment type: {0}", type);

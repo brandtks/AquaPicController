@@ -65,13 +65,12 @@ namespace AquaPic.UserInterface
             var c = new SettingsComboBox ("Outlet");
             if (this.fixtureName.IsNotEmpty ()) {
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (this.fixtureName);
-                string psName = Power.GetPowerStripName (ic.Group);
-                c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", psName, ic.Individual));
+				c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", ic.GroupName, ic.Individual));
                 c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Select outlet";
             }
-            c.combo.comboList.AddRange (Power.GetAllAvaiblableOutlets ());
+            c.combo.comboList.AddRange (Power.GetAllAvailableOutlets ());
             AddSetting (c);
 
             var s = new SettingsSelectorSwitch ("Lighting Time", "Day", "Night");
@@ -226,10 +225,9 @@ namespace AquaPic.UserInterface
             DrawSettings ();
         }
 
-        protected void ParseOutlet (string s, ref int g, ref int i) {
+        protected void ParseOutlet (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-            string psName = s.Substring (0, idx);
-            g = (byte)Power.GetPowerStripIndex (psName);
+			g = s.Substring (0, idx);
             i = Convert.ToByte (s.Substring (idx + 2));
         }
 
@@ -300,7 +298,7 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties");
+			var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
             var ja = jo["lightingFixtures"] as JArray;
 
             if (fixtureName.IsEmpty ()) {
@@ -314,7 +312,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
+                ParseOutlet (outletStr, ref outletIc.GroupName, ref outletIc.Individual);
 
                 if (dimmingFixture) {
                     if (((SettingsComboBox)settings ["Dimming Channel"]).combo.activeIndex == -1) {
@@ -338,7 +336,7 @@ namespace AquaPic.UserInterface
                 else
                     jobj.Add (new JProperty ("type", "notDimmable"));
                 jobj.Add (new JProperty ("name", name));
-                jobj.Add (new JProperty ("powerStrip", Power.GetPowerStripName (outletIc.Group)));
+                jobj.Add (new JProperty ("powerStrip", outletIc.GroupName));
                 jobj.Add (new JProperty ("outlet", outletIc.Individual.ToString ()));
                 if (lTime == LightingTime.Daytime)
                     jobj.Add (new JProperty ("lightingTime", "day"));
@@ -369,7 +367,7 @@ namespace AquaPic.UserInterface
                     }
 
                     if (!outletStr.StartsWith ("Current:")) {
-                        ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
+                        ParseOutlet (outletStr, ref outletIc.GroupName, ref outletIc.Individual);
                         Lighting.SetFixtureOutletIndividualControl (fixtureName, outletIc);
                     } else {
                         outletIc = Lighting.GetFixtureOutletIndividualControl (fixtureName);
@@ -402,7 +400,7 @@ namespace AquaPic.UserInterface
                     }
 
                     ja[arrIdx]["name"] = name;
-                    ja[arrIdx]["powerStrip"] = Power.GetPowerStripName (outletIc.Group);
+                    ja[arrIdx]["powerStrip"] = outletIc.GroupName;
                     ja[arrIdx]["outlet"] = outletIc.Individual.ToString ();
                     if (lTime == LightingTime.Daytime)
                         ja[arrIdx]["lightingTime"] = "day";
@@ -431,7 +429,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties");
+            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
             var ja = jo["lightingFixtures"] as JArray;
 
             int arrIdx = SettingsHelper.FindSettingsInArray (ja, fixtureName);

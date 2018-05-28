@@ -241,7 +241,7 @@ namespace AquaPic.UserInterface
 		protected override bool OnSave (object sender) {
 			var name = (string)settings["Name"].setting;
 			if (name == "Enter name") {
-                MessageBox.Show ("Invalid water group name");
+                MessageBox.Show ("Invalid ATO name");
                 return false;
             }
 
@@ -261,8 +261,8 @@ namespace AquaPic.UserInterface
 
 			var maximumRuntime = (uint)ParseTime ((string)settings["Max Runtime"].setting);
 			var minimumCooldown = (uint)ParseTime ((string)settings["Cooldown"].setting);
-
-			JObject jo = SettingsHelper.OpenSettingsFile ("autoTopOffProperties");
+            
+			var jo = SettingsHelper.OpenSettingsFile ("autoTopOffProperties") as JObject;
 			var ja = jo["atoGroups"] as JArray;
 
 			if (groupName.IsEmpty ()) {          

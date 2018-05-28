@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Globals
 {
@@ -33,17 +34,19 @@ namespace AquaPic.Globals
                 var ic = new IndividualControl ();
                 ic.Individual = -1;
                 ic.Group = -1;
+				ic.GroupName = string.Empty;
                 return ic;
             }
         }
 
         public int Group;
+		public string GroupName;
         public int Individual;
 
         public bool IsNotEmpty () {
-            bool check = true;
-            check &= (Individual != -1);
-            check &= (Group != -1);
+			bool check = Group != -1;
+			check |= GroupName.IsNotEmpty ();
+			check &= Group != -1;
             return check;
         }
 

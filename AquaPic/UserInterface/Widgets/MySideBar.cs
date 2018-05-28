@@ -109,9 +109,11 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey4");
                     cr.Fill ();
 
+                    // Menu Button
                     cr.MoveTo (right + 5, top);
                     cr.LineTo (right - 120, top);
-                    cr.ArcNegative (right - 80, top, 40, 0, Math.PI / 2);
+					cr.LineTo (right - 120, top + 20);
+                    cr.ArcNegative (right - 100, top + 20, 20, 0, Math.PI / 2);
                     cr.LineTo (right + 5, top + 40);
                     cr.ClosePath ();
                     TouchColor.SetSource (cr, "grey4", 0.80);
@@ -120,7 +122,8 @@ namespace AquaPic.UserInterface
                     // Home Button
                     cr.MoveTo (right + 5, bottom + 5);
                     cr.LineTo (right - 165, bottom + 5);
-                    cr.Arc (right - 125, bottom, 40, 0, -Math.PI / 2);
+					cr.LineTo (right - 165, bottom - 20);
+                    cr.Arc (right - 145, bottom - 20, 20, 0, -Math.PI / 2);
                     cr.LineTo (right + 5, bottom - 40);
                     cr.ClosePath ();
                     TouchColor.SetSource (cr, "grey4", 0.80);

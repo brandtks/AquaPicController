@@ -30,7 +30,7 @@ namespace AquaPic.Runtime
 {
     public class SettingsHelper
     {
-        public static JObject OpenSettingsFile (string fileName) {
+		public static JToken OpenSettingsFile (string fileName) {
             if (!fileName.EndsWith (".json")) {
                 fileName = string.Format ("{0}.json", fileName);
             }
@@ -38,10 +38,10 @@ namespace AquaPic.Runtime
             path = Path.Combine (path, fileName);
 
             string json = File.ReadAllText (path);
-            return (JObject)JToken.Parse (json);
+            return JToken.Parse (json);
         }
 
-        public static void SaveSettingsFile (string fileName, JObject settings) {
+        public static void SaveSettingsFile (string fileName, JToken settings) {
             if (!fileName.EndsWith (".json")) {
                 fileName = string.Format ("{0}.json", fileName);
             }

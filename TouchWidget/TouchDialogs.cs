@@ -73,14 +73,14 @@ namespace GoodtimeDevelopment.TouchWidget
         }
     }
 
-    public class TouchDialog : Gtk.Dialog
+    public class TouchDialog : Dialog
     {
-        public TouchDialog (string msg, Gtk.Window parent) 
+        public TouchDialog (string msg, Window parent) 
             : base (string.Empty, parent, DialogFlags.DestroyWithParent)
         {
-            this.ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
+            ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
-            this.KeepAbove = true;
+            KeepAbove = true;
 
             #if RPI_BUILD
             Decorated = false;

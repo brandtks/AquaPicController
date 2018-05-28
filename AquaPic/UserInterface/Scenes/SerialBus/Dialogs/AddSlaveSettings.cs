@@ -94,7 +94,7 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            if (!SerialBus.AquaPicBus.IsAddressOk (address)) {
+			if (!SerialBus.AquaPicBus.SlaveAddressOk (address)) {
                 MessageBox.Show ("Address already in use");
                 return false;
             }
@@ -129,7 +129,7 @@ namespace AquaPic.UserInterface
 
                 optionTokens.Add (alarmOnPowerLoss.ToString ());
 
-                Power.AddPowerStrip (address, name, alarmOnPowerLoss);
+                Power.AddPowerStrip (name, address, alarmOnPowerLoss);
                 break;
             case 1:
                 type = "analogInput";

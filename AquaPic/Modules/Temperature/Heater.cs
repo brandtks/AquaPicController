@@ -36,11 +36,9 @@ namespace AquaPic.Modules
             public IndividualControl plug;
             public string temperatureGroupName;
 
-            public Heater (string name, int powerID, int plugID, string temperatureGroupName) {
-                plug = IndividualControl.Empty;
+			public Heater (string name, IndividualControl plug, string temperatureGroupName) {
                 this.name = name;
-                plug.Group = powerID;
-                plug.Individual = plugID;
+				this.plug = plug;
                 this.temperatureGroupName = temperatureGroupName;
                 var plugControl = Power.AddOutlet (plug, name, MyState.On, "Temperature");
                 plugControl.ConditionGetter = OnPlugControl;

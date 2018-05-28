@@ -228,7 +228,7 @@ namespace AquaPic.UserInterface
                 groupName = string.Empty;
             }
 
-            JObject jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties");
+			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["floatSwitches"] as JArray;
 
             if (switchName.IsEmpty ()) {
@@ -290,7 +290,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-            JObject jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties");
+			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["floatSwitches"] as JArray;
 
             int arrIdx = SettingsHelper.FindSettingsInArray (ja, switchName);

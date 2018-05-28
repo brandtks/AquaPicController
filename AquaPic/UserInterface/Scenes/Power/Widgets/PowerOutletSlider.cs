@@ -121,7 +121,7 @@ namespace AquaPic.UserInterface
             IndividualControl ic = Power.GetOutletIndividualControl (outletName.text);
             string owner = Power.GetOutletOwner (ic);
             if (owner == "Power") {
-                string n = string.Format ("{0}.p{1}", Power.GetPowerStripName (ic.Group), ic.Individual);
+                string n = string.Format ("{0}.p{1}", ic.GroupName, ic.Individual);
                 OutletSettings os;
                 if (n == outletName.text)
                     os = new OutletSettings (outletName.text, false, ic);
@@ -129,11 +129,8 @@ namespace AquaPic.UserInterface
                     os = new OutletSettings (outletName.text, true, ic);
 
                 os.Run ();
-                os.Destroy ();
-                os.Dispose ();
-
-                if (UpdateScreen != null)
-                    UpdateScreen ();
+                
+				UpdateScreen?.Invoke ();
             } else {
                 MessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
             }

@@ -192,7 +192,7 @@ namespace AquaPic.Modules
 
                         string name = (string)obj["name"];
                         var plug = IndividualControl.Empty;
-                        plug.Group = Power.GetPowerStripIndex ((string)obj["powerStrip"]);
+                        plug.GroupName = (string)obj["powerStrip"];
                         plug.Individual = Convert.ToInt32 (obj["outlet"]);
                         bool highTempLockout = Convert.ToBoolean (obj["highTempLockout"]);
 

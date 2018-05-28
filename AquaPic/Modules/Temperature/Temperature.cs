@@ -302,16 +302,21 @@ namespace AquaPic.Modules
                     ja = jo["heaters"] as JArray;
                     foreach (var jt in ja) {
                         JObject obj = jt as JObject;
-                        string name = (string)obj["name"];
-                        int powerStripId = Power.GetPowerStripIndex ((string)obj["powerStrip"]);
-                        int outletId = Convert.ToInt32 (obj["outlet"]);
-
-                        var temperatureGroupName = (string)obj["temperatureGroup"];
+                        var name = (string)obj["name"];
+						var ic = IndividualControl.Empty;
+						ic.GroupName = (string)obj["powerStrip"];
+						try {
+							ic.Individual = Convert.ToInt32 (obj["outlet"]);
+						} catch {
+							continue;
+						}
+						var temperatureGroupName = (string)obj["temperatureGroup"];
+                        
                         if (!CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
                             Logger.AddWarning ("Temperature probe {0} added to nonexistant group {1}", name, temperatureGroupName);
                         }
 
-                        AddHeater (name, powerStripId, outletId, temperatureGroupName);
+						AddHeater (name, ic, temperatureGroupName);
                     }
                 }
             } else {
@@ -690,12 +695,12 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Heaters                                                                                                    */
         /**************************************************************************************************************/
-        public static void AddHeater (string name, int powerID, int plugID, string temperatureGroupName) {
+		public static void AddHeater (string name, IndividualControl plug, string temperatureGroupName) {
             if (!HeaterNameOk (name)) {
                 throw new Exception (string.Format ("Heater: {0} already exists", name));
             }
             
-            heaters [name] = new Heater (name, powerID, plugID, temperatureGroupName);
+			heaters [name] = new Heater (name, plug, temperatureGroupName);
         }
 
         public static void RemoveHeater (string heaterName) {

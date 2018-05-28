@@ -164,9 +164,11 @@ namespace AquaPic.SerialBus
             }
         }
 
-        public static bool IsAddressOk (int a) {
+        public static bool SlaveAddressOk (int address) {
+			var compareAddress = (byte)address;
             for (int i = 0; i < slaves.Count; ++i) {
-                if (slaves [i].Address == (byte)a)
+				var slaveAddress = slaves[i].Address;
+				if (slaveAddress == compareAddress)
                     return false;
             }
             return true;

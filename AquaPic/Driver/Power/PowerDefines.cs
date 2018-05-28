@@ -30,25 +30,25 @@ namespace AquaPic.Drivers
     public delegate void StateChangeHandler (object sender, StateChangeEventArgs args);
 
     public class ModeChangeEventArgs : EventArgs {
-        public byte outletID;
-        public byte powerID;
+		public int outletId;
+		public string powerStripName;
         public Mode mode;
 
-        public ModeChangeEventArgs (int plugID, byte powerID, Mode mode) {
-            this.outletID = (byte)plugID;
-            this.powerID = powerID;
+		public ModeChangeEventArgs (int outletId, string powerStripName, Mode mode) {
+			this.outletId = outletId;
+			this.powerStripName = powerStripName;
             this.mode = mode;
         }
     }
 
     public class StateChangeEventArgs : EventArgs {
-        public byte outletID;
-        public byte powerID;
+		public int outletId;
+		public string powerStripName;
         public MyState state;
-
-        public StateChangeEventArgs (int plugID, byte powerID, MyState state) {
-            this.outletID = (byte)plugID;
-            this.powerID = powerID;
+        
+		public StateChangeEventArgs (int outletId, string powerStripName, MyState state) {
+			this.outletId = outletId;
+			this.powerStripName = powerStripName;
             this.state = state;
         }
     }
@@ -56,24 +56,16 @@ namespace AquaPic.Drivers
     public class ModeChangedObj {
         public event ModeChangedHandler ModeChangedEvent;
 
-        public ModeChangedObj () {
-        }
-
         public void CallEvent (object sender, ModeChangeEventArgs args) {
-            if (ModeChangedEvent != null)
-                ModeChangedEvent (sender, args);
+			ModeChangedEvent?.Invoke (sender, args);
         }
     }
 
     public class StateChangedObj {
         public event StateChangeHandler StateChangedEvent;
 
-        public StateChangedObj () {
-        }
-
         public void CallEvent (object sender, StateChangeEventArgs args) {
-            if (StateChangedEvent != null)
-                StateChangedEvent (sender, args);
+			StateChangedEvent?.Invoke (sender, args);
         }
     }
 }

@@ -35,6 +35,11 @@ namespace AquaPic.UserInterface
     public class PowerSettings : TouchSettingsDialog
 	{
 		string powerStripName;
+		public string newPowerStripName {
+			get {
+				return powerStripName;
+			}
+		}
 
 		public PowerSettings (string powerStripName, bool includeDelete = false) 
 			: base ("New Power Strip", includeDelete) 
@@ -93,14 +98,14 @@ namespace AquaPic.UserInterface
 					return false;
 				}
 				var address = Convert.ToInt32 (addressString.Substring (addressString.IndexOf (",", StringComparison.InvariantCultureIgnoreCase) + 2));
-				var name = string.Format ("PS{0}", Power.powerStripCount + 1);
+				powerStripName = string.Format ("PS{0}", Power.powerStripCount + 1);
 
-				Power.AddPowerStrip (name, address, alarmOnPowerLoss);        
+				Power.AddPowerStrip (powerStripName, address, alarmOnPowerLoss);        
                             
 				var jo = new JObject {
 					new JProperty ("type", "power"),
 					new JProperty ("address", string.Format ("0x{0:X}", address)),
-                    new JProperty ("name ", name)
+					new JProperty ("name ", powerStripName)
                 };
 				var jao = new JArray ();
                 jao.Add (alarmOnPowerLoss.ToString ());

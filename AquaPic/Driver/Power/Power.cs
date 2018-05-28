@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic; // for List
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
@@ -33,465 +34,457 @@ using AquaPic.Operands;
 
 namespace AquaPic.Drivers
 {
-    public partial class Power
-    {
-        private static List<PowerStrip> pwrStrips = new List<PowerStrip> ();
-        private static Dictionary<string, ModeChangedObj> modeChangedHandlers = new Dictionary<string, ModeChangedObj> ();
-        private static Dictionary<string, StateChangedObj> stateChangedHandlers = new Dictionary<string, StateChangedObj> ();
+	public partial class Power
+	{
+		private static Dictionary<string, PowerStrip> powerStrips = new Dictionary<string, PowerStrip> ();
+		private static Dictionary<string, ModeChangedObj> modeChangedHandlers = new Dictionary<string, ModeChangedObj> ();
+		private static Dictionary<string, StateChangedObj> stateChangedHandlers = new Dictionary<string, StateChangedObj> ();
 
-        public static int powerStripCount {
+		public static int powerStripCount {
+			get {
+				return powerStrips.Count;
+			}
+		}
+
+		public static string firstPowerStrip {
             get {
-                return pwrStrips.Count;
-            }
-        }
-
-        public static void Init () {
-            string path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = Path.Combine (path, "powerProperties.json");
-
-            if (File.Exists (path)) {
-                using (StreamReader reader = File.OpenText (path)) {
-                    JArray ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));
-
-                    foreach (var jt in ja) {
-                        var jo = jt as JObject;
-
-                        string name = (string)jo["name"];
-                        int powerStripId = Power.GetPowerStripIndex ((string)jo["powerStrip"]);
-                        int outletId = Convert.ToInt32 (jo["outlet"]);
-
-                        MyState fallback = (MyState)Enum.Parse (typeof (MyState), (string)jo["fallback"]);
-
-                        List<string> conditions = new List<string> ();
-                        JArray cja = (JArray)jo["conditions"];
-                        foreach (var cjt in cja) {
-                            conditions.Add ((string)cjt);
-                        }
-
-                        var script = Script.CompileOutletConditionCheck (conditions.ToArray ());
-                        if (script != null) {
-                            var c = AddOutlet (powerStripId, outletId, name, fallback);
-                            c.ConditionGetter = () => {
-                                return script.OutletConditionCheck ();
-                            };
-                        } else {
-                            Logger.AddInfo ("Error while adding outlet");
-                        }
-                    }
+				if (powerStrips.Count > 0) {
+					var first = powerStrips.First ();
+                    return first.Key;
                 }
-            } else {
-                Logger.Add ("Power settings file did not exist, created new power settings");
-                var file = File.Create (path);
-                file.Close ();
 
-                var ja = new JArray ();
-                File.WriteAllText (path, ja.ToString ());
-            }
-
-            TaskManager.AddCyclicInterrupt ("Power", 1000, Run);
-        }
-
-        protected static void Run () {
-            foreach (var strip in pwrStrips) {
-                strip.GetStatus ();
-
-                int i = 0;
-                foreach (var outlet in strip.outlets) { // could, probably should use a for loop but its just extra words
-                    if (outlet.mode == Mode.Manual) {
-                        if (outlet.manualState != outlet.currentState)
-                            strip.SetOutletState ((byte)i, outlet.manualState);
-
-                    } else {
-                        outlet.OutletControl.Execute ();
-                    }
-
-                    ++i;
-                }
+                return string.Empty;
             }
         }
 
-        public static int AddPowerStrip (int address, string name, bool alarmOnLossOfPower) {
-            int count = pwrStrips.Count;
-            int pwrLossAlarmIdx = -1;
+		public static void Init () {
+			string path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
+			path = Path.Combine (path, "powerProperties.json");
 
-            if (alarmOnLossOfPower) {
-                for (int i = 0; i < pwrStrips.Count; ++i) {
-                    if (pwrStrips [i].powerLossAlarmIndex != -1)
-                        pwrLossAlarmIdx = pwrStrips [i].powerLossAlarmIndex;
-                }
-            }
+			if (File.Exists (path)) {
+				using (StreamReader reader = File.OpenText (path)) {
+					JArray ja = (JArray)JToken.ReadFrom (new JsonTextReader (reader));
 
-            pwrStrips.Add (new PowerStrip ((byte)address, (byte)count, name, alarmOnLossOfPower, pwrLossAlarmIdx));
-            return count;
-        }
+					foreach (var jt in ja) {
+						var jo = jt as JObject;
 
-        public static Coil AddOutlet (IndividualControl outlet, string name, MyState fallback) {
-            return AddOutlet (outlet.Group, outlet.Individual, name, fallback, "Power");
-        }
+						string name = (string)jo["name"];
+						string powerStripName = (string)jo["powerStrip"];
+						int outletId = Convert.ToInt32 (jo["outlet"]);
 
-        public static Coil AddOutlet (IndividualControl outlet, string name, MyState fallback, string owner) {
-            return AddOutlet (outlet.Group, outlet.Individual, name, fallback, owner);
-        }
+						MyState fallback = (MyState)Enum.Parse (typeof (MyState), (string)jo["fallback"]);
 
-        public static Coil AddOutlet (int powerID, int outletID, string name, MyState fallback) {
-            return AddOutlet (powerID, outletID, name, fallback, "Power");
-        }
+						List<string> conditions = new List<string> ();
+						JArray cja = (JArray)jo["conditions"];
+						foreach (var cjt in cja) {
+							conditions.Add ((string)cjt);
+						}
 
-        public static Coil AddOutlet (int powerID, int outletID, string name, MyState fallback, string owner) {
-            if ((powerID < 0) && (powerID >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("powerId");
+						var script = Script.CompileOutletConditionCheck (conditions.ToArray ());
+						if (script != null) {
+							var c = AddOutlet (powerStripName, outletId, name, fallback);
+							c.ConditionGetter = () => {
+								return script.OutletConditionCheck ();
+							};
+						} else {
+							Logger.AddInfo ("Error while adding outlet");
+						}
+					}
+				}
+			} else {
+				Logger.Add ("Power settings file did not exist, created new power settings");
+				var file = File.Create (path);
+				file.Close ();
 
-            if ((outletID < 0) || (outletID >= pwrStrips [powerID].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outletID");
+				var ja = new JArray ();
+				File.WriteAllText (path, ja.ToString ());
+			}
 
-            string s = string.Format ("{0}.p{1}", pwrStrips [powerID].name, outletID);
-            if (pwrStrips [powerID].outlets [outletID].name != s)
-                throw new Exception (string.Format ("Outlet already taken by {0}", pwrStrips [powerID].outlets [outletID].name));
+			TaskManager.AddCyclicInterrupt ("Power", 1000, Run);
+		}
 
-            pwrStrips [powerID].outlets [outletID].name = name;
-            pwrStrips [powerID].outlets [outletID].fallback = fallback;
-            pwrStrips [powerID].outlets [outletID].mode = Mode.Auto;
-            pwrStrips [powerID].outlets [outletID].owner = owner;
-            pwrStrips [powerID].SetupOutlet (
-                (byte)outletID,
-                pwrStrips [powerID].outlets [outletID].fallback);
+		protected static void Run () {
+			foreach (var strip in powerStrips.Values) {
+				strip.GetStatus ();
 
-            return pwrStrips [powerID].outlets [outletID].OutletControl;
-        }
+				int i = 0;
+				foreach (var outlet in strip.outlets) { // could, probably should use a for loop but its just extra words
+					if (outlet.mode == Mode.Manual) {
+						if (outlet.manualState != outlet.currentState)
+							strip.SetOutletState ((byte)i, outlet.manualState);
 
-        public static void RemoveOutlet (IndividualControl outlet) {
-            RemoveOutlet (outlet.Group, outlet.Individual);
-        }
+					} else {
+						outlet.OutletControl.Execute ();
+					}
 
-        public static void RemoveOutlet (int powerID, int outletID) {
-            if ((powerID < 0) && (powerID >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("powerId");
+					++i;
+				}
+			}
+		}
 
-            if ((outletID < 0) || (outletID >= pwrStrips [powerID].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outletID");
+		public static void AddPowerStrip (string name, int address, bool alarmOnLossOfPower) {
+			int powerLossAlarmIndex = -1;
 
-            string s = string.Format ("{0}.p{1}", pwrStrips [powerID].name, outletID);
-            pwrStrips [powerID].outlets [outletID].name = s;
-            pwrStrips [powerID].outlets [outletID].fallback = MyState.Off;
-            pwrStrips [powerID].outlets [outletID].mode = Mode.Manual;
-            pwrStrips [powerID].outlets [outletID].owner = "Power";
-            pwrStrips [powerID].outlets [outletID].manualState = MyState.Off;
+			if (alarmOnLossOfPower) {
+				foreach (var strip in powerStrips.Values) {
+					if (strip.powerLossAlarmIndex != -1)
+						powerLossAlarmIndex = strip.powerLossAlarmIndex;
+				}
 
-            pwrStrips [powerID].outlets [outletID].OutletControl.ConditionGetter = () => {
-                return false;
-            };
+				// No other power strips are subscride to a loss of power
+				if (powerLossAlarmIndex == -1) {
+					powerLossAlarmIndex = Alarm.Subscribe ("Loss of AC Power");
+				}
+			}
 
-            pwrStrips [powerID].SetupOutlet (
-                (byte)outletID,
-                pwrStrips [powerID].outlets [outletID].fallback);
-            pwrStrips [powerID].SetOutletState ((byte)outletID, MyState.Off);
-        }
-
-        public static void SetOutletManualState (IndividualControl outlet, MyState state) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
-
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
-
-            pwrStrips [outlet.Group].outlets [outlet.Individual].manualState = state;
-        }
-
-        public static MyState GetOutletManualState (IndividualControl outlet) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
-
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
-
-            return pwrStrips [outlet.Group].outlets [outlet.Individual].manualState;
-        }
-
-        public static MyState GetOutletState (IndividualControl outlet) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
-
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
-
-            return pwrStrips [outlet.Group].outlets [outlet.Individual].currentState;
-        }
-
-        public static MyState[] GetAllStates (int powerID) {
-            if ((powerID < 0) && (powerID >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("powerId");
-
-            MyState[] states = new MyState[8];
-            for (int i = 0; i < states.Length; ++i)
-                states [i] = pwrStrips [powerID].outlets [i].currentState;
-            return states;
-        }
-
-        public static void SetOutletMode (IndividualControl outlet, Mode mode) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
-
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
-
-            pwrStrips [outlet.Group].SetPlugMode ((byte)outlet.Individual, mode);
-        }
-
-        public static Mode GetOutletMode (IndividualControl outlet) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
-
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
-
-            return pwrStrips [outlet.Group].outlets [outlet.Individual].mode;
-        }
+			powerStrips.Add (name, new PowerStrip (name, (byte)address, powerLossAlarmIndex));
+		}
         
-        public static Mode[] GetAllModes (int powerID) {
-            if ((powerID < 0) && (powerID >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("powerId");
+		public static void RemovePowerStrip (string powerStripName) {
+			CheckPowerStripName (powerStripName);
+			if (!CheckPowerStipEmpty (powerStripName)) {
+				throw new Exception ("At least one outlet is occupied");
+			}
+			powerStrips.Remove (powerStripName);
+		}
 
-            Mode[] modes = new Mode[8];
-            for (int i = 0; i < modes.Length; ++i)
-                modes [i] = pwrStrips [powerID].outlets [i].mode;
-            return modes;
-        }
+		public static void CheckPowerStripName (string powerStripName) {
+			if (!powerStrips.ContainsKey (powerStripName))
+				throw new ArgumentOutOfRangeException (nameof (powerStripName));
+		}
 
-        public static string[] GetAllOutletNames (int powerID) {
-            if ((powerID < 0) && (powerID >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("powerId");
+		public static bool CheckPowerStipEmpty (string powerStripName) {
+			CheckPowerStripName (powerStripName);
+			if (GetAllAvailableOutlets (powerStripName).Length == powerStrips[powerStripName].outlets.Length)
+				return true;
+			return false;
+		}
 
-            string[] names = new string[8];
-            for (int i = 0; i < names.Length; ++i)
-                names [i] = pwrStrips [powerID].outlets [i].name;
-            return names;
-        }
-
-        public static string[] GetAllPowerStripNames () {
-            string[] names = new string[pwrStrips.Count];
-            for (int i = 0; i < pwrStrips.Count; ++i) {
-                names [i] = pwrStrips [i].name;
+		public static string[] GetAllPowerStripNames () {
+			List<string> names = new List<string> ();
+			foreach (var strip in powerStrips.Values) {
+				names.Add (strip.name);
             }
-            return names;
+			return names.ToArray ();
         }
 
-        public static string GetPowerStripName (int powerID) {
-            if ((powerID < 0) && (powerID >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("powerId");
+		public static bool GetPowerStripAlarmOnPowerLoss (string powerStripName) {
+			CheckPowerStripName (powerStripName);
+			return powerStrips[powerStripName].powerLossAlarmIndex != -1;
+		}
 
-            return pwrStrips [powerID].name;
-        }
+		public static void SetPowerStripAlarmOnPowerLoss (string powerStripName, bool alarmOnLossOfPower) {
+			CheckPowerStripName (powerStripName);
+			if (alarmOnLossOfPower) {
+				foreach (var strip in powerStrips.Values) {
+					if (strip.powerLossAlarmIndex != -1)
+						powerStrips[powerStripName].powerLossAlarmIndex = strip.powerLossAlarmIndex;
+				}
 
-        public static int GetPowerStripIndex (string name) {
-            for (int i = 0; i < pwrStrips.Count; ++i) {
-                if (string.Equals (pwrStrips [i].name, name, StringComparison.CurrentCultureIgnoreCase))
-                    return i;
-            }
+				if (powerStrips[powerStripName].powerLossAlarmIndex == -1) {
+					powerStrips[powerStripName].powerLossAlarmIndex = Alarm.Subscribe ("Loss of AC Power");
+				}
+			} else {
+				powerStrips[powerStripName].powerLossAlarmIndex = -1;
+			}
+		}
 
-            throw new ArgumentException (name + " does not exists");
-        }
+		public static Coil AddOutlet (IndividualControl outlet, string name, MyState fallback, string owner = "Power") {
+			return AddOutlet (outlet.GroupName, outlet.Individual, name, fallback, owner);
+		}
 
-        public static string GetOutletName (IndividualControl outlet) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+		public static Coil AddOutlet (string powerStripName, int outletId, string name, MyState fallback, string owner = "Power") {
+			CheckPowerStripName (powerStripName);
+			CheckOutletId (powerStripName, outletId);
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+			string s = string.Format ("{0}.p{1}", powerStripName, outletId);
+			if (powerStrips[powerStripName].outlets[outletId].name != s)
+				throw new Exception (string.Format ("Outlet already taken by {0}", powerStrips[powerStripName].outlets[outletId].name));
 
-            return pwrStrips[outlet.Group].outlets[outlet.Individual].name;
-        }
+			powerStrips[powerStripName].outlets[outletId].name = name;
+			powerStrips[powerStripName].outlets[outletId].fallback = fallback;
+			powerStrips[powerStripName].outlets[outletId].mode = Mode.Auto;
+			powerStrips[powerStripName].outlets[outletId].owner = owner;
+			powerStrips[powerStripName].SetupOutlet (
+				(byte)outletId,
+				powerStrips[powerStripName].outlets[outletId].fallback);
 
-        public static bool OutletNameOk (string name) {
-            try {
-                GetOutletIndividualControl (name);
-                return false;
-            } catch {
-                return true;
-            }
-        }
+			return powerStrips[powerStripName].outlets[outletId].OutletControl;
+		}
 
-        public static void SetOutletName (IndividualControl outlet, string name) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+		public static void RemoveOutlet (IndividualControl outlet) {
+			RemoveOutlet (outlet.GroupName, outlet.Individual);
+		}
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+		public static void RemoveOutlet (string powerStripName, int outletId) {
+			CheckPowerStripName (powerStripName);
+			CheckOutletId (powerStripName, outletId);
 
-            if (OutletNameOk (name))
-                pwrStrips [outlet.Group].outlets [outlet.Individual].name = name;
-            else
-                throw new Exception (string.Format ("Outlet: {0} already exists", name));
-        }
+			string s = string.Format ("{0}.p{1}", powerStripName, outletId);
+			powerStrips[powerStripName].outlets[outletId].name = s;
+			powerStrips[powerStripName].outlets[outletId].fallback = MyState.Off;
+			powerStrips[powerStripName].outlets[outletId].mode = Mode.Manual;
+			powerStrips[powerStripName].outlets[outletId].owner = "Power";
+			powerStrips[powerStripName].outlets[outletId].manualState = MyState.Off;
 
-        public static MyState GetOutletFallback (IndividualControl outlet) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+			powerStrips[powerStripName].outlets[outletId].OutletControl.ConditionGetter = () => {
+				return false;
+			};
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+			powerStrips[powerStripName].SetupOutlet (
+				(byte)outletId,
+				powerStrips[powerStripName].outlets[outletId].fallback);
+			powerStrips[powerStripName].SetOutletState ((byte)outletId, MyState.Off);
+		}
 
-            return pwrStrips [outlet.Group].outlets [outlet.Individual].fallback;
-        }
+		public static void CheckOutletId (string powerStripName, int outletId) {
+			if ((outletId < 0) || (outletId >= powerStrips[powerStripName].outlets.Length))
+				throw new ArgumentOutOfRangeException (nameof (outletId));
+		}
 
-        public static void SetOutletFallback (IndividualControl outlet, MyState fallback) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+		public static void SetOutletManualState (IndividualControl outlet, MyState state) {
+			CheckPowerStripName (outlet.GroupName);
+			CheckOutletId (outlet.GroupName, outlet.Individual);
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+			powerStrips[outlet.GroupName].outlets[outlet.Individual].manualState = state;
+		}
 
-            pwrStrips [outlet.Group].outlets [outlet.Individual].fallback = fallback;
-            pwrStrips [outlet.Group].SetupOutlet (
-                (byte)outlet.Individual,
-                pwrStrips [outlet.Group].outlets [outlet.Individual].fallback);
-        }
+		public static MyState GetOutletManualState (IndividualControl outlet) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
+
+			return powerStrips[outlet.GroupName].outlets[outlet.Individual].manualState;
+		}
+
+		public static MyState GetOutletState (IndividualControl outlet) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
+
+			return powerStrips[outlet.GroupName].outlets[outlet.Individual].currentState;
+		}
+
+		public static MyState[] GetAllStates (string powerStripName) {
+			CheckPowerStripName (powerStripName);
+
+			MyState[] states = new MyState[8];
+			for (int i = 0; i < states.Length; ++i)
+				states[i] = powerStrips[powerStripName].outlets[i].currentState;
+			return states;
+		}
+
+		public static void SetOutletMode (IndividualControl outlet, Mode mode) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
+
+			powerStrips[outlet.GroupName].SetPlugMode ((byte)outlet.Individual, mode);
+		}
+
+		public static Mode GetOutletMode (IndividualControl outlet) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
+
+			return powerStrips[outlet.GroupName].outlets[outlet.Individual].mode;
+		}
+
+		public static Mode[] GetAllModes (string powerStripName) {
+			CheckPowerStripName (powerStripName);
+
+			Mode[] modes = new Mode[8];
+			for (int i = 0; i < modes.Length; ++i)
+				modes[i] = powerStrips[powerStripName].outlets[i].mode;
+			return modes;
+		}
+
+		public static string[] GetAllOutletNames (string powerStripName) {
+			CheckPowerStripName (powerStripName);
+
+			string[] names = new string[8];
+			for (int i = 0; i < names.Length; ++i)
+				names[i] = powerStrips[powerStripName].outlets[i].name;
+			return names;
+		}
+
+		public static string GetOutletName (IndividualControl outlet) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
+
+			return powerStrips[outlet.GroupName].outlets[outlet.Individual].name;
+		}
+
+		public static bool OutletNameOk (string name) {
+			try {
+				GetOutletIndividualControl (name);
+				return false;
+			} catch {
+				return true;
+			}
+		}
+
+		public static void SetOutletName (IndividualControl outlet, string name) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
+
+			if (OutletNameOk (name))
+				powerStrips[outlet.GroupName].outlets[outlet.Individual].name = name;
+			else
+				throw new Exception (string.Format ("Outlet: {0} already exists", name));
+		}
+
+		public static MyState GetOutletFallback (IndividualControl outlet) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
+
+			return powerStrips[outlet.GroupName].outlets[outlet.Individual].fallback;
+		}
+
+		public static void SetOutletFallback (IndividualControl outlet, MyState fallback) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
+
+			powerStrips[outlet.GroupName].outlets[outlet.Individual].fallback = fallback;
+			powerStrips[outlet.GroupName].SetupOutlet (
+				(byte)outlet.Individual,
+				powerStrips[outlet.GroupName].outlets[outlet.Individual].fallback);
+		}
 
 
-        public static void SetOutletConditionCheck (IndividualControl outlet, ConditionGetterHandler checker) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+		public static void SetOutletConditionCheck (IndividualControl outlet, ConditionGetterHandler checker) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips[outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+			powerStrips[outlet.GroupName].outlets[outlet.Individual].OutletControl.ConditionGetter = checker;
+		}
 
-            pwrStrips[outlet.Group].outlets[outlet.Individual].OutletControl.ConditionGetter = checker;
-        }
+		public static void SetOutletConditionCheck (IndividualControl outlet, IOutletScript script) {
+			SetOutletConditionCheck (outlet, script.OutletConditionCheck);
+		}
 
-        public static void SetOutletConditionCheck (IndividualControl outlet, IOutletScript script) {
-            SetOutletConditionCheck (outlet, script.OutletConditionCheck);
-        }
+		public static IndividualControl GetOutletIndividualControl (string name) {
+			var outlet = IndividualControl.Empty;
 
-        public static IndividualControl GetOutletIndividualControl (string name) {
-            var outlet = IndividualControl.Empty;
+			foreach (var strip in powerStrips.Values) {
+				for (int j = 0; j < strip.outlets.Length; ++j) {
+					if (string.Equals (strip.outlets[j].name, name, StringComparison.InvariantCultureIgnoreCase)) {
+						outlet.GroupName = strip.name;
+						outlet.Individual = j;
+						return outlet;
+					}
+				}
+			}
 
-            for (int i = 0; i < pwrStrips.Count; ++i) {
-                for (int j = 0; j < pwrStrips [i].outlets.Length; ++j) {
-                    if (string.Equals (pwrStrips [i].outlets [j].name, name, StringComparison.InvariantCultureIgnoreCase)) {
-                        outlet.Group = i;
-                        outlet.Individual = j;
-                        return outlet;
-                    }
-                }
-            }
+			throw new ArgumentException (name + " does not exists");
+		}
 
-            throw new ArgumentException (name + " does not exists");
-        }
+		public static string[] GetAllAvailableOutlets () {
+			var available = new List<string> ();
 
-        public static string[] GetAllAvaiblableOutlets () {
-            List<string> avail = new List<string> ();
+			foreach (var strip in powerStrips.Values) {
+				for (int i = 0; i < strip.outlets.Length; ++i) {
+					string s = string.Format ("{0}.p{1}", strip.name, i);
+					if (s == strip.outlets[i].name)
+						available.Add (s);
+				}
+			}
 
-            foreach (var ps in pwrStrips) {
-                for (int i = 0; i < ps.outlets.Length; ++i) {
-                    string s = string.Format ("{0}.p{1}", ps.name, i);
-                    if (s == ps.outlets [i].name)
-                        avail.Add (s);
-                }
-            }
+			return available.ToArray ();
+		}
 
-            return avail.ToArray ();
-        }
+		public static string[] GetAllAvailableOutlets (string powerStripName) {
+			CheckPowerStripName (powerStripName);
 
-        public static string GetOutletOwner (IndividualControl outlet) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+			var available = new List<string> ();
+			var ps = powerStrips[powerStripName];
+			for (int i = 0; i < ps.outlets.Length; ++i) {
+				string s = string.Format ("{0}.p{1}", ps.name, i);
+				if (s == ps.outlets[i].name)
+					available.Add (s);
+			}
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+			return available.ToArray ();
+		}
 
-            return pwrStrips [outlet.Group].outlets [outlet.Individual].owner;
-        }
+		public static string GetOutletOwner (IndividualControl outlet) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
 
-        public static string[] GetAllOutletOwners (int powerId) {
-            if ((powerId < 0) && (powerId >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("powerId");
+			return powerStrips[outlet.GroupName].outlets[outlet.Individual].owner;
+		}
 
-            string[] owners = new string[pwrStrips [powerId].outlets.Length];
-            for (int i = 0; i < owners.Length; ++i)
-                owners [i] = pwrStrips [powerId].outlets [i].owner;
+		public static string[] GetAllOutletOwners (string powerStripName) {
+			CheckPowerStripName (powerStripName);
 
-            return owners;
-        }
+			string[] owners = new string[powerStrips[powerStripName].outlets.Length];
+			for (int i = 0; i < owners.Length; ++i)
+				owners[i] = powerStrips[powerStripName].outlets[i].owner;
 
-        public static void AddHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+			return owners;
+		}
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+		public static void AddHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
 
-            string name = GetOutletName (outlet);
+			string name = GetOutletName (outlet);
 
-            if (!modeChangedHandlers.ContainsKey (name))
-                modeChangedHandlers.Add (name, new ModeChangedObj ());
+			if (!modeChangedHandlers.ContainsKey (name))
+				modeChangedHandlers.Add (name, new ModeChangedObj ());
 
-            modeChangedHandlers [name].ModeChangedEvent += handler;
-        }
+			modeChangedHandlers[name].ModeChangedEvent += handler;
+		}
 
-        public static void RemoveHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+		public static void RemoveHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+			string name = GetOutletName (outlet);
 
-            string name = GetOutletName (outlet);
+			if (modeChangedHandlers.ContainsKey (name))
+				modeChangedHandlers[name].ModeChangedEvent -= handler;
+		}
 
-            if (modeChangedHandlers.ContainsKey (name))
-                modeChangedHandlers [name].ModeChangedEvent -= handler;
-        }
+		private static void OnModeChange (OutletData outlet, ModeChangeEventArgs args) {
+			if (modeChangedHandlers.ContainsKey (outlet.name)) {
+				modeChangedHandlers[outlet.name].CallEvent (outlet, args);
+			}
+		}
 
-        private static void OnModeChange (OutletData outlet, ModeChangeEventArgs args) {
-            if (modeChangedHandlers.ContainsKey (outlet.name)) {
-                modeChangedHandlers [outlet.name].CallEvent (outlet, args);
-            }
-        }
+		public static void AddHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
 
-        public static void AddHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+			string name = GetOutletName (outlet);
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+			if (!stateChangedHandlers.ContainsKey (name))
+				stateChangedHandlers.Add (name, new StateChangedObj ());
 
-            string name = GetOutletName (outlet);
+			stateChangedHandlers[name].StateChangedEvent += handler;
+		}
 
-            if (!stateChangedHandlers.ContainsKey (name))
-                stateChangedHandlers.Add (name, new StateChangedObj ());
+		public static void RemoveHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
+			CheckPowerStripName (outlet.GroupName);
+            CheckOutletId (outlet.GroupName, outlet.Individual);
 
-            stateChangedHandlers [name].StateChangedEvent += handler;
-        }
+			string name = GetOutletName (outlet);
 
-        public static void RemoveHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-            if ((outlet.Group < 0) && (outlet.Group >= pwrStrips.Count))
-                throw new ArgumentOutOfRangeException ("outlet.Group");
+			if (stateChangedHandlers.ContainsKey (name))
+				stateChangedHandlers[name].StateChangedEvent -= handler;
+		}
 
-            if ((outlet.Individual < 0) && (outlet.Individual >= pwrStrips [outlet.Group].outlets.Length))
-                throw new ArgumentOutOfRangeException ("outlet.Individual");
+		private static void OnStateChange (OutletData outlet, StateChangeEventArgs args) {
+			if (stateChangedHandlers.ContainsKey (outlet.name)) {
+				stateChangedHandlers[outlet.name].CallEvent (outlet, args);
+			}
+		}
 
-            string name = GetOutletName (outlet);
+		public static bool AquaPicBusCommunicationOk (string powerStripName) {
+			CheckPowerStripName (powerStripName);
+			return powerStrips[powerStripName].AquaPicBusCommunicationOk;
+		}
 
-            if (stateChangedHandlers.ContainsKey (name))
-                stateChangedHandlers [name].StateChangedEvent -= handler;
-        }
-
-        private static void OnStateChange (OutletData outlet, StateChangeEventArgs args) {
-            if (stateChangedHandlers.ContainsKey (outlet.name)) {
-                stateChangedHandlers [outlet.name].CallEvent (outlet, args);
-            }
-        }
-
-        public static bool AquaPicBusCommunicationOk (int powerId) {
-            return pwrStrips [powerId].AquaPicBusCommunicationOk;
-        }
-
-        public static bool AquaPicBusCommunicationOk (IndividualControl ic) {
-            return pwrStrips [ic.Group].AquaPicBusCommunicationOk;
-        }
-
-        public static bool AquaPicBusCommunicationOk (string name) {
-            int powerId = GetPowerStripIndex (name);
-            return pwrStrips [powerId].AquaPicBusCommunicationOk;
-        }
-    }
+		public static bool AquaPicBusCommunicationOk (IndividualControl outlet) {
+			CheckPowerStripName (outlet.GroupName);
+			return powerStrips[outlet.GroupName].AquaPicBusCommunicationOk;
+		}      
+	}
 }
 

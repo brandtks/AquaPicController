@@ -23,7 +23,6 @@
 
 using System;
 using System.IO;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -33,7 +32,7 @@ using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class PowerSettings : TouchSettingsDialog
+    public class HeaterSettings : TouchSettingsDialog
     {
         string heaterName;
         public string newOrUpdatedHeaterName {
@@ -42,7 +41,7 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public PowerSettings (string heaterName, bool includeDelete)
+        public HeaterSettings (string heaterName, bool includeDelete)
             : base (heaterName, includeDelete) 
         {
             this.heaterName = heaterName;
@@ -66,13 +65,13 @@ namespace AquaPic.UserInterface
             var c = new SettingsComboBox ("Outlet");
             if (this.heaterName.IsNotEmpty ()) {
                 IndividualControl ic = Temperature.GetHeaterIndividualControl (this.heaterName);
-                string psName = Power.GetPowerStripName (ic.Group);
+                string psName = ic.GroupName;
                 c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", psName, ic.Individual));
                 c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Select outlet";
             }
-            c.combo.comboList.AddRange (Power.GetAllAvaiblableOutlets ());
+            c.combo.comboList.AddRange (Power.GetAllAvailableOutlets ());
             AddSetting (c);
 
             c = new SettingsComboBox ("Temperature Group");
@@ -86,10 +85,10 @@ namespace AquaPic.UserInterface
             DrawSettings ();
         }
 
-        protected void ParseOutlet (string s, ref int g, ref int i) {
+        protected void ParseOutlet (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-            string psName = s.Substring (0, idx);
-            g = Power.GetPowerStripIndex (psName);
+			string powerStripName = s.Substring (0, idx);
+            g = powerStripName;
             i = Convert.ToByte (s.Substring (idx + 2));
         }
         
@@ -121,14 +120,14 @@ namespace AquaPic.UserInterface
                 }
 
                 IndividualControl ic = IndividualControl.Empty;
-                ParseOutlet (unparseOutletString, ref ic.Group, ref ic.Individual);
+                ParseOutlet (unparseOutletString, ref ic.GroupName, ref ic.Individual);
 
-                Temperature.AddHeater (name, ic.Group, ic.Individual, temperatureGroupName);
+                Temperature.AddHeater (name, ic, temperatureGroupName);
 
                 JObject jobj = new JObject ();
 
                 jobj.Add (new JProperty ("name", name));
-                jobj.Add (new JProperty ("powerStrip", Power.GetPowerStripName (ic.Group)));
+                jobj.Add (new JProperty ("powerStrip", ic.GroupName));
                 jobj.Add (new JProperty ("outlet", ic.Individual.ToString ()));
                 jobj.Add (new JProperty ("temperatureGroup", temperatureGroupName));
 
@@ -149,7 +148,7 @@ namespace AquaPic.UserInterface
                 
                 IndividualControl ic = IndividualControl.Empty;
                 if (!unparseOutletString.StartsWith ("Current:")) {
-                    ParseOutlet (unparseOutletString, ref ic.Group, ref ic.Individual);
+                    ParseOutlet (unparseOutletString, ref ic.GroupName, ref ic.Individual);
                     Temperature.SetHeaterIndividualControl (heaterName, ic);
                 } else {
                     ic = Temperature.GetHeaterIndividualControl (heaterName);
@@ -177,7 +176,7 @@ namespace AquaPic.UserInterface
                 }
 
                 ja[arrIdx]["name"] = name;
-                ja[arrIdx]["powerStrip"] = Power.GetPowerStripName (ic.Group);
+                ja[arrIdx]["powerStrip"] = ic.GroupName;
                 ja[arrIdx]["outlet"] = ic.Individual.ToString ();
                 ja[arrIdx]["temperatureGroup"] = temperatureGroupName;
             }

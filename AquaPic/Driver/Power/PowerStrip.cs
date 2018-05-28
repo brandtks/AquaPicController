@@ -33,7 +33,6 @@ namespace AquaPic.Drivers
     {
         private class PowerStrip : AquaPicBus.Slave
         {
-            public byte powerID;
             public int powerLossAlarmIndex;
             public bool AcPowerAvailable;
             public string name;
@@ -45,19 +44,12 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public PowerStrip (byte address, byte powerID, string name, bool alarmOnLossOfPower, int powerLossAlarmIndex) 
+			public PowerStrip (string name, byte address, int powerLossAlarmIndex) 
                 : base (address, name + " (Power Strip)")
-            {
-                this.powerID = powerID;
-
-                if (alarmOnLossOfPower && (powerLossAlarmIndex == -1)) {
-                    this.powerLossAlarmIndex = Alarm.Subscribe ("Loss of power");
-                } else {
-                    this.powerLossAlarmIndex = powerLossAlarmIndex;
-                }
-
+            {   
                 this.name = name;
                 AcPowerAvailable = false;
+				this.powerLossAlarmIndex = powerLossAlarmIndex;    
 
                 outlets = new OutletData[8];
                 for (int i = 0; i < 8; ++i) {
@@ -154,19 +146,19 @@ namespace AquaPic.Drivers
                     0, // this just returns the default response so there is no data, ie 0
                     (args) => {
                         outlets [outletId].currentState = state;
-                        OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
+                        OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, name, state));
                     });
 
 
                 #if !RPI_BUILD
                 outlets [outletId].currentState = state;
-                OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, powerID, state));
+				OnStateChange (outlets [outletId], new StateChangeEventArgs (outletId, name, state));
                 #endif
             }
 
             public void SetPlugMode (byte outletId, Mode mode) {
                 outlets [outletId].mode = mode;
-                OnModeChange (outlets [outletId], new ModeChangeEventArgs (outletId, powerID, outlets [outletId].mode));
+				OnModeChange (outlets [outletId], new ModeChangeEventArgs (outletId, name, outlets [outletId].mode));
             }
     	}
     }

@@ -154,7 +154,7 @@ namespace AquaPic.UserInterface
             Lighting.minSunSet = Time.Parse ((string)settings["Min Sunset"].setting);
             Lighting.maxSunSet = Time.Parse ((string)settings["Max Sunset"].setting);
 
-            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties");
+			var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
 
             jo["latitude"] = Lighting.latitude.ToString ();
             jo["longitude"] = Lighting.longitude.ToString ();

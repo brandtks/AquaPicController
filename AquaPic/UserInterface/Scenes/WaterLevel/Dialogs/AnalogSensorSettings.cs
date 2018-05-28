@@ -115,7 +115,7 @@ namespace AquaPic.UserInterface
                 groupName = string.Empty;
             }
 
-            JObject jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties");
+			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["analogSensors"] as JArray;
 
             if (analogSensorName.IsEmpty ()) {
@@ -185,7 +185,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-            JObject jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties");
+			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["analogSensors"] as JArray;
 
             int arrIdx = SettingsHelper.FindSettingsInArray (ja, analogSensorName);

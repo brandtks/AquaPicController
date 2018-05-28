@@ -99,7 +99,6 @@ namespace AquaPic.UserInterface
                 var newGroupName = s.waterLevelGroupName;
                 var outcome = s.outcome;
                 s.Destroy ();
-                s.Dispose ();
 
                 if (outcome == TouchSettingsOutcome.Added) {
                     groupName = newGroupName;
@@ -369,7 +368,7 @@ namespace AquaPic.UserInterface
             }
             atoGroupCombo.WidthRequest = 235;
             atoGroupCombo.comboList.Add ("New ATO...");
-            atoGroupCombo.ComboChangedEvent += OnGroupComboChanged;
+			atoGroupCombo.ComboChangedEvent += OnAtoGroupComboChanged;
 			Put (atoGroupCombo, 153, 277);
             atoGroupCombo.Show ();
 
@@ -449,14 +448,12 @@ namespace AquaPic.UserInterface
                     groupCombo.activeText = newGroupName;
                     groupName = newGroupName;
                 } else {
-                    Console.WriteLine ("Moving combo back to {0}", groupName);
                     groupCombo.activeText = groupName;
                 }
-
-                groupCombo.QueueDraw ();
             } else {
                 groupName = e.activeText;
             }
+
             GetGroupData ();
         }
 
@@ -474,16 +471,12 @@ namespace AquaPic.UserInterface
                     atoGroupCombo.activeText = newGroupName;
                     atoGroupName = newGroupName;
                 } else {
-                    Console.WriteLine ("Moving combo back to {0}", atoGroupName);
                     atoGroupCombo.activeText = atoGroupName;
                 }
-
-                atoGroupCombo.QueueDraw ();
             } else {
                 atoGroupName = e.activeText;
             }
-            GetAtoGroupData ();
-
+            GetAtoGroupData ();         
         }
 
         protected void OnAnalogSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
@@ -502,7 +495,6 @@ namespace AquaPic.UserInterface
                 } else {
                     analogSensorCombo.activeText = analogSensorName;
                 }
-                analogSensorCombo.QueueDraw ();
             } else {
                 analogSensorName = e.activeText;
             }
@@ -525,7 +517,6 @@ namespace AquaPic.UserInterface
                 } else {
                     switchCombo.activeText = switchName;
                 }
-                switchCombo.QueueDraw ();
             } else {
                 switchName = e.activeText;
             }

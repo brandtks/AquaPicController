@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using Gtk;
 using Cairo;
+using GoodtimeDevelopment.Utilites;
 
 namespace GoodtimeDevelopment.TouchWidget
 {
@@ -34,12 +35,12 @@ namespace GoodtimeDevelopment.TouchWidget
     {
         public int activeIndex;
         public string activeText;
-        public bool keepChange;
+		public bool keepChange;
 
         public ComboBoxChangedEventArgs (int activeIndex, string activeText) {
             this.activeIndex = activeIndex;
             this.activeText = activeText;
-            keepChange = true;
+			keepChange = true;
         }
     }
 
@@ -47,7 +48,7 @@ namespace GoodtimeDevelopment.TouchWidget
     {
         public List<string> comboList;
         public string nonActiveMessage;
-        public int activeIndex;
+		public int activeIndex;
         public string activeText {
             get {
                 if (activeIndex != -1) {
@@ -60,7 +61,7 @@ namespace GoodtimeDevelopment.TouchWidget
                 if (comboList.Contains (value)) {
                     for (int i = 0; i < comboList.Count; i++) {
                         if (value == comboList[i]) {
-                            activeIndex = i;
+							activeIndex = i;
                             break;
                         }
                     }
@@ -242,16 +243,17 @@ namespace GoodtimeDevelopment.TouchWidget
 
                     DrawDownButton (cr, left, top, width);
                 }
-
-                bool writeStringCond1 = !string.IsNullOrWhiteSpace (nonActiveMessage) && (activeIndex == -1);
+                
+				bool writeStringCond1 = nonActiveMessage.IsNotEmpty () && (activeIndex == -1);
                 bool writeStringCond2 = (comboList.Count > 0) && (activeIndex >= 0) ;
-
+                
                 if (writeStringCond1 || writeStringCond2) {
                     string text;
-                    if (writeStringCond1)
-                        text = nonActiveMessage;
-                    else
-                        text = comboList[activeIndex];
+					if (writeStringCond1) {
+						text = nonActiveMessage;
+					} else {
+						text = comboList[activeIndex];
+					}
 
                     TouchText t = new TouchText (text);
                     t.textWrap = TouchTextWrap.Shrink;
@@ -394,24 +396,23 @@ namespace GoodtimeDevelopment.TouchWidget
                     int topWindow = i * height + 30;
                     int bottomWindow = (i + 1) * height + 30;
                     if ((y >= topWindow) && (y <= bottomWindow)) {
-                        int newIndex;
+						var previousIndex = activeIndex;
                         if (includeScrollBar) {
-                            newIndex = i + listOffset;
+							activeIndex = i + listOffset;
                         } else {
-                            newIndex = i;
+							activeIndex = i;
                         }
-                        var comboChangedEventArgs = new ComboBoxChangedEventArgs (newIndex, comboList[newIndex]);
 
+						var newIndex = activeIndex;
+						var comboChangedEventArgs = new ComboBoxChangedEventArgs (activeIndex, comboList[activeIndex]);                  
                         if (ComboChangedEvent != null) {
                             ComboChangedEvent (this, comboChangedEventArgs);
                         }
 
-                        if (comboChangedEventArgs.keepChange) {
-                            activeIndex = newIndex;
-                            listDropdown = false;
-                        }
+						if (!comboChangedEventArgs.keepChange || (newIndex != activeIndex)) {
+							activeIndex = previousIndex;
+						}
 
-                        QueueDraw ();
                         break;
                     }
                 }

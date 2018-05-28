@@ -59,7 +59,7 @@ namespace AquaPic.UserInterface
             JObject jo = null;
 
             string code = "These are not the scripts you're looking for.";
-            string psName = Power.GetPowerStripName (ic.Group);
+            string psName = ic.GroupName;
             string outletId = ic.Individual.ToString ();
             foreach (var jt in ja) {
                 jo = jt as JObject;
@@ -165,7 +165,7 @@ namespace AquaPic.UserInterface
                 Power.SetOutletConditionCheck (ic, script);
 
                 int arrIdx = -1;
-                string psName = Power.GetPowerStripName (ic.Group);
+                string psName = ic.GroupName;
                 string outletId = ic.Individual.ToString ();
                 for (int i = 0; i < ja.Count; ++i) {
                     string n = (string)ja [i] ["powerStrip"];
@@ -199,7 +199,7 @@ namespace AquaPic.UserInterface
 
                 JObject jo = new JObject ();
                 jo.Add (new JProperty ("name", name));
-                jo.Add (new JProperty ("powerStrip", Power.GetPowerStripName (ic.Group)));
+                jo.Add (new JProperty ("powerStrip", ic.GroupName));
                 jo.Add (new JProperty ("outlet", ic.Individual.ToString ()));
                 jo.Add (new JProperty ("fallback", fallback.ToString ()));
                 jo.Add (new JProperty ("conditions", jcond));
@@ -221,7 +221,7 @@ namespace AquaPic.UserInterface
             JArray ja = (JArray)JToken.Parse (jstring);
 
             int arrIdx = -1;
-            string psName = Power.GetPowerStripName (ic.Group);
+            string psName = ic.GroupName;
             string outletId = ic.Individual.ToString ();
             for (int i = 0; i < ja.Count; ++i) {
                 string n = (string)ja [i] ["powerStrip"];

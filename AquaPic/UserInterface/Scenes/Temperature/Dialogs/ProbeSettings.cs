@@ -98,7 +98,7 @@ namespace AquaPic.UserInterface
             var ic = IndividualControl.Empty;
             var temperatureGroupName = (string)settings["Temperature Group"].setting;
 
-            var jo = SettingsHelper.OpenSettingsFile ("tempProperties");
+			var jo = SettingsHelper.OpenSettingsFile ("tempProperties") as JObject;
             var ja = jo["temperatureProbes"] as JArray;
 
             if (probeName.IsEmpty ()) {
@@ -175,8 +175,8 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-            var jo = SettingsHelper.OpenSettingsFile ("tempProperties");
-            JArray ja = jo["temperatureProbes"] as JArray;
+			var jo = SettingsHelper.OpenSettingsFile ("tempProperties") as JObject;
+            var ja = jo["temperatureProbes"] as JArray;
 
             int arrayIndex = SettingsHelper.FindSettingsInArray (ja, probeName);
             if (arrayIndex == -1) {
