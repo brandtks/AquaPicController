@@ -70,13 +70,18 @@ namespace AquaPic
 				}
 			} else {
 				aquaPicEnvironment = Environment.GetEnvironmentVariable ("HOME");
-#if EMPTY_SETTINGS
-				aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.empty");
-#elif FULL_SETTINGS
-				aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.full");
-#else
-                aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic");
-#endif
+				if (args.Length > 0) {
+					if (args[0].Contains ("-e")) {
+						aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.empty");
+					} else if (args[0].Contains ("-f")) {
+						aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.full");
+					} else {
+						aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic");
+					}
+				} else {
+					aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic");
+				}
+
 
 				if (!Directory.Exists (aquaPicEnvironment)) {
 					Directory.CreateDirectory (aquaPicEnvironment);

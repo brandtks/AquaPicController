@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Full-Settings' ">
+    <StartAction>Project</StartAction>
+    <StartArguments>-f</StartArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Empty-Settings' ">
+    <StartAction>Project</StartAction>
+    <StartArguments>-e</StartArguments>
+  </PropertyGroup>
+</Project>
