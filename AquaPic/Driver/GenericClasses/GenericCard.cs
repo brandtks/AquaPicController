@@ -38,7 +38,7 @@ namespace AquaPic.Drivers
 
         public bool AquaPicBusCommunicationOk {
             get {
-                return ((Status == AquaPicBusStatus.CommunicationStart) || (Status == AquaPicBusStatus.CommunicationSuccess));
+                return ((status == AquaPicBusStatus.CommunicationStart) || (status == AquaPicBusStatus.CommunicationSuccess));
             }
         }
 

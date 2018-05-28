@@ -40,7 +40,7 @@ namespace AquaPic.Drivers
 
             public bool AquaPicBusCommunicationOk {
                 get {
-                    return ((Status == AquaPicBusStatus.CommunicationStart) || (Status == AquaPicBusStatus.CommunicationSuccess));
+                    return ((status == AquaPicBusStatus.CommunicationStart) || (status == AquaPicBusStatus.CommunicationSuccess));
                 }
             }
 
@@ -68,8 +68,8 @@ namespace AquaPic.Drivers
                             }
                         });
                 }
-            }
-
+            }         
+            
             public void SetupOutlet (int outletId, MyState fallback) {
                 const int messageLength = 2; 
                 byte[] message = new byte[messageLength];
@@ -89,7 +89,7 @@ namespace AquaPic.Drivers
             }
 
             protected void GetStatusCallback (CallbackArgs callArgs) {
-                if (Status != AquaPicBusStatus.CommunicationSuccess)
+                if (status != AquaPicBusStatus.CommunicationSuccess)
                     return;
 
                 AcPowerAvailable = callArgs.GetDataFromReadBuffer<bool> (0);
@@ -120,7 +120,7 @@ namespace AquaPic.Drivers
             }
 
             protected void ReadOutletCurrentCallback (CallbackArgs callArgs) {
-                if (Status != AquaPicBusStatus.CommunicationSuccess)
+                if (status != AquaPicBusStatus.CommunicationSuccess)
                     return;
 
                 int outletId = callArgs.GetDataFromReadBuffer<byte> (0);

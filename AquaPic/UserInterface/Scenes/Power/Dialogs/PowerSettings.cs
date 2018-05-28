@@ -81,6 +81,13 @@ namespace AquaPic.UserInterface
 			}
 
 			var s = new SettingsSelectorSwitch ("Power Loss Alarm", "Yes", "No");
+			if (powerStripName.IsNotEmpty ()) {
+				if (Power.GetPowerStripAlarmOnPowerLoss (powerStripName)) {
+					s.selectorSwitch.currentSelected = 0;
+				} else {
+					s.selectorSwitch.currentSelected = 1;
+				}
+			}
             AddSetting (s);
 
             DrawSettings ();
@@ -98,14 +105,14 @@ namespace AquaPic.UserInterface
 					return false;
 				}
 				var address = Convert.ToInt32 (addressString.Substring (addressString.IndexOf (",", StringComparison.InvariantCultureIgnoreCase) + 2));
-				powerStripName = string.Format ("PS{0}", Power.powerStripCount + 1);
+				powerStripName = string.Format ("PS{0}", Power.GetLowestPowerStripNameIndex ());
 
 				Power.AddPowerStrip (powerStripName, address, alarmOnPowerLoss);        
                             
 				var jo = new JObject {
 					new JProperty ("type", "power"),
 					new JProperty ("address", string.Format ("0x{0:X}", address)),
-					new JProperty ("name ", powerStripName)
+					new JProperty ("name", powerStripName)
                 };
 				var jao = new JArray ();
                 jao.Add (alarmOnPowerLoss.ToString ());

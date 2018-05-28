@@ -34,17 +34,18 @@ namespace AquaPic.SerialBus
 {
     public partial class AquaPicBus
     {
-        private static SerialPort uart;
-        private static Queue messageBuffer;
-        private static Thread txRxThread;
-        private static Thread responseThread;
-        private static bool enableTxRx;
-        private static bool enableResponse;
-        private static AutoResetEvent getInput, gotInput;
-        private static Stopwatch stopwatch;
-        private static List<Slave> slaves;
-        private static ReceiveBuffer receiveBuffer;
-        public static int retryCount, readTimeout;
+        static SerialPort uart;
+        static Queue messageBuffer;
+        static Thread txRxThread;
+        static Thread responseThread;
+        static bool enableTxRx;
+        static bool enableResponse;
+        static AutoResetEvent getInput, gotInput;
+        static Stopwatch stopwatch;
+		static List<Slave> slaves;
+        static ReceiveBuffer receiveBuffer;
+        
+		public static int retryCount, readTimeout;
 
         public static int slaveCount {
             get {
@@ -57,7 +58,7 @@ namespace AquaPic.SerialBus
                 string[] names = new string[slaves.Count];
                 int i = 0;
                 foreach (var s in slaves)
-                    names [i++] = s.Name;
+                    names [i++] = s.slaveName;
                 return names;
             }
         }
@@ -67,7 +68,7 @@ namespace AquaPic.SerialBus
                 int[] address = new int[slaves.Count];
                 int i = 0;
                 foreach (var s in slaves)
-                    address [i++] = s.Address;
+                    address [i++] = s.address;
                 return address;
             }
         }
@@ -77,7 +78,7 @@ namespace AquaPic.SerialBus
                 var status = new AquaPicBusStatus[slaves.Count];
                 int i = 0;
                 foreach (var s in slaves)
-                    status [i++] = s.Status;
+                    status [i++] = s.status;
                 return status;
             }
         }
@@ -87,7 +88,7 @@ namespace AquaPic.SerialBus
                 int[] time = new int[slaves.Count];
                 int i = 0;
                 foreach (var s in slaves)
-                    time [i++] = s.ResponeTime;
+                    time [i++] = s.responeTime;
                 return time;
             }
         }
@@ -96,8 +97,8 @@ namespace AquaPic.SerialBus
             get {
                 if (uart != null)
                     return uart.IsOpen;
-                else
-                    return false;
+                
+                return false;
             }
         }
 
@@ -105,8 +106,8 @@ namespace AquaPic.SerialBus
             get {
                 if (uart != null)
                     return uart.PortName;
-                else
-                    return string.Empty;
+                
+                return string.Empty;
             }
         }
 
@@ -167,7 +168,7 @@ namespace AquaPic.SerialBus
         public static bool SlaveAddressOk (int address) {
 			var compareAddress = (byte)address;
             for (int i = 0; i < slaves.Count; ++i) {
-				var slaveAddress = slaves[i].Address;
+				var slaveAddress = slaves[i].address;
 				if (slaveAddress == compareAddress)
                     return false;
             }
@@ -254,7 +255,7 @@ namespace AquaPic.SerialBus
                                 } catch (TimeoutException) {
                                     m.slave.UpdateStatus (AquaPicBusStatus.Timeout, readTimeout);
                                     Gtk.Application.Invoke ((sender, e) => {
-                                        Logger.AddWarning ("APB {0} timeout on function number {1}", m.slave.Address, m.writeBuffer [1]);
+                                        Logger.AddWarning ("APB {0} timeout on function number {1}", m.slave.address, m.writeBuffer [1]);
                                     });
 
                                     #if DEBUG_SERIAL
@@ -285,7 +286,7 @@ namespace AquaPic.SerialBus
                                     } else { // Crc error
                                         m.slave.UpdateStatus (AquaPicBusStatus.CrcError, readTimeout);
                                         Gtk.Application.Invoke ((sender, e) => {
-                                            Logger.AddWarning ("APB {0} crc error on function number {1}", m.slave.Address, m.writeBuffer[1]);
+                                            Logger.AddWarning ("APB {0} crc error on function number {1}", m.slave.address, m.writeBuffer[1]);
                                         });
 
                                         #if DEBUG_SERIAL
@@ -295,7 +296,7 @@ namespace AquaPic.SerialBus
                                 } else { // message length error
                                     m.slave.UpdateStatus (AquaPicBusStatus.LengthError, readTimeout);
                                     Gtk.Application.Invoke ((sender, e) => {
-                                        Logger.AddWarning ("APB {0} response length error on function number {1}", m.slave.Address, m.writeBuffer[1]);
+                                        Logger.AddWarning ("APB {0} response length error on function number {1}", m.slave.address, m.writeBuffer[1]);
                                     });
 
                                     #if DEBUG_SERIAL
@@ -310,7 +311,7 @@ namespace AquaPic.SerialBus
                             }
 
                             //all retry attempts have failed, post alarm
-                            if ((m.slave.Status == AquaPicBusStatus.CrcError) || (m.slave.Status == AquaPicBusStatus.LengthError) || (m.slave.Status == AquaPicBusStatus.Timeout)) {
+                            if ((m.slave.status == AquaPicBusStatus.CrcError) || (m.slave.status == AquaPicBusStatus.LengthError) || (m.slave.status == AquaPicBusStatus.Timeout)) {
                                 Gtk.Application.Invoke ((sender, e) => {
                                     Alarm.Post (m.slave.alarmIdx);
                                 });

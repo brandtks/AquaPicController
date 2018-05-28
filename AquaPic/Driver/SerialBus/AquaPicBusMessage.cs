@@ -48,7 +48,7 @@ namespace AquaPic.SerialBus
                 this.readBuffer = new byte[responseLength];
                 this.callback = callback;
 
-                this.writeBuffer [0] = slave.Address;
+                this.writeBuffer [0] = slave.address;
                 this.writeBuffer [1] = func;
                 this.writeBuffer [2] = (byte)this.writeBuffer.Length;
 

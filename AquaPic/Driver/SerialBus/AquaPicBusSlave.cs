@@ -33,43 +33,56 @@ namespace AquaPic.SerialBus
         {
             public event StatusUpdateHandler OnStatusUpdate;
 
-            private byte address;
-            private int responeTime;
-            private int[] timeQue;
-            private int queIdx;
-            private AquaPicBusStatus status;
-            private int _alarmIdx;
+			string _name;
+			public string slaveName {
+				get {
+					return _name;
+				}
+			}
 
-            public AquaPicBusStatus Status { 
-                get { return status; }
+			byte _address;
+			public byte address {
+                get { return _address; }
             }
-            public byte Address {
-                get { return address; }
+
+			int _responeTime;
+			public int responeTime {
+                get { return _responeTime; }
             }
-            public int ResponeTime {
-                get { return responeTime; }
+
+			AquaPicBusStatus _status;
+            public AquaPicBusStatus status {
+                get { return _status; }
             }
-            public string Name { get; set; }
+
+            int _alarmIdx;
             public int alarmIdx {
                 get { return _alarmIdx; }
             }
+            
+            int[] timeQue;
+            int queIdx;
 
             public Slave (int address, string name) {
 				if (!SlaveAddressOk ((byte)address))
                     throw new Exception ("Address already in use");
-
-                this.address = (byte)address;
-                responeTime = 0;
+                
+                _address = (byte)address;
+                _responeTime = 0;
                 timeQue = new int[10];
                 queIdx = 0;
-                status = AquaPicBusStatus.NotOpen;
-                Name = name;
+                _status = AquaPicBusStatus.NotOpen;
+                _name = name;
 
                 slaves.Add (this);
 
                 _alarmIdx = Alarm.Subscribe (address.ToString () + " communication fault");
             }
 
+			public void RemoveSlave () {
+				slaves.Remove (this);
+            }
+         
             public void Read (byte func, int readSize, ResponseCallback callback, bool queueDuringPortClosed = false) {
                 QueueMessage (this, func, null, 0, readSize, callback, queueDuringPortClosed);
             }
@@ -113,11 +126,11 @@ namespace AquaPic.SerialBus
                         }
                     }
 
-                    responeTime = (int)(sum / sumCount);
+                    _responeTime = (int)(sum / sumCount);
                     queIdx = ++queIdx % timeQue.Length;
                 }
 
-                status = stat;
+                _status = stat;
 
                 if (OnStatusUpdate != null)
                     Application.Invoke ((sender, e) => OnStatusUpdate (this));

@@ -37,15 +37,22 @@ namespace AquaPic.UserInterface
         string powerStripName;
         TouchComboBox combo;
 		TouchButton settingsButton;
+		PowerWindowGraphics graphics;
 
-		public PowerWindow (params object[] options) : base () {
-			ExposeEvent += OnExposeEvent;
-
+		public PowerWindow (params object[] options) : base () {         
 			powerStripName = Power.firstPowerStrip;
 			if (powerStripName.IsNotEmpty ()) {
 				sceneTitle = "Power Strip";
 			} else {
 				sceneTitle = "No Power Strips Added";
+			}
+
+			graphics = new PowerWindowGraphics ();
+			Put (graphics, 0, 80);
+			if (powerStripName.IsNotEmpty ()) {
+				graphics.Show ();
+			} else {
+				graphics.Visible = false;
 			}
 
 			int x, y;
@@ -92,14 +99,17 @@ namespace AquaPic.UserInterface
 					ic.GroupName = powerStripName;
 					ic.Individual = i;
 					Power.AddHandlerOnStateChange (ic, PlugStateChange);
+				} else {
+					selectors[i].Visible = false;
 				}
             }
 
 			combo = new TouchComboBox (Power.GetAllPowerStripNames ());
+			combo.WidthRequest = 200;
 			combo.comboList.Add ("New power strip...");
 			combo.activeText = powerStripName;
             combo.ComboChangedEvent += OnComboChanged;
-            Put (combo, 575, 35);
+            Put (combo, 550, 35);
             combo.Show ();
 
 			settingsButton = new TouchButton ();
@@ -142,6 +152,10 @@ namespace AquaPic.UserInterface
 					foreach (var sel in selectors) {
 						sel.Visible = true;
 					}
+					graphics.Visible = true;
+					combo.Visible = false;
+					combo.Visible = true;
+					sceneTitle = "Power Strip";
 					GetPowerData ();
 				}
 
@@ -164,8 +178,11 @@ namespace AquaPic.UserInterface
 						foreach (var sel in selectors) {
 							sel.Visible = false;
 						}
+						graphics.Visible = false;
+						combo.activeIndex = -1;
 					} else {
 						powerStripName = Power.firstPowerStrip;
+						combo.activeText = powerStripName;
 						GetPowerData ();
 					}
 					QueueDraw ();
@@ -205,15 +222,15 @@ namespace AquaPic.UserInterface
 			}
         }
 
-        protected void OnSelectorChanged (object sender, SelectorChangedEventArgs e) {
-            var ss = sender as TouchSelectorSwitch;
-            var ic = IndividualControl.Empty;
+		protected void OnSelectorChanged (object sender, SelectorChangedEventArgs e) {
+			var ss = sender as TouchSelectorSwitch;
+			var ic = IndividualControl.Empty;
 			ic.GroupName = powerStripName;
-            ic.Individual = ss.id;
+			ic.Individual = ss.id;
 
-            if (ss.currentSelected == 1) // auto
-                Power.SetOutletMode (ic, Mode.Auto);
-            else if (ss.currentSelected == 0) { // manual and state off
+			if (ss.currentSelected == 1) { // auto
+				Power.SetOutletMode (ic, Mode.Auto);
+		    } else if (ss.currentSelected == 0) { // manual and state off
                 Power.SetOutletMode (ic, Mode.Manual);
                 Power.SetOutletManualState (ic, MyState.Off);
             } else if (ss.currentSelected == 2) {// manual and state on
@@ -275,6 +292,44 @@ namespace AquaPic.UserInterface
 
             base.Dispose ();
         }
-    }
+
+		class PowerWindowGraphics : EventBox
+		{         
+			public PowerWindowGraphics () {
+                Visible = true;
+                VisibleWindow = false;
+
+				WidthRequest = 800;
+				HeightRequest = 336;            
+
+                ExposeEvent += OnExpose;
+            }
+
+            protected virtual void OnExpose (object sender, ExposeEventArgs args) {
+                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                    TouchColor.SetSource (cr, "grey3", 0.75);
+
+                    double midY = 272.5;
+
+                    for (int i = 0; i < 3; ++i) {
+                        cr.MoveTo (60 + (i * 185), midY);
+                        cr.LineTo (220 + (i * 185), midY);
+                        cr.ClosePath ();
+                        cr.Stroke ();
+
+                        cr.MoveTo (232.5 + (i * 185), 115);
+                        cr.LineTo (232.5 + (i * 185), 425);
+                        cr.ClosePath ();
+                        cr.Stroke ();
+                    }
+
+                    cr.MoveTo (615, midY);
+                    cr.LineTo (775, midY);
+                    cr.ClosePath ();
+                    cr.Stroke ();
+                }
+            }
+		}
+	}
 }
 

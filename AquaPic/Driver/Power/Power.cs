@@ -145,6 +145,7 @@ namespace AquaPic.Drivers
 			if (!CheckPowerStipEmpty (powerStripName)) {
 				throw new Exception ("At least one outlet is occupied");
 			}
+			powerStrips[powerStripName].RemoveSlave ();
 			powerStrips.Remove (powerStripName);
 		}
 
@@ -167,6 +168,26 @@ namespace AquaPic.Drivers
             }
 			return names.ToArray ();
         }
+
+		public static int GetLowestPowerStripNameIndex () {
+			var nameIndexes = new List<int> ();
+			var lowestNameIndex = 1;
+			foreach (var strip in powerStrips.Values) {
+				// All names start with PS, so everything after that is the name index
+				nameIndexes.Add (Convert.ToInt32 (strip.name.Substring (2)));
+			}
+
+			bool lowestFound = false;
+			while (!lowestFound) {
+				if (nameIndexes.Contains (lowestNameIndex)) {
+					++lowestNameIndex;
+				} else {
+					lowestFound = true;
+				}
+			}
+
+			return lowestNameIndex;
+		}
 
 		public static bool GetPowerStripAlarmOnPowerLoss (string powerStripName) {
 			CheckPowerStripName (powerStripName);
