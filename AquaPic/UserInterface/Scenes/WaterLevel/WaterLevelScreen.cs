@@ -91,8 +91,9 @@ namespace AquaPic.UserInterface
             levelLabel.Show ();
 
             var globalSettingsBtn = new TouchButton ();
-            globalSettingsBtn.text = "Settings";
-            globalSettingsBtn.SetSizeRequest (100, 60);
+			globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
+			globalSettingsBtn.SetSizeRequest (30, 30);
+			globalSettingsBtn.buttonColor = "grey4";
             globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new WaterGroupSettings (groupName, groupName.IsNotEmpty ());
                 s.Run ();
@@ -113,7 +114,7 @@ namespace AquaPic.UserInterface
                 groupCombo.QueueDraw ();
                 GetGroupData ();
             };
-			Put (globalSettingsBtn, 290, 195);
+			Put (globalSettingsBtn, 358, 77);
             globalSettingsBtn.Show ();
 
 			/******************************************************************************************************/
@@ -136,8 +137,9 @@ namespace AquaPic.UserInterface
             atoStateTextBox.Show ();
 
             var atoSettingsBtn = new TouchButton ();
-            atoSettingsBtn.text = "Settings";
-            atoSettingsBtn.SetSizeRequest (100, 60);
+			atoSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
+			atoSettingsBtn.SetSizeRequest (30, 30);
+			atoSettingsBtn.buttonColor = "grey4";
             atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new AtoSettings (atoGroupName, atoGroupName.IsNotEmpty ());
                 s.Run ();
@@ -167,7 +169,7 @@ namespace AquaPic.UserInterface
                 atoGroupCombo.QueueDraw ();
                 GetAtoGroupData ();
             };
-            Put (atoSettingsBtn, 290, 405);
+            Put (atoSettingsBtn, 358, 277);
             atoSettingsBtn.Show ();
 
             atoClearFailBtn = new TouchButton ();
@@ -209,8 +211,9 @@ namespace AquaPic.UserInterface
             Put (analogSensorLevelTextBox, 415, 120);
 
             var settingsBtn = new TouchButton ();
-            settingsBtn.text = "Settings";
-            settingsBtn.SetSizeRequest (100, 60);
+			settingsBtn.text = Convert.ToChar (0x2699).ToString ();
+			settingsBtn.SetSizeRequest (30, 30);
+			settingsBtn.buttonColor = "grey4";
             settingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new AnalogSensorSettings (analogSensorName, analogSensorName.IsNotEmpty ());
                 s.Run ();
@@ -240,7 +243,7 @@ namespace AquaPic.UserInterface
                 analogSensorCombo.QueueDraw ();
                 GetAnalogSensorData ();
             };
-            Put (settingsBtn, 415, 195);
+            Put (settingsBtn, 755, 77);
             settingsBtn.Show ();
 
             var b = new TouchButton ();
@@ -276,7 +279,7 @@ namespace AquaPic.UserInterface
                     MessageBox.Show ("Can't calibrate a none existent sensor");
                 }
             };
-            Put (b, 525, 195);
+            Put (b, 415, 195);
             b.Show ();
 
             /**************************************************************************************************************/
@@ -314,8 +317,9 @@ namespace AquaPic.UserInterface
             switchTypeLabel.Show ();
 
             var switchSetupBtn = new TouchButton ();
-            switchSetupBtn.text = "Probe Setup";
-            switchSetupBtn.SetSizeRequest (100, 60);
+			switchSetupBtn.text = Convert.ToChar (0x2699).ToString ();
+			switchSetupBtn.SetSizeRequest (30, 30);
+			switchSetupBtn.buttonColor = "grey4";
             switchSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new SwitchSettings (switchName, switchName.IsNotEmpty ());
                 s.Run ();
@@ -345,7 +349,7 @@ namespace AquaPic.UserInterface
                 switchCombo.QueueDraw ();
                 GetSwitchData ();
             };
-            Put (switchSetupBtn, 415, 405);
+            Put (switchSetupBtn, 755, 277);
             switchSetupBtn.Show ();
 
             groupCombo = new TouchComboBox (WaterLevel.GetAllWaterLevelGroupNames ());
@@ -354,7 +358,7 @@ namespace AquaPic.UserInterface
             } else {
                 groupCombo.activeIndex = 0;
             }
-            groupCombo.WidthRequest = 235;
+            groupCombo.WidthRequest = 200;
             groupCombo.comboList.Add ("New group...");
             groupCombo.ComboChangedEvent += OnGroupComboChanged;
             Put (groupCombo, 153, 77);
@@ -366,7 +370,7 @@ namespace AquaPic.UserInterface
             } else {
                 atoGroupCombo.activeIndex = 0;
             }
-            atoGroupCombo.WidthRequest = 235;
+            atoGroupCombo.WidthRequest = 200;
             atoGroupCombo.comboList.Add ("New ATO...");
 			atoGroupCombo.ComboChangedEvent += OnAtoGroupComboChanged;
 			Put (atoGroupCombo, 153, 277);
@@ -378,7 +382,7 @@ namespace AquaPic.UserInterface
             } else {
                 analogSensorCombo.activeIndex = 0;
             }
-            analogSensorCombo.WidthRequest = 235;
+            analogSensorCombo.WidthRequest = 200;
             analogSensorCombo.comboList.Add ("New level sensor...");
             analogSensorCombo.ComboChangedEvent += OnAnalogSensorComboChanged;
             Put (analogSensorCombo, 550, 77);
@@ -390,7 +394,7 @@ namespace AquaPic.UserInterface
             } else {
                 switchCombo.activeIndex = 0;
             }
-            switchCombo.WidthRequest = 235;
+            switchCombo.WidthRequest = 200;
             switchCombo.comboList.Add ("New switch...");
             switchCombo.ComboChangedEvent += OnSwitchComboChanged;
             Put (switchCombo, 550, 277);

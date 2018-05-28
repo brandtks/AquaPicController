@@ -119,8 +119,9 @@ namespace AquaPic.UserInterface
             tempDeadband.Show ();
 
             var globalSettingsBtn = new TouchButton ();
-            globalSettingsBtn.text = "Settings";
-            globalSettingsBtn.SetSizeRequest (100, 60);
+			globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
+            globalSettingsBtn.SetSizeRequest (30, 30);
+			globalSettingsBtn.buttonColor = "grey4";
             globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new TemperatureGroupSettings (groupName, !groupName.IsEmpty ());
                 s.Run ();
@@ -142,7 +143,7 @@ namespace AquaPic.UserInterface
                 groupCombo.QueueDraw ();
                 GetGroupData ();
             };
-            Put (globalSettingsBtn, 290, 405);
+            Put (globalSettingsBtn, 358, 77);
             globalSettingsBtn.Show ();
 
             /******************************************************************************************************/
@@ -166,8 +167,9 @@ namespace AquaPic.UserInterface
             heaterLabel.Show ();
 
             var heaterSetupBtn = new TouchButton ();
-            heaterSetupBtn.text = "Heater Setup";
-            heaterSetupBtn.SetSizeRequest (100, 60);
+			heaterSetupBtn.text = Convert.ToChar (0x2699).ToString ();
+            heaterSetupBtn.SetSizeRequest (30, 30);
+			heaterSetupBtn.buttonColor = "grey4";
             heaterSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new HeaterSettings (heaterName, heaterName.IsNotEmpty ());
                 s.Run ();
@@ -193,7 +195,7 @@ namespace AquaPic.UserInterface
                 heaterCombo.QueueDraw ();
                 GetHeaterData ();
             };
-            Put (heaterSetupBtn, 415, 195);
+			Put (heaterSetupBtn, 755, 77);
             heaterSetupBtn.Show ();
 
             /******************************************************************************************************/
@@ -209,8 +211,9 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             var probeSetupBtn = new TouchButton ();
-            probeSetupBtn.text = "Probe Setup";
-            probeSetupBtn.SetSizeRequest (100, 60);
+			probeSetupBtn.text = Convert.ToChar (0x2699).ToString ();
+            probeSetupBtn.SetSizeRequest (30, 30);
+			probeSetupBtn.buttonColor = "grey4";
             probeSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new ProbeSettings (probeName, probeName.IsNotEmpty ());
                 s.Run ();
@@ -236,7 +239,7 @@ namespace AquaPic.UserInterface
                 probeCombo.QueueDraw ();
                 GetProbeData ();
             };
-            Put (probeSetupBtn, 415, 405);
+            Put (probeSetupBtn, 755, 277);
             probeSetupBtn.Show ();
 
             var b = new TouchButton ();
@@ -277,7 +280,7 @@ namespace AquaPic.UserInterface
                                     "Can't perfom a calibration");
                 }
             };
-            Put (b, 525, 405);
+            Put (b, 415, 405);
 
 			probeTempLabel = new TouchLabel ();
             probeTempLabel.text = "Temperature";
@@ -295,7 +298,7 @@ namespace AquaPic.UserInterface
             probeTempTextbox.Show ();
 
             heaterCombo = new TouchComboBox (Temperature.GetAllHeaterNames ()); 
-            heaterCombo.WidthRequest = 235;
+            heaterCombo.WidthRequest = 200;
             heaterCombo.comboList.Add ("New heater...");
             heaterCombo.ComboChangedEvent += OnHeaterComboChanged;
             Put (heaterCombo, 550, 77);
@@ -307,7 +310,7 @@ namespace AquaPic.UserInterface
                 heaterCombo.activeIndex = 0;
 
             probeCombo = new TouchComboBox (Temperature.GetAllTemperatureProbeNames ());
-            probeCombo.WidthRequest = 235;
+            probeCombo.WidthRequest = 200;
             probeCombo.comboList.Add ("New probe...");
             probeCombo.ComboChangedEvent += OnProbeComboChanged;
             Put (probeCombo, 550, 277);
@@ -319,7 +322,7 @@ namespace AquaPic.UserInterface
                 probeCombo.activeIndex = 0;
 
             groupCombo = new TouchComboBox (Temperature.GetAllTemperatureGroupNames ());
-            groupCombo.WidthRequest = 235;
+            groupCombo.WidthRequest = 200;
             groupCombo.comboList.Add ("New group...");
             groupCombo.ComboChangedEvent += OnGroupComboChanged;
             Put (groupCombo, 153, 77);

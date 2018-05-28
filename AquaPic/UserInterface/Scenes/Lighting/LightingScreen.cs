@@ -324,7 +324,7 @@ namespace AquaPic.UserInterface
                 numberInput.Run ();
                 numberInput.Destroy ();
             };
-            Put (modifyOnTime, 525, 405);
+            Put (modifyOnTime, 415, 405);
             modifyOnTime.Show ();
 
             offTimeLabel = new TouchLabel ();
@@ -386,7 +386,7 @@ namespace AquaPic.UserInterface
                 numberInput.Run ();
                 numberInput.Destroy ();
             };
-            Put (modifyOffTime, 635, 405);
+            Put (modifyOffTime, 525, 405);
             modifyOffTime.Show ();
 
             var settingsBtn = new TouchButton ();
@@ -429,8 +429,9 @@ namespace AquaPic.UserInterface
             outletSelectorSwitch.Show ();
 
             fixtureSettingBtn = new TouchButton ();
-            fixtureSettingBtn.text = "Fixture Setup";
-            fixtureSettingBtn.SetSizeRequest (100, 60);
+			fixtureSettingBtn.text = Convert.ToChar (0x2699).ToString ();
+            fixtureSettingBtn.SetSizeRequest (30, 30);
+			fixtureSettingBtn.buttonColor = "grey4";
             fixtureSettingBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new FixtureSettings (fixtureName, fixtureName.IsNotEmpty ());
                 s.Run ();
@@ -456,13 +457,12 @@ namespace AquaPic.UserInterface
                 combo.QueueDraw ();
                 GetFixtureData ();
             };
-            Put (fixtureSettingBtn, 415, 405);
+			Put (fixtureSettingBtn, 755, 77);
             fixtureSettingBtn.Show ();
-
-            string[] names = Lighting.GetAllFixtureNames ();
-            combo = new TouchComboBox (names);
+            
+			combo = new TouchComboBox (Lighting.GetAllFixtureNames ());
             combo.activeIndex = 0;
-            combo.WidthRequest = 235;
+            combo.WidthRequest = 200;
             combo.comboList.Add ("New fixture...");
             combo.ComboChangedEvent += OnComboChanged;
             Put (combo, 550, 77);
