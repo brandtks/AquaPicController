@@ -123,8 +123,8 @@ namespace AquaPic.Modules
 
                     try {
                         defaultSunRise = new Time (
-                            Convert.ToByte (jo["defaultSunRise"]["hour"]), 
-                            Convert.ToByte (jo["defaultSunRise"]["minute"])
+							Convert.ToInt32 (jo["defaultSunRise"]["hour"]), 
+							Convert.ToInt32 (jo["defaultSunRise"]["minute"])
                         );
                     } catch {
                         defaultSunRise = new Time (7, 30);
@@ -133,8 +133,8 @@ namespace AquaPic.Modules
 
                     try {
                         defaultSunSet = new Time (
-                            Convert.ToByte (jo["defaultSunRise"]["hour"]),
-                            Convert.ToByte (jo["defaultSunRise"]["minute"])
+							Convert.ToInt32 (jo["defaultSunRise"]["hour"]),
+							Convert.ToInt32 (jo["defaultSunRise"]["minute"])
                         );
                     } catch {
                         defaultSunSet = new Time (20, 30);
@@ -143,8 +143,8 @@ namespace AquaPic.Modules
 
                     try {
                         minSunRise = new Time (
-                            Convert.ToByte (jo["minSunRise"]["hour"]),
-                            Convert.ToByte (jo["minSunRise"]["minute"])
+							Convert.ToInt32 (jo["minSunRise"]["hour"]),
+							Convert.ToInt32 (jo["minSunRise"]["minute"])
                         );
                     } catch {
                         minSunRise = new Time (7, 15);
@@ -153,8 +153,8 @@ namespace AquaPic.Modules
 
                     try {
                         maxSunRise = new Time (
-                            Convert.ToByte (jo["maxSunRise"]["hour"]),
-                            Convert.ToByte (jo["maxSunRise"]["minute"])
+							Convert.ToInt32 (jo["maxSunRise"]["hour"]),
+							Convert.ToInt32 (jo["maxSunRise"]["minute"])
                         );
                     } catch {
                         maxSunRise = new Time (8, 00);
@@ -163,8 +163,8 @@ namespace AquaPic.Modules
 
                     try {
                         minSunSet = new Time (
-                            Convert.ToByte (jo["minSunSet"]["hour"]),
-                            Convert.ToByte (jo["minSunSet"]["minute"])
+							Convert.ToInt32 (jo["minSunSet"]["hour"]),
+							Convert.ToInt32 (jo["minSunSet"]["minute"])
                         );
                     } catch {
                         minSunSet = new Time (19, 30);

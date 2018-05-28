@@ -34,43 +34,49 @@ using AquaPic.SerialBus;
 
 namespace AquaPic
 {
-    class MainClass
-    {
-        public static void Main (string[] args) {
-            string aquaPicEnvironment = string.Empty;
-            // Call the Gtk library hack because Windows sucks at everything
-            if (Utils.ExecutingOperatingSystem == Platform.Windows) {
-                CheckWindowsGtk ();
-                
-                //Get the AquaPic directory environment
-                aquaPicEnvironment = Environment.GetEnvironmentVariable ("AquaPic");
-                if (aquaPicEnvironment.IsEmpty ()) {
-                    var path = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-                    path = Path.Combine(path, "AquaPicEnvironment.txt");
-                    if (File.Exists(path)) {
-                        var lines = File.ReadAllLines(path);
-                        aquaPicEnvironment = lines[0];
-                    }
-                }
+	class MainClass
+	{
+		public static void Main (string[] args) {
+			string aquaPicEnvironment = string.Empty;
+			// Call the Gtk library hack because Windows sucks at everything
+			if (Utils.ExecutingOperatingSystem == Platform.Windows) {
+				CheckWindowsGtk ();
 
-                if (aquaPicEnvironment.IsNotEmpty ()) {
-                    var path = aquaPicEnvironment;
-                    if (!Directory.Exists (path)) {
-                        Console.WriteLine ("Path to AquaPic directory environment is incorrect");
-                        Console.WriteLine("Incorrect path was {0}", path);
-                        aquaPicEnvironment = string.Empty;
-                    }
-                }
+				//Get the AquaPic directory environment
+				aquaPicEnvironment = Environment.GetEnvironmentVariable ("AquaPic");
+				if (aquaPicEnvironment.IsEmpty ()) {
+					var path = Path.GetDirectoryName (System.Reflection.Assembly.GetEntryAssembly ().Location);
+					path = Path.Combine (path, "AquaPicEnvironment.txt");
+					if (File.Exists (path)) {
+						var lines = File.ReadAllLines (path);
+						aquaPicEnvironment = lines[0];
+					}
+				}
 
-                if (aquaPicEnvironment.IsEmpty ()) {
-                    Console.WriteLine ("Please edit the AquaPicEnvironment.txt file to point to the path of the AquaPicRuntime directory.");
-                    Console.WriteLine ("For example if the AquaPicRuntime directory is located at /home/user/AquaPicRuntimeProject/,");
-                    Console.WriteLine ("then add \"/home/user/AquaPicRuntimeProject/\" to the first line of the file.");
-                    return;
-                }
-            } else {
-                aquaPicEnvironment = Environment.GetEnvironmentVariable ("HOME");
+				if (aquaPicEnvironment.IsNotEmpty ()) {
+					var path = aquaPicEnvironment;
+					if (!Directory.Exists (path)) {
+						Console.WriteLine ("Path to AquaPic directory environment is incorrect");
+						Console.WriteLine ("Incorrect path was {0}", path);
+						aquaPicEnvironment = string.Empty;
+					}
+				}
+
+				if (aquaPicEnvironment.IsEmpty ()) {
+					Console.WriteLine ("Please edit the AquaPicEnvironment.txt file to point to the path of the AquaPicRuntime directory.");
+					Console.WriteLine ("For example if the AquaPicRuntime directory is located at /home/user/AquaPicRuntimeProject/,");
+					Console.WriteLine ("then add \"/home/user/AquaPicRuntimeProject/\" to the first line of the file.");
+					return;
+				}
+			} else {
+				aquaPicEnvironment = Environment.GetEnvironmentVariable ("HOME");
+#if EMPTY_SETTINGS
+				aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.empty");
+#elif FULL_SETTINGS
+				aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.full");
+#else
                 aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic");
+#endif
 
 				if (!Directory.Exists (aquaPicEnvironment)) {
 					Directory.CreateDirectory (aquaPicEnvironment);
