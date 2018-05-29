@@ -29,18 +29,17 @@ namespace AquaPic.Drivers
 {
     public partial class AnalogInputBase
     {
-        protected class AnalogInputCard<T> : GenericCard<T>
+        protected class AnalogInputCard : GenericCard
         {
-            public AnalogInputCard (string name, int cardId, int address)
+            public AnalogInputCard (string name, int address)
                 : base (
                     name, 
-                    CardType.AnalogInputCard, 
-                    cardId,
+                    CardType.AnalogInput, 
                     address,
                     4) { }
 
-            protected override GenericChannel<T> ChannelCreater (int index) {
-                return new AnalogInputChannel<T> (GetDefualtName (index));
+			protected override GenericChannel ChannelCreater (int index) {
+				return new AnalogInputChannel (GetDefualtName (index));
             }
 
             public override void GetValueCommunication (int channel) {
@@ -74,7 +73,7 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public override void SetChannelValue (int channel, T value) {
+			public override void SetChannelValue (int channel, ValueType value) {
                 CheckChannelRange (channel);
 
                 if (channels [channel].mode == Mode.Manual) {
@@ -84,7 +83,7 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public override void SetAllChannelValues (T[] values) {
+			public override void SetAllChannelValues (ValueType[] values) {
                 if (values.Length != channels.Length)
                     throw new ArgumentOutOfRangeException ("values.Length");
 
@@ -97,14 +96,14 @@ namespace AquaPic.Drivers
 
             public int GetChannelLowPassFilterFactor (int channel) {
                 CheckChannelRange (channel);
-                var analogInputChannel = channels[channel] as AnalogInputChannel<T>;
+                var analogInputChannel = channels[channel] as AnalogInputChannel;
                 return analogInputChannel.lowPassFilterFactor;
             }
 
             public int[] GetAllChannelLowPassFilterFactors () {
                 int[] lowPassFilterFactors = new int[channelCount];
                 for (int i = 0; i < channelCount; ++i) {
-                    var analogInputCard = channels[i] as AnalogInputChannel<T>;
+                    var analogInputCard = channels[i] as AnalogInputChannel;
                     lowPassFilterFactors[i] = analogInputCard.lowPassFilterFactor;
                 }
                 return lowPassFilterFactors;
@@ -113,7 +112,7 @@ namespace AquaPic.Drivers
             public void SetChannelLowPassFilterFactor (int channel, int lowPassFilterFactor) {
                 CheckChannelRange (channel);
 
-                var analogInputChannel = channels[channel] as AnalogInputChannel<T>;
+                var analogInputChannel = channels[channel] as AnalogInputChannel;
                 analogInputChannel.lowPassFilterFactor = lowPassFilterFactor;
 
                 var message = new byte[2];

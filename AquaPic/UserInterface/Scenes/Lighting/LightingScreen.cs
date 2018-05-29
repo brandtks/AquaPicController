@@ -295,9 +295,9 @@ namespace AquaPic.UserInterface
                     numberInput = new TouchNumberInput (true);
                 }
 
-                numberInput.NumberSetEvent += (value) => {
+                numberInput.TextSetEvent += (s, a) => {
                     try {
-                        var t = Time.Parse (value);
+						var t = Time.Parse (a.text);
 
                         bool timeOk = true;
                         if (t.Before (new Time ())) {
@@ -357,9 +357,9 @@ namespace AquaPic.UserInterface
                     numberInput = new TouchNumberInput (true);
                 }
 
-                numberInput.NumberSetEvent += (value) => {
+                numberInput.TextSetEvent += (s, a) => {
                     try {
-                        var t = Time.Parse (value);
+						var t = Time.Parse (a.text);
 
                         bool timeOk = true;
                         if (t.Before (new Time ())) {

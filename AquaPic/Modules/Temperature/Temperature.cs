@@ -234,13 +234,13 @@ namespace AquaPic.Modules
                         var text = (string)obj["inputCard"];
                         if (text.IsNotEmpty ()) {
                             try {
-                                ic.Group = AquaPicDrivers.AnalogInput.GetCardIndex (text);
+                                ic.Group = text;
                             } catch {
                                 //
                             }
                         }
 
-                        if (ic.Group != -1) {
+						if (ic.Group.IsNotEmpty ()) {
                             text = (string)obj["channel"];
                             if (text.IsEmpty ()) {
                                 ic = IndividualControl.Empty;
@@ -304,7 +304,7 @@ namespace AquaPic.Modules
                         JObject obj = jt as JObject;
                         var name = (string)obj["name"];
 						var ic = IndividualControl.Empty;
-						ic.GroupName = (string)obj["powerStrip"];
+						ic.Group = (string)obj["powerStrip"];
 						try {
 							ic.Individual = Convert.ToInt32 (obj["outlet"]);
 						} catch {

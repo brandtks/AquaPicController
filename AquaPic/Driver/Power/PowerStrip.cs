@@ -86,7 +86,7 @@ namespace AquaPic.Drivers
 
             public void GetStatus () {
                 Read (20, 3, GetStatusCallback);
-            }
+            }         
 
             protected void GetStatusCallback (CallbackArgs callArgs) {
                 if (status != AquaPicBusStatus.CommunicationSuccess)

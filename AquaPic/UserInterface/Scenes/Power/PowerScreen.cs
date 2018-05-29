@@ -65,7 +65,7 @@ namespace AquaPic.UserInterface
                 selectors[i].UpdateScreen = () => {
 					if (powerStripName.IsNotEmpty ()) {
 						var ic = IndividualControl.Empty;
-						ic.GroupName = powerStripName;
+						ic.Group = powerStripName;
 						ic.Individual = idx;
 						selectors[idx].outletName.text = Power.GetOutletName (ic);
 						Mode mode = Power.GetOutletMode (ic);
@@ -96,21 +96,13 @@ namespace AquaPic.UserInterface
 				if (powerStripName.IsNotEmpty ()) {
 					selectors[i].Show ();
 					var ic = IndividualControl.Empty;
-					ic.GroupName = powerStripName;
+					ic.Group = powerStripName;
 					ic.Individual = i;
 					Power.AddHandlerOnStateChange (ic, PlugStateChange);
 				} else {
 					selectors[i].Visible = false;
 				}
             }
-
-			combo = new TouchComboBox (Power.GetAllPowerStripNames ());
-			combo.WidthRequest = 200;
-			combo.comboList.Add ("New power strip...");
-			combo.activeText = powerStripName;
-            combo.ComboChangedEvent += OnComboChanged;
-            Put (combo, 550, 35);
-            combo.Show ();
 
 			settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
@@ -120,6 +112,14 @@ namespace AquaPic.UserInterface
             Put (settingsButton, 755, 35);
             settingsButton.Show ();
 
+			combo = new TouchComboBox (Power.GetAllPowerStripNames ());
+			combo.comboList.Add ("New power strip...");
+			combo.activeText = powerStripName;
+			combo.WidthRequest = 200;
+            combo.ComboChangedEvent += OnComboChanged;
+            Put (combo, 550, 35);
+            combo.Show ();         
+
 			GetPowerData ();
          
 			Show ();
@@ -128,7 +128,7 @@ namespace AquaPic.UserInterface
 		protected void OnComboChanged (object sender, ComboBoxChangedEventArgs args) {
 			if (args.activeText != "New power strip...") {
 				var ic = IndividualControl.Empty;
-				ic.GroupName = powerStripName; 
+				ic.Group = powerStripName; 
 				for (int i = 0; i < selectors.Length; ++i) {
 					ic.Individual = i;
 					Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
@@ -137,7 +137,7 @@ namespace AquaPic.UserInterface
 				powerStripName = args.activeText;
 				GetPowerData ();
 
-				ic.GroupName = powerStripName;
+				ic.Group = powerStripName;
 				for (int i = 0; i < selectors.Length; ++i) {
 					ic.Individual = i;
 					Power.AddHandlerOnStateChange (ic, PlugStateChange);
@@ -225,7 +225,7 @@ namespace AquaPic.UserInterface
 		protected void OnSelectorChanged (object sender, SelectorChangedEventArgs e) {
 			var ss = sender as TouchSelectorSwitch;
 			var ic = IndividualControl.Empty;
-			ic.GroupName = powerStripName;
+			ic.Group = powerStripName;
 			ic.Individual = ss.id;
 
 			if (ss.currentSelected == 1) { // auto
@@ -283,7 +283,7 @@ namespace AquaPic.UserInterface
 		public override void Dispose () {
 			if (powerStripName.IsNotEmpty ()) {
                 var ic = IndividualControl.Empty;
-				ic.GroupName = powerStripName;
+				ic.Group = powerStripName;
                 for (int i = 0; i < selectors.Length; ++i) {
                     ic.Individual = i;
                     Power.RemoveHandlerOnStateChange (ic, PlugStateChange);

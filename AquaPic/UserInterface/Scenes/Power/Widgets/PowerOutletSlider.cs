@@ -121,7 +121,7 @@ namespace AquaPic.UserInterface
             IndividualControl ic = Power.GetOutletIndividualControl (outletName.text);
             string owner = Power.GetOutletOwner (ic);
             if (owner == "Power") {
-                string n = string.Format ("{0}.p{1}", ic.GroupName, ic.Individual);
+                string n = string.Format ("{0}.p{1}", ic.Group, ic.Individual);
                 OutletSettings os;
                 if (n == outletName.text)
                     os = new OutletSettings (outletName.text, false, ic);

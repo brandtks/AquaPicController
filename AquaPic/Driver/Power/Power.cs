@@ -141,7 +141,7 @@ namespace AquaPic.Drivers
 		}
         
 		public static void RemovePowerStrip (string powerStripName) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 			if (!CheckPowerStipEmpty (powerStripName)) {
 				throw new Exception ("At least one outlet is occupied");
 			}
@@ -149,13 +149,26 @@ namespace AquaPic.Drivers
 			powerStrips.Remove (powerStripName);
 		}
 
-		public static void CheckPowerStripName (string powerStripName) {
+		public static void CheckPowerStripKey (string powerStripName) {
 			if (!powerStrips.ContainsKey (powerStripName))
 				throw new ArgumentOutOfRangeException (nameof (powerStripName));
 		}
 
+		public static bool CheckPowerStripKeyNoThrow (string powerStripName) {
+			try {
+				CheckPowerStripKey (powerStripName);
+                return true;
+            } catch {
+                return false;
+            }
+		}
+
+		public static bool PowerStripNameOk (string powerStripName) {
+			return !CheckPowerStripKeyNoThrow (powerStripName);
+		}
+
 		public static bool CheckPowerStipEmpty (string powerStripName) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 			if (GetAllAvailableOutlets (powerStripName).Length == powerStrips[powerStripName].outlets.Length)
 				return true;
 			return false;
@@ -190,12 +203,12 @@ namespace AquaPic.Drivers
 		}
 
 		public static bool GetPowerStripAlarmOnPowerLoss (string powerStripName) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 			return powerStrips[powerStripName].powerLossAlarmIndex != -1;
 		}
 
 		public static void SetPowerStripAlarmOnPowerLoss (string powerStripName, bool alarmOnLossOfPower) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 			if (alarmOnLossOfPower) {
 				foreach (var strip in powerStrips.Values) {
 					if (strip.powerLossAlarmIndex != -1)
@@ -211,11 +224,11 @@ namespace AquaPic.Drivers
 		}
 
 		public static Coil AddOutlet (IndividualControl outlet, string name, MyState fallback, string owner = "Power") {
-			return AddOutlet (outlet.GroupName, outlet.Individual, name, fallback, owner);
+			return AddOutlet (outlet.Group, outlet.Individual, name, fallback, owner);
 		}
 
 		public static Coil AddOutlet (string powerStripName, int outletId, string name, MyState fallback, string owner = "Power") {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 			CheckOutletId (powerStripName, outletId);
 
 			string s = string.Format ("{0}.p{1}", powerStripName, outletId);
@@ -234,11 +247,11 @@ namespace AquaPic.Drivers
 		}
 
 		public static void RemoveOutlet (IndividualControl outlet) {
-			RemoveOutlet (outlet.GroupName, outlet.Individual);
+			RemoveOutlet (outlet.Group, outlet.Individual);
 		}
 
 		public static void RemoveOutlet (string powerStripName, int outletId) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 			CheckOutletId (powerStripName, outletId);
 
 			string s = string.Format ("{0}.p{1}", powerStripName, outletId);
@@ -264,28 +277,28 @@ namespace AquaPic.Drivers
 		}
 
 		public static void SetOutletManualState (IndividualControl outlet, MyState state) {
-			CheckPowerStripName (outlet.GroupName);
-			CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+			CheckOutletId (outlet.Group, outlet.Individual);
 
-			powerStrips[outlet.GroupName].outlets[outlet.Individual].manualState = state;
+			powerStrips[outlet.Group].outlets[outlet.Individual].manualState = state;
 		}
 
 		public static MyState GetOutletManualState (IndividualControl outlet) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
-			return powerStrips[outlet.GroupName].outlets[outlet.Individual].manualState;
+			return powerStrips[outlet.Group].outlets[outlet.Individual].manualState;
 		}
 
 		public static MyState GetOutletState (IndividualControl outlet) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
-			return powerStrips[outlet.GroupName].outlets[outlet.Individual].currentState;
+			return powerStrips[outlet.Group].outlets[outlet.Individual].currentState;
 		}
 
 		public static MyState[] GetAllStates (string powerStripName) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 
 			MyState[] states = new MyState[8];
 			for (int i = 0; i < states.Length; ++i)
@@ -294,21 +307,21 @@ namespace AquaPic.Drivers
 		}
 
 		public static void SetOutletMode (IndividualControl outlet, Mode mode) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
-			powerStrips[outlet.GroupName].SetPlugMode ((byte)outlet.Individual, mode);
+			powerStrips[outlet.Group].SetPlugMode ((byte)outlet.Individual, mode);
 		}
 
 		public static Mode GetOutletMode (IndividualControl outlet) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
-			return powerStrips[outlet.GroupName].outlets[outlet.Individual].mode;
+			return powerStrips[outlet.Group].outlets[outlet.Individual].mode;
 		}
 
 		public static Mode[] GetAllModes (string powerStripName) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 
 			Mode[] modes = new Mode[8];
 			for (int i = 0; i < modes.Length; ++i)
@@ -317,7 +330,7 @@ namespace AquaPic.Drivers
 		}
 
 		public static string[] GetAllOutletNames (string powerStripName) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 
 			string[] names = new string[8];
 			for (int i = 0; i < names.Length; ++i)
@@ -326,10 +339,10 @@ namespace AquaPic.Drivers
 		}
 
 		public static string GetOutletName (IndividualControl outlet) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
-			return powerStrips[outlet.GroupName].outlets[outlet.Individual].name;
+			return powerStrips[outlet.Group].outlets[outlet.Individual].name;
 		}
 
 		public static bool OutletNameOk (string name) {
@@ -342,38 +355,38 @@ namespace AquaPic.Drivers
 		}
 
 		public static void SetOutletName (IndividualControl outlet, string name) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
 			if (OutletNameOk (name))
-				powerStrips[outlet.GroupName].outlets[outlet.Individual].name = name;
+				powerStrips[outlet.Group].outlets[outlet.Individual].name = name;
 			else
 				throw new Exception (string.Format ("Outlet: {0} already exists", name));
 		}
 
 		public static MyState GetOutletFallback (IndividualControl outlet) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
-			return powerStrips[outlet.GroupName].outlets[outlet.Individual].fallback;
+			return powerStrips[outlet.Group].outlets[outlet.Individual].fallback;
 		}
 
 		public static void SetOutletFallback (IndividualControl outlet, MyState fallback) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
-			powerStrips[outlet.GroupName].outlets[outlet.Individual].fallback = fallback;
-			powerStrips[outlet.GroupName].SetupOutlet (
+			powerStrips[outlet.Group].outlets[outlet.Individual].fallback = fallback;
+			powerStrips[outlet.Group].SetupOutlet (
 				(byte)outlet.Individual,
-				powerStrips[outlet.GroupName].outlets[outlet.Individual].fallback);
+				powerStrips[outlet.Group].outlets[outlet.Individual].fallback);
 		}
 
 
 		public static void SetOutletConditionCheck (IndividualControl outlet, ConditionGetterHandler checker) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
-			powerStrips[outlet.GroupName].outlets[outlet.Individual].OutletControl.ConditionGetter = checker;
+			powerStrips[outlet.Group].outlets[outlet.Individual].OutletControl.ConditionGetter = checker;
 		}
 
 		public static void SetOutletConditionCheck (IndividualControl outlet, IOutletScript script) {
@@ -386,7 +399,7 @@ namespace AquaPic.Drivers
 			foreach (var strip in powerStrips.Values) {
 				for (int j = 0; j < strip.outlets.Length; ++j) {
 					if (string.Equals (strip.outlets[j].name, name, StringComparison.InvariantCultureIgnoreCase)) {
-						outlet.GroupName = strip.name;
+						outlet.Group = strip.name;
 						outlet.Individual = j;
 						return outlet;
 					}
@@ -411,7 +424,7 @@ namespace AquaPic.Drivers
 		}
 
 		public static string[] GetAllAvailableOutlets (string powerStripName) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 
 			var available = new List<string> ();
 			var ps = powerStrips[powerStripName];
@@ -425,14 +438,14 @@ namespace AquaPic.Drivers
 		}
 
 		public static string GetOutletOwner (IndividualControl outlet) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
-			return powerStrips[outlet.GroupName].outlets[outlet.Individual].owner;
+			return powerStrips[outlet.Group].outlets[outlet.Individual].owner;
 		}
 
 		public static string[] GetAllOutletOwners (string powerStripName) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 
 			string[] owners = new string[powerStrips[powerStripName].outlets.Length];
 			for (int i = 0; i < owners.Length; ++i)
@@ -442,8 +455,8 @@ namespace AquaPic.Drivers
 		}
 
 		public static void AddHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
 			string name = GetOutletName (outlet);
 
@@ -454,8 +467,8 @@ namespace AquaPic.Drivers
 		}
 
 		public static void RemoveHandlerOnModeChange (IndividualControl outlet, ModeChangedHandler handler) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
 			string name = GetOutletName (outlet);
 
@@ -470,8 +483,8 @@ namespace AquaPic.Drivers
 		}
 
 		public static void AddHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
 			string name = GetOutletName (outlet);
 
@@ -482,8 +495,8 @@ namespace AquaPic.Drivers
 		}
 
 		public static void RemoveHandlerOnStateChange (IndividualControl outlet, StateChangeHandler handler) {
-			CheckPowerStripName (outlet.GroupName);
-            CheckOutletId (outlet.GroupName, outlet.Individual);
+			CheckPowerStripKey (outlet.Group);
+            CheckOutletId (outlet.Group, outlet.Individual);
 
 			string name = GetOutletName (outlet);
 
@@ -498,13 +511,13 @@ namespace AquaPic.Drivers
 		}
 
 		public static bool AquaPicBusCommunicationOk (string powerStripName) {
-			CheckPowerStripName (powerStripName);
+			CheckPowerStripKey (powerStripName);
 			return powerStrips[powerStripName].AquaPicBusCommunicationOk;
 		}
 
 		public static bool AquaPicBusCommunicationOk (IndividualControl outlet) {
-			CheckPowerStripName (outlet.GroupName);
-			return powerStrips[outlet.GroupName].AquaPicBusCommunicationOk;
+			CheckPowerStripKey (outlet.Group);
+			return powerStrips[outlet.Group].AquaPicBusCommunicationOk;
 		}      
 	}
 }

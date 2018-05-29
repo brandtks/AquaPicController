@@ -26,23 +26,35 @@ using System.Diagnostics;
 using System.Text;
 using Cairo;
 using Gtk;
+using GoodtimeDevelopment.Utilites;
 
 namespace GoodtimeDevelopment.TouchWidget
 {
-    public delegate void NumberSetEventHandler (string value);
+	public delegate void TextSetEventHandler (object sender, TextSetEventArgs args);
 
-    public class TouchNumberInput : Gtk.Dialog
+    public class TextSetEventArgs : EventArgs
     {
-        public event NumberSetEventHandler NumberSetEvent;
+        public string text;
+        public bool keepText;
 
-        private Entry entry;
-        private Fixed fix;
-        private VirtualKeyboard vkb;
+		public TextSetEventArgs (string text) {
+            this.text = text;
+            keepText = true;
+        }
+    }
 
-        public TouchNumberInput (bool timeInput = false, Gtk.Window parent = null) : base ("Input", parent, DialogFlags.DestroyWithParent) {
+    public class TouchNumberInput : Dialog
+    {
+        public event TextSetEventHandler TextSetEvent;
+
+        Entry entry;
+        Fixed fix;
+        VirtualKeyboard vkb;
+
+        public TouchNumberInput (bool timeInput = false, Window parent = null) : base ("Input", parent, DialogFlags.DestroyWithParent) {
             Name = "AquaPic.Keyboard.Input";
             Title = "Input";
-            WindowPosition = (Gtk.WindowPosition)4;
+            WindowPosition = (WindowPosition)4;
             DefaultWidth = 205;
             DefaultHeight = 290;
             KeepAbove = true;
@@ -68,7 +80,7 @@ namespace GoodtimeDevelopment.TouchWidget
             fix.WidthRequest = 205;
             fix.HeightRequest = 290;
 
-            this.ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
+            ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
             entry = new Entry ();
             entry.WidthRequest = 145;
@@ -78,10 +90,16 @@ namespace GoodtimeDevelopment.TouchWidget
             entry.ModifyBase (StateType.Normal, TouchColor.NewGtkColor ("grey4"));
             entry.ModifyText (StateType.Normal, TouchColor.NewGtkColor ("black"));
             entry.Activated += (sender, e) => {
-                if (NumberSetEvent != null)
-                    NumberSetEvent (entry.Text);
+				if (entry.Text.IsNotEmpty ()) {
+					TextSetEventArgs args = new TextSetEventArgs (entry.Text);
+					TextSetEvent?.Invoke (this, args);
 
-                Destroy ();
+					if (args.keepText) {
+						Destroy ();
+					}
+				} else {
+					Destroy ();
+				}
             };
 
             fix.Put (entry, 5, 5);
@@ -240,15 +258,17 @@ namespace GoodtimeDevelopment.TouchWidget
             TouchButton enter = new TouchButton ();
             enter.text = Convert.ToChar (0x23CE).ToString ();
             enter.HeightRequest = 95;
-            enter.ButtonReleaseEvent += (o, args) => {
-                if (NumberSetEvent != null)
-                    NumberSetEvent (entry.Text);
+            enter.ButtonReleaseEvent += (o, a) => {
+                var args = new TextSetEventArgs (entry.Text);
+				TextSetEvent?.Invoke (this, args);
 
-                Destroy ();
+				if (args.keepText) {
+                    Destroy ();
+                }
             };
             fix.Put (enter, 155, 140);
 
-            foreach (Widget w in this.Children) {
+            foreach (Widget w in Children) {
                 Remove (w);
                 w.Dispose ();
             }
@@ -265,7 +285,7 @@ namespace GoodtimeDevelopment.TouchWidget
             ++entry.Position;
         }
 
-        private class KeyButton : TouchButton {
+        class KeyButton : TouchButton {
             public KeyButton (string text, ButtonReleaseEventHandler handler) {
                 this.text = text;
                 this.textSize = 13;
@@ -274,7 +294,7 @@ namespace GoodtimeDevelopment.TouchWidget
             }
         }
 
-        private class VirtualKeyboard : Fixed {
+        class VirtualKeyboard : Fixed {
             enum ShiftKeyState {
                 Lower,
                 Shifted,

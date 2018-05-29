@@ -341,9 +341,9 @@ namespace AquaPic.UserInterface
                     int failCount = 3;
                     while ((number == -1) && (failCount != 0)) {
                         var t = new TouchNumberInput (false, parent);
-                        t.NumberSetEvent += (value) => {
+                        t.TextSetEvent += (o, a) => {
                             try {
-                                number = Convert.ToDouble (value);
+								number = Convert.ToDouble (a.text);
                             } catch {
                                 number = -1;
                             }

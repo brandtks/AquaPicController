@@ -27,13 +27,13 @@ namespace AquaPic.Drivers
 {
     public partial class PhOrpBase
     {
-        protected class PhOrpChannel<T> : GenericChannel<T>
+        protected class PhOrpChannel : GenericChannel
         {
             public bool enabled;
             public int lowPassFilterFactor;
             
             public PhOrpChannel (string name) 
-                : base (name, (T)(object)0f) 
+				: base (name, typeof(float)) 
             {
                 enabled = false;
                 lowPassFilterFactor = 5;

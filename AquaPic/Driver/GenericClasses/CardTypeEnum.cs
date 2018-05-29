@@ -26,21 +26,22 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Drivers
 {
-    public enum CardType {
-        [Description("Analog Input Card")]
-        AnalogInputCard,
+	public enum CardType
+	{
+		[Description ("Analog Input Card")]
+		AnalogInput,
 
-        [Description("Analog Output Card")]
-        AnalogOutputCard,
+		[Description ("Analog Output Card")]
+		AnalogOutput,
 
-        [Description("Digital Input Card")]
-        DigitalInputCard,
+		[Description ("Digital Input Card")]
+		DigitalInput,
 
-        [Description("Power Strip")]
-        PowerStrip,
+		[Description ("Power Strip")]
+		Power,
 
-        [Description("pH ORP Card")]
-        PhOrpCard
+		[Description ("pH ORP Card")]
+		PhOrp,
     }
 }
 

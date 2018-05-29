@@ -192,7 +192,7 @@ namespace AquaPic.Modules
 
                         string name = (string)obj["name"];
                         var plug = IndividualControl.Empty;
-                        plug.GroupName = (string)obj["powerStrip"];
+                        plug.Group = (string)obj["powerStrip"];
                         plug.Individual = Convert.ToInt32 (obj["outlet"]);
                         bool highTempLockout = Convert.ToBoolean (obj["highTempLockout"]);
 
@@ -206,7 +206,7 @@ namespace AquaPic.Modules
 
                         if (string.Equals (type, "dimming", StringComparison.InvariantCultureIgnoreCase)) {
                             var channel = IndividualControl.Empty;
-                            channel.Group = AquaPicDrivers.AnalogOutput.GetCardIndex ((string)obj["dimmingCard"]);
+                            channel.Group = (string)obj["dimmingCard"];
                             channel.Individual = Convert.ToInt32 (obj["channel"]);
                             float minDimmingOutput = Convert.ToSingle (obj["minDimmingOutput"]);
                             float maxDimmingOutput = Convert.ToSingle (obj["maxDimmingOutput"]);

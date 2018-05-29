@@ -23,225 +23,250 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AquaPic.Globals;
 using AquaPic.Runtime;
 
 namespace AquaPic.Drivers
 {
-    public class GenericBase<T>
-    {
-        protected List<GenericCard<T>> cards;
-        private string name;
+	public class GenericBase
+	{
+		protected Dictionary<string, GenericCard> cards;
+		string name;
 
-        public int cardCount {
-            get {
-                return cards.Count;
+		public int cardCount {
+			get {
+				return cards.Count;
+			}
+		}
+
+		public string firstCard {
+			get {
+				if (cards.Count > 0) {
+					var first = cards.First ();
+                    return first.Key;
+                }
+
+                return string.Empty;
             }
+		}
+
+		public GenericBase (string name, uint runtime = 1000) {
+			cards = new Dictionary<string, GenericCard> ();
+			this.name = name;
+			TaskManager.AddCyclicInterrupt (name, runtime, Run);
+		}
+
+		protected virtual void Run () {
+			Logger.AddWarning (name + " does not have an implemented Runtime function");
+			TaskManager.RemoveCyclicInterrupt (name);
+		}
+
+		protected virtual GenericCard CardCreater (string cardName, int address) {
+			throw new NotImplementedException ();
+		}
+
+		public virtual string GetCardAcyronym () {
+			throw new NotImplementedException ();
+		}
+
+		public virtual CardType GetCardType () {
+			throw new NotImplementedException ();
+		}
+
+		/**************************************************************************************************************/
+		/* Cards                                                                                                      */
+		/**************************************************************************************************************/
+		public virtual void AddCard (string card, int address) {
+			cards.Add (card, CardCreater (card, address));
+		}
+
+		public virtual void RemoveCard (string card) {
+			CheckCardKey (card);
+			if (!CheckCardEmpty (card)) {
+                throw new Exception ("At least one channel is occupied");
+            }
+            cards[card].RemoveSlave ();
+            cards.Remove (card);
         }
 
-        public GenericBase (string name, uint runtime = 1000) {
-            cards = new List<GenericCard<T>> ();
-            this.name = name;
-            TaskManager.AddCyclicInterrupt (name, runtime, Run);
-        }
+		public virtual string[] GetAllCardNames () {
+			var names = new List<string> ();
+			foreach (var card in cards.Values) {
+				names.Add (card.name);
+			}
+			return names.ToArray ();
+		}
 
-        protected virtual void Run () {
-            Logger.AddWarning (name + " does not have an implemented Runtime function");
-            TaskManager.RemoveCyclicInterrupt (name);
-        }
+		//Base class doesn't check channel range because card handles that
+		protected virtual void CheckCardKey (string card) {
+			if (!cards.ContainsKey (card)) {
+				throw new ArgumentOutOfRangeException (nameof (card));
+			}
+		}
 
-        protected virtual GenericCard<T> CardCreater (string cardName, int cardId, int address) {
-            throw new NotImplementedException ();
-        }
+		public virtual bool CheckCardKeyNoThrow (string card) {
+			try {
+				CheckCardKey (card);
+				return true;
+			} catch (ArgumentOutOfRangeException) {
+				return false;
+			}
+		}
 
-        /**************************************************************************************************************/
-        /* Cards                                                                                                      */
-        /**************************************************************************************************************/
-        public virtual int AddCard (int address, string cardName) {
-            int cardId = cards.Count;
-            cards.Add (CardCreater (cardName, cardId, address));
-            return cardId;
-        }
+		public virtual bool CardNameOk (string card) {
+			return !CheckCardKeyNoThrow (card);
+		}
 
-        public virtual int GetCardIndex (string cardName) {
-            for (int i = 0; i < cardCount; ++i) {
-                if (string.Equals (cards [i].name, cardName, StringComparison.InvariantCultureIgnoreCase))
-                    return i;
+		public virtual bool CheckCardEmpty (string card) {
+			CheckCardKey (card);
+			if (GetAllAvaiableChannels (card).Length == cards[card].channelCount) {
+				return true;
+			}
+			return false;
+		}
+
+		public virtual int GetLowestCardNameIndex () {
+            var nameIndexes = new List<int> ();
+            var lowestNameIndex = 1;
+            foreach (var card in cards.Values) {
+                // All names start with two letter acyronym, so everything after that is the name index
+                nameIndexes.Add (Convert.ToInt32 (card.name.Substring (2)));
             }
 
-            throw new ArgumentException (cardName + " does not exists");
-        }
-
-        public virtual string GetCardName (int card) {
-            CheckCardRange (card);
-            return cards [card].name;
-        }
-
-        public virtual string[] GetAllCardNames () {
-            string[] names = new string[cards.Count];
-            for (int i = 0; i < cards.Count; ++i) {
-                names [i] = cards [i].name;
-            }
-            return names;
-        }
-
-        //Base class doesn't check channel range because card handles that
-        protected virtual void CheckCardRange (int card) {
-            if ((card < 0) && (card >= cards.Count)) {
-                throw new ArgumentOutOfRangeException ("channel");
-            }
-        }
-
-        public virtual bool CheckCardRangeNoThrow (int card) {
-            try {
-                CheckCardRange (card);
-                return true;
-            } catch (ArgumentOutOfRangeException) {
-                return false;
-            } 
-        }
-
-        public bool AquaPicBusCommunicationOk (string name) {
-            int card = GetCardIndex (name);
-            return AquaPicBusCommunicationOk (card);
-        }
-
-        public bool AquaPicBusCommunicationOk (IndividualControl ic) {
-            return AquaPicBusCommunicationOk (ic.Group);
-        }
-
-        public bool AquaPicBusCommunicationOk (int card) {
-            CheckCardRange (card);
-            return cards [card].AquaPicBusCommunicationOk;
-        }
-
-        /**************************************************************************************************************/
-        /* Channels                                                                                                   */
-        /**************************************************************************************************************/
-        public virtual void AddChannel (IndividualControl channel, string channelName) {
-            AddChannel (channel.Group, channel.Individual, channelName);
-        }
-
-        public virtual void AddChannel (int card, int channel, string channelName) {
-            CheckCardRange (card);
-			if (!ChannelNameOk (card, name)) {
-                throw new Exception (string.Format ("Channel name {0} already exists", name));
-            }
-            cards [card].AddChannel (channel, channelName);
-        }
-
-        public virtual void RemoveChannel (string channelName) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
-            RemoveChannel (channel.Group, channel.Individual);
-        }
-
-        public virtual void RemoveChannel (IndividualControl channel) {
-            RemoveChannel (channel.Group, channel.Individual);
-        }
-
-        public virtual void RemoveChannel (int card, int channel) {
-            CheckCardRange (card);
-            cards [card].RemoveChannel (channel);
-        }
-
-        public virtual IndividualControl GetChannelIndividualControl (string channelName) {
-            var channel = IndividualControl.Empty;
-
-            for (int i = 0; i < cardCount; ++i) {
-                for (int j = 0; j < cards [i].channels.Length; ++j) {
-                    if (string.Equals (cards [i].channels [j].name, channelName, StringComparison.InvariantCultureIgnoreCase)) {
-                        channel.Group = i;
-                        channel.Individual = j;
-                        return channel;
-                    }
+            bool lowestFound = false;
+            while (!lowestFound) {
+                if (nameIndexes.Contains (lowestNameIndex)) {
+                    ++lowestNameIndex;
+                } else {
+                    lowestFound = true;
                 }
             }
 
-            throw new ArgumentException (channelName + " does not exists");
+            return lowestNameIndex;
         }
 
-        public virtual int GetChannelIndex (string cardName, string channelName) {
-            int card = GetCardIndex (cardName);
-            return GetChannelIndex (card, channelName);
-        }
+		public bool AquaPicBusCommunicationOk (IndividualControl ic) {
+			return AquaPicBusCommunicationOk (ic.Group);
+		}
 
-        public virtual int GetChannelIndex (int card, string channelName) {
-            CheckCardRange (card);
-            return cards [card].GetChannelIndex (channelName);
-        }
+		public bool AquaPicBusCommunicationOk (string card) {
+			CheckCardKey (card);
+			return cards[card].AquaPicBusCommunicationOk;
+		}
 
-        public virtual string[] GetAllAvaiableChannels () {
-            List<string> availableChannels = new List<string> ();
-            foreach (var card in cards) {
-                availableChannels.AddRange (card.GetAllAvaiableChannels ());
-            }
-            return availableChannels.ToArray ();
-        }
+		/**************************************************************************************************************/
+		/* Channels                                                                                                   */
+		/**************************************************************************************************************/
+		public virtual void AddChannel (IndividualControl channel, string channelName) {
+			AddChannel (channel.Group, channel.Individual, channelName);
+		}
 
-        /**************************************************************************************************************/
-        /* Channel Value Getters                                                                                      */
-        /**************************************************************************************************************/
-        public virtual T GetChannelValue (string channelName) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
-            return GetChannelValue (channel.Group, channel.Individual);
-        }
+		public virtual void AddChannel (string card, int channel, string channelName) {
+			CheckCardKey (card);
+			if (!ChannelNameOk (card, name)) {
+				throw new Exception (string.Format ("Channel name {0} already exists", name));
+			}
+			cards[card].AddChannel (channel, channelName);
+		}
 
-        public virtual T GetChannelValue (IndividualControl channel) {
-            return GetChannelValue (channel.Group, channel.Individual);
-        }
+		public virtual void RemoveChannel (string channelName) {
+			IndividualControl channel = GetChannelIndividualControl (channelName);
+			RemoveChannel (channel);
+		}
 
-        public virtual T GetChannelValue (int card, int channel) {
-            CheckCardRange (card);
-            return cards [card].GetChannelValue (channel);
-        }
+		public virtual void RemoveChannel (IndividualControl channel) {
+			RemoveChannel (channel.Group, channel.Individual);
+		}
 
-        public virtual T[] GetAllChannelValues (string cardName) {
-            int card = GetCardIndex (cardName);
-            return GetAllChannelValues (card);
-        }
+		public virtual void RemoveChannel (string card, int channel) {
+			CheckCardKey (card);
+			cards[card].RemoveChannel (channel);
+		}
 
-        public virtual T[] GetAllChannelValues (int card) {
-            CheckCardRange (card);
-            return cards [card].GetAllChannelValues ();
-        }
+		public virtual IndividualControl GetChannelIndividualControl (string channelName) {
+			var channel = IndividualControl.Empty;
 
-        /**************************************************************************************************************/
-        /* Channel Value Setters                                                                                      */
-        /**************************************************************************************************************/
-        public virtual void SetChannelValue (string channelName, T value) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
-            SetChannelValue (channel.Group, channel.Individual, value);
-        }
+			foreach (var card in cards.Values) {
+				for (int j = 0; j < cards[card.name].channels.Length; ++j) {
+					if (string.Equals (cards[card.name].channels[j].name, channelName, StringComparison.InvariantCultureIgnoreCase)) {
+						channel.Group = card.name;
+						channel.Individual = j;
+						return channel;
+					}
+				}
+			}
 
-        public virtual void SetChannelValue (IndividualControl channel, T value) {
-            SetChannelValue (channel.Group, channel.Individual, value);
-        }
+			throw new ArgumentException (channelName + " does not exists");
+		}
 
-        public virtual void SetChannelValue (int card, int channel, T value) {
-            CheckCardRange (card);
-            cards [card].SetChannelValue (channel, value);
-        }
+		public virtual int GetChannelIndex (string card, string channelName) {
+			CheckCardKey (card);
+			return cards[card].GetChannelIndex (channelName);
+		}
 
-        public virtual void SetAllChannelValues (string cardName, T[] values) {
-            int card = GetCardIndex (cardName);
-            SetAllChannelValues (card, values);
-        }
+		public virtual string[] GetAllAvaiableChannels () {
+			List<string> availableChannels = new List<string> ();
+			foreach (var card in cards.Values) {
+				availableChannels.AddRange (card.GetAllAvaiableChannels ());
+			}
+			return availableChannels.ToArray ();
+		}
 
-        public virtual void SetAllChannelValues (int card, T[] values) {
-            CheckCardRange (card);
-            cards [card].SetAllChannelValues (values);
-        }
+		public virtual string[] GetAllAvaiableChannels (string card) {
+			var availableChannels = new List<string> (cards[card].GetAllAvaiableChannels ());
+			return availableChannels.ToArray ();
+		}
+
+		/**************************************************************************************************************/
+		/* Channel Value Getters                                                                                      */
+		/**************************************************************************************************************/
+		public virtual dynamic GetChannelValue (string channelName) {
+			IndividualControl channel = GetChannelIndividualControl (channelName);
+			return GetChannelValue (channel.Group, channel.Individual);
+		}
+
+		public virtual dynamic GetChannelValue (IndividualControl channel) {
+			return GetChannelValue (channel.Group, channel.Individual);
+		}
+
+		public virtual dynamic GetChannelValue (string card, int channel) {
+			CheckCardKey (card);
+			return cards[card].GetChannelValue (channel);
+		}
+
+		public virtual dynamic[] GetAllChannelValues (string card) {
+			CheckCardKey (card);
+			return cards[card].GetAllChannelValues ();
+		}
+
+		/**************************************************************************************************************/
+		/* Channel Value Setters                                                                                      */
+		/**************************************************************************************************************/
+		public virtual void SetChannelValue (string channelName, ValueType value) {
+			IndividualControl channel = GetChannelIndividualControl (channelName);
+			SetChannelValue (channel.Group, channel.Individual, value);
+		}
+
+		public virtual void SetChannelValue (IndividualControl channel, ValueType value) {
+			SetChannelValue (channel.Group, channel.Individual, value);
+		}
+
+		public virtual void SetChannelValue (string card, int channel, ValueType value) {
+			CheckCardKey (card);
+			cards[card].SetChannelValue (channel, value);
+		}
+
+		public virtual void SetAllChannelValues (string card, ValueType[] values) {
+			CheckCardKey (card);
+			cards[card].SetAllChannelValues (values);
+		}
 
 		/**************************************************************************************************************/
 		/* Channel Name Check                                                                                         */
 		/**************************************************************************************************************/
-		public virtual bool ChannelNameOk (string cardName, string channelName) {
-			int card = GetCardIndex (cardName);
-			return ChannelNameOk (card, channelName);
-        }
-
-		public virtual bool ChannelNameOk (int card, string channelName) {
-			CheckCardRange (card);
+        public virtual bool ChannelNameOk (string card, string channelName) {
+			CheckCardKey (card);
 			bool nameOk;
 			try {
 				GetChannelIndex (card, channelName);
@@ -252,81 +277,76 @@ namespace AquaPic.Drivers
 			return nameOk;
 		}
 
-        /**************************************************************************************************************/
-        /* Channel Name Getters                                                                                       */
-        /**************************************************************************************************************/
-        public virtual string GetChannelName (IndividualControl channel) {
-            return GetChannelName (channel.Group, channel.Individual);
-        }
+		/**************************************************************************************************************/
+		/* Channel Name Getters                                                                                       */
+		/**************************************************************************************************************/
+		public virtual string GetChannelName (IndividualControl channel) {
+			return GetChannelName (channel.Group, channel.Individual);
+		}
 
-        public virtual string GetChannelName (int card, int channel) {
-            CheckCardRange (card);
-            return cards [card].GetChannelName (channel);
-        }
+		public virtual string GetChannelName (string card, int channel) {
+			CheckCardKey (card);
+			return cards[card].GetChannelName (channel);
+		}
 
-        public virtual string[] GetAllChannelNames (int card) {
-            CheckCardRange (card);
-            return cards [card].GetAllChannelNames ();
-        }
+		public virtual string[] GetAllChannelNames (string card) {
+			CheckCardKey (card);
+			return cards[card].GetAllChannelNames ();
+		}
 
-        /**************************************************************************************************************/
-        /* Channel Name Setters                                                                                       */
-        /**************************************************************************************************************/
-        public virtual void SetChannelName (IndividualControl channel, string name) {
-            SetChannelName (channel.Group, channel.Individual, name);
-        }
+		/**************************************************************************************************************/
+		/* Channel Name Setters                                                                                       */
+		/**************************************************************************************************************/
+		public virtual void SetChannelName (IndividualControl channel, string name) {
+			SetChannelName (channel.Group, channel.Individual, name);
+		}
 
-        public virtual void SetChannelName (int card, int channel, string name) {
-            CheckCardRange (card);
+		public virtual void SetChannelName (string card, int channel, string name) {
+			CheckCardKey (card);
 			if (!ChannelNameOk (card, name)) {
 				throw new Exception (string.Format ("Channel name {0} already exists", name));
 			}
-            cards[card].SetChannelName (channel, name);
-        }
+			cards[card].SetChannelName (channel, name);
+		}
 
-        /**************************************************************************************************************/
-        /* Channel Mode Getters                                                                                       */
-        /**************************************************************************************************************/
-        public virtual Mode GetChannelMode (string channelName) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
-            return GetChannelMode (channel.Group, channel.Individual);
-        }
+		/**************************************************************************************************************/
+		/* Channel Mode Getters                                                                                       */
+		/**************************************************************************************************************/
+		public virtual Mode GetChannelMode (string channelName) {
+			IndividualControl channel = GetChannelIndividualControl (channelName);
+			return GetChannelMode (channel.Group, channel.Individual);
+		}
 
-        public virtual Mode GetChannelMode (IndividualControl channel) {
-            return GetChannelMode (channel.Group, channel.Individual);
-        }
+		public virtual Mode GetChannelMode (IndividualControl channel) {
+			return GetChannelMode (channel.Group, channel.Individual);
+		}
 
-        public virtual Mode GetChannelMode (int card, int channel) {
-            CheckCardRange (card);
-            return cards [card].GetChannelMode (channel);
-        }
+		public virtual Mode GetChannelMode (string card, int channel) {
+			CheckCardKey (card);
+			return cards[card].GetChannelMode (channel);
+		}
 
-        public virtual Mode[] GetAllChannelModes (string cardName) {
-            int card = GetCardIndex (cardName);
-            return GetAllChannelModes (card);
-        }
+		public virtual Mode[] GetAllChannelModes (string card) {
+			CheckCardKey (card);
+			return cards[card].GetAllChannelModes ();
+		}
 
-        public virtual Mode[] GetAllChannelModes (int card) {
-            CheckCardRange (card);
-            return cards [card].GetAllChannelModes ();
-        }
+		/**************************************************************************************************************/
+		/* Channel Mode Setters                                                                                       */
+		/**************************************************************************************************************/
+		public virtual void SetChannelMode (string channelName, Mode mode) {
+			IndividualControl channel = GetChannelIndividualControl (channelName);
+			SetChannelMode (channel.Group, channel.Individual, mode);
+		}
 
-        /**************************************************************************************************************/
-        /* Channel Mode Setters                                                                                       */
-        /**************************************************************************************************************/
-        public virtual void SetChannelMode (string channelName, Mode mode) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
-            SetChannelMode (channel.Group, channel.Individual, mode);
-        }
+		public virtual void SetChannelMode (IndividualControl channel, Mode mode) {
+			SetChannelMode (channel.Group, channel.Individual, mode);
+		}
 
-        public virtual void SetChannelMode (IndividualControl channel, Mode mode) {
-            SetChannelMode (channel.Group, channel.Individual, mode);
-        }
-
-        public virtual void SetChannelMode (int card, int channel, Mode mode) {
-            CheckCardRange (card);
-            cards [card].SetChannelMode (channel, mode);
-        }
-    }
+		public virtual void SetChannelMode (string card, int channel, Mode mode) {
+			CheckCardKey (card);
+			cards[card].SetChannelMode (channel, mode);
+		}
+	}
 }
 

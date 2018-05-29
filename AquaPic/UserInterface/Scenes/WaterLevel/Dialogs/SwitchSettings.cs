@@ -66,8 +66,8 @@ namespace AquaPic.UserInterface
 
             var c = new SettingsComboBox ("Input");
             if (switchName.IsNotEmpty ()) {
-                IndividualControl ic = WaterLevel.GetFloatSwitchIndividualControl (this.switchName);
-                string cardName = AquaPicDrivers.DigitalInput.GetCardName (ic.Group);
+                IndividualControl ic = WaterLevel.GetFloatSwitchIndividualControl (switchName);
+                string cardName = ic.Group;
                 c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", cardName, ic.Individual));
                 c.combo.activeIndex = 0;
             } else {
@@ -159,10 +159,9 @@ namespace AquaPic.UserInterface
             DrawSettings ();
         }
 
-        protected void ParseChannnel (string s, ref int g, ref int i) {
+        protected void ParseChannnel (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-            string cardName = s.Substring (0, idx);
-            g = AquaPicDrivers.DigitalInput.GetCardIndex (cardName);
+			g = s.Substring (0, idx);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
@@ -238,7 +237,7 @@ namespace AquaPic.UserInterface
 
                 var jobj = new JObject {
                     new JProperty ("name", name),
-                    new JProperty ("inputCard", AquaPicDrivers.DigitalInput.GetCardName (ic.Group)),
+                    new JProperty ("inputCard", ic.Group),
                     new JProperty ("channel", ic.Individual.ToString ()),
                     new JProperty ("physicalLevel", physicalLevel.ToString ()),
                     new JProperty ("switchType", type.ToString ()),
@@ -276,7 +275,7 @@ namespace AquaPic.UserInterface
                 }
 
                 ja[arrIdx]["name"] = switchName;
-                ja[arrIdx]["inputCard"] = AquaPicDrivers.DigitalInput.GetCardName (ic.Group);
+                ja[arrIdx]["inputCard"] = ic.Group;
                 ja[arrIdx]["channel"] = ic.Individual.ToString ();
                 ja[arrIdx]["physicalLevel"] = physicalLevel.ToString ();
                 ja[arrIdx]["switchType"] = type.ToString ();

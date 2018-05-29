@@ -29,18 +29,21 @@ namespace AquaPic.Drivers
 {
     public partial class DigitalInputBase
     {
-        private class DigitalInputCard<T> : GenericCard<T>
+        private class DigitalInputCard : GenericCard
         {
-            public DigitalInputCard (string name, int cardId, int address)
+            public DigitalInputCard (string name, int address)
                 : base (
                     name, 
-                    CardType.DigitalInputCard, 
-                    cardId,
+                    CardType.DigitalInput, 
                     address,
                     6) { }
 
-            protected override GenericChannel<T> ChannelCreater (int index) {
-                return new DigitalInputChannel<T> (GetDefualtName (index));
+            protected override GenericChannel ChannelCreater (int index) {
+                return new DigitalInputChannel (GetDefualtName (index));
+            }
+
+			public override string GetChannelPrefix () {
+                return "i";
             }
 
             public override void GetAllValuesCommunication () {

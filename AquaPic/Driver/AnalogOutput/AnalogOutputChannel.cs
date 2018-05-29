@@ -29,13 +29,13 @@ namespace AquaPic.Drivers
 {
     public partial class AnalogOutputBase
     {
-        protected class AnalogOutputChannel<T> : GenericChannel<T>
+        protected class AnalogOutputChannel : GenericChannel
         {
             public AnalogType type;
             public Value valueControl;
 
             public AnalogOutputChannel (string name)
-                : base (name, (T)(object)0f) 
+				: base (name, typeof(float)) 
             {
                 type = AnalogType.ZeroTen;
                 valueControl = new Value ();

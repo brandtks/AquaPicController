@@ -29,21 +29,24 @@ namespace AquaPic.Drivers
 {
     public partial class PhOrpBase
     {
-        protected class PhOrpCard<T> : GenericCard<T>
+        protected class PhOrpCard : GenericCard
         {
-            public PhOrpCard (string name, int cardId, int address)
+            public PhOrpCard (string name, int address)
                 : base (
                     name, 
-                    CardType.PhOrpCard, 
-                    cardId,
+                    CardType.PhOrp, 
                     address,
                     2) { }
 
-            protected override GenericChannel<T> ChannelCreater (int index) {
-                return new PhOrpChannel<T> (GetDefualtName (index));
+            protected override GenericChannel ChannelCreater (int index) {
+                return new PhOrpChannel (GetDefualtName (index));
             }
 
-            public override void GetValueCommunication (int channel) {
+			public override string GetChannelPrefix () {
+				return "i";
+			}
+
+			public override void GetValueCommunication (int channel) {
                 CheckChannelRange (channel);
 
                 if (channels [channel].mode == Mode.Auto) {
@@ -74,7 +77,7 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public override void SetChannelValue (int channel, T value) {
+			public override void SetChannelValue (int channel, ValueType value) {
                 CheckChannelRange (channel);
 
                 if (channels [channel].mode == Mode.Manual) {
@@ -84,7 +87,7 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public override void SetAllChannelValues (T[] values) {
+			public override void SetAllChannelValues (ValueType[] values) {
                 if (values.Length != channels.Length)
                     throw new ArgumentOutOfRangeException (nameof (values), "values length");
 
@@ -98,7 +101,7 @@ namespace AquaPic.Drivers
             public void SetupChannel (int channel, bool enabled, int lowPassFilterFactor) {
                 CheckChannelRange (channel);
 
-                var phOrpChannel = channels[channel] as PhOrpChannel<T>;
+                var phOrpChannel = channels[channel] as PhOrpChannel;
                 phOrpChannel.enabled = enabled;
                 phOrpChannel.lowPassFilterFactor = lowPassFilterFactor;
 
@@ -112,13 +115,13 @@ namespace AquaPic.Drivers
 
             public int GetLowPassFilterFactor (int channel) {
                 CheckChannelRange (channel);
-                var phOrpChannel = channels[channel] as PhOrpChannel<T>;
+                var phOrpChannel = channels[channel] as PhOrpChannel;
                 return phOrpChannel.lowPassFilterFactor;
             }
 
             public bool GetChannelEnable (int channel) {
                 CheckChannelRange (channel);
-                var phOrpChannel = channels[channel] as PhOrpChannel<T>;
+                var phOrpChannel = channels[channel] as PhOrpChannel;
                 return phOrpChannel.enabled;
             }
         }

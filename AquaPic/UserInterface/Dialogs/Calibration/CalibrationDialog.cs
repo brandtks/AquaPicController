@@ -375,8 +375,8 @@ namespace AquaPic.UserInterface
                     if (!forced) {
                         valTb.enableTouch = false;
                         valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
-
                     }
+
                     valTb.text = GetCalibrationValue ().ToString ("F2");
                     valTb.QueueDraw ();
 
@@ -402,8 +402,7 @@ namespace AquaPic.UserInterface
                     calState = CalibrationState.FullScaleValue;
                     break;
                 case CalibrationState.FullScaleValue:
-                    if (CalibrationCompleteEvent != null)
-                        CalibrationCompleteEvent (calArgs);
+					CalibrationCompleteEvent?.Invoke (calArgs);
 
                     Destroy ();
                     break;
@@ -442,7 +441,7 @@ namespace AquaPic.UserInterface
             }
         }
 
-        protected void OnValueTextBoxTextChanged (object sender, TextChangedEventArgs args) {
+        protected void OnValueTextBoxTextChanged (object sender, TextSetEventArgs args) {
             try {
                 Convert.ToDouble (args.text);
             } catch {

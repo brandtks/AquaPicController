@@ -237,9 +237,9 @@ namespace AquaPic.UserInterface
                 SetSizeRequest (800, 460);
                 QueueDraw ();
 
-                if (ExpandEvent != null) {
-                    ExpandEvent (this, new EventArgs ());
-                }
+				Visible = false;
+				Visible = true;
+				ExpandEvent?.Invoke (this, new EventArgs ());
             } else {
                 int x, y;
                 GetPointer (out x, out y);

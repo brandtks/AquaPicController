@@ -30,18 +30,17 @@ namespace AquaPic.Drivers
 {
     public partial class AnalogOutputBase
     {
-        protected class AnalogOutputCard<T> : GenericCard<T>
+        protected class AnalogOutputCard : GenericCard
         {
-            public AnalogOutputCard (string name, int cardId, int address)
+            public AnalogOutputCard (string name, int address)
                 : base (
                     name, 
-                    CardType.AnalogOutputCard, 
-                    cardId,
+                    CardType.AnalogOutput, 
                     address,
                     4) { }
 
-            protected override GenericChannel<T> ChannelCreater (int index) {
-                return new AnalogOutputChannel<T> (GetDefualtName (index));
+            protected override GenericChannel ChannelCreater (int index) {
+                return new AnalogOutputChannel (GetDefualtName (index));
             }
 
             public override void GetValueCommunication (int channel) {
@@ -100,7 +99,7 @@ namespace AquaPic.Drivers
 
             public void SetChannelType (int channel, AnalogType type) {
                 CheckChannelRange (channel);
-                var analogOutputChannel = channels[channel] as AnalogOutputChannel<T>;
+                var analogOutputChannel = channels[channel] as AnalogOutputChannel;
                 analogOutputChannel.type = type;
 
                 var message = new byte[2];
@@ -112,14 +111,14 @@ namespace AquaPic.Drivers
 
             public AnalogType GetChannelType (int channel) {
                 CheckChannelRange (channel);
-                var analogOutputChannel = channels [channel] as AnalogOutputChannel<T>;
+                var analogOutputChannel = channels [channel] as AnalogOutputChannel;
                 return analogOutputChannel.type;
             }
 
             public AnalogType[] GetAllChannelTypes () {
                 AnalogType[] types = new AnalogType[channelCount];
                 for (int i = 0; i < channelCount; ++i) {
-                    var analogOutputChannel = channels [i] as AnalogOutputChannel<T>;
+                    var analogOutputChannel = channels [i] as AnalogOutputChannel;
                     types [i] = analogOutputChannel.type;
                 }
                 return types;
@@ -127,7 +126,7 @@ namespace AquaPic.Drivers
 
             public Value GetChannelValueControl (int channel) {
                 CheckChannelRange (channel);
-                var analogOutputChannel = channels [channel] as AnalogOutputChannel<T>;
+                var analogOutputChannel = channels [channel] as AnalogOutputChannel;
                 return analogOutputChannel.valueControl;
             }
         }

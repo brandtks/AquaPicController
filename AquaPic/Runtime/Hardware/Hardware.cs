@@ -57,26 +57,26 @@ namespace AquaPic.Runtime
                         case "analogInput":
                             Logger.Add ("Adding analog input card");
                             AquaPicDrivers.AnalogInput.AddCard (
-                                address,
-								name);
+								name,
+								address);
                             break;
                         case "analogOutput":
                             Logger.Add ("Adding analog output card");
                             AquaPicDrivers.AnalogOutput.AddCard (
-								address,
-                                name);
+								name,
+                                address);
                             break;
                         case "digitalInput":
                             Logger.Add ("Adding digital input card");
                             AquaPicDrivers.DigitalInput.AddCard (
-								address,
-                                name);
+								name,
+                                address);
                             break;
                         case "phOrp":
                             Logger.Add ("Adding pH/ORP card");
                             AquaPicDrivers.PhOrp.AddCard (
-								address,
-                                name);
+								name,
+                                address);
                             break;
                         default:
                             Console.WriteLine ("Unknow equipment type: {0}", type);

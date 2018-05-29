@@ -68,7 +68,7 @@ namespace AquaPic.UserInterface
             if (analogSensorNameNotEmpty) {
                 IndividualControl ic = WaterLevel.GetAnalogLevelSensorIndividualControl (name);
                 if (ic.IsNotEmpty ()) {
-                    string chName = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
+                    string chName = ic.Group;
                     chName = string.Format ("{0}.i{1}", chName, ic.Individual);
                     c.combo.comboList.Add (string.Format ("Current: {0}", chName));
                     c.combo.activeIndex = 0;
@@ -94,10 +94,9 @@ namespace AquaPic.UserInterface
             DrawSettings ();
         }
 
-        protected void ParseChannnel (string s, ref int g, ref int i) {
+        protected void ParseChannnel (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-            string cardName = s.Substring (0, idx);
-            g = AquaPicDrivers.AnalogInput.GetCardIndex (cardName);
+			g = s.Substring (0, idx);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
@@ -143,7 +142,7 @@ namespace AquaPic.UserInterface
                 var jobj = new JObject {
                     new JProperty ("name", name),
                     new JProperty ("waterLevelGroupName", groupName),
-                    new JProperty ("inputCard", AquaPicDrivers.AnalogInput.GetCardName (ic.Group)),
+                    new JProperty ("inputCard", ic.Group),
                     new JProperty ("channel", ic.Individual.ToString ()),
                     new JProperty ("zeroScaleCalibrationValue", "819.2"),
                     new JProperty ("fullScaleCalibrationActual", "10.0"),
@@ -176,7 +175,7 @@ namespace AquaPic.UserInterface
 
                 ja[arrIdx]["name"] = analogSensorName;
                 ja[arrIdx]["waterLevelGroupName"] = groupName;
-                ja[arrIdx]["inputCard"] = AquaPicDrivers.AnalogInput.GetCardName (ic.Group);
+                ja[arrIdx]["inputCard"] = ic.Group;
                 ja[arrIdx]["channel"] = ic.Individual.ToString ();
             }
 

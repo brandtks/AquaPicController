@@ -28,7 +28,7 @@ using AquaPic.Globals;
 
 namespace AquaPic.Drivers
 {
-    public partial class DigitalInputBase : GenericBase<bool>
+    public partial class DigitalInputBase : GenericBase
     {
         public static DigitalInputBase SharedDigitalInputInstance = new DigitalInputBase ();
 
@@ -36,14 +36,22 @@ namespace AquaPic.Drivers
             : base ("Digital Input") { }
 
         protected override void Run () {
-            foreach (var card in cards) {
+			foreach (var card in cards.Values) {
                 card.GetAllValuesCommunication ();
             }
         }
 
-        protected override GenericCard<bool> CardCreater (string cardName, int cardId, int address) {
-            return new DigitalInputCard<bool> (cardName, cardId, address);
+        protected override GenericCard CardCreater (string cardName, int address) {
+            return new DigitalInputCard (cardName, address);
         }
-    }
+
+		public override string GetCardAcyronym () {
+			return "DI";
+		}
+
+		public override CardType GetCardType () {
+			return CardType.DigitalInput; 
+		}
+	}
 }
 

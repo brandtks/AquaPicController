@@ -29,12 +29,11 @@ using AquaPic.SerialBus;
 
 namespace AquaPic.Drivers
 {
-    public class GenericCard<T> : AquaPicBus.Slave
+    public class GenericCard : AquaPicBus.Slave
     {
         public string name;
         public CardType cardType;
-        public int cardId;
-        public GenericChannel<T>[] channels;
+        public GenericChannel[] channels;
 
         public bool AquaPicBusCommunicationOk {
             get {
@@ -51,7 +50,6 @@ namespace AquaPic.Drivers
         protected GenericCard (
             string name, 
             CardType cardType, 
-            int cardId, 
             int address, 
             int numChannels
         )
@@ -59,15 +57,14 @@ namespace AquaPic.Drivers
         {
             this.name = name;
             this.cardType = cardType;
-            this.cardId = cardId;
 
-            channels = new GenericChannel<T>[numChannels];
+            channels = new GenericChannel[numChannels];
             for (int i = 0; i < channelCount; ++i) {
                 channels [i] = ChannelCreater (i);
             }
         }
 
-        protected virtual GenericChannel<T> ChannelCreater (int index) {
+        protected virtual GenericChannel ChannelCreater (int index) {
             throw new NotImplementedException ();
         }
 
@@ -115,14 +112,17 @@ namespace AquaPic.Drivers
 
         protected virtual bool CheckChannelRange (int channel, bool throwException = true) {
             if ((channel < 0) || (channel >= channelCount)) {
-                if (throwException) {
-                    throw new ArgumentOutOfRangeException ("channel");
-                } else {
-                    return false;
-                }
+				if (throwException) {
+					throw new ArgumentOutOfRangeException ("channel");
+				}
+                return false;
             }
             return true;
         }
+
+		public virtual string GetChannelPrefix () {
+			return string.Empty;
+		}
 
         /**************************************************************************************************************/
         /* Channel Value Setters                                                                                      */
@@ -135,14 +135,14 @@ namespace AquaPic.Drivers
             throw new NotImplementedException ();
         }
 
-        public virtual void SetChannelValue (int channel, T value) {
+		public virtual void SetChannelValue (int channel, ValueType value) {
             CheckChannelRange (channel);
             channels [channel].SetValue (value);
         }
 
-        public virtual void SetAllChannelValues (T[] values) {
+		public virtual void SetAllChannelValues (ValueType[] values) {
             if (values.Length < channelCount)
-                throw new ArgumentOutOfRangeException ("values length");
+                throw new ArgumentOutOfRangeException ("values.length");
 
             for (int i = 0; i < channelCount; ++i) {
                 channels [i].SetValue (values [i]);
@@ -160,16 +160,21 @@ namespace AquaPic.Drivers
             throw new NotImplementedException ();
         }
 
-        public virtual T GetChannelValue (int channel) {
+		public virtual ValueType GetChannelValue (int channel) {
             CheckChannelRange (channel);
-            T value = channels [channel].value;
-            return value;
+			dynamic value;
+			try {
+				value = (ValueType)Convert.ChangeType (channels[channel].value, channels[channel].valueType);
+			} catch {
+				value = Activator.CreateInstance (channels[channel].valueType);;
+			}
+			return value;
         }
 
-        public virtual T[] GetAllChannelValues () {
-            T[] values = new T[channels.Length];
+		public virtual ValueType[] GetAllChannelValues () {
+			var values = new ValueType[channels.Length];
             for (int i = 0; i < channels.Length; ++i) {
-                values [i] = channels [i].value;
+				values [i] = GetChannelValue (i);
             }
             return values;
         }
@@ -182,24 +187,12 @@ namespace AquaPic.Drivers
             return channels [channel].name;
         }
 
-        public virtual string GetDefualtName (int channel, string suffice = null) {
+		public virtual string GetDefualtName (int channel, string prefix = null) {
             CheckChannelRange (channel);
-            if (suffice == null) {
-                switch (cardType) {
-                    case CardType.PhOrpCard:
-                    case CardType.AnalogInputCard:
-                    case CardType.DigitalInputCard:
-                        suffice = ".i";
-                        break;
-                    case CardType.AnalogOutputCard:
-                        suffice = ".q";
-                        break;
-                    case CardType.PowerStrip:
-                        suffice = ".p";
-                        break;
-                }
-            }
-            return string.Format ("{0}{1}{2}", name, suffice, channel);
+            if (prefix == null) {
+				prefix = GetChannelPrefix ();
+			}
+            return string.Format ("{0}.{1}{2}", name, prefix, channel);
         }
 
         public virtual string[] GetAllChannelNames () {

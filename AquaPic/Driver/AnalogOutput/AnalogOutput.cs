@@ -27,7 +27,7 @@ using AquaPic.Operands;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogOutputBase : GenericBase<float>
+    public partial class AnalogOutputBase : GenericBase
     {
         public static AnalogOutputBase SharedAnalogOutputInstance = new AnalogOutputBase ();
 
@@ -35,29 +35,37 @@ namespace AquaPic.Drivers
             : base ("Analog Output") { }
 
         protected override void Run () {
-            foreach (var card in cards) {
+            foreach (var card in cards.Values) {
                 byte channelId = 0;
 
                 var values = new float[4];
 
                 foreach (var genericChannel in card.channels) {
-                    var channel = genericChannel as AnalogOutputChannel<float>;
+                    var channel = genericChannel as AnalogOutputChannel;
 
                     if (channel.mode == Mode.Auto) {
                         channel.valueControl.Execute ();
                     }
 
-                    values[channelId] = channel.value;
+					values[channelId] = (float)channel.value;
 
                     ++channelId;
                 }
 
-                card.SetAllValuesCommunication<float> (values);
+                card.SetAllValuesCommunication (values);
             }
         }
 
-        protected override GenericCard<float> CardCreater (string cardName, int cardId, int address) {
-            return new AnalogOutputCard<float> (cardName, cardId, address);
+        protected override GenericCard CardCreater (string cardName, int address) {
+            return new AnalogOutputCard (cardName, address);
+        }
+
+		public override string GetCardAcyronym () {
+            return "AQ";
+        }
+
+		public override CardType GetCardType () {
+			return CardType.AnalogOutput;
         }
 
         public AnalogType GetChannelType (string channelName) {
@@ -69,20 +77,15 @@ namespace AquaPic.Drivers
             return GetChannelType (channel.Group, channel.Individual);
         }
 
-        public AnalogType GetChannelType (int card, int channel) {
-            CheckCardRange (card);
-            var analogOutputCard = cards[card] as AnalogOutputCard<float>;
+        public AnalogType GetChannelType (string card, int channel) {
+			CheckCardKey (card);
+            var analogOutputCard = cards[card] as AnalogOutputCard;
             return analogOutputCard.GetChannelType (channel);
         }
 
-        public AnalogType[] GetAllChannelTypes (string cardName) {
-            int card = GetCardIndex (cardName);
-            return GetAllChannelTypes (card);
-        }
-
-        public AnalogType[] GetAllChannelTypes (int card) {
-            CheckCardRange (card);
-            var analogOutputCard = cards[card] as AnalogOutputCard<float>;
+		public AnalogType[] GetAllChannelTypes (string card) {
+			CheckCardKey (card);
+            var analogOutputCard = cards[card] as AnalogOutputCard;
             return analogOutputCard.GetAllChannelTypes ();
         }
 
@@ -95,9 +98,9 @@ namespace AquaPic.Drivers
             SetChannelType (channel.Group, channel.Individual, type);
         }
 
-        public void SetChannelType (int card, int channel, AnalogType type) {
-            CheckCardRange (card);
-            var analogOutputCard = cards[card] as AnalogOutputCard<float>;
+		public void SetChannelType (string card, int channel, AnalogType type) {
+			CheckCardKey (card);
+            var analogOutputCard = cards[card] as AnalogOutputCard;
             analogOutputCard.SetChannelType (channel, type);
         }
 
@@ -110,9 +113,9 @@ namespace AquaPic.Drivers
             return GetChannelValueControl (channel.Group, channel.Individual);
         }
 
-        public Value GetChannelValueControl (int card, int channel) {
-            CheckCardRange (card);
-            var analogOutputCard = cards[card] as AnalogOutputCard<float>;
+		public Value GetChannelValueControl (string card, int channel) {
+            CheckCardKey (card);
+            var analogOutputCard = cards[card] as AnalogOutputCard;
             return analogOutputCard.GetChannelValueControl (channel);
         }
     }

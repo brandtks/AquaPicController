@@ -26,25 +26,26 @@ using AquaPic.Globals;
 
 namespace AquaPic.Drivers
 {
-    public class GenericChannel<T>
-    {
-        public string name;
-        public T value;
-        public Mode mode;
+	public class GenericChannel
+	{
+		public string name;
+		public ValueType value;
+		public Type valueType;
+		public Mode mode;
 
-        protected GenericChannel (string name, T value = default(T)) {
-            this.name = name;
-            this.value = value;
-            mode = Mode.Auto;
-        }
+		public GenericChannel (string name, Type valueType) {
+			this.name = name;
+			this.valueType = valueType;
+			mode = Mode.Auto;
+		}
 
-        public virtual void SetValue (object value) {
-            try {
-                this.value = (T)Convert.ChangeType (value, typeof(T));
-            } catch {
-                this.value = default(T);
-            }
-        }
-    }
+		public virtual void SetValue (object value) {
+			try {
+				this.value = (ValueType)Convert.ChangeType (value, valueType);
+			} catch {
+				this.value = (ValueType)Activator.CreateInstance (valueType);
+			}
+		}
+	}
 }
 

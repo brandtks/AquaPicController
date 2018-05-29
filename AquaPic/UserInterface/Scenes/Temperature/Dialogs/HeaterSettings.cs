@@ -65,7 +65,7 @@ namespace AquaPic.UserInterface
             var c = new SettingsComboBox ("Outlet");
             if (this.heaterName.IsNotEmpty ()) {
                 IndividualControl ic = Temperature.GetHeaterIndividualControl (this.heaterName);
-                string psName = ic.GroupName;
+                string psName = ic.Group;
                 c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", psName, ic.Individual));
                 c.combo.activeIndex = 0;
             } else {
@@ -120,14 +120,14 @@ namespace AquaPic.UserInterface
                 }
 
                 IndividualControl ic = IndividualControl.Empty;
-                ParseOutlet (unparseOutletString, ref ic.GroupName, ref ic.Individual);
+                ParseOutlet (unparseOutletString, ref ic.Group, ref ic.Individual);
 
                 Temperature.AddHeater (name, ic, temperatureGroupName);
 
                 JObject jobj = new JObject ();
 
                 jobj.Add (new JProperty ("name", name));
-                jobj.Add (new JProperty ("powerStrip", ic.GroupName));
+                jobj.Add (new JProperty ("powerStrip", ic.Group));
                 jobj.Add (new JProperty ("outlet", ic.Individual.ToString ()));
                 jobj.Add (new JProperty ("temperatureGroup", temperatureGroupName));
 
@@ -148,7 +148,7 @@ namespace AquaPic.UserInterface
                 
                 IndividualControl ic = IndividualControl.Empty;
                 if (!unparseOutletString.StartsWith ("Current:")) {
-                    ParseOutlet (unparseOutletString, ref ic.GroupName, ref ic.Individual);
+                    ParseOutlet (unparseOutletString, ref ic.Group, ref ic.Individual);
                     Temperature.SetHeaterIndividualControl (heaterName, ic);
                 } else {
                     ic = Temperature.GetHeaterIndividualControl (heaterName);
@@ -176,7 +176,7 @@ namespace AquaPic.UserInterface
                 }
 
                 ja[arrIdx]["name"] = name;
-                ja[arrIdx]["powerStrip"] = ic.GroupName;
+                ja[arrIdx]["powerStrip"] = ic.Group;
                 ja[arrIdx]["outlet"] = ic.Individual.ToString ();
                 ja[arrIdx]["temperatureGroup"] = temperatureGroupName;
             }

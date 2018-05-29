@@ -45,7 +45,6 @@ namespace AquaPic.UserInterface
             label = new TouchLabel ();
             label.SetSizeRequest (115,30);
             label.textAlignment = TouchAlignment.Right;
-            //label.textColor = "white";
             label.textRender.textWrap = TouchTextWrap.Shrink;
             label.textHorizontallyCentered = true;
             label.text = name;

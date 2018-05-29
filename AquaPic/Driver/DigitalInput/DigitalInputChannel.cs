@@ -28,10 +28,10 @@ namespace AquaPic.Drivers
 {
     public partial class DigitalInputBase
     {
-        private class DigitalInputChannel <T> : GenericChannel<T> 
+        private class DigitalInputChannel : GenericChannel 
         {
             public DigitalInputChannel (string name) 
-                : base (name, (T)(object)false) { }
+				: base (name, typeof(bool)) { }
         }
     }
 }

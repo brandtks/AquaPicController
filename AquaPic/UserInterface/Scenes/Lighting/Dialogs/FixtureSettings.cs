@@ -65,7 +65,7 @@ namespace AquaPic.UserInterface
             var c = new SettingsComboBox ("Outlet");
             if (this.fixtureName.IsNotEmpty ()) {
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (this.fixtureName);
-				c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", ic.GroupName, ic.Individual));
+				c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", ic.Group, ic.Individual));
                 c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Select outlet";
@@ -161,7 +161,7 @@ namespace AquaPic.UserInterface
             c = new SettingsComboBox ("Dimming Channel");
             if ((this.fixtureName.IsNotEmpty ()) && (isDimming)) {
                 IndividualControl ic = Lighting.GetDimmingChannelIndividualControl (this.fixtureName);
-                string cardName = AquaPicDrivers.AnalogOutput.GetCardName (ic.Group);
+                string cardName = ic.Group;
                 c.combo.comboList.Add (string.Format ("Current: {0}.q{1}", cardName, ic.Individual));
                 c.combo.activeIndex = 0;
             } else {
@@ -231,10 +231,9 @@ namespace AquaPic.UserInterface
             i = Convert.ToByte (s.Substring (idx + 2));
         }
 
-        protected void ParseChannnel (string s, ref int g, ref int i) {
+        protected void ParseChannnel (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-            string cardName = s.Substring (0, idx);
-            g = AquaPicDrivers.AnalogOutput.GetCardIndex (cardName);
+			g = s.Substring (0, idx);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
@@ -312,7 +311,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                ParseOutlet (outletStr, ref outletIc.GroupName, ref outletIc.Individual);
+                ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
 
                 if (dimmingFixture) {
                     if (((SettingsComboBox)settings ["Dimming Channel"]).combo.activeIndex == -1) {
@@ -336,7 +335,7 @@ namespace AquaPic.UserInterface
                 else
                     jobj.Add (new JProperty ("type", "notDimmable"));
                 jobj.Add (new JProperty ("name", name));
-                jobj.Add (new JProperty ("powerStrip", outletIc.GroupName));
+                jobj.Add (new JProperty ("powerStrip", outletIc.Group));
                 jobj.Add (new JProperty ("outlet", outletIc.Individual.ToString ()));
                 if (lTime == LightingTime.Daytime)
                     jobj.Add (new JProperty ("lightingTime", "day"));
@@ -344,7 +343,7 @@ namespace AquaPic.UserInterface
                     jobj.Add (new JProperty ("lightingTime", "night"));
                 jobj.Add (new JProperty ("highTempLockout", highTempLockout.ToString ()));
                 if (dimmingFixture) {
-                    jobj.Add (new JProperty ("dimmingCard", AquaPicDrivers.AnalogOutput.GetCardName (chIc.Group)));
+                    jobj.Add (new JProperty ("dimmingCard", chIc.Group));
                     jobj.Add (new JProperty ("channel", chIc.Individual.ToString ()));
                     jobj.Add (new JProperty ("minDimmingOutput", minDimming.ToString ()));
                     jobj.Add (new JProperty ("maxDimmingOutput", maxDimming.ToString ()));
@@ -367,7 +366,7 @@ namespace AquaPic.UserInterface
                     }
 
                     if (!outletStr.StartsWith ("Current:")) {
-                        ParseOutlet (outletStr, ref outletIc.GroupName, ref outletIc.Individual);
+                        ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
                         Lighting.SetFixtureOutletIndividualControl (fixtureName, outletIc);
                     } else {
                         outletIc = Lighting.GetFixtureOutletIndividualControl (fixtureName);
@@ -400,7 +399,7 @@ namespace AquaPic.UserInterface
                     }
 
                     ja[arrIdx]["name"] = name;
-                    ja[arrIdx]["powerStrip"] = outletIc.GroupName;
+                    ja[arrIdx]["powerStrip"] = outletIc.Group;
                     ja[arrIdx]["outlet"] = outletIc.Individual.ToString ();
                     if (lTime == LightingTime.Daytime)
                         ja[arrIdx]["lightingTime"] = "day";
@@ -412,7 +411,7 @@ namespace AquaPic.UserInterface
                     ja[arrIdx]["offTimeOffset"] = offOffset.ToString ();
 
                     if (dimmingFixture) {
-                        ja[arrIdx]["dimmingCard"] = AquaPicDrivers.AnalogOutput.GetCardName (chIc.Group);
+                        ja[arrIdx]["dimmingCard"] = chIc.Group;
                         ja[arrIdx]["channel"] = chIc.Individual.ToString ();
                         ja[arrIdx]["minDimmingOutput"] = minDimming.ToString ();
                         ja[arrIdx]["maxDimmingOutput"] = maxDimming.ToString ();

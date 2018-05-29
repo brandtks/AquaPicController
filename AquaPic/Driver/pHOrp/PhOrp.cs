@@ -26,7 +26,7 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Drivers
 {
-    public partial class PhOrpBase : GenericBase<float>
+    public partial class PhOrpBase : GenericBase
     {
         public static PhOrpBase SharedPhOrpInstance = new PhOrpBase ();
 
@@ -34,13 +34,21 @@ namespace AquaPic.Drivers
             : base ("pH ORP") { }
         
         protected override void Run () {
-            foreach (var card in cards) {
+			foreach (var card in cards.Values) {
                 card.GetAllValuesCommunication ();
             }
         }
 
-        protected override GenericCard<float> CardCreater (string cardName, int cardId, int address) {
-            return new PhOrpCard<float> (cardName, cardId, address);
+        protected override GenericCard CardCreater (string cardName, int address) {
+            return new PhOrpCard (cardName, address);
+        }
+
+		public override string GetCardAcyronym () {
+            return "PH";
+        }
+
+		public override CardType GetCardType () {
+			return CardType.PhOrp;
         }
     }
 }

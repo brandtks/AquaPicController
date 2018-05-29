@@ -28,18 +28,6 @@ using Cairo;
 
 namespace GoodtimeDevelopment.TouchWidget
 {
-    public delegate void TextChangedHandler (object sender, TextChangedEventArgs args);
-
-    public class TextChangedEventArgs : EventArgs {
-        public string text;
-        public bool keepText;
-
-        public TextChangedEventArgs (string text) {
-            this.text = text;
-            keepText = true;
-        }
-    }
-
     public class TouchTextBox : EventBox
     {
         public string name;
@@ -81,30 +69,30 @@ namespace GoodtimeDevelopment.TouchWidget
         public TouchColor bkgndColor;
         public bool enableTouch;
         public bool includeTimeFunctions;
-        public event TextChangedHandler TextChangedEvent;
+		public event TextSetEventHandler TextChangedEvent;
         public TouchText textRender;
 
         public TouchTextBox () {
-            this.Visible = true;
-            this.VisibleWindow = false;
-
-            this.WidthRequest = 100;
-            this.HeightRequest = 30;
+            Visible = true;
+            VisibleWindow = false;
+            
+            WidthRequest = 100;
+            HeightRequest = 30;
 
             textRender = new TouchText ();
             textRender.textWrap = TouchTextWrap.Shrink;
 
-            this.text = string.Empty;
+            text = string.Empty;
             name = string.Empty;
-            this.textColor = new TouchColor ("black");
-            this.textAlignment = TouchAlignment.Left;
+            textColor = new TouchColor ("black");
+            textAlignment = TouchAlignment.Left;
 
             bkgndColor = "grey4";
 
             enableTouch = false;
             includeTimeFunctions = false;
 
-            this.ExposeEvent += OnExpose;
+            ExposeEvent += OnExpose;
             ButtonReleaseEvent += OnTouchButtonRelease;
         }
 
@@ -130,7 +118,7 @@ namespace GoodtimeDevelopment.TouchWidget
             if (enableTouch) {
                 TouchNumberInput t;
 
-                var parent = this.Toplevel as Gtk.Window;
+                var parent = Toplevel as Window;
                 if (parent != null) {
                     if (parent.IsTopLevel)
                         t = new TouchNumberInput (includeTimeFunctions, parent);
@@ -142,16 +130,11 @@ namespace GoodtimeDevelopment.TouchWidget
                 if (!string.IsNullOrWhiteSpace (name))
                     t.Title = name;
                 
-                t.NumberSetEvent += (value) => {
-                    if (!string.IsNullOrWhiteSpace (value)) {
-                        TextChangedEventArgs a = new TextChangedEventArgs (value);
+                t.TextSetEvent += (sender, a) => {
+					TextChangedEvent?.Invoke (this, a);
 
-                        if (TextChangedEvent != null)
-                            TextChangedEvent (this, a);
-
-                        if (a.keepText) 
-                            text = a.text;
-                    }
+                    if (a.keepText) 
+                        text = a.text;
                 };
                 
                 t.Run ();

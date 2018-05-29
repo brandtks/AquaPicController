@@ -27,7 +27,7 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogInputBase : GenericBase<float>
+    public partial class AnalogInputBase : GenericBase
     {
         public static AnalogInputBase SharedAnalogInputInstance = new AnalogInputBase ();
 
@@ -35,16 +35,24 @@ namespace AquaPic.Drivers
             : base ("Analog Input") { }
         
         protected override void Run () {
-            foreach (var card in cards) {
+            foreach (var card in cards.Values) {
                 card.GetAllValuesCommunication ();
             }
         }
 
-        protected override GenericCard<float> CardCreater (string cardName, int cardId, int address) {
-            return new AnalogInputCard<float> (cardName, cardId, address);
+        protected override GenericCard CardCreater (string cardName, int address) {
+            return new AnalogInputCard (cardName, address);
         }
 
-        public int GetChannelLowPassFilterFactor (string channelName) {
+		public override string GetCardAcyronym () {
+            return "AI";
+        }
+
+		public override CardType GetCardType () {
+			return CardType.AnalogInput;
+		}
+
+		public int GetChannelLowPassFilterFactor (string channelName) {
             IndividualControl channel = GetChannelIndividualControl (channelName);
             return GetChannelLowPassFilterFactor (channel);
         }
@@ -53,20 +61,15 @@ namespace AquaPic.Drivers
             return GetChannelLowPassFilterFactor (channel.Group, channel.Individual);
         }
 
-        public int GetChannelLowPassFilterFactor (int card, int channel) {
-            CheckCardRange (card);
-            var analogInputCard = cards[card] as AnalogInputCard<float>;
+        public int GetChannelLowPassFilterFactor (string card, int channel) {
+            CheckCardKey (card);
+            var analogInputCard = cards[card] as AnalogInputCard;
             return analogInputCard.GetChannelLowPassFilterFactor (channel);
         }
 
-        public int[] GetAllChannelLowPassFilterFactors (string cardName) {
-            var card = GetCardIndex (cardName);
-            return GetAllChannelLowPassFilterFactors (card);
-        }
-
-        public int[] GetAllChannelLowPassFilterFactors (int card) {
-            CheckCardRange (card);
-            var analogInputCard = cards[card] as AnalogInputCard<float>;
+		public int[] GetAllChannelLowPassFilterFactors (string card) {
+			CheckCardKey (card);
+            var analogInputCard = cards[card] as AnalogInputCard;
             return analogInputCard.GetAllChannelLowPassFilterFactors ();
         }
 
@@ -79,9 +82,9 @@ namespace AquaPic.Drivers
             SetChannelLowPassFilterFactor (channel.Group, channel.Individual, lowPassFilterFactor);
         }
 
-        public void SetChannelLowPassFilterFactor (int card, int channel, int lowPassFilterFactor) {
-            CheckCardRange (card);
-            var analogInputCard = cards[card] as AnalogInputCard<float>;
+        public void SetChannelLowPassFilterFactor (string card, int channel, int lowPassFilterFactor) {
+			CheckCardKey (card);
+            var analogInputCard = cards[card] as AnalogInputCard;
             analogInputCard.SetChannelLowPassFilterFactor (channel, lowPassFilterFactor);
         }
     }

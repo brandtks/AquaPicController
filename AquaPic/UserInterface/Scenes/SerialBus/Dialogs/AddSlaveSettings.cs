@@ -134,22 +134,22 @@ namespace AquaPic.UserInterface
             case 1:
                 type = "analogInput";
                 name = string.Format ("AI{0}", AquaPicDrivers.AnalogInput.cardCount + 1);
-                AquaPicDrivers.AnalogInput.AddCard (address, name);
+				AquaPicDrivers.AnalogInput.AddCard (name, address);
                 break;
             case 2:
                 type = "analogOutput";
                 name = string.Format ("AQ{0}", AquaPicDrivers.AnalogOutput.cardCount + 1);
-                AquaPicDrivers.AnalogOutput.AddCard (address, name);
+				AquaPicDrivers.AnalogOutput.AddCard (name, address);
                 break;
             case 3:
                 type = "digitalInput";
                 name = string.Format ("DI{0}", AquaPicDrivers.DigitalInput.cardCount + 1);
-                AquaPicDrivers.DigitalInput.AddCard (address, name);
+				AquaPicDrivers.DigitalInput.AddCard (name, address);
                 break;
             case 4:
                 type = "phOrp";
                 name = string.Format ("PH{0}", AquaPicDrivers.DigitalInput.cardCount + 1);
-                AquaPicDrivers.PhOrp.AddCard (address, name);
+				AquaPicDrivers.PhOrp.AddCard (name, address);
                 break;
             }
 
