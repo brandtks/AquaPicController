@@ -157,7 +157,6 @@
     <Compile Include="UserInterface\Scenes\Power\Dialogs\OutletSettings.cs" />
     <Compile Include="UserInterface\Scenes\Power\Widgets\PowerOutletSlider.cs" />
     <Compile Include="UserInterface\Scenes\SerialBus\SerialBusScreen.cs" />
-    <Compile Include="UserInterface\Scenes\SerialBus\Dialogs\AddSlaveSettings.cs" />
     <Compile Include="UserInterface\Scenes\SerialBus\Widgets\SerialBusSlaveWidget.cs" />
     <Compile Include="UserInterface\Scenes\Settings\SettingsScreen.cs" />
     <Compile Include="UserInterface\Scenes\Temperature\TemperatureScreen.cs" />
