@@ -33,8 +33,7 @@ namespace AquaPic.Drivers
         {
             public PhOrpCard (string name, int address)
                 : base (
-                    name, 
-                    CardType.PhOrp, 
+                    name,  
                     address,
                     2) { }
 

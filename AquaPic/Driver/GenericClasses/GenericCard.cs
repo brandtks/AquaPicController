@@ -32,7 +32,6 @@ namespace AquaPic.Drivers
     public class GenericCard : AquaPicBus.Slave
     {
         public string name;
-        public CardType cardType;
         public GenericChannel[] channels;
 
         public bool AquaPicBusCommunicationOk {
@@ -49,14 +48,12 @@ namespace AquaPic.Drivers
 
         protected GenericCard (
             string name, 
-            CardType cardType, 
             int address, 
             int numChannels
         )
             : base (address, string.Format ("{0} ({1})", name, Utils.GetDescription (cardType)))
         {
             this.name = name;
-            this.cardType = cardType;
 
             channels = new GenericChannel[numChannels];
             for (int i = 0; i < channelCount; ++i) {

@@ -34,7 +34,6 @@ namespace AquaPic.Drivers
             public AnalogInputCard (string name, int address)
                 : base (
                     name, 
-                    CardType.AnalogInput, 
                     address,
                     4) { }
 

@@ -48,7 +48,7 @@ namespace AquaPic.UserInterface
 			}
 
 			graphics = new PowerWindowGraphics ();
-			Put (graphics, 0, 80);
+			Put (graphics, 50, 80);
 			if (powerStripName.IsNotEmpty ()) {
 				graphics.Show ();
 			} else {
@@ -299,7 +299,7 @@ namespace AquaPic.UserInterface
                 Visible = true;
                 VisibleWindow = false;
 
-				WidthRequest = 800;
+				WidthRequest = 750;
 				HeightRequest = 336;            
 
                 ExposeEvent += OnExpose;

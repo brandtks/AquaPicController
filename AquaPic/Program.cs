@@ -71,9 +71,10 @@ namespace AquaPic
 			} else {
 				aquaPicEnvironment = Environment.GetEnvironmentVariable ("HOME");
 				if (args.Length > 0) {
-					if (args[0].Contains ("-e")) {
+                    Console.WriteLine ("Arguments {0}", args[0]);
+					if (args[0].Contains ("-empty")) {
 						aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.empty");
-					} else if (args[0].Contains ("-f")) {
+					} else if (args[0].Contains ("-full")) {
 						aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.full");
 					} else {
 						aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic");
