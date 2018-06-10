@@ -42,8 +42,7 @@ namespace AquaPic.UserInterface
         }
 
         public FixtureSettings (string fixtureName, bool includeDelete)
-            : base (fixtureName, includeDelete) 
-        {
+            : base (fixtureName, includeDelete) {
             this.fixtureName = fixtureName;
 
             var t = new SettingsTextBox ("Name");
@@ -65,7 +64,7 @@ namespace AquaPic.UserInterface
             var c = new SettingsComboBox ("Outlet");
             if (this.fixtureName.IsNotEmpty ()) {
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (this.fixtureName);
-				c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", ic.Group, ic.Individual));
+                c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", ic.Group, ic.Individual));
                 c.combo.activeIndex = 0;
             } else {
                 c.combo.nonActiveMessage = "Select outlet";
@@ -178,7 +177,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     float max = Convert.ToSingle (args.text);
-                    float min = Convert.ToSingle (((SettingsTextBox)settings ["Min Dimming"]).textBox.text);
+                    float min = Convert.ToSingle (((SettingsTextBox)settings["Min Dimming"]).textBox.text);
 
                     if (max < min) {
                         MessageBox.Show ("Maximum cannot be less than minimum");
@@ -199,7 +198,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     float min = Convert.ToSingle (args.text);
-                    float max = Convert.ToSingle (((SettingsTextBox)settings ["Max Dimming"]).textBox.text);
+                    float max = Convert.ToSingle (((SettingsTextBox)settings["Max Dimming"]).textBox.text);
 
                     if (min > max) {
                         MessageBox.Show ("Minimum cannot be greater than maximum");
@@ -227,25 +226,25 @@ namespace AquaPic.UserInterface
 
         protected void ParseOutlet (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-			g = s.Substring (0, idx);
+            g = s.Substring (0, idx);
             i = Convert.ToByte (s.Substring (idx + 2));
         }
 
         protected void ParseChannnel (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-			g = s.Substring (0, idx);
+            g = s.Substring (0, idx);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
         protected override bool OnSave (object sender) {
-            string name = ((SettingsTextBox)settings ["Name"]).textBox.text;
+            string name = ((SettingsTextBox)settings["Name"]).textBox.text;
 
-            string outletStr = ((SettingsComboBox)settings ["Outlet"]).combo.activeText;
+            string outletStr = ((SettingsComboBox)settings["Outlet"]).combo.activeText;
             IndividualControl outletIc = IndividualControl.Empty;
 
             LightingTime lTime = LightingTime.Daytime;
             try {
-                SettingsSelectorSwitch s = settings ["Lighting Time"] as SettingsSelectorSwitch;
+                SettingsSelectorSwitch s = settings["Lighting Time"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     lTime = LightingTime.Nighttime;
             } catch {
@@ -254,7 +253,7 @@ namespace AquaPic.UserInterface
 
             bool highTempLockout = true;
             try {
-                SettingsSelectorSwitch s = settings ["Temp Lockout"] as SettingsSelectorSwitch;
+                SettingsSelectorSwitch s = settings["Temp Lockout"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     highTempLockout = false;
             } catch {
@@ -263,41 +262,41 @@ namespace AquaPic.UserInterface
 
             bool autoTimeUpdate = true;
             try {
-                SettingsSelectorSwitch s = settings ["Auto Time Update"] as SettingsSelectorSwitch;
+                SettingsSelectorSwitch s = settings["Auto Time Update"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     autoTimeUpdate = false;
             } catch {
                 return false;
             }
 
-            int onOffset = Convert.ToInt32 (((SettingsTextBox)settings ["On Time Offset"]).textBox.text);
-            int offOffset = Convert.ToInt32 (((SettingsTextBox)settings ["Off Time Offset"]).textBox.text);
+            int onOffset = Convert.ToInt32 (((SettingsTextBox)settings["On Time Offset"]).textBox.text);
+            int offOffset = Convert.ToInt32 (((SettingsTextBox)settings["Off Time Offset"]).textBox.text);
 
             bool dimmingFixture = true;
             try {
-                SettingsSelectorSwitch s = settings ["Dimming Fixture"] as SettingsSelectorSwitch;
+                SettingsSelectorSwitch s = settings["Dimming Fixture"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     dimmingFixture = false;
             } catch {
                 return false;
             }
 
-            var chStr = ((SettingsComboBox)settings ["Dimming Channel"]).combo.activeText;
+            var chStr = ((SettingsComboBox)settings["Dimming Channel"]).combo.activeText;
             var chIc = IndividualControl.Empty;
 
-            var maxDimming = Convert.ToSingle (((SettingsTextBox)settings ["Max Dimming"]).textBox.text);
-            var minDimming = Convert.ToSingle (((SettingsTextBox)settings ["Min Dimming"]).textBox.text);
+            var maxDimming = Convert.ToSingle (((SettingsTextBox)settings["Max Dimming"]).textBox.text);
+            var minDimming = Convert.ToSingle (((SettingsTextBox)settings["Min Dimming"]).textBox.text);
 
             AnalogType aType = AnalogType.ZeroTen;
             try {
-                var s = settings ["Dimming Type"] as SettingsSelectorSwitch;
+                var s = settings["Dimming Type"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected != 0)
                     aType = AnalogType.PWM;
             } catch {
                 return false;
             }
 
-			var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
+            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
             var ja = jo["lightingFixtures"] as JArray;
 
             if (fixtureName.IsEmpty ()) {
@@ -314,7 +313,7 @@ namespace AquaPic.UserInterface
                 ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
 
                 if (dimmingFixture) {
-                    if (((SettingsComboBox)settings ["Dimming Channel"]).combo.activeIndex == -1) {
+                    if (((SettingsComboBox)settings["Dimming Channel"]).combo.activeIndex == -1) {
                         MessageBox.Show ("Please select a dimming channel");
                         return false;
                     }

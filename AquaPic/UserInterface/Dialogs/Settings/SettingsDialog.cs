@@ -31,13 +31,14 @@ namespace AquaPic.UserInterface
 {
     public delegate bool SaveHandler (object sender);
 
-    public enum TouchSettingsOutcome {
+    public enum TouchSettingsOutcome
+    {
         Added,
         Modified,
         Deleted,
         Cancelled
     }
-    
+
     public class TouchSettingsDialog : Dialog
     {
         public Fixed fix;
@@ -152,7 +153,7 @@ namespace AquaPic.UserInterface
                             }
                         }
                     };
-                    
+
                     ms.Run ();
                     ms.Destroy ();
                 };
@@ -178,7 +179,7 @@ namespace AquaPic.UserInterface
         protected void DrawSettings () {
             int x = 5;
             int y = 5;
-            
+
             foreach (var s in settings.Values) {
                 fix.Put (s, x, y);
 

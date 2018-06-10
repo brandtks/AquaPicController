@@ -25,9 +25,10 @@ using System;
 using Gtk;
 using Cairo;
 
-namespace GoodtimeDevelopment.TouchWidget  
+namespace GoodtimeDevelopment.TouchWidget
 {
-    public enum ButtonClickAction : byte {
+    public enum ButtonClickAction : byte
+    {
         None = 0,
         NoTransparency,
         Brighten,
@@ -112,7 +113,7 @@ namespace GoodtimeDevelopment.TouchWidget
         protected void OnTouchButtonPress (object o, ButtonPressEventArgs args) {
             if (args.Event.Type == Gdk.EventType.ButtonPress) {
                 if (clickAction == ButtonClickAction.NoTransparency) {
-                    unmodifiedColor = new TouchColor(buttonColor);
+                    unmodifiedColor = new TouchColor (buttonColor);
                     buttonColor.ModifyAlpha (1.0);
                 } else if (clickAction == ButtonClickAction.Brighten) {
                     unmodifiedColor = new TouchColor (buttonColor);
@@ -129,7 +130,7 @@ namespace GoodtimeDevelopment.TouchWidget
         protected override bool OnButtonReleaseEvent (Gdk.EventButton evnt) {
             buttonColor = unmodifiedColor;
             QueueDraw ();
-            
+
             if ((evnt.X < 0) || (evnt.X > Allocation.Width)) {
                 return true;
             }

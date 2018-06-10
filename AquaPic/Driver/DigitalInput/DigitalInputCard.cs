@@ -33,7 +33,7 @@ namespace AquaPic.Drivers
         {
             public DigitalInputCard (string name, int address)
                 : base (
-                    name, 
+                    name,
                     address,
                     6) { }
 
@@ -41,12 +41,12 @@ namespace AquaPic.Drivers
                 return new DigitalInputChannel (GetDefualtName (index));
             }
 
-			public override string GetChannelPrefix () {
+            public override string GetChannelPrefix () {
                 return "i";
             }
 
             public override void GetAllValuesCommunication () {
-                Read (20, sizeof(byte), GetInputsCallback);
+                Read (20, sizeof (byte), GetInputsCallback);
             }
 
             protected void GetInputsCallback (CallbackArgs args) {
@@ -65,7 +65,7 @@ namespace AquaPic.Drivers
             protected void GetInputCallback (CallbackArgs args) {
                 var ch = args.GetDataFromReadBuffer<byte> (0);
                 var value = args.GetDataFromReadBuffer<bool> (1);
-                channels [ch].SetValue(value);
+                channels[ch].SetValue (value);
             }
         }
     }

@@ -68,10 +68,10 @@ namespace GoodtimeDevelopment.TouchWidget
         private bool clicked;
 
         public TouchProgressBar (
-            TouchColor colorBackground, 
+            TouchColor colorBackground,
             TouchColor colorProgress,
-            float currentProgress, 
-            bool enableTouch, 
+            float currentProgress,
+            bool enableTouch,
             TouchOrientation orientation
         ) {
             this.Visible = true;
@@ -103,8 +103,8 @@ namespace GoodtimeDevelopment.TouchWidget
             base.Dispose ();
         }
 
-        public TouchProgressBar () 
-            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f, false, TouchOrientation.Vertical) { 
+        public TouchProgressBar ()
+            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f, false, TouchOrientation.Vertical) {
         }
 
         public TouchProgressBar (TouchOrientation orientation)

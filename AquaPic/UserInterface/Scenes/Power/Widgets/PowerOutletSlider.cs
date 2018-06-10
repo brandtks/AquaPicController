@@ -81,12 +81,12 @@ namespace AquaPic.UserInterface
             ss.sliderSize = MySliderSize.Large;
             ss.WidthRequest = 170;
             ss.HeightRequest = 30;
-            ss.sliderColorOptions [0] = "grey2";
-            ss.sliderColorOptions [1] = "pri";
-            ss.sliderColorOptions [2] = "seca";
-            ss.textOptions [0] = "Off";
-            ss.textOptions [1] = "Auto";
-            ss.textOptions [2] = "On";
+            ss.sliderColorOptions[0] = "grey2";
+            ss.sliderColorOptions[1] = "pri";
+            ss.sliderColorOptions[2] = "seca";
+            ss.textOptions[0] = "Off";
+            ss.textOptions[1] = "Auto";
+            ss.textOptions[2] = "On";
             Put (ss, 5, 145);
             ss.Show ();
 
@@ -129,8 +129,8 @@ namespace AquaPic.UserInterface
                     os = new OutletSettings (outletName.text, true, ic);
 
                 os.Run ();
-                
-				UpdateScreen?.Invoke ();
+
+                UpdateScreen?.Invoke ();
             } else {
                 MessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
             }

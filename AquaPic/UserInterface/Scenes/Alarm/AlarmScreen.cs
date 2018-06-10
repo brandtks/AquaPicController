@@ -62,7 +62,7 @@ namespace AquaPic.UserInterface
             tv.Show ();
 
             if (options.Length >= 2) {
-                var lastScreen = options [1] as string;
+                var lastScreen = options[1] as string;
                 if (lastScreen != null) {
                     var b = new TouchButton ();
                     b.SetSizeRequest (100, 60);

@@ -32,11 +32,11 @@ using AquaPic.SerialBus;
 
 namespace AquaPic.UserInterface
 {
-	public class CardSettingsHelper
-	{
-		public static bool OnAddressSetEvent (string text, ref string card, GenericBase cardDriver) {
-			var keepText = false;
-			if (text.IsNotEmpty ()) {
+    public class CardSettingsHelper
+    {
+        public static bool OnAddressSetEvent (string text, ref string card, GenericBase cardDriver) {
+            var keepText = false;
+            if (text.IsNotEmpty ()) {
                 try {
                     int address;
                     if ((text.StartsWith ("x", StringComparison.InvariantCultureIgnoreCase)) ||
@@ -54,12 +54,12 @@ namespace AquaPic.UserInterface
 
                         card = string.Format (
                             "{0}{1}",
-							cardDriver.GetCardAcyronym (),
-							cardDriver.GetLowestCardNameIndex ());
+                            cardDriver.GetCardAcyronym (),
+                            cardDriver.GetLowestCardNameIndex ());
 
-						cardDriver.AddCard (card, address);
+                        cardDriver.AddCard (card, address);
 
-						var type = cardDriver.GetCardType ().ToString ();
+                        var type = cardDriver.GetCardType ().ToString ();
                         type = Char.ToLower (type[0]) + type.Substring (1);
                         var jo = new JObject {
                                     new JProperty ("type", type),
@@ -69,29 +69,29 @@ namespace AquaPic.UserInterface
                                 };
                         ja.Add (jo);
                         SettingsHelper.SaveSettingsFile ("equipment", ja);
-						keepText = true;
+                        keepText = true;
                     }
                 } catch {
                     MessageBox.Show ("Improper address");
                 }
             }
 
-			return keepText;
-		}
+            return keepText;
+        }
 
-		public static bool OnCardDeleteEvent (string card, GenericBase cardDriver) {
-			var ja = SettingsHelper.OpenSettingsFile ("equipment") as JArray;
+        public static bool OnCardDeleteEvent (string card, GenericBase cardDriver) {
+            var ja = SettingsHelper.OpenSettingsFile ("equipment") as JArray;
             var index = SettingsHelper.FindSettingsInArray (ja, card);
             if (index == -1) {
                 MessageBox.Show ("Something went wrong");
-				return false;
-            } 
+                return false;
+            }
 
             ja.RemoveAt (index);
             SettingsHelper.SaveSettingsFile ("equipment", ja);
-			cardDriver.RemoveCard (card);
-			return true;
-		}
-	}
+            cardDriver.RemoveCard (card);
+            return true;
+        }
+    }
 }
 

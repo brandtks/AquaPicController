@@ -47,17 +47,16 @@ namespace AquaPic.Drivers
         }
 
         protected GenericCard (
-            string name, 
-            int address, 
+            string name,
+            int address,
             int numChannels
         )
-            : base (address, string.Format ("{0} ({1})", name, Utils.GetDescription (cardType)))
-        {
+            : base (address, name) {
             this.name = name;
 
             channels = new GenericChannel[numChannels];
             for (int i = 0; i < channelCount; ++i) {
-                channels [i] = ChannelCreater (i);
+                channels[i] = ChannelCreater (i);
             }
         }
 
@@ -68,28 +67,28 @@ namespace AquaPic.Drivers
         public virtual void AddChannel (int channel, string channelName) {
             CheckChannelRange (channel);
 
-            if (!string.Equals (channels [channel].name, GetDefualtName (channel), StringComparison.InvariantCultureIgnoreCase)) {
-                throw new Exception (string.Format ("Channel already taken by {0}", channels [channel].name));
+            if (!string.Equals (channels[channel].name, GetDefualtName (channel), StringComparison.InvariantCultureIgnoreCase)) {
+                throw new Exception (string.Format ("Channel already taken by {0}", channels[channel].name));
             }
-                
+
             try {
                 // If the name exists, GetChannelIndex will return, if it doesn't it will throw a ArgumentException
                 GetChannelIndex (channelName);
 
                 throw new ArgumentException ("Channel name already exists");
             } catch (ArgumentException) {
-                channels [channel].name = channelName;
+                channels[channel].name = channelName;
             }
         }
 
         public virtual void RemoveChannel (int channel) {
             CheckChannelRange (channel);
-            channels [channel] = ChannelCreater (channel);
+            channels[channel] = ChannelCreater (channel);
         }
 
         public virtual int GetChannelIndex (string channelName) {
             for (int i = 0; i < channelCount; ++i) {
-                if (string.Equals (channels [i].name, channelName, StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals (channels[i].name, channelName, StringComparison.InvariantCultureIgnoreCase))
                     return i;
             }
 
@@ -100,7 +99,7 @@ namespace AquaPic.Drivers
             List<string> availableChannels = new List<string> ();
             for (int i = 0; i < channelCount; ++i) {
                 string defaultName = GetDefualtName (i);
-                if (channels [i].name == defaultName) {
+                if (channels[i].name == defaultName) {
                     availableChannels.Add (defaultName);
                 }
             }
@@ -109,17 +108,17 @@ namespace AquaPic.Drivers
 
         protected virtual bool CheckChannelRange (int channel, bool throwException = true) {
             if ((channel < 0) || (channel >= channelCount)) {
-				if (throwException) {
-					throw new ArgumentOutOfRangeException ("channel");
-				}
+                if (throwException) {
+                    throw new ArgumentOutOfRangeException ("channel");
+                }
                 return false;
             }
             return true;
         }
 
-		public virtual string GetChannelPrefix () {
-			return string.Empty;
-		}
+        public virtual string GetChannelPrefix () {
+            return string.Empty;
+        }
 
         /**************************************************************************************************************/
         /* Channel Value Setters                                                                                      */
@@ -132,17 +131,17 @@ namespace AquaPic.Drivers
             throw new NotImplementedException ();
         }
 
-		public virtual void SetChannelValue (int channel, ValueType value) {
+        public virtual void SetChannelValue (int channel, ValueType value) {
             CheckChannelRange (channel);
-            channels [channel].SetValue (value);
+            channels[channel].SetValue (value);
         }
 
-		public virtual void SetAllChannelValues (ValueType[] values) {
+        public virtual void SetAllChannelValues (ValueType[] values) {
             if (values.Length < channelCount)
                 throw new ArgumentOutOfRangeException ("values.length");
 
             for (int i = 0; i < channelCount; ++i) {
-                channels [i].SetValue (values [i]);
+                channels[i].SetValue (values[i]);
             }
         }
 
@@ -157,21 +156,21 @@ namespace AquaPic.Drivers
             throw new NotImplementedException ();
         }
 
-		public virtual ValueType GetChannelValue (int channel) {
+        public virtual ValueType GetChannelValue (int channel) {
             CheckChannelRange (channel);
-			dynamic value;
-			try {
-				value = (ValueType)Convert.ChangeType (channels[channel].value, channels[channel].valueType);
-			} catch {
-				value = Activator.CreateInstance (channels[channel].valueType);;
-			}
-			return value;
+            dynamic value;
+            try {
+                value = (ValueType)Convert.ChangeType (channels[channel].value, channels[channel].valueType);
+            } catch {
+                value = Activator.CreateInstance (channels[channel].valueType); ;
+            }
+            return value;
         }
 
-		public virtual ValueType[] GetAllChannelValues () {
-			var values = new ValueType[channels.Length];
+        public virtual ValueType[] GetAllChannelValues () {
+            var values = new ValueType[channels.Length];
             for (int i = 0; i < channels.Length; ++i) {
-				values [i] = GetChannelValue (i);
+                values[i] = GetChannelValue (i);
             }
             return values;
         }
@@ -181,28 +180,28 @@ namespace AquaPic.Drivers
         /**************************************************************************************************************/
         public virtual string GetChannelName (int channel) {
             CheckChannelRange (channel);
-            return channels [channel].name;
+            return channels[channel].name;
         }
 
-		public virtual string GetDefualtName (int channel, string prefix = null) {
+        public virtual string GetDefualtName (int channel, string prefix = null) {
             CheckChannelRange (channel);
             if (prefix == null) {
-				prefix = GetChannelPrefix ();
-			}
+                prefix = GetChannelPrefix ();
+            }
             return string.Format ("{0}.{1}{2}", name, prefix, channel);
         }
 
         public virtual string[] GetAllChannelNames () {
             string[] names = new string[channelCount];
             for (int i = 0; i < channelCount; ++i) {
-                names [i] = channels [i].name;
+                names[i] = channels[i].name;
             }
             return names;
         }
 
         public virtual void SetChannelName (int channel, string name) {
             CheckChannelRange (channel);
-            channels [channel].name = name;
+            channels[channel].name = name;
         }
 
         /**************************************************************************************************************/
@@ -210,20 +209,20 @@ namespace AquaPic.Drivers
         /**************************************************************************************************************/
         public virtual Mode GetChannelMode (int channel) {
             CheckChannelRange (channel);
-            return channels [channel].mode;
+            return channels[channel].mode;
         }
 
         public virtual Mode[] GetAllChannelModes () {
             Mode[] modes = new Mode[channelCount];
             for (int i = 0; i < channelCount; ++i) {
-                modes [i] = channels [i].mode;
+                modes[i] = channels[i].mode;
             }
             return modes;
         }
 
         public virtual void SetChannelMode (int channel, Mode mode) {
             CheckChannelRange (channel);
-            channels [channel].mode = mode;
+            channels[channel].mode = mode;
         }
     }
 }

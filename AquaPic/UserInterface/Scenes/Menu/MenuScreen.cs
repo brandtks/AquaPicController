@@ -43,7 +43,7 @@ namespace AquaPic.UserInterface
             int x = 60;
             int y = 80;
             foreach (var name in screenNames) {
-                SceneData screen = AquaPicGui.AquaPicUserInterface.scenes [name];
+                SceneData screen = AquaPicGui.AquaPicUserInterface.scenes[name];
                 if (screen.showInMenu) {
                     var b = new TouchButton ();
                     b.SetSizeRequest (220, 50);
@@ -52,7 +52,7 @@ namespace AquaPic.UserInterface
                     b.ButtonReleaseEvent += OnButtonClick;
                     Put (b, x, y);
 
-                    x += 230;  
+                    x += 230;
                     if (x >= 690) {
                         x = 60;
                         y += 60;

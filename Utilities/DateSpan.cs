@@ -48,15 +48,15 @@ namespace GoodtimeDevelopment.Utilites
             }
         }
 
-		public static DateSpan Zero { 
+        public static DateSpan Zero {
             get {
-				return new DateSpan (0, 0, 0, 0, 0, 0, 0);
+                return new DateSpan (0, 0, 0, 0, 0, 0, 0);
             }
         }
 
-		public static DateSpan Now {
+        public static DateSpan Now {
             get {
-				return new DateSpan (DateTime.Now);
+                return new DateSpan (DateTime.Now);
             }
         }
 
@@ -78,9 +78,8 @@ namespace GoodtimeDevelopment.Utilites
             : this (year, month, day, hour, minute, 0, 0) {
         }
 
-        public DateSpan (int hour, int minute, int second) 
-            : this (0, 0, 0, hour, minute, second, 0) 
-        {
+        public DateSpan (int hour, int minute, int second)
+            : this (0, 0, 0, hour, minute, second, 0) {
             DateTime now = DateTime.Now;
             _year = now.Year;
             _month = now.Month;
@@ -88,21 +87,19 @@ namespace GoodtimeDevelopment.Utilites
         }
 
         public DateSpan (int hour, int minute, int second, int millisecond)
-            : this (0, 0, 0, hour, minute, second, millisecond) 
-        {
+            : this (0, 0, 0, hour, minute, second, millisecond) {
             DateTime now = DateTime.Now;
             _year = now.Year;
             _month = now.Month;
             _day = now.Day;
         }
-          
+
         public DateSpan (DateTime dateTime)
             : this (dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond) {
         }
 
         public DateSpan (Time time)
-            : this (0, 0, 0, time.hour, time.minute, time.second, time.millisecond) 
-        {
+            : this (0, 0, 0, time.hour, time.minute, time.second, time.millisecond) {
             DateTime now = DateTime.Now;
             _year = now.Year;
             _month = now.Month;
@@ -110,14 +107,14 @@ namespace GoodtimeDevelopment.Utilites
         }
 
         public DateSpan () {
-			DateTime value = DateTime.Now;
-			_year = value.Year;
-			_month = value.Month;
-			_day = value.Day;
-			_hour = value.Hour;
-			_minute = value.Minute;
-			_second = value.Second;
-			_millisecond = value.Millisecond;
+            DateTime value = DateTime.Now;
+            _year = value.Year;
+            _month = value.Month;
+            _day = value.Day;
+            _hour = value.Hour;
+            _minute = value.Minute;
+            _second = value.Second;
+            _millisecond = value.Millisecond;
         }
 
         public void UpdateDateToToday () {
@@ -173,7 +170,7 @@ namespace GoodtimeDevelopment.Utilites
 
         public double DifferenceInSeconds (DateSpan dateSpan) {
             var span = ToDateTime ().Subtract (dateSpan.ToDateTime ());
-            return span.TotalSeconds; 
+            return span.TotalSeconds;
         }
 
         public DateTime ToDateTime () {
@@ -203,9 +200,9 @@ namespace GoodtimeDevelopment.Utilites
             _millisecond = value.millisecond;
         }
 
-		public override string ToString () {
-			return ToDateTime ().ToString ("M/dd/yy h:mm:ss.fff tt");
-		}
+        public override string ToString () {
+            return ToDateTime ().ToString ("M/dd/yy h:mm:ss.fff tt");
+        }
 
         public string ToShortDateString () {
             var val = ToDateTime ();

@@ -40,7 +40,8 @@ namespace GoodtimeDevelopment.TouchWidget
         }
     }
 
-    public enum MySliderSize {
+    public enum MySliderSize
+    {
         Small = 1,
         Large
     }
@@ -80,19 +81,19 @@ namespace GoodtimeDevelopment.TouchWidget
 
             this.backgoundColorOptions = new TouchColor[_selectionCount];
             for (int i = 0; i < backgoundColorOptions.Length; ++i)
-                this.backgoundColorOptions [i] = new TouchColor ("grey0");
+                this.backgoundColorOptions[i] = new TouchColor ("grey0");
 
             this.textColorOptions = new TouchColor[_selectionCount];
             for (int i = 0; i < backgoundColorOptions.Length; ++i)
-                this.textColorOptions [i] = new TouchColor ("white");
+                this.textColorOptions[i] = new TouchColor ("white");
 
             this.sliderColorOptions = new TouchColor[_selectionCount];
             for (int i = 0; i < sliderColorOptions.Length; ++i)
-                this.sliderColorOptions [i] = new TouchColor ("grey4");
+                this.sliderColorOptions[i] = new TouchColor ("grey4");
 
             this.textOptions = new string[_selectionCount];
             for (int i = 0; i < textOptions.Length; ++i)
-                this.textOptions [i] = string.Empty;
+                this.textOptions[i] = string.Empty;
 
             clicked = false;
             clickTimer = 0;
@@ -115,11 +116,11 @@ namespace GoodtimeDevelopment.TouchWidget
         public TouchSelectorSwitch (int id, int selectionCount) : this (id, selectionCount, 0, TouchOrientation.Horizontal) { }
 
         public void AddSelectedColorOption (int selectionIndex, string newColor) {
-            backgoundColorOptions [selectionIndex] = newColor;
+            backgoundColorOptions[selectionIndex] = newColor;
         }
 
         public void AddSelectedColorOption (int selectionIndex, double R, double G, double B) {
-            backgoundColorOptions [selectionIndex] = new TouchColor (R, G, B);
+            backgoundColorOptions[selectionIndex] = new TouchColor (R, G, B);
         }
 
         public override void Dispose () {
@@ -138,7 +139,7 @@ namespace GoodtimeDevelopment.TouchWidget
 
                 int seperation, sliderWidth, sliderLength, sliderMax, x, y;
 
-                if (orientation == TouchOrientation.Horizontal) {  
+                if (orientation == TouchOrientation.Horizontal) {
                     if (sliderSize == MySliderSize.Small)
                         sliderWidth = height;
                     else {
@@ -193,7 +194,7 @@ namespace GoodtimeDevelopment.TouchWidget
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, height / 2);
                 else
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
-                backgoundColorOptions [currentSelected].SetSource (cr);
+                backgoundColorOptions[currentSelected].SetSource (cr);
                 cr.FillPreserve ();
                 cr.LineWidth = 1;
                 cr.SetSourceRGB (0.0, 0.0, 0.0);
@@ -204,7 +205,7 @@ namespace GoodtimeDevelopment.TouchWidget
                     TouchGlobal.DrawRoundedRectangle (cr, x, y, sliderWidth, height, height / 2);
                 else
                     TouchGlobal.DrawRoundedRectangle (cr, x, y, width, sliderWidth, width / 2);
-                sliderColorOptions [currentSelected].SetSource (cr);
+                sliderColorOptions[currentSelected].SetSource (cr);
                 cr.FillPreserve ();
                 cr.LineWidth = 1;
                 cr.SetSourceRGB (0.0, 0.0, 0.0);
@@ -218,9 +219,9 @@ namespace GoodtimeDevelopment.TouchWidget
                 seperation = Allocation.Width / _selectionCount;
                 x = Allocation.Left;
                 for (int i = 0; i < _selectionCount; ++i) {
-                    if (!string.IsNullOrWhiteSpace (textOptions [i])) {
-                        render.font.color = textColorOptions [i];
-                        render.text = textOptions [i];
+                    if (!string.IsNullOrWhiteSpace (textOptions[i])) {
+                        render.font.color = textColorOptions[i];
+                        render.text = textOptions[i];
                         render.Render (this, x, Allocation.Top + 6, seperation);
                     }
 

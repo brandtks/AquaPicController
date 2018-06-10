@@ -30,7 +30,8 @@ namespace AquaPic.UserInterface
 {
     public delegate LinePlotWidget CreateLinePlotHandler (params object[] options);
 
-    public class LinePlotData {
+    public class LinePlotData
+    {
         public CreateLinePlotHandler CreateInstanceEvent;
 
         public LinePlotData (CreateLinePlotHandler CreateInstanceEvent) {
@@ -49,8 +50,8 @@ namespace AquaPic.UserInterface
     public class LinePlotWidget : Fixed
     {
         public string text {
-            get { 
-                return displayLabel.text; 
+            get {
+                return displayLabel.text;
             }
             set {
                 displayLabel.text = value;
@@ -108,7 +109,7 @@ namespace AquaPic.UserInterface
             textBox.textHorizontallyCentered = true;
             textBox.textRender.textWrap = TouchTextWrap.Shrink;
             Put (textBox, 1, 3);
-            
+
             ShowAll ();
         }
 

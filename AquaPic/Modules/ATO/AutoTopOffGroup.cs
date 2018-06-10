@@ -32,7 +32,7 @@ namespace AquaPic.Modules
 {
     public partial class AutoTopOff
     {
-        private class AutoTopOffGroup
+        class AutoTopOffGroup
         {
             public string name;
             public bool enable;
@@ -41,11 +41,11 @@ namespace AquaPic.Modules
             public string requestBitName;
             public string waterLevelGroupName;
 
-			public IntervalTimer timer;
+            public IntervalTimer timer;
             public uint atoTime {
                 get {
                     if (state == AutoTopOffState.Filling)
-						return (maximumRuntime * 60) - timer.secondsRemaining;
+                        return (maximumRuntime * 60) - timer.secondsRemaining;
                     if (state == AutoTopOffState.Cooldown)
                         return timer.secondsRemaining;
 
@@ -96,7 +96,7 @@ namespace AquaPic.Modules
 
                 timer = IntervalTimer.GetTimer (name);
                 timer.TimerElapsedEvent += OnTimerElapsed;
-				timer.Reset ();
+                timer.Reset ();
 
                 failAlarmIndex = Alarm.Subscribe (string.Format ("{0}, ATO, failed", name));
             }
@@ -107,14 +107,14 @@ namespace AquaPic.Modules
                     switch (state) {
                     case AutoTopOffState.Standby:
                         // If the water level group isn't alarming on high allow pump on request
-						pumpOnRequest = !WaterLevel.GetWaterLevelGroupHighAlarming (waterLevelGroupName);
+                        pumpOnRequest = !WaterLevel.GetWaterLevelGroupHighAlarming (waterLevelGroupName);
 
                         if (useAnalogSensors) {
-							if (WaterLevel.GetWaterLevelGroupAnalogSensorConnected (waterLevelGroupName)) {
-								pumpOnRequest &= WaterLevel.GetWaterLevelGroupLevel (waterLevelGroupName) < analogOnSetpoint;
-							} else {
-								pumpOnRequest = false;
-							}
+                            if (WaterLevel.GetWaterLevelGroupAnalogSensorConnected (waterLevelGroupName)) {
+                                pumpOnRequest &= WaterLevel.GetWaterLevelGroupLevel (waterLevelGroupName) < analogOnSetpoint;
+                            } else {
+                                pumpOnRequest = false;
+                            }
                         }
 
                         if (useFloatSwitches) {
@@ -131,17 +131,17 @@ namespace AquaPic.Modules
 
                         break;
                     case AutoTopOffState.Filling:
-						pumpOnRequest = !WaterLevel.GetWaterLevelGroupHighAlarming (waterLevelGroupName);;
+                        pumpOnRequest = !WaterLevel.GetWaterLevelGroupHighAlarming (waterLevelGroupName); ;
 
-						// Check analog sensor
-						if (useAnalogSensors) {
-							if (WaterLevel.GetWaterLevelGroupAnalogSensorConnected (waterLevelGroupName)) {
-								// If the level is greater than the off setpoint the request is off
-								pumpOnRequest &= WaterLevel.GetWaterLevelGroupLevel (waterLevelGroupName) < analogOffSetpoint;
-							} else {
-								pumpOnRequest = false;
-							}
-						}
+                        // Check analog sensor
+                        if (useAnalogSensors) {
+                            if (WaterLevel.GetWaterLevelGroupAnalogSensorConnected (waterLevelGroupName)) {
+                                // If the level is greater than the off setpoint the request is off
+                                pumpOnRequest &= WaterLevel.GetWaterLevelGroupLevel (waterLevelGroupName) < analogOffSetpoint;
+                            } else {
+                                pumpOnRequest = false;
+                            }
+                        }
 
                         // check float switch
                         if ((useFloatSwitches) && (!WaterLevel.GetWaterLevelGroupSwitchesActivated (waterLevelGroupName))) {

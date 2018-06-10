@@ -33,7 +33,7 @@ namespace AquaPic.Modules
     public partial class Lighting
     {
         public class LightingFixture
-    	{
+        {
             public string name;
             public int onTimeOffset;
             public int offTimeOffset;
@@ -46,10 +46,10 @@ namespace AquaPic.Modules
             public Mode mode;
 
             public LightingFixture (
-                string name, 
-                IndividualControl plug, 
-                Time onTime, 
-                Time offTime, 
+                string name,
+                IndividualControl plug,
+                Time onTime,
+                Time offTime,
                 LightingTime lightingTime,
                 bool highTempLockout
             ) {
@@ -83,7 +83,7 @@ namespace AquaPic.Modules
                 DateSpan now = DateSpan.Now;
                 if (now.After (onTime) && now.Before (offTime)) {
                     return true;
-                } 
+                }
 
                 if (mode == Mode.Auto) { // only update times if mode is auto
                     if (lightingOn == MyState.On) { // lights are on and are supposed to be off, update next on/off times
@@ -116,7 +116,7 @@ namespace AquaPic.Modules
                 offTime = newOffTime;
                 offTime.AddMinutes (offTimeOffset);
             }
-    	}
+        }
     }
 }
 

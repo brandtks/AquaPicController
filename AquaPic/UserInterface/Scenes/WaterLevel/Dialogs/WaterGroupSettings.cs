@@ -40,8 +40,7 @@ namespace AquaPic.UserInterface
         }
 
         public WaterGroupSettings (string name, bool includeDelete)
-            : base (name + " Water", includeDelete) 
-        {
+            : base (name + " Water", includeDelete) {
             groupName = name;
 
             var t = new SettingsTextBox ("Name");
@@ -158,12 +157,12 @@ namespace AquaPic.UserInterface
         protected override bool OnSave (object sender) {
             var name = (string)settings["Name"].setting;
 
-			var highAnalogAlarmSetpoint = Convert.ToSingle (settings["High Alarm"].setting);
+            var highAnalogAlarmSetpoint = Convert.ToSingle (settings["High Alarm"].setting);
             var enableHighAnalogAlarm = (int)settings["Enable High Alarm"].setting == 0;
-			var lowAnalogAlarmSetpoint = Convert.ToSingle (settings["Low Alarm"].setting);
+            var lowAnalogAlarmSetpoint = Convert.ToSingle (settings["Low Alarm"].setting);
             var enableLowAnalogAlarm = (int)settings["Enable Low Alarm"].setting == 0;
 
-			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
+            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["waterLevelGroups"] as JArray;
 
             if (groupName.IsEmpty ()) {
@@ -213,7 +212,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
+            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["waterLevelGroups"] as JArray;
 
             int arrIdx = SettingsHelper.FindSettingsInArray (ja, groupName);

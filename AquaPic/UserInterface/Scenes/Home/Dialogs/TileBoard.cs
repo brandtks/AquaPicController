@@ -30,7 +30,7 @@ namespace AquaPic.UserInterface
 {
     partial class HomeSettings
     {
-        private class CheckerBoard : EventBox
+        private class TileBoard : EventBox
         {
             Tile[,] tiles;
 
@@ -45,7 +45,7 @@ namespace AquaPic.UserInterface
                 }
             }
 
-            public CheckerBoard () {
+            public TileBoard () {
                 VisibleWindow = false;
                 Visible = true;
 

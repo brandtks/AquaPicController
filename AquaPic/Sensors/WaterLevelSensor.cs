@@ -101,7 +101,7 @@ namespace AquaPic.Sensors
             _channel = channel;
 
             if (_channel.IsNotEmpty ()) {
-				AquaPicDrivers.AnalogInput.AddChannel (_channel, string.Format ("{0}, Water Level Sensor", name));
+                AquaPicDrivers.AnalogInput.AddChannel (_channel, string.Format ("{0}, Water Level Sensor", name));
             }
         }
 
@@ -130,7 +130,7 @@ namespace AquaPic.Sensors
 
         public void SetName (string name) {
             _name = name;
-			AquaPicDrivers.AnalogInput.SetChannelName (_channel, string.Format ("{0}, Water Level Sensor", name));
+            AquaPicDrivers.AnalogInput.SetChannelName (_channel, string.Format ("{0}, Water Level Sensor", name));
         }
     }
 }

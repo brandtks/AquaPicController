@@ -39,7 +39,7 @@ namespace AquaPic.UserInterface
                 buttonColor = "pri";
             else
                 buttonColor = "seca";
-            
+
             ButtonReleaseEvent += OnButtonRelease;
         }
 

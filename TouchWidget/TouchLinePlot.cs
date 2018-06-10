@@ -35,7 +35,7 @@ namespace GoodtimeDevelopment.TouchWidget
     {
         uint timerId;
         const int graphWidth = 240;
-        
+
         private CircularBuffer<LogEntry> _dataPoints;
         public CircularBuffer<LogEntry> dataPoints {
             get {
@@ -84,7 +84,7 @@ namespace GoodtimeDevelopment.TouchWidget
             _dataPoints = new CircularBuffer<LogEntry> (maxDataPoints);
             _eventPoints = new CircularBuffer<LogEntry> (maxDataPoints);
             eventColors = new Dictionary<string, TouchColor> ();
-            
+
             rangeMargin = 3;
             timeSpan = TouchLinePlotPointTimeDifference.Seconds1;
             startingPoint = new TouchLinePlotStartingPoint ();
@@ -139,7 +139,7 @@ namespace GoodtimeDevelopment.TouchWidget
                     for (int i = 1; i < valueBuffer.Length; ++i) {
                         y = valueBuffer[i].value.Map (min, max, bottom - 4, top + 4);
                         x = left + 8;
-                        
+
                         pointDifference = now.Subtract (valueBuffer[i].dateTime).TotalSeconds / (double)PointTimeDifferenceToSeconds ();
                         x += pointDifference * (double)_pointSpacing;
 
@@ -202,9 +202,9 @@ namespace GoodtimeDevelopment.TouchWidget
             }
         }
 
-        public void LinkDataLogger (IDataLogger logger) {          
+        public void LinkDataLogger (IDataLogger logger) {
             var endSearchTime = DateTime.Now.Subtract (new TimeSpan (0, 0, maxDataPoints * PointTimeDifferenceToSeconds ()));
-            
+
             logger.ValueLogEntryAddedEvent += OnValueLogEntryAdded;
             var valueEntries = logger.GetValueEntries (maxDataPoints, PointTimeDifferenceToSeconds (), endSearchTime);
             _dataPoints.AddRange (valueEntries);
@@ -226,7 +226,7 @@ namespace GoodtimeDevelopment.TouchWidget
                 var secondTimeSpan = PointTimeDifferenceToSeconds ();
                 if (totalSeconds >= secondTimeSpan) {
                     _dataPoints.Add (new LogEntry (args.entry));
-                } 
+                }
             } else {
                 _dataPoints.Add (new LogEntry (args.entry));
             }
@@ -238,22 +238,22 @@ namespace GoodtimeDevelopment.TouchWidget
 
         public int PointTimeDifferenceToSeconds () {
             switch (timeSpan) {
-                case TouchLinePlotPointTimeDifference.Seconds1:
-                    return 1;
-                case TouchLinePlotPointTimeDifference.Seconds5:
-                    return 5;
-                case TouchLinePlotPointTimeDifference.Seconds10:
-                    return 10;
-                case TouchLinePlotPointTimeDifference.Minute1:
-                    return 60;
-                case TouchLinePlotPointTimeDifference.Minute2:
-                    return 120;
-                case TouchLinePlotPointTimeDifference.Minute5:
-                    return 300;
-                case TouchLinePlotPointTimeDifference.Minute10:
-                    return 600;
-                default:
-                    return 1;
+            case TouchLinePlotPointTimeDifference.Seconds1:
+                return 1;
+            case TouchLinePlotPointTimeDifference.Seconds5:
+                return 5;
+            case TouchLinePlotPointTimeDifference.Seconds10:
+                return 10;
+            case TouchLinePlotPointTimeDifference.Minute1:
+                return 60;
+            case TouchLinePlotPointTimeDifference.Minute2:
+                return 120;
+            case TouchLinePlotPointTimeDifference.Minute5:
+                return 300;
+            case TouchLinePlotPointTimeDifference.Minute10:
+                return 600;
+            default:
+                return 1;
             }
         }
 
@@ -263,10 +263,11 @@ namespace GoodtimeDevelopment.TouchWidget
         }
     }
 
-    public enum TouchLinePlotPointTimeDifference {
+    public enum TouchLinePlotPointTimeDifference
+    {
         [Description ("One second")]
         Seconds1,
-        
+
         [Description ("Five seconds")]
         Seconds5,
 
@@ -288,7 +289,8 @@ namespace GoodtimeDevelopment.TouchWidget
 
     //240 is a high composite number 
     //factors are 1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 16, 20, 24, 30, 40, 48, 60, 80, 120, and 240
-    public enum TouchLinePlotPointPixelDifference {
+    public enum TouchLinePlotPointPixelDifference
+    {
         One = 1,
         Two = 2,
         Three = 3,
@@ -321,7 +323,8 @@ namespace GoodtimeDevelopment.TouchWidget
         }
     }
 
-    public enum TouchLinePlotStartTime {
+    public enum TouchLinePlotStartTime
+    {
         Now,
         PastTimePoint
     }

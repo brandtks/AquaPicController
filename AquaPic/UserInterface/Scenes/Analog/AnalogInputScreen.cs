@@ -39,45 +39,45 @@ namespace AquaPic.UserInterface
         TouchComboBox combo;
         string card;
         AnalogChannelDisplay[] displays;
-		TouchButton settingsButton;
+        TouchButton settingsButton;
 
         public AnalogInputWindow (params object[] options) : base () {
-			card = AquaPicDrivers.AnalogInput.firstCard;
-			if (card.IsNotEmpty ()) {
-				sceneTitle = "Analog Inputs Cards";
-			} else {
-				sceneTitle = "No Analog Input Cards Added";
-			}
+            card = AquaPicDrivers.AnalogInput.firstCard;
+            if (card.IsNotEmpty ()) {
+                sceneTitle = "Analog Inputs Cards";
+            } else {
+                sceneTitle = "No Analog Input Cards Added";
+            }
 
             displays = new AnalogChannelDisplay[4];
             for (int i = 0; i < 4; ++i) {
-				displays[i] = new AnalogChannelDisplay ();
-				displays[i].divisionSteps = 4096;
-				displays[i].ForceButtonReleaseEvent += OnForceRelease;
-				displays[i].SettingsButtonReleaseEvent += OnSettingsRelease;
-				displays[i].ValueChangedEvent += OnValueChanged;
-				displays[i].typeLabel.Visible = true;
-				Put (displays[i], 70, 90 + (i * 75));
-				if (card.IsNotEmpty ()) {
+                displays[i] = new AnalogChannelDisplay ();
+                displays[i].divisionSteps = 4096;
+                displays[i].ForceButtonReleaseEvent += OnForceRelease;
+                displays[i].SettingsButtonReleaseEvent += OnSettingsRelease;
+                displays[i].ValueChangedEvent += OnValueChanged;
+                displays[i].typeLabel.Visible = true;
+                Put (displays[i], 70, 90 + (i * 75));
+                if (card.IsNotEmpty ()) {
                     displays[i].Show ();
                 } else {
                     displays[i].Visible = false;
                 }
             }
-            
-			settingsButton = new TouchButton ();
+
+            settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
             settingsButton.text = Convert.ToChar (0x2699).ToString ();
-			settingsButton.ButtonReleaseEvent += OnGlobalSettingsRelease;
+            settingsButton.ButtonReleaseEvent += OnGlobalSettingsRelease;
             Put (settingsButton, 755, 35);
             settingsButton.Show ();
 
-			combo = new TouchComboBox (AquaPicDrivers.AnalogInput.GetAllCardNames ());
-			combo.comboList.Add ("New card...");
-			if (card.IsNotEmpty ()) {
-				combo.activeText = card;
-			}
-			combo.WidthRequest = 200;
+            combo = new TouchComboBox (AquaPicDrivers.AnalogInput.GetAllCardNames ());
+            combo.comboList.Add ("New card...");
+            if (card.IsNotEmpty ()) {
+                combo.activeText = card;
+            }
+            combo.WidthRequest = 200;
             combo.ComboChangedEvent += OnComboChanged;
             Put (combo, 550, 35);
             combo.Show ();
@@ -87,26 +87,26 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnUpdateTimer () {
-			if (card.IsNotEmpty ()) {            
-				var values = AquaPicDrivers.AnalogInput.GetAllChannelValues (card);
+            if (card.IsNotEmpty ()) {
+                var values = AquaPicDrivers.AnalogInput.GetAllChannelValues (card);
 
-				int i = 0;
-				foreach (var d in displays) {
-					d.currentValue = values[i];
-					d.QueueDraw ();
+                int i = 0;
+                foreach (var d in displays) {
+                    d.currentValue = values[i];
+                    d.QueueDraw ();
 
-					++i;
-				}
-			}
+                    ++i;
+                }
+            }
             return true;
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs args) {
             if (args.activeText != "New card...") {
                 card = args.activeText;
-				GetCardData ();
+                GetCardData ();
             } else {
-				var parent = Toplevel as Window;
+                var parent = Toplevel as Window;
                 if (parent != null) {
                     if (!parent.IsTopLevel)
                         parent = null;
@@ -116,19 +116,19 @@ namespace AquaPic.UserInterface
                 numberInput.Title = "Address";
 
                 numberInput.TextSetEvent += (o, a) => {
-					a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, AquaPicDrivers.AnalogInput);
+                    a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, AquaPicDrivers.AnalogInput);
 
-					if (a.keepText) {
-						combo.comboList.Insert (combo.comboList.Count - 1, card);
-						foreach (var display in displays) {
-							display.Visible = true;
-						}
-						combo.activeText = card;
-						combo.Visible = false;
-						combo.Visible = true;
-						sceneTitle = "Analog Inputs Cards";
-						GetCardData ();
-					}
+                    if (a.keepText) {
+                        combo.comboList.Insert (combo.comboList.Count - 1, card);
+                        foreach (var display in displays) {
+                            display.Visible = true;
+                        }
+                        combo.activeText = card;
+                        combo.Visible = false;
+                        combo.Visible = true;
+                        sceneTitle = "Analog Inputs Cards";
+                        GetCardData ();
+                    }
                 };
 
                 numberInput.Run ();
@@ -138,10 +138,10 @@ namespace AquaPic.UserInterface
             QueueDraw ();
         }
 
-		protected void OnGlobalSettingsRelease (object sender, ButtonReleaseEventArgs args) {
+        protected void OnGlobalSettingsRelease (object sender, ButtonReleaseEventArgs args) {
             if (card.IsNotEmpty ()) {
-				if (AquaPicDrivers.AnalogInput.CheckCardEmpty (card)) {
-					var parent = Toplevel as Window;
+                if (AquaPicDrivers.AnalogInput.CheckCardEmpty (card)) {
+                    var parent = Toplevel as Window;
                     if (parent != null) {
                         if (!parent.IsTopLevel)
                             parent = null;
@@ -151,30 +151,30 @@ namespace AquaPic.UserInterface
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {
-							var deleted = CardSettingsHelper.OnCardDeleteEvent (card, AquaPicDrivers.AnalogInput);
-							if (deleted) {
-								combo.comboList.Remove (card);
-								if (AquaPicDrivers.AnalogInput.cardCount == 0) {
+                            var deleted = CardSettingsHelper.OnCardDeleteEvent (card, AquaPicDrivers.AnalogInput);
+                            if (deleted) {
+                                combo.comboList.Remove (card);
+                                if (AquaPicDrivers.AnalogInput.cardCount == 0) {
                                     card = string.Empty;
                                     sceneTitle = "No Analog Input Cards Added";
                                     foreach (var display in displays) {
                                         display.Visible = false;
                                     }
                                     combo.activeIndex = -1;
-									settingsButton.buttonColor = "grey1";
+                                    settingsButton.buttonColor = "grey1";
                                 } else {
-									card = AquaPicDrivers.AnalogInput.firstCard;
+                                    card = AquaPicDrivers.AnalogInput.firstCard;
                                     combo.activeText = card;
                                     GetCardData ();
                                 }
                                 QueueDraw ();
-							}
+                            }
                         }
                     };
 
                     ms.Run ();
                     ms.Destroy ();
-				}
+                }
             }
         }
 
@@ -202,34 +202,34 @@ namespace AquaPic.UserInterface
             d.QueueDraw ();
         }
 
-		protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
+        protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
             var d = sender as AnalogChannelDisplay;
 
             var ic = IndividualControl.Empty;
             ic.Group = card;
             ic.Individual = AquaPicDrivers.AnalogInput.GetChannelIndex (card, d.label.text);
 
-			var parent = Toplevel as Window;
+            var parent = Toplevel as Window;
             if (parent != null) {
                 if (!parent.IsTopLevel)
                     parent = null;
             }
 
-			var numberInput = new TouchNumberInput (false, parent);
-			numberInput.Title = "LPF";
+            var numberInput = new TouchNumberInput (false, parent);
+            numberInput.Title = "LPF";
 
-			numberInput.TextSetEvent += (obj, a) => {
-				if (a.text.IsNotEmpty ()) {
-					try {
-						var lpf = Convert.ToInt32 (a.text);
-						AquaPicDrivers.AnalogInput.SetChannelLowPassFilterFactor (ic, lpf);
-						d.typeLabel.text = string.Format ("LPF: {0}", lpf);
-					} catch {
-						MessageBox.Show ("Invalid number format");
-					}
-				} else {
-					MessageBox.Show ("Low pass filter can't be empty");
-				}
+            numberInput.TextSetEvent += (obj, a) => {
+                if (a.text.IsNotEmpty ()) {
+                    try {
+                        var lpf = Convert.ToInt32 (a.text);
+                        AquaPicDrivers.AnalogInput.SetChannelLowPassFilterFactor (ic, lpf);
+                        d.typeLabel.text = string.Format ("LPF: {0}", lpf);
+                    } catch {
+                        MessageBox.Show ("Invalid number format");
+                    }
+                } else {
+                    MessageBox.Show ("Low pass filter can't be empty");
+                }
             };
 
             numberInput.Run ();
@@ -251,44 +251,44 @@ namespace AquaPic.UserInterface
                 AquaPicDrivers.AnalogInput.SetChannelValue (ic, value);
 
             d.QueueDraw ();
-        }      
+        }
 
         protected void GetCardData () {
-			if (card.IsNotEmpty ()) {
-				var names = AquaPicDrivers.AnalogInput.GetAllChannelNames (card);
-				var values = AquaPicDrivers.AnalogInput.GetAllChannelValues (card);
-				var modes = AquaPicDrivers.AnalogInput.GetAllChannelModes (card);
-				var factors = AquaPicDrivers.AnalogInput.GetAllChannelLowPassFilterFactors (card);
+            if (card.IsNotEmpty ()) {
+                var names = AquaPicDrivers.AnalogInput.GetAllChannelNames (card);
+                var values = AquaPicDrivers.AnalogInput.GetAllChannelValues (card);
+                var modes = AquaPicDrivers.AnalogInput.GetAllChannelModes (card);
+                var factors = AquaPicDrivers.AnalogInput.GetAllChannelLowPassFilterFactors (card);
 
-				int i = 0;
-				foreach (var d in displays) {
-					d.label.text = names[i];
-					d.currentValue = values[i];
-					d.typeLabel.text = string.Format ("LPF: {0}", factors[i]);
+                int i = 0;
+                foreach (var d in displays) {
+                    d.label.text = names[i];
+                    d.currentValue = values[i];
+                    d.typeLabel.text = string.Format ("LPF: {0}", factors[i]);
 
-					if (modes[i] == Mode.Auto) {
-						d.progressBar.enableTouch = false;
-						d.textBox.enableTouch = false;
-						d.forceButton.buttonColor = "grey4";
-					} else {
-						d.progressBar.enableTouch = true;
-						d.textBox.enableTouch = true;
-						d.forceButton.buttonColor = "pri";
-					}
+                    if (modes[i] == Mode.Auto) {
+                        d.progressBar.enableTouch = false;
+                        d.textBox.enableTouch = false;
+                        d.forceButton.buttonColor = "grey4";
+                    } else {
+                        d.progressBar.enableTouch = true;
+                        d.textBox.enableTouch = true;
+                        d.forceButton.buttonColor = "pri";
+                    }
 
-					d.QueueDraw ();
+                    d.QueueDraw ();
 
-					++i;
-				}
+                    ++i;
+                }
 
-				if (AquaPicDrivers.AnalogInput.CheckCardEmpty (card)) {
-					settingsButton.buttonColor = "compl";
-				} else {
-					settingsButton.buttonColor = "grey1";
-				}
-			} else {
-				settingsButton.buttonColor = "grey1";
-			}
+                if (AquaPicDrivers.AnalogInput.CheckCardEmpty (card)) {
+                    settingsButton.buttonColor = "compl";
+                } else {
+                    settingsButton.buttonColor = "grey1";
+                }
+            } else {
+                settingsButton.buttonColor = "grey1";
+            }
         }
     }
 }

@@ -67,9 +67,8 @@ namespace AquaPic.Sensors
             float zeroActual,
             float zeroValue,
             float fullScaleActual,
-            float fullScaleValue, 
-            string temperatureGroupName) 
-        {
+            float fullScaleValue,
+            string temperatureGroupName) {
             _name = name;
             _channel = channel;
             this.zeroActual = zeroActual;
@@ -90,7 +89,7 @@ namespace AquaPic.Sensors
             _channel = channel;
 
             if (_channel.IsNotEmpty ()) {
-				AquaPicDrivers.AnalogInput.AddChannel (_channel, string.Format ("{0}, Temperature Probe", name));
+                AquaPicDrivers.AnalogInput.AddChannel (_channel, string.Format ("{0}, Temperature Probe", name));
             }
         }
 
@@ -119,7 +118,7 @@ namespace AquaPic.Sensors
 
         public void SetName (string name) {
             _name = name;
-			AquaPicDrivers.AnalogInput.SetChannelName (_channel, string.Format ("{0}, Temperature Probe", name));
+            AquaPicDrivers.AnalogInput.SetChannelName (_channel, string.Format ("{0}, Temperature Probe", name));
         }
     }
 }

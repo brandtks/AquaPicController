@@ -66,10 +66,10 @@ namespace AquaPic.UserInterface
             selector = new TouchSelectorSwitch (2);
             selector.SetSizeRequest (120, 30);
             selector.sliderSize = MySliderSize.Large;
-            selector.textOptions [0] = "Open";
-            selector.textOptions [1] = "Closed";
-            selector.sliderColorOptions [0] = "grey2";
-            selector.sliderColorOptions [1] = "pri";
+            selector.textOptions[0] = "Open";
+            selector.textOptions[1] = "Closed";
+            selector.sliderColorOptions[0] = "grey2";
+            selector.sliderColorOptions[1] = "pri";
             selector.SelectorChangedEvent += OnSelectorChange;
             selector.Visible = false;
             Put (selector, 0, 90);

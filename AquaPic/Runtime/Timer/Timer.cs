@@ -54,7 +54,7 @@ namespace AquaPic.Runtime
         protected uint timerId;
 
         public event TimerElapsedHandler TimerElapsedEvent;
-        public uint timerInterval; 
+        public uint timerInterval;
         public bool autoReset;
 
         public Timer () : this (0) { }

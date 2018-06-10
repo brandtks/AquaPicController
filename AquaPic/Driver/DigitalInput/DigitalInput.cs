@@ -32,11 +32,11 @@ namespace AquaPic.Drivers
     {
         public static DigitalInputBase SharedDigitalInputInstance = new DigitalInputBase ();
 
-        protected DigitalInputBase () 
+        protected DigitalInputBase ()
             : base ("Digital Input") { }
 
         protected override void Run () {
-			foreach (var card in cards.Values) {
+            foreach (var card in cards.Values) {
                 card.GetAllValuesCommunication ();
             }
         }
@@ -45,13 +45,13 @@ namespace AquaPic.Drivers
             return new DigitalInputCard (cardName, address);
         }
 
-		public override string GetCardAcyronym () {
-			return "DI";
-		}
+        public override string GetCardAcyronym () {
+            return "DI";
+        }
 
-		public override CardType GetCardType () {
-			return CardType.DigitalInput; 
-		}
-	}
+        public override CardType GetCardType () {
+            return CardType.DigitalInput;
+        }
+    }
 }
 

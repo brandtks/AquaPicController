@@ -35,8 +35,7 @@ namespace AquaPic.UserInterface
         TouchLabel label;
 
         public WaterLevelWidget (params object[] options)
-            : base () 
-        {
+            : base () {
             text = "Water Level";
             unitOfMeasurement = UnitsOfMeasurement.Inches;
 
@@ -45,11 +44,11 @@ namespace AquaPic.UserInterface
             label.text = "Disconnected";
             label.WidthRequest = 199;
             label.textAlignment = TouchAlignment.Center;
-			label.textRender.orientation = TouchOrientation.Vertical;
+            label.textRender.orientation = TouchOrientation.Vertical;
             Put (label, 60, 9);
             label.Show ();
 
-			groupName = string.Empty;
+            groupName = string.Empty;
             if (options.Length >= 1) {
                 var groupNameOption = options[0] as string;
                 if (groupNameOption != null) {
@@ -59,8 +58,8 @@ namespace AquaPic.UserInterface
                 }
             }
 
-            if (groupName.IsNotEmpty ()) {            
-				text = groupName;
+            if (groupName.IsNotEmpty ()) {
+                text = groupName;
             }
 
             var eventbox = new EventBox ();
@@ -80,7 +79,7 @@ namespace AquaPic.UserInterface
         public override void OnUpdate () {
             if (groupName.IsNotEmpty ()) {
                 if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (groupName)) {
-					textBox.text = "--";
+                    textBox.text = "--";
                     label.Visible = true;
                 } else {
                     currentValue = WaterLevel.GetWaterLevelGroupLevel (groupName);

@@ -71,7 +71,7 @@ namespace AquaPic.UserInterface
 
             var sunRiseLabel = new TouchLabel ();
             sunRiseLabel.text = "Sunrise Today";
-            sunRiseLabel.textColor = "grey3"; 
+            sunRiseLabel.textColor = "grey3";
             sunRiseLabel.textAlignment = TouchAlignment.Center;
             sunRiseLabel.WidthRequest = 150;
             Put (sunRiseLabel, 60, 125);
@@ -80,7 +80,7 @@ namespace AquaPic.UserInterface
             var sunRise = new TouchLabel ();
             sunRise.text = Lighting.sunRiseToday.ToShortDateString ();
             sunRise.textAlignment = TouchAlignment.Center;
-			sunRise.textRender.textWrap = TouchTextWrap.Shrink;
+            sunRise.textRender.textWrap = TouchTextWrap.Shrink;
             sunRise.textSize = 20;
             sunRise.WidthRequest = 150;
             Put (sunRise, 60, 90);
@@ -88,7 +88,7 @@ namespace AquaPic.UserInterface
 
             var sunSetLabel = new TouchLabel ();
             sunSetLabel.text = "Sunset Today";
-            sunSetLabel.textColor = "grey3"; 
+            sunSetLabel.textColor = "grey3";
             sunSetLabel.textAlignment = TouchAlignment.Center;
             sunSetLabel.WidthRequest = 150;
             Put (sunSetLabel, 220, 125);
@@ -97,7 +97,7 @@ namespace AquaPic.UserInterface
             var sunSet = new TouchLabel ();
             sunSet.text = Lighting.sunSetToday.ToShortDateString ();
             sunSet.textAlignment = TouchAlignment.Center;
-			sunSet.textRender.textWrap = TouchTextWrap.Shrink;
+            sunSet.textRender.textWrap = TouchTextWrap.Shrink;
             sunSet.textSize = 20;
             sunSet.WidthRequest = 150;
             Put (sunSet, 220, 90);
@@ -105,7 +105,7 @@ namespace AquaPic.UserInterface
 
             var sunRiseTomorrowLabel = new TouchLabel ();
             sunRiseTomorrowLabel.text = "Sunrise Tomorrow";
-            sunRiseTomorrowLabel.textColor = "grey3"; 
+            sunRiseTomorrowLabel.textColor = "grey3";
             sunRiseTomorrowLabel.textAlignment = TouchAlignment.Center;
             sunRiseTomorrowLabel.WidthRequest = 150;
             Put (sunRiseTomorrowLabel, 60, 225);
@@ -114,7 +114,7 @@ namespace AquaPic.UserInterface
             var sunRiseTomorrow = new TouchLabel ();
             sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToShortDateString ();
             sunRiseTomorrow.textAlignment = TouchAlignment.Center;
-			sunRiseTomorrow.textRender.textWrap = TouchTextWrap.Shrink;
+            sunRiseTomorrow.textRender.textWrap = TouchTextWrap.Shrink;
             sunRiseTomorrow.textSize = 20;
             sunRiseTomorrow.WidthRequest = 150;
             Put (sunRiseTomorrow, 60, 190);
@@ -122,7 +122,7 @@ namespace AquaPic.UserInterface
 
             var sunSetTomorrowLabel = new TouchLabel ();
             sunSetTomorrowLabel.text = "Sunset Tomorrow";
-            sunSetTomorrowLabel.textColor = "grey3"; 
+            sunSetTomorrowLabel.textColor = "grey3";
             sunSetTomorrowLabel.textAlignment = TouchAlignment.Center;
             sunSetTomorrowLabel.WidthRequest = 150;
             Put (sunSetTomorrowLabel, 220, 225);
@@ -131,7 +131,7 @@ namespace AquaPic.UserInterface
             var sunSetTomorrow = new TouchLabel ();
             sunSetTomorrow.text = Lighting.sunSetTomorrow.ToShortDateString ();
             sunSetTomorrow.textAlignment = TouchAlignment.Center;
-			sunSetTomorrow.textRender.textWrap = TouchTextWrap.Shrink;
+            sunSetTomorrow.textRender.textWrap = TouchTextWrap.Shrink;
             sunSetTomorrow.textSize = 20;
             sunSetTomorrow.WidthRequest = 150;
             Put (sunSetTomorrow, 220, 190);
@@ -154,7 +154,7 @@ namespace AquaPic.UserInterface
             }
 
             if (options.Length >= 3) {
-                string requestedFixture = options [2] as string;
+                string requestedFixture = options[2] as string;
                 if (requestedFixture != null) {
                     if (Lighting.CheckFixtureKeyNoThrow (requestedFixture)) {
                         fixtureName = requestedFixture;
@@ -171,10 +171,10 @@ namespace AquaPic.UserInterface
             modeSelector = new TouchSelectorSwitch (2);
             modeSelector.SetSizeRequest (135, 30);
             modeSelector.sliderSize = MySliderSize.Large;
-            modeSelector.textOptions [0] = "Manual";
-            modeSelector.textOptions [1] = "Auto";
-            modeSelector.sliderColorOptions [0] = "grey2";
-            modeSelector.sliderColorOptions [1] = "pri";
+            modeSelector.textOptions[0] = "Manual";
+            modeSelector.textOptions[1] = "Auto";
+            modeSelector.sliderColorOptions[0] = "grey2";
+            modeSelector.sliderColorOptions[1] = "pri";
             modeSelector.SelectorChangedEvent += OnDimmingModeSelectorChanged;
             Put (modeSelector, 640, 145);
             modeSelector.Show ();
@@ -268,7 +268,7 @@ namespace AquaPic.UserInterface
             onTimeLabel = new TouchLabel ();
             onTimeLabel.WidthRequest = 185;
             onTimeLabel.text = "On Time";
-            onTimeLabel.textColor = "grey3"; 
+            onTimeLabel.textColor = "grey3";
             onTimeLabel.textAlignment = TouchAlignment.Center;
             Put (onTimeLabel, 415, 222);
             onTimeLabel.Show ();
@@ -297,7 +297,7 @@ namespace AquaPic.UserInterface
 
                 numberInput.TextSetEvent += (s, a) => {
                     try {
-						var t = Time.Parse (a.text);
+                        var t = Time.Parse (a.text);
 
                         bool timeOk = true;
                         if (t.Before (new Time ())) {
@@ -330,7 +330,7 @@ namespace AquaPic.UserInterface
             offTimeLabel = new TouchLabel ();
             offTimeLabel.WidthRequest = 185;
             offTimeLabel.text = "Off Time";
-            offTimeLabel.textColor = "grey3"; 
+            offTimeLabel.textColor = "grey3";
             offTimeLabel.textAlignment = TouchAlignment.Center;
             Put (offTimeLabel, 415, 285);
             offTimeLabel.Show ();
@@ -359,7 +359,7 @@ namespace AquaPic.UserInterface
 
                 numberInput.TextSetEvent += (s, a) => {
                     try {
-						var t = Time.Parse (a.text);
+                        var t = Time.Parse (a.text);
 
                         bool timeOk = true;
                         if (t.Before (new Time ())) {
@@ -420,18 +420,18 @@ namespace AquaPic.UserInterface
             outletSelectorSwitch.sliderSize = MySliderSize.Large;
             outletSelectorSwitch.WidthRequest = 185;
             outletSelectorSwitch.HeightRequest = 30;
-            outletSelectorSwitch.sliderColorOptions [0] = "grey2";
-            outletSelectorSwitch.sliderColorOptions [1] = "pri";
-            outletSelectorSwitch.sliderColorOptions [2] = "seca";
-            outletSelectorSwitch.textOptions = new string[] {"Off", "Auto", "On"};
+            outletSelectorSwitch.sliderColorOptions[0] = "grey2";
+            outletSelectorSwitch.sliderColorOptions[1] = "pri";
+            outletSelectorSwitch.sliderColorOptions[2] = "seca";
+            outletSelectorSwitch.textOptions = new string[] { "Off", "Auto", "On" };
             outletSelectorSwitch.SelectorChangedEvent += OnOutletControlSelectorChanged;
             Put (outletSelectorSwitch, 415, 145);
             outletSelectorSwitch.Show ();
 
             fixtureSettingBtn = new TouchButton ();
-			fixtureSettingBtn.text = Convert.ToChar (0x2699).ToString ();
+            fixtureSettingBtn.text = Convert.ToChar (0x2699).ToString ();
             fixtureSettingBtn.SetSizeRequest (30, 30);
-			fixtureSettingBtn.buttonColor = "grey4";
+            fixtureSettingBtn.buttonColor = "grey4";
             fixtureSettingBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new FixtureSettings (fixtureName, fixtureName.IsNotEmpty ());
                 s.Run ();
@@ -457,10 +457,10 @@ namespace AquaPic.UserInterface
                 combo.QueueDraw ();
                 GetFixtureData ();
             };
-			Put (fixtureSettingBtn, 755, 77);
+            Put (fixtureSettingBtn, 755, 77);
             fixtureSettingBtn.Show ();
-            
-			combo = new TouchComboBox (Lighting.GetAllFixtureNames ());
+
+            combo = new TouchComboBox (Lighting.GetAllFixtureNames ());
             combo.activeIndex = 0;
             combo.WidthRequest = 200;
             combo.comboList.Add ("New fixture...");
@@ -654,8 +654,8 @@ namespace AquaPic.UserInterface
                 }
 
                 return isDimmingFixture;
-            } 
-            
+            }
+
             return false;
         }
 

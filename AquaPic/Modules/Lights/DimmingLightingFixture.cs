@@ -43,10 +43,10 @@ namespace AquaPic.Modules
 
             public DimmingLightingFixture (
                 string name,
-                IndividualControl plug, 
+                IndividualControl plug,
                 Time onTime,
                 Time offTime,
-                IndividualControl channel, 
+                IndividualControl channel,
                 float minDimmingOutput,
                 float maxDimmingOutput,
                 AnalogType type,
@@ -54,10 +54,10 @@ namespace AquaPic.Modules
                 bool highTempLockout)
             : base (
                 name,
-                plug, 
+                plug,
                 onTime,
                 offTime,
-                lightingTime, 
+                lightingTime,
                 highTempLockout
             ) {
                 currentDimmingLevel = 0.0f;
@@ -83,10 +83,10 @@ namespace AquaPic.Modules
                     DateSpan now = DateSpan.Now;
 
                     autoDimmingLevel = Utils.CalcParabola (
-                        onTime, 
-                        offTime, 
-                        now, 
-                        minDimmingOutput, 
+                        onTime,
+                        offTime,
+                        now,
+                        minDimmingOutput,
                         maxDimmingOutput
                     );
 
@@ -94,11 +94,11 @@ namespace AquaPic.Modules
                         requestedDimmingLevel = autoDimmingLevel;
                     }
 
-                    currentDimmingLevel = rocl.RateOfChange(requestedDimmingLevel);
+                    currentDimmingLevel = rocl.RateOfChange (requestedDimmingLevel);
 
                     return currentDimmingLevel;
                 }
-                 
+
                 autoDimmingLevel = 0.0f;
                 requestedDimmingLevel = 0.0f;
                 currentDimmingLevel = 0.0f;

@@ -33,24 +33,24 @@ namespace AquaPic.SerialBus
         {
             public event StatusUpdateHandler OnStatusUpdate;
 
-			string _name;
-			public string slaveName {
-				get {
-					return _name;
-				}
-			}
+            string _name;
+            public string slaveName {
+                get {
+                    return _name;
+                }
+            }
 
-			byte _address;
-			public byte address {
+            byte _address;
+            public byte address {
                 get { return _address; }
             }
 
-			int _responeTime;
-			public int responeTime {
+            int _responeTime;
+            public int responeTime {
                 get { return _responeTime; }
             }
 
-			AquaPicBusStatus _status;
+            AquaPicBusStatus _status;
             public AquaPicBusStatus status {
                 get { return _status; }
             }
@@ -59,14 +59,14 @@ namespace AquaPic.SerialBus
             public int alarmIdx {
                 get { return _alarmIdx; }
             }
-            
+
             int[] timeQue;
             int queIdx;
 
             public Slave (int address, string name) {
-				if (!SlaveAddressOk ((byte)address))
+                if (!SlaveAddressOk ((byte)address))
                     throw new Exception ("Address already in use");
-                
+
                 _address = (byte)address;
                 _responeTime = 0;
                 timeQue = new int[10];
@@ -79,10 +79,10 @@ namespace AquaPic.SerialBus
                 _alarmIdx = Alarm.Subscribe (address.ToString () + " communication fault");
             }
 
-			public void RemoveSlave () {
-				slaves.Remove (this);
+            public void RemoveSlave () {
+                slaves.Remove (this);
             }
-         
+
             public void Read (byte func, int readSize, ResponseCallback callback, bool queueDuringPortClosed = false) {
                 QueueMessage (this, func, null, 0, readSize, callback, queueDuringPortClosed);
             }
@@ -118,10 +118,10 @@ namespace AquaPic.SerialBus
                     long sum = 0;
                     int sumCount = 0;
 
-                    timeQue [queIdx] = time;
+                    timeQue[queIdx] = time;
                     for (int i = 0; i < timeQue.Length; ++i) {
-                        if (timeQue [i] != 0) {
-                            sum += timeQue [i];
+                        if (timeQue[i] != 0) {
+                            sum += timeQue[i];
                             ++sumCount;
                         }
                     }

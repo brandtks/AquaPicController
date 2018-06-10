@@ -31,9 +31,9 @@ namespace AquaPic.Drivers
     {
         public static AnalogInputBase SharedAnalogInputInstance = new AnalogInputBase ();
 
-        protected AnalogInputBase () 
+        protected AnalogInputBase ()
             : base ("Analog Input") { }
-        
+
         protected override void Run () {
             foreach (var card in cards.Values) {
                 card.GetAllValuesCommunication ();
@@ -44,15 +44,15 @@ namespace AquaPic.Drivers
             return new AnalogInputCard (cardName, address);
         }
 
-		public override string GetCardAcyronym () {
+        public override string GetCardAcyronym () {
             return "AI";
         }
 
-		public override CardType GetCardType () {
-			return CardType.AnalogInput;
-		}
+        public override CardType GetCardType () {
+            return CardType.AnalogInput;
+        }
 
-		public int GetChannelLowPassFilterFactor (string channelName) {
+        public int GetChannelLowPassFilterFactor (string channelName) {
             IndividualControl channel = GetChannelIndividualControl (channelName);
             return GetChannelLowPassFilterFactor (channel);
         }
@@ -67,8 +67,8 @@ namespace AquaPic.Drivers
             return analogInputCard.GetChannelLowPassFilterFactor (channel);
         }
 
-		public int[] GetAllChannelLowPassFilterFactors (string card) {
-			CheckCardKey (card);
+        public int[] GetAllChannelLowPassFilterFactors (string card) {
+            CheckCardKey (card);
             var analogInputCard = cards[card] as AnalogInputCard;
             return analogInputCard.GetAllChannelLowPassFilterFactors ();
         }
@@ -83,7 +83,7 @@ namespace AquaPic.Drivers
         }
 
         public void SetChannelLowPassFilterFactor (string card, int channel, int lowPassFilterFactor) {
-			CheckCardKey (card);
+            CheckCardKey (card);
             var analogInputCard = cards[card] as AnalogInputCard;
             analogInputCard.SetChannelLowPassFilterFactor (channel, lowPassFilterFactor);
         }

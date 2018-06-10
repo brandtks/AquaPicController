@@ -29,43 +29,47 @@ namespace AquaPic.Drivers
     public delegate void ModeChangedHandler (object sender, ModeChangeEventArgs args);
     public delegate void StateChangeHandler (object sender, StateChangeEventArgs args);
 
-    public class ModeChangeEventArgs : EventArgs {
-		public int outletId;
-		public string powerStripName;
+    public class ModeChangeEventArgs : EventArgs
+    {
+        public int outletId;
+        public string powerStripName;
         public Mode mode;
 
-		public ModeChangeEventArgs (int outletId, string powerStripName, Mode mode) {
-			this.outletId = outletId;
-			this.powerStripName = powerStripName;
+        public ModeChangeEventArgs (int outletId, string powerStripName, Mode mode) {
+            this.outletId = outletId;
+            this.powerStripName = powerStripName;
             this.mode = mode;
         }
     }
 
-    public class StateChangeEventArgs : EventArgs {
-		public int outletId;
-		public string powerStripName;
+    public class StateChangeEventArgs : EventArgs
+    {
+        public int outletId;
+        public string powerStripName;
         public MyState state;
-        
-		public StateChangeEventArgs (int outletId, string powerStripName, MyState state) {
-			this.outletId = outletId;
-			this.powerStripName = powerStripName;
+
+        public StateChangeEventArgs (int outletId, string powerStripName, MyState state) {
+            this.outletId = outletId;
+            this.powerStripName = powerStripName;
             this.state = state;
         }
     }
 
-    public class ModeChangedObj {
+    public class ModeChangedObj
+    {
         public event ModeChangedHandler ModeChangedEvent;
 
         public void CallEvent (object sender, ModeChangeEventArgs args) {
-			ModeChangedEvent?.Invoke (sender, args);
+            ModeChangedEvent?.Invoke (sender, args);
         }
     }
 
-    public class StateChangedObj {
+    public class StateChangedObj
+    {
         public event StateChangeHandler StateChangedEvent;
 
         public void CallEvent (object sender, StateChangeEventArgs args) {
-			StateChangedEvent?.Invoke (sender, args);
+            StateChangedEvent?.Invoke (sender, args);
         }
     }
 }

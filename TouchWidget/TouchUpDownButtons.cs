@@ -24,7 +24,7 @@
 using System;
 using Gtk;
 
-namespace GoodtimeDevelopment.TouchWidget  
+namespace GoodtimeDevelopment.TouchWidget
 {
     public class TouchUpDownButtons : Fixed
     {

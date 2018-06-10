@@ -40,7 +40,7 @@ namespace AquaPic.UserInterface
         private TouchButton cancelButton;
 		private TouchButton deleteButton;
         private TouchComboBox widgetCombo;
-        private CheckerBoard board;
+        private TileBoard board;
         private SettingsTextBox rowTextBox;
         private SettingsTextBox columnTextBox;
         private TouchUpDownButtons rowUpDownBtn;
@@ -193,7 +193,7 @@ namespace AquaPic.UserInterface
 
             widgetCombo = new TouchComboBox ();
             widgets = new List<HomeSettingsWidget> ();
-            board = new CheckerBoard ();
+            board = new TileBoard ();
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "mainScreen.json");

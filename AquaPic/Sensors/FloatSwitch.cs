@@ -29,14 +29,16 @@ using AquaPic.Drivers;
 
 namespace AquaPic.Sensors
 {
-    public enum SwitchType {
-        [Description("Normally Opened")]
+    public enum SwitchType
+    {
+        [Description ("Normally Opened")]
         NormallyOpened,
-        [Description("Normally Closed")]
+        [Description ("Normally Closed")]
         NormallyClosed
     }
 
-    public enum SwitchFunction {
+    public enum SwitchFunction
+    {
         LowLevel,
         HighLevel,
         ATO,

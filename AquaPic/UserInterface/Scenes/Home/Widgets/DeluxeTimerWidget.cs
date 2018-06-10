@@ -48,11 +48,11 @@ namespace AquaPic.UserInterface
 
             timers = new IntervalTimer[3];
             for (int i = 0; i < timers.Length; ++i) {
-                timers [i] = IntervalTimer.GetTimer ("Timer " + name + " " + (i + 1).ToString ());
-                timers [i].TimerInterumEvent += OnTimerInterum;
-                timers [i].TimerElapsedEvent += OnTimerElapsed;
-                timers [i].TimerStartEvent += OnTimerStartStop;
-                timers [i].TimerStopEvent += OnTimerStartStop;
+                timers[i] = IntervalTimer.GetTimer ("Timer " + name + " " + (i + 1).ToString ());
+                timers[i].TimerInterumEvent += OnTimerInterum;
+                timers[i].TimerElapsedEvent += OnTimerElapsed;
+                timers[i].TimerStartEvent += OnTimerStartStop;
+                timers[i].TimerStopEvent += OnTimerStartStop;
             }
 
             var box2 = new TimerBackground (310, 139);
@@ -62,14 +62,14 @@ namespace AquaPic.UserInterface
 
             tabs = new TimerTab[3];
             for (int i = 2; i >= 0; --i) {
-                tabs [i] = new TimerTab (i);
-                tabs [i].text = "Timer " + (i + 1).ToString ();
-                tabs [i].ButtonReleaseEvent += OnTabButtonRelease;
-                Put (tabs [i], 90 * i, 0);
-                tabs [i].Show ();
+                tabs[i] = new TimerTab (i);
+                tabs[i].text = "Timer " + (i + 1).ToString ();
+                tabs[i].ButtonReleaseEvent += OnTabButtonRelease;
+                Put (tabs[i], 90 * i, 0);
+                tabs[i].Show ();
             }
 
-            tabs [0].selected = true;
+            tabs[0].selected = true;
 
             var minuteLabel = new TouchLabel ();
             minuteLabel.text = "Minutes";
@@ -171,10 +171,10 @@ namespace AquaPic.UserInterface
             resetButton.ButtonReleaseEvent += OnResetButtonRelease;
             Put (resetButton, 209, 113);
 
-            if (timers [timerIndex].enabled)
-                UpdateTime (timers [timerIndex].secondsRemaining, false);
+            if (timers[timerIndex].enabled)
+                UpdateTime (timers[timerIndex].secondsRemaining, false);
             else
-                UpdateTime (timers [timerIndex].totalSeconds, false);
+                UpdateTime (timers[timerIndex].totalSeconds, false);
         }
 
         public override void Dispose () {
@@ -190,25 +190,25 @@ namespace AquaPic.UserInterface
 
         protected void OnTimerInterum (object sender) {
             IntervalTimer timer = sender as IntervalTimer;
-            int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
+            int tIdx = Convert.ToInt32 (timer.name[timer.name.Length - 1].ToString ()) - 1;
             if (timerIndex == tIdx)
                 UpdateTime (timer.secondsRemaining, false);
         }
 
         protected void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
             IntervalTimer timer = sender as IntervalTimer;
-            int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
+            int tIdx = Convert.ToInt32 (timer.name[timer.name.Length - 1].ToString ()) - 1;
             if (timerIndex == tIdx)
-                UpdateTime (timers [timerIndex].totalSeconds);
+                UpdateTime (timers[timerIndex].totalSeconds);
 
             MessageBox.Show (timer.name);
         }
 
         protected void OnTimerStartStop (object sender) {
             IntervalTimer timer = sender as IntervalTimer;
-            int tIdx = Convert.ToInt32 (timer.name [timer.name.Length - 1].ToString ()) - 1;
+            int tIdx = Convert.ToInt32 (timer.name[timer.name.Length - 1].ToString ()) - 1;
             if (timerIndex == tIdx)
-                UpdateTime (timers [timerIndex].secondsRemaining, false);
+                UpdateTime (timers[timerIndex].secondsRemaining, false);
         }
 
         protected void OnStartStopButtonRelease (object sender, ButtonReleaseEventArgs args) {
@@ -223,12 +223,12 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnResetButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            if (timers [timerIndex].state != IntervalTimerState.Waiting) {
-                timers [timerIndex].Reset ();
+            if (timers[timerIndex].state != IntervalTimerState.Waiting) {
+                timers[timerIndex].Reset ();
             }
 
-            if (timers [timerIndex].secondsRemaining != timers [timerIndex].totalSeconds)
-                UpdateTime (timers [timerIndex].totalSeconds);
+            if (timers[timerIndex].secondsRemaining != timers[timerIndex].totalSeconds)
+                UpdateTime (timers[timerIndex].totalSeconds);
 
             UpdateScreen ();
         }
@@ -237,25 +237,25 @@ namespace AquaPic.UserInterface
             TimerTab b = sender as TimerTab;
             timerIndex = b.position;
 
-            if (timers [timerIndex].enabled)
-                UpdateTime (timers [timerIndex].secondsRemaining, false);
+            if (timers[timerIndex].enabled)
+                UpdateTime (timers[timerIndex].secondsRemaining, false);
             else
-                UpdateTime (timers [timerIndex].totalSeconds, false);
+                UpdateTime (timers[timerIndex].totalSeconds, false);
 
             foreach (var tab in tabs) {
-                
+
                 tab.selected = false;
             }
 
-            Remove (tabs [timerIndex]);
-            tabs [timerIndex].Destroy ();
-            tabs [timerIndex].Dispose ();
-            tabs [timerIndex] = new TimerTab (timerIndex);
-            tabs [timerIndex].text = "Timer " + (timerIndex + 1).ToString ();
-            tabs [timerIndex].ButtonReleaseEvent += OnTabButtonRelease;
-            Put (tabs [timerIndex], 90 * timerIndex, 0);
-            tabs [timerIndex].Show ();
-            tabs [timerIndex].selected = true;
+            Remove (tabs[timerIndex]);
+            tabs[timerIndex].Destroy ();
+            tabs[timerIndex].Dispose ();
+            tabs[timerIndex] = new TimerTab (timerIndex);
+            tabs[timerIndex].text = "Timer " + (timerIndex + 1).ToString ();
+            tabs[timerIndex].ButtonReleaseEvent += OnTabButtonRelease;
+            Put (tabs[timerIndex], 90 * timerIndex, 0);
+            tabs[timerIndex].Show ();
+            tabs[timerIndex].selected = true;
         }
 
         protected void UpdateTime (uint time, bool changeTimerTime = true) {
@@ -265,26 +265,26 @@ namespace AquaPic.UserInterface
             seconds.QueueDraw ();
 
             if (changeTimerTime) {
-                timers [timerIndex].totalSeconds = time;
+                timers[timerIndex].totalSeconds = time;
             }
 
             UpdateScreen ();
         }
 
         protected void UpdateScreen () {
-            if (timers [timerIndex].state == IntervalTimerState.Waiting)
+            if (timers[timerIndex].state == IntervalTimerState.Waiting)
                 resetButton.buttonColor = "grey1";
             else
                 resetButton.buttonColor = "pri";
 
-            if (timers [timerIndex].enabled) {
+            if (timers[timerIndex].enabled) {
                 startStopButton.text = "Stop";
                 startStopButton.buttonColor = "pri";
             } else {
                 startStopButton.text = "Start";
                 startStopButton.buttonColor = "seca";
 
-                if (timers [timerIndex].totalSeconds == 0)
+                if (timers[timerIndex].totalSeconds == 0)
                     secUpDown.down.buttonColor = "grey1";
                 else
                     secUpDown.down.buttonColor = "pri";

@@ -39,15 +39,15 @@ namespace AquaPic.UserInterface
         TouchLabel levelLabel;
         TouchComboBox groupCombo;
 
-		string atoGroupName;
-		TouchLabel atoStateTextBox;
+        string atoGroupName;
+        TouchLabel atoStateTextBox;
         TouchButton atoClearFailBtn;
-		TouchComboBox atoGroupCombo;
+        TouchComboBox atoGroupCombo;
 
         string analogSensorName;
-		TouchLabel analogSensorLevelTextBox;
-		TouchLabel analogSensorLevelLabel;
-		TouchComboBox analogSensorCombo;
+        TouchLabel analogSensorLevelTextBox;
+        TouchLabel analogSensorLevelLabel;
+        TouchComboBox analogSensorCombo;
 
         string switchName;
         TouchLabel switchStateTextBox;
@@ -79,21 +79,21 @@ namespace AquaPic.UserInterface
             label.text = "Level";
             label.textColor = "grey3";
             label.textAlignment = TouchAlignment.Center;
-			Put (label, 60, 155);
+            Put (label, 60, 155);
             label.Show ();
 
             levelLabel = new TouchLabel ();
-			levelLabel.WidthRequest = 329;
+            levelLabel.WidthRequest = 329;
             levelLabel.textSize = 20;
             levelLabel.textAlignment = TouchAlignment.Center;
             levelLabel.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-			Put (levelLabel, 60, 120);
+            Put (levelLabel, 60, 120);
             levelLabel.Show ();
 
             var globalSettingsBtn = new TouchButton ();
-			globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
-			globalSettingsBtn.SetSizeRequest (30, 30);
-			globalSettingsBtn.buttonColor = "grey4";
+            globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
+            globalSettingsBtn.SetSizeRequest (30, 30);
+            globalSettingsBtn.buttonColor = "grey4";
             globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new WaterGroupSettings (groupName, groupName.IsNotEmpty ());
                 s.Run ();
@@ -114,42 +114,42 @@ namespace AquaPic.UserInterface
                 groupCombo.QueueDraw ();
                 GetGroupData ();
             };
-			Put (globalSettingsBtn, 358, 77);
+            Put (globalSettingsBtn, 358, 77);
             globalSettingsBtn.Show ();
 
-			/******************************************************************************************************/
+            /******************************************************************************************************/
             /* ATO Groups                                                                                         */
             /******************************************************************************************************/
-			atoGroupName = AutoTopOff.firstAtoGroup;
+            atoGroupName = AutoTopOff.firstAtoGroup;
 
-			label = new TouchLabel ();
+            label = new TouchLabel ();
             label.text = "ATO";
             label.textColor = "seca";
             label.textSize = 12;
-			Put (label, 37, 280);
+            Put (label, 37, 280);
             label.Show ();
 
             atoStateTextBox = new TouchLabel ();
             atoStateTextBox.WidthRequest = 329;
             atoStateTextBox.textSize = 20;
             atoStateTextBox.textAlignment = TouchAlignment.Center;
-			Put (atoStateTextBox, 60, 320);
+            Put (atoStateTextBox, 60, 320);
             atoStateTextBox.Show ();
 
             var atoSettingsBtn = new TouchButton ();
-			atoSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
-			atoSettingsBtn.SetSizeRequest (30, 30);
-			atoSettingsBtn.buttonColor = "grey4";
+            atoSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
+            atoSettingsBtn.SetSizeRequest (30, 30);
+            atoSettingsBtn.buttonColor = "grey4";
             atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new AtoSettings (atoGroupName, atoGroupName.IsNotEmpty ());
                 s.Run ();
-				var newAtoGroupName = s.atoGroupName;
+                var newAtoGroupName = s.atoGroupName;
                 var outcome = s.outcome;
                 s.Destroy ();
                 s.Dispose ();
 
-				if ((outcome == TouchSettingsOutcome.Modified) && (newAtoGroupName != groupName)) {
-					var index = atoGroupCombo.comboList.IndexOf (groupName);
+                if ((outcome == TouchSettingsOutcome.Modified) && (newAtoGroupName != groupName)) {
+                    var index = atoGroupCombo.comboList.IndexOf (groupName);
                     atoGroupCombo.comboList[index] = newAtoGroupName;
                     atoGroupName = newAtoGroupName;
                 } else if (outcome == TouchSettingsOutcome.Added) {
@@ -158,12 +158,12 @@ namespace AquaPic.UserInterface
                     atoGroupName = newAtoGroupName;
                 } else if (outcome == TouchSettingsOutcome.Deleted) {
                     atoGroupCombo.comboList.Remove (atoGroupName);
-					atoGroupName = AutoTopOff.firstAtoGroup;
-					if (atoGroupName.IsNotEmpty ()) {
-						atoGroupCombo.activeText = atoGroupName;
-					} else {
-						atoGroupCombo.activeIndex = -1;
-					}
+                    atoGroupName = AutoTopOff.firstAtoGroup;
+                    if (atoGroupName.IsNotEmpty ()) {
+                        atoGroupCombo.activeText = atoGroupName;
+                    } else {
+                        atoGroupCombo.activeIndex = -1;
+                    }
                 }
 
                 atoGroupCombo.QueueDraw ();
@@ -196,13 +196,13 @@ namespace AquaPic.UserInterface
             Put (label, 415, 80);
             label.Show ();
 
-			analogSensorLevelLabel = new TouchLabel ();
-			analogSensorLevelLabel.WidthRequest = 370;
-			analogSensorLevelLabel.text = "Water Level";
-			analogSensorLevelLabel.textColor = "grey3";
-			analogSensorLevelLabel.textAlignment = TouchAlignment.Center;
-			Put (analogSensorLevelLabel, 415, 155);
-			analogSensorLevelLabel.Show ();
+            analogSensorLevelLabel = new TouchLabel ();
+            analogSensorLevelLabel.WidthRequest = 370;
+            analogSensorLevelLabel.text = "Water Level";
+            analogSensorLevelLabel.textColor = "grey3";
+            analogSensorLevelLabel.textAlignment = TouchAlignment.Center;
+            Put (analogSensorLevelLabel, 415, 155);
+            analogSensorLevelLabel.Show ();
 
             analogSensorLevelTextBox = new TouchLabel ();
             analogSensorLevelTextBox.WidthRequest = 370;
@@ -211,9 +211,9 @@ namespace AquaPic.UserInterface
             Put (analogSensorLevelTextBox, 415, 120);
 
             var settingsBtn = new TouchButton ();
-			settingsBtn.text = Convert.ToChar (0x2699).ToString ();
-			settingsBtn.SetSizeRequest (30, 30);
-			settingsBtn.buttonColor = "grey4";
+            settingsBtn.text = Convert.ToChar (0x2699).ToString ();
+            settingsBtn.SetSizeRequest (30, 30);
+            settingsBtn.buttonColor = "grey4";
             settingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new AnalogSensorSettings (analogSensorName, analogSensorName.IsNotEmpty ());
                 s.Run ();
@@ -233,11 +233,11 @@ namespace AquaPic.UserInterface
                 } else if (outcome == TouchSettingsOutcome.Deleted) {
                     analogSensorCombo.comboList.Remove (analogSensorName);
                     analogSensorName = WaterLevel.firstAnalogLevelSensor;
-					if (analogSensorName.IsNotEmpty ()) {
-						analogSensorCombo.activeText = analogSensorName;
-					} else {
-						analogSensorCombo.activeIndex = -1;
-					}
+                    if (analogSensorName.IsNotEmpty ()) {
+                        analogSensorCombo.activeText = analogSensorName;
+                    } else {
+                        analogSensorCombo.activeIndex = -1;
+                    }
                 }
 
                 analogSensorCombo.QueueDraw ();
@@ -261,7 +261,7 @@ namespace AquaPic.UserInterface
 
                     cal.CalibrationCompleteEvent += (aa) => {
                         WaterLevel.SetCalibrationData (
-                            analogSensorName, 
+                            analogSensorName,
                             (float)aa.zeroValue,
                             (float)aa.fullScaleActual,
                             (float)aa.fullScaleValue);
@@ -269,7 +269,7 @@ namespace AquaPic.UserInterface
 
                     cal.calArgs.zeroValue = WaterLevel.GetAnalogLevelSensorZeroScaleValue (analogSensorName);
                     cal.calArgs.fullScaleActual = WaterLevel.GetAnalogLevelSensorFullScaleActual (analogSensorName);
-                    cal.calArgs.fullScaleValue =WaterLevel.GetAnalogLevelSensorFullScaleValue (analogSensorName);
+                    cal.calArgs.fullScaleValue = WaterLevel.GetAnalogLevelSensorFullScaleValue (analogSensorName);
 
                     cal.Run ();
                     cal.Destroy ();
@@ -317,9 +317,9 @@ namespace AquaPic.UserInterface
             switchTypeLabel.Show ();
 
             var switchSetupBtn = new TouchButton ();
-			switchSetupBtn.text = Convert.ToChar (0x2699).ToString ();
-			switchSetupBtn.SetSizeRequest (30, 30);
-			switchSetupBtn.buttonColor = "grey4";
+            switchSetupBtn.text = Convert.ToChar (0x2699).ToString ();
+            switchSetupBtn.SetSizeRequest (30, 30);
+            switchSetupBtn.buttonColor = "grey4";
             switchSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new SwitchSettings (switchName, switchName.IsNotEmpty ());
                 s.Run ();
@@ -339,11 +339,11 @@ namespace AquaPic.UserInterface
                 } else if (outcome == TouchSettingsOutcome.Deleted) {
                     switchCombo.comboList.Remove (switchName);
                     switchName = WaterLevel.firstFloatSwitch;
-					if (switchName.IsNotEmpty ()) {
-						switchCombo.activeText = switchName;
-					} else {
-						switchCombo.activeIndex = -1;
-					}
+                    if (switchName.IsNotEmpty ()) {
+                        switchCombo.activeText = switchName;
+                    } else {
+                        switchCombo.activeIndex = -1;
+                    }
                 }
 
                 switchCombo.QueueDraw ();
@@ -364,7 +364,7 @@ namespace AquaPic.UserInterface
             Put (groupCombo, 153, 77);
             groupCombo.Show ();
 
-			atoGroupCombo = new TouchComboBox (AutoTopOff.GetAllAtoGroupNames ());
+            atoGroupCombo = new TouchComboBox (AutoTopOff.GetAllAtoGroupNames ());
             if (atoGroupName.IsNotEmpty ()) {
                 atoGroupCombo.activeText = atoGroupName;
             } else {
@@ -372,8 +372,8 @@ namespace AquaPic.UserInterface
             }
             atoGroupCombo.WidthRequest = 200;
             atoGroupCombo.comboList.Add ("New ATO...");
-			atoGroupCombo.ComboChangedEvent += OnAtoGroupComboChanged;
-			Put (atoGroupCombo, 153, 277);
+            atoGroupCombo.ComboChangedEvent += OnAtoGroupComboChanged;
+            Put (atoGroupCombo, 153, 277);
             atoGroupCombo.Show ();
 
             analogSensorCombo = new TouchComboBox (WaterLevel.GetAllAnalogLevelSensors ());
@@ -401,7 +401,7 @@ namespace AquaPic.UserInterface
             switchCombo.Show ();
 
             GetGroupData ();
-			GetAtoGroupData ();
+            GetAtoGroupData ();
             GetAnalogSensorData ();
             GetSwitchData ();
 
@@ -418,7 +418,7 @@ namespace AquaPic.UserInterface
                 cr.ClosePath ();
                 cr.Stroke ();
 
-				cr.MoveTo (40, 267.5);
+                cr.MoveTo (40, 267.5);
                 cr.LineTo (387.5, 267.5);
                 cr.ClosePath ();
                 cr.Stroke ();
@@ -431,8 +431,8 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnUpdateTimer () {
-			GetGroupData ();
-			GetAtoGroupData ();
+            GetGroupData ();
+            GetAtoGroupData ();
             GetAnalogSensorData ();
             GetSwitchData ();
             return true;
@@ -461,7 +461,7 @@ namespace AquaPic.UserInterface
             GetGroupData ();
         }
 
-		protected void OnAtoGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
+        protected void OnAtoGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New ATO...") {
                 var s = new AtoSettings (string.Empty, false);
                 s.Run ();
@@ -480,7 +480,7 @@ namespace AquaPic.UserInterface
             } else {
                 atoGroupName = e.activeText;
             }
-            GetAtoGroupData ();         
+            GetAtoGroupData ();
         }
 
         protected void OnAnalogSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
@@ -537,7 +537,7 @@ namespace AquaPic.UserInterface
             levelLabel.QueueDraw ();
         }
 
-		protected void GetAtoGroupData () {
+        protected void GetAtoGroupData () {
             if (atoGroupName.IsNotEmpty ()) {
                 if (AutoTopOff.GetAtoGroupEnable (atoGroupName)) {
                     atoStateTextBox.text = string.Format ("{0} : {1}",
@@ -569,16 +569,16 @@ namespace AquaPic.UserInterface
                 if (wl < 0.0f) {
                     analogSensorLevelTextBox.text = "Probe Disconnected";
                     analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-					analogSensorLevelLabel.Visible = true;
+                    analogSensorLevelLabel.Visible = true;
                 } else {
                     analogSensorLevelTextBox.text = wl.ToString ("F2");
                     analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-					analogSensorLevelLabel.Visible = false;
+                    analogSensorLevelLabel.Visible = false;
                 }
             } else {
-				analogSensorLevelTextBox.text = "Probe not available";
+                analogSensorLevelTextBox.text = "Probe not available";
                 analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-				analogSensorLevelLabel.Visible = false;
+                analogSensorLevelLabel.Visible = false;
             }
 
             analogSensorLevelTextBox.QueueDraw ();

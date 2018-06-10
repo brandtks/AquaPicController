@@ -42,8 +42,7 @@ namespace AquaPic.UserInterface
         }
 
         public ProbeSettings (string name, bool includeDelete)
-            : base (name, includeDelete) 
-        {
+            : base (name, includeDelete) {
             probeName = name;
 
             var t = new SettingsTextBox ("Name");
@@ -87,7 +86,7 @@ namespace AquaPic.UserInterface
 
         protected void ParseChannnel (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-			g = s.Substring (0, idx);
+            g = s.Substring (0, idx);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
@@ -97,7 +96,7 @@ namespace AquaPic.UserInterface
             var ic = IndividualControl.Empty;
             var temperatureGroupName = (string)settings["Temperature Group"].setting;
 
-			var jo = SettingsHelper.OpenSettingsFile ("tempProperties") as JObject;
+            var jo = SettingsHelper.OpenSettingsFile ("tempProperties") as JObject;
             var ja = jo["temperatureProbes"] as JArray;
 
             if (probeName.IsEmpty ()) {
@@ -119,10 +118,10 @@ namespace AquaPic.UserInterface
                 ParseChannnel (unparseChannelString, ref ic.Group, ref ic.Individual);
 
                 Temperature.AddTemperatureProbe (
-                    name, 
+                    name,
                     ic,
-                    32.0f, 
-                    0.0f, 
+                    32.0f,
+                    0.0f,
                     100.0f,
                     4095.0f,
                     temperatureGroupName);
@@ -174,7 +173,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-			var jo = SettingsHelper.OpenSettingsFile ("tempProperties") as JObject;
+            var jo = SettingsHelper.OpenSettingsFile ("tempProperties") as JObject;
             var ja = jo["temperatureProbes"] as JArray;
 
             int arrayIndex = SettingsHelper.FindSettingsInArray (ja, probeName);

@@ -30,15 +30,15 @@ namespace AquaPic.Modules
 {
     public partial class Temperature
     {
-        private class Heater 
+        private class Heater
         {
             public string name;
             public IndividualControl plug;
             public string temperatureGroupName;
 
-			public Heater (string name, IndividualControl plug, string temperatureGroupName) {
+            public Heater (string name, IndividualControl plug, string temperatureGroupName) {
                 this.name = name;
-				this.plug = plug;
+                this.plug = plug;
                 this.temperatureGroupName = temperatureGroupName;
                 var plugControl = Power.AddOutlet (plug, name, MyState.On, "Temperature");
                 plugControl.ConditionGetter = OnPlugControl;
@@ -58,7 +58,7 @@ namespace AquaPic.Modules
 
             public bool CheckTemperature () {
                 if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
-                    var deadband =  temperatureGroups[temperatureGroupName].temperatureDeadband / 2;
+                    var deadband = temperatureGroups[temperatureGroupName].temperatureDeadband / 2;
                     var temp = temperatureGroups[temperatureGroupName].temperatureSetpoint + deadband;
                     if (temperatureGroups[temperatureGroupName].temperature >= temp)
                         return false;

@@ -56,7 +56,7 @@ namespace AquaPic.Globals
         Nighttime
     }
 
-    public static class Globals 
+    public static class Globals
     {
         public static MyState ToMyState (this bool value) {
             if (value) {

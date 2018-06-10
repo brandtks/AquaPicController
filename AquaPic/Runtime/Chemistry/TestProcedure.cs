@@ -33,8 +33,6 @@ namespace AquaPic.Runtime
     {
         public bool InProcedure {
             get {
-                //Console.WriteLine ("Is -1: {0}", _currentStep == -1);
-                //Console.WriteLine ("Is array length: {0}", _currentStep == (procedure.Length - 1));
                 return ((_currentStep == -1) || (_currentStep == procedure.Length));
             }
         }
@@ -86,21 +84,21 @@ namespace AquaPic.Runtime
             _name = (string)jo["Testing"];
 
             try {
-                JObject jpoints = (JObject)jo ["Points"];
-                double x1 = Convert.ToDouble ((string)jpoints ["Titration1"]);
-                double y1 = Convert.ToDouble ((string)jpoints ["Value1"]);
-                double x2 = Convert.ToDouble ((string)jpoints ["Titration2"]);
-                double y2 = Convert.ToDouble ((string)jpoints ["Value2"]);
+                JObject jpoints = (JObject)jo["Points"];
+                double x1 = Convert.ToDouble ((string)jpoints["Titration1"]);
+                double y1 = Convert.ToDouble ((string)jpoints["Value1"]);
+                double x2 = Convert.ToDouble ((string)jpoints["Titration2"]);
+                double y2 = Convert.ToDouble ((string)jpoints["Value2"]);
 
                 slope = (y2 - y1) / (x2 - x1);
                 intercept = y1 - slope * x1;
 
-                _unit = (string)jo ["Units"];
+                _unit = (string)jo["Units"];
 
-                JArray ja = (JArray)jo ["Procedure"];
+                JArray ja = (JArray)jo["Procedure"];
                 procedure = new string[ja.Count];
                 for (int i = 0; i < ja.Count; ++i) {
-                    procedure [i] = (string)ja [i];
+                    procedure[i] = (string)ja[i];
                 }
             } catch {
                 throw new Exception ("Error while parsing json");
@@ -116,9 +114,9 @@ namespace AquaPic.Runtime
         public bool GetNextStep (out string step, out string action) {
             if (_currentStep < (procedure.Length - 1)) {
                 ++_currentStep;
-                int start = procedure [_currentStep].IndexOf ('{');
-                step = procedure [_currentStep].Substring (0, start - 1);
-                action = procedure [_currentStep].Substring (start + 1, procedure [_currentStep].Length - 2 - start);
+                int start = procedure[_currentStep].IndexOf ('{');
+                step = procedure[_currentStep].Substring (0, start - 1);
+                action = procedure[_currentStep].Substring (start + 1, procedure[_currentStep].Length - 2 - start);
             } else if (_currentStep == (procedure.Length - 1)) {
                 _currentStep = procedure.Length;
                 // Yes future self, this is ugly and hacky.

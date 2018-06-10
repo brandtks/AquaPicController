@@ -82,8 +82,8 @@ namespace GoodtimeDevelopment.TouchWidget
                     break;
                 }
             }
-           
-            l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + t + "</span>"); 
+
+            l.SetMarkup ("<span color=\"" + font.color.ToHTML () + "\">" + t + "</span>");
 
             if (orientation == TouchOrientation.Horizontal) {
                 if (textWrap == TouchTextWrap.WordWrap) {
@@ -101,7 +101,7 @@ namespace GoodtimeDevelopment.TouchWidget
                 string displayedText = t;
                 if ((l.LineCount > 1) && (textWrap == TouchTextWrap.None)) {
                     Pango.LayoutLine[] ll = l.Lines;
-                    displayedText = t.Substring (0, ll [1].StartIndex - 1);
+                    displayedText = t.Substring (0, ll[1].StartIndex - 1);
                     int lastSpace = displayedText.LastIndexOf (' ');
                     if (lastSpace != -1)
                         displayedText = displayedText.Substring (0, lastSpace);
@@ -138,7 +138,7 @@ namespace GoodtimeDevelopment.TouchWidget
 
             } else {
                 var matrix = Pango.Matrix.Identity;
-                matrix.Rotate(270);
+                matrix.Rotate (270);
                 l.Context.Matrix = matrix;
             }
 

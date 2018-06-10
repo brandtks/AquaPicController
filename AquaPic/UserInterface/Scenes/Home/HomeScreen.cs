@@ -166,7 +166,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnUpdateTimer () {
-            Update();
+            Update ();
             return true;
         }
 
@@ -175,12 +175,12 @@ namespace AquaPic.UserInterface
                 lp.OnUpdate ();
                 lp.QueueDraw ();
             }
-            
+
             foreach (var bp in barPlots) {
                 bp.OnUpdate ();
                 bp.QueueDraw ();
             }
-            
+
             foreach (var curvedBarPlot in curvedBarPlots) {
                 curvedBarPlot.OnUpdate ();
                 curvedBarPlot.QueueDraw ();

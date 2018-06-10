@@ -36,52 +36,52 @@ namespace AquaPic.UserInterface
         PowerOutletSlider[] selectors;
         string powerStripName;
         TouchComboBox combo;
-		TouchButton settingsButton;
-		PowerWindowGraphics graphics;
+        TouchButton settingsButton;
+        PowerWindowGraphics graphics;
 
-		public PowerWindow (params object[] options) : base () {         
-			powerStripName = Power.firstPowerStrip;
-			if (powerStripName.IsNotEmpty ()) {
-				sceneTitle = "Power Strip";
-			} else {
-				sceneTitle = "No Power Strips Added";
-			}
+        public PowerWindow (params object[] options) : base () {
+            powerStripName = Power.firstPowerStrip;
+            if (powerStripName.IsNotEmpty ()) {
+                sceneTitle = "Power Strip";
+            } else {
+                sceneTitle = "No Power Strips Added";
+            }
 
-			graphics = new PowerWindowGraphics ();
-			Put (graphics, 50, 80);
-			if (powerStripName.IsNotEmpty ()) {
-				graphics.Show ();
-			} else {
-				graphics.Visible = false;
-			}
+            graphics = new PowerWindowGraphics ();
+            Put (graphics, 50, 80);
+            if (powerStripName.IsNotEmpty ()) {
+                graphics.Show ();
+            } else {
+                graphics.Visible = false;
+            }
 
-			int x, y;
-			selectors = new PowerOutletSlider[8];
-			for (int i = 0; i < 8; ++i) {
+            int x, y;
+            selectors = new PowerOutletSlider[8];
+            for (int i = 0; i < 8; ++i) {
                 selectors[i] = new PowerOutletSlider (i);
                 selectors[i].ss.SelectorChangedEvent += OnSelectorChanged;
 
                 int idx = i;
                 selectors[i].UpdateScreen = () => {
-					if (powerStripName.IsNotEmpty ()) {
-						var ic = IndividualControl.Empty;
-						ic.Group = powerStripName;
-						ic.Individual = idx;
-						selectors[idx].outletName.text = Power.GetOutletName (ic);
-						Mode mode = Power.GetOutletMode (ic);
-						MyState state = Power.GetOutletState (ic);
-						if (mode == Mode.Auto) {
-							selectors[idx].ss.currentSelected = 1;
-						} else { // mode is manual
-							if (state == MyState.On) {
-								selectors[idx].ss.currentSelected = 2;
-							} else {
-								selectors[idx].ss.currentSelected = 0;
-							}
-						}
+                    if (powerStripName.IsNotEmpty ()) {
+                        var ic = IndividualControl.Empty;
+                        ic.Group = powerStripName;
+                        ic.Individual = idx;
+                        selectors[idx].outletName.text = Power.GetOutletName (ic);
+                        Mode mode = Power.GetOutletMode (ic);
+                        MyState state = Power.GetOutletState (ic);
+                        if (mode == Mode.Auto) {
+                            selectors[idx].ss.currentSelected = 1;
+                        } else { // mode is manual
+                            if (state == MyState.On) {
+                                selectors[idx].ss.currentSelected = 2;
+                            } else {
+                                selectors[idx].ss.currentSelected = 0;
+                            }
+                        }
 
-						selectors[idx].QueueDraw ();
-					}
+                        selectors[idx].QueueDraw ();
+                    }
                 };
 
                 if ((i % 2) == 0) { // even numbers top row
@@ -93,18 +93,18 @@ namespace AquaPic.UserInterface
                 }
                 Put (selectors[i], x, y);
 
-				if (powerStripName.IsNotEmpty ()) {
-					selectors[i].Show ();
-					var ic = IndividualControl.Empty;
-					ic.Group = powerStripName;
-					ic.Individual = i;
-					Power.AddHandlerOnStateChange (ic, PlugStateChange);
-				} else {
-					selectors[i].Visible = false;
-				}
+                if (powerStripName.IsNotEmpty ()) {
+                    selectors[i].Show ();
+                    var ic = IndividualControl.Empty;
+                    ic.Group = powerStripName;
+                    ic.Individual = i;
+                    Power.AddHandlerOnStateChange (ic, PlugStateChange);
+                } else {
+                    selectors[i].Visible = false;
+                }
             }
 
-			settingsButton = new TouchButton ();
+            settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
             settingsButton.buttonColor = "grey4";
             settingsButton.text = Convert.ToChar (0x2699).ToString ();
@@ -112,125 +112,125 @@ namespace AquaPic.UserInterface
             Put (settingsButton, 755, 35);
             settingsButton.Show ();
 
-			combo = new TouchComboBox (Power.GetAllPowerStripNames ());
-			combo.comboList.Add ("New power strip...");
-			combo.activeText = powerStripName;
-			combo.WidthRequest = 200;
+            combo = new TouchComboBox (Power.GetAllPowerStripNames ());
+            combo.comboList.Add ("New power strip...");
+            combo.activeText = powerStripName;
+            combo.WidthRequest = 200;
             combo.ComboChangedEvent += OnComboChanged;
             Put (combo, 550, 35);
-            combo.Show ();         
+            combo.Show ();
 
-			GetPowerData ();
-         
-			Show ();
+            GetPowerData ();
+
+            Show ();
         }
 
-		protected void OnComboChanged (object sender, ComboBoxChangedEventArgs args) {
-			if (args.activeText != "New power strip...") {
-				var ic = IndividualControl.Empty;
-				ic.Group = powerStripName; 
-				for (int i = 0; i < selectors.Length; ++i) {
-					ic.Individual = i;
-					Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
-				}
+        protected void OnComboChanged (object sender, ComboBoxChangedEventArgs args) {
+            if (args.activeText != "New power strip...") {
+                var ic = IndividualControl.Empty;
+                ic.Group = powerStripName;
+                for (int i = 0; i < selectors.Length; ++i) {
+                    ic.Individual = i;
+                    Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
+                }
 
-				powerStripName = args.activeText;
-				GetPowerData ();
+                powerStripName = args.activeText;
+                GetPowerData ();
 
-				ic.Group = powerStripName;
-				for (int i = 0; i < selectors.Length; ++i) {
-					ic.Individual = i;
-					Power.AddHandlerOnStateChange (ic, PlugStateChange);
-				}
-   			} else {
-				var s = new PowerSettings (string.Empty);
+                ic.Group = powerStripName;
+                for (int i = 0; i < selectors.Length; ++i) {
+                    ic.Individual = i;
+                    Power.AddHandlerOnStateChange (ic, PlugStateChange);
+                }
+            } else {
+                var s = new PowerSettings (string.Empty);
                 s.Run ();
 
-				if (s.outcome == TouchSettingsOutcome.Added) {
-					powerStripName = s.newPowerStripName;
-					combo.comboList.Insert (combo.comboList.Count - 1, powerStripName);
-					foreach (var sel in selectors) {
-						sel.Visible = true;
-					}
-					graphics.Visible = true;
-					combo.Visible = false;
-					combo.Visible = true;
-					sceneTitle = "Power Strip";
-					GetPowerData ();
-				}
+                if (s.outcome == TouchSettingsOutcome.Added) {
+                    powerStripName = s.newPowerStripName;
+                    combo.comboList.Insert (combo.comboList.Count - 1, powerStripName);
+                    foreach (var sel in selectors) {
+                        sel.Visible = true;
+                    }
+                    graphics.Visible = true;
+                    combo.Visible = false;
+                    combo.Visible = true;
+                    sceneTitle = "Power Strip";
+                    GetPowerData ();
+                }
 
-				combo.activeText = powerStripName;
-			}
+                combo.activeText = powerStripName;
+            }
 
-			QueueDraw ();
+            QueueDraw ();
         }
 
-		protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
-			if (powerStripName.IsNotEmpty ()) {
-				var s = new PowerSettings (powerStripName, Power.CheckPowerStipEmpty (powerStripName));
+        protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
+            if (powerStripName.IsNotEmpty ()) {
+                var s = new PowerSettings (powerStripName, Power.CheckPowerStipEmpty (powerStripName));
                 s.Run ();
 
-				if (s.outcome == TouchSettingsOutcome.Deleted) {
-					combo.comboList.Remove (powerStripName);
-					if (Power.powerStripCount == 0) {
-						powerStripName = string.Empty;
-						sceneTitle = "No Power Strips Added";
-						foreach (var sel in selectors) {
-							sel.Visible = false;
-						}
-						graphics.Visible = false;
-						combo.activeIndex = -1;
-					} else {
-						powerStripName = Power.firstPowerStrip;
-						combo.activeText = powerStripName;
-						GetPowerData ();
-					}
-					QueueDraw ();
-				}
-			} 
-		}
-
-		protected void GetPowerData () {
-			if (powerStripName.IsNotEmpty ()) {
-				MyState[] states = Power.GetAllStates (powerStripName);
-				Mode[] modes = Power.GetAllModes (powerStripName);
-				string[] names = Power.GetAllOutletNames (powerStripName);
-
-				int i = 0;
-				foreach (var s in selectors) {
-					s.outletName.text = names[i];
-
-					if (states[i] == MyState.On) {
-						s.statusLabel.text = "On";
-						s.statusLabel.textColor = "secb";
-					} else {
-						s.statusLabel.text = "Off";
-						s.statusLabel.textColor = "grey4";
-					}
-
-					if (modes[i] == Mode.Auto) {
-						s.ss.currentSelected = 1;
-					} else { // mode is manual
-						if (states[i] == MyState.On) {
-							s.ss.currentSelected = 2;
-						} else {
-							s.ss.currentSelected = 0;
-						}
-					}
-					++i;
-				}
-			}
+                if (s.outcome == TouchSettingsOutcome.Deleted) {
+                    combo.comboList.Remove (powerStripName);
+                    if (Power.powerStripCount == 0) {
+                        powerStripName = string.Empty;
+                        sceneTitle = "No Power Strips Added";
+                        foreach (var sel in selectors) {
+                            sel.Visible = false;
+                        }
+                        graphics.Visible = false;
+                        combo.activeIndex = -1;
+                    } else {
+                        powerStripName = Power.firstPowerStrip;
+                        combo.activeText = powerStripName;
+                        GetPowerData ();
+                    }
+                    QueueDraw ();
+                }
+            }
         }
 
-		protected void OnSelectorChanged (object sender, SelectorChangedEventArgs e) {
-			var ss = sender as TouchSelectorSwitch;
-			var ic = IndividualControl.Empty;
-			ic.Group = powerStripName;
-			ic.Individual = ss.id;
+        protected void GetPowerData () {
+            if (powerStripName.IsNotEmpty ()) {
+                MyState[] states = Power.GetAllStates (powerStripName);
+                Mode[] modes = Power.GetAllModes (powerStripName);
+                string[] names = Power.GetAllOutletNames (powerStripName);
 
-			if (ss.currentSelected == 1) { // auto
-				Power.SetOutletMode (ic, Mode.Auto);
-		    } else if (ss.currentSelected == 0) { // manual and state off
+                int i = 0;
+                foreach (var s in selectors) {
+                    s.outletName.text = names[i];
+
+                    if (states[i] == MyState.On) {
+                        s.statusLabel.text = "On";
+                        s.statusLabel.textColor = "secb";
+                    } else {
+                        s.statusLabel.text = "Off";
+                        s.statusLabel.textColor = "grey4";
+                    }
+
+                    if (modes[i] == Mode.Auto) {
+                        s.ss.currentSelected = 1;
+                    } else { // mode is manual
+                        if (states[i] == MyState.On) {
+                            s.ss.currentSelected = 2;
+                        } else {
+                            s.ss.currentSelected = 0;
+                        }
+                    }
+                    ++i;
+                }
+            }
+        }
+
+        protected void OnSelectorChanged (object sender, SelectorChangedEventArgs e) {
+            var ss = sender as TouchSelectorSwitch;
+            var ic = IndividualControl.Empty;
+            ic.Group = powerStripName;
+            ic.Individual = ss.id;
+
+            if (ss.currentSelected == 1) { // auto
+                Power.SetOutletMode (ic, Mode.Auto);
+            } else if (ss.currentSelected == 0) { // manual and state off
                 Power.SetOutletMode (ic, Mode.Manual);
                 Power.SetOutletManualState (ic, MyState.Off);
             } else if (ss.currentSelected == 2) {// manual and state on
@@ -240,50 +240,50 @@ namespace AquaPic.UserInterface
         }
 
         protected void PlugStateChange (object sender, StateChangeEventArgs args) {
-			if (args.powerStripName == powerStripName) {
+            if (args.powerStripName == powerStripName) {
                 if (args.state == MyState.On) {
-                    selectors [args.outletId].statusLabel.text = "On";
-                    selectors [args.outletId].statusLabel.textColor = "secb";
+                    selectors[args.outletId].statusLabel.text = "On";
+                    selectors[args.outletId].statusLabel.textColor = "secb";
                 } else {
-                    selectors [args.outletId].statusLabel.text = "Off";
-                    selectors [args.outletId].statusLabel.textColor = "grey4";
+                    selectors[args.outletId].statusLabel.text = "Off";
+                    selectors[args.outletId].statusLabel.textColor = "grey4";
                 }
-                   
-                selectors [args.outletId].QueueDraw ();
+
+                selectors[args.outletId].QueueDraw ();
             }
         }
 
-		protected void OnExposeEvent (object sender, ExposeEventArgs args) {
-			if (powerStripName.IsNotEmpty ()) {
-				using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
-					TouchColor.SetSource (cr, "grey3", 0.75);
+        protected void OnExposeEvent (object sender, ExposeEventArgs args) {
+            if (powerStripName.IsNotEmpty ()) {
+                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                    TouchColor.SetSource (cr, "grey3", 0.75);
 
-					double midY = 272.5;
+                    double midY = 272.5;
 
-					for (int i = 0; i < 3; ++i) {
-						cr.MoveTo (60 + (i * 185), midY);
-						cr.LineTo (220 + (i * 185), midY);
-						cr.ClosePath ();
-						cr.Stroke ();
+                    for (int i = 0; i < 3; ++i) {
+                        cr.MoveTo (60 + (i * 185), midY);
+                        cr.LineTo (220 + (i * 185), midY);
+                        cr.ClosePath ();
+                        cr.Stroke ();
 
-						cr.MoveTo (232.5 + (i * 185), 115);
-						cr.LineTo (232.5 + (i * 185), 425);
-						cr.ClosePath ();
-						cr.Stroke ();
-					}
+                        cr.MoveTo (232.5 + (i * 185), 115);
+                        cr.LineTo (232.5 + (i * 185), 425);
+                        cr.ClosePath ();
+                        cr.Stroke ();
+                    }
 
-					cr.MoveTo (615, midY);
-					cr.LineTo (775, midY);
-					cr.ClosePath ();
-					cr.Stroke ();
-				}
-			}
-		}
+                    cr.MoveTo (615, midY);
+                    cr.LineTo (775, midY);
+                    cr.ClosePath ();
+                    cr.Stroke ();
+                }
+            }
+        }
 
-		public override void Dispose () {
-			if (powerStripName.IsNotEmpty ()) {
+        public override void Dispose () {
+            if (powerStripName.IsNotEmpty ()) {
                 var ic = IndividualControl.Empty;
-				ic.Group = powerStripName;
+                ic.Group = powerStripName;
                 for (int i = 0; i < selectors.Length; ++i) {
                     ic.Individual = i;
                     Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
@@ -293,14 +293,14 @@ namespace AquaPic.UserInterface
             base.Dispose ();
         }
 
-		class PowerWindowGraphics : EventBox
-		{         
-			public PowerWindowGraphics () {
+        class PowerWindowGraphics : EventBox
+        {
+            public PowerWindowGraphics () {
                 Visible = true;
                 VisibleWindow = false;
 
-				WidthRequest = 750;
-				HeightRequest = 336;            
+                WidthRequest = 750;
+                HeightRequest = 336;
 
                 ExposeEvent += OnExpose;
             }
@@ -329,7 +329,7 @@ namespace AquaPic.UserInterface
                     cr.Stroke ();
                 }
             }
-		}
-	}
+        }
+    }
 }
 

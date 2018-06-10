@@ -31,10 +31,9 @@ namespace AquaPic.Drivers
         {
             public bool enabled;
             public int lowPassFilterFactor;
-            
-            public PhOrpChannel (string name) 
-				: base (name, typeof(float)) 
-            {
+
+            public PhOrpChannel (string name)
+                : base (name, typeof (float)) {
                 enabled = false;
                 lowPassFilterFactor = 5;
             }

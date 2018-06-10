@@ -30,14 +30,14 @@ using GoodtimeDevelopment.Utilites;
 
 namespace GoodtimeDevelopment.TouchWidget
 {
-	public delegate void TextSetEventHandler (object sender, TextSetEventArgs args);
+    public delegate void TextSetEventHandler (object sender, TextSetEventArgs args);
 
     public class TextSetEventArgs : EventArgs
     {
         public string text;
         public bool keepText;
 
-		public TextSetEventArgs (string text) {
+        public TextSetEventArgs (string text) {
             this.text = text;
             keepText = true;
         }
@@ -59,7 +59,7 @@ namespace GoodtimeDevelopment.TouchWidget
             DefaultHeight = 290;
             KeepAbove = true;
 
-            #if RPI_BUILD
+#if RPI_BUILD
             Decorated = false;
 
             ExposeEvent += (o, args) => {
@@ -74,7 +74,7 @@ namespace GoodtimeDevelopment.TouchWidget
                     cr.Stroke ();
                 }
             };
-            #endif
+#endif
 
             fix = new Fixed ();
             fix.WidthRequest = 205;
@@ -90,16 +90,16 @@ namespace GoodtimeDevelopment.TouchWidget
             entry.ModifyBase (StateType.Normal, TouchColor.NewGtkColor ("grey4"));
             entry.ModifyText (StateType.Normal, TouchColor.NewGtkColor ("black"));
             entry.Activated += (sender, e) => {
-				if (entry.Text.IsNotEmpty ()) {
-					TextSetEventArgs args = new TextSetEventArgs (entry.Text);
-					TextSetEvent?.Invoke (this, args);
+                if (entry.Text.IsNotEmpty ()) {
+                    TextSetEventArgs args = new TextSetEventArgs (entry.Text);
+                    TextSetEvent?.Invoke (this, args);
 
-					if (args.keepText) {
-						Destroy ();
-					}
-				} else {
-					Destroy ();
-				}
+                    if (args.keepText) {
+                        Destroy ();
+                    }
+                } else {
+                    Destroy ();
+                }
             };
 
             fix.Put (entry, 5, 5);
@@ -131,13 +131,13 @@ namespace GoodtimeDevelopment.TouchWidget
             int x, y;
             var buttons = new KeyButton[10];
             for (int i = 0; i < buttons.Length; ++i) {
-                buttons [i] = new KeyButton (i.ToString (), OnButtonRelease);
+                buttons[i] = new KeyButton (i.ToString (), OnButtonRelease);
 
                 if (i == 0) {
                     x = 55;
                     y = 190;
                 } else {
-                    
+
                     if (i <= 3) {
                         x = ((i - 1) * 50) + 5;
                         y = 40;
@@ -150,7 +150,7 @@ namespace GoodtimeDevelopment.TouchWidget
                     }
                 }
 
-                fix.Put (buttons [i], x, y);
+                fix.Put (buttons[i], x, y);
             }
 
             KeyButton plusMinus = new KeyButton ("-", null);
@@ -159,10 +159,10 @@ namespace GoodtimeDevelopment.TouchWidget
                     int pos = 0;
                     entry.InsertText ("-", ref pos);
                     ++entry.Position;
-                    plusMinus.text = "+"; 
+                    plusMinus.text = "+";
                 } else {
                     entry.DeleteText (0, 1);
-                    plusMinus.text = "-"; 
+                    plusMinus.text = "-";
                 }
 
                 plusMinus.text = plusMinus.text.ToString ();
@@ -260,9 +260,9 @@ namespace GoodtimeDevelopment.TouchWidget
             enter.HeightRequest = 95;
             enter.ButtonReleaseEvent += (o, a) => {
                 var args = new TextSetEventArgs (entry.Text);
-				TextSetEvent?.Invoke (this, args);
+                TextSetEvent?.Invoke (this, args);
 
-				if (args.keepText) {
+                if (args.keepText) {
                     Destroy ();
                 }
             };
@@ -285,7 +285,8 @@ namespace GoodtimeDevelopment.TouchWidget
             ++entry.Position;
         }
 
-        class KeyButton : TouchButton {
+        class KeyButton : TouchButton
+        {
             public KeyButton (string text, ButtonReleaseEventHandler handler) {
                 this.text = text;
                 this.textSize = 13;
@@ -294,20 +295,22 @@ namespace GoodtimeDevelopment.TouchWidget
             }
         }
 
-        class VirtualKeyboard : Fixed {
-            enum ShiftKeyState {
+        class VirtualKeyboard : Fixed
+        {
+            enum ShiftKeyState
+            {
                 Lower,
                 Shifted,
                 Caps
             };
 
-            static char[] qwerty1Lower = {'q','w','e','r','t','y','u','i','o','p'};
-            static char[] qwerty2Lower = {'a','s','d','f','g','h','j','k','l'};
-            static char[] qwerty3Lower = {'z','x','c','v','b','n','m'};
+            static char[] qwerty1Lower = { 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p' };
+            static char[] qwerty2Lower = { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l' };
+            static char[] qwerty3Lower = { 'z', 'x', 'c', 'v', 'b', 'n', 'm' };
 
-            static char[] qwerty1Upper = {'Q','W','E','R','T','Y','U','I','O','P'};
-            static char[] qwerty2Upper = {'A','S','D','F','G','H','J','K','L'};
-            static char[] qwerty3Upper = {'Z','X','C','V','B','N','M'};
+            static char[] qwerty1Upper = { 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P' };
+            static char[] qwerty2Upper = { 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L' };
+            static char[] qwerty3Upper = { 'Z', 'X', 'C', 'V', 'B', 'N', 'M' };
 
             KeyButton[] row1;
             KeyButton[] row2;
@@ -323,21 +326,21 @@ namespace GoodtimeDevelopment.TouchWidget
                 row3 = new KeyButton[7];
 
                 for (int i = 0; i < 10; ++i) {
-                    row1 [i] = new KeyButton (qwerty1Lower [i].ToString (), handler);
-                    Put (row1 [i], (i * 50) + 5, 5);
-                    row1 [i].Show ();
+                    row1[i] = new KeyButton (qwerty1Lower[i].ToString (), handler);
+                    Put (row1[i], (i * 50) + 5, 5);
+                    row1[i].Show ();
                 }
 
                 for (int i = 0; i < 9; ++i) {
-                    row2 [i] = new KeyButton (qwerty2Lower [i].ToString (), handler);
-                    Put (row2 [i], (i * 50) + 30, 55);
-                    row2 [i].Show ();
+                    row2[i] = new KeyButton (qwerty2Lower[i].ToString (), handler);
+                    Put (row2[i], (i * 50) + 30, 55);
+                    row2[i].Show ();
                 }
 
                 for (int i = 0; i < 7; ++i) {
-                    row3 [i] = new KeyButton (qwerty3Lower [i].ToString (), handler);
-                    Put (row3 [i], (i * 50) + 80, 105);
-                    row3 [i].Show ();
+                    row3[i] = new KeyButton (qwerty3Lower[i].ToString (), handler);
+                    Put (row3[i], (i * 50) + 80, 105);
+                    row3[i].Show ();
                 }
 
                 shiftState = ShiftKeyState.Lower;
@@ -401,35 +404,35 @@ namespace GoodtimeDevelopment.TouchWidget
 
             public void ToUpper () {
                 for (int i = 0; i < 10; ++i) {
-                    row1 [i].text = qwerty1Upper [i].ToString ();
-                    row1 [i].QueueDraw ();
+                    row1[i].text = qwerty1Upper[i].ToString ();
+                    row1[i].QueueDraw ();
                 }
 
                 for (int i = 0; i < 9; ++i) {
-                    row2 [i].text = qwerty2Upper [i].ToString ();
-                    row2 [i].QueueDraw ();
+                    row2[i].text = qwerty2Upper[i].ToString ();
+                    row2[i].QueueDraw ();
                 }
 
                 for (int i = 0; i < 7; ++i) {
-                    row3 [i].text = qwerty3Upper [i].ToString ();
-                    row3 [i].QueueDraw ();
+                    row3[i].text = qwerty3Upper[i].ToString ();
+                    row3[i].QueueDraw ();
                 }
             }
 
             public void ToLower () {
                 for (int i = 0; i < 10; ++i) {
-                    row1 [i].text = qwerty1Lower [i].ToString ();
-                    row1 [i].QueueDraw ();
+                    row1[i].text = qwerty1Lower[i].ToString ();
+                    row1[i].QueueDraw ();
                 }
 
                 for (int i = 0; i < 9; ++i) {
-                    row2 [i].text = qwerty2Lower [i].ToString ();
-                    row2 [i].QueueDraw ();
+                    row2[i].text = qwerty2Lower[i].ToString ();
+                    row2[i].QueueDraw ();
                 }
 
                 for (int i = 0; i < 7; ++i) {
-                    row3 [i].text = qwerty3Lower [i].ToString ();
-                    row3 [i].QueueDraw ();
+                    row3[i].text = qwerty3Lower[i].ToString ();
+                    row3[i].QueueDraw ();
                 }
             }
         }

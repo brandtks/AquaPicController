@@ -31,9 +31,8 @@ namespace AquaPic.Drivers
         {
             public int lowPassFilterFactor;
 
-			public AnalogInputChannel (string name) 
-				: base (name, typeof(float)) 
-            { 
+            public AnalogInputChannel (string name)
+                : base (name, typeof (float)) {
                 lowPassFilterFactor = 5;
             }
         }

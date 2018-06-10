@@ -30,106 +30,106 @@ using AquaPic.Drivers;
 
 namespace AquaPic.Runtime
 {
-	public interface IOutletScript
-	{
-		bool OutletConditionCheck ();
-	}
+    public interface IOutletScript
+    {
+        bool OutletConditionCheck ();
+    }
 
-	public class Script
-	{
-		public static IOutletScript CompileOutletConditionCheck (IEnumerable<string> conditions) {
-			try {
-				return CompileOutletConditionCheckNoCatch (conditions);
-			} catch (Exception ex) {
-				Logger.AddError (ex.ToString ());
-			}
+    public class Script
+    {
+        public static IOutletScript CompileOutletConditionCheck (IEnumerable<string> conditions) {
+            try {
+                return CompileOutletConditionCheckNoCatch (conditions);
+            } catch (Exception ex) {
+                Logger.AddError (ex.ToString ());
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		public static IOutletScript CompileOutletConditionCheckNoCatch (IEnumerable<string> conditions) {
-			List<string> cond = conditions.ToList<string> ();
-			List<string> preprocess = new List<string> ();
+        public static IOutletScript CompileOutletConditionCheckNoCatch (IEnumerable<string> conditions) {
+            List<string> cond = conditions.ToList<string> ();
+            List<string> preprocess = new List<string> ();
 
-			foreach (var l in cond) {
-				string line = l.Trim ();
-				if (line.StartsWith ("#hardware"))
-					preprocess.Add (line);
-			}
+            foreach (var l in cond) {
+                string line = l.Trim ();
+                if (line.StartsWith ("#hardware"))
+                    preprocess.Add (line);
+            }
 
-			foreach (var rm in preprocess)
-				cond.Remove (rm);
+            foreach (var rm in preprocess)
+                cond.Remove (rm);
 
-			var sb = new StringBuilder ();
-			sb.AppendLine ("using GoodtimeDevelopment.Utilites;");
-			sb.AppendLine ("using AquaPic.Runtime;");
-			sb.AppendLine ("using AquaPic.Modules;");
-			sb.AppendLine ("using AquaPic.Globals;");
-			sb.AppendLine ("using AquaPic.Drivers;");
-			sb.AppendLine ("using AquaPic.Operands;");
-			sb.AppendLine ("public class MyOutletScipt : IOutletScript {");
-			sb.AppendLine ("public bool OutletConditionCheck () {");
-			foreach (var s in cond) {
-				sb.AppendLine (s);
-			}
-			sb.AppendLine ("}");
-			sb.AppendLine ("}");
+            var sb = new StringBuilder ();
+            sb.AppendLine ("using GoodtimeDevelopment.Utilites;");
+            sb.AppendLine ("using AquaPic.Runtime;");
+            sb.AppendLine ("using AquaPic.Modules;");
+            sb.AppendLine ("using AquaPic.Globals;");
+            sb.AppendLine ("using AquaPic.Drivers;");
+            sb.AppendLine ("using AquaPic.Operands;");
+            sb.AppendLine ("public class MyOutletScipt : IOutletScript {");
+            sb.AppendLine ("public bool OutletConditionCheck () {");
+            foreach (var s in cond) {
+                sb.AppendLine (s);
+            }
+            sb.AppendLine ("}");
+            sb.AppendLine ("}");
 
-			var code = sb.ToString ();
+            var code = sb.ToString ();
 
-			var outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
+            var outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
 
-			//"preprocessor" conditions are ran after the code is compiled because these add actual real world stuff
-			if (outletScript != null) {
-				EvaluatePreprocessor (preprocess);
-			}
+            //"preprocessor" conditions are ran after the code is compiled because these add actual real world stuff
+            if (outletScript != null) {
+                EvaluatePreprocessor (preprocess);
+            }
 
-			return outletScript;
-		}
+            return outletScript;
+        }
 
-		protected static void EvaluatePreprocessor (IEnumerable<string> preprocess) {
-			foreach (var pre in preprocess) {
-				string line = pre;
-				int idx = line.IndexOf (' ') + 1;
-				line = line.Substring (idx);
-				idx = line.IndexOf (' ');
-				string eq = line.Substring (0, idx);
-				line = line.Substring (idx + 1);
+        protected static void EvaluatePreprocessor (IEnumerable<string> preprocess) {
+            foreach (var pre in preprocess) {
+                string line = pre;
+                int idx = line.IndexOf (' ') + 1;
+                line = line.Substring (idx);
+                idx = line.IndexOf (' ');
+                string eq = line.Substring (0, idx);
+                line = line.Substring (idx + 1);
 
-				if (string.Equals (eq, "DigitalInput", StringComparison.InvariantCultureIgnoreCase)) {
-					var args = line.Split (',');
-					string card = args[0];
-					int inputId = Convert.ToInt32 (args[1]);
-					AquaPicDrivers.DigitalInput.AddChannel (card, inputId, args[2]);
-				}
-			}
-		}
+                if (string.Equals (eq, "DigitalInput", StringComparison.InvariantCultureIgnoreCase)) {
+                    var args = line.Split (',');
+                    string card = args[0];
+                    int inputId = Convert.ToInt32 (args[1]);
+                    AquaPicDrivers.DigitalInput.AddChannel (card, inputId, args[2]);
+                }
+            }
+        }
 
-		public static void UndoPreprocessor (IEnumerable<string> conditions) {
-			List<string> preprocess = new List<string> ();
+        public static void UndoPreprocessor (IEnumerable<string> conditions) {
+            List<string> preprocess = new List<string> ();
 
-			foreach (var l in conditions) {
-				string line = l.Trim ();
-				if (line.StartsWith ("#hardware"))
-					preprocess.Add (line);
-			}
+            foreach (var l in conditions) {
+                string line = l.Trim ();
+                if (line.StartsWith ("#hardware"))
+                    preprocess.Add (line);
+            }
 
-			foreach (var pre in preprocess) {
-				string line = pre;
-				int idx = line.IndexOf (' ') + 1;
-				line = line.Substring (idx);
-				idx = line.IndexOf (' ');
-				string eq = line.Substring (0, idx);
-				line = line.Substring (idx + 1);
+            foreach (var pre in preprocess) {
+                string line = pre;
+                int idx = line.IndexOf (' ') + 1;
+                line = line.Substring (idx);
+                idx = line.IndexOf (' ');
+                string eq = line.Substring (0, idx);
+                line = line.Substring (idx + 1);
 
-				if (string.Equals (eq, "DigitalInput", StringComparison.InvariantCultureIgnoreCase)) {
-					var args = line.Split (',');
-					string card = args[0];
-					int inputId = Convert.ToInt32 (args[1]);
-					AquaPicDrivers.DigitalInput.RemoveChannel (card, inputId);
-				}
-			}
-		}
-	}
+                if (string.Equals (eq, "DigitalInput", StringComparison.InvariantCultureIgnoreCase)) {
+                    var args = line.Split (',');
+                    string card = args[0];
+                    int inputId = Convert.ToInt32 (args[1]);
+                    AquaPicDrivers.DigitalInput.RemoveChannel (card, inputId);
+                }
+            }
+        }
+    }
 }
 

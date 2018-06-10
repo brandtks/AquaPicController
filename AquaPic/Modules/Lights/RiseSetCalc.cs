@@ -26,7 +26,7 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Modules
 {
-	public static class RiseSetCalc
+    public static class RiseSetCalc
     {
         public static double latitude;
         public static double longitude;
@@ -39,8 +39,8 @@ namespace AquaPic.Modules
         public static void GetRiseSetTimes (out DateSpan rise, out DateSpan sSet) {
             rise = GetRiseTime ();
             sSet = GetSetTime ();
-		}
-	    
+        }
+
         public static DateSpan GetRiseTime () {
             double julianDate = calcJD (DateTime.Today);
             double riseUTC = calcSunRiseUTC (julianDate, latitude, longitude);
@@ -71,17 +71,15 @@ namespace AquaPic.Modules
             return setTomorrow;
         }
 
-		//http://www.esrl.noaa.gov/gmd/grad/solcalc/
+        //http://www.esrl.noaa.gov/gmd/grad/solcalc/
 
         // Convert radian angle to degrees
-		static private double radToDeg(double angleRad)
-        {
+        static private double radToDeg (double angleRad) {
             return (180.0 * angleRad / Math.PI);
         }
 
         // Convert degree angle to radians
-		static private double degToRad(double angleDeg)
-        {
+        static private double degToRad (double angleDeg) {
             return (Math.PI * angleDeg / 180.0);
         }
 
@@ -101,23 +99,20 @@ namespace AquaPic.Modules
         //* added later.	
         //***********************************************************************/
 
-		static private double calcJD(int year, int month, int day)
-        {
-            if (month <= 2)
-            {
+        static private double calcJD (int year, int month, int day) {
+            if (month <= 2) {
                 year -= 1;
                 month += 12;
             }
-            double A = Math.Floor(year / 100.0);
-            double B = 2 - A + Math.Floor(A / 4);
+            double A = Math.Floor (year / 100.0);
+            double B = 2 - A + Math.Floor (A / 4);
 
-            double JD = Math.Floor(365.25 * (year + 4716)) + Math.Floor(30.6001 * (month + 1)) + day + B - 1524.5;
+            double JD = Math.Floor (365.25 * (year + 4716)) + Math.Floor (30.6001 * (month + 1)) + day + B - 1524.5;
             return JD;
         }
 
-		static private double calcJD(DateTime date)
-        {
-            return calcJD(date.Year, date.Month, date.Day);
+        static private double calcJD (DateTime date) {
+            return calcJD (date.Year, date.Month, date.Day);
         }
 
         //***********************************************************************/
@@ -130,8 +125,7 @@ namespace AquaPic.Modules
         //* the T value corresponding to the Julian Day	
         //***********************************************************************/
 
-		static private double calcTimeJulianCent(double jd)
-        {
+        static private double calcTimeJulianCent (double jd) {
             double T = (jd - 2451545.0) / 36525.0;
             return T;
         }
@@ -147,8 +141,7 @@ namespace AquaPic.Modules
         //* the Julian Day corresponding to the t value	
         //***********************************************************************/
 
-		static private double calcJDFromJulianCent(double t)
-        {
+        static private double calcJDFromJulianCent (double t) {
             double JD = t * 36525.0 + 2451545.0;
             return JD;
         }
@@ -164,15 +157,12 @@ namespace AquaPic.Modules
         //* the Geometric Mean Longitude of the Sun in degrees	
         //***********************************************************************/
 
-		static private double calcGeomMeanLongSun(double t)
-        {
+        static private double calcGeomMeanLongSun (double t) {
             double L0 = 280.46646 + t * (36000.76983 + 0.0003032 * t);
-            while (L0 > 360.0)
-            {
+            while (L0 > 360.0) {
                 L0 -= 360.0;
             }
-            while (L0 < 0.0)
-            {
+            while (L0 < 0.0) {
                 L0 += 360.0;
             }
             return L0;	 // in degrees
@@ -189,8 +179,7 @@ namespace AquaPic.Modules
         //* the Geometric Mean Anomaly of the Sun in degrees	
         //***********************************************************************/
 
-		static private double calcGeomMeanAnomalySun(double t)
-        {
+        static private double calcGeomMeanAnomalySun (double t) {
             double M = 357.52911 + t * (35999.05029 - 0.0001537 * t);
             return M;	 // in degrees
         }
@@ -206,8 +195,7 @@ namespace AquaPic.Modules
         //***********************************************************************/
 
 
-		static private double calcEccentricityEarthOrbit(double t)
-        {
+        static private double calcEccentricityEarthOrbit (double t) {
             double e = 0.016708634 - t * (0.000042037 + 0.0000001267 * t);
             return e;	 // unitless
         }
@@ -223,14 +211,13 @@ namespace AquaPic.Modules
         //***********************************************************************/
 
 
-		static private double calcSunEqOfCenter(double t)
-        {
-            double m = calcGeomMeanAnomalySun(t);
+        static private double calcSunEqOfCenter (double t) {
+            double m = calcGeomMeanAnomalySun (t);
 
-            double mrad = degToRad(m);
-            double sinm = Math.Sin(mrad);
-            double sin2m = Math.Sin(mrad + mrad);
-            double sin3m = Math.Sin(mrad + mrad + mrad);
+            double mrad = degToRad (m);
+            double sinm = Math.Sin (mrad);
+            double sin2m = Math.Sin (mrad + mrad);
+            double sin3m = Math.Sin (mrad + mrad + mrad);
 
             double C = sinm * (1.914602 - t * (0.004817 + 0.000014 * t)) + sin2m * (0.019993 - 0.000101 * t) + sin3m * 0.000289;
             return C;	 // in degrees
@@ -247,10 +234,9 @@ namespace AquaPic.Modules
         //***********************************************************************/
 
 
-		static private double calcSunTrueLong(double t)
-        {
-            double l0 = calcGeomMeanLongSun(t);
-            double c = calcSunEqOfCenter(t);
+        static private double calcSunTrueLong (double t) {
+            double l0 = calcGeomMeanLongSun (t);
+            double c = calcSunEqOfCenter (t);
 
             double O = l0 + c;
             return O;	 // in degrees
@@ -266,10 +252,9 @@ namespace AquaPic.Modules
         //* sun's true anamoly in degrees	
         //***********************************************************************/
 
-		static private double calcSunTrueAnomaly(double t)
-        {
-            double m = calcGeomMeanAnomalySun(t);
-            double c = calcSunEqOfCenter(t);
+        static private double calcSunTrueAnomaly (double t) {
+            double m = calcGeomMeanAnomalySun (t);
+            double c = calcSunEqOfCenter (t);
 
             double v = m + c;
             return v;	 // in degrees
@@ -285,12 +270,11 @@ namespace AquaPic.Modules
         //* sun radius vector in AUs	
         //***********************************************************************/
 
-		static private double calcSunRadVector(double t)
-        {
-            double v = calcSunTrueAnomaly(t);
-            double e = calcEccentricityEarthOrbit(t);
+        static private double calcSunRadVector (double t) {
+            double v = calcSunTrueAnomaly (t);
+            double e = calcEccentricityEarthOrbit (t);
 
-            double R = (1.000001018 * (1 - e * e)) / (1 + e * Math.Cos(degToRad(v)));
+            double R = (1.000001018 * (1 - e * e)) / (1 + e * Math.Cos (degToRad (v)));
             return R;	 // in AUs
         }
 
@@ -304,12 +288,11 @@ namespace AquaPic.Modules
         //* sun's apparent longitude in degrees	
         //***********************************************************************/
 
-		static private double calcSunApparentLong(double t)
-        {
-            double o = calcSunTrueLong(t);
+        static private double calcSunApparentLong (double t) {
+            double o = calcSunTrueLong (t);
 
             double omega = 125.04 - 1934.136 * t;
-            double lambda = o - 0.00569 - 0.00478 * Math.Sin(degToRad(omega));
+            double lambda = o - 0.00569 - 0.00478 * Math.Sin (degToRad (omega));
             return lambda;	 // in degrees
         }
 
@@ -323,8 +306,7 @@ namespace AquaPic.Modules
         //* mean obliquity in degrees	
         //***********************************************************************/
 
-		static private double calcMeanObliquityOfEcliptic(double t)
-        {
+        static private double calcMeanObliquityOfEcliptic (double t) {
             double seconds = 21.448 - t * (46.8150 + t * (0.00059 - t * (0.001813)));
             double e0 = 23.0 + (26.0 + (seconds / 60.0)) / 60.0;
             return e0;	 // in degrees
@@ -340,12 +322,11 @@ namespace AquaPic.Modules
         //* corrected obliquity in degrees	
         //***********************************************************************/
 
-		static private double calcObliquityCorrection(double t)
-        {
-            double e0 = calcMeanObliquityOfEcliptic(t);
+        static private double calcObliquityCorrection (double t) {
+            double e0 = calcMeanObliquityOfEcliptic (t);
 
             double omega = 125.04 - 1934.136 * t;
-            double e = e0 + 0.00256 * Math.Cos(degToRad(omega));
+            double e = e0 + 0.00256 * Math.Cos (degToRad (omega));
             return e;	 // in degrees
         }
 
@@ -359,14 +340,13 @@ namespace AquaPic.Modules
         //* sun's right ascension in degrees	
         //***********************************************************************/
 
-		static private double calcSunRtAscension(double t)
-        {
-            double e = calcObliquityCorrection(t);
-            double lambda = calcSunApparentLong(t);
+        static private double calcSunRtAscension (double t) {
+            double e = calcObliquityCorrection (t);
+            double lambda = calcSunApparentLong (t);
 
-            double tananum = (Math.Cos(degToRad(e)) * Math.Sin(degToRad(lambda)));
-            double tanadenom = (Math.Cos(degToRad(lambda)));
-            double alpha = radToDeg(Math.Atan2(tananum, tanadenom));
+            double tananum = (Math.Cos (degToRad (e)) * Math.Sin (degToRad (lambda)));
+            double tanadenom = (Math.Cos (degToRad (lambda)));
+            double alpha = radToDeg (Math.Atan2 (tananum, tanadenom));
             return alpha;	 // in degrees
         }
 
@@ -380,13 +360,12 @@ namespace AquaPic.Modules
         //* sun's declination in degrees	
         //***********************************************************************/
 
-		static private double calcSunDeclination(double t)
-        {
-            double e = calcObliquityCorrection(t);
-            double lambda = calcSunApparentLong(t);
+        static private double calcSunDeclination (double t) {
+            double e = calcObliquityCorrection (t);
+            double lambda = calcSunApparentLong (t);
 
-            double sint = Math.Sin(degToRad(e)) * Math.Sin(degToRad(lambda));
-            double theta = radToDeg(Math.Asin(sint));
+            double sint = Math.Sin (degToRad (e)) * Math.Sin (degToRad (lambda));
+            double theta = radToDeg (Math.Asin (sint));
             return theta;	 // in degrees
         }
 
@@ -401,26 +380,25 @@ namespace AquaPic.Modules
         //* equation of time in minutes of time	
         //***********************************************************************/
 
-		static private double calcEquationOfTime(double t)
-        {
-            double epsilon = calcObliquityCorrection(t);
-            double l0 = calcGeomMeanLongSun(t);
-            double e = calcEccentricityEarthOrbit(t);
-            double m = calcGeomMeanAnomalySun(t);
+        static private double calcEquationOfTime (double t) {
+            double epsilon = calcObliquityCorrection (t);
+            double l0 = calcGeomMeanLongSun (t);
+            double e = calcEccentricityEarthOrbit (t);
+            double m = calcGeomMeanAnomalySun (t);
 
-            double y = Math.Tan(degToRad(epsilon) / 2.0);
+            double y = Math.Tan (degToRad (epsilon) / 2.0);
             y *= y;
 
-            double sin2l0 = Math.Sin(2.0 * degToRad(l0));
-            double sinm = Math.Sin(degToRad(m));
-            double cos2l0 = Math.Cos(2.0 * degToRad(l0));
-            double sin4l0 = Math.Sin(4.0 * degToRad(l0));
-            double sin2m = Math.Sin(2.0 * degToRad(m));
+            double sin2l0 = Math.Sin (2.0 * degToRad (l0));
+            double sinm = Math.Sin (degToRad (m));
+            double cos2l0 = Math.Cos (2.0 * degToRad (l0));
+            double sin4l0 = Math.Sin (4.0 * degToRad (l0));
+            double sin2m = Math.Sin (2.0 * degToRad (m));
 
             double Etime = y * sin2l0 - 2.0 * e * sinm + 4.0 * e * y * sinm * cos2l0
             - 0.5 * y * y * sin4l0 - 1.25 * e * e * sin2m;
 
-            return radToDeg(Etime) * 4.0;	// in minutes of time
+            return radToDeg (Etime) * 4.0;	// in minutes of time
         }
 
         //***********************************************************************/
@@ -435,14 +413,13 @@ namespace AquaPic.Modules
         //* hour angle of sunrise in radians	
         //***********************************************************************/
 
-		static private double calcHourAngleSunrise(double lat, double solarDec)
-        {
-            double latRad = degToRad(lat);
-            double sdRad = degToRad(solarDec);
+        static private double calcHourAngleSunrise (double lat, double solarDec) {
+            double latRad = degToRad (lat);
+            double sdRad = degToRad (solarDec);
 
             //double HAarg = (Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad));
 
-            double HA = (Math.Acos(Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad)));
+            double HA = (Math.Acos (Math.Cos (degToRad (90.833)) / (Math.Cos (latRad) * Math.Cos (sdRad)) - Math.Tan (latRad) * Math.Tan (sdRad)));
 
             return HA;	 // in radians
         }
@@ -459,14 +436,13 @@ namespace AquaPic.Modules
         //* hour angle of sunset in radians	
         //***********************************************************************/
 
-		static private double calcHourAngleSunset(double lat, double solarDec)
-        {
-            double latRad = degToRad(lat);
-            double sdRad = degToRad(solarDec);
+        static private double calcHourAngleSunset (double lat, double solarDec) {
+            double latRad = degToRad (lat);
+            double sdRad = degToRad (solarDec);
 
             //double HAarg = (Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad));
 
-            double HA = (Math.Acos(Math.Cos(degToRad(90.833)) / (Math.Cos(latRad) * Math.Cos(sdRad)) - Math.Tan(latRad) * Math.Tan(sdRad)));
+            double HA = (Math.Acos (Math.Cos (degToRad (90.833)) / (Math.Cos (latRad) * Math.Cos (sdRad)) - Math.Tan (latRad) * Math.Tan (sdRad)));
 
             return -HA;	 // in radians
         }
@@ -485,24 +461,23 @@ namespace AquaPic.Modules
         //* time in minutes from zero Z	
         //***********************************************************************/
 
-        static private double calcSunriseUTC(double JD, double latitudeVar, double longitudeVar)
-        {
-            double t = calcTimeJulianCent(JD);
+        static private double calcSunriseUTC (double JD, double latitudeVar, double longitudeVar) {
+            double t = calcTimeJulianCent (JD);
 
             // *** Find the time of solar noon at the location, and use
             // that declination. This is better than start of the 
             // Julian day
 
-            double noonmin = calcSolNoonUTC(t, longitudeVar);
-            double tnoon = calcTimeJulianCent(JD + noonmin / 1440.0);
+            double noonmin = calcSolNoonUTC (t, longitudeVar);
+            double tnoon = calcTimeJulianCent (JD + noonmin / 1440.0);
 
             // *** First pass to approximate sunrise (using solar noon)
 
-            double eqTime = calcEquationOfTime(tnoon);
-            double solarDec = calcSunDeclination(tnoon);
-            double hourAngle = calcHourAngleSunrise(latitudeVar, solarDec);
+            double eqTime = calcEquationOfTime (tnoon);
+            double solarDec = calcSunDeclination (tnoon);
+            double hourAngle = calcHourAngleSunrise (latitudeVar, solarDec);
 
-            double delta = longitudeVar - radToDeg(hourAngle);
+            double delta = longitudeVar - radToDeg (hourAngle);
             double timeDiff = 4 * delta;	// in minutes of time
             double timeUTC = 720 + timeDiff - eqTime;	// in minutes
 
@@ -510,11 +485,11 @@ namespace AquaPic.Modules
 
             // *** Second pass includes fractional jday in gamma calc
 
-            double newt = calcTimeJulianCent(calcJDFromJulianCent(t) + timeUTC / 1440.0);
-            eqTime = calcEquationOfTime(newt);
-            solarDec = calcSunDeclination(newt);
-            hourAngle = calcHourAngleSunrise(latitudeVar, solarDec);
-            delta = longitudeVar - radToDeg(hourAngle);
+            double newt = calcTimeJulianCent (calcJDFromJulianCent (t) + timeUTC / 1440.0);
+            eqTime = calcEquationOfTime (newt);
+            solarDec = calcSunDeclination (newt);
+            hourAngle = calcHourAngleSunrise (latitudeVar, solarDec);
+            delta = longitudeVar - radToDeg (hourAngle);
             timeDiff = 4 * delta;
             timeUTC = 720 + timeDiff - eqTime; // in minutes
 
@@ -535,16 +510,15 @@ namespace AquaPic.Modules
         //* time in minutes from zero Z	
         //***********************************************************************/
 
-        static private double calcSolNoonUTC(double t, double longitudeVar)
-        {
+        static private double calcSolNoonUTC (double t, double longitudeVar) {
             // First pass uses approximate solar noon to calculate eqtime
-            double tnoon = calcTimeJulianCent(calcJDFromJulianCent(t) + longitudeVar / 360.0);
-            double eqTime = calcEquationOfTime(tnoon);
+            double tnoon = calcTimeJulianCent (calcJDFromJulianCent (t) + longitudeVar / 360.0);
+            double eqTime = calcEquationOfTime (tnoon);
             double solNoonUTC = 720 + (longitudeVar * 4) - eqTime; // min
 
-            double newt = calcTimeJulianCent(calcJDFromJulianCent(t) - 0.5 + solNoonUTC / 1440.0);
+            double newt = calcTimeJulianCent (calcJDFromJulianCent (t) - 0.5 + solNoonUTC / 1440.0);
 
-            eqTime = calcEquationOfTime(newt);
+            eqTime = calcEquationOfTime (newt);
             // double solarNoonDec = calcSunDeclination(newt);
             solNoonUTC = 720 + (longitudeVar * 4) - eqTime; // min
 
@@ -564,107 +538,91 @@ namespace AquaPic.Modules
         //* time in minutes from zero Z	
         //***********************************************************************/
 
-        static private double calcSunSetUTC(double JD, double latitudeVar, double longitudeVar)
-        {
-            var t = calcTimeJulianCent(JD);
-            var eqTime = calcEquationOfTime(t);
-            var solarDec = calcSunDeclination(t);
-            var hourAngle = calcHourAngleSunrise(latitudeVar, solarDec);
+        static private double calcSunSetUTC (double JD, double latitudeVar, double longitudeVar) {
+            var t = calcTimeJulianCent (JD);
+            var eqTime = calcEquationOfTime (t);
+            var solarDec = calcSunDeclination (t);
+            var hourAngle = calcHourAngleSunrise (latitudeVar, solarDec);
             hourAngle = -hourAngle;
-            var delta = longitudeVar + radToDeg(hourAngle);
+            var delta = longitudeVar + radToDeg (hourAngle);
             var timeUTC = 720 - (4.0 * delta) - eqTime;	// in minutes
             return timeUTC;
         }
 
-        static private double calcSunRiseUTC(double JD, double latitudeVar, double longitudeVar)
-        {
-            var t = calcTimeJulianCent(JD);
-            var eqTime = calcEquationOfTime(t);
-            var solarDec = calcSunDeclination(t);
-            var hourAngle = calcHourAngleSunrise(latitudeVar, solarDec);
-            var delta = longitudeVar + radToDeg(hourAngle);
+        static private double calcSunRiseUTC (double JD, double latitudeVar, double longitudeVar) {
+            var t = calcTimeJulianCent (JD);
+            var eqTime = calcEquationOfTime (t);
+            var solarDec = calcSunDeclination (t);
+            var hourAngle = calcHourAngleSunrise (latitudeVar, solarDec);
+            var delta = longitudeVar + radToDeg (hourAngle);
             var timeUTC = 720 - (4.0 * delta) - eqTime;	// in minutes
             return timeUTC;
         }
 
-		static private string getTimeString(double time, int timezone, double JD, bool dst)
-        {
+        static private string getTimeString (double time, int timezone, double JD, bool dst) {
             var timeLocal = time + (timezone * 60.0);
             //var riseT = calcTimeJulianCent(JD + time / 1440.0);
             timeLocal += ((dst) ? 60.0 : 0.0);
-            return getTimeString(timeLocal);
+            return getTimeString (timeLocal);
         }
 
-		static private DateTime? getDateTime(double time, int timezone, DateTime date, bool dst)
-        {
+        static private DateTime? getDateTime (double time, int timezone, DateTime date, bool dst) {
             //double JD = calcJD(date);
             var timeLocal = time + (timezone * 60.0);
             //var riseT = calcTimeJulianCent(JD + time / 1440.0);
             timeLocal += ((dst) ? 60.0 : 0.0);
-            return getDateTime(timeLocal, date);
+            return getDateTime (timeLocal, date);
         }
 
-        static private string getTimeString(double minutes)
-        {
+        static private string getTimeString (double minutes) {
             string output;
 
-            if ((minutes >= 0) && (minutes < 1440))
-            {
+            if ((minutes >= 0) && (minutes < 1440)) {
                 var floatHour = minutes / 60.0;
-                var hour = Math.Floor(floatHour);
-                var floatMinute = 60.0 * (floatHour - Math.Floor(floatHour));
-                var minute = Math.Floor(floatMinute);
-                var floatSec = 60.0 * (floatMinute - Math.Floor(floatMinute));
-                var second = Math.Floor(floatSec + 0.5);
-                if (second > 59)
-                {
+                var hour = Math.Floor (floatHour);
+                var floatMinute = 60.0 * (floatHour - Math.Floor (floatHour));
+                var minute = Math.Floor (floatMinute);
+                var floatSec = 60.0 * (floatMinute - Math.Floor (floatMinute));
+                var second = Math.Floor (floatSec + 0.5);
+                if (second > 59) {
                     second = 0;
                     minute += 1;
                 }
                 if ((second >= 30)) minute++;
-                if (minute > 59)
-                {
+                if (minute > 59) {
                     minute = 0;
                     hour += 1;
                 }
-                output = String.Format("{0} : {1}", hour, minute);
-            }
-            else
-            {
+                output = String.Format ("{0} : {1}", hour, minute);
+            } else {
                 return "error";
             }
 
             return output;
         }
 
-        static private DateTime? getDateTime(double minutes, DateTime date)
-        {
+        static private DateTime? getDateTime (double minutes, DateTime date) {
 
             DateTime? retVal = null;
 
-            if ((minutes >= 0) && (minutes < 1440))
-            {
+            if ((minutes >= 0) && (minutes < 1440)) {
                 var floatHour = minutes / 60.0;
-                var hour = Math.Floor(floatHour);
-                var floatMinute = 60.0 * (floatHour - Math.Floor(floatHour));
-                var minute = Math.Floor(floatMinute);
-                var floatSec = 60.0 * (floatMinute - Math.Floor(floatMinute));
-                var second = Math.Floor(floatSec + 0.5);
-                if (second > 59)
-                {
+                var hour = Math.Floor (floatHour);
+                var floatMinute = 60.0 * (floatHour - Math.Floor (floatHour));
+                var minute = Math.Floor (floatMinute);
+                var floatSec = 60.0 * (floatMinute - Math.Floor (floatMinute));
+                var second = Math.Floor (floatSec + 0.5);
+                if (second > 59) {
                     second = 0;
                     minute += 1;
                 }
                 if ((second >= 30)) minute++;
-                if (minute > 59)
-                {
+                if (minute > 59) {
                     minute = 0;
                     hour += 1;
                 }
-                return new DateTime(date.Year, date.Month, date.Day, (int)hour, (int)minute, (int)second);
-            }
-            else
-            {
+                return new DateTime (date.Year, date.Month, date.Day, (int)hour, (int)minute, (int)second);
+            } else {
                 return retVal;
             }
         }

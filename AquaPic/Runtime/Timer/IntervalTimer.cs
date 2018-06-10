@@ -28,7 +28,8 @@ namespace AquaPic.Runtime
 {
     public delegate void TimerHandler (object sender);
 
-    public enum IntervalTimerState {
+    public enum IntervalTimerState
+    {
         Waiting,
         Running,
         Paused
@@ -98,7 +99,7 @@ namespace AquaPic.Runtime
 
         public static IntervalTimer GetTimer (string name, uint minutes, uint seconds) {
             if (intervalTimers.ContainsKey (name))
-                return intervalTimers [name];
+                return intervalTimers[name];
 
             IntervalTimer intervalTimer = new IntervalTimer (name, minutes, seconds);
             intervalTimers.Add (name, intervalTimer);

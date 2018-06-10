@@ -28,7 +28,8 @@ using System.Text;
 
 namespace GoodtimeDevelopment.Utilites
 {
-    public class Description : Attribute {
+    public class Description : Attribute
+    {
         public string Text;
 
         public Description (string text) {
@@ -36,7 +37,8 @@ namespace GoodtimeDevelopment.Utilites
         }
     }
 
-    public enum Platform {
+    public enum Platform
+    {
         Windows,
         Linux,
         Mac
@@ -83,7 +85,7 @@ namespace GoodtimeDevelopment.Utilites
 
         public static string GetDescription (Enum en) {
             var type = en.GetType ();
-            var memInfo = type.GetMember (en.ToString());
+            var memInfo = type.GetMember (en.ToString ());
 
             if (memInfo != null && memInfo.Length > 0) {
                 var attrs = memInfo[0].GetCustomAttributes (typeof (Description), false);
@@ -92,7 +94,7 @@ namespace GoodtimeDevelopment.Utilites
                     return ((Description)attrs[0]).Text;
             }
 
-            return en.ToString();
+            return en.ToString ();
         }
 
         public static bool IsEmpty (this string value) {
@@ -108,13 +110,13 @@ namespace GoodtimeDevelopment.Utilites
                 .Where (c => !char.IsWhiteSpace (c))
                 .ToArray ());
         }
-        
-        public static float CalcParabola(DateSpan start, DateSpan end, DateSpan now, float min, float max) {
-            var period = end.DifferenceInMinutes(start);
-            var phase = now.DifferenceInMinutes(start);
+
+        public static float CalcParabola (DateSpan start, DateSpan end, DateSpan now, float min, float max) {
+            var period = end.DifferenceInMinutes (start);
+            var phase = now.DifferenceInMinutes (start);
             var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
             var delta = max - min;
-            return min + (float)(delta * Math.Sin(radian));
+            return min + (float)(delta * Math.Sin (radian));
         }
 
         public static uint SecondsToMilliseconds (double seconds) {
@@ -195,7 +197,7 @@ namespace GoodtimeDevelopment.Utilites
                 mask |= (byte)Math.Pow (2, shift);
             else {
                 int m = ~(int)Math.Pow (2, shift);
-                mask &= (byte) m;
+                mask &= (byte)m;
             }
         }
 
@@ -227,6 +229,6 @@ namespace GoodtimeDevelopment.Utilites
 
             return ts;
         }
-	}
+    }
 }
 

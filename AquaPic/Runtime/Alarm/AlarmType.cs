@@ -51,7 +51,7 @@ namespace AquaPic.Runtime
                 return _name;
             }
         }
-        
+
         public bool clearOnAck {
             get {
                 return _clearOnAck;

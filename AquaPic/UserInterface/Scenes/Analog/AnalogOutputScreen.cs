@@ -35,33 +35,33 @@ namespace AquaPic.UserInterface
         TouchComboBox combo;
         string card;
         AnalogChannelDisplay[] displays;
-		TouchButton settingsButton;
+        TouchButton settingsButton;
 
-        public AnalogOutputWindow (params object[] options) : base () {         
-			card = AquaPicDrivers.AnalogOutput.firstCard;
+        public AnalogOutputWindow (params object[] options) : base () {
+            card = AquaPicDrivers.AnalogOutput.firstCard;
             if (card.IsNotEmpty ()) {
-				sceneTitle = "Analog Output Cards";
+                sceneTitle = "Analog Output Cards";
             } else {
-				sceneTitle = "No Analog Output Cards Added";
+                sceneTitle = "No Analog Output Cards Added";
             }
 
             displays = new AnalogChannelDisplay[4];
             for (int i = 0; i < 4; ++i) {
-                displays [i] = new AnalogChannelDisplay ();
-                displays [i].divisionSteps = 1000;
-                displays [i].typeLabel.Visible = true;
-                displays [i].ForceButtonReleaseEvent += OnForceRelease;
-                displays [i].ValueChangedEvent += OnValueChanged;
-				displays[i].settingsButton.buttonColor = "grey1";
-                Put (displays [i], 70, 90 + (i * 75));
-				if (card.IsNotEmpty ()) {
-					displays[i].Show ();
-				} else {
-					displays[i].Visible = false;
-				}
+                displays[i] = new AnalogChannelDisplay ();
+                displays[i].divisionSteps = 1000;
+                displays[i].typeLabel.Visible = true;
+                displays[i].ForceButtonReleaseEvent += OnForceRelease;
+                displays[i].ValueChangedEvent += OnValueChanged;
+                displays[i].settingsButton.buttonColor = "grey1";
+                Put (displays[i], 70, 90 + (i * 75));
+                if (card.IsNotEmpty ()) {
+                    displays[i].Show ();
+                } else {
+                    displays[i].Visible = false;
+                }
             }
-            
-			settingsButton = new TouchButton ();
+
+            settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
             settingsButton.buttonColor = "grey4";
             settingsButton.text = Convert.ToChar (0x2699).ToString ();
@@ -69,8 +69,8 @@ namespace AquaPic.UserInterface
             Put (settingsButton, 755, 35);
             settingsButton.Show ();
 
-			combo = new TouchComboBox (AquaPicDrivers.AnalogOutput.GetAllCardNames ());
-			combo.comboList.Add ("New card...");
+            combo = new TouchComboBox (AquaPicDrivers.AnalogOutput.GetAllCardNames ());
+            combo.comboList.Add ("New card...");
             if (card.IsNotEmpty ()) {
                 combo.activeText = card;
             }
@@ -84,27 +84,27 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnUpdateTimer () {
-			if (card.IsNotEmpty ()) {
+            if (card.IsNotEmpty ()) {
                 var values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (card);
 
-				int i = 0;
-				foreach (var d in displays) {
-					d.currentValue = values[i];
-					d.QueueDraw ();
+                int i = 0;
+                foreach (var d in displays) {
+                    d.currentValue = values[i];
+                    d.QueueDraw ();
 
-					++i;
-				}
-			}
+                    ++i;
+                }
+            }
 
             return true;
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs args) {
-			if (args.activeText != "New card...") {
+            if (args.activeText != "New card...") {
                 card = args.activeText;
                 GetCardData ();
             } else {
-				var parent = Toplevel as Window;
+                var parent = Toplevel as Window;
                 if (parent != null) {
                     if (!parent.IsTopLevel)
                         parent = null;
@@ -114,7 +114,7 @@ namespace AquaPic.UserInterface
                 numberInput.Title = "Address";
 
                 numberInput.TextSetEvent += (o, a) => {
-					a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, AquaPicDrivers.AnalogOutput);
+                    a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, AquaPicDrivers.AnalogOutput);
 
                     if (a.keepText) {
                         combo.comboList.Insert (combo.comboList.Count - 1, card);
@@ -136,9 +136,9 @@ namespace AquaPic.UserInterface
             QueueDraw ();
         }
 
-		protected void OnGlobalSettingsRelease (object sender, ButtonReleaseEventArgs args) {
+        protected void OnGlobalSettingsRelease (object sender, ButtonReleaseEventArgs args) {
             if (card.IsNotEmpty ()) {
-				if (AquaPicDrivers.AnalogOutput.CheckCardEmpty (card)) {
+                if (AquaPicDrivers.AnalogOutput.CheckCardEmpty (card)) {
                     var parent = Toplevel as Window;
                     if (parent != null) {
                         if (!parent.IsTopLevel)
@@ -149,19 +149,19 @@ namespace AquaPic.UserInterface
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {
-							var deleted = CardSettingsHelper.OnCardDeleteEvent (card, AquaPicDrivers.AnalogOutput);
+                            var deleted = CardSettingsHelper.OnCardDeleteEvent (card, AquaPicDrivers.AnalogOutput);
                             if (deleted) {
                                 combo.comboList.Remove (card);
-								if (AquaPicDrivers.AnalogOutput.cardCount == 0) {
+                                if (AquaPicDrivers.AnalogOutput.cardCount == 0) {
                                     card = string.Empty;
                                     sceneTitle = "No Analog Output Cards Added";
                                     foreach (var display in displays) {
                                         display.Visible = false;
                                     }
                                     combo.activeIndex = -1;
-									settingsButton.buttonColor = "grey1";
+                                    settingsButton.buttonColor = "grey1";
                                 } else {
-									card = AquaPicDrivers.AnalogOutput.firstCard;
+                                    card = AquaPicDrivers.AnalogOutput.firstCard;
                                     combo.activeText = card;
                                     GetCardData ();
                                 }
@@ -221,34 +221,34 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetCardData () {
-			if (card.IsNotEmpty ()) {
-				var names = AquaPicDrivers.AnalogOutput.GetAllChannelNames (card);
-				var values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (card);
-				var types = AquaPicDrivers.AnalogOutput.GetAllChannelTypes (card);
-				var modes = AquaPicDrivers.AnalogOutput.GetAllChannelModes (card);
+            if (card.IsNotEmpty ()) {
+                var names = AquaPicDrivers.AnalogOutput.GetAllChannelNames (card);
+                var values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (card);
+                var types = AquaPicDrivers.AnalogOutput.GetAllChannelTypes (card);
+                var modes = AquaPicDrivers.AnalogOutput.GetAllChannelModes (card);
 
-				int i = 0;
-				foreach (var d in displays) {
-					d.label.text = names[i];
-					d.currentValue = values[i];
-					d.typeLabel.text = Utils.GetDescription (types[i]);
+                int i = 0;
+                foreach (var d in displays) {
+                    d.label.text = names[i];
+                    d.currentValue = values[i];
+                    d.typeLabel.text = Utils.GetDescription (types[i]);
 
-					if (modes[i] == Mode.Auto) {
-						d.progressBar.enableTouch = false;
-						d.textBox.enableTouch = false;
-						d.forceButton.buttonColor = "grey4";
-					} else {
-						d.progressBar.enableTouch = true;
-						d.textBox.enableTouch = true;
-						d.forceButton.buttonColor = "pri";
-					}
+                    if (modes[i] == Mode.Auto) {
+                        d.progressBar.enableTouch = false;
+                        d.textBox.enableTouch = false;
+                        d.forceButton.buttonColor = "grey4";
+                    } else {
+                        d.progressBar.enableTouch = true;
+                        d.textBox.enableTouch = true;
+                        d.forceButton.buttonColor = "pri";
+                    }
 
-					d.QueueDraw ();
+                    d.QueueDraw ();
 
-					++i;
-				}
+                    ++i;
+                }
 
-				if (AquaPicDrivers.AnalogOutput.CheckCardEmpty (card)) {
+                if (AquaPicDrivers.AnalogOutput.CheckCardEmpty (card)) {
                     settingsButton.buttonColor = "compl";
                 } else {
                     settingsButton.buttonColor = "grey1";

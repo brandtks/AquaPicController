@@ -29,7 +29,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
-    public delegate void ChangeSceneHandler (SceneData screen, params object [] options);
+    public delegate void ChangeSceneHandler (SceneData screen, params object[] options);
 
     public class AquaPicGui : Window
     {
@@ -84,7 +84,7 @@ namespace AquaPic.UserInterface
 
             ChangeSceneEvent += ScreenChange;
 
-            scenes = new Dictionary<string, SceneData>() {
+            scenes = new Dictionary<string, SceneData> () {
                 { "Power", new SceneData ("Power", true, (options) => {return new PowerWindow (options);}) },
                 { "Lighting", new SceneData ("Lighting", true, (options) => {return new LightingWindow (options);}) },
                 { "Temperature", new SceneData ("Temperature", true, (options) => {return new TemperatureWindow (options);}) },
@@ -106,11 +106,11 @@ namespace AquaPic.UserInterface
             f = new Fixed ();
             f.SetSizeRequest (800, 480);
 
-            current = scenes [_currentScene].CreateInstance ();
+            current = scenes[_currentScene].CreateInstance ();
             f.Put (current, 0, 0);
             current.Show ();
 
-			notification = new MyNotificationBar ();
+            notification = new MyNotificationBar ();
             f.Put (notification, 0, 0);
             notification.Show ();
 
@@ -126,14 +126,14 @@ namespace AquaPic.UserInterface
 
         public static AquaPicGui CreateInstance () {
             if (_userInterface == null) {
-                _userInterface = new AquaPicGui();
+                _userInterface = new AquaPicGui ();
                 return _userInterface;
             }
 
-            throw new Exception("User interface is already created");
+            throw new Exception ("User interface is already created");
         }
 
-        public void ChangeScreens (string name, params object [] options) {
+        public void ChangeScreens (string name, params object[] options) {
             if (!scenes.ContainsKey (name))
                 throw new Exception ("Screen does not exist");
 
@@ -144,7 +144,7 @@ namespace AquaPic.UserInterface
             _currentScene = name;
 
             if (ChangeSceneEvent != null) {
-                ChangeSceneEvent (scenes [name], options);
+                ChangeSceneEvent (scenes[name], options);
             }
         }
 
@@ -160,7 +160,7 @@ namespace AquaPic.UserInterface
 #endif
         }
 
-        protected void ScreenChange (SceneData screen, params object [] options) {
+        protected void ScreenChange (SceneData screen, params object[] options) {
             f.Remove (current);
             current.Destroy ();
             current.Dispose ();

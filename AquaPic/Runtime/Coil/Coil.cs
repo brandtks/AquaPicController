@@ -25,22 +25,22 @@ using System;
 
 namespace AquaPic.Operands
 {
-    public delegate float ValueGetterHandler ();
-    public delegate void ValueSetterHandler (float value);
+    public delegate bool ConditionGetterHandler ();
+    public delegate void ConditionSetterHandler (bool condition);
 
-    public class Value
+    public class Coil
     {
-        public ValueGetterHandler ValueGetter;
-        public ValueSetterHandler ValueSetter;
-        public float value;
+        public ConditionGetterHandler ConditionGetter;
+        public ConditionSetterHandler ConditionSetter;
+        public bool state;
 
-        public Value () {
-            value = 0.0f;
+        public Coil () {
+            state = false;
         }
 
         public void Execute () {
-            value = (float)ValueGetter?.Invoke();
-            ValueSetter?.Invoke (value);
+            state = (bool)ConditionGetter?.Invoke ();  // do we have a condition check method, if yes, lets run it to find out the new state
+            ConditionSetter?.Invoke (state);
         }
     }
 }

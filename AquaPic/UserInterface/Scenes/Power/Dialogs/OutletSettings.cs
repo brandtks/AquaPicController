@@ -42,8 +42,7 @@ namespace AquaPic.UserInterface
         public IndividualControl ic;
 
         public OutletSettings (string name, bool includeDelete, IndividualControl ic)
-            : base (name, includeDelete, 400)
-        {
+            : base (name, includeDelete, 400) {
             this.ic = ic;
 
             tv = new TextView ();
@@ -63,12 +62,12 @@ namespace AquaPic.UserInterface
             string outletId = ic.Individual.ToString ();
             foreach (var jt in ja) {
                 jo = jt as JObject;
-                string n = (string)jo ["powerStrip"];
+                string n = (string)jo["powerStrip"];
                 if (n == psName) {
-                    n = (string)jo ["outlet"];
+                    n = (string)jo["outlet"];
                     if (n == outletId) {
                         StringBuilder sb = new StringBuilder ();
-                        JArray ja2 = (JArray)jo ["conditions"];
+                        JArray ja2 = (JArray)jo["conditions"];
                         foreach (var jt2 in ja2)
                             sb.AppendLine ((string)jt2);
                         code = sb.ToString ();
@@ -125,11 +124,11 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnSave (object sender) {
-            string name = ((SettingsTextBox)settings ["Name"]).textBox.text;
+            string name = ((SettingsTextBox)settings["Name"]).textBox.text;
 
             MyState fallback = MyState.Off;
             try {
-                SettingsSelectorSwitch s = settings ["Fallback"] as SettingsSelectorSwitch;
+                SettingsSelectorSwitch s = settings["Fallback"] as SettingsSelectorSwitch;
                 if (s.selectorSwitch.currentSelected == 0)
                     fallback = MyState.On;
                 else
@@ -168,9 +167,9 @@ namespace AquaPic.UserInterface
                 string psName = ic.Group;
                 string outletId = ic.Individual.ToString ();
                 for (int i = 0; i < ja.Count; ++i) {
-                    string n = (string)ja [i] ["powerStrip"];
+                    string n = (string)ja[i]["powerStrip"];
                     if (n == psName) {
-                        n = (string)ja [i] ["outlet"];
+                        n = (string)ja[i]["outlet"];
                         if (n == outletId) {
                             arrIdx = i;
                             break;
@@ -183,9 +182,9 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                ja [arrIdx] ["name"] = name;
-                ja [arrIdx] ["fallback"] = fallback.ToString ();
-                ja [arrIdx] ["conditions"] = jcond;
+                ja[arrIdx]["name"] = name;
+                ja[arrIdx]["fallback"] = fallback.ToString ();
+                ja[arrIdx]["conditions"] = jcond;
             } else {
                 if (name == "Enter name") {
                     MessageBox.Show ("Invalid outlet name");
@@ -224,9 +223,9 @@ namespace AquaPic.UserInterface
             string psName = ic.Group;
             string outletId = ic.Individual.ToString ();
             for (int i = 0; i < ja.Count; ++i) {
-                string n = (string)ja [i] ["powerStrip"];
+                string n = (string)ja[i]["powerStrip"];
                 if (n == psName) {
-                    n = (string)ja [i] ["outlet"];
+                    n = (string)ja[i]["outlet"];
                     if (n == outletId) {
                         arrIdx = i;
                         break;
@@ -240,7 +239,7 @@ namespace AquaPic.UserInterface
             }
 
             List<string> code = new List<string> ();
-            JArray ja2 = (JArray)ja [arrIdx] ["conditions"];
+            JArray ja2 = (JArray)ja[arrIdx]["conditions"];
             foreach (var jt2 in ja2)
                 code.Add ((string)jt2);
 
@@ -261,10 +260,10 @@ namespace AquaPic.UserInterface
                 return false;
             }
 
-            conditions = tv.Buffer.Text.Split (new string[] {Environment.NewLine, "\n"}, StringSplitOptions.None);
-//            List<string> cond = new List<string> ();
-//            foreach (var c in conditions)
-//                cond.Add (c);
+            conditions = tv.Buffer.Text.Split (new string[] { Environment.NewLine, "\n" }, StringSplitOptions.None);
+            //            List<string> cond = new List<string> ();
+            //            foreach (var c in conditions)
+            //                cond.Add (c);
 
             try {
                 Script.UndoPreprocessor (conditions);

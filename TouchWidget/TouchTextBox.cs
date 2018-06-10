@@ -69,13 +69,13 @@ namespace GoodtimeDevelopment.TouchWidget
         public TouchColor bkgndColor;
         public bool enableTouch;
         public bool includeTimeFunctions;
-		public event TextSetEventHandler TextChangedEvent;
+        public event TextSetEventHandler TextChangedEvent;
         public TouchText textRender;
 
         public TouchTextBox () {
             Visible = true;
             VisibleWindow = false;
-            
+
             WidthRequest = 100;
             HeightRequest = 30;
 
@@ -129,14 +129,14 @@ namespace GoodtimeDevelopment.TouchWidget
 
                 if (!string.IsNullOrWhiteSpace (name))
                     t.Title = name;
-                
-                t.TextSetEvent += (sender, a) => {
-					TextChangedEvent?.Invoke (this, a);
 
-                    if (a.keepText) 
+                t.TextSetEvent += (sender, a) => {
+                    TextChangedEvent?.Invoke (this, a);
+
+                    if (a.keepText)
                         text = a.text;
                 };
-                
+
                 t.Run ();
                 t.Destroy ();
                 QueueDraw ();

@@ -34,7 +34,7 @@ namespace AquaPic.UserInterface
     public class AnalogChannelDisplay : Fixed
     {
         public event ButtonReleaseEventHandler ForceButtonReleaseEvent;
-		public event ButtonReleaseEventHandler SettingsButtonReleaseEvent;
+        public event ButtonReleaseEventHandler SettingsButtonReleaseEvent;
         public event ValueChangedHandler ValueChangedEvent;
 
         public TouchLabel label;
@@ -42,7 +42,7 @@ namespace AquaPic.UserInterface
         public TouchProgressBar progressBar;
         public TouchLabel typeLabel;
         public TouchButton forceButton;
-		public TouchButton settingsButton;
+        public TouchButton settingsButton;
 
         public int divisionSteps;
 
@@ -59,12 +59,12 @@ namespace AquaPic.UserInterface
             SetSizeRequest (710, 50);
 
             label = new TouchLabel ();
-			label.WidthRequest = 490;
+            label.WidthRequest = 490;
             Put (label, 5, 0);
             label.Show ();
 
             textBox = new TouchTextBox ();
-            textBox.WidthRequest = 175; 
+            textBox.WidthRequest = 175;
             textBox.TextChangedEvent += (sender, args) => {
                 try {
                     currentValue = Convert.ToSingle (args.text);
@@ -93,19 +93,19 @@ namespace AquaPic.UserInterface
 
             forceButton = new TouchButton ();
             forceButton.SetSizeRequest (85, 30);
-			forceButton.buttonColor = "grey4";
+            forceButton.buttonColor = "grey4";
             forceButton.text = "Force";
             forceButton.ButtonReleaseEvent += OnForceReleased;
             Put (forceButton, 590, 20);
             forceButton.Show ();
 
-			settingsButton = new TouchButton ();
-			settingsButton.SetSizeRequest (30, 30);
-			settingsButton.buttonColor = "grey4";
-			settingsButton.text = Convert.ToChar (0x2699).ToString ();
-			settingsButton.ButtonReleaseEvent += OnSettingsRelease;
-			Put (settingsButton, 680, 20);
-			settingsButton.Show ();
+            settingsButton = new TouchButton ();
+            settingsButton.SetSizeRequest (30, 30);
+            settingsButton.buttonColor = "grey4";
+            settingsButton.text = Convert.ToChar (0x2699).ToString ();
+            settingsButton.ButtonReleaseEvent += OnSettingsRelease;
+            Put (settingsButton, 680, 20);
+            settingsButton.Show ();
 
             Show ();
         }
@@ -117,9 +117,9 @@ namespace AquaPic.UserInterface
                 throw new NotImplementedException ("Force button release not implemented");
         }
 
-		protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
-			if (SettingsButtonReleaseEvent != null)
-				SettingsButtonReleaseEvent (this, args);
+        protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
+            if (SettingsButtonReleaseEvent != null)
+                SettingsButtonReleaseEvent (this, args);
             else
                 throw new NotImplementedException ("Settings button release not implemented");
         }

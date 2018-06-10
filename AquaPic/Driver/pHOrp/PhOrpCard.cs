@@ -33,7 +33,7 @@ namespace AquaPic.Drivers
         {
             public PhOrpCard (string name, int address)
                 : base (
-                    name,  
+                    name,
                     address,
                     2) { }
 
@@ -41,14 +41,14 @@ namespace AquaPic.Drivers
                 return new PhOrpChannel (GetDefualtName (index));
             }
 
-			public override string GetChannelPrefix () {
-				return "i";
-			}
+            public override string GetChannelPrefix () {
+                return "i";
+            }
 
-			public override void GetValueCommunication (int channel) {
+            public override void GetValueCommunication (int channel) {
                 CheckChannelRange (channel);
 
-                if (channels [channel].mode == Mode.Auto) {
+                if (channels[channel].mode == Mode.Auto) {
                     ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback);
                 }
             }
@@ -56,43 +56,43 @@ namespace AquaPic.Drivers
             protected void GetValueCommunicationCallback (CallbackArgs args) {
                 var ch = args.GetDataFromReadBuffer<byte> (0);
                 var value = args.GetDataFromReadBuffer<short> (1);
-                channels [ch].SetValue (value);
+                channels[ch].SetValue (value);
             }
 
             public override void GetAllValuesCommunication () {
-                Read (20, sizeof(short) * 4, GetAllValuesCommunicationCallback);
+                Read (20, sizeof (short) * 4, GetAllValuesCommunicationCallback);
             }
 
             protected void GetAllValuesCommunicationCallback (CallbackArgs args) {
                 var values = new short[4];
 
                 for (int i = 0; i < values.Length; ++i) {
-                    values [i] = args.GetDataFromReadBuffer<short> (i * 2);
+                    values[i] = args.GetDataFromReadBuffer<short> (i * 2);
                 }
 
                 for (int i = 0; i < channels.Length; ++i) {
-                    if (channels [i].mode == Mode.Auto)
-                        channels [i].SetValue (values [i]);
+                    if (channels[i].mode == Mode.Auto)
+                        channels[i].SetValue (values[i]);
                 }
             }
 
-			public override void SetChannelValue (int channel, ValueType value) {
+            public override void SetChannelValue (int channel, ValueType value) {
                 CheckChannelRange (channel);
 
-                if (channels [channel].mode == Mode.Manual) {
-                    channels [channel].SetValue (value);
+                if (channels[channel].mode == Mode.Manual) {
+                    channels[channel].SetValue (value);
                 } else {
                     throw new Exception ("Can only modify pH/ORP value with channel forced");
                 }
             }
 
-			public override void SetAllChannelValues (ValueType[] values) {
+            public override void SetAllChannelValues (ValueType[] values) {
                 if (values.Length != channels.Length)
                     throw new ArgumentOutOfRangeException (nameof (values), "values length");
 
                 for (int i = 0; i < channels.Length; ++i) {
-                    if (channels [i].mode == Mode.Manual) {
-                        channels [i].SetValue (values [i]);
+                    if (channels[i].mode == Mode.Manual) {
+                        channels[i].SetValue (values[i]);
                     }
                 }
             }

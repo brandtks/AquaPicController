@@ -25,13 +25,15 @@ using System;
 
 namespace AquaPic.Runtime
 {
-    public enum AlarmEventType {
+    public enum AlarmEventType
+    {
         Posted,
         Acknowledged,
         Cleared
     }
 
-    public class AlarmEventArgs : EventArgs {
+    public class AlarmEventArgs : EventArgs
+    {
         public AlarmEventType type;
         public string name;
 

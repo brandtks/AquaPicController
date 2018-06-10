@@ -143,12 +143,12 @@ namespace AquaPic.UserInterface
             ExposeEvent += (o, args) => {
                 GrabFocus ();
             };
-                       
+
             Show ();
         }
 
         void EntryKeyPressEvent (object o, KeyPressEventArgs args) {
-            Console.WriteLine("DEBUG: KeyValue: " + args.Event.KeyValue);
+            Console.WriteLine ("DEBUG: KeyValue: " + args.Event.KeyValue);
             if (args.Event.KeyValue == 32) {
                 if (enableStepButton) {
                     OnStepButtonReleased (null, null);
@@ -158,7 +158,7 @@ namespace AquaPic.UserInterface
 
         protected void NextStep () {
             string step, action;
-            bool done = tests [testIdx].GetNextStep (out step, out action);
+            bool done = tests[testIdx].GetNextStep (out step, out action);
             stepLabel.text = step;
             actionLabel.text = action;
 
@@ -199,9 +199,9 @@ namespace AquaPic.UserInterface
             if (done) {
                 stepButton.text = "Done";
                 stepButton.buttonColor = "compl";
-                string result = String.Format ("{0:f2} {1}", tests [testIdx].CalculateResults (), tests [testIdx].unit);
+                string result = String.Format ("{0:f2} {1}", tests[testIdx].CalculateResults (), tests[testIdx].unit);
                 stepLabel.text = result;
-                Logger.Add ("Tested {0}, result is {1}", tests [testIdx].name, result);
+                Logger.Add ("Tested {0}, result is {1}", tests[testIdx].name, result);
             }
 
             stepLabel.QueueDraw ();
@@ -211,7 +211,7 @@ namespace AquaPic.UserInterface
 
         protected void Restart () {
             if (testIdx != -1) {
-                tests [testIdx].Restart ();
+                tests[testIdx].Restart ();
 
                 timerProgress.Visible = false;
                 timerLabel.Visible = false;
@@ -234,7 +234,7 @@ namespace AquaPic.UserInterface
             --currentTime;
 
             timerProgress.progress = (float)currentTime / (float)actionOption;
-            timerProgress.progressColor = new TouchColor ("compl").Blend(new TouchColor ("pri"), timerProgress.progress);
+            timerProgress.progressColor = new TouchColor ("compl").Blend (new TouchColor ("pri"), timerProgress.progress);
 
             if ((currentTime % 5) == 0) {
                 timerLabel.text = string.Format ("{0:D} secs", currentTime / 5);
@@ -268,7 +268,7 @@ namespace AquaPic.UserInterface
             int newIdx = testIdx;
 
             if (testIdx != -1) {
-                if (!tests [testIdx].InProcedure) {
+                if (!tests[testIdx].InProcedure) {
                     var parent = this.Toplevel as Gtk.Window;
                     if (parent != null) {
                         if (!parent.IsTopLevel)
@@ -276,7 +276,7 @@ namespace AquaPic.UserInterface
                     }
 
                     var ms = new TouchDialog (
-                         "Are you sure you want to quit in the middle of a procedure", 
+                         "Are you sure you want to quit in the middle of a procedure",
                          parent);
 
                     ms.Response += (o, a) => {
@@ -296,12 +296,12 @@ namespace AquaPic.UserInterface
 
             if (newIdx != testIdx) {
                 if (testIdx != -1) {
-                    tests [testIdx].Restart ();
+                    tests[testIdx].Restart ();
                 }
 
                 testIdx = newIdx;
 
-                nameLabel.text = tests [testIdx].name;
+                nameLabel.text = tests[testIdx].name;
                 nameLabel.QueueDraw ();
 
                 resetBtn.Visible = false;
@@ -343,7 +343,7 @@ namespace AquaPic.UserInterface
                         var t = new TouchNumberInput (false, parent);
                         t.TextSetEvent += (o, a) => {
                             try {
-								number = Convert.ToDouble (a.text);
+                                number = Convert.ToDouble (a.text);
                             } catch {
                                 number = -1;
                             }
@@ -356,11 +356,11 @@ namespace AquaPic.UserInterface
                         }
                     }
 
-                    if (failCount != 0) { 
+                    if (failCount != 0) {
                         if (actionOption == 1) {
-                            tests [testIdx].level1 = number;
+                            tests[testIdx].level1 = number;
                         } else {
-                            tests [testIdx].level2 = number;
+                            tests[testIdx].level2 = number;
                         }
 
                         stepButton.text = "Next";
@@ -371,14 +371,14 @@ namespace AquaPic.UserInterface
                     }
                 } else {
                     if (testIdx != -1) {
-                        if (tests [testIdx].NotStarted) {
+                        if (tests[testIdx].NotStarted) {
                             stepButton.text = "Next";
                             stepButton.buttonColor = "seca";
                             resetBtn.Visible = true;
                             resetBtn.QueueDraw ();
-                        } 
+                        }
 
-                        if (!tests [testIdx].Done) {
+                        if (!tests[testIdx].Done) {
                             NextStep ();
                         }
                     }
@@ -390,7 +390,7 @@ namespace AquaPic.UserInterface
             if (testIdx != -1) {
                 bool restart = false;
 
-                if (tests [testIdx].Done) {
+                if (tests[testIdx].Done) {
                     restart = true;
                 } else {
                     var parent = this.Toplevel as Window;
@@ -400,7 +400,7 @@ namespace AquaPic.UserInterface
                     }
 
                     var ms = new TouchDialog (
-                        "Are you sure you want to quit in the middle of a procedure", 
+                        "Are you sure you want to quit in the middle of a procedure",
                         parent);
 
                     ms.Response += (obj, a) => {

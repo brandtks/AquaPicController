@@ -40,10 +40,10 @@ namespace AquaPic.UserInterface
             private TouchComboBox typeCombo;
             private SettingsTextBox nameTextBox;
 
-			private SettingsComboBox moduleComboBox;
-			private SettingsComboBox groupComboBox;
+            private SettingsComboBox moduleComboBox;
+            private SettingsComboBox groupComboBox;
 
-			private SettingsComboBox nameComboBox;
+            private SettingsComboBox nameComboBox;
 
             public HomeSettingsWidget newWidget;
 
@@ -104,25 +104,25 @@ namespace AquaPic.UserInterface
                 widgetLabel.Show ();
 
                 nameTextBox = new SettingsTextBox ("Name");
-				nameTextBox.Visible = false;
+                nameTextBox.Visible = false;
                 fix.Put (nameTextBox, 5, 40);
-                
-				moduleComboBox = new SettingsComboBox ("Module");
-				moduleComboBox.combo.nonActiveMessage = "Please select module";
-				moduleComboBox.combo.ComboChangedEvent += OnModuleComboChanged;
-				moduleComboBox.Visible = false;
-				fix.Put (moduleComboBox, 5, 40);
 
-				nameComboBox = new SettingsComboBox ("Name");
-				nameComboBox.combo.nonActiveMessage = "Please select name";
-				nameComboBox.combo.ComboChangedEvent += OnModuleComboChanged;
-				nameComboBox.Visible = false;
-				fix.Put (nameComboBox, 5, 40);
+                moduleComboBox = new SettingsComboBox ("Module");
+                moduleComboBox.combo.nonActiveMessage = "Please select module";
+                moduleComboBox.combo.ComboChangedEvent += OnModuleComboChanged;
+                moduleComboBox.Visible = false;
+                fix.Put (moduleComboBox, 5, 40);
 
-				groupComboBox = new SettingsComboBox ("Group");
-				groupComboBox.combo.nonActiveMessage = "Please select group";
-				groupComboBox.Visible = false;
-				fix.Put (groupComboBox, 305, 40);
+                nameComboBox = new SettingsComboBox ("Name");
+                nameComboBox.combo.nonActiveMessage = "Please select name";
+                nameComboBox.combo.ComboChangedEvent += OnModuleComboChanged;
+                nameComboBox.Visible = false;
+                fix.Put (nameComboBox, 5, 40);
+
+                groupComboBox = new SettingsComboBox ("Group");
+                groupComboBox.combo.nonActiveMessage = "Please select group";
+                groupComboBox.Visible = false;
+                fix.Put (groupComboBox, 305, 40);
 
                 typeCombo = new TouchComboBox ();
                 typeCombo.comboList.Add ("Line Plot");
@@ -133,7 +133,7 @@ namespace AquaPic.UserInterface
                 typeCombo.nonActiveMessage = "Select type";
                 typeCombo.WidthRequest = 400;
                 typeCombo.maxListHeight = 3;
-				typeCombo.ComboChangedEvent += OnTypeComboChanged;
+                typeCombo.ComboChangedEvent += OnTypeComboChanged;
                 fix.Put (typeCombo, 195, 5);
                 typeCombo.Show ();
 
@@ -146,67 +146,67 @@ namespace AquaPic.UserInterface
                 fix.Show ();
             }
 
-			protected void OnTypeComboChanged (object sender, ComboBoxChangedEventArgs args) {
-				switch (args.activeText) {
-				case "Line Plot":
-					nameTextBox.Visible = false;
+            protected void OnTypeComboChanged (object sender, ComboBoxChangedEventArgs args) {
+                switch (args.activeText) {
+                case "Line Plot":
+                    nameTextBox.Visible = false;
                     moduleComboBox.Visible = true;
-					groupComboBox.Visible = false;
+                    groupComboBox.Visible = false;
                     nameComboBox.Visible = false;
 
-					moduleComboBox.combo.comboList.Clear ();
-					moduleComboBox.combo.comboList.AddRange (HomeWindowWidgets.linePlots.Keys);
-					moduleComboBox.combo.activeIndex = -1;
+                    moduleComboBox.combo.comboList.Clear ();
+                    moduleComboBox.combo.comboList.AddRange (HomeWindowWidgets.linePlots.Keys);
+                    moduleComboBox.combo.activeIndex = -1;
 
-					break;
-				case "Bar Plot":
-					nameTextBox.Visible = false;
+                    break;
+                case "Bar Plot":
+                    nameTextBox.Visible = false;
                     moduleComboBox.Visible = true;
-					groupComboBox.Visible = false;
+                    groupComboBox.Visible = false;
                     nameComboBox.Visible = false;
 
-					moduleComboBox.combo.comboList.Clear ();
+                    moduleComboBox.combo.comboList.Clear ();
                     moduleComboBox.combo.comboList.AddRange (HomeWindowWidgets.barPlots.Keys);
                     moduleComboBox.combo.activeIndex = -1;
 
-					break;
-				case "Curved Bar Plot":
-                    nameTextBox.Visible = false;
-					moduleComboBox.Visible = false;
-					groupComboBox.Visible = false;
-					nameComboBox.Visible = true;
-
-					nameComboBox.combo.comboList.Clear ();
-					nameComboBox.combo.comboList.AddRange (HomeWindowWidgets.curvedBarPlots.Keys);
-					moduleComboBox.combo.activeIndex = -1;
-
                     break;
-				default:
-					nameTextBox.Visible = true;
+                case "Curved Bar Plot":
+                    nameTextBox.Visible = false;
                     moduleComboBox.Visible = false;
                     groupComboBox.Visible = false;
-					nameComboBox.Visible = false;
-					break;
-				}
-			}
+                    nameComboBox.Visible = true;
 
-			protected void OnModuleComboChanged (object sender, ComboBoxChangedEventArgs args) {
-				if (args.activeIndex != -1) {
+                    nameComboBox.combo.comboList.Clear ();
+                    nameComboBox.combo.comboList.AddRange (HomeWindowWidgets.curvedBarPlots.Keys);
+                    moduleComboBox.combo.activeIndex = -1;
+
+                    break;
+                default:
+                    nameTextBox.Visible = true;
+                    moduleComboBox.Visible = false;
+                    groupComboBox.Visible = false;
+                    nameComboBox.Visible = false;
+                    break;
+                }
+            }
+
+            protected void OnModuleComboChanged (object sender, ComboBoxChangedEventArgs args) {
+                if (args.activeIndex != -1) {
                     if (args.activeText == "Temperature") {
-						groupComboBox.Visible = true;
-						groupComboBox.combo.comboList.Clear ();
-						groupComboBox.combo.comboList.AddRange (Temperature.GetAllTemperatureGroupNames ());
-						groupComboBox.combo.activeIndex = -1;
-					} else if (args.activeText == "Water Level") {
-						groupComboBox.Visible = true;
-						groupComboBox.combo.comboList.Clear ();
-						groupComboBox.combo.comboList.AddRange (WaterLevel.GetAllWaterLevelGroupNames ());
-						groupComboBox.combo.activeIndex = -1;
-					} else {
-						groupComboBox.Visible = false;
-					}
-				}
-			}
+                        groupComboBox.Visible = true;
+                        groupComboBox.combo.comboList.Clear ();
+                        groupComboBox.combo.comboList.AddRange (Temperature.GetAllTemperatureGroupNames ());
+                        groupComboBox.combo.activeIndex = -1;
+                    } else if (args.activeText == "Water Level") {
+                        groupComboBox.Visible = true;
+                        groupComboBox.combo.comboList.Clear ();
+                        groupComboBox.combo.comboList.AddRange (WaterLevel.GetAllWaterLevelGroupNames ());
+                        groupComboBox.combo.activeIndex = -1;
+                    } else {
+                        groupComboBox.Visible = false;
+                    }
+                }
+            }
 
             protected void OnAddButtonReleased (object sender, ButtonReleaseEventArgs args) {
                 if (typeCombo.activeIndex == -1) {
@@ -214,24 +214,24 @@ namespace AquaPic.UserInterface
                     return;
                 }
 
-				string name, group;
+                string name, group;
 
                 var type = Regex.Replace (typeCombo.activeText, @"\s+", "");
-				switch (type) {
+                switch (type) {
                 case "LinePlot":
-				case "BarPlot":
-					if (moduleComboBox.combo.activeIndex < 0) {
+                case "BarPlot":
+                    if (moduleComboBox.combo.activeIndex < 0) {
                         MessageBox.Show ("Please select a module");
                         return;
                     }
-					name = (string)moduleComboBox.setting;
+                    name = (string)moduleComboBox.setting;
 
-					if (groupComboBox.combo.activeIndex < 0) 
-					if (groupComboBox.Visible) {
-                        MessageBox.Show ("Please select a group");
-                        return;
-                    }
-					group = (string)groupComboBox.setting;
+                    if (groupComboBox.combo.activeIndex < 0)
+                        if (groupComboBox.Visible) {
+                            MessageBox.Show ("Please select a group");
+                            return;
+                        }
+                    group = (string)groupComboBox.setting;
 
                     break;
                 case "CurvedBarPlot":
@@ -239,12 +239,12 @@ namespace AquaPic.UserInterface
                         MessageBox.Show ("Please select a name");
                         return;
                     }
-					name = (string)nameComboBox.setting;
-					group = string.Empty;
+                    name = (string)nameComboBox.setting;
+                    group = string.Empty;
                     break;
                 default:
-					name = nameTextBox.textBox.text;
-					group = string.Empty;
+                    name = nameTextBox.textBox.text;
+                    group = string.Empty;
                     break;
                 }
 

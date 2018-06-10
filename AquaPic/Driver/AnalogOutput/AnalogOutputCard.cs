@@ -34,7 +34,7 @@ namespace AquaPic.Drivers
         {
             public AnalogOutputCard (string name, int address)
                 : base (
-                    name, 
+                    name,
                     address,
                     4) { }
 
@@ -48,8 +48,8 @@ namespace AquaPic.Drivers
             }
 
             protected void GetValueCommunicationCallback (CallbackArgs args) {
-                var ch = args.GetDataFromReadBuffer<byte>(0);
-                var value = args.GetDataFromReadBuffer<float>(1);
+                var ch = args.GetDataFromReadBuffer<byte> (0);
+                var value = args.GetDataFromReadBuffer<float> (1);
                 channels[ch].SetValue (value);
             }
 
@@ -58,8 +58,8 @@ namespace AquaPic.Drivers
                 channels[channel].SetValue (value);
                 var valueToSend = Convert.ToSingle (value);
                 var buf = new WriteBuffer ();
-                buf.Add ((byte)channel, sizeof(byte));
-                buf.Add (valueToSend, sizeof(float));
+                buf.Add ((byte)channel, sizeof (byte));
+                buf.Add (valueToSend, sizeof (float));
                 Write (31, buf);
             }
 
@@ -69,8 +69,8 @@ namespace AquaPic.Drivers
 
                 var valuesToSend = new float[channelCount];
                 for (int i = 0; i < 4; ++i) {
-                    channels [i].SetValue (values [i]);
-                    valuesToSend [i] = Convert.ToSingle (values [i]);
+                    channels[i].SetValue (values[i]);
+                    valuesToSend[i] = Convert.ToSingle (values[i]);
                 }
 
                 var buf = new WriteBuffer ();
@@ -81,18 +81,18 @@ namespace AquaPic.Drivers
             }
 
             public override void GetAllValuesCommunication () {
-                Read (20, sizeof(float) * 4, GetAllValuesCommunicationCallback);
+                Read (20, sizeof (float) * 4, GetAllValuesCommunicationCallback);
             }
 
             protected void GetAllValuesCommunicationCallback (CallbackArgs args) {
                 var values = new float[4];
 
                 for (int i = 0; i < values.Length; ++i) {
-                    values [i] = args.GetDataFromReadBuffer<float> (i * 4);
+                    values[i] = args.GetDataFromReadBuffer<float> (i * 4);
                 }
 
                 for (int i = 0; i < channels.Length; ++i) {
-                    channels [i].SetValue (values [i]);
+                    channels[i].SetValue (values[i]);
                 }
             }
 
@@ -102,30 +102,30 @@ namespace AquaPic.Drivers
                 analogOutputChannel.type = type;
 
                 var message = new byte[2];
-                message [0] = (byte)channel;
-                message [1] = (byte)analogOutputChannel.type;
+                message[0] = (byte)channel;
+                message[1] = (byte)analogOutputChannel.type;
 
                 Write (2, message);
             }
 
             public AnalogType GetChannelType (int channel) {
                 CheckChannelRange (channel);
-                var analogOutputChannel = channels [channel] as AnalogOutputChannel;
+                var analogOutputChannel = channels[channel] as AnalogOutputChannel;
                 return analogOutputChannel.type;
             }
 
             public AnalogType[] GetAllChannelTypes () {
                 AnalogType[] types = new AnalogType[channelCount];
                 for (int i = 0; i < channelCount; ++i) {
-                    var analogOutputChannel = channels [i] as AnalogOutputChannel;
-                    types [i] = analogOutputChannel.type;
+                    var analogOutputChannel = channels[i] as AnalogOutputChannel;
+                    types[i] = analogOutputChannel.type;
                 }
                 return types;
             }
 
             public Value GetChannelValueControl (int channel) {
                 CheckChannelRange (channel);
-                var analogOutputChannel = channels [channel] as AnalogOutputChannel;
+                var analogOutputChannel = channels[channel] as AnalogOutputChannel;
                 return analogOutputChannel.valueControl;
             }
         }

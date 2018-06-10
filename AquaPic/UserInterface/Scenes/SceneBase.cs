@@ -64,25 +64,25 @@ namespace AquaPic.UserInterface
             label.textAlignment = TouchAlignment.Center;
             Put (label, 50, 37);
             label.Show ();
-            
+
             if (addTimer) {
                 timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
             }
 
-//            Gdk.Pixbuf display = new Gdk.Pixbuf("images/background2.jpg");
-//            string bpath = "temp", tempname = "temp";
-//            for (int i = 0; File.Exists (tempname); i++)
-//              tempname = bpath + i.ToString ();
-//            display.Save (tempname, "png");
-//            background = new Image (tempname);
-//            Put (background, 0, 0);
-//            background.Show ();
-//            File.Delete (tempname);
-//            Gdk.Pixbuf pic = new Gdk.Pixbuf ("images/background3.png");
-//            this.background = new Image (pic);
-//            this.Put (background, 0, 0);
-//            this.background.Show ();
-//            pic.Dispose ();
+            //            Gdk.Pixbuf display = new Gdk.Pixbuf("images/background2.jpg");
+            //            string bpath = "temp", tempname = "temp";
+            //            for (int i = 0; File.Exists (tempname); i++)
+            //              tempname = bpath + i.ToString ();
+            //            display.Save (tempname, "png");
+            //            background = new Image (tempname);
+            //            Put (background, 0, 0);
+            //            background.Show ();
+            //            File.Delete (tempname);
+            //            Gdk.Pixbuf pic = new Gdk.Pixbuf ("images/background3.png");
+            //            this.background = new Image (pic);
+            //            this.Put (background, 0, 0);
+            //            this.background.Show ();
+            //            pic.Dispose ();
         }
 
         protected virtual bool OnUpdateTimer () {

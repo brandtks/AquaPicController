@@ -44,38 +44,38 @@ namespace AquaPic.Runtime
                     foreach (var jt in ja) {
                         var jo = jt as JObject;
                         var type = (string)jo["type"];
-						var address = Convert.ToInt32((string)jo["address"], 16);
-						var name = (string)jo["name"];
+                        var address = Convert.ToInt32 ((string)jo["address"], 16);
+                        var name = (string)jo["name"];
                         switch (type) {
                         case "power":
                             Logger.Add ("Adding power strip");
                             Power.AddPowerStrip (
-								name,
-								address,
+                                name,
+                                address,
                                 Convert.ToBoolean (jo["options"][0]));
                             break;
                         case "analogInput":
                             Logger.Add ("Adding analog input card");
                             AquaPicDrivers.AnalogInput.AddCard (
-								name,
-								address);
+                                name,
+                                address);
                             break;
                         case "analogOutput":
                             Logger.Add ("Adding analog output card");
                             AquaPicDrivers.AnalogOutput.AddCard (
-								name,
+                                name,
                                 address);
                             break;
                         case "digitalInput":
                             Logger.Add ("Adding digital input card");
                             AquaPicDrivers.DigitalInput.AddCard (
-								name,
+                                name,
                                 address);
                             break;
                         case "phOrp":
                             Logger.Add ("Adding pH/ORP card");
                             AquaPicDrivers.PhOrp.AddCard (
-								name,
+                                name,
                                 address);
                             break;
                         default:
@@ -100,12 +100,12 @@ namespace AquaPic.Runtime
                 var jstring = File.ReadAllText (path);
                 var jobj = (JObject)JToken.Parse (jstring);
 
-				bool autoConnect;
-				try {
-					autoConnect = Convert.ToBoolean (jobj["autoConnectAquaPicBus"]);
-				} catch {
-					autoConnect = false;
-				}
+                bool autoConnect;
+                try {
+                    autoConnect = Convert.ToBoolean (jobj["autoConnectAquaPicBus"]);
+                } catch {
+                    autoConnect = false;
+                }
 
                 if (autoConnect) {
                     var port = (string)jobj["aquaPicBusPort"];

@@ -30,7 +30,8 @@ namespace AquaPic.UserInterface
 {
     public delegate CurvedBarPlotWidget CreateCurevedBarPlotHandler ();
 
-    public class CurvedBarPlotData {
+    public class CurvedBarPlotData
+    {
         public CreateCurevedBarPlotHandler CreateInstanceEvent;
 
         public CurvedBarPlotData (CreateCurevedBarPlotHandler CreateInstanceEvent) {

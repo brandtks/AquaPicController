@@ -48,17 +48,17 @@ namespace AquaPic.SerialBus
                 this.readBuffer = new byte[responseLength];
                 this.callback = callback;
 
-                this.writeBuffer [0] = slave.address;
-                this.writeBuffer [1] = func;
-                this.writeBuffer [2] = (byte)this.writeBuffer.Length;
+                this.writeBuffer[0] = slave.address;
+                this.writeBuffer[1] = func;
+                this.writeBuffer[2] = (byte)this.writeBuffer.Length;
 
                 if (writeBuffer != null) {
                     Array.Copy (writeBuffer, 0, this.writeBuffer, 3, writeSize);
                 }
 
                 crc16 (ref this.writeBuffer, ref crc);
-                this.writeBuffer [this.writeBuffer.Length - 2] = crc [0];
-                this.writeBuffer [this.writeBuffer.Length - 1] = crc [1];
+                this.writeBuffer[this.writeBuffer.Length - 2] = crc[0];
+                this.writeBuffer[this.writeBuffer.Length - 1] = crc[1];
             }
         }
     }

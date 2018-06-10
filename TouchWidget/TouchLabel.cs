@@ -93,7 +93,7 @@ namespace GoodtimeDevelopment.TouchWidget
         protected void OnExpose (object sender, ExposeEventArgs args) {
             if (!_centered)
                 textRender.Render (this, Allocation.Left, Allocation.Top, Allocation.Width);
-            else 
+            else
                 textRender.Render (this, Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
         }
     }

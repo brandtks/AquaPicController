@@ -45,8 +45,8 @@ namespace AquaPic.Modules
             public int lowTemperatureAlarmIndex;
 
             public TemperatureGroup (
-                string name, 
-                float highTemperatureAlarmSetpoint, 
+                string name,
+                float highTemperatureAlarmSetpoint,
                 float lowTemperatureAlarmSetpoint,
                 float temperatureSetpoint,
                 float temperatureDeadband
@@ -60,7 +60,7 @@ namespace AquaPic.Modules
                 temperature = 0.0f;
                 dataLogger = Factory.GetDataLogger (string.Format ("{0}Temperature", this.name.RemoveWhitespace ()));
 
-                highTemperatureAlarmIndex = Alarm.Subscribe (string.Format("{0} high temperature", name));
+                highTemperatureAlarmIndex = Alarm.Subscribe (string.Format ("{0} high temperature", name));
                 lowTemperatureAlarmIndex = Alarm.Subscribe (string.Format ("{0} low temperature", name));
             }
 

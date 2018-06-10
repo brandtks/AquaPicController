@@ -28,36 +28,38 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.SerialBus
 {
-    public enum AquaPicBusStatus {
-        [Description("AquaPic bus port not open")]
+    public enum AquaPicBusStatus
+    {
+        [Description ("AquaPic bus port not open")]
         NotOpen = 1,
 
-        [Description("AquaPic bus port is open")]
+        [Description ("AquaPic bus port is open")]
         Open,
 
-        [Description("Starting Communication")]
+        [Description ("Starting Communication")]
         CommunicationStart,
 
-        [Description("Read/Write was successful")]
+        [Description ("Read/Write was successful")]
         CommunicationSuccess,
 
-        [Description("An exception error has occurred")]
+        [Description ("An exception error has occurred")]
         Exception = 101,
 
-        [Description("Response timed out from slave")]
+        [Description ("Response timed out from slave")]
         Timeout,
 
-        [Description("Cyclic reducency check error")]
+        [Description ("Cyclic reducency check error")]
         CrcError,
 
-        [Description("Message length error")]
+        [Description ("Message length error")]
         LengthError
     }
 
     public delegate void ResponseCallback (CallbackArgs args);
     public delegate void StatusUpdateHandler (object sender);
 
-    public class CallbackArgs {
+    public class CallbackArgs
+    {
         public byte[] readBuffer;
 
         public CallbackArgs (byte[] readBuffer) {
@@ -67,7 +69,7 @@ namespace AquaPic.SerialBus
         public T GetDataFromReadBuffer<T> (int offset) {
             GCHandle handle = GCHandle.Alloc (readBuffer, GCHandleType.Pinned);
             IntPtr ptr = new IntPtr (handle.AddrOfPinnedObject ().ToInt64 () + offset + 3);
-            T data = (T)Marshal.PtrToStructure (ptr, typeof(T));
+            T data = (T)Marshal.PtrToStructure (ptr, typeof (T));
             handle.Free ();
             return data;
         }

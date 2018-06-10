@@ -29,7 +29,7 @@ namespace AquaPic.Runtime
     public class Chemistry
     {
         static Chemistry () {
-            
+
         }
     }
 }

@@ -42,8 +42,7 @@ namespace AquaPic.UserInterface
         }
 
         public HeaterSettings (string heaterName, bool includeDelete)
-            : base (heaterName, includeDelete) 
-        {
+            : base (heaterName, includeDelete) {
             this.heaterName = heaterName;
 
             var t = new SettingsTextBox ("Name");
@@ -87,13 +86,13 @@ namespace AquaPic.UserInterface
 
         protected void ParseOutlet (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-			string powerStripName = s.Substring (0, idx);
+            string powerStripName = s.Substring (0, idx);
             g = powerStripName;
             i = Convert.ToByte (s.Substring (idx + 2));
         }
-        
+
         protected override bool OnSave (object sender) {
-            var unparseOutletString = (settings ["Outlet"] as SettingsComboBox).combo.activeText;
+            var unparseOutletString = (settings["Outlet"] as SettingsComboBox).combo.activeText;
             var name = (settings["Name"] as SettingsTextBox).textBox.text;
             var temperatureGroupName = (settings["Temperature Group"] as SettingsComboBox).combo.activeText;
 
@@ -139,13 +138,13 @@ namespace AquaPic.UserInterface
                     MessageBox.Show ("Please select an temperature group");
                     return false;
                 }
-                
+
                 string oldName = heaterName;
                 if (heaterName != name) {
                     Temperature.SetHeaterName (heaterName, name);
                     heaterName = name;
                 }
-                
+
                 IndividualControl ic = IndividualControl.Empty;
                 if (!unparseOutletString.StartsWith ("Current:")) {
                     ParseOutlet (unparseOutletString, ref ic.Group, ref ic.Individual);
@@ -159,7 +158,7 @@ namespace AquaPic.UserInterface
                     Temperature.SetHeaterTemperatureGroupName (heaterName, temperatureGroupName);
                 }
 
-                JArray ja = jo ["heaters"] as JArray;
+                JArray ja = jo["heaters"] as JArray;
 
                 int arrIdx = -1;
                 for (int i = 0; i < ja.Count; ++i) {

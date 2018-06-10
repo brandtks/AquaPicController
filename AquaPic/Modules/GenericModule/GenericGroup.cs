@@ -38,7 +38,7 @@ namespace AquaPic.Modules
         public string name;
 
         public GenericGroup () {
-            
+
         }
 
         public virtual void GroupRun () {

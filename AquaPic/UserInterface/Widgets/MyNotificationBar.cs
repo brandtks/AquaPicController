@@ -107,7 +107,7 @@ namespace AquaPic.UserInterface
             updateAlarm = ++updateAlarm % 6;
             if (updateAlarm == 0)
                 UpdateAlarmText ();
-            
+
             QueueDraw ();
             return true;
         }
@@ -119,7 +119,7 @@ namespace AquaPic.UserInterface
                 if (displayedAlarm >= notAck.Count)
                     displayedAlarm = 0;
 
-                alarmName = notAck [displayedAlarm].name;
+                alarmName = notAck[displayedAlarm].name;
                 displayedAlarm = ++displayedAlarm % notAck.Count;
             } else if (Alarm.AlarmCount () != 0)
                 alarmName = "Alarms";

@@ -25,24 +25,28 @@ using System;
 
 namespace GoodtimeDevelopment.TouchWidget
 {
-    public enum TouchOrientation : byte {
+    public enum TouchOrientation
+    {
         Vertical = 1,
         Horizontal
     }
 
-    public enum TouchAlignment : byte {
+    public enum TouchAlignment
+    {
         Right = 1,
         Left,
         Center
     }
 
-    public enum TouchTextWrap : byte {
+    public enum TouchTextWrap
+    {
         None = 1,
         WordWrap,
         Shrink
     }
 
-    public enum UnitsOfMeasurement {
+    public enum UnitsOfMeasurement
+    {
         None,
         Degrees,
         Percentage,

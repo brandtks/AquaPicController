@@ -37,7 +37,7 @@ namespace AquaPic.UserInterface
             sceneTitle = "Settings";
 
             if (options.Length >= 1) {
-                topWindow = options [0] as AquaPicGui;
+                topWindow = options[0] as AquaPicGui;
                 if (topWindow != null) {
                     if (topWindow.IsTopLevel) {
                         var b = new TouchButton ();
@@ -45,9 +45,9 @@ namespace AquaPic.UserInterface
                         b.text = "Unfullscreen";
                         b.ButtonReleaseEvent += (o, args) => {
                             topWindow.ShowDecoration ();
-                            #if RPI_BUILD
+#if RPI_BUILD
                             topWindow.Unfullscreen ();
-                            #endif
+#endif
                         };
                         Put (b, 685, 140);
                         b.Show ();

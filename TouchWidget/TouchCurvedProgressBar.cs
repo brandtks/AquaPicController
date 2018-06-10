@@ -28,7 +28,8 @@ using GoodtimeDevelopment.Utilites;
 
 namespace GoodtimeDevelopment.TouchWidget
 {
-    public enum CurveStyle {
+    public enum CurveStyle
+    {
         HalfCurve,
         ThreeQuarterCurve
     }
@@ -57,7 +58,7 @@ namespace GoodtimeDevelopment.TouchWidget
         public TouchColor progressColor;
 
         public TouchCurvedProgressBar (
-            TouchColor colorBackground, 
+            TouchColor colorBackground,
             TouchColor colorProgress,
             float currentProgress
         ) {
@@ -75,8 +76,8 @@ namespace GoodtimeDevelopment.TouchWidget
             this.ExposeEvent += OnExpose;
         }
 
-        public TouchCurvedProgressBar () 
-            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f) { 
+        public TouchCurvedProgressBar ()
+            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f) {
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {

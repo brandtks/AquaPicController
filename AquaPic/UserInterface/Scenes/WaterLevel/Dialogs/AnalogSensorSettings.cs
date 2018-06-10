@@ -42,8 +42,7 @@ namespace AquaPic.UserInterface
         }
 
         public AnalogSensorSettings (string name, bool includeDelete)
-            : base (name, includeDelete)
-        {
+            : base (name, includeDelete) {
             analogSensorName = name;
             var analogSensorNameNotEmpty = analogSensorName.IsNotEmpty ();
 
@@ -75,7 +74,7 @@ namespace AquaPic.UserInterface
                 }
             }
             c.combo.nonActiveMessage = "Select outlet";
-            c.combo.comboList.AddRange (availCh); 
+            c.combo.comboList.AddRange (availCh);
             AddSetting (c);
 
             c = new SettingsComboBox ("Water Level Group");
@@ -96,7 +95,7 @@ namespace AquaPic.UserInterface
 
         protected void ParseChannnel (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-			g = s.Substring (0, idx);
+            g = s.Substring (0, idx);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
@@ -114,7 +113,7 @@ namespace AquaPic.UserInterface
                 groupName = string.Empty;
             }
 
-			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
+            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["analogSensors"] as JArray;
 
             if (analogSensorName.IsEmpty ()) {
@@ -132,7 +131,7 @@ namespace AquaPic.UserInterface
 
                 WaterLevel.AddAnalogLevelSensor (
                     name,
-                    groupName, 
+                    groupName,
                     ic,
                     819.2f,
                     10f,
@@ -184,7 +183,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
+            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["analogSensors"] as JArray;
 
             int arrIdx = SettingsHelper.FindSettingsInArray (ja, analogSensorName);

@@ -67,7 +67,7 @@ namespace AquaPic.Equipment
         }
 
         public void Add (IndividualControl outlet) {
-            if (!_outlet.Equals(outlet)) {
+            if (!_outlet.Equals (outlet)) {
                 Remove ();
             }
 

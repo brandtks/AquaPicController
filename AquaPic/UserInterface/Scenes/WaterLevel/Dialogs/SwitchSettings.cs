@@ -44,8 +44,7 @@ namespace AquaPic.UserInterface
         }
 
         public SwitchSettings (string name, bool includeDelete)
-            : base (name, includeDelete) 
-        {
+            : base (name, includeDelete) {
             switchName = name;
 
             var t = new SettingsTextBox ("Name");
@@ -99,7 +98,7 @@ namespace AquaPic.UserInterface
             AddSetting (t);
 
             c = new SettingsComboBox ("Type");
-            string[] types = Enum.GetNames (typeof(SwitchType));
+            string[] types = Enum.GetNames (typeof (SwitchType));
             c.combo.comboList.AddRange (types);
             c.combo.nonActiveMessage = "Please select type";
             if (switchName.IsNotEmpty ()) {
@@ -108,7 +107,7 @@ namespace AquaPic.UserInterface
             AddSetting (c);
 
             c = new SettingsComboBox ("Function");
-            string[] functions = Enum.GetNames (typeof(SwitchFunction));
+            string[] functions = Enum.GetNames (typeof (SwitchFunction));
             c.combo.comboList.AddRange (functions);
             c.combo.comboList.Remove ("None");
             c.combo.nonActiveMessage = "Please select function";
@@ -161,7 +160,7 @@ namespace AquaPic.UserInterface
 
         protected void ParseChannnel (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
-			g = s.Substring (0, idx);
+            g = s.Substring (0, idx);
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
@@ -183,7 +182,7 @@ namespace AquaPic.UserInterface
 
             float physicalLevel = Convert.ToSingle (settings["Physical Level"].setting);
 
-            string typeString = (string)settings ["Type"].setting;
+            string typeString = (string)settings["Type"].setting;
             SwitchType type;
             if (typeString.IsNotEmpty ()) {
                 type = (SwitchType)Enum.Parse (typeof (SwitchType), typeString);
@@ -227,7 +226,7 @@ namespace AquaPic.UserInterface
                 groupName = string.Empty;
             }
 
-			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
+            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["floatSwitches"] as JArray;
 
             if (switchName.IsEmpty ()) {
@@ -289,7 +288,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-			var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
+            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
             var ja = jo["floatSwitches"] as JArray;
 
             int arrIdx = SettingsHelper.FindSettingsInArray (ja, switchName);

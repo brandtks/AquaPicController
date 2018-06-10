@@ -33,7 +33,7 @@ namespace GoodtimeDevelopment.TouchWidget
             var ms = new Dialog (string.Empty, null, DialogFlags.DestroyWithParent);
             ms.KeepAbove = true;
 
-            #if RPI_BUILD
+#if RPI_BUILD
             ms.Decorated = false;
 
             ms.ExposeEvent += (o, args) => {
@@ -48,7 +48,7 @@ namespace GoodtimeDevelopment.TouchWidget
                     cr.Stroke ();
                 }
             };
-            #endif
+#endif
 
             ms.ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
@@ -75,14 +75,13 @@ namespace GoodtimeDevelopment.TouchWidget
 
     public class TouchDialog : Dialog
     {
-        public TouchDialog (string msg, Window parent) 
-            : base (string.Empty, parent, DialogFlags.DestroyWithParent)
-        {
+        public TouchDialog (string msg, Window parent)
+            : base (string.Empty, parent, DialogFlags.DestroyWithParent) {
             ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
             KeepAbove = true;
 
-            #if RPI_BUILD
+#if RPI_BUILD
             Decorated = false;
 
             ExposeEvent += (o, args) => {
@@ -97,19 +96,19 @@ namespace GoodtimeDevelopment.TouchWidget
                     cr.Stroke ();
                 }
             };
-            #endif
+#endif
 
             var btn = new TouchButton ();
             btn.text = "Yes";
             btn.HeightRequest = 30;
-            btn.ButtonReleaseEvent += (o, args) => 
+            btn.ButtonReleaseEvent += (o, args) =>
                 this.Respond (ResponseType.Yes);
             this.ActionArea.Add (btn);
 
             btn = new TouchButton ();
             btn.text = "No";
             btn.HeightRequest = 30;
-            btn.ButtonReleaseEvent += (o, args) => 
+            btn.ButtonReleaseEvent += (o, args) =>
                 this.Respond (ResponseType.No);
             this.ActionArea.Add (btn);
 

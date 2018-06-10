@@ -79,7 +79,7 @@ namespace GoodtimeDevelopment.TouchWidget
 
         public TouchColor (byte R, byte G, byte B, double A = 1.0) {
             colorName = string.Empty;
-            this.R = (double)R/255.0;
+            this.R = (double)R / 255.0;
             this.G = (double)G / 255.0;
             this.B = (double)B / 255.0;
             this.A = A;
@@ -101,7 +101,7 @@ namespace GoodtimeDevelopment.TouchWidget
             A = a;
         }
 
-        public void ModifyColor(double ratio) {
+        public void ModifyColor (double ratio) {
             R *= (float)ratio;
             if (R > 1.0f)
                 R = 1.0f;

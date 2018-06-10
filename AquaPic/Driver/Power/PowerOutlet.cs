@@ -27,7 +27,7 @@ using AquaPic.Operands;
 
 namespace AquaPic.Drivers
 {
-    public partial class Power 
+    public partial class Power
     {
         private class OutletData
         {

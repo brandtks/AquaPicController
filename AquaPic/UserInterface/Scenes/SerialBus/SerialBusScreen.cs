@@ -127,9 +127,9 @@ namespace AquaPic.UserInterface
             int[] times = AquaPicBus.slaveResponseTimes;
 
             for (int i = 0; i < slaves.Length; ++i) {
-                slaves [i].status = status [i];
-                slaves [i].responseTime = times [i];
-                slaves [i].QueueDraw ();
+                slaves[i].status = status[i];
+                slaves[i].responseTime = times[i];
+                slaves[i].QueueDraw ();
             }
         }
 
@@ -141,7 +141,7 @@ namespace AquaPic.UserInterface
         protected void OnOpenButtonRelease (object sender, ButtonReleaseEventArgs args) {
             var b = sender as TouchButton;
 
-            if (b != null) { 
+            if (b != null) {
                 if (c.activeIndex != -1) {
                     AquaPicBus.Open (c.activeText);
                     if (AquaPicBus.isOpen) {

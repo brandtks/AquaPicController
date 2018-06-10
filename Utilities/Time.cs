@@ -55,9 +55,9 @@ namespace GoodtimeDevelopment.Utilites
             }
         }
 
-		public static Time TimeZero {
+        public static Time TimeZero {
             get {
-				return new Time (TimeSpan.Zero);
+                return new Time (TimeSpan.Zero);
             }
         }
 
@@ -68,7 +68,7 @@ namespace GoodtimeDevelopment.Utilites
             this._millisecond = millisecond;
         }
 
-        public Time (int hour, int minute, int second) 
+        public Time (int hour, int minute, int second)
             : this (hour, minute, second, 0) {
         }
 
@@ -76,7 +76,7 @@ namespace GoodtimeDevelopment.Utilites
             : this (hours, minute, 0, 0) {
         }
 
-        public Time (TimeSpan timeSpan) 
+        public Time (TimeSpan timeSpan)
             : this (timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds) {
         }
 
@@ -86,10 +86,10 @@ namespace GoodtimeDevelopment.Utilites
 
         public Time () {
             DateTime value = DateTime.Now;
-		    _hour = value.Hour;
-			_minute = value.Minute;
-			_second = value.Second;
-			_millisecond = value.Millisecond;
+            _hour = value.Hour;
+            _minute = value.Minute;
+            _second = value.Second;
+            _millisecond = value.Millisecond;
         }
 
         public TimeSpan ToTimeSpan () {
@@ -135,7 +135,7 @@ namespace GoodtimeDevelopment.Utilites
             _second = timeSpan.Seconds;
             _millisecond = timeSpan.Milliseconds;
         }
-          
+
         public static Time Parse (string value) {
             int pos = value.IndexOf (":");
 

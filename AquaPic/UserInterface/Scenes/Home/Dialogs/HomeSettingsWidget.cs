@@ -36,7 +36,7 @@ namespace AquaPic.UserInterface
 {
     partial class HomeSettings
     {
-        private class HomeSettingsWidget
+        class HomeSettingsWidget
         {
             public string name;
             public string group;

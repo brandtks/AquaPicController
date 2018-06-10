@@ -21,7 +21,7 @@
 
 #endregion // License
 
-﻿using System;
+using System;
 
 namespace AquaPic.DataLogging
 {

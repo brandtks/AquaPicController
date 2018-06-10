@@ -34,24 +34,24 @@ namespace AquaPic.UserInterface
     public class DigitalInputWindow : SceneBase
     {
         TouchComboBox combo;
-		string card;
+        string card;
         DigitalDisplay[] displays;
-		TouchButton settingsButton;
+        TouchButton settingsButton;
 
-        public DigitalInputWindow (params object[] options) : base () {         
-			card = AquaPicDrivers.DigitalInput.firstCard;
+        public DigitalInputWindow (params object[] options) : base () {
+            card = AquaPicDrivers.DigitalInput.firstCard;
             if (card.IsNotEmpty ()) {
-				sceneTitle = "Digital Inputs Cards";
+                sceneTitle = "Digital Inputs Cards";
             } else {
-				sceneTitle = "No Digital Input Cards Added";
+                sceneTitle = "No Digital Input Cards Added";
             }
 
             displays = new DigitalDisplay[6];
 
             for (int i = 0; i < 6; ++i) {
-                displays [i] = new DigitalDisplay ();
-                displays [i].ForceButtonReleaseEvent += OnForceRelease;
-                displays [i].StateSelectedChangedEvent += OnSelectorChanged;
+                displays[i] = new DigitalDisplay ();
+                displays[i].ForceButtonReleaseEvent += OnForceRelease;
+                displays[i].StateSelectedChangedEvent += OnSelectorChanged;
                 int x, y;
                 if (i < 3) {
                     x = (i * 150) + 175;
@@ -60,24 +60,24 @@ namespace AquaPic.UserInterface
                     x = ((i - 3) * 150) + 175;
                     y = 275;
                 }
-                Put (displays [i], x, y);
-				if (card.IsNotEmpty ()) {
+                Put (displays[i], x, y);
+                if (card.IsNotEmpty ()) {
                     displays[i].Show ();
                 } else {
                     displays[i].Visible = false;
                 }
             }
 
-			settingsButton = new TouchButton ();
+            settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
             settingsButton.buttonColor = "grey4";
             settingsButton.text = Convert.ToChar (0x2699).ToString ();
             settingsButton.ButtonReleaseEvent += OnGlobalSettingsRelease;
             Put (settingsButton, 755, 35);
             settingsButton.Show ();
-            
-			combo = new TouchComboBox (AquaPicDrivers.DigitalInput.GetAllCardNames ());
-			combo.comboList.Add ("New card...");
+
+            combo = new TouchComboBox (AquaPicDrivers.DigitalInput.GetAllCardNames ());
+            combo.comboList.Add ("New card...");
             if (card.IsNotEmpty ()) {
                 combo.activeText = card;
             }
@@ -91,31 +91,31 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnUpdateTimer () {
-			if (card.IsNotEmpty ()) {
+            if (card.IsNotEmpty ()) {
                 var states = AquaPicDrivers.DigitalInput.GetAllChannelValues (card);
 
-				for (int i = 0; i < states.Length; ++i) {
-					if (states[i]) {
-						displays[i].textBox.textColor = "pri";
-						displays[i].textBox.text = "Closed";
-					} else {
-						displays[i].textBox.textColor = "seca";
-						displays[i].textBox.text = "Open";
-					}
+                for (int i = 0; i < states.Length; ++i) {
+                    if (states[i]) {
+                        displays[i].textBox.textColor = "pri";
+                        displays[i].textBox.text = "Closed";
+                    } else {
+                        displays[i].textBox.textColor = "seca";
+                        displays[i].textBox.text = "Open";
+                    }
 
-					displays[i].textBox.QueueDraw ();
-				}
-			}
+                    displays[i].textBox.QueueDraw ();
+                }
+            }
 
             return true;
         }
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs args) {
-			if (args.activeText != "New card...") {
+            if (args.activeText != "New card...") {
                 card = args.activeText;
                 GetCardData ();
             } else {
-				var parent = Toplevel as Window;
+                var parent = Toplevel as Window;
                 if (parent != null) {
                     if (!parent.IsTopLevel)
                         parent = null;
@@ -125,7 +125,7 @@ namespace AquaPic.UserInterface
                 numberInput.Title = "Address";
 
                 numberInput.TextSetEvent += (o, a) => {
-					a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, AquaPicDrivers.DigitalInput);
+                    a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, AquaPicDrivers.DigitalInput);
 
                     if (a.keepText) {
                         combo.comboList.Insert (combo.comboList.Count - 1, card);
@@ -147,9 +147,9 @@ namespace AquaPic.UserInterface
             QueueDraw ();
         }
 
-		protected void OnGlobalSettingsRelease (object sender, ButtonReleaseEventArgs args) {
+        protected void OnGlobalSettingsRelease (object sender, ButtonReleaseEventArgs args) {
             if (card.IsNotEmpty ()) {
-				if (AquaPicDrivers.DigitalInput.CheckCardEmpty (card)) {
+                if (AquaPicDrivers.DigitalInput.CheckCardEmpty (card)) {
                     var parent = Toplevel as Window;
                     if (parent != null) {
                         if (!parent.IsTopLevel)
@@ -160,19 +160,19 @@ namespace AquaPic.UserInterface
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {
-							var deleted = CardSettingsHelper.OnCardDeleteEvent (card, AquaPicDrivers.DigitalInput);
+                            var deleted = CardSettingsHelper.OnCardDeleteEvent (card, AquaPicDrivers.DigitalInput);
                             if (deleted) {
                                 combo.comboList.Remove (card);
-								if (AquaPicDrivers.DigitalInput.cardCount == 0) {
+                                if (AquaPicDrivers.DigitalInput.cardCount == 0) {
                                     card = string.Empty;
                                     sceneTitle = "No Digial Input Cards Added";
                                     foreach (var display in displays) {
                                         display.Visible = false;
                                     }
                                     combo.activeIndex = -1;
-									settingsButton.buttonColor = "grey1";
+                                    settingsButton.buttonColor = "grey1";
                                 } else {
-									card = AquaPicDrivers.DigitalInput.firstCard;
+                                    card = AquaPicDrivers.DigitalInput.firstCard;
                                     combo.activeText = card;
                                     GetCardData ();
                                 }
@@ -192,7 +192,7 @@ namespace AquaPic.UserInterface
 
             var ic = IndividualControl.Empty;
             ic.Group = card;
-			ic.Individual = AquaPicDrivers.DigitalInput.GetChannelIndex (card, d.label.text);
+            ic.Individual = AquaPicDrivers.DigitalInput.GetChannelIndex (card, d.label.text);
 
             Mode m = AquaPicDrivers.DigitalInput.GetChannelMode (ic);
 
@@ -233,39 +233,39 @@ namespace AquaPic.UserInterface
         }
 
         protected void GetCardData () {
-			if (card.IsNotEmpty ()) {
-				var states = AquaPicDrivers.DigitalInput.GetAllChannelValues (card);
-				var modes = AquaPicDrivers.DigitalInput.GetAllChannelModes (card);
-				var names = AquaPicDrivers.DigitalInput.GetAllChannelNames (card);
+            if (card.IsNotEmpty ()) {
+                var states = AquaPicDrivers.DigitalInput.GetAllChannelValues (card);
+                var modes = AquaPicDrivers.DigitalInput.GetAllChannelModes (card);
+                var names = AquaPicDrivers.DigitalInput.GetAllChannelNames (card);
 
-				int i = 0;
-				foreach (var d in displays) {
-					d.label.text = names[i];
+                int i = 0;
+                foreach (var d in displays) {
+                    d.label.text = names[i];
 
-					if (states[i]) {
-						d.textBox.textColor = "pri";
-						d.textBox.text = "Closed";
-						d.selector.currentSelected = 1;
-					} else {
-						d.textBox.textColor = "seca";
-						d.textBox.text = "Open";
-						d.selector.currentSelected = 0;
-					}
+                    if (states[i]) {
+                        d.textBox.textColor = "pri";
+                        d.textBox.text = "Closed";
+                        d.selector.currentSelected = 1;
+                    } else {
+                        d.textBox.textColor = "seca";
+                        d.textBox.text = "Open";
+                        d.selector.currentSelected = 0;
+                    }
 
-					if (modes[i] == Mode.Auto) {
-						d.selector.Visible = false;
-						d.button.buttonColor = "grey4";
-					} else {
-						d.selector.Visible = true;
-						d.button.buttonColor = "pri";
-					}
+                    if (modes[i] == Mode.Auto) {
+                        d.selector.Visible = false;
+                        d.button.buttonColor = "grey4";
+                    } else {
+                        d.selector.Visible = true;
+                        d.button.buttonColor = "pri";
+                    }
 
-					d.QueueDraw ();
+                    d.QueueDraw ();
 
-					++i;
-				}
+                    ++i;
+                }
 
-				if (AquaPicDrivers.DigitalInput.CheckCardEmpty (card)) {
+                if (AquaPicDrivers.DigitalInput.CheckCardEmpty (card)) {
                     settingsButton.buttonColor = "compl";
                 } else {
                     settingsButton.buttonColor = "grey1";

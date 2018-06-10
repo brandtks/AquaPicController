@@ -49,9 +49,9 @@ namespace AquaPic.Modules
             public int lowSwitchAlarmIndex;
 
             public WaterLevelGroup (
-                string name, 
-                float highAnalogAlarmSetpoint, 
-                bool enableHighAnalogAlarm, 
+                string name,
+                float highAnalogAlarmSetpoint,
+                bool enableHighAnalogAlarm,
                 float lowAnalogAlarmSetpoint,
                 bool enableLowAnalogAlarm
             ) {

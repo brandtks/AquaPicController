@@ -33,17 +33,17 @@ namespace AquaPic.Globals
             get {
                 var ic = new IndividualControl ();
                 ic.Individual = -1;
-				ic.Group = string.Empty;
+                ic.Group = string.Empty;
                 return ic;
             }
         }
-        
-		public string Group;
+
+        public string Group;
         public int Individual;
 
         public bool IsNotEmpty () {
-			bool check = Group.IsNotEmpty ();
-			check &= Individual != -1;
+            bool check = Group.IsNotEmpty ();
+            check &= Individual != -1;
             return check;
         }
 

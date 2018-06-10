@@ -31,8 +31,8 @@ namespace AquaPic.UserInterface
     {
         public string name;
         public CreateInstanceHandler CreateInstanceEvent;
-        public bool showInMenu; 
-        
+        public bool showInMenu;
+
         public SceneData (string name, bool showInMenu, CreateInstanceHandler CreateInstanceEvent) {
             this.name = name;
             this.showInMenu = showInMenu;

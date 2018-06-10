@@ -43,7 +43,7 @@ namespace AquaPic.UserInterface
         public event EventHandler ExpandEvent;
         public event EventHandler CollapseEvent;
 
-        public MySideBar() 
+        public MySideBar ()
             : this (AquaPicGui.AquaPicUserInterface.scenes, AquaPicGui.AquaPicUserInterface.currentScene) { }
 
         public MySideBar (Dictionary<string, SceneData> scenes, string currentScene) {
@@ -112,7 +112,7 @@ namespace AquaPic.UserInterface
                     // Menu Button
                     cr.MoveTo (right + 5, top);
                     cr.LineTo (right - 120, top);
-					cr.LineTo (right - 120, top + 20);
+                    cr.LineTo (right - 120, top + 20);
                     cr.ArcNegative (right - 100, top + 20, 20, 0, Math.PI / 2);
                     cr.LineTo (right + 5, top + 40);
                     cr.ClosePath ();
@@ -122,14 +122,14 @@ namespace AquaPic.UserInterface
                     // Home Button
                     cr.MoveTo (right + 5, bottom + 5);
                     cr.LineTo (right - 165, bottom + 5);
-					cr.LineTo (right - 165, bottom - 20);
+                    cr.LineTo (right - 165, bottom - 20);
                     cr.Arc (right - 145, bottom - 20, 20, 0, -Math.PI / 2);
                     cr.LineTo (right + 5, bottom - 40);
                     cr.ClosePath ();
                     TouchColor.SetSource (cr, "grey4", 0.80);
                     cr.Fill ();
 
-                    var t = new TouchText (windows [highlighedScreenIndex]);
+                    var t = new TouchText (windows[highlighedScreenIndex]);
                     t.font.color = "pri";
                     t.alignment = TouchAlignment.Right;
                     if (clicked) {
@@ -152,14 +152,14 @@ namespace AquaPic.UserInterface
                         double radians = (177.24119 - (i * 2.75881) + (offset * 2.75881)).ToRadians ();
                         double textWidth = 210 - CalcX (radius, radians);
 
-                        t.text = windows [drawIndex];
+                        t.text = windows[drawIndex];
                         t.font.size = 16 - ((double)i * 0.75).ToInt ();
                         int textY = (height / 2) + top + 25 + (i * 50) - (offset * 50.0).ToInt ();
 
                         t.Render (
-                            this, 
-                            left, 
-                            textY, 
+                            this,
+                            left,
+                            textY,
                             textWidth.ToInt (),
                             50);
 
@@ -168,13 +168,13 @@ namespace AquaPic.UserInterface
                             drawIndex = windows.Length + drawIndex; //adding drawIndex because its negative
                         }
 
-                        t.text = windows [drawIndex];
+                        t.text = windows[drawIndex];
                         textY = (height / 2) + top - 75 - (i * 50) - (offset * 50.0).ToInt ();
 
                         t.Render (
-                            this, 
-                            left, 
-                            textY, 
+                            this,
+                            left,
+                            textY,
                             textWidth.ToInt (),
                             50);
                     }
@@ -190,9 +190,9 @@ namespace AquaPic.UserInterface
                     t.Render (this, right - 120, bottom - 40, 115, 40);
 
                     // Settings Text
-					t.text = Convert.ToChar (0x2699).ToString ();
-					t.alignment = TouchAlignment.Center;
-					t.Render (this, right - 160, bottom - 40, 40, 40);
+                    t.text = Convert.ToChar (0x2699).ToString ();
+                    t.alignment = TouchAlignment.Center;
+                    t.Render (this, right - 160, bottom - 40, 40, 40);
                 } else {
                     cr.Arc (originX - 208, originY, radius, 0, 2 * Math.PI);
                     cr.ClosePath ();
@@ -211,7 +211,7 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey3");
                     cr.Fill ();
                 }
-            } 
+            }
         }
 
         protected double CalcX (double radius, double radians) {
@@ -237,9 +237,9 @@ namespace AquaPic.UserInterface
                 SetSizeRequest (800, 460);
                 QueueDraw ();
 
-				Visible = false;
-				Visible = true;
-				ExpandEvent?.Invoke (this, new EventArgs ());
+                Visible = false;
+                Visible = true;
+                ExpandEvent?.Invoke (this, new EventArgs ());
             } else {
                 int x, y;
                 GetPointer (out x, out y);
@@ -247,9 +247,9 @@ namespace AquaPic.UserInterface
                 if (y.WithinRange (clickY, 25)) {
                     if (x <= 250) {
                         if (y.WithinRange (Allocation.Height / 2 + Allocation.Top, 15)) {
-                            if (windows [highlighedScreenIndex] != AquaPicGui.AquaPicUserInterface.currentScene) {
+                            if (windows[highlighedScreenIndex] != AquaPicGui.AquaPicUserInterface.currentScene) {
                                 var topWidget = this.Toplevel;
-                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows [highlighedScreenIndex], topWidget, AquaPicGui.AquaPicUserInterface.currentScene);
+                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], topWidget, AquaPicGui.AquaPicUserInterface.currentScene);
                             } else {
                                 CollapseMenu ();
                             }
@@ -267,9 +267,9 @@ namespace AquaPic.UserInterface
                                 highlighedScreenIndex = windows.Length + highlighedScreenIndex;
                             }
 
-                            if (windows [highlighedScreenIndex] != AquaPicGui.AquaPicUserInterface.currentScene) {
+                            if (windows[highlighedScreenIndex] != AquaPicGui.AquaPicUserInterface.currentScene) {
                                 var topWidget = this.Toplevel;
-                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows [highlighedScreenIndex], topWidget, AquaPicGui.AquaPicUserInterface.currentScene);
+                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], topWidget, AquaPicGui.AquaPicUserInterface.currentScene);
                             } else {
                                 CollapseMenu ();
                             }

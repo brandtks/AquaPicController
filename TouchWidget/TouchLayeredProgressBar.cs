@@ -35,12 +35,12 @@ namespace GoodtimeDevelopment.TouchWidget
         public bool drawPrimaryWhenEqual;
 
         public TouchLayeredProgressBar (
-            TouchColor colorBackground, 
+            TouchColor colorBackground,
             TouchColor colorProgress,
-            float currentProgress, 
-            bool enableTouch, 
+            float currentProgress,
+            bool enableTouch,
             TouchOrientation orientation,
-            TouchColor colorProgressSecondary, 
+            TouchColor colorProgressSecondary,
             float currentProgressSecondary,
             bool drawPrimaryWhenEqual)
             : base (
@@ -48,8 +48,7 @@ namespace GoodtimeDevelopment.TouchWidget
                 colorProgress,
                 currentProgress,
                 enableTouch,
-                orientation)
-        {
+                orientation) {
             this.colorProgressSecondary = colorProgressSecondary;
             this.currentProgressSecondary = currentProgressSecondary;
             this.drawPrimaryWhenEqual = drawPrimaryWhenEqual;

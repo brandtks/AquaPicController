@@ -121,8 +121,6 @@
     <Compile Include="Driver\GenericClasses\GenericBase.cs" />
     <Compile Include="Driver\Driver.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputChannel.cs" />
-    <Compile Include="Operands\Coil\Coil.cs" />
-    <Compile Include="Operands\Value\Value.cs" />
     <Compile Include="UserInterface\AquaPicGui.cs" />
     <Compile Include="UserInterface\Dialogs\Calibration\CalibrationDialog.cs" />
     <Compile Include="UserInterface\Dialogs\Settings\SettingsDialog.cs" />
@@ -138,7 +136,7 @@
     <Compile Include="UserInterface\Scenes\Digital\Widgets\DigitalDisplay.cs" />
     <Compile Include="UserInterface\Scenes\Home\HomeScreen.cs" />
     <Compile Include="UserInterface\Scenes\Home\Dialogs\AddHomeWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Dialogs\CheckerBoard.cs" />
+    <Compile Include="UserInterface\Scenes\Home\Dialogs\TileBoard.cs" />
     <Compile Include="UserInterface\Scenes\Home\Dialogs\HomeSettings.cs" />
     <Compile Include="UserInterface\Scenes\Home\Dialogs\HomeSettingsWidget.cs" />
     <Compile Include="UserInterface\Scenes\Home\Widgets\BarPlotWidget.cs" />
@@ -192,6 +190,8 @@
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AtoSettings.cs" />
     <Compile Include="UserInterface\Scenes\Power\Dialogs\PowerSettings.cs" />
     <Compile Include="UserInterface\Dialogs\Settings\CardSettingsHelper.cs" />
+    <Compile Include="Runtime\Coil\Coil.cs" />
+    <Compile Include="Runtime\Value\Value.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -209,9 +209,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Operands\" />
-    <Folder Include="Operands\Coil\" />
-    <Folder Include="Operands\Value\" />
     <Folder Include="Equipment\" />
     <Folder Include="Modules\ATO\" />
     <Folder Include="Tests\" />
@@ -219,6 +216,8 @@
     <Folder Include="Runtime\SettingsHelper\" />
     <Folder Include="Modules\GenericModule\" />
     <Folder Include="Runtime\Bit\" />
+    <Folder Include="Runtime\Coil\" />
+    <Folder Include="Runtime\Value\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

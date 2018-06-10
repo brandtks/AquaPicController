@@ -43,7 +43,7 @@ namespace AquaPic.Runtime
                 AlarmType a = new AlarmType (name, audible, clearOnAck);
                 alarms.Add (a);
                 return alarms.IndexOf (a);
-            } 
+            }
 
             return ListIndexOf (name);
         }
@@ -52,7 +52,7 @@ namespace AquaPic.Runtime
             if ((index >= 0) && (index <= (alarms.Count - 1))) {
                 if (!alarms[index].alarming) {
                     alarms[index].PostAlarm ();
-                    Logger.AddError (string.Format ("{0} posted", alarms [index].name));
+                    Logger.AddError (string.Format ("{0} posted", alarms[index].name));
                     AlarmsUpdatedEvent?.Invoke (null, new AlarmEventArgs (AlarmEventType.Posted, alarms[index].name));
                 }
             }
@@ -78,7 +78,7 @@ namespace AquaPic.Runtime
 
         public static bool CheckAlarming (int index) {
             if ((index >= 0) && (index <= (alarms.Count - 1)))
-                return alarms [index].alarming;
+                return alarms[index].alarming;
             return false;
         }
 
@@ -89,7 +89,7 @@ namespace AquaPic.Runtime
 
         public static bool CheckAcknowledged (int index) {
             if ((index >= 0) && (index <= (alarms.Count - 1)))
-                return alarms [index].acknowledged;
+                return alarms[index].acknowledged;
             return false;
         }
 
@@ -101,15 +101,15 @@ namespace AquaPic.Runtime
         public static void AddAlarmHandler (int index, AlarmEventHandler handler) {
             if ((index < 0) || (index >= alarms.Count))
                 throw new ArgumentException ("index");
-            
-            alarms [index].AlarmEvent += handler;
+
+            alarms[index].AlarmEvent += handler;
         }
 
         public static void RemoveAlarmHandler (int index, AlarmEventHandler handler) {
             if ((index < 0) || (index >= alarms.Count))
                 throw new ArgumentException ("index");
 
-            alarms [index].AlarmEvent -= handler;
+            alarms[index].AlarmEvent -= handler;
         }
 
         public static bool ListContains (string name) {
@@ -123,7 +123,7 @@ namespace AquaPic.Runtime
 
         public static int ListIndexOf (string name) {
             for (int i = 0; i < alarms.Count; ++i) {
-                if (string.Equals (alarms [i].name, name, StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals (alarms[i].name, name, StringComparison.InvariantCultureIgnoreCase))
                     return i;
             }
 

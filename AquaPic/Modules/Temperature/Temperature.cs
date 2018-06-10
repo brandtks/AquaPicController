@@ -78,7 +78,7 @@ namespace AquaPic.Modules
                     var first = probes.First ();
                     return first.Key;
                 }
-                    
+
                 return string.Empty;
             }
         }
@@ -91,7 +91,7 @@ namespace AquaPic.Modules
                 return temperatureGroups.Count;
             }
         }
-        
+
         public static string defaultTemperatureGroup {
             get {
                 if (_defaultTemperatureGroup.IsEmpty () && (temperatureGroupCount > 0)) {
@@ -108,7 +108,7 @@ namespace AquaPic.Modules
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].temperature;
                 }
-                    
+
                 return 0.0f;
             }
         }
@@ -118,7 +118,7 @@ namespace AquaPic.Modules
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].temperatureSetpoint;
                 }
-                    
+
                 return 0.0f;
             }
         }
@@ -128,7 +128,7 @@ namespace AquaPic.Modules
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].temperatureDeadband;
                 }
-                    
+
                 return 0.0f;
             }
         }
@@ -138,7 +138,7 @@ namespace AquaPic.Modules
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].highTemperatureAlarmSetpoint;
                 }
-                    
+
                 return 0.0f;
             }
         }
@@ -148,7 +148,7 @@ namespace AquaPic.Modules
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].lowTemperatureAlarmSetpoint;
                 }
-                    
+
                 return 0.0f;
             }
         }
@@ -240,7 +240,7 @@ namespace AquaPic.Modules
                             }
                         }
 
-						if (ic.Group.IsNotEmpty ()) {
+                        if (ic.Group.IsNotEmpty ()) {
                             text = (string)obj["channel"];
                             if (text.IsEmpty ()) {
                                 ic = IndividualControl.Empty;
@@ -303,20 +303,20 @@ namespace AquaPic.Modules
                     foreach (var jt in ja) {
                         JObject obj = jt as JObject;
                         var name = (string)obj["name"];
-						var ic = IndividualControl.Empty;
-						ic.Group = (string)obj["powerStrip"];
-						try {
-							ic.Individual = Convert.ToInt32 (obj["outlet"]);
-						} catch {
-							continue;
-						}
-						var temperatureGroupName = (string)obj["temperatureGroup"];
-                        
+                        var ic = IndividualControl.Empty;
+                        ic.Group = (string)obj["powerStrip"];
+                        try {
+                            ic.Individual = Convert.ToInt32 (obj["outlet"]);
+                        } catch {
+                            continue;
+                        }
+                        var temperatureGroupName = (string)obj["temperatureGroup"];
+
                         if (!CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
                             Logger.AddWarning ("Temperature probe {0} added to nonexistant group {1}", name, temperatureGroupName);
                         }
 
-						AddHeater (name, ic, temperatureGroupName);
+                        AddHeater (name, ic, temperatureGroupName);
                     }
                 }
             } else {
@@ -364,7 +364,7 @@ namespace AquaPic.Modules
             }
 
             temperatureGroups[name] = new TemperatureGroup (
-                name,  
+                name,
                 highTemperatureAlarmSetpoint,
                 lowTemperatureAlarmSetpoint,
                 temperatureSetpoint,
@@ -378,7 +378,7 @@ namespace AquaPic.Modules
         public static void RemoveTemperatureGroup (string name) {
             CheckTemperatureGroupKey (name);
             temperatureGroups.Remove (name);
-            
+
             if (_defaultTemperatureGroup == name) {
                 if (temperatureGroups.Count > 0) {
                     var first = temperatureGroups.First ();
@@ -695,12 +695,12 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Heaters                                                                                                    */
         /**************************************************************************************************************/
-		public static void AddHeater (string name, IndividualControl plug, string temperatureGroupName) {
+        public static void AddHeater (string name, IndividualControl plug, string temperatureGroupName) {
             if (!HeaterNameOk (name)) {
                 throw new Exception (string.Format ("Heater: {0} already exists", name));
             }
-            
-			heaters [name] = new Heater (name, plug, temperatureGroupName);
+
+            heaters[name] = new Heater (name, plug, temperatureGroupName);
         }
 
         public static void RemoveHeater (string heaterName) {
@@ -760,10 +760,10 @@ namespace AquaPic.Modules
             }
 
             var heater = heaters[oldHeaterName];
-            
+
             heater.name = newHeaterName;
             Power.SetOutletName (heater.plug, heater.name);
-            
+
             heaters.Remove (oldHeaterName);
             heaters[newHeaterName] = heater;
         }

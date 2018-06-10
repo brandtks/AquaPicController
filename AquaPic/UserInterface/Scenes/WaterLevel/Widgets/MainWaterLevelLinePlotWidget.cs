@@ -33,10 +33,9 @@ namespace AquaPic.UserInterface
     {
         string groupName;
         TouchLabel label;
-        
-        public WaterLevelLinePlot (params object[] options) 
-            : base () 
-        {
+
+        public WaterLevelLinePlot (params object[] options)
+            : base () {
             text = "Water Level";
             unitOfMeasurement = UnitsOfMeasurement.Inches;
 
@@ -75,7 +74,7 @@ namespace AquaPic.UserInterface
                     linePlot.UnLinkDataLogger (dataLogger);
                 };
 
-				text = string.Format ("{0} Water Level", groupName);
+                text = string.Format ("{0} Water Level", groupName);
             }
 
             linePlot.rangeMargin = 1;
@@ -96,10 +95,10 @@ namespace AquaPic.UserInterface
                     label.Visible = true;
                     label.text = "Disconnected";
                 } else {
-                    currentValue = WaterLevel.GetWaterLevelGroupLevel (groupName);;
+                    currentValue = WaterLevel.GetWaterLevelGroupLevel (groupName); ;
                     label.Visible = false;
                 }
-            } 
+            }
         }
     }
 }

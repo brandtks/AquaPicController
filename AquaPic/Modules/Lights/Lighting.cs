@@ -37,7 +37,7 @@ namespace AquaPic.Modules
 {
     public partial class Lighting
     {
-        static Dictionary<string,LightingFixture> fixtures;
+        static Dictionary<string, LightingFixture> fixtures;
         public static DateSpan sunRiseToday;
         public static DateSpan sunSetToday;
         public static DateSpan sunRiseTomorrow;
@@ -123,8 +123,8 @@ namespace AquaPic.Modules
 
                     try {
                         defaultSunRise = new Time (
-							Convert.ToInt32 (jo["defaultSunRise"]["hour"]), 
-							Convert.ToInt32 (jo["defaultSunRise"]["minute"])
+                            Convert.ToInt32 (jo["defaultSunRise"]["hour"]),
+                            Convert.ToInt32 (jo["defaultSunRise"]["minute"])
                         );
                     } catch {
                         defaultSunRise = new Time (7, 30);
@@ -133,8 +133,8 @@ namespace AquaPic.Modules
 
                     try {
                         defaultSunSet = new Time (
-							Convert.ToInt32 (jo["defaultSunRise"]["hour"]),
-							Convert.ToInt32 (jo["defaultSunRise"]["minute"])
+                            Convert.ToInt32 (jo["defaultSunRise"]["hour"]),
+                            Convert.ToInt32 (jo["defaultSunRise"]["minute"])
                         );
                     } catch {
                         defaultSunSet = new Time (20, 30);
@@ -143,8 +143,8 @@ namespace AquaPic.Modules
 
                     try {
                         minSunRise = new Time (
-							Convert.ToInt32 (jo["minSunRise"]["hour"]),
-							Convert.ToInt32 (jo["minSunRise"]["minute"])
+                            Convert.ToInt32 (jo["minSunRise"]["hour"]),
+                            Convert.ToInt32 (jo["minSunRise"]["minute"])
                         );
                     } catch {
                         minSunRise = new Time (7, 15);
@@ -153,8 +153,8 @@ namespace AquaPic.Modules
 
                     try {
                         maxSunRise = new Time (
-							Convert.ToInt32 (jo["maxSunRise"]["hour"]),
-							Convert.ToInt32 (jo["maxSunRise"]["minute"])
+                            Convert.ToInt32 (jo["maxSunRise"]["hour"]),
+                            Convert.ToInt32 (jo["maxSunRise"]["minute"])
                         );
                     } catch {
                         maxSunRise = new Time (8, 00);
@@ -163,8 +163,8 @@ namespace AquaPic.Modules
 
                     try {
                         minSunSet = new Time (
-							Convert.ToInt32 (jo["minSunSet"]["hour"]),
-							Convert.ToInt32 (jo["minSunSet"]["minute"])
+                            Convert.ToInt32 (jo["minSunSet"]["hour"]),
+                            Convert.ToInt32 (jo["minSunSet"]["minute"])
                         );
                     } catch {
                         minSunSet = new Time (19, 30);
@@ -320,8 +320,8 @@ namespace AquaPic.Modules
         /* Lighting fixtures                                                                                          */
         /**************************************************************************************************************/
         public static void AddLight (
-            string name, 
-            IndividualControl plug, 
+            string name,
+            IndividualControl plug,
             LightingTime lightingTime = LightingTime.Daytime,
             bool highTempLockout = true
         ) {
@@ -335,8 +335,8 @@ namespace AquaPic.Modules
                 offTime = defaultSunRise;
             }
 
-            fixtures [name] = new LightingFixture (
-                name, 
+            fixtures[name] = new LightingFixture (
+                name,
                 plug,
                 onTime,
                 offTime,
@@ -345,9 +345,9 @@ namespace AquaPic.Modules
         }
 
         public static void AddLight (
-            string name, 
-            IndividualControl plug, 
-            IndividualControl channel, 
+            string name,
+            IndividualControl plug,
+            IndividualControl channel,
             float minDimmingOutput = 0.0f,
             float maxDimmingOutput = 100.0f,
             AnalogType type = AnalogType.ZeroTen,
@@ -409,7 +409,7 @@ namespace AquaPic.Modules
             DateSpan now = DateSpan.Now;
             if (now.After (sunRiseToday) && now.Before (sunSetToday)) {
                 // time is after sunrise but before sunset so normal daytime
-                if (light.lightingTime == LightingTime.Daytime) { 
+                if (light.lightingTime == LightingTime.Daytime) {
                     light.SetOnTime (sunRiseToday);
                     light.SetOffTime (sunSetToday);
                 } else {
@@ -417,7 +417,7 @@ namespace AquaPic.Modules
                     light.SetOffTime (sunRiseTomorrow);
                 }
             } else if (now.Before (sunRiseToday)) { // time is before sunrise today
-                if (light.lightingTime == LightingTime.Daytime) { 
+                if (light.lightingTime == LightingTime.Daytime) {
                     // lights are supposed to be off, no special funny business required
                     light.SetOnTime (sunRiseToday);
                     light.SetOffTime (sunSetToday);
@@ -428,7 +428,7 @@ namespace AquaPic.Modules
                     light.SetOffTime (sunRiseToday); // night time lighting turns off at sunrise
                 }
             } else { // time is after sunrise
-                if (light.lightingTime == LightingTime.Daytime) { 
+                if (light.lightingTime == LightingTime.Daytime) {
                     light.SetOnTime (sunRiseTomorrow);
                     light.SetOffTime (sunSetTomorrow);
                 } else {
@@ -475,7 +475,7 @@ namespace AquaPic.Modules
             }
 
             var fixture = fixtures[oldFixtureName];
-            
+
             fixture.name = newFixtureName;
             Power.SetOutletName (fixture.powerOutlet, fixture.name);
             DimmingLightingFixture dimmingFixture = fixture as DimmingLightingFixture;
@@ -542,7 +542,7 @@ namespace AquaPic.Modules
 
         public static void SetFixtureLightingTime (string fixtureName, LightingTime lightingTime) {
             CheckFixtureKey (fixtureName);
-            
+
             fixtures[fixtureName].lightingTime = lightingTime;
 
             if (fixtures[fixtureName].lightingTime == LightingTime.Daytime) {

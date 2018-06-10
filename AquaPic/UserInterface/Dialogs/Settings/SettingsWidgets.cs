@@ -43,7 +43,7 @@ namespace AquaPic.UserInterface
             optionalSetting = false;
 
             label = new TouchLabel ();
-            label.SetSizeRequest (115,30);
+            label.SetSizeRequest (115, 30);
             label.textAlignment = TouchAlignment.Right;
             label.textRender.textWrap = TouchTextWrap.Shrink;
             label.textHorizontallyCentered = true;
@@ -61,7 +61,7 @@ namespace AquaPic.UserInterface
 
         public override object setting => textBox.text;
 
-		public SettingsTextBox (string name) : base (name) {
+        public SettingsTextBox (string name) : base (name) {
             textBox = new TouchTextBox ();
             textBox.SetSizeRequest (170, 30);
             textBox.enableTouch = true;
@@ -77,7 +77,7 @@ namespace AquaPic.UserInterface
 
         public override object setting => combo.activeText;
 
-		public SettingsComboBox (string name) : base (name) {
+        public SettingsComboBox (string name) : base (name) {
             combo = new TouchComboBox ();
             combo.SetSizeRequest (170, 30);
             combo.ButtonPressEvent += OnComboButtonPressed;
@@ -103,12 +103,12 @@ namespace AquaPic.UserInterface
 
         public override object setting => selectorSwitch.currentSelected;
 
-		public SettingsSelectorSwitch (string name, string label1, string label2) : base (name) {
+        public SettingsSelectorSwitch (string name, string label1, string label2) : base (name) {
             selectorSwitch = new TouchSelectorSwitch (2);
             selectorSwitch.currentSelected = 0;
             selectorSwitch.sliderSize = MySliderSize.Large;
-            selectorSwitch.sliderColorOptions [0] = "pri";
-            selectorSwitch.sliderColorOptions [1] = "grey2";
+            selectorSwitch.sliderColorOptions[0] = "pri";
+            selectorSwitch.sliderColorOptions[1] = "grey2";
 
             selectorSwitch.SetSizeRequest (170, 30);
             selectorSwitch.ExposeEvent += OnExpose;
@@ -116,8 +116,8 @@ namespace AquaPic.UserInterface
             selectorSwitch.Show ();
 
             labels = new string[2];
-            labels [0] = label1;
-            labels [1] = label2;
+            labels[0] = label1;
+            labels[1] = label2;
         }
 
         public SettingsSelectorSwitch (string name) : this (name, "True", "False") { }

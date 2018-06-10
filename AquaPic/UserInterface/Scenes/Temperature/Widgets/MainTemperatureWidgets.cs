@@ -35,8 +35,7 @@ namespace AquaPic.UserInterface
         TouchLabel label;
 
         public TemperatureLinePlot (params object[] options)
-            : base () 
-        {
+            : base () {
             text = "Temperature";
             unitOfMeasurement = UnitsOfMeasurement.Degrees;
 

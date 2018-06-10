@@ -30,11 +30,11 @@ namespace AquaPic.Drivers
     {
         public static PhOrpBase SharedPhOrpInstance = new PhOrpBase ();
 
-        protected PhOrpBase () 
+        protected PhOrpBase ()
             : base ("pH ORP") { }
-        
+
         protected override void Run () {
-			foreach (var card in cards.Values) {
+            foreach (var card in cards.Values) {
                 card.GetAllValuesCommunication ();
             }
         }
@@ -43,12 +43,12 @@ namespace AquaPic.Drivers
             return new PhOrpCard (cardName, address);
         }
 
-		public override string GetCardAcyronym () {
+        public override string GetCardAcyronym () {
             return "PH";
         }
 
-		public override CardType GetCardType () {
-			return CardType.PhOrp;
+        public override CardType GetCardType () {
+            return CardType.PhOrp;
         }
     }
 }

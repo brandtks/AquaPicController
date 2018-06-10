@@ -38,23 +38,23 @@ namespace AquaPic.Runtime
                 staticOnDelayTimers.Add (name, new OnDelayTimer (timeDelay));
             }
 
-            return staticOnDelayTimers [name].Evaluate (enable);
+            return staticOnDelayTimers[name].Evaluate (enable);
         }
 
         public static uint ParseTime (string timeString) {
-            char[] seperator = new char[1] {':'};
+            char[] seperator = new char[1] { ':' };
             string[] t = timeString.Split (seperator, 3);
 
             uint time = 0;
             if (t.Length == 3) {
                 //milliseconds
-                time = Convert.ToUInt32 (t [2]);
+                time = Convert.ToUInt32 (t[2]);
 
                 //seconds
-                time += (Convert.ToUInt32 (t [1]) * 1000);
+                time += (Convert.ToUInt32 (t[1]) * 1000);
 
                 //minutes
-                time += (Convert.ToUInt32 (t [0]) * 60000);
+                time += (Convert.ToUInt32 (t[0]) * 60000);
             }
 
             return time;

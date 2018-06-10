@@ -39,19 +39,18 @@ namespace AquaPic.UserInterface
         TouchLabel tempSetpoint;
         TouchLabel tempDeadband;
         TouchComboBox groupCombo;
-        
+
         string heaterName;
         TouchLabel heaterLabel;
         TouchComboBox heaterCombo;
 
         string probeName;
         TouchLabel probeTempTextbox;
-		TouchLabel probeTempLabel;
+        TouchLabel probeTempLabel;
         TouchComboBox probeCombo;
 
-        public TemperatureWindow (params object[] options) 
-            : base () 
-        {
+        public TemperatureWindow (params object[] options)
+            : base () {
             sceneTitle = "Temperature";
 
             ExposeEvent += OnExpose;
@@ -89,7 +88,7 @@ namespace AquaPic.UserInterface
             var setpointlabel = new TouchLabel ();
             setpointlabel.WidthRequest = 116;
             setpointlabel.text = "Setpoint";
-            setpointlabel.textColor = "grey3"; 
+            setpointlabel.textColor = "grey3";
             setpointlabel.textAlignment = TouchAlignment.Center;
             Put (setpointlabel, 108, 260);
             setpointlabel.Show ();
@@ -119,9 +118,9 @@ namespace AquaPic.UserInterface
             tempDeadband.Show ();
 
             var globalSettingsBtn = new TouchButton ();
-			globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
+            globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
             globalSettingsBtn.SetSizeRequest (30, 30);
-			globalSettingsBtn.buttonColor = "grey4";
+            globalSettingsBtn.buttonColor = "grey4";
             globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new TemperatureGroupSettings (groupName, !groupName.IsEmpty ());
                 s.Run ();
@@ -167,9 +166,9 @@ namespace AquaPic.UserInterface
             heaterLabel.Show ();
 
             var heaterSetupBtn = new TouchButton ();
-			heaterSetupBtn.text = Convert.ToChar (0x2699).ToString ();
+            heaterSetupBtn.text = Convert.ToChar (0x2699).ToString ();
             heaterSetupBtn.SetSizeRequest (30, 30);
-			heaterSetupBtn.buttonColor = "grey4";
+            heaterSetupBtn.buttonColor = "grey4";
             heaterSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new HeaterSettings (heaterName, heaterName.IsNotEmpty ());
                 s.Run ();
@@ -195,7 +194,7 @@ namespace AquaPic.UserInterface
                 heaterCombo.QueueDraw ();
                 GetHeaterData ();
             };
-			Put (heaterSetupBtn, 755, 77);
+            Put (heaterSetupBtn, 755, 77);
             heaterSetupBtn.Show ();
 
             /******************************************************************************************************/
@@ -211,9 +210,9 @@ namespace AquaPic.UserInterface
             label.Show ();
 
             var probeSetupBtn = new TouchButton ();
-			probeSetupBtn.text = Convert.ToChar (0x2699).ToString ();
+            probeSetupBtn.text = Convert.ToChar (0x2699).ToString ();
             probeSetupBtn.SetSizeRequest (30, 30);
-			probeSetupBtn.buttonColor = "grey4";
+            probeSetupBtn.buttonColor = "grey4";
             probeSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new ProbeSettings (probeName, probeName.IsNotEmpty ());
                 s.Run ();
@@ -282,7 +281,7 @@ namespace AquaPic.UserInterface
             };
             Put (b, 415, 405);
 
-			probeTempLabel = new TouchLabel ();
+            probeTempLabel = new TouchLabel ();
             probeTempLabel.text = "Temperature";
             probeTempLabel.textAlignment = TouchAlignment.Center;
             probeTempLabel.textColor = "grey3";
@@ -297,7 +296,7 @@ namespace AquaPic.UserInterface
             Put (probeTempTextbox, 415, 320);
             probeTempTextbox.Show ();
 
-            heaterCombo = new TouchComboBox (Temperature.GetAllHeaterNames ()); 
+            heaterCombo = new TouchComboBox (Temperature.GetAllHeaterNames ());
             heaterCombo.WidthRequest = 200;
             heaterCombo.comboList.Add ("New heater...");
             heaterCombo.ComboChangedEvent += OnHeaterComboChanged;
@@ -369,7 +368,7 @@ namespace AquaPic.UserInterface
                 s.Destroy ();
                 s.Dispose ();
 
-                if (outcome == TouchSettingsOutcome.Added) { 
+                if (outcome == TouchSettingsOutcome.Added) {
                     heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
                     heaterCombo.activeText = newHeaterName;
                     heaterName = newHeaterName;
@@ -454,16 +453,16 @@ namespace AquaPic.UserInterface
                 if (Temperature.IsTemperatureProbeConnected (probeName)) {
                     probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeName).ToString ("F2");
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
-					probeTempLabel.Visible = true;
+                    probeTempLabel.Visible = true;
                 } else {
                     probeTempTextbox.text = "Probe disconnected";
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-					probeTempLabel.Visible = false;
+                    probeTempLabel.Visible = false;
                 }
             } else {
                 probeTempTextbox.text = "Probe not available";
                 probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-				probeTempLabel.Visible = false;
+                probeTempLabel.Visible = false;
             }
 
             probeTempTextbox.QueueDraw ();
