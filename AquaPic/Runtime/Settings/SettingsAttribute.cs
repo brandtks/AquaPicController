@@ -1,9 +1,9 @@
-#region License
+﻿#region License
 
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2017 Goodtime Development
+    Copyright (c) 2018 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,25 +23,13 @@
 
 using System;
 
-namespace AquaPic.Operands
+namespace AquaPic
 {
-    public delegate bool ConditionGetterHandler ();
-    public delegate void ConditionSetterHandler (bool condition);
-
-    public class Coil
+    public class SettingsAttribute : Attribute
     {
-        public ConditionGetterHandler ConditionGetter;
-        public ConditionSetterHandler ConditionSetter;
-        public bool state;
-
-        public Coil () {
-            state = false;
-        }
-
-        public void Execute () {
-            state = (bool)ConditionGetter?.Invoke ();  // do we have a condition check method, if yes, lets run it to find out the new state
-            ConditionSetter?.Invoke (state);
+        
+        public SettingsAttribute () {
+            
         }
     }
 }
-

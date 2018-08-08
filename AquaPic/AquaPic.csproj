@@ -60,14 +60,14 @@
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Package>gtk-sharp-2.0</Package>
     </Reference>
-    <Reference Include="CSScriptLibrary">
-      <HintPath>..\packages\CS-Script.lib.3.28.2.0\lib\CSScriptLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="CSScriptLibrary">
+      <HintPath>..\packages\CS-Script.lib.3.28.4.0\lib\CSScriptLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -110,9 +110,7 @@
     <Compile Include="Runtime\Timer\OffDelayTimer.cs" />
     <Compile Include="Runtime\Timer\OnDelayTimer.cs" />
     <Compile Include="Runtime\Timer\StaticTimer.cs" />
-    <Compile Include="Sensors\TemperatureProbe.cs" />
     <Compile Include="Runtime\Logger\Logger.cs" />
-    <Compile Include="Sensors\FloatSwitch.cs" />
     <Compile Include="Runtime\Chemistry\Chemistry.cs" />
     <Compile Include="Runtime\Chemistry\TestProcedure.cs" />
     <Compile Include="Driver\GenericClasses\GenericChannel.cs" />
@@ -169,29 +167,33 @@
     <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainWaterLevelLinePlotWidget.cs" />
     <Compile Include="UserInterface\Widgets\MyNotificationBar.cs" />
     <Compile Include="UserInterface\Widgets\MySideBar.cs" />
-    <Compile Include="Sensors\ISensor.cs" />
-    <Compile Include="Equipment\IEquipment.cs" />
-    <Compile Include="Equipment\Pump.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroup.cs" />
-    <Compile Include="Sensors\WaterLevelSensor.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\WaterGroupSettings.cs" />
     <Compile Include="Driver\pHOrp\PhOrp.cs" />
     <Compile Include="Driver\pHOrp\PhOrpCard.cs" />
     <Compile Include="Driver\pHOrp\PhOrpChannel.cs" />
     <Compile Include="Modules\ATO\AutoTopOffGroup.cs" />
-    <Compile Include="Runtime\SettingsHelper\SettingsHelper.cs" />
-    <Compile Include="Sensors\PhProbe.cs" />
     <Compile Include="Modules\ATO\AutoTopOff.cs" />
     <Compile Include="Modules\GenericModule\GenericModule.cs" />
     <Compile Include="Modules\GenericModule\GenericGroup.cs" />
     <Compile Include="Runtime\Logger\LogItem.cs" />
-    <Compile Include="Runtime\Bit\Bit.cs" />
-    <Compile Include="Runtime\Bit\BitState.cs" />
     <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AtoSettings.cs" />
     <Compile Include="UserInterface\Scenes\Power\Dialogs\PowerSettings.cs" />
     <Compile Include="UserInterface\Dialogs\Settings\CardSettingsHelper.cs" />
-    <Compile Include="Runtime\Coil\Coil.cs" />
-    <Compile Include="Runtime\Value\Value.cs" />
+    <Compile Include="Domain\Sensors\FloatSwitch.cs" />
+    <Compile Include="Domain\Sensors\ISensor.cs" />
+    <Compile Include="Domain\Sensors\PhProbe.cs" />
+    <Compile Include="Domain\Sensors\TemperatureProbe.cs" />
+    <Compile Include="Domain\Sensors\WaterLevelSensor.cs" />
+    <Compile Include="Domain\Equipment\IEquipment.cs" />
+    <Compile Include="Domain\Equipment\Pump.cs" />
+    <Compile Include="Domain\Bit\Bit.cs" />
+    <Compile Include="Domain\Bit\BitState.cs" />
+    <Compile Include="Domain\Operands\Value.cs" />
+    <Compile Include="Domain\Operands\Coil.cs" />
+    <Compile Include="Domain\Operands\IOperand.cs" />
+    <Compile Include="Runtime\Settings\SettingsAttribute.cs" />
+    <Compile Include="Runtime\Settings\SettingsHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -209,15 +211,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Equipment\" />
     <Folder Include="Modules\ATO\" />
     <Folder Include="Tests\" />
     <Folder Include="Driver\pHOrp\" />
-    <Folder Include="Runtime\SettingsHelper\" />
     <Folder Include="Modules\GenericModule\" />
-    <Folder Include="Runtime\Bit\" />
-    <Folder Include="Runtime\Coil\" />
-    <Folder Include="Runtime\Value\" />
+    <Folder Include="Domain\" />
+    <Folder Include="Domain\Sensors\" />
+    <Folder Include="Domain\Equipment\" />
+    <Folder Include="Domain\Bit\" />
+    <Folder Include="Domain\Operands\" />
+    <Folder Include="Runtime\Settings\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

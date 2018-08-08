@@ -120,7 +120,7 @@ namespace AquaPic.UserInterface
             var globalSettingsBtn = new TouchButton ();
             globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
             globalSettingsBtn.SetSizeRequest (30, 30);
-            globalSettingsBtn.buttonColor = "grey4";
+            globalSettingsBtn.buttonColor = "pri";
             globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new TemperatureGroupSettings (groupName, !groupName.IsEmpty ());
                 s.Run ();
@@ -168,7 +168,7 @@ namespace AquaPic.UserInterface
             var heaterSetupBtn = new TouchButton ();
             heaterSetupBtn.text = Convert.ToChar (0x2699).ToString ();
             heaterSetupBtn.SetSizeRequest (30, 30);
-            heaterSetupBtn.buttonColor = "grey4";
+            heaterSetupBtn.buttonColor = "pri";
             heaterSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new HeaterSettings (heaterName, heaterName.IsNotEmpty ());
                 s.Run ();
@@ -212,7 +212,7 @@ namespace AquaPic.UserInterface
             var probeSetupBtn = new TouchButton ();
             probeSetupBtn.text = Convert.ToChar (0x2699).ToString ();
             probeSetupBtn.SetSizeRequest (30, 30);
-            probeSetupBtn.buttonColor = "grey4";
+            probeSetupBtn.buttonColor = "pri";
             probeSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new ProbeSettings (probeName, probeName.IsNotEmpty ());
                 s.Run ();

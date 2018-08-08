@@ -431,7 +431,7 @@ namespace AquaPic.UserInterface
             fixtureSettingBtn = new TouchButton ();
             fixtureSettingBtn.text = Convert.ToChar (0x2699).ToString ();
             fixtureSettingBtn.SetSizeRequest (30, 30);
-            fixtureSettingBtn.buttonColor = "grey4";
+            fixtureSettingBtn.buttonColor = "pri";
             fixtureSettingBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new FixtureSettings (fixtureName, fixtureName.IsNotEmpty ());
                 s.Run ();

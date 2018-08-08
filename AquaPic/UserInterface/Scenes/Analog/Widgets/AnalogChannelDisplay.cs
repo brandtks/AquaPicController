@@ -101,7 +101,7 @@ namespace AquaPic.UserInterface
 
             settingsButton = new TouchButton ();
             settingsButton.SetSizeRequest (30, 30);
-            settingsButton.buttonColor = "grey4";
+            settingsButton.buttonColor = "pri";
             settingsButton.text = Convert.ToChar (0x2699).ToString ();
             settingsButton.ButtonReleaseEvent += OnSettingsRelease;
             Put (settingsButton, 680, 20);

@@ -93,7 +93,7 @@ namespace AquaPic.UserInterface
             var globalSettingsBtn = new TouchButton ();
             globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
             globalSettingsBtn.SetSizeRequest (30, 30);
-            globalSettingsBtn.buttonColor = "grey4";
+            globalSettingsBtn.buttonColor = "pri";
             globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new WaterGroupSettings (groupName, groupName.IsNotEmpty ());
                 s.Run ();
@@ -139,7 +139,7 @@ namespace AquaPic.UserInterface
             var atoSettingsBtn = new TouchButton ();
             atoSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
             atoSettingsBtn.SetSizeRequest (30, 30);
-            atoSettingsBtn.buttonColor = "grey4";
+            atoSettingsBtn.buttonColor = "pri";
             atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new AtoSettings (atoGroupName, atoGroupName.IsNotEmpty ());
                 s.Run ();
@@ -213,7 +213,7 @@ namespace AquaPic.UserInterface
             var settingsBtn = new TouchButton ();
             settingsBtn.text = Convert.ToChar (0x2699).ToString ();
             settingsBtn.SetSizeRequest (30, 30);
-            settingsBtn.buttonColor = "grey4";
+            settingsBtn.buttonColor = "pri";
             settingsBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new AnalogSensorSettings (analogSensorName, analogSensorName.IsNotEmpty ());
                 s.Run ();
@@ -319,7 +319,7 @@ namespace AquaPic.UserInterface
             var switchSetupBtn = new TouchButton ();
             switchSetupBtn.text = Convert.ToChar (0x2699).ToString ();
             switchSetupBtn.SetSizeRequest (30, 30);
-            switchSetupBtn.buttonColor = "grey4";
+            switchSetupBtn.buttonColor = "pri";
             switchSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var s = new SwitchSettings (switchName, switchName.IsNotEmpty ());
                 s.Run ();
