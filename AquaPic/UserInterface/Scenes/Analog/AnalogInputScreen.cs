@@ -133,6 +133,13 @@ namespace AquaPic.UserInterface
 
                 numberInput.Run ();
                 numberInput.Destroy ();
+
+                // The number input was canceled
+                if (combo.activeText == "New card...") {
+                    card = AquaPicDrivers.AnalogInput.firstCard;
+                    combo.activeText = card;
+                    GetCardData ();
+                }
             }
 
             QueueDraw ();

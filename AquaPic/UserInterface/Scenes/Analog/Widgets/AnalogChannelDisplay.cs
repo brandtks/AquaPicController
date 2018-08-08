@@ -118,10 +118,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
-            if (SettingsButtonReleaseEvent != null)
-                SettingsButtonReleaseEvent (this, args);
-            else
-                throw new NotImplementedException ("Settings button release not implemented");
+            SettingsButtonReleaseEvent?.Invoke (this, args);
         }
 
         protected void ValueChanged () {

@@ -192,7 +192,6 @@
     <Compile Include="Domain\Operands\Value.cs" />
     <Compile Include="Domain\Operands\Coil.cs" />
     <Compile Include="Domain\Operands\IOperand.cs" />
-    <Compile Include="Runtime\Settings\SettingsAttribute.cs" />
     <Compile Include="Runtime\Settings\SettingsHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

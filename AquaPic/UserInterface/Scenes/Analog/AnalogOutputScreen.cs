@@ -131,6 +131,13 @@ namespace AquaPic.UserInterface
 
                 numberInput.Run ();
                 numberInput.Destroy ();
+
+                // The number input was canceled
+                if (combo.activeText == "New card...") {
+                    card = AquaPicDrivers.AnalogOutput.firstCard;
+                    combo.activeText = card;
+                    GetCardData ();
+                }
             }
 
             QueueDraw ();
@@ -190,13 +197,11 @@ namespace AquaPic.UserInterface
                 d.progressBar.enableTouch = true;
                 d.textBox.enableTouch = true;
                 d.forceButton.buttonColor = "pri";
-                d.typeLabel.Visible = false;
             } else {
                 AquaPicDrivers.AnalogOutput.SetChannelMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;
                 d.textBox.enableTouch = false;
                 d.forceButton.buttonColor = "grey4";
-                d.typeLabel.Visible = true;
             }
 
             d.QueueDraw ();
