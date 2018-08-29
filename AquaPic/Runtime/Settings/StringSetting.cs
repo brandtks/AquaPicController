@@ -22,18 +22,23 @@
 #endregion // License
 
 using System;
-using AquaPic.Runtime;
 
-namespace AquaPic.Modules
+namespace AquaPic.Runtime
 {
-    public class WaterLevelGroupSettings
+    public class StringSetting
     {
-        public StringSetting name;
+        public string stringVariable;
 
-        public FloatSetting highAnalogAlarmSetpoint;
-        public BoolSetting enableHighAnalogAlarm;
+        public static implicit operator StringSetting (string stringVariable) {
+            return new StringSetting (stringVariable);
+        }
 
-        public FloatSetting lowAnalogAlarmSetpoint;
-        public BoolSetting enableLowAnalogAlarm;
+        public static implicit operator string (StringSetting stringSetting) {
+            return stringSetting.stringVariable;
+        }
+
+        public StringSetting (string stringVariable) {
+            this.stringVariable = stringVariable;
+        }
     }
 }

@@ -22,18 +22,12 @@
 #endregion // License
 
 using System;
-using AquaPic.Runtime;
 
-namespace AquaPic.Modules
+namespace AquaPic.Runtime
 {
-    public class WaterLevelGroupSettings
+    public class SettingValidationMethod
     {
-        public StringSetting name;
-
-        public FloatSetting highAnalogAlarmSetpoint;
-        public BoolSetting enableHighAnalogAlarm;
-
-        public FloatSetting lowAnalogAlarmSetpoint;
-        public BoolSetting enableLowAnalogAlarm;
+        public SettingValidationMethod () {
+        }
     }
 }

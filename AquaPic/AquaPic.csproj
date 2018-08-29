@@ -140,6 +140,10 @@
     <Compile Include="Domain\Operands\IOperand.cs" />
     <Compile Include="Runtime\Settings\SettingsHelper.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroupSettings.cs" />
+    <Compile Include="Runtime\Settings\SettingsAttributes.cs" />
+    <Compile Include="Runtime\Settings\StringSetting.cs" />
+    <Compile Include="Runtime\Settings\FloatSetting.cs" />
+    <Compile Include="Runtime\Settings\BoolSetting.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

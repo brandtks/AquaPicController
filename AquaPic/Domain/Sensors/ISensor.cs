@@ -26,7 +26,7 @@ using AquaPic.Globals;
 
 namespace AquaPic.Sensors
 {
-    interface ISensor<T>
+    public interface ISensor<T>
     {
         void Add (IndividualControl channel);
         void Remove ();
