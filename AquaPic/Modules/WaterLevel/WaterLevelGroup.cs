@@ -33,18 +33,57 @@ namespace AquaPic.Modules
     {
         private class WaterLevelGroup
         {
-            public string name;
+            public WaterLevelGroupSettings settings;
+
+            public string name {
+                get {
+                    return settings.name;
+                }
+                set {
+                    settings.name = value;
+                }
+            }
+
+            public float highAnalogAlarmSetpoint {
+                get {
+                    return settings.highAnalogAlarmSetpoint;
+                }
+                set {
+                    settings.highAnalogAlarmSetpoint = value;
+                }
+            }
+
+            public float lowAnalogAlarmSetpoint {
+                get {
+                    return settings.lowAnalogAlarmSetpoint;
+                }
+                set {
+                    settings.lowAnalogAlarmSetpoint = value;
+                }
+            }
+
+            public bool enableHighAnalogAlarm {
+                get {
+                    return settings.enableHighAnalogAlarm;
+                }
+                set {
+                    settings.enableHighAnalogAlarm = value;
+                }
+            }
+
+            public bool enableLowAnalogAlarm {
+                get {
+                    return settings.enableLowAnalogAlarm;
+                }
+                set {
+                    settings.enableLowAnalogAlarm = value;
+                }
+            }
+
             public float level;
             public IDataLogger dataLogger;
-
-            public float highAnalogAlarmSetpoint;
-            public bool enableHighAnalogAlarm;
             public int highAnalogAlarmIndex;
-
-            public float lowAnalogAlarmSetpoint;
-            public bool enableLowAnalogAlarm;
             public int lowAnalogAlarmIndex;
-
             public int highSwitchAlarmIndex;
             public int lowSwitchAlarmIndex;
 
@@ -55,6 +94,8 @@ namespace AquaPic.Modules
                 float lowAnalogAlarmSetpoint,
                 bool enableLowAnalogAlarm
             ) {
+                settings = new WaterLevelGroupSettings ();
+
                 this.name = name;
                 level = 0.0f;
                 dataLogger = Factory.GetDataLogger (string.Format ("{0}WaterLevel", this.name.RemoveWhitespace ()));

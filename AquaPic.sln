@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TouchWidget", "TouchWidget\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLogging", "DataLogging\DataLogging.csproj", "{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserInterface", "UserInterface\UserInterface.csproj", "{8B3F07BA-572F-4E93-8971-ED2917A6C145}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{46BD2A7C-CD50-4022-AEE0-34A7AF686EAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -34,6 +38,14 @@ Global
 		{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}.Debug|x86.Build.0 = Debug|Any CPU
 		{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}.Release|x86.ActiveCfg = Release|Any CPU
 		{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}.Release|x86.Build.0 = Release|Any CPU
+		{8B3F07BA-572F-4E93-8971-ED2917A6C145}.Debug|x86.ActiveCfg = Debug|x86
+		{8B3F07BA-572F-4E93-8971-ED2917A6C145}.Debug|x86.Build.0 = Debug|x86
+		{8B3F07BA-572F-4E93-8971-ED2917A6C145}.Release|x86.ActiveCfg = Release|x86
+		{8B3F07BA-572F-4E93-8971-ED2917A6C145}.Release|x86.Build.0 = Release|x86
+		{46BD2A7C-CD50-4022-AEE0-34A7AF686EAE}.Debug|x86.ActiveCfg = Debug|x86
+		{46BD2A7C-CD50-4022-AEE0-34A7AF686EAE}.Debug|x86.Build.0 = Debug|x86
+		{46BD2A7C-CD50-4022-AEE0-34A7AF686EAE}.Release|x86.ActiveCfg = Release|x86
+		{46BD2A7C-CD50-4022-AEE0-34A7AF686EAE}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

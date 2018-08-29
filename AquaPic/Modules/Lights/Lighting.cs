@@ -31,7 +31,7 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Globals;
 using AquaPic.Drivers;
-using AquaPic.UserInterface;
+//using AquaPic.UserInterface;
 
 namespace AquaPic.Modules
 {
@@ -388,7 +388,7 @@ namespace AquaPic.Modules
             if (dimmingFixture != null) {
                 Power.RemoveHandlerOnModeChange (dimmingFixture.powerOutlet, dimmingFixture.OnLightingPlugModeChange);
                 AquaPicDrivers.AnalogOutput.RemoveChannel (dimmingFixture.channel);
-                HomeWindowWidgets.barPlots.Remove (dimmingFixture.name);
+                //HomeWindowWidgets.barPlots.Remove (dimmingFixture.name);
             }
 
             fixtures.Remove (fixtureName);

@@ -5,10 +5,9 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{5272A01C-4356-4F37-AF92-B53974F21B34}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>AquaPic</RootNamespace>
     <AssemblyName>AquaPic</AssemblyName>
-    <StartupObject>AquaPic.MainClass</StartupObject>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <ReleaseVersion>0.1.0</ReleaseVersion>
   </PropertyGroup>
@@ -60,11 +59,11 @@
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Package>gtk-sharp-2.0</Package>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="CSScriptLibrary">
       <HintPath>..\packages\CS-Script.lib.3.28.4.0\lib\CSScriptLibrary.dll</HintPath>
@@ -72,7 +71,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modules\Temperature\TemperatureGroup.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Driver\Power\PowerStrip.cs" />
     <Compile Include="Driver\AnalogInput\AnalogInputCard.cs" />
@@ -119,56 +117,7 @@
     <Compile Include="Driver\GenericClasses\GenericBase.cs" />
     <Compile Include="Driver\Driver.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputChannel.cs" />
-    <Compile Include="UserInterface\AquaPicGui.cs" />
-    <Compile Include="UserInterface\Dialogs\Calibration\CalibrationDialog.cs" />
-    <Compile Include="UserInterface\Dialogs\Settings\SettingsDialog.cs" />
-    <Compile Include="UserInterface\Dialogs\Settings\SettingsWidgets.cs" />
-    <Compile Include="UserInterface\Scenes\SceneBase.cs" />
-    <Compile Include="UserInterface\Scenes\SceneData.cs" />
-    <Compile Include="UserInterface\Scenes\Alarm\AlarmScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Analog\AnalogInputScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Analog\AnalogOutputScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Analog\Widgets\AnalogChannelDisplay.cs" />
-    <Compile Include="UserInterface\Scenes\Chemistry\ChemistryScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Digital\DigitalInputScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Digital\Widgets\DigitalDisplay.cs" />
-    <Compile Include="UserInterface\Scenes\Home\HomeScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Dialogs\AddHomeWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Dialogs\TileBoard.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Dialogs\HomeSettings.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Dialogs\HomeSettingsWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Widgets\BarPlotWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Widgets\ButtonWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Widgets\CurvedBarPlotWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Widgets\DeluxeTimerWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Widgets\HomeWindowWidgets.cs" />
-    <Compile Include="UserInterface\Scenes\Home\Widgets\LinePlotWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Lighting\LightingScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Lighting\Dialogs\FixtureSettings.cs" />
-    <Compile Include="UserInterface\Scenes\Lighting\Dialogs\LightingSettings.cs" />
-    <Compile Include="UserInterface\Scenes\Lighting\Widgets\MainLightingWidgets.cs" />
-    <Compile Include="UserInterface\Scenes\Logger\LoggerScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Menu\MenuScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Power\PowerScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Power\Dialogs\OutletSettings.cs" />
-    <Compile Include="UserInterface\Scenes\Power\Widgets\PowerOutletSlider.cs" />
-    <Compile Include="UserInterface\Scenes\SerialBus\SerialBusScreen.cs" />
-    <Compile Include="UserInterface\Scenes\SerialBus\Widgets\SerialBusSlaveWidget.cs" />
-    <Compile Include="UserInterface\Scenes\Settings\SettingsScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Temperature\TemperatureScreen.cs" />
-    <Compile Include="UserInterface\Scenes\Temperature\Dialogs\HeaterSettings.cs" />
-    <Compile Include="UserInterface\Scenes\Temperature\Dialogs\ProbeSettings.cs" />
-    <Compile Include="UserInterface\Scenes\Temperature\Dialogs\TemperatureGroupSettings.cs" />
-    <Compile Include="UserInterface\Scenes\Temperature\Widgets\MainTemperatureWidgets.cs" />
-    <Compile Include="UserInterface\Scenes\WaterLevel\WaterLevelScreen.cs" />
-    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AnalogSensorSettings.cs" />
-    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\SwitchSettings.cs" />
-    <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainWaterLevelBarPlotWidget.cs" />
-    <Compile Include="UserInterface\Scenes\WaterLevel\Widgets\MainWaterLevelLinePlotWidget.cs" />
-    <Compile Include="UserInterface\Widgets\MyNotificationBar.cs" />
-    <Compile Include="UserInterface\Widgets\MySideBar.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroup.cs" />
-    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\WaterGroupSettings.cs" />
     <Compile Include="Driver\pHOrp\PhOrp.cs" />
     <Compile Include="Driver\pHOrp\PhOrpCard.cs" />
     <Compile Include="Driver\pHOrp\PhOrpChannel.cs" />
@@ -177,9 +126,6 @@
     <Compile Include="Modules\GenericModule\GenericModule.cs" />
     <Compile Include="Modules\GenericModule\GenericGroup.cs" />
     <Compile Include="Runtime\Logger\LogItem.cs" />
-    <Compile Include="UserInterface\Scenes\WaterLevel\Dialogs\AtoSettings.cs" />
-    <Compile Include="UserInterface\Scenes\Power\Dialogs\PowerSettings.cs" />
-    <Compile Include="UserInterface\Dialogs\Settings\CardSettingsHelper.cs" />
     <Compile Include="Domain\Sensors\FloatSwitch.cs" />
     <Compile Include="Domain\Sensors\ISensor.cs" />
     <Compile Include="Domain\Sensors\PhProbe.cs" />
@@ -193,6 +139,7 @@
     <Compile Include="Domain\Operands\Coil.cs" />
     <Compile Include="Domain\Operands\IOperand.cs" />
     <Compile Include="Runtime\Settings\SettingsHelper.cs" />
+    <Compile Include="Modules\WaterLevel\WaterLevelGroupSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -205,8 +152,6 @@
     <None Include="Runtime\Plugin.Disable\EventScript.cs" />
     <None Include="Runtime\Plugin.Disable\ScriptMessage.cs" />
     <None Include="Runtime\Plugin.Disable\ModuleScript.cs" />
-    <None Include="UserInterface\Scenes\Plugin.Disable\EditPluginScreen.cs" />
-    <None Include="UserInterface\Scenes\Plugin.Disable\PluginScreen.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
