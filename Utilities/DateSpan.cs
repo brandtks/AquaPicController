@@ -174,8 +174,7 @@ namespace GoodtimeDevelopment.Utilites
         }
 
         public DateTime ToDateTime () {
-            var val = new DateTime (_year, _month, _day, _hour, _minute, _second, _millisecond);
-            return val;
+            return new DateTime (_year, _month, _day, _hour, _minute, _second, _millisecond);
         }
 
         public void AddDays (int numberOfDays) {

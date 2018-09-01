@@ -774,7 +774,7 @@ namespace AquaPic.Modules
             Power.RemoveOutlet (heaters[heaterName].plug);
             heaters[heaterName].plug = ic;
             var coil = Power.AddOutlet (heaters[heaterName].plug, heaters[heaterName].name, MyState.On, "Temperature");
-            coil.ConditionGetter = heaters[heaterName].OnPlugControl;
+            coil.StateGetter = heaters[heaterName].OnPlugControl;
         }
 
         /***Temperature group***/

@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.Drivers;
@@ -35,86 +36,78 @@ namespace AquaPic.Modules
         public class LightingFixture
         {
             public string name;
-            public int onTimeOffset;
-            public int offTimeOffset;
-            public DateSpan onTime;
-            public DateSpan offTime;
-            public LightingTime lightingTime;
-            public MyState lightingOn;
+            public MyState plugState;
             public bool highTempLockout;
             public IndividualControl powerOutlet;
-            public Mode mode;
+            public LightingState[] lightingStates;
+            public int currentState;
 
             public LightingFixture (
                 string name,
-                IndividualControl plug,
-                Time onTime,
-                Time offTime,
-                LightingTime lightingTime,
-                bool highTempLockout
-            ) {
+                IndividualControl powerOutlet,
+                LightingState[] lightingStates,
+                bool highTempLockout)
+            {
                 this.name = name;
-                this.powerOutlet = plug;
-
-                // sets time to today and whatever onTime and offTime are
-                this.onTime = new DateSpan (onTime);
-                this.offTime = new DateSpan (offTime);
-
-                this.lightingTime = lightingTime;
-
+                this.powerOutlet = powerOutlet;
                 this.highTempLockout = highTempLockout;
 
-                mode = Mode.Manual;
+                this.lightingStates = lightingStates;
+                if (this.lightingStates.Length > 0) {
+                    var now = DateSpan.Now;
+                    for (int i = 0; i < this.lightingStates.Length; ++i) {
+                        if (now.After (this.lightingStates[i].startTime) && now.Before (this.lightingStates[i].endTime)) {
+                            currentState = i;
+                            break;
+                        }
+                    }
+                } else {
+                    currentState = -1;
+                }
 
-                onTimeOffset = 0;
-                offTimeOffset = 0;
-
-                lightingOn = MyState.Off;
-
-                var plugControl = Power.AddOutlet (plug, this.name, MyState.Off, "Lighting");
-                plugControl.ConditionGetter = OnPlugControl;
-                Power.AddHandlerOnStateChange (plug, OnLightingPlugStateChange);
+                var plugControl = Power.AddOutlet (this.powerOutlet, this.name, MyState.Off, "Lighting");
+                plugControl.StateGetter = OnPlugStateGetter;
+                Power.AddHandlerOnStateChange (this.powerOutlet, OnLightingPlugStateChange);
             }
 
-            public bool OnPlugControl () {
+            public bool OnPlugStateGetter () {
                 if (highTempLockout && Alarm.CheckAlarming (Temperature.defaultHighTemperatureAlarmIndex))
                     return false;
 
+                if (currentState == -1) {
+                    return false;
+                }
+
                 DateSpan now = DateSpan.Now;
-                if (now.After (onTime) && now.Before (offTime)) {
+                if (now.Before (lightingStates[currentState].endTime)) { // Still in current lighting state
+                    if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
+                        return false;
+                    }
+
+                    // State is anything but off
                     return true;
                 }
 
-                if (mode == Mode.Auto) { // only update times if mode is auto
-                    if (lightingOn == MyState.On) { // lights are on and are supposed to be off, update next on/off times
-                        if (lightingTime == LightingTime.Daytime) {
-                            // its dusk and daytime lighting on/off time is rise and set tomorrow respectfully
-                            SetOnTime (sunRiseTomorrow);
-                            SetOffTime (sunSetTomorrow);
-                        } else { // lighting time is nighttime
-                            // its dawn and nighttime lighting on/off time is set today because we're already on the current day,
-                            // and rise time tomorrow respectfully
-                            SetOnTime (sunSetToday);
-                            SetOffTime (sunRiseTomorrow);
-                        }
-                    }
+                // Now in next state
+                currentState = currentState++ % lightingStates.Length;
+                var nextState = currentState++ % lightingStates.Length;
+                lightingStates[nextState].ParseTimeDescriptors ();
+                if (lightingStates[nextState].startTime.Before (lightingStates[currentState].endTime)) {
+                    // The next state starts before the current state ends
+                    // This happens if the next state is supposed to be tomorrow
+                    lightingStates[nextState].ParseTimeDescriptors (true);
                 }
 
-                return false;
+                if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
+                    return false;
+                }
+
+                // State is anything but off
+                return true;
             }
 
             public void OnLightingPlugStateChange (object sender, StateChangeEventArgs args) {
-                lightingOn = args.state;
-            }
-
-            public void SetOnTime (DateSpan newOnTime) {
-                onTime = newOnTime;
-                onTime.AddMinutes (onTimeOffset);
-            }
-
-            public void SetOffTime (DateSpan newOffTime) {
-                offTime = newOffTime;
-                offTime.AddMinutes (offTimeOffset);
+                plugState = args.state;
             }
         }
     }

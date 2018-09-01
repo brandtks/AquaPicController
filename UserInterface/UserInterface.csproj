@@ -52,7 +52,6 @@
     <Compile Include="Scenes\Home\Widgets\HomeWindowWidgets.cs" />
     <Compile Include="Scenes\Home\Widgets\LinePlotWidget.cs" />
     <Compile Include="Scenes\Lighting\Dialogs\FixtureSettings.cs" />
-    <Compile Include="Scenes\Lighting\Dialogs\LightingSettings.cs" />
     <Compile Include="Scenes\Lighting\LightingScreen.cs" />
     <Compile Include="Scenes\Lighting\Widgets\MainLightingWidgets.cs" />
     <Compile Include="Scenes\Logger\LoggerScreen.cs" />
@@ -85,6 +84,7 @@
     <None Include="packages.config" />
     <None Include="Scenes\Plugin.Disable\EditPluginScreen.cs" />
     <None Include="Scenes\Plugin.Disable\PluginScreen.cs" />
+    <None Include="Scenes\Lighting\Dialogs\LightingSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dialogs\" />

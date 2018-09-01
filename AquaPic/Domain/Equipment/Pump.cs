@@ -28,7 +28,7 @@ using AquaPic.Operands;
 
 namespace AquaPic.Equipment
 {
-    public class Pump : IEquipment<ConditionGetterHandler>
+    public class Pump : IEquipment
     {
         protected IndividualControl _outlet;
         public IndividualControl outlet {
@@ -75,7 +75,7 @@ namespace AquaPic.Equipment
 
             if (_outlet.IsNotEmpty ()) {
                 var coil = Power.AddOutlet (_outlet, _name, _fallback, _owner);
-                coil.ConditionGetter = OnConditionGetter;
+                coil.StateGetter = OnConditionGetter;
             }
         }
 
@@ -88,12 +88,6 @@ namespace AquaPic.Equipment
         public void SetName (string name) {
             _name = name;
             Power.SetOutletName (_outlet, name);
-        }
-
-        public void SetGetter (ConditionGetterHandler OnGetter) {
-            if (_outlet.IsNotEmpty ()) {
-                Power.SetOutletConditionCheck (_outlet, OnGetter);
-            }
         }
 
         protected virtual bool OnConditionGetter () {

@@ -38,43 +38,6 @@ namespace AquaPic.Modules
     public partial class Lighting
     {
         static Dictionary<string, LightingFixture> fixtures;
-        public static DateSpan sunRiseToday;
-        public static DateSpan sunSetToday;
-        public static DateSpan sunRiseTomorrow;
-        public static DateSpan sunSetTomorrow;
-
-        public static Time minSunRise;
-        public static Time maxSunRise;
-
-        public static Time minSunSet;
-        public static Time maxSunSet;
-
-        public static Time defaultSunRise;
-        public static Time defaultSunSet;
-
-        public static double latitude {
-            get {
-                return RiseSetCalc.latitude;
-            }
-            set {
-                RiseSetCalc.latitude = value;
-            }
-        }
-
-        public static double longitude {
-            get {
-                return RiseSetCalc.longitude;
-            }
-            set {
-                RiseSetCalc.longitude = value;
-            }
-        }
-
-        public static int timeZone {
-            get {
-                return RiseSetCalc.timeZone;
-            }
-        }
 
         public static int fixtureCount {
             get {
@@ -107,213 +70,179 @@ namespace AquaPic.Modules
                 using (StreamReader reader = File.OpenText (path)) {
                     var jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
-                    try {
-                        RiseSetCalc.latitude = Convert.ToDouble (jo["latitude"]);
-                    } catch {
-                        RiseSetCalc.latitude = 37.0902;
-                        Logger.AddWarning ("Error parsing latitude setting, using default");
-                    }
-
-                    try {
-                        RiseSetCalc.longitude = Convert.ToDouble (jo["longitude"]);
-                    } catch {
-                        RiseSetCalc.longitude = -95.7129;
-                        Logger.AddWarning ("Error parsing longitude setting, using default");
-                    }
-
-                    try {
-                        defaultSunRise = new Time (
-                            Convert.ToInt32 (jo["defaultSunRise"]["hour"]),
-                            Convert.ToInt32 (jo["defaultSunRise"]["minute"])
-                        );
-                    } catch {
-                        defaultSunRise = new Time (7, 30);
-                        Logger.AddWarning ("Error parsing default sun rise setting, using default");
-                    }
-
-                    try {
-                        defaultSunSet = new Time (
-                            Convert.ToInt32 (jo["defaultSunRise"]["hour"]),
-                            Convert.ToInt32 (jo["defaultSunRise"]["minute"])
-                        );
-                    } catch {
-                        defaultSunSet = new Time (20, 30);
-                        Logger.AddWarning ("Error parsing default sun set setting, using default");
-                    }
-
-                    try {
-                        minSunRise = new Time (
-                            Convert.ToInt32 (jo["minSunRise"]["hour"]),
-                            Convert.ToInt32 (jo["minSunRise"]["minute"])
-                        );
-                    } catch {
-                        minSunRise = new Time (7, 15);
-                        Logger.AddWarning ("Error parsing min sun rise setting, using default");
-                    }
-
-                    try {
-                        maxSunRise = new Time (
-                            Convert.ToInt32 (jo["maxSunRise"]["hour"]),
-                            Convert.ToInt32 (jo["maxSunRise"]["minute"])
-                        );
-                    } catch {
-                        maxSunRise = new Time (8, 00);
-                        Logger.AddWarning ("Error parsing max sun rise setting, using default");
-                    }
-
-                    try {
-                        minSunSet = new Time (
-                            Convert.ToInt32 (jo["minSunSet"]["hour"]),
-                            Convert.ToInt32 (jo["minSunSet"]["minute"])
-                        );
-                    } catch {
-                        minSunSet = new Time (19, 30);
-                        Logger.AddWarning ("Error parsing min sun set setting, using default");
-                    }
-
-
-                    try {
-                        maxSunSet = new Time (
-                            Convert.ToByte (jo["maxSunSet"]["hour"]),
-                            Convert.ToByte (jo["maxSunSet"]["minute"])
-                        );
-                    } catch {
-                        maxSunSet = new Time (21, 00);
-                        Logger.AddWarning ("Error parsing max sun set setting, using default");
-                    }
-
                     // Very important to update rise/set times before we setup auto on/off for lighting fixtures
-                    UpdateRiseSetTimes ();
+                    AbstractTimes.UpdateRiseSetTimes ();
 
-                    JArray ja = jo["lightingFixtures"] as JArray;
+                    var ja = jo["lightingFixtures"] as JArray;
                     foreach (var jt in ja) {
                         JObject obj = jt as JObject;
-                        string type = (string)obj["type"];
 
-                        string name = (string)obj["name"];
+                        var lightingType = (string)obj["type"];
+
+                        var name = (string)obj["name"];
+
                         var plug = IndividualControl.Empty;
-                        plug.Group = (string)obj["powerStrip"];
-                        plug.Individual = Convert.ToInt32 (obj["outlet"]);
-                        bool highTempLockout = Convert.ToBoolean (obj["highTempLockout"]);
-
-                        string lTime = (string)obj["lightingTime"];
-                        LightingTime lightingTime;
-                        if (string.Equals (lTime, "night", StringComparison.InvariantCultureIgnoreCase)) {
-                            lightingTime = LightingTime.Nighttime;
-                        } else {
-                            lightingTime = LightingTime.Daytime;
+                        var text = (string)obj["powerStrip"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                plug.Group = text;
+                            } catch {
+                                //
+                            }
                         }
 
-                        if (string.Equals (type, "dimming", StringComparison.InvariantCultureIgnoreCase)) {
+                        if (plug.Group.IsNotEmpty ()) {
+                            text = (string)obj["outlet"];
+                            if (text.IsEmpty ()) {
+                                plug = IndividualControl.Empty;
+                            } else {
+                                try {
+                                    plug.Individual = Convert.ToInt32 (text);
+                                } catch {
+                                    plug = IndividualControl.Empty;
+                                }
+                            }
+                        }
+
+                        bool highTempLockout = true;
+                        text = (string)obj["highTempLockout"];
+                        if (text.IsNotEmpty ()) {
+                            try {
+                                highTempLockout = Convert.ToBoolean (text);
+                            } catch {
+                                //
+                            }
+                        }
+
+                        var lightingStates = new List<LightingState> ();
+                        var jaEvents = obj["events"] as JArray;
+                        foreach (var jtEvent in jaEvents) {
+                            JObject joEvent = jtEvent as JObject;
+
+                            var startTimeDescriptor = (string)joEvent["startTimeDescriptor"];
+                            var endTimeDescriptor = (string)joEvent["endTimeDescriptor"];
+   
+                            var type = LightingStateType.Off;
+                            text = (string)joEvent["type"];
+                            if (text.IsNotEmpty ()) {
+                                try {
+                                    type = (LightingStateType)Enum.Parse (typeof (LightingStateType), text);
+                                } catch {
+                                    //
+                                }
+                            }
+
+                            LightingState state;
+                            if (joEvent.ContainsKey ("startingDimmingLevel")) {
+                                var startingDimmingLevel = 0.0f;
+                                text = (string)joEvent["startingDimmingLevel"];
+                                if (text.IsNotEmpty ()) {
+                                    try {
+                                        startingDimmingLevel = Convert.ToSingle (text);
+                                    } catch {
+                                        //
+                                    }
+                                }
+
+                                var endingDimmingLevel = 0.0f;
+                                text = (string)joEvent["endingDimmingLevel"];
+                                if (text.IsNotEmpty ()) {
+                                    try {
+                                        endingDimmingLevel = Convert.ToSingle (text);
+                                    } catch {
+                                        //
+                                    }
+                                }
+
+                                state = new LightingState (
+                                    startTimeDescriptor,
+                                    endTimeDescriptor,
+                                    type,
+                                    startingDimmingLevel,
+                                    endingDimmingLevel);
+
+                            } else {
+                                state = new LightingState (
+                                    startTimeDescriptor,
+                                    endTimeDescriptor,
+                                    type);
+                            }
+                            lightingStates.Add (state);
+                        }
+
+                        if (string.Equals (lightingType, "dimming", StringComparison.InvariantCultureIgnoreCase)) {
                             var channel = IndividualControl.Empty;
-                            channel.Group = (string)obj["dimmingCard"];
-                            channel.Individual = Convert.ToInt32 (obj["channel"]);
-                            float minDimmingOutput = Convert.ToSingle (obj["minDimmingOutput"]);
-                            float maxDimmingOutput = Convert.ToSingle (obj["maxDimmingOutput"]);
+                            text = (string)obj["dimmingCard"];
+                            if (text.IsNotEmpty ()) {
+                                try {
+                                    channel.Group = text;
+                                } catch {
+                                    //
+                                }
+                            }
+
+                            if (channel.Group.IsNotEmpty ()) {
+                                text = (string)obj["channel"];
+                                if (text.IsEmpty ()) {
+                                    channel = IndividualControl.Empty;
+                                } else {
+                                    try {
+                                        channel.Individual = Convert.ToInt32 (text);
+                                    } catch {
+                                        channel = IndividualControl.Empty;
+                                    }
+                                }
+                            }
+
+                            float minDimmingOutput = 0.0f;
+                            text = (string)obj["minDimmingOutput"];
+                            if (text.IsNotEmpty ()) {
+                                try {
+                                    minDimmingOutput = Convert.ToSingle (text);
+                                } catch {
+                                    //
+                                }
+                            }
+
+                            float maxDimmingOutput = 0.0f;
+                            text = (string)obj["maxDimmingOutput"];
+                            if (text.IsNotEmpty ()) {
+                                try {
+                                    maxDimmingOutput = Convert.ToSingle (text);
+                                } catch {
+                                    //
+                                }
+                            }
 
                             AddLight (
                                 name,
                                 plug,
                                 channel,
+                                lightingStates.ToArray (),
                                 minDimmingOutput,
                                 maxDimmingOutput,
                                 AnalogType.ZeroTen,
-                                lightingTime,
-                                highTempLockout
-                            );
+                                highTempLockout);
                         } else {
                             AddLight (
                                 name,
                                 plug,
-                                lightingTime,
+                                lightingStates.ToArray (),
                                 highTempLockout
                             );
-                        }
-
-                        if (Convert.ToBoolean (obj["autoTimeUpdate"])) {
-                            int onTimeOffset = Convert.ToInt32 (obj["onTimeOffset"]);
-                            int offTimeOffset = Convert.ToInt32 (obj["offTimeOffset"]);
-                            SetupAutoOnOffTime (name, onTimeOffset, offTimeOffset);
                         }
                     }
                 }
             } else {
-                RiseSetCalc.latitude = 37.0902;
-                RiseSetCalc.longitude = -95.7129;
-                defaultSunRise = new Time (7, 45);
-                defaultSunSet = new Time (21, 00);
-                minSunRise = new Time (7, 15);
-                maxSunRise = new Time (8, 00);
-                minSunSet = new Time (20, 15);
-                maxSunSet = new Time (21, 00);
-
-                UpdateRiseSetTimes ();
-
-                Logger.Add ("Temperature settings file did not exist, created new temperature settings");
+                Logger.Add ("Lighting settings file did not exist, created new lighting settings");
                 var file = File.Create (path);
                 file.Close ();
 
                 var jo = new JObject ();
-                jo.Add (new JProperty ("latitude", RiseSetCalc.latitude.ToString ()));
-                jo.Add (new JProperty ("longitude", RiseSetCalc.longitude.ToString ()));
-
-                var jot = new JObject ();
-                jot.Add ("hour", defaultSunRise.hour.ToString ());
-                jot.Add ("minute", defaultSunRise.minute.ToString ());
-                jo.Add (new JProperty ("defaultSunRise", jot));
-
-                jot["hour"] = defaultSunSet.hour.ToString ();
-                jot["minute"] = defaultSunSet.minute.ToString ();
-                jo.Add (new JProperty ("defaultSunSet", jot));
-
-                jot["hour"] = minSunRise.hour.ToString ();
-                jot["minute"] = minSunRise.minute.ToString ();
-                jo.Add (new JProperty ("minSunRise", jot));
-
-                jot["hour"] = maxSunRise.hour.ToString ();
-                jot["minute"] = maxSunRise.minute.ToString ();
-                jo.Add (new JProperty ("maxSunRise", jot));
-
-                jot["hour"] = minSunSet.hour.ToString ();
-                jot["minute"] = minSunSet.minute.ToString ();
-                jo.Add (new JProperty ("minSunSet", jot));
-
-                jot["hour"] = maxSunSet.hour.ToString ();
-                jot["minute"] = maxSunSet.minute.ToString ();
-                jo.Add (new JProperty ("maxSunSet", jot));
-
                 jo.Add (new JProperty ("lightingFixtures", new JArray ()));
 
                 File.WriteAllText (path, jo.ToString ());
             }
-
-            TaskManager.AddTimeOfDayInterrupt ("RiseSetUpdate", new Time (0, 0), () => UpdateRiseSetTimes ());
-        }
-
-        public static void UpdateRiseSetTimes () {
-            RiseSetCalc.GetRiseSetTimes (out sunRiseToday, out sunSetToday);
-            sunRiseTomorrow = RiseSetCalc.GetRiseTimeTomorrow ();
-            sunSetTomorrow = RiseSetCalc.GetSetTimeTomorrow ();
-
-            if (sunRiseToday.Before (minSunRise))
-                sunRiseToday.UpdateTime (minSunRise);
-            else if (sunRiseToday.After (maxSunRise))
-                sunRiseToday.UpdateTime (maxSunRise);
-
-            if (sunSetToday.Before (minSunSet))
-                sunSetToday.UpdateTime (minSunSet);
-            else if (sunSetToday.After (maxSunSet))
-                sunSetToday.UpdateTime (maxSunSet);
-
-            if (sunRiseTomorrow.Before (minSunRise))
-                sunRiseTomorrow.UpdateTime (minSunRise);
-            else if (sunRiseTomorrow.After (maxSunRise))
-                sunRiseTomorrow.UpdateTime (maxSunRise);
-
-            if (sunSetTomorrow.Before (minSunSet))
-                sunSetTomorrow.UpdateTime (minSunSet);
-            else if (sunSetTomorrow.After (maxSunSet))
-                sunSetTomorrow.UpdateTime (maxSunSet);
         }
 
         /**************************************************************************************************************/
@@ -322,25 +251,13 @@ namespace AquaPic.Modules
         public static void AddLight (
             string name,
             IndividualControl plug,
-            LightingTime lightingTime = LightingTime.Daytime,
+            LightingState[] lightingStates,
             bool highTempLockout = true
         ) {
-            Time onTime, offTime;
-
-            if (lightingTime == LightingTime.Daytime) {
-                onTime = defaultSunRise;
-                offTime = defaultSunSet;
-            } else {
-                onTime = defaultSunSet;
-                offTime = defaultSunRise;
-            }
-
             fixtures[name] = new LightingFixture (
                 name,
                 plug,
-                onTime,
-                offTime,
-                lightingTime,
+                lightingStates,
                 highTempLockout);
         }
 
@@ -348,32 +265,20 @@ namespace AquaPic.Modules
             string name,
             IndividualControl plug,
             IndividualControl channel,
+            LightingState[] lightingStates,
             float minDimmingOutput = 0.0f,
             float maxDimmingOutput = 100.0f,
             AnalogType type = AnalogType.ZeroTen,
-            LightingTime lightingTime = LightingTime.Daytime,
             bool highTempLockout = true
         ) {
-            Time onTime, offTime;
-
-            if (lightingTime == LightingTime.Daytime) {
-                onTime = defaultSunRise;
-                offTime = defaultSunSet;
-            } else {
-                onTime = defaultSunSet;
-                offTime = defaultSunRise;
-            }
-
             fixtures[name] = new DimmingLightingFixture (
                 name,
                 plug,
-                onTime,
-                offTime,
                 channel,
+                lightingStates,
                 minDimmingOutput,
                 maxDimmingOutput,
                 type,
-                lightingTime,
                 highTempLockout);
         }
 
@@ -392,50 +297,6 @@ namespace AquaPic.Modules
             }
 
             fixtures.Remove (fixtureName);
-        }
-
-        public static void SetupAutoOnOffTime (
-            string fixtureName,
-            int onTimeOffset = 0,
-            int offTimeOffset = 0
-        ) {
-            CheckFixtureKey (fixtureName);
-            var light = fixtures[fixtureName];
-
-            light.onTimeOffset = onTimeOffset;
-            light.offTimeOffset = offTimeOffset;
-            light.mode = Mode.Auto;
-
-            DateSpan now = DateSpan.Now;
-            if (now.After (sunRiseToday) && now.Before (sunSetToday)) {
-                // time is after sunrise but before sunset so normal daytime
-                if (light.lightingTime == LightingTime.Daytime) {
-                    light.SetOnTime (sunRiseToday);
-                    light.SetOffTime (sunSetToday);
-                } else {
-                    light.SetOnTime (sunSetToday);
-                    light.SetOffTime (sunRiseTomorrow);
-                }
-            } else if (now.Before (sunRiseToday)) { // time is before sunrise today
-                if (light.lightingTime == LightingTime.Daytime) {
-                    // lights are supposed to be off, no special funny business required
-                    light.SetOnTime (sunRiseToday);
-                    light.SetOffTime (sunSetToday);
-                } else { // lights are supposed to be on, a little funny bussiness is required
-                    DateSpan sunSetYesterday = new DateSpan (sunSetToday);
-                    sunSetYesterday.AddDays (-1);
-                    light.SetOnTime (sunSetYesterday);
-                    light.SetOffTime (sunRiseToday); // night time lighting turns off at sunrise
-                }
-            } else { // time is after sunrise
-                if (light.lightingTime == LightingTime.Daytime) {
-                    light.SetOnTime (sunRiseTomorrow);
-                    light.SetOffTime (sunSetTomorrow);
-                } else {
-                    light.SetOnTime (sunSetToday);
-                    light.SetOffTime (sunRiseTomorrow);
-                }
-            }
         }
 
         public static void CheckFixtureKey (string fixtureName) {
@@ -500,7 +361,7 @@ namespace AquaPic.Modules
             Power.RemoveOutlet (fixtures[fixtureName].powerOutlet);
             fixtures[fixtureName].powerOutlet = ic;
             var coil = Power.AddOutlet (fixtures[fixtureName].powerOutlet, fixtures[fixtureName].name, MyState.On, "Heater");
-            coil.ConditionGetter = fixtures[fixtureName].OnPlugControl;
+            coil.StateGetter = fixtures[fixtureName].OnPlugStateGetter;
         }
 
         public static IndividualControl GetDimmingChannelIndividualControl (string fixtureName) {
@@ -530,30 +391,6 @@ namespace AquaPic.Modules
             }
 
             throw new ArgumentException ("fixtureName");
-        }
-
-        /**************************************************************************************************************/
-        /* Lighting Time                                                                                              */
-        /**************************************************************************************************************/
-        public static LightingTime GetFixtureLightingTime (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-            return fixtures[fixtureName].lightingTime;
-        }
-
-        public static void SetFixtureLightingTime (string fixtureName, LightingTime lightingTime) {
-            CheckFixtureKey (fixtureName);
-
-            fixtures[fixtureName].lightingTime = lightingTime;
-
-            if (fixtures[fixtureName].lightingTime == LightingTime.Daytime) {
-                fixtures[fixtureName].SetOnTime (new DateSpan (defaultSunRise));
-                fixtures[fixtureName].SetOffTime (new DateSpan (defaultSunSet));
-            } else {
-                fixtures[fixtureName].SetOnTime (new DateSpan (defaultSunSet));
-                DateSpan defRiseTom = new DateSpan (defaultSunRise);
-                defRiseTom.AddDays (1);
-                fixtures[fixtureName].SetOffTime (defRiseTom);
-            }
         }
 
         /**************************************************************************************************************/
@@ -693,27 +530,6 @@ namespace AquaPic.Modules
         }
 
         /**************************************************************************************************************/
-        /* Auto Update Time / Mode                                                                                    */
-        /**************************************************************************************************************/
-        public static Mode GetFixtureMode (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-            return fixtures[fixtureName].mode;
-        }
-
-        /**************************************************************************************************************/
-        /* Auto Time Offsets                                                                                          */
-        /**************************************************************************************************************/
-        public static int GetFixtureOnTimeOffset (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-            return fixtures[fixtureName].onTimeOffset;
-        }
-
-        public static int GetFixtureOffTimeOffset (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-            return fixtures[fixtureName].offTimeOffset;
-        }
-
-        /**************************************************************************************************************/
         /* Dimming Types                                                                                              */
         /**************************************************************************************************************/
         public static AnalogType GetDimmingType (string fixtureName) {
@@ -736,29 +552,6 @@ namespace AquaPic.Modules
             }
 
             throw new ArgumentException ("fixtureName");
-        }
-
-        /**************************************************************************************************************/
-        /* On/Off Times                                                                                               */
-        /**************************************************************************************************************/
-        public static DateSpan GetFixtureOnTime (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-            return fixtures[fixtureName].onTime;
-        }
-
-        public static void SetFixtureOnTime (string fixtureName, DateSpan newOnTime) {
-            CheckFixtureKey (fixtureName);
-            fixtures[fixtureName].SetOnTime (newOnTime);
-        }
-
-        public static DateSpan GetFixtureOffTime (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-            return fixtures[fixtureName].offTime;
-        }
-
-        public static void SetFixtureOffTime (string fixtureName, DateSpan newOffTime) {
-            CheckFixtureKey (fixtureName);
-            fixtures[fixtureName].SetOffTime (newOffTime);
         }
     }
 }

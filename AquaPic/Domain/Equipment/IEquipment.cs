@@ -27,12 +27,11 @@ using AquaPic.Operands;
 
 namespace AquaPic.Equipment
 {
-    interface IEquipment<T>
+    interface IEquipment
     {
         void Add (IndividualControl channel);
         void Remove ();
         void SetName (string name);
-        void SetGetter (T OnGetter);
     }
 }
 

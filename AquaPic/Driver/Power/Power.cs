@@ -80,13 +80,13 @@ namespace AquaPic.Drivers
                             conditions.Add ((string)cjt);
                         }
 
-                        var script = Script.CompileOutletConditionCheck (conditions.ToArray ());
-                        if (script != null) {
+                        try {
+                            var script = Script.CompileOutletCoilStateGetter (conditions.ToArray ());
                             var c = AddOutlet (powerStripName, outletId, name, fallback);
-                            c.ConditionGetter = () => {
-                                return script.OutletConditionCheck ();
+                            c.StateGetter = () => {
+                                return script.OutletCoilStateGetter ();
                             };
-                        } else {
+                        } catch {
                             Logger.AddInfo ("Error while adding outlet");
                         }
                     }
@@ -261,7 +261,7 @@ namespace AquaPic.Drivers
             powerStrips[powerStripName].outlets[outletId].owner = "Power";
             powerStrips[powerStripName].outlets[outletId].manualState = MyState.Off;
 
-            powerStrips[powerStripName].outlets[outletId].OutletControl.ConditionGetter = () => {
+            powerStrips[powerStripName].outlets[outletId].OutletControl.StateGetter = () => {
                 return false;
             };
 
@@ -382,15 +382,15 @@ namespace AquaPic.Drivers
         }
 
 
-        public static void SetOutletConditionCheck (IndividualControl outlet, ConditionGetterHandler checker) {
+        public static void SetOutletCoilStateGetter (IndividualControl outlet, StateGetterHandler setter) {
             CheckPowerStripKey (outlet.Group);
             CheckOutletId (outlet.Group, outlet.Individual);
 
-            powerStrips[outlet.Group].outlets[outlet.Individual].OutletControl.ConditionGetter = checker;
+            powerStrips[outlet.Group].outlets[outlet.Individual].OutletControl.StateGetter = setter;
         }
 
-        public static void SetOutletConditionCheck (IndividualControl outlet, IOutletScript script) {
-            SetOutletConditionCheck (outlet, script.OutletConditionCheck);
+        public static void SetOutletCoilStateGetter (IndividualControl outlet, IOutletScript script) {
+            SetOutletCoilStateGetter (outlet, script.OutletCoilStateGetter);
         }
 
         public static IndividualControl GetOutletIndividualControl (string name) {

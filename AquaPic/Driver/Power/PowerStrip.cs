@@ -123,7 +123,7 @@ namespace AquaPic.Drivers
                     return;
 
                 int outletId = callArgs.GetDataFromReadBuffer<byte> (0);
-                outlets[outletId].SetAmpCurrent (callArgs.GetDataFromReadBuffer<float> (1));
+                outlets[outletId].SetAmperage (callArgs.GetDataFromReadBuffer<float> (1));
             }
 
             public void SetOutletState (byte outletId, MyState state) {

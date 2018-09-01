@@ -29,6 +29,7 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Modules;
 using AquaPic.Globals;
+using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
@@ -46,22 +47,23 @@ namespace AquaPic.UserInterface
         private TouchTextBox requestedTextBox;
         private TouchLabel autoTextBox;
         private TouchLabel autoLabel;
-        private TouchLabel onTimeLabel;
-        private TouchLabel onTimeTextBox;
-        private TouchLabel offTimeLabel;
-        private TouchLabel offTimeTextBox;
+        //private TouchLabel onTimeLabel;
+        //private TouchLabel onTimeTextBox;
+        //private TouchLabel offTimeLabel;
+        //private TouchLabel offTimeTextBox;
         private TouchLabel outletLabel;
         private TouchLabel outletStateLabel;
         private TouchSelectorSwitch outletSelectorSwitch;
         private TouchButton fixtureSettingBtn;
-        private TouchButton modifyOnTime;
-        private TouchButton modifyOffTime;
+        //private TouchButton modifyOnTime;
+        //private TouchButton modifyOffTime;
         private bool isDimmingFixture;
         private bool dimmingIsManual;
 
         public LightingWindow (params object[] options) : base (false) {
             sceneTitle = "Lighting";
 
+            /*
             var fixtureLabel = new TouchLabel ();
             fixtureLabel.text = "Lighting Fixtures";
             fixtureLabel.textColor = "seca";
@@ -78,7 +80,7 @@ namespace AquaPic.UserInterface
             sunRiseLabel.Show ();
 
             var sunRise = new TouchLabel ();
-            sunRise.text = Lighting.sunRiseToday.ToShortDateString ();
+            sunRise.text = AbstractTimes.sunRiseToday.ToShortDateString ();
             sunRise.textAlignment = TouchAlignment.Center;
             sunRise.textRender.textWrap = TouchTextWrap.Shrink;
             sunRise.textSize = 20;
@@ -95,7 +97,7 @@ namespace AquaPic.UserInterface
             sunSetLabel.Show ();
 
             var sunSet = new TouchLabel ();
-            sunSet.text = Lighting.sunSetToday.ToShortDateString ();
+            sunSet.text = AbstractTimes.sunSetToday.ToShortDateString ();
             sunSet.textAlignment = TouchAlignment.Center;
             sunSet.textRender.textWrap = TouchTextWrap.Shrink;
             sunSet.textSize = 20;
@@ -112,7 +114,7 @@ namespace AquaPic.UserInterface
             sunRiseTomorrowLabel.Show ();
 
             var sunRiseTomorrow = new TouchLabel ();
-            sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToShortDateString ();
+            sunRiseTomorrow.text = AbstractTimes.sunRiseTomorrow.ToShortDateString ();
             sunRiseTomorrow.textAlignment = TouchAlignment.Center;
             sunRiseTomorrow.textRender.textWrap = TouchTextWrap.Shrink;
             sunRiseTomorrow.textSize = 20;
@@ -129,14 +131,16 @@ namespace AquaPic.UserInterface
             sunSetTomorrowLabel.Show ();
 
             var sunSetTomorrow = new TouchLabel ();
-            sunSetTomorrow.text = Lighting.sunSetTomorrow.ToShortDateString ();
+            sunSetTomorrow.text = AbstractTimes.sunSetTomorrow.ToShortDateString ();
             sunSetTomorrow.textAlignment = TouchAlignment.Center;
             sunSetTomorrow.textRender.textWrap = TouchTextWrap.Shrink;
             sunSetTomorrow.textSize = 20;
             sunSetTomorrow.WidthRequest = 150;
             Put (sunSetTomorrow, 220, 190);
             sunSetTomorrow.Show ();
+            */
 
+            /*
             ExposeEvent += (o, args) => {
                 using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                     cr.MoveTo (402.5, 70);
@@ -147,6 +151,7 @@ namespace AquaPic.UserInterface
                     cr.Stroke ();
                 }
             };
+            */
 
             fixtureName = Lighting.defaultFixture;
             if (fixtureName.IsNotEmpty ()) {
@@ -265,6 +270,7 @@ namespace AquaPic.UserInterface
             Put (autoLabel, 623, 348);
             autoLabel.Show ();
 
+            /*
             onTimeLabel = new TouchLabel ();
             onTimeLabel.WidthRequest = 185;
             onTimeLabel.text = "On Time";
@@ -279,7 +285,9 @@ namespace AquaPic.UserInterface
             onTimeTextBox.textAlignment = TouchAlignment.Center;
             Put (onTimeTextBox, 410, 187);
             onTimeTextBox.Show ();
+            */
 
+            /*
             modifyOnTime = new TouchButton ();
             modifyOnTime.SetSizeRequest (100, 60);
             modifyOnTime.text = "Modify On Time";
@@ -326,7 +334,9 @@ namespace AquaPic.UserInterface
             };
             Put (modifyOnTime, 415, 405);
             modifyOnTime.Show ();
+            */
 
+            /*
             offTimeLabel = new TouchLabel ();
             offTimeLabel.WidthRequest = 185;
             offTimeLabel.text = "Off Time";
@@ -341,7 +351,9 @@ namespace AquaPic.UserInterface
             offTimeTextBox.textAlignment = TouchAlignment.Center;
             Put (offTimeTextBox, 410, 250);
             offTimeTextBox.Show ();
+            */
 
+            /*
             modifyOffTime = new TouchButton ();
             modifyOffTime.SetSizeRequest (100, 60);
             modifyOffTime.text = "Modify Off Time";
@@ -388,7 +400,9 @@ namespace AquaPic.UserInterface
             };
             Put (modifyOffTime, 525, 405);
             modifyOffTime.Show ();
+            */
 
+            /*
             var settingsBtn = new TouchButton ();
             settingsBtn.text = "Settings";
             settingsBtn.SetSizeRequest (100, 60);
@@ -398,13 +412,14 @@ namespace AquaPic.UserInterface
                 s.Destroy ();
                 s.Dispose ();
 
-                sunRise.text = Lighting.sunRiseToday.ToShortDateString ();
-                sunSet.text = Lighting.sunSetToday.ToShortDateString ();
-                sunRiseTomorrow.text = Lighting.sunRiseTomorrow.ToShortDateString ();
-                sunSetTomorrow.text = Lighting.sunSetTomorrow.ToShortDateString ();
+                sunRise.text = AbstractTimes.sunRiseToday.ToShortDateString ();
+                sunSet.text = AbstractTimes.sunSetToday.ToShortDateString ();
+                sunRiseTomorrow.text = AbstractTimes.sunRiseTomorrow.ToShortDateString ();
+                sunSetTomorrow.text = AbstractTimes.sunSetTomorrow.ToShortDateString ();
             };
             Put (settingsBtn, 290, 405);
             settingsBtn.Show ();
+            */
 
             outletLabel = new TouchLabel ();
             outletLabel.text = "Outlet:";
@@ -487,19 +502,25 @@ namespace AquaPic.UserInterface
 
         protected void GetFixtureData () {
             if (fixtureName.IsNotEmpty ()) {
+                /*
                 onTimeLabel.Visible = true;
                 onTimeTextBox.Visible = true;
                 offTimeLabel.Visible = true;
                 offTimeTextBox.Visible = true;
+                */
                 dimmingHeader.Visible = true;
                 outletLabel.Visible = true;
                 outletStateLabel.Visible = true;
                 outletSelectorSwitch.Visible = true;
+                /*
                 modifyOnTime.Visible = true;
                 modifyOffTime.Visible = true;
+                */
 
+                /*
                 onTimeTextBox.text = Lighting.GetFixtureOnTime (fixtureName).ToShortDateString ();
                 offTimeTextBox.text = Lighting.GetFixtureOffTime (fixtureName).ToShortDateString ();
+                */
 
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
                 Power.AddHandlerOnStateChange (ic, OnOutletStateChange);
@@ -533,8 +554,10 @@ namespace AquaPic.UserInterface
                     actualLabel.Visible = true;
                     requestedLabel.Visible = true;
                     requestedTextLabel.Visible = true;
+                    /*
                     modifyOnTime.Visible = true;
                     modifyOffTime.Visible = true;
+                    */
 
                     Mode m = Lighting.GetDimmingMode (fixtureName);
                     dimmingIsManual = m == Mode.Manual;
@@ -585,10 +608,12 @@ namespace AquaPic.UserInterface
 
                 QueueDraw ();
             } else {
+                /*
                 onTimeLabel.Visible = false;
                 onTimeTextBox.Visible = false;
                 offTimeLabel.Visible = false;
                 offTimeTextBox.Visible = false;
+                */
                 dimmingHeader.Visible = false;
                 modeSelector.Visible = false;
                 dimmingProgressBar.Visible = false;
@@ -602,8 +627,10 @@ namespace AquaPic.UserInterface
                 outletStateLabel.Visible = false;
                 outletSelectorSwitch.Visible = false;
                 requestedTextBox.Visible = false;
+                /*
                 modifyOnTime.Visible = false;
                 modifyOffTime.Visible = false;
+                */
             }
         }
 

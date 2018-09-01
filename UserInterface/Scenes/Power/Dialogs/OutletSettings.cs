@@ -161,7 +161,7 @@ namespace AquaPic.UserInterface
                 if (oldFallback != fallback)
                     Power.SetOutletFallback (ic, fallback);
 
-                Power.SetOutletConditionCheck (ic, script);
+                Power.SetOutletCoilStateGetter (ic, script);
 
                 int arrIdx = -1;
                 string psName = ic.Group;
@@ -192,8 +192,8 @@ namespace AquaPic.UserInterface
                 }
 
                 var c = Power.AddOutlet (ic, name, fallback);
-                c.ConditionGetter = () => {
-                    return script.OutletConditionCheck ();
+                c.StateGetter = () => {
+                    return script.OutletCoilStateGetter ();
                 };
 
                 JObject jo = new JObject ();
@@ -267,8 +267,8 @@ namespace AquaPic.UserInterface
 
             try {
                 Script.UndoPreprocessor (conditions);
-                script = Script.CompileOutletConditionCheckNoCatch (conditions);
-                script.OutletConditionCheck ();
+                script = Script.CompileOutletCoilStateGetter (conditions);
+                script.OutletCoilStateGetter ();
             } catch (Exception ex) {
                 MessageBox.Show (ex.Message);
                 script = null;

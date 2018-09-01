@@ -64,18 +64,43 @@ namespace GoodtimeDevelopment.Utilites.Test
 
         [Test]
         public void ParseTest () {
-            var str = "8:00 AM";
+            var str = "8:15 AM";
             var t1 = Time.Parse (str);
-            var t2 = new Time (8, 0);
+            var t2 = new Time (8, 15);
             Assert.AreEqual (t2, t1);
 
-            str = "15:00";
+            str = "16:15";
             t1 = Time.Parse (str);
-            t2 = new Time (15, 0);
+            t2 = new Time (16, 15);
             Assert.AreEqual (t2, t1);
 
-            str = "3:00 PM";
+            str = "4:15 PM";
             t1 = Time.Parse (str);
+            Assert.AreEqual (t2, t1);
+
+            str = "00:00:00:00";
+            t1 = Time.Parse (str);
+            t2 = Time.TimeZero;
+            Assert.AreEqual (t2, t1);
+
+            str = "8:15:45AM";
+            t1 = Time.Parse (str);
+            t2 = new Time (8, 15, 45);
+            Assert.AreEqual (t2, t1);
+
+            str = "8:15:45:540";
+            t1 = Time.Parse (str);
+            t2 = new Time (8, 15, 45, 540);
+            Assert.AreEqual (t2, t1);
+
+            str = "8:15:45:540 AM";
+            t1 = Time.Parse (str);
+            t2 = new Time (8, 15, 45, 540);
+            Assert.AreEqual (t2, t1);
+
+            str = "10:30 PM";
+            t1 = Time.Parse (str);
+            t2 = new Time (22, 30, 0, 0);
             Assert.AreEqual (t2, t1);
         }
 
@@ -105,6 +130,13 @@ namespace GoodtimeDevelopment.Utilites.Test
 
             t2 = new Time (8, 0, 0, 500);
             Assert.False (t1.Equals (t2));
+        }
+
+        [Test]
+        public void ImplicitStringTest () {
+            Time t1 = "8:30:15:300";
+            var t2 = new Time (8, 30, 15, 300);
+            Assert.AreEqual (t2, t1);
         }
     }
 }

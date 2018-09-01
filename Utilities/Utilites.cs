@@ -119,12 +119,30 @@ namespace GoodtimeDevelopment.Utilites
             return min + (float)(delta * Math.Sin (radian));
         }
 
+        public static float CalcHalfParabola (DateSpan startTime, DateSpan endTime, DateSpan now, float startLevel, float endLevel) {
+            var period = endTime.DifferenceInMinutes (startTime);
+            var phase = now.DifferenceInMinutes (startTime);
+            var radian = (phase / period).Map (0, 1, 0, 90).Constrain (0, 90).ToRadians ();
+            var delta = endLevel - startLevel;
+            return startLevel + (float)(delta * Math.Sin (radian));
+        }
+
+        public static float CalcLinearRamp (DateSpan startTime, DateSpan endTime, DateSpan now, float startLevel, float endLevel) {
+            var period = endTime.DifferenceInMinutes (startTime);
+            var phase = now.DifferenceInMinutes (startTime);
+            return (float)(phase / period).Map (0, 1, startLevel, endLevel);
+        }
+
         public static uint SecondsToMilliseconds (double seconds) {
             return (uint)Math.Round (seconds * 1000);
         }
 
         public static double ToRadians (this double angle) {
             return (Math.PI / 180) * angle;
+        }
+
+        public static double ToDegrees (this double angle) {
+            return (180.0 * angle) / Math.PI;
         }
 
         public static int Map (this int value, int from1, int from2, int to1, int to2) {

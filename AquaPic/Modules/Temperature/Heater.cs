@@ -41,7 +41,7 @@ namespace AquaPic.Modules
                 this.plug = plug;
                 this.temperatureGroupName = temperatureGroupName;
                 var plugControl = Power.AddOutlet (plug, name, MyState.On, "Temperature");
-                plugControl.ConditionGetter = OnPlugControl;
+                plugControl.StateGetter = OnPlugControl;
                 Power.AddHandlerOnStateChange (plug, OnStateChange);
             }
 

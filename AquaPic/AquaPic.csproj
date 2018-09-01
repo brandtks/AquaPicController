@@ -87,10 +87,6 @@
     <Compile Include="Driver\AnalogOutput\AnalogOutputChannel.cs" />
     <Compile Include="Modules\Temperature\Heater.cs" />
     <Compile Include="Modules\Temperature\Temperature.cs" />
-    <Compile Include="Modules\Lights\DimmingLightingFixture.cs" />
-    <Compile Include="Modules\Lights\Lighting.cs" />
-    <Compile Include="Modules\Lights\LightingFixture.cs" />
-    <Compile Include="Modules\Lights\RiseSetCalc.cs" />
     <Compile Include="Globals\GlobalEnums.cs" />
     <Compile Include="Globals\IndividualControl.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInput.cs" />
@@ -101,13 +97,8 @@
     <Compile Include="Runtime\Alarm\AlarmType.cs" />
     <Compile Include="Driver\Power\PowerOutlet.cs" />
     <Compile Include="Runtime\Hardware\Hardware.cs" />
-    <Compile Include="Runtime\Timer\Timer.cs" />
-    <Compile Include="Runtime\Timer\IntervalTimer.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevel.cs" />
     <Compile Include="Runtime\Script\Script.cs" />
-    <Compile Include="Runtime\Timer\OffDelayTimer.cs" />
-    <Compile Include="Runtime\Timer\OnDelayTimer.cs" />
-    <Compile Include="Runtime\Timer\StaticTimer.cs" />
     <Compile Include="Runtime\Logger\Logger.cs" />
     <Compile Include="Runtime\Chemistry\Chemistry.cs" />
     <Compile Include="Runtime\Chemistry\TestProcedure.cs" />
@@ -144,6 +135,21 @@
     <Compile Include="Runtime\Settings\StringSetting.cs" />
     <Compile Include="Runtime\Settings\FloatSetting.cs" />
     <Compile Include="Runtime\Settings\BoolSetting.cs" />
+    <Compile Include="Domain\Timer\IntervalTimer.cs" />
+    <Compile Include="Domain\Timer\OffDelayTimer.cs" />
+    <Compile Include="Domain\Timer\OnDelayTimer.cs" />
+    <Compile Include="Domain\Timer\StaticTimer.cs" />
+    <Compile Include="Domain\Timer\Timer.cs" />
+    <Compile Include="Domain\TimePeriod\TimePeriod.cs" />
+    <Compile Include="Tests\Domain\Timer\StaticTimerTests.cs" />
+    <Compile Include="Tests\Domain\TimePeriod\TimePeriodTests.cs" />
+    <Compile Include="Tests\Domain\TimePeriod\AbstractTimeTests.cs" />
+    <Compile Include="Runtime\AbstractTimes\AbstractTimes.cs" />
+    <Compile Include="Runtime\AbstractTimes\SunRiseSetCalc.cs" />
+    <Compile Include="Modules\Lights\Lighting.cs" />
+    <Compile Include="Modules\Lights\LightingFixture.cs" />
+    <Compile Include="Modules\Lights\LightingState.cs" />
+    <Compile Include="Modules\Lights\DimmingLightingFixture.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -169,6 +175,12 @@
     <Folder Include="Domain\Bit\" />
     <Folder Include="Domain\Operands\" />
     <Folder Include="Runtime\Settings\" />
+    <Folder Include="Domain\Timer\" />
+    <Folder Include="Domain\TimePeriod\" />
+    <Folder Include="Tests\Domain\" />
+    <Folder Include="Tests\Domain\Timer\" />
+    <Folder Include="Tests\Domain\TimePeriod\" />
+    <Folder Include="Runtime\AbstractTimes\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">

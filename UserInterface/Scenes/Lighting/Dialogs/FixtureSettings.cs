@@ -72,17 +72,7 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (Power.GetAllAvailableOutlets ());
             AddSetting (c);
 
-            var s = new SettingsSelectorSwitch ("Lighting Time", "Day", "Night");
-            if (this.fixtureName.IsNotEmpty ()) {
-                if (Lighting.GetFixtureLightingTime (this.fixtureName) == LightingTime.Daytime)
-                    s.selectorSwitch.currentSelected = 0;
-                else
-                    s.selectorSwitch.currentSelected = 1;
-            } else
-                s.selectorSwitch.currentSelected = 0;
-            AddSetting (s);
-
-            s = new SettingsSelectorSwitch ("Temp Lockout");
+            var s = new SettingsSelectorSwitch ("Temp Lockout");
             if (this.fixtureName.IsNotEmpty ()) {
                 if (Lighting.GetFixtureTemperatureLockout (this.fixtureName))
                     s.selectorSwitch.currentSelected = 0;
@@ -91,47 +81,6 @@ namespace AquaPic.UserInterface
             } else
                 s.selectorSwitch.currentSelected = 0;
             AddSetting (s);
-
-            s = new SettingsSelectorSwitch ("Auto Time Update");
-            if (this.fixtureName.IsNotEmpty ()) {
-                if (Lighting.GetFixtureMode (this.fixtureName) == Mode.Auto)
-                    s.selectorSwitch.currentSelected = 0;
-                else
-                    s.selectorSwitch.currentSelected = 1;
-            } else
-                s.selectorSwitch.currentSelected = 1;
-            AddSetting (s);
-
-            t = new SettingsTextBox ("On Time Offset");
-            if (this.fixtureName.IsNotEmpty ())
-                t.textBox.text = Lighting.GetFixtureOnTimeOffset (this.fixtureName).ToString ();
-            else
-                t.textBox.text = "0";
-            t.textBox.TextChangedEvent += (sender, args) => {
-                try {
-                    Convert.ToInt32 (args.text);
-                } catch {
-                    MessageBox.Show ("Improper integer format");
-                    args.keepText = false;
-                }
-            };
-            AddSetting (t);
-
-            t = new SettingsTextBox ("Off Time Offset");
-            t.textBox.includeTimeFunctions = true;
-            if (this.fixtureName.IsNotEmpty ())
-                t.textBox.text = Lighting.GetFixtureOffTimeOffset (this.fixtureName).ToString ();
-            else
-                t.textBox.text = "0";
-            t.textBox.TextChangedEvent += (sender, args) => {
-                try {
-                    Convert.ToInt32 (args.text);
-                } catch {
-                    MessageBox.Show ("Improper integer format");
-                    args.keepText = false;
-                }
-            };
-            AddSetting (t);
 
             bool isDimming;
             if (this.fixtureName.IsNotEmpty ())
@@ -242,15 +191,6 @@ namespace AquaPic.UserInterface
             string outletStr = ((SettingsComboBox)settings["Outlet"]).combo.activeText;
             IndividualControl outletIc = IndividualControl.Empty;
 
-            LightingTime lTime = LightingTime.Daytime;
-            try {
-                SettingsSelectorSwitch s = settings["Lighting Time"] as SettingsSelectorSwitch;
-                if (s.selectorSwitch.currentSelected != 0)
-                    lTime = LightingTime.Nighttime;
-            } catch {
-                return false;
-            }
-
             bool highTempLockout = true;
             try {
                 SettingsSelectorSwitch s = settings["Temp Lockout"] as SettingsSelectorSwitch;
@@ -259,18 +199,6 @@ namespace AquaPic.UserInterface
             } catch {
                 return false;
             }
-
-            bool autoTimeUpdate = true;
-            try {
-                SettingsSelectorSwitch s = settings["Auto Time Update"] as SettingsSelectorSwitch;
-                if (s.selectorSwitch.currentSelected != 0)
-                    autoTimeUpdate = false;
-            } catch {
-                return false;
-            }
-
-            int onOffset = Convert.ToInt32 (((SettingsTextBox)settings["On Time Offset"]).textBox.text);
-            int offOffset = Convert.ToInt32 (((SettingsTextBox)settings["Off Time Offset"]).textBox.text);
 
             bool dimmingFixture = true;
             try {
@@ -312,6 +240,8 @@ namespace AquaPic.UserInterface
 
                 ParseOutlet (outletStr, ref outletIc.Group, ref outletIc.Individual);
 
+                var lightingStates = new LightingState[0];
+
                 if (dimmingFixture) {
                     if (((SettingsComboBox)settings["Dimming Channel"]).combo.activeIndex == -1) {
                         MessageBox.Show ("Please select a dimming channel");
@@ -320,13 +250,11 @@ namespace AquaPic.UserInterface
 
                     ParseChannnel (chStr, ref chIc.Group, ref chIc.Individual);
 
-                    Lighting.AddLight (name, outletIc, chIc, minDimming, maxDimming, aType, lTime, highTempLockout);
+                    Lighting.AddLight (name, outletIc, chIc, lightingStates, minDimming, maxDimming, aType, highTempLockout);
                 } else {
-                    Lighting.AddLight (name, outletIc, lTime, highTempLockout);
+                    Lighting.AddLight (name, outletIc, lightingStates, highTempLockout);
                 }
 
-                if (autoTimeUpdate)
-                    Lighting.SetupAutoOnOffTime (name, onOffset, offOffset);
 
                 JObject jobj = new JObject ();
                 if (dimmingFixture)
@@ -336,21 +264,13 @@ namespace AquaPic.UserInterface
                 jobj.Add (new JProperty ("name", name));
                 jobj.Add (new JProperty ("powerStrip", outletIc.Group));
                 jobj.Add (new JProperty ("outlet", outletIc.Individual.ToString ()));
-                if (lTime == LightingTime.Daytime)
-                    jobj.Add (new JProperty ("lightingTime", "day"));
-                else
-                    jobj.Add (new JProperty ("lightingTime", "night"));
                 jobj.Add (new JProperty ("highTempLockout", highTempLockout.ToString ()));
                 if (dimmingFixture) {
                     jobj.Add (new JProperty ("dimmingCard", chIc.Group));
                     jobj.Add (new JProperty ("channel", chIc.Individual.ToString ()));
                     jobj.Add (new JProperty ("minDimmingOutput", minDimming.ToString ()));
                     jobj.Add (new JProperty ("maxDimmingOutput", maxDimming.ToString ()));
-                    jobj.Add (new JProperty ("analogType", aType.ToString ()));
                 }
-                jobj.Add (new JProperty ("autoTimeUpdate", autoTimeUpdate.ToString ()));
-                jobj.Add (new JProperty ("onTimeOffset", onOffset.ToString ()));
-                jobj.Add (new JProperty ("offTimeOffset", offOffset.ToString ()));
 
                 ja.Add (jobj);
 
@@ -371,12 +291,7 @@ namespace AquaPic.UserInterface
                         outletIc = Lighting.GetFixtureOutletIndividualControl (fixtureName);
                     }
 
-                    Lighting.SetFixtureLightingTime (fixtureName, lTime);
-
                     Lighting.SetFixtureTemperatureLockout (fixtureName, highTempLockout);
-
-                    if (autoTimeUpdate)
-                        Lighting.SetupAutoOnOffTime (fixtureName, onOffset, offOffset);
 
                     if (dimmingFixture) {
                         Lighting.SetMaxDimmingLevel (fixtureName, maxDimming);
@@ -400,14 +315,7 @@ namespace AquaPic.UserInterface
                     ja[arrIdx]["name"] = name;
                     ja[arrIdx]["powerStrip"] = outletIc.Group;
                     ja[arrIdx]["outlet"] = outletIc.Individual.ToString ();
-                    if (lTime == LightingTime.Daytime)
-                        ja[arrIdx]["lightingTime"] = "day";
-                    else
-                        ja[arrIdx]["lightingTime"] = "night";
                     ja[arrIdx]["highTempLockout"] = highTempLockout.ToString ();
-                    ja[arrIdx]["autoTimeUpdate"] = autoTimeUpdate.ToString ();
-                    ja[arrIdx]["onTimeOffset"] = onOffset.ToString ();
-                    ja[arrIdx]["offTimeOffset"] = offOffset.ToString ();
 
                     if (dimmingFixture) {
                         ja[arrIdx]["dimmingCard"] = chIc.Group;

@@ -44,22 +44,18 @@ namespace AquaPic.Modules
             public DimmingLightingFixture (
                 string name,
                 IndividualControl plug,
-                Time onTime,
-                Time offTime,
                 IndividualControl channel,
+                LightingState[] lightingStates,
                 float minDimmingOutput,
                 float maxDimmingOutput,
                 AnalogType type,
-                LightingTime lightingTime,
                 bool highTempLockout)
             : base (
                 name,
                 plug,
-                onTime,
-                offTime,
-                lightingTime,
-                highTempLockout
-            ) {
+                lightingStates,
+                highTempLockout) 
+            {
                 currentDimmingLevel = 0.0f;
                 autoDimmingLevel = 0.0f;
                 requestedDimmingLevel = 0.0f;
@@ -76,33 +72,45 @@ namespace AquaPic.Modules
                 Power.AddHandlerOnModeChange (
                     plug,
                     OnLightingPlugModeChange);
+                
+                Power.AddHandlerOnStateChange (
+                    plug,
+                    OnDimmingLightPlugStateChange);
             }
 
             public float CalculateDimmingLevel () {
-                if (lightingOn == MyState.On) {
-                    DateSpan now = DateSpan.Now;
-
-                    autoDimmingLevel = Utils.CalcParabola (
-                        onTime,
-                        offTime,
+                DateSpan now = DateSpan.Now;
+                if (lightingStates[currentState].type == LightingStateType.LinearRamp) {
+                    autoDimmingLevel = Utils.CalcLinearRamp (
+                        lightingStates[currentState].startTime,
+                        lightingStates[currentState].endTime,
                         now,
-                        minDimmingOutput,
-                        maxDimmingOutput
-                    );
+                        lightingStates[currentState].startingDimmingLevel,
+                        lightingStates[currentState].endingDimmingLevel);
+                } else if (lightingStates[currentState].type == LightingStateType.HalfParabolaRamp) {
+                    autoDimmingLevel = Utils.CalcHalfParabola (
+                        lightingStates[currentState].startTime,
+                        lightingStates[currentState].endTime,
+                        now,
+                        lightingStates[currentState].startingDimmingLevel,
+                        lightingStates[currentState].endingDimmingLevel);
+                } else if (lightingStates[currentState].type == LightingStateType.ParabolaRamp) {
+                    autoDimmingLevel = Utils.CalcParabola (
+                        lightingStates[currentState].startTime,
+                        lightingStates[currentState].endTime,
+                        now,
+                        lightingStates[currentState].startingDimmingLevel,
+                        lightingStates[currentState].endingDimmingLevel);
+                }
 
+                autoDimmingLevel.Constrain (minDimmingOutput, maxDimmingOutput);
+                if (plugState == MyState.On) {
                     if (dimmingMode == Mode.Auto) {
                         requestedDimmingLevel = autoDimmingLevel;
                     }
 
                     currentDimmingLevel = rocl.RateOfChange (requestedDimmingLevel);
-
-                    return currentDimmingLevel;
                 }
-
-                autoDimmingLevel = 0.0f;
-                requestedDimmingLevel = 0.0f;
-                currentDimmingLevel = 0.0f;
-                rocl.Reset ();
 
                 return currentDimmingLevel;
             }
@@ -112,6 +120,14 @@ namespace AquaPic.Modules
                     dimmingMode = Mode.Auto;
                 else
                     dimmingMode = Mode.Manual;
+            }
+
+            public void OnDimmingLightPlugStateChange (object sender, StateChangeEventArgs args) {
+                if (args.state == MyState.Off) {
+                    requestedDimmingLevel = 0.0f;
+                    currentDimmingLevel = 0.0f;
+                    rocl.Reset ();
+                }
             }
         }
     }

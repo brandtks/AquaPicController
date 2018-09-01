@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using System.Linq;
 
 namespace GoodtimeDevelopment.Utilites
 {
@@ -61,11 +62,15 @@ namespace GoodtimeDevelopment.Utilites
             }
         }
 
+        public static implicit operator Time (string timeString) {
+            return Time.Parse (timeString);
+        }
+
         public Time (int hour, int minute, int second, int millisecond) {
-            this._hour = hour;
-            this._minute = minute;
-            this._second = second;
-            this._millisecond = millisecond;
+            _hour = hour;
+            _minute = minute;
+            _second = second;
+            _millisecond = millisecond;
         }
 
         public Time (int hour, int minute, int second)
@@ -120,8 +125,32 @@ namespace GoodtimeDevelopment.Utilites
             return true;
         }
 
+        public void AddHours (int numberOfHours) {
+            TimeSpan timeSpan = new TimeSpan (0, _hour + numberOfHours, _minute, _second, _millisecond);
+            _hour = timeSpan.Hours;
+            _minute = timeSpan.Minutes;
+            _second = timeSpan.Seconds;
+            _millisecond = timeSpan.Milliseconds;
+        }
+
         public void AddMinutes (int numberOfMinutes) {
-            TimeSpan timeSpan = new TimeSpan (_hour, _minute + numberOfMinutes, _second);
+            TimeSpan timeSpan = new TimeSpan (0, _hour, _minute + numberOfMinutes, _second, _millisecond);
+            _hour = timeSpan.Hours;
+            _minute = timeSpan.Minutes;
+            _second = timeSpan.Seconds;
+            _millisecond = timeSpan.Milliseconds;
+        }
+
+        public void AddSeconds (int numberOfSeconds) {
+            TimeSpan timeSpan = new TimeSpan (0, _hour, _minute, _second + numberOfSeconds, _millisecond);
+            _hour = timeSpan.Hours;
+            _minute = timeSpan.Minutes;
+            _second = timeSpan.Seconds;
+            _millisecond = timeSpan.Milliseconds;
+        }
+
+        public void AddMilliSeconds (int numberOfMilliSeconds) {
+            TimeSpan timeSpan = new TimeSpan (0, _hour, _minute, _second, _millisecond + numberOfMilliSeconds);
             _hour = timeSpan.Hours;
             _minute = timeSpan.Minutes;
             _second = timeSpan.Seconds;
@@ -136,34 +165,63 @@ namespace GoodtimeDevelopment.Utilites
             _millisecond = timeSpan.Milliseconds;
         }
 
+        public Time Negate () {
+            return new Time (ToTimeSpan ().Negate ());
+        }
+
         public static Time Parse (string value) {
-            int pos = value.IndexOf (":");
+            var seperator = new char[2] { ':' , '.' };
+            var t = value.Split (seperator, 4);
 
-            if ((pos != 1) && (pos != 2))
-                throw new Exception ();
+            int hours = 0, minutes = 0, seconds = 0, milliseconds = 0;
+            string hrFormatString = string.Empty;
 
-            string hourString = value.Substring (0, pos);
-            int hour = Convert.ToInt32 (hourString);
-
-            if ((hour < 0) || (hour > 23))
-                throw new Exception ();
-
-            string minString = value.Substring (pos + 1, 2);
-            int min = Convert.ToInt32 (minString);
-
-            if ((min < 0) || (min > 59))
-                throw new Exception ();
-
-            pos = value.Length;
-            if (pos > 3) {
-                string last = value.Substring (pos - 2);
-                if (string.Equals (last, "pm", StringComparison.InvariantCultureIgnoreCase)) {
-                    if ((hour >= 1) && (hour <= 12))
-                        hour = (hour + 12) % 24;
+            var lastElement = t.Length - 1;
+            if (t[lastElement].Length > 2) { // there might be am or pm after the last element
+                int splitPoint = t[lastElement].Length - 2; // the last two character might be am or pm
+                hrFormatString = t[lastElement].Substring (splitPoint); // the the last two characters
+                if (hrFormatString.All (x => char.IsLetter (x))) { // make sure the last two characters are letter characters
+                    t[lastElement] = t[lastElement].Substring (0, splitPoint); // remove the last two characters
+                } else { // If the last two character are not letter than there isn't a hour format string
+                    hrFormatString = string.Empty;
                 }
             }
 
-            return new Time (hour, min);
+            if (t.Length < 2) {
+                throw new Exception ("The string can not be parsed into a Time value");
+            }
+
+            // the value to parse has at least the hours and seconds
+            hours = Convert.ToInt32 (t[0]);
+            if (string.Equals (hrFormatString, "pm", StringComparison.InvariantCultureIgnoreCase)) {
+                if (hours < 13) { // the hours spot indicates AM time period
+                    hours = (hours + 12) % 24;
+                }
+            }
+            if (hours == 24) { // convert the 24th hour to 0
+                hours = 0;
+            }
+
+            minutes = Convert.ToInt32 (t[1]);
+
+            if ((hours < 0) || (hours > 23))
+                throw new Exception ("Invalid hours");
+
+            if ((minutes < 0) || (minutes > 59))
+                throw new Exception ("Invalid minutes");
+
+            if (t.Length >= 3) { // the value to parse contains seconds
+                seconds = Convert.ToInt32 (t[2]);
+            }
+
+            if ((seconds < 0) || (seconds > 59))
+                throw new Exception ("Invalid seconds");
+
+            if (t.Length >= 4) { // the value to parse contains milliseconds
+                milliseconds = Convert.ToInt32 (t[3]);
+            }
+
+            return new Time (hours, minutes, seconds, milliseconds);
         }
 
         public string ToShortTimeString () {

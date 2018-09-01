@@ -40,11 +40,12 @@ namespace AquaPic.Drivers
             public string name;
             public MyState currentState;
             public MyState manualState;
+            public MyState autoState;
             public MyState fallback;
             public Coil OutletControl;
             public string owner;
 
-            public OutletData (string name, ConditionSetterHandler outletSetter) {
+            public OutletData (string name, StateSetterHandler outletSetter) {
                 this.name = name;
                 currentState = MyState.Off;
                 manualState = MyState.Off;
@@ -53,15 +54,14 @@ namespace AquaPic.Drivers
                 ampCurrent = 0.0f;
                 wattPower = 0.0f;
                 powerFactor = 1.0f;
-                OutletControl = new Coil ();
-                OutletControl.ConditionGetter = () => {
+                owner = "Power";
+                OutletControl = new Coil (outletSetter);
+                OutletControl.StateGetter = () => {
                     return false;
                 };
-                OutletControl.ConditionSetter = outletSetter;
-                owner = "Power";
             }
 
-            public void SetAmpCurrent (float c) {
+            public void SetAmperage (float c) {
                 ampCurrent = c;
                 wattPower = ampCurrent * Voltage * powerFactor;
             }

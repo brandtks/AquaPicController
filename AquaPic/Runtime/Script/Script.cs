@@ -32,22 +32,12 @@ namespace AquaPic.Runtime
 {
     public interface IOutletScript
     {
-        bool OutletConditionCheck ();
+        bool OutletCoilStateGetter ();
     }
 
     public class Script
     {
-        public static IOutletScript CompileOutletConditionCheck (IEnumerable<string> conditions) {
-            try {
-                return CompileOutletConditionCheckNoCatch (conditions);
-            } catch (Exception ex) {
-                Logger.AddError (ex.ToString ());
-            }
-
-            return null;
-        }
-
-        public static IOutletScript CompileOutletConditionCheckNoCatch (IEnumerable<string> conditions) {
+        public static IOutletScript CompileOutletCoilStateGetter (IEnumerable<string> conditions) {
             List<string> cond = conditions.ToList<string> ();
             List<string> preprocess = new List<string> ();
 
@@ -68,7 +58,7 @@ namespace AquaPic.Runtime
             sb.AppendLine ("using AquaPic.Drivers;");
             sb.AppendLine ("using AquaPic.Operands;");
             sb.AppendLine ("public class MyOutletScipt : IOutletScript {");
-            sb.AppendLine ("public bool OutletConditionCheck () {");
+            sb.AppendLine ("public bool OutletCoilStateGetter () {");
             foreach (var s in cond) {
                 sb.AppendLine (s);
             }

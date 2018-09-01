@@ -25,22 +25,24 @@ using System;
 
 namespace AquaPic.Operands
 {
-    public delegate bool ConditionGetterHandler ();
-    public delegate void ConditionSetterHandler (bool condition);
+    public delegate bool StateGetterHandler ();
+    public delegate void StateSetterHandler (bool condition);
 
     public class Coil : IOperand
     {
-        public ConditionGetterHandler ConditionGetter;
-        public ConditionSetterHandler ConditionSetter;
+        public StateGetterHandler StateGetter;
+        // This is protected to minimize the risk changing the setter after initialization
+        protected StateSetterHandler StateSetter;
         public bool state;
 
-        public Coil () {
+        public Coil (StateSetterHandler ConditionSetter) {
             state = false;
+            this.StateSetter = ConditionSetter;
         }
 
         public void Execute () {
-            state = (bool)ConditionGetter?.Invoke ();  // do we have a condition check method, if yes, lets run it to find out the new state
-            ConditionSetter?.Invoke (state);
+            state = (bool)StateGetter?.Invoke ();  // do we have a condition check method, if yes, lets run it to find out the new state
+            StateSetter?.Invoke (state);
         }
     }
 }

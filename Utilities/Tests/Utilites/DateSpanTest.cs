@@ -127,6 +127,30 @@ namespace GoodtimeDevelopment.Utilites.Test
             ds1 = new DateSpan (2017, 1, 1, 12, 0, 0, 500);
             Assert.AreNotEqual (ds2, ds1);
         }
+
+        [Test]
+        public void DateSpanConstructorTest () {
+            Time time = "10:30 PM";
+            var ds1 = new DateSpan (time);
+            var ds2 = new DateSpan (new Time (22, 30));
+            Assert.AreEqual (ds2, ds1);
+
+            ds1.ToDateTime ();
+            ds2.ToDateTime ();
+
+            time = "2:15am";
+            var ds3 = new DateSpan (time);
+            var ds4 = new DateSpan (new Time (2, 15));
+            Assert.AreEqual (ds3, ds4);
+
+            ds3.ToDateTime ();
+            ds4.ToDateTime ();
+
+            Assert.IsTrue (ds1.After (ds3));
+            Assert.IsFalse (ds1.Before (ds3));
+            Assert.IsTrue (ds3.Before (ds1));
+            Assert.IsFalse (ds3.After (ds1));
+        }
     }
 }
 
