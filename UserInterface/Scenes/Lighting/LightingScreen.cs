@@ -47,12 +47,12 @@ namespace AquaPic.UserInterface
         private TouchTextBox requestedTextBox;
         private TouchLabel autoTextBox;
         private TouchLabel autoLabel;
-        private TouchLabel outletLabel;
         private TouchLabel outletStateLabel;
         private TouchSelectorSwitch outletSelectorSwitch;
         private TouchButton fixtureSettingBtn;
         private bool isDimmingFixture;
         private bool dimmingIsManual;
+        private LightingStateDisplay lightingStateDisplay;
 
         public LightingWindow (params object[] options) : base (false) {
             sceneTitle = "Lighting";
@@ -71,14 +71,10 @@ namespace AquaPic.UserInterface
                 }
             }
 
-            outletLabel = new TouchLabel ();
-            outletLabel.text = "Outlet:";
-            outletLabel.textColor = "grey4";
-            Put (outletLabel, 605, 152);
-            outletLabel.Show ();
-
             outletStateLabel = new TouchLabel ();
-            Put (outletStateLabel, 655, 152);
+            outletStateLabel.WidthRequest = 250;
+            outletStateLabel.textSize = 14;
+            Put (outletStateLabel, 55, 37);
             outletStateLabel.Show ();
 
             outletSelectorSwitch = new TouchSelectorSwitch (0, 3, 0, TouchOrientation.Horizontal);
@@ -90,25 +86,25 @@ namespace AquaPic.UserInterface
             outletSelectorSwitch.sliderColorOptions[2] = "seca";
             outletSelectorSwitch.textOptions = new string[] { "Off", "Auto", "On" };
             outletSelectorSwitch.SelectorChangedEvent += OnOutletControlSelectorChanged;
-            Put (outletSelectorSwitch, 605, 117);
+            Put (outletSelectorSwitch, 605, 77);
             outletSelectorSwitch.Show ();
 
             dimmingHeader = new TouchLabel ();
             dimmingHeader.textAlignment = TouchAlignment.Center;
             dimmingHeader.WidthRequest = 180;
             dimmingHeader.text = "Dimming Control";
-            Put (dimmingHeader, 605, 175);
+            Put (dimmingHeader, 605, 113);
             dimmingHeader.Show ();
 
             modeSelector = new TouchSelectorSwitch (2);
-            modeSelector.SetSizeRequest (135, 30);
+            modeSelector.SetSizeRequest (140, 30);
             modeSelector.sliderSize = MySliderSize.Large;
             modeSelector.textOptions[0] = "Manual";
             modeSelector.textOptions[1] = "Auto";
             modeSelector.sliderColorOptions[0] = "grey2";
             modeSelector.sliderColorOptions[1] = "pri";
             modeSelector.SelectorChangedEvent += OnDimmingModeSelectorChanged;
-            Put (modeSelector, 605, 202);
+            Put (modeSelector, 605, 138);
             modeSelector.Show ();
 
             dimmingProgressBar = new TouchLayeredProgressBar ();
@@ -117,34 +113,34 @@ namespace AquaPic.UserInterface
             dimmingProgressBar.drawPrimaryWhenEqual = false;
             dimmingProgressBar.ProgressChangedEvent += OnProgressChanged;
             dimmingProgressBar.ProgressChangingEvent += OnProgressChanging;
-            dimmingProgressBar.HeightRequest = 260;
-            Put (dimmingProgressBar, 760, 202);
+            dimmingProgressBar.HeightRequest = 319;
+            Put (dimmingProgressBar, 755, 138);
             dimmingProgressBar.Show ();
 
             actualTextBox = new TouchLabel ();
-            actualTextBox.WidthRequest = 110;
+            actualTextBox.WidthRequest = 140;
             actualTextBox.textSize = 20;
             actualTextBox.textColor = "pri";
             actualTextBox.textAlignment = TouchAlignment.Center;
             actualTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
-            Put (actualTextBox, 623, 234);
+            Put (actualTextBox, 605, 174);
             actualTextBox.Show ();
 
             actualLabel = new TouchLabel ();
-            actualLabel.WidthRequest = 110;
+            actualLabel.WidthRequest = 140;
             actualLabel.text = "Current";
             actualLabel.textColor = "grey3";
             actualLabel.textAlignment = TouchAlignment.Center;
-            Put (actualLabel, 623, 269);
+            Put (actualLabel, 605, 209);
             actualLabel.Show ();
 
             requestedLabel = new TouchLabel ();
-            requestedLabel.WidthRequest = 110;
+            requestedLabel.WidthRequest = 140;
             requestedLabel.textSize = 20;
             requestedLabel.textColor = "seca";
             requestedLabel.textAlignment = TouchAlignment.Center;
             requestedLabel.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
-            Put (requestedLabel, 623, 297);
+            Put (requestedLabel, 605, 237);
             requestedLabel.Show ();
 
             requestedTextBox = new TouchTextBox ();
@@ -167,34 +163,34 @@ namespace AquaPic.UserInterface
             requestedTextBox.textAlignment = TouchAlignment.Center;
             requestedTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
             requestedTextBox.Visible = false;
-            Put (requestedTextBox, 623, 294);
+            Put (requestedTextBox, 620, 234);
             requestedTextBox.Show ();
 
             requestedTextLabel = new TouchLabel ();
-            requestedTextLabel.WidthRequest = 110;
+            requestedTextLabel.WidthRequest = 140;
             requestedTextLabel.text = "Requested";
             requestedTextLabel.textColor = "grey3";
             requestedTextLabel.textAlignment = TouchAlignment.Center;
-            Put (requestedTextLabel, 623, 332);
+            Put (requestedTextLabel, 605, 272);
             requestedTextLabel.Show ();
 
             autoTextBox = new TouchLabel ();
-            autoTextBox.WidthRequest = 110;
+            autoTextBox.WidthRequest = 140;
             autoTextBox.Visible = false;
             autoTextBox.textSize = 20;
             autoTextBox.textColor = "grey4";
             autoTextBox.textAlignment = TouchAlignment.Center;
             autoTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
-            Put (autoTextBox, 623, 360);
+            Put (autoTextBox, 605, 300);
             autoTextBox.Show ();
 
             autoLabel = new TouchLabel ();
-            autoLabel.WidthRequest = 110;
+            autoLabel.WidthRequest = 140;
             autoLabel.Visible = false;
             autoLabel.text = "Auto";
             autoLabel.textColor = "grey3";
             autoLabel.textAlignment = TouchAlignment.Center;
-            Put (autoLabel, 623, 395);
+            Put (autoLabel, 605, 335);
             autoLabel.Show ();
 
             fixtureSettingBtn = new TouchButton ();
@@ -226,15 +222,19 @@ namespace AquaPic.UserInterface
                 combo.QueueDraw ();
                 GetFixtureData ();
             };
-            Put (fixtureSettingBtn, 755, 77);
+            Put (fixtureSettingBtn, 755, 35);
             fixtureSettingBtn.Show ();
+
+            lightingStateDisplay = new LightingStateDisplay ();
+            Put (lightingStateDisplay, 55, 107);
+            lightingStateDisplay.Show ();
 
             combo = new TouchComboBox (Lighting.GetAllFixtureNames ());
             combo.activeIndex = 0;
             combo.WidthRequest = 200;
             combo.comboList.Add ("New fixture...");
             combo.ComboChangedEvent += OnComboChanged;
-            Put (combo, 550, 77);
+            Put (combo, 550, 35);
             combo.Show ();
 
             if (fixtureName.IsNotEmpty ()) {
@@ -257,7 +257,6 @@ namespace AquaPic.UserInterface
         protected void GetFixtureData () {
             if (fixtureName.IsNotEmpty ()) {
                 dimmingHeader.Visible = true;
-                outletLabel.Visible = true;
                 outletStateLabel.Visible = true;
                 outletSelectorSwitch.Visible = true;
 
@@ -276,12 +275,15 @@ namespace AquaPic.UserInterface
                 }
 
                 if (Power.GetOutletState (ic) == MyState.Off) {
-                    outletStateLabel.text = "Off";
+                    outletStateLabel.text = "Light Off";
                     outletStateLabel.textColor = "grey4";
                 } else {
-                    outletStateLabel.text = "On";
+                    outletStateLabel.text = "Light On";
                     outletStateLabel.textColor = "secb";
                 }
+
+                lightingStateDisplay.lightingStates = Lighting.GetLightingStates (fixtureName);
+                lightingStateDisplay.QueueDraw ();
 
                 isDimmingFixture = Lighting.IsDimmingFixture (fixtureName);
                 if (isDimmingFixture) {
@@ -351,7 +353,6 @@ namespace AquaPic.UserInterface
                 autoLabel.Visible = false;
                 requestedLabel.Visible = false;
                 requestedTextLabel.Visible = false;
-                outletLabel.Visible = false;
                 outletStateLabel.Visible = false;
                 outletSelectorSwitch.Visible = false;
                 requestedTextBox.Visible = false;
@@ -476,10 +477,10 @@ namespace AquaPic.UserInterface
 
         protected void OnOutletStateChange (object sender, StateChangeEventArgs args) {
             if (args.state == MyState.Off) {
-                outletStateLabel.text = "Off";
+                outletStateLabel.text = "Light Off";
                 outletStateLabel.textColor = "grey4";
             } else {
-                outletStateLabel.text = "On";
+                outletStateLabel.text = "Light On";
                 outletStateLabel.textColor = "secb";
             }
             outletStateLabel.QueueDraw ();

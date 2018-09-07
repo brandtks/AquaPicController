@@ -40,7 +40,7 @@ namespace AquaPic.Drivers
             public string name;
             public MyState currentState;
             public MyState manualState;
-            public MyState autoState;
+            //public MyState autoState;
             public MyState fallback;
             public Coil OutletControl;
             public string owner;

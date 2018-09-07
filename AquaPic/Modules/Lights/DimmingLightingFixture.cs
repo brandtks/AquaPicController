@@ -91,27 +91,29 @@ namespace AquaPic.Modules
                     end = new DateSpan (tomorrow, lightingStates [currentState].endTime);
                 }
 
-                if (lightingStates[currentState].type == LightingStateType.LinearRamp) {
+                if (lightingStates [currentState].type == LightingStateType.LinearRamp) {
                     autoDimmingLevel = Utils.CalcLinearRamp (
                         start,
                         end,
                         now,
-                        lightingStates[currentState].startingDimmingLevel,
-                        lightingStates[currentState].endingDimmingLevel);
-                } else if (lightingStates[currentState].type == LightingStateType.HalfParabolaRamp) {
+                        lightingStates [currentState].startingDimmingLevel,
+                        lightingStates [currentState].endingDimmingLevel);
+                } else if (lightingStates [currentState].type == LightingStateType.HalfParabolaRamp) {
                     autoDimmingLevel = Utils.CalcHalfParabola (
                         start,
                         end,
                         now,
-                        lightingStates[currentState].startingDimmingLevel,
-                        lightingStates[currentState].endingDimmingLevel);
-                } else if (lightingStates[currentState].type == LightingStateType.ParabolaRamp) {
+                        lightingStates [currentState].startingDimmingLevel,
+                        lightingStates [currentState].endingDimmingLevel);
+                } else if (lightingStates [currentState].type == LightingStateType.ParabolaRamp) {
                     autoDimmingLevel = Utils.CalcParabola (
                         start,
                         end,
                         now,
-                        lightingStates[currentState].startingDimmingLevel,
-                        lightingStates[currentState].endingDimmingLevel);
+                        lightingStates [currentState].startingDimmingLevel,
+                        lightingStates [currentState].endingDimmingLevel);
+                } else if (lightingStates [currentState].type == LightingStateType.On) {
+                    autoDimmingLevel = lightingStates [currentState].startingDimmingLevel;
                 }
 
                 autoDimmingLevel.Constrain (minDimmingOutput, maxDimmingOutput);

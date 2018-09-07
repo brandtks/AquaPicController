@@ -39,8 +39,8 @@ namespace GoodtimeDevelopment.TouchWidget
         private static Dictionary<string, int[]> colorLookup = new Dictionary<string, int[]> () {
             { "pri", new int[3] {103, 227, 0}}, // greenish 67E300 {103, 227, 0}
             { "seca", new int[3] {2, 142, 155}}, // blueish 028E9B {2, 142, 155}
-            { "secc", new int[3] {255, 253, 64}}, // yellowish FFFD40 {255, 253, 64}
             { "secb", new int[3] {255, 154, 64}}, // orangish FF9A40 {255, 154, 64}
+            { "secc", new int[3] {255, 253, 64}}, // yellowish FFFD40 {255, 253, 64}
             { "compl", new int[3] {228, 0, 69}}, // redish E40045 {228, 0, 69}
             { "grey0", new int[3] {39, 39, 39}},
             { "grey1", new int[3] {89, 89, 89}},

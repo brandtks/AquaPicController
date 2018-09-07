@@ -549,6 +549,17 @@ namespace AquaPic.Modules
 
             throw new ArgumentException ("fixtureName");
         }
+
+        /**************************************************************************************************************/
+        /* Lighting States                                                                                            */
+        /**************************************************************************************************************/
+        public static LightingState[] GetLightingStates (string fixtureName)
+        {
+            CheckFixtureKey (fixtureName);
+            var lightingStates = new List<LightingState> ();
+            lightingStates.AddRange (fixtures [fixtureName].lightingStates);
+            return lightingStates.ToArray ();
+        }
     }
 }
 

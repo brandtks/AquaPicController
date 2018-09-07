@@ -62,6 +62,8 @@ namespace AquaPic.Modules
         public LightingState (string startTimeDescriptor, string endTimeDescriptor, LightingStateType type) {
             timePeriod = new TimePeriod (startTimeDescriptor, endTimeDescriptor);
             this.type = type;
+            startingDimmingLevel = 100f;
+            endingDimmingLevel = 100f;
         }
 
         public LightingState (

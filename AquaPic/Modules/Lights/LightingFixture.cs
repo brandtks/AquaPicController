@@ -62,7 +62,7 @@ namespace AquaPic.Modules
                                 currentState = i;
                                 break;
                             }
-                        // If it isn't that means that the start is next day, so reverse checking end and start times
+                        // If start is after end then that means that the start is next day, so reverse checking end and start times
                         } else {
                             if (now.After (this.lightingStates [i].endTime) || now.Before (this.lightingStates [i].startTime)) {
                                 currentState = i;
@@ -71,8 +71,6 @@ namespace AquaPic.Modules
                         }
                     }
                 }
-
-                Console.WriteLine ("Current state for {0} is {1}", name, currentState);
 
                 plugState = MyState.Off;
                 var plugControl = Power.AddOutlet (this.powerOutlet, this.name, MyState.Off, "Lighting");
@@ -88,8 +86,6 @@ namespace AquaPic.Modules
                 if (highTempLockout && Alarm.CheckAlarming (Temperature.defaultHighTemperatureAlarmIndex)) {
                     return false;
                 }
-
-                Console.WriteLine ("Current state for {0} is {1}", name, currentState);
 
                 var now = Time.TimeNow;
                 if (now.Before (lightingStates[currentState].endTime)) { // Still in current lighting state

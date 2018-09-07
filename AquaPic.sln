@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaPic", "AquaPic\AquaPic.csproj", "{5272A01C-4356-4F37-AF92-B53974F21B34}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "Utilities", "Utilities\Utilities.csproj", "{D16D7BCC-1475-4F6F-995F-815518E10A49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{D16D7BCC-1475-4F6F-995F-815518E10A49}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TouchWidget", "TouchWidget\TouchWidget.csproj", "{9F122E71-B510-4481-BC19-550C14250481}"
 EndProject
@@ -17,9 +17,6 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
-		Debug-Empty|Any CPU = Debug-Empty|Any CPU
-		Debug-Empty-Settings|x86 = Debug-Empty-Settings|x86
-		Debug-Full-Settings|x86 = Debug-Full-Settings|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -50,30 +47,38 @@ Global
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
-		$1.DirectoryNamespaceAssociation = None
-		$1.ResourceNamePolicy = FileFormatDefault
 		$0.TextStylePolicy = $2
-		$2.FileWidth = 120
 		$2.NoTabsAfterNonTabs = True
-		$2.inheritsSet = VisualStudio
-		$2.inheritsScope = text/plain
 		$2.scope = text/plain
+		$2.TabsToSpaces = True
 		$0.CSharpFormattingPolicy = $3
 		$3.BeforeIndexerDeclarationBracket = False
 		$3.AfterDelegateDeclarationParameterComma = True
 		$3.SpacesBeforeBrackets = False
-		$3.inheritsSet = Mono
-		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
+		$3.IndentSwitchSection = False
+		$3.NewLinesForBracesInProperties = False
+		$3.NewLinesForBracesInAccessors = False
+		$3.NewLinesForBracesInAnonymousMethods = False
+		$3.NewLinesForBracesInControlBlocks = False
+		$3.NewLinesForBracesInAnonymousTypes = False
+		$3.NewLinesForBracesInObjectCollectionArrayInitializers = False
+		$3.NewLinesForBracesInLambdaExpressionBody = False
+		$3.NewLineForElse = False
+		$3.NewLineForCatch = False
+		$3.NewLineForFinally = False
+		$3.NewLineForMembersInObjectInit = False
+		$3.NewLineForMembersInAnonymousTypes = False
+		$3.NewLineForClausesInQuery = False
+		$3.SpacingAfterMethodDeclarationName = True
+		$3.SpaceAfterMethodCallName = True
+		$3.SpaceBeforeOpenSquareBracket = True
 		$0.TextStylePolicy = $4
-		$4.FileWidth = 120
 		$4.NoTabsAfterNonTabs = True
-		$4.inheritsSet = VisualStudio
-		$4.inheritsScope = text/plain
 		$4.scope = text/x-csharp
+		$4.TabsToSpaces = True
 		$0.StandardHeader = $5
 		$5.Text = @#region License\n\n/*\n    AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.\n\n    Copyright (c) ${Year} Goodtime Development\n\n    This program is free software: you can redistribute it and/or modify\n    it under the terms of the GNU General Public License as published by\n    the Free Software Foundation, either version 3 of the License, or\n    (at your option) any later version.\n\n    This program is distributed in the hope that it will be useful,\n    but WITHOUT ANY WARRANTY; without even the implied warranty of\n    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n    GNU General Public License for more details.\n\n    You should have received a copy of the GNU General Public License\n    along with this program.  If not, see http://www.gnu.org/licenses/\n*/\n\n#endregion // License
-		$5.IncludeInNewFiles = True
 		$0.NameConventionPolicy = $6
 		$6.Rules = $7
 		$7.NamingRule = $8
@@ -203,22 +208,17 @@ Global
 		$29.IncludeInstanceMembers = True
 		$29.IncludeStaticEntities = True
 		$0.VersionControlPolicy = $31
-		$31.inheritsSet = Mono
 		$0.TextStylePolicy = $32
-		$32.inheritsSet = VisualStudio
-		$32.inheritsScope = text/plain
 		$32.scope = application/config+xml
+		$32.FileWidth = 80
+		$32.TabsToSpaces = True
 		$0.XmlFormattingPolicy = $33
-		$33.inheritsSet = Mono
-		$33.inheritsScope = application/xml
 		$33.scope = application/config+xml
 		$0.TextStylePolicy = $34
-		$34.inheritsSet = VisualStudio
-		$34.inheritsScope = text/plain
 		$34.scope = application/xml
+		$34.FileWidth = 80
+		$34.TabsToSpaces = True
 		$0.XmlFormattingPolicy = $35
-		$35.inheritsSet = Mono
-		$35.inheritsScope = application/xml
 		$35.scope = application/xml
 		version = 0.1.0
 	EndGlobalSection
