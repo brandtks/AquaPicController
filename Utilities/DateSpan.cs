@@ -95,8 +95,13 @@ namespace GoodtimeDevelopment.Utilites
         }
 
         public DateSpan (DateTime dateTime)
-            : this (dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond) {
-        }
+            : this (dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond) { }
+
+        public DateSpan (DateTime dateTime, Time time)
+            : this (dateTime.Year, dateTime.Month, dateTime.Day, time.hour, time.minute, time.second, time.millisecond) { }
+
+        public DateSpan (DateSpan dateSpan, Time time)
+            : this (dateSpan.year, dateSpan.month, dateSpan.day, time.hour, time.minute, time.second, time.millisecond) { }
 
         public DateSpan (Time time)
             : this (0, 0, 0, time.hour, time.minute, time.second, time.millisecond) {
@@ -104,17 +109,6 @@ namespace GoodtimeDevelopment.Utilites
             _year = now.Year;
             _month = now.Month;
             _day = now.Day;
-        }
-
-        public DateSpan () {
-            DateTime value = DateTime.Now;
-            _year = value.Year;
-            _month = value.Month;
-            _day = value.Day;
-            _hour = value.Hour;
-            _minute = value.Minute;
-            _second = value.Second;
-            _millisecond = value.Millisecond;
         }
 
         public void UpdateDateToToday () {

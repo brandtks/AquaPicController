@@ -62,8 +62,15 @@ namespace GoodtimeDevelopment.Utilites
             }
         }
 
+        public static Time TimeNow {
+            get {
+                var now = DateTime.Now;
+                return new Time (now.Hour, now.Minute, now.Second, now.Millisecond);
+            }
+        }
+
         public static implicit operator Time (string timeString) {
-            return Time.Parse (timeString);
+            return Parse (timeString);
         }
 
         public Time (int hour, int minute, int second, int millisecond) {

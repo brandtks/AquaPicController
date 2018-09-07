@@ -70,9 +70,6 @@ namespace AquaPic.Modules
                 using (StreamReader reader = File.OpenText (path)) {
                     var jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
-                    // Very important to update rise/set times before we setup auto on/off for lighting fixtures
-                    AbstractTimes.UpdateRiseSetTimes ();
-
                     var ja = jo["lightingFixtures"] as JArray;
                     foreach (var jt in ja) {
                         JObject obj = jt as JObject;
@@ -194,7 +191,7 @@ namespace AquaPic.Modules
                                 }
                             }
 
-                            float minDimmingOutput = 0.0f;
+                            float minDimmingOutput = 0f;
                             text = (string)obj["minDimmingOutput"];
                             if (text.IsNotEmpty ()) {
                                 try {
@@ -204,7 +201,7 @@ namespace AquaPic.Modules
                                 }
                             }
 
-                            float maxDimmingOutput = 0.0f;
+                            float maxDimmingOutput = 100f;
                             text = (string)obj["maxDimmingOutput"];
                             if (text.IsNotEmpty ()) {
                                 try {

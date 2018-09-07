@@ -45,9 +45,6 @@ namespace AquaPic.Runtime
                     }
                 }
             });
-
-            AbstractTimes.UpdateRiseSetTimes ();
-            AddTimeOfDayInterrupt ("RiseSetUpdate", new Time (0, 0), () => AbstractTimes.UpdateRiseSetTimes ());
         }
 
         public static void AddCyclicInterrupt (string name, uint timeInterval, RunHandler OnRun) {

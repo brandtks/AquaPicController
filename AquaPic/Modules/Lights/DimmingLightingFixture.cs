@@ -79,25 +79,36 @@ namespace AquaPic.Modules
             }
 
             public float CalculateDimmingLevel () {
-                DateSpan now = DateSpan.Now;
+                DateSpan start, end, now = DateSpan.Now;
+                if (lightingStates [currentState].startTime.Before (lightingStates [currentState].endTime)) {
+                    start = new DateSpan (lightingStates [currentState].startTime);
+                    end = new DateSpan (lightingStates [currentState].endTime);
+                } else {
+                    var tomorrow = DateSpan.Now;
+                    tomorrow.AddDays (1);
+
+                    start = new DateSpan (lightingStates [currentState].startTime);
+                    end = new DateSpan (tomorrow, lightingStates [currentState].endTime);
+                }
+
                 if (lightingStates[currentState].type == LightingStateType.LinearRamp) {
                     autoDimmingLevel = Utils.CalcLinearRamp (
-                        lightingStates[currentState].startTime,
-                        lightingStates[currentState].endTime,
+                        start,
+                        end,
                         now,
                         lightingStates[currentState].startingDimmingLevel,
                         lightingStates[currentState].endingDimmingLevel);
                 } else if (lightingStates[currentState].type == LightingStateType.HalfParabolaRamp) {
                     autoDimmingLevel = Utils.CalcHalfParabola (
-                        lightingStates[currentState].startTime,
-                        lightingStates[currentState].endTime,
+                        start,
+                        end,
                         now,
                         lightingStates[currentState].startingDimmingLevel,
                         lightingStates[currentState].endingDimmingLevel);
                 } else if (lightingStates[currentState].type == LightingStateType.ParabolaRamp) {
                     autoDimmingLevel = Utils.CalcParabola (
-                        lightingStates[currentState].startTime,
-                        lightingStates[currentState].endTime,
+                        start,
+                        end,
                         now,
                         lightingStates[currentState].startingDimmingLevel,
                         lightingStates[currentState].endingDimmingLevel);

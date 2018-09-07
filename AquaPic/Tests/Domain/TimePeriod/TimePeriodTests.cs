@@ -32,41 +32,11 @@ namespace AquaPic.Runtime.Test
     {
         [Test]
         public void TimePeriodConstructorTest () {
-            AbstractTimes.UpdateRiseSetTimes ();
-
-            var start = "sunrise";
-            var end = "sunset";
-            var tp = new TimePeriod (start, end);
-            Assert.AreEqual (AbstractTimes.sunRiseToday, tp.startTime);
-            Assert.AreEqual (AbstractTimes.sunSetToday, tp.endTime);
-
-            start = "sunset";
-            end = "sunrise";
-            tp = new TimePeriod (start, end);
-            Assert.AreEqual (AbstractTimes.sunSetToday, tp.startTime);
-            Assert.AreEqual (AbstractTimes.sunRiseTomorrow, tp.endTime);
-
-            var ds1 = AbstractTimes.sunRiseToday;
-            ds1.AddHours (2);
-            start = "sunrise";
-            end = "sunrise + 2hr";
-            tp = new TimePeriod (start, end);
-            Assert.AreEqual (AbstractTimes.sunRiseToday, tp.startTime);
-            Assert.AreEqual (ds1, tp.endTime);
-
-            ds1 = AbstractTimes.sunSetToday;
-            ds1.AddHours (-2);
-            start = "sunset - 2hr";
-            end = "sunset";
-            tp = new TimePeriod (start, end);
-            Assert.AreEqual (ds1, tp.startTime);
-            Assert.AreEqual (AbstractTimes.sunSetToday, tp.endTime);
-
-            ds1 = new DateSpan (new Time (8, 15, 30));
+            var ds1 = new DateSpan (new Time (8, 15, 30));
             var ds2 = new DateSpan (new Time (12, 30));
-            start = "8:15:30";
-            end = "12:30";
-            tp = new TimePeriod (start, end);
+            var start = "8:15:30";
+            var end = "12:30";
+            var tp = new TimePeriod (start, end);
             Assert.AreEqual (ds1, tp.startTime);
             Assert.AreEqual (ds2, tp.endTime);
 

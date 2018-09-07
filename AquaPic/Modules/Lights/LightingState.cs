@@ -43,13 +43,13 @@ namespace AquaPic.Modules
     {
         public TimePeriod timePeriod;
 
-        public DateSpan startTime {
+        public Time startTime {
             get {
                 return timePeriod.startTime;
             }
         }
 
-        public DateSpan endTime {
+        public Time endTime {
             get {
                 return timePeriod.endTime;
             }
@@ -74,10 +74,6 @@ namespace AquaPic.Modules
         {
             this.startingDimmingLevel = startingDimmingLevel;
             this.endingDimmingLevel = endingDimmingLevel;
-        }
-
-        public void ParseTimeDescriptors (bool forceTomorrow = false) {
-            timePeriod.ParseTimeDescriptors (forceTomorrow);
         }
     }
 }

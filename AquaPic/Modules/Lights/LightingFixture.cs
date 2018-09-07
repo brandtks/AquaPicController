@@ -27,7 +27,6 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
-using AquaPic.Modules;
 
 namespace AquaPic.Modules
 {
@@ -53,32 +52,46 @@ namespace AquaPic.Modules
                 this.highTempLockout = highTempLockout;
 
                 this.lightingStates = lightingStates;
+                currentState = -1;
                 if (this.lightingStates.Length > 0) {
-                    var now = DateSpan.Now;
+                    var now = Time.TimeNow;
                     for (int i = 0; i < this.lightingStates.Length; ++i) {
-                        if (now.After (this.lightingStates[i].startTime) && now.Before (this.lightingStates[i].endTime)) {
-                            currentState = i;
-                            break;
+                        // Check if the start time is before the end time, 
+                        if (this.lightingStates [i].startTime.Before (this.lightingStates [i].endTime)) {
+                            if (now.After (this.lightingStates [i].startTime) && now.Before (this.lightingStates [i].endTime)) {
+                                currentState = i;
+                                break;
+                            }
+                        // If it isn't that means that the start is next day, so reverse checking end and start times
+                        } else {
+                            if (now.After (this.lightingStates [i].endTime) || now.Before (this.lightingStates [i].startTime)) {
+                                currentState = i;
+                                break;
+                            }
                         }
                     }
-                } else {
-                    currentState = -1;
                 }
 
+                Console.WriteLine ("Current state for {0} is {1}", name, currentState);
+
+                plugState = MyState.Off;
                 var plugControl = Power.AddOutlet (this.powerOutlet, this.name, MyState.Off, "Lighting");
                 plugControl.StateGetter = OnPlugStateGetter;
                 Power.AddHandlerOnStateChange (this.powerOutlet, OnLightingPlugStateChange);
             }
 
             public bool OnPlugStateGetter () {
-                if (highTempLockout && Alarm.CheckAlarming (Temperature.defaultHighTemperatureAlarmIndex))
-                    return false;
-
                 if (currentState == -1) {
                     return false;
                 }
 
-                DateSpan now = DateSpan.Now;
+                if (highTempLockout && Alarm.CheckAlarming (Temperature.defaultHighTemperatureAlarmIndex)) {
+                    return false;
+                }
+
+                Console.WriteLine ("Current state for {0} is {1}", name, currentState);
+
+                var now = Time.TimeNow;
                 if (now.Before (lightingStates[currentState].endTime)) { // Still in current lighting state
                     if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
                         return false;
@@ -90,14 +103,6 @@ namespace AquaPic.Modules
 
                 // Now in next state
                 currentState = currentState++ % lightingStates.Length;
-                var nextState = currentState++ % lightingStates.Length;
-                lightingStates[nextState].ParseTimeDescriptors ();
-                if (lightingStates[nextState].startTime.Before (lightingStates[currentState].endTime)) {
-                    // The next state starts before the current state ends
-                    // This happens if the next state is supposed to be tomorrow
-                    lightingStates[nextState].ParseTimeDescriptors (true);
-                }
-
                 if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
                     return false;
                 }

@@ -74,6 +74,15 @@
     <Reference Include="CSScriptLibrary">
       <HintPath>..\packages\CS-Script.lib.3.28.7\lib\CSScriptLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="CSScriptLibrary">
+      <HintPath>..\packages\CS-Script.lib.3.28.7\lib\CSScriptLibrary.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modules\Temperature\TemperatureGroup.cs" />
@@ -149,9 +158,6 @@
     <Compile Include="Domain\TimePeriod\TimePeriod.cs" />
     <Compile Include="Tests\Domain\Timer\StaticTimerTests.cs" />
     <Compile Include="Tests\Domain\TimePeriod\TimePeriodTests.cs" />
-    <Compile Include="Tests\Domain\TimePeriod\AbstractTimeTests.cs" />
-    <Compile Include="Runtime\AbstractTimes\AbstractTimes.cs" />
-    <Compile Include="Runtime\AbstractTimes\SunRiseSetCalc.cs" />
     <Compile Include="Modules\Lights\Lighting.cs" />
     <Compile Include="Modules\Lights\LightingFixture.cs" />
     <Compile Include="Modules\Lights\LightingState.cs" />
@@ -160,14 +166,6 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
   <ItemGroup>
-    <None Include="Runtime\Plugin.Disable\PluginDefines.cs" />
-    <None Include="Runtime\Plugin.Disable\Plugin.cs" />
-    <None Include="Runtime\Plugin.Disable\CyclicScript.cs" />
-    <None Include="Runtime\Plugin.Disable\BaseScript.cs" />
-    <None Include="Runtime\Plugin.Disable\StartupScript.cs" />
-    <None Include="Runtime\Plugin.Disable\EventScript.cs" />
-    <None Include="Runtime\Plugin.Disable\ScriptMessage.cs" />
-    <None Include="Runtime\Plugin.Disable\ModuleScript.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -186,7 +184,6 @@
     <Folder Include="Tests\Domain\" />
     <Folder Include="Tests\Domain\Timer\" />
     <Folder Include="Tests\Domain\TimePeriod\" />
-    <Folder Include="Runtime\AbstractTimes\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">
