@@ -31,28 +31,28 @@ namespace AquaPic.Runtime
         protected static DateSpan _sunRiseToday;
         public static DateSpan sunRiseToday {
             get {
-                return _sunRiseToday;
+                return new DateSpan (_sunSetToday);
             }
         }
 
         protected static DateSpan _sunSetToday;
         public static DateSpan sunSetToday {
             get {
-                return _sunSetToday;
+                return new DateSpan (_sunSetToday);
             }
         }
 
         protected static DateSpan _sunRiseTomorrow;
         public static DateSpan sunRiseTomorrow {
             get {
-                return _sunRiseTomorrow;
+                return new DateSpan (_sunRiseTomorrow);
             }
         }
 
         protected static DateSpan _sunSetTomorrow;
         public static DateSpan sunSetTomorrow {
             get {
-                return _sunSetTomorrow;
+                return new DateSpan (_sunSetTomorrow);
             }
         }
 

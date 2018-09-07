@@ -293,7 +293,6 @@ namespace AquaPic.Modules
             if (dimmingFixture != null) {
                 Power.RemoveHandlerOnModeChange (dimmingFixture.powerOutlet, dimmingFixture.OnLightingPlugModeChange);
                 AquaPicDrivers.AnalogOutput.RemoveChannel (dimmingFixture.channel);
-                //HomeWindowWidgets.barPlots.Remove (dimmingFixture.name);
             }
 
             fixtures.Remove (fixtureName);

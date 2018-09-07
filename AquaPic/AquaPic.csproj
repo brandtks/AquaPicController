@@ -38,7 +38,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Mono.CSharp">
       <HintPath>..\packages\Mono.CSharp.4.0.0.143\lib\4.5\Mono.CSharp.dll</HintPath>
     </Reference>
@@ -68,6 +67,7 @@
     <Reference Include="CSScriptLibrary">
       <HintPath>..\packages\CS-Script.lib.3.28.4.0\lib\CSScriptLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modules\Temperature\TemperatureGroup.cs" />
@@ -183,10 +183,6 @@
     <Folder Include="Runtime\AbstractTimes\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Utilities\Utilities.csproj">
-      <Project>{D16D7BCC-1475-4F6F-995F-815518E10A49}</Project>
-      <Name>Utilities</Name>
-    </ProjectReference>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">
       <Project>{9F122E71-B510-4481-BC19-550C14250481}</Project>
       <Name>TouchWidget</Name>
@@ -194,6 +190,10 @@
     <ProjectReference Include="..\DataLogging\DataLogging.csproj">
       <Project>{2AEEC09C-AAC3-4085-B6B6-CE2A49D68665}</Project>
       <Name>DataLogging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities\Utilities.csproj">
+      <Project>{D16D7BCC-1475-4F6F-995F-815518E10A49}</Project>
+      <Name>Utilities</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

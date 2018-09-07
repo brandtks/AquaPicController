@@ -79,6 +79,7 @@
     <Compile Include="Scenes\WaterLevel\Widgets\MainWaterLevelLinePlotWidget.cs" />
     <Compile Include="Widgets\MyNotificationBar.cs" />
     <Compile Include="Widgets\MySideBar.cs" />
+    <Compile Include="Scenes\Lighting\Widgets\LightingStateDisplay.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
