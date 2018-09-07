@@ -34,7 +34,7 @@ namespace AquaPic.UserInterface
 {
     public class LightingStateDisplay : EventBox
     {
-        bool clicked, expanded;
+        bool clicked;
         uint clickTimer;
         int clickX, clickY;
 
@@ -62,11 +62,9 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnButtonPress (object o, ButtonPressEventArgs args) {
-            if (expanded) {
-                clicked = true;
-                GetPointer (out clickX, out clickY);
-                clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
-            }
+            clicked = true;
+            GetPointer (out clickX, out clickY);
+            clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
         }
 
         protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {

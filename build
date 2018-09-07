@@ -1,12 +1,60 @@
 #!/bin/bash
 
-. ./defines.build
+# When a interrupt command is recieved, remove the temp directory and exit the script
+trap 'echo; exit 130' int
 
-if [ $BUILD ]; then
-    config=$BUILD
-else
-    config=Release
-fi
+# Initialize default variables:
+config=Release
+NUGET="nuget"
+MSBUILD=""
+
+version="AquaPic Build 0.2"
+copy="Copyright (c) 2018 Goodtime Development"
+
+# Help function
+show_help () {
+    	cat << stop
+'build' builds the entire AquaPic runtime including the backend service and the user interface.
+
+Version: $version
+$copy
+
+Usage: build [options....]
+
+Available options:
+  -n    If nuget is installed via the repos this probably isn't neccesary and the defualt will work.
+        Default: $NUGET
+        If not in the repos, download nuget.exe using
+            wget 'wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe'
+        and pass as "mono /path/to/nuget.exe"
+  -m    This isn't required, just shortens the execution time of the build script
+        Default: The script will try to find MSBuild and if it can't find it, it will download
+        MSBuild using NuGet
+  -c    Build config
+        Default: $config
+  -h    This message
+stop
+}
+
+# Interpret options. Options proceed by a ':' require an argument
+while getopts ":n:m:c:h" opt; do
+    case $opt in
+    n)  NUGET=$OPTARG   ;;
+    m)  MSBUILD=$OPTARG ;;
+    c)  config=$OPTARG  ;;
+    h|\?)
+        show_help
+        exit 0
+        ;;
+    :)  # An option requiring an argument didn't get passed with one
+        echo "ERROR: Option -$OPTARG requires an argument." >&2
+        show_help
+        exit 1
+        ;;
+    esac
+done
+
+shift $(( $OPTIND - 1 ))
 
 output=$($NUGET 2> /dev/null)
 regex="Version: ([3-9].|[1-9][0-9]|2.[1-9][2-9])"
@@ -54,18 +102,22 @@ echo Using \'$msbuild\' as the MSBuild command
 
 echo ----------------------------------------------------------------------------------
 echo Installing dependencies...
+$NUGET install Utilities/packages.config -OutputDirectory packages
+$NUGET install UserInterface/packages.config -OutputDirectory packages
+$NUGET install TouchWidgets/packages.config -OutputDirectory packages
+$NUGET install DataLogging/packages.config -OutputDirectory packages
 $NUGET install AquaPic/packages.config -OutputDirectory packages
 
 echo ----------------------------------------------------------------------------------
 echo Building AquaPic...
-$msbuild /p:Configuration=$config AquaPic/AquaPic.csproj 
+$msbuild /p:Configuration=$config Main/Main.csproj
 
 echo ----------------------------------------------------------------------------------
 echo Cleaning up...
 if [ $config == "Release" ]; then
-    output_directory='AquaPic/bin/Release'
+    output_directory='Main/bin/Release'
 else
-    output_directory='AquaPic/bin/Debug'
+    output_directory='Main/bin/Debug'
 fi
 
 # Can't figure out how to prevent MSBuild from copying GTK libraries to the output directory. 
@@ -75,7 +127,7 @@ rm -f $output_directory/atk-sharp.dll $output_directory/gdk-sharp.dll $output_di
 rm -f AquaPic.run
 cat << stop > AquaPic.run
 #!/bin/sh
-mono $output_directory/AquaPic.exe "\$@"
+mono $output_directory/AquaPicFullRuntime.exe "\$@"
 stop
 chmod +x AquaPic.run
 
