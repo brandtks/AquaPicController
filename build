@@ -22,11 +22,12 @@ $copy
 Usage: build [options....]
 
 Available options:
-  -n    If nuget is installed via the repos this probably isn't neccesary and the defualt will work.
-        Default: $NUGET
-        If not in the repos, download nuget.exe using
+  -n    NuGet version 2.12 or higher is required to install all the dependecies and MSBuild.
+        If nuget is installed via the repos this probably isn't neccesary. If not in the repos 
+        or if the version in the repos is too old, download nuget.exe using:
             wget 'wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe'
         and pass as "mono /path/to/nuget.exe"
+        Default: $NUGET
   -m    This isn't required, just shortens the execution time of the build script
         Default: The script will try to find MSBuild and if it can't find it, it will download
         MSBuild using NuGet
