@@ -16,3 +16,5 @@ AquaPic.run
 mybuild
 .vimrc
 packages*/
+.DS*
+*_conflict*

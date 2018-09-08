@@ -36,6 +36,7 @@ namespace AquaPic.UserInterface
         bool clicked;
         uint clickTimer;
         int clickX, clickY;
+
         List<StateInformation> stateInfos;
 
         public LightingStateDisplay () {
@@ -269,6 +270,7 @@ namespace AquaPic.UserInterface
             }
         }
 
+        /*
         public void SetStates (LightingState[] lightingStates) {
             stateInfos.Clear ();
             for (int i = 0; i < lightingStates.Length; ++i) {
@@ -281,6 +283,7 @@ namespace AquaPic.UserInterface
                 }
             }
         }
+        */
 
         protected void OnButtonPress (object sender, ButtonPressEventArgs args) {
             clicked = true;
