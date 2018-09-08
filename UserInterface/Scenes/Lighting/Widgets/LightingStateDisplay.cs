@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
 using Gtk;
 using Cairo;
 using GoodtimeDevelopment.TouchWidget;
@@ -35,14 +36,14 @@ namespace AquaPic.UserInterface
         bool clicked;
         uint clickTimer;
         int clickX, clickY;
-        public LightingState[] lightingStates;
+        List<StateInformation> stateInfos;
 
         public LightingStateDisplay () {
             Visible = true;
             VisibleWindow = false;
-            SetSizeRequest (550, 330);
+            SetSizeRequest (540, 360);
 
-            lightingStates = new LightingState [0];
+            stateInfos = new List<StateInformation> ();
 
             ExposeEvent += onExpose;
             clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
@@ -64,7 +65,7 @@ namespace AquaPic.UserInterface
 
             var top = Allocation.Top;
             var bottom = Allocation.Bottom;
-            var graphBottom = bottom - 28;
+            var graphBottom = bottom - 88;
             var height = Allocation.Height;
             var midY = height / 2 + top;
 
@@ -101,18 +102,17 @@ namespace AquaPic.UserInterface
 
                 text = new TouchText ("0%");
                 text.alignment = TouchAlignment.Right;
-                text.Render (this, left, bottom - 27, 30);
+                text.Render (this, left, graphBottom - 13, 30);
 
                 // Draw the states
                 bool firstTimeThrough = true, lastOnSecondLine = false;
-                for (var i = 0; i < lightingStates.Length; ++i) {
-                    var state = lightingStates[i];
+                foreach (var stateInfo in stateInfos) {
+                    var state = stateInfo.lightingState;
                     if (state.type != LightingStateType.Off) {
                         var startXPos = state.startTime.ToTimeSpan ().TotalMinutes.Map (0, 1440, graphLeft, right);
                         var endXPos = state.endTime.ToTimeSpan ().TotalMinutes.Map (0, 1440, graphLeft, right);
                         var startYPos = state.startingDimmingLevel.Map (0, 100, graphBottom, top);
                         var endYPos = state.endingDimmingLevel.Map (0, 100, graphBottom, top);
-
 
                         var rightPart = right - startXPos;
                         double period;
@@ -124,18 +124,17 @@ namespace AquaPic.UserInterface
                         var delta = endYPos - startYPos;
                         var interXPos = graphLeft - rightPart;
 
-                        cr.MoveTo (startXPos, graphBottom);
+                        if (firstTimeThrough) {
+                            cr.MoveTo (startXPos, startYPos);
+                            cr.Arc (startXPos, startYPos, 3, -Math.PI, Math.PI);
+                            cr.ClosePath ();
+                            TouchColor.SetSource (cr, "secb");
+                            cr.Fill ();
+                        }
+
+                        cr.MoveTo (startXPos, startYPos);
                         switch (state.type) {
                         case LightingStateType.LinearRamp: {
-                                // The diagonal looks bad if we go all the way to the tip so we fudge the number 
-                                // by a bit to make it look good 
-                                if (endYPos > startYPos) {
-                                    startYPos += 3;
-                                } else {
-                                    endYPos += 3;
-                                }
-
-                                cr.LineTo (startXPos, startYPos);
                                 if (state.startTime.Before (state.endTime)) {
                                     cr.LineTo (endXPos, endYPos);
                                 } else {
@@ -143,41 +142,37 @@ namespace AquaPic.UserInterface
                                     var rightYPos = startYPos + (rightRatio * delta);
 
                                     cr.LineTo (right, rightYPos);
-                                    cr.LineTo (right, graphBottom);
-                                    cr.ClosePath ();
 
-                                    cr.MoveTo (graphLeft, graphBottom);
-                                    cr.LineTo (graphLeft, rightYPos);
+                                    cr.MoveTo (graphLeft, rightYPos);
                                     cr.LineTo (endXPos, endYPos);
                                 }
                                 break;
                             }
                         case LightingStateType.ParabolaRamp: {
                                 delta = Math.Abs (delta);
+                                double interYPos = graphBottom;
 
-                                cr.LineTo (startXPos, startYPos);
                                 if (state.startTime.Before (state.endTime)) {
                                     for (var phase = 1; phase <= period; ++phase) {
                                         var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                        var interYPos = startYPos - delta * Math.Sin (radian);
+                                        interYPos = startYPos - delta * Math.Sin (radian);
                                         cr.LineTo (startXPos + phase, interYPos);
                                     }
                                 } else {
                                     for (var phase = 1; phase <= rightPart; ++phase) {
                                         var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                        var interYPos = startYPos - delta * Math.Sin (radian);
+                                        interYPos = startYPos - delta * Math.Sin (radian);
                                         cr.LineTo (startXPos + phase, interYPos);
                                     }
-                                    cr.LineTo (right, graphBottom);
-                                    cr.ClosePath ();
 
-                                    cr.MoveTo (graphLeft, graphBottom);
+                                    cr.MoveTo (graphLeft, interYPos);
                                     for (var phase = rightPart; phase <= period; ++phase) {
                                         var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                        var interYPos = startYPos - delta * Math.Sin (radian);
+                                        interYPos = startYPos - delta * Math.Sin (radian);
                                         cr.LineTo (interXPos + phase, interYPos);
                                     }
                                 }
+                                endYPos = (float)interYPos;
                                 break;
                             }
                         case LightingStateType.HalfParabolaRamp: {
@@ -193,54 +188,47 @@ namespace AquaPic.UserInterface
                                     basePoint = startYPos;
                                 }
 
-                                cr.LineTo (startXPos, startYPos);
+                                double interYPos = graphBottom;
                                 if (state.startTime.Before (state.endTime)) {
                                     for (var phase = 1; phase <= period; ++phase) {
                                         var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
-                                        var interYPos = basePoint - delta * Math.Sin (radian);
+                                        interYPos = basePoint - delta * Math.Sin (radian);
                                         cr.LineTo (startXPos + phase, interYPos);
                                     }
                                     cr.LineTo (endXPos, endYPos);
                                 } else {
                                     for (var phase = 1; phase <= rightPart; ++phase) {
                                         var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
-                                        var interYPos = basePoint - delta * Math.Sin (radian);
+                                        interYPos = basePoint - delta * Math.Sin (radian);
                                         cr.LineTo (startXPos + phase, interYPos);
                                     }
-                                    cr.LineTo (right, graphBottom);
-                                    cr.ClosePath ();
 
-                                    cr.MoveTo (graphLeft, graphBottom);
+                                    cr.MoveTo (graphLeft, interYPos);
                                     for (var phase = rightPart; phase <= period; ++phase) {
                                         var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
-                                        var interYPos = basePoint - delta * Math.Sin (radian);
+                                        interYPos = basePoint - delta * Math.Sin (radian);
                                         cr.LineTo (interXPos + phase, interYPos);
                                     }
                                 }
                                 break;
                             }
                         case LightingStateType.On:
-                            cr.LineTo (startXPos, startYPos);
+                            endYPos = startYPos;
                             if (state.startTime.Before (state.endTime)) {
                                 cr.LineTo (endXPos, startYPos);
                             } else {
                                 cr.LineTo (right, startYPos);
-                                cr.LineTo (right, graphBottom);
-                                cr.ClosePath ();
 
-                                cr.MoveTo (graphLeft, graphBottom);
-                                cr.LineTo (graphLeft, startYPos);
+                                cr.MoveTo (graphLeft, startYPos);
                                 cr.LineTo (endXPos, startYPos);
                             }
                             break;
                         }
+                        cr.Stroke ();
 
-                        cr.LineTo (endXPos, graphBottom);
+                        cr.MoveTo (endXPos, endYPos);
+                        cr.Arc (endXPos, endYPos, 3, -Math.PI, Math.PI);
                         cr.ClosePath ();
-                        TouchColor.SetSource (cr, "pri");
-                        cr.LineWidth = 1;
-                        cr.StrokePreserve ();
-                        TouchColor.SetSource (cr, "grey2");
                         cr.Fill ();
 
                         // Only the first state needs the starting time drawn. All other states the start time 
@@ -259,7 +247,7 @@ namespace AquaPic.UserInterface
                                 textYPos = graphBottom;
                                 lastOnSecondLine = false;
                             } else {
-                                textYPos = bottom - 15;
+                                textYPos = graphBottom + 13;
                                 lastOnSecondLine = true;
                             }
                         } else {
@@ -278,6 +266,19 @@ namespace AquaPic.UserInterface
                 cr.LineTo (xPos, top);
                 TouchColor.SetSource (cr, "seca");
                 cr.Stroke ();
+            }
+        }
+
+        public void SetStates (LightingState[] lightingStates) {
+            stateInfos.Clear ();
+            for (int i = 0; i < lightingStates.Length; ++i) {
+                var stateInfo = new StateInformation ();
+                stateInfo.lightingState = lightingStates[i];
+                if (i == 0) {
+                    stateInfo.previous = lightingStates[lightingStates.Length - 1];
+                } else {
+                    stateInfo.previous = lightingStates[i - 1];
+                }
             }
         }
 
@@ -302,6 +303,14 @@ namespace AquaPic.UserInterface
 
             QueueDraw ();
             return true;
+        }
+
+        class StateInformation
+        {
+            public LightingState lightingState;
+            public StateInformation previous;
+            public StateInformation next;
+
         }
     }
 }

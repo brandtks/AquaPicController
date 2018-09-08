@@ -225,7 +225,7 @@ namespace AquaPic.UserInterface
             fixtureSettingBtn.Show ();
 
             lightingStateDisplay = new LightingStateDisplay ();
-            Put (lightingStateDisplay, 55, 107);
+            Put (lightingStateDisplay, 55, 120);
             lightingStateDisplay.Show ();
 
             combo = new TouchComboBox (Lighting.GetAllFixtureNames ());

@@ -85,7 +85,6 @@
     <None Include="packages.config" />
     <None Include="Scenes\Plugin.Disable\EditPluginScreen.cs" />
     <None Include="Scenes\Plugin.Disable\PluginScreen.cs" />
-    <None Include="Scenes\Lighting\Dialogs\LightingSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dialogs\" />
