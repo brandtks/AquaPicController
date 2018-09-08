@@ -22,9 +22,8 @@
 #endregion // License
 
 using System;
-using System.Collections.Generic;
-using Cairo;
 using Gtk;
+using Cairo;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
@@ -65,12 +64,13 @@ namespace AquaPic.UserInterface
 
             var top = Allocation.Top;
             var bottom = Allocation.Bottom;
-            var graphBottom = bottom - 15;
+            var graphBottom = bottom - 28;
             var height = Allocation.Height;
             var midY = height / 2 + top;
 
 
             using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                // Draw the graph outline
                 cr.MoveTo (graphLeft - 5, top);
                 cr.LineTo (graphLeft, top);
                 cr.LineTo (graphLeft, midY);
@@ -90,6 +90,7 @@ namespace AquaPic.UserInterface
                 TouchColor.SetSource (cr, "grey3");
                 cr.Stroke ();
 
+                // Draw the y axis labels
                 var text = new TouchText ("100%");
                 text.alignment = TouchAlignment.Right;
                 text.Render (this, left, top - 12, 30);
@@ -102,85 +103,173 @@ namespace AquaPic.UserInterface
                 text.alignment = TouchAlignment.Right;
                 text.Render (this, left, bottom - 27, 30);
 
-                foreach (var state in lightingStates) {
+                // Draw the states
+                bool firstTimeThrough = true, lastOnSecondLine = false;
+                for (var i = 0; i < lightingStates.Length; ++i) {
+                    var state = lightingStates[i];
                     if (state.type != LightingStateType.Off) {
+                        var startXPos = state.startTime.ToTimeSpan ().TotalMinutes.Map (0, 1440, graphLeft, right);
+                        var endXPos = state.endTime.ToTimeSpan ().TotalMinutes.Map (0, 1440, graphLeft, right);
+                        var startYPos = state.startingDimmingLevel.Map (0, 100, graphBottom, top);
+                        var endYPos = state.endingDimmingLevel.Map (0, 100, graphBottom, top);
+
+
+                        var rightPart = right - startXPos;
+                        double period;
                         if (state.startTime.Before (state.endTime)) {
-                            var startXPos = state.startTime.ToTimeSpan ().TotalMinutes.Map (0, 1440, graphLeft, right);
-                            var endXPos = state.endTime.ToTimeSpan ().TotalMinutes.Map (0, 1440, graphLeft, right);
-                            var startYPos = state.startingDimmingLevel.Map (0, 100, graphBottom, top);
-                            var endYPos = state.endingDimmingLevel.Map (0, 100, graphBottom, top);
+                            period = endXPos - startXPos;
+                        } else {
+                            period = rightPart + (endXPos - graphLeft);
+                        }
+                        var delta = endYPos - startYPos;
+                        var interXPos = graphLeft - rightPart;
 
-                            cr.MoveTo (startXPos, graphBottom);
-                            switch (state.type) {
-                            case LightingStateType.LinearRamp:
+                        cr.MoveTo (startXPos, graphBottom);
+                        switch (state.type) {
+                        case LightingStateType.LinearRamp: {
                                 // The diagonal looks bad if we go all the way to the tip so we fudge the number 
-                                // by quite a bit to make it look good 
+                                // by a bit to make it look good 
                                 if (endYPos > startYPos) {
-                                    endYPos += 30;
+                                    startYPos += 3;
                                 } else {
-                                    startYPos += 30;
+                                    endYPos += 3;
                                 }
 
                                 cr.LineTo (startXPos, startYPos);
-                                cr.LineTo (endXPos, endYPos);
-                                break;
-                            case LightingStateType.ParabolaRamp: {
-                                    cr.LineTo (startXPos, startYPos);
-
-                                    var period = endXPos - startXPos;
-                                    var delta = Math.Abs (endYPos - startYPos);
-                                    for (int i = 1; i <= period; ++i) {
-                                        var radian = (i / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                        var interYPos = startYPos - delta * Math.Sin (radian);
-                                        cr.LineTo (startXPos + i, interYPos);
-                                    }
-                                    break;
-                                }
-                            case LightingStateType.HalfParabolaRamp: {
-                                    cr.LineTo (startXPos, startYPos);
-
-                                    var period = endXPos - startXPos;
-                                    var delta = Math.Abs (endYPos - startYPos);
-                                    double mapFrom1, mapFrom2, basePoint;
-                                    if (startYPos <= endYPos) {
-                                        mapFrom1 = 1d;
-                                        mapFrom2 = 0d;
-                                        basePoint = endYPos;
-                                    } else {
-                                        mapFrom1 = 0d;
-                                        mapFrom2 = 1d;
-                                        basePoint = startYPos;
-                                    }
-                                    for (int i = 1; i <= period; ++i) {
-                                        var radian = (i / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
-                                        var interYPos = basePoint - delta * Math.Sin (radian);
-                                        cr.LineTo (startXPos + i, interYPos);
-                                    }
+                                if (state.startTime.Before (state.endTime)) {
                                     cr.LineTo (endXPos, endYPos);
-                                    break;
+                                } else {
+                                    var rightRatio = rightPart / period;
+                                    var rightYPos = startYPos + (rightRatio * delta);
+
+                                    cr.LineTo (right, rightYPos);
+                                    cr.LineTo (right, graphBottom);
+                                    cr.ClosePath ();
+
+                                    cr.MoveTo (graphLeft, graphBottom);
+                                    cr.LineTo (graphLeft, rightYPos);
+                                    cr.LineTo (endXPos, endYPos);
                                 }
-                            case LightingStateType.On:
-                                cr.LineTo (startXPos, startYPos);
-                                cr.LineTo (endXPos, startYPos);
                                 break;
                             }
+                        case LightingStateType.ParabolaRamp: {
+                                delta = Math.Abs (delta);
 
-                            cr.LineTo (endXPos, graphBottom);
-                            cr.ClosePath ();
-                            TouchColor.SetSource (cr, "pri");
-                            cr.LineWidth = 1;
-                            cr.StrokePreserve ();
-                            TouchColor.SetSource (cr, "grey2");
-                            cr.Fill ();
+                                cr.LineTo (startXPos, startYPos);
+                                if (state.startTime.Before (state.endTime)) {
+                                    for (var phase = 1; phase <= period; ++phase) {
+                                        var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+                                        var interYPos = startYPos - delta * Math.Sin (radian);
+                                        cr.LineTo (startXPos + phase, interYPos);
+                                    }
+                                } else {
+                                    for (var phase = 1; phase <= rightPart; ++phase) {
+                                        var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+                                        var interYPos = startYPos - delta * Math.Sin (radian);
+                                        cr.LineTo (startXPos + phase, interYPos);
+                                    }
+                                    cr.LineTo (right, graphBottom);
+                                    cr.ClosePath ();
 
+                                    cr.MoveTo (graphLeft, graphBottom);
+                                    for (var phase = rightPart; phase <= period; ++phase) {
+                                        var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+                                        var interYPos = startYPos - delta * Math.Sin (radian);
+                                        cr.LineTo (interXPos + phase, interYPos);
+                                    }
+                                }
+                                break;
+                            }
+                        case LightingStateType.HalfParabolaRamp: {
+                                delta = Math.Abs (delta);
+                                double mapFrom1, mapFrom2, basePoint;
+                                if (startYPos <= endYPos) {
+                                    mapFrom1 = 1d;
+                                    mapFrom2 = 0d;
+                                    basePoint = endYPos;
+                                } else {
+                                    mapFrom1 = 0d;
+                                    mapFrom2 = 1d;
+                                    basePoint = startYPos;
+                                }
+
+                                cr.LineTo (startXPos, startYPos);
+                                if (state.startTime.Before (state.endTime)) {
+                                    for (var phase = 1; phase <= period; ++phase) {
+                                        var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+                                        var interYPos = basePoint - delta * Math.Sin (radian);
+                                        cr.LineTo (startXPos + phase, interYPos);
+                                    }
+                                    cr.LineTo (endXPos, endYPos);
+                                } else {
+                                    for (var phase = 1; phase <= rightPart; ++phase) {
+                                        var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+                                        var interYPos = basePoint - delta * Math.Sin (radian);
+                                        cr.LineTo (startXPos + phase, interYPos);
+                                    }
+                                    cr.LineTo (right, graphBottom);
+                                    cr.ClosePath ();
+
+                                    cr.MoveTo (graphLeft, graphBottom);
+                                    for (var phase = rightPart; phase <= period; ++phase) {
+                                        var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+                                        var interYPos = basePoint - delta * Math.Sin (radian);
+                                        cr.LineTo (interXPos + phase, interYPos);
+                                    }
+                                }
+                                break;
+                            }
+                        case LightingStateType.On:
+                            cr.LineTo (startXPos, startYPos);
+                            if (state.startTime.Before (state.endTime)) {
+                                cr.LineTo (endXPos, startYPos);
+                            } else {
+                                cr.LineTo (right, startYPos);
+                                cr.LineTo (right, graphBottom);
+                                cr.ClosePath ();
+
+                                cr.MoveTo (graphLeft, graphBottom);
+                                cr.LineTo (graphLeft, startYPos);
+                                cr.LineTo (endXPos, startYPos);
+                            }
+                            break;
+                        }
+
+                        cr.LineTo (endXPos, graphBottom);
+                        cr.ClosePath ();
+                        TouchColor.SetSource (cr, "pri");
+                        cr.LineWidth = 1;
+                        cr.StrokePreserve ();
+                        TouchColor.SetSource (cr, "grey2");
+                        cr.Fill ();
+
+                        // Only the first state needs the starting time drawn. All other states the start time 
+                        // is the same as the last time.
+                        if (firstTimeThrough) {
                             text = new TouchText (state.startTime.ToShortTimeString ());
                             text.alignment = TouchAlignment.Center;
-                            text.Render (this, startXPos.ToInt () - 50, bottom - 15, 100);
-
-                            text = new TouchText (state.endTime.ToShortTimeString ());
-                            text.alignment = TouchAlignment.Center;
-                            text.Render (this, endXPos.ToInt () - 50, bottom - 15, 100);
+                            text.Render (this, startXPos.ToInt () - 50, graphBottom, 100);
+                            firstTimeThrough = false;
                         }
+
+                        // If the start and end of the state are close together draw the end at alterating elevations
+                        int textYPos;
+                        if (period < 80) {
+                            if (lastOnSecondLine) {
+                                textYPos = graphBottom;
+                                lastOnSecondLine = false;
+                            } else {
+                                textYPos = bottom - 15;
+                                lastOnSecondLine = true;
+                            }
+                        } else {
+                            textYPos = graphBottom;
+                            lastOnSecondLine = false;
+                        }
+
+                        text = new TouchText (state.endTime.ToShortTimeString ());
+                        text.alignment = TouchAlignment.Center;
+                        text.Render (this, endXPos.ToInt () - 50, textYPos, 100);
                     }
                 }
 

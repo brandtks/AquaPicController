@@ -22,7 +22,6 @@
 #endregion // License
 
 using System;
-using System.Collections.Generic;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.Drivers;
@@ -62,9 +61,12 @@ namespace AquaPic.Modules
                                 currentState = i;
                                 break;
                             }
-                        // If start is after end then that means that the start is next day, so reverse checking end and start times
+                        // If start is after end then that means that the start is next day
                         } else {
-                            if (now.After (this.lightingStates [i].endTime) || now.Before (this.lightingStates [i].startTime)) {
+                            var midnight = new Time (11, 59, 59);
+
+                            if ((now.After (this.lightingStates[i].startTime) && now.Before (midnight)) || 
+                                (now.After (Time.TimeZero) && now.Before (this.lightingStates [i].endTime))) {
                                 currentState = i;
                                 break;
                             }
@@ -98,7 +100,7 @@ namespace AquaPic.Modules
                 }
 
                 // Now in next state
-                currentState = currentState++ % lightingStates.Length;
+                currentState = ++currentState % lightingStates.Length;
                 if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
                     return false;
                 }

@@ -120,11 +120,22 @@ namespace GoodtimeDevelopment.Utilites
         }
 
         public static float CalcHalfParabola (DateSpan startTime, DateSpan endTime, DateSpan now, float startLevel, float endLevel) {
+            float mapFrom1, mapFrom2, basePoint;
+            if (endLevel <= startLevel) {
+                mapFrom1 = 1;
+                mapFrom2 = 0;
+                basePoint = endLevel;
+            } else {
+                mapFrom1 = 0;
+                mapFrom2 = 1;
+                basePoint = startLevel;
+            }
+
             var period = endTime.DifferenceInMinutes (startTime);
             var phase = now.DifferenceInMinutes (startTime);
-            var radian = (phase / period).Map (0, 1, 0, 90).Constrain (0, 90).ToRadians ();
-            var delta = endLevel - startLevel;
-            return startLevel + (float)(delta * Math.Sin (radian));
+            var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+            var delta = Math.Abs (endLevel - startLevel);
+            return basePoint + (float)(delta * Math.Sin (radian));
         }
 
         public static float CalcLinearRamp (DateSpan startTime, DateSpan endTime, DateSpan now, float startLevel, float endLevel) {
@@ -152,10 +163,9 @@ namespace GoodtimeDevelopment.Utilites
         public static int Constrain (this int value, int min, int max) {
             if (value < min)
                 return min;
-            else if (value > max)
+            if (value > max)
                 return max;
-            else
-                return value;
+            return value;
         }
 
         public static float Map (this float value, float from1, float from2, float to1, float to2) {
@@ -165,10 +175,9 @@ namespace GoodtimeDevelopment.Utilites
         public static float Constrain (this float value, float min, float max) {
             if (value < min)
                 return min;
-            else if (value > max)
+            if (value > max)
                 return max;
-            else
-                return value;
+            return value;
         }
 
         public static double Map (this double value, double from1, double from2, double to1, double to2) {

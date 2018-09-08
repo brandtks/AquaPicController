@@ -119,7 +119,10 @@ namespace GoodtimeDevelopment.Utilites
 
         // returns 1 if after value, -1 if before value
         protected int CompareToTime (Time value) {
-            return TimeSpan.Compare (ToTimeSpan (), value.ToTimeSpan ());
+            var compare1 = ToTimeSpan ();
+            var compare2 = value.ToTimeSpan ();
+            var result = TimeSpan.Compare (compare1, compare2);
+            return result;
         }
 
         public bool EqualsShortTime (DateTime value) {
@@ -194,10 +197,6 @@ namespace GoodtimeDevelopment.Utilites
                 }
             }
 
-            if (t.Length < 2) {
-                throw new Exception ("The string can not be parsed into a Time value");
-            }
-
             // the value to parse has at least the hours and seconds
             hours = Convert.ToInt32 (t[0]);
             if (string.Equals (hrFormatString, "pm", StringComparison.InvariantCultureIgnoreCase)) {
@@ -205,14 +204,17 @@ namespace GoodtimeDevelopment.Utilites
                     hours = (hours + 12) % 24;
                 }
             }
+
             if (hours == 24) { // convert the 24th hour to 0
                 hours = 0;
             }
 
-            minutes = Convert.ToInt32 (t[1]);
-
             if ((hours < 0) || (hours > 23))
                 throw new Exception ("Invalid hours");
+
+            if (t.Length >= 2) { // the value to parse contains seconds
+                minutes = Convert.ToInt32 (t[1]);
+            }
 
             if ((minutes < 0) || (minutes > 59))
                 throw new Exception ("Invalid minutes");

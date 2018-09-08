@@ -102,6 +102,16 @@ namespace GoodtimeDevelopment.Utilites.Test
             t1 = Time.Parse (str);
             t2 = new Time (22, 30, 0, 0);
             Assert.AreEqual (t2, t1);
+
+            str = "10 PM";
+            t1 = Time.Parse (str);
+            t2 = new Time (22, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            str = "2";
+            t1 = Time.Parse (str);
+            t2 = new Time (2, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
         }
 
         [Test]

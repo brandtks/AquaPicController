@@ -158,7 +158,9 @@ namespace GoodtimeDevelopment.Utilites
         }
 
         public double DifferenceInMinutes (DateSpan dateSpan) {
-            var span = ToDateTime ().Subtract (dateSpan.ToDateTime ());
+            var compare1 = this.ToDateTime ();
+            var compare2 = dateSpan.ToDateTime ();
+            var span = compare1.Subtract (compare2);
             return span.TotalMinutes;
         }
 

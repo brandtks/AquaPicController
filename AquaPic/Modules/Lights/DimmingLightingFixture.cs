@@ -76,11 +76,17 @@ namespace AquaPic.Modules
                     start = new DateSpan (lightingStates [currentState].startTime);
                     end = new DateSpan (lightingStates [currentState].endTime);
                 } else {
-                    var tomorrow = DateSpan.Now;
-                    tomorrow.AddDays (1);
-
-                    start = new DateSpan (lightingStates [currentState].startTime);
-                    end = new DateSpan (tomorrow, lightingStates [currentState].endTime);
+                    var otherDay = DateSpan.Now;
+                    // its after midnight
+                    if (now.Before (lightingStates[currentState].endTime)) {
+                        otherDay.AddDays (-1);
+                        start = new DateSpan (otherDay, lightingStates[currentState].startTime);
+                        end = new DateSpan (lightingStates[currentState].endTime);
+                    } else {
+                        otherDay.AddDays (1);
+                        start = new DateSpan (lightingStates[currentState].startTime);
+                        end = new DateSpan (otherDay, lightingStates[currentState].endTime);
+                    }
                 }
 
                 if (lightingStates [currentState].type == LightingStateType.LinearRamp) {
