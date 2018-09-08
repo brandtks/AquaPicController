@@ -35,8 +35,6 @@ namespace AquaPic.Modules
             public float currentDimmingLevel;
             public float autoDimmingLevel;
             public float requestedDimmingLevel;
-            public float minDimmingOutput;
-            public float maxDimmingOutput;
             public IndividualControl channel;
             public Mode dimmingMode;
             public RateOfChangeLimiter rocl;
@@ -46,9 +44,6 @@ namespace AquaPic.Modules
                 IndividualControl plug,
                 IndividualControl channel,
                 LightingState[] lightingStates,
-                float minDimmingOutput,
-                float maxDimmingOutput,
-                AnalogType type,
                 bool highTempLockout)
             : base (
                 name,
@@ -61,11 +56,8 @@ namespace AquaPic.Modules
                 requestedDimmingLevel = 0.0f;
                 rocl = new RateOfChangeLimiter (1.0f);
                 this.channel = channel;
-                this.minDimmingOutput = minDimmingOutput;
-                this.maxDimmingOutput = maxDimmingOutput;
                 dimmingMode = Mode.Auto;
                 AquaPicDrivers.AnalogOutput.AddChannel (channel, name);
-                AquaPicDrivers.AnalogOutput.SetChannelType (channel, type);
                 var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (channel);
                 valueControl.ValueGetter = CalculateDimmingLevel;
 
@@ -116,7 +108,7 @@ namespace AquaPic.Modules
                     autoDimmingLevel = lightingStates [currentState].startingDimmingLevel;
                 }
 
-                autoDimmingLevel.Constrain (minDimmingOutput, maxDimmingOutput);
+                autoDimmingLevel.Constrain (0, 100);
                 if (plugState == MyState.On) {
                     if (dimmingMode == Mode.Auto) {
                         requestedDimmingLevel = autoDimmingLevel;

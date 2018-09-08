@@ -42,6 +42,10 @@ namespace AquaPic.Drivers
                 return new AnalogOutputChannel (GetDefualtName (index));
             }
 
+            public override string GetChannelPrefix () {
+                return "q";
+            }
+
             public override void GetValueCommunication (int channel) {
                 CheckChannelRange (channel);
                 ReadWrite (10, (byte)channel, 3, GetValueCommunicationCallback); // byte channel id and float value, 5 bytes

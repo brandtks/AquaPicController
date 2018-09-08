@@ -31,7 +31,6 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Globals;
 using AquaPic.Drivers;
-//using AquaPic.UserInterface;
 
 namespace AquaPic.Modules
 {
@@ -167,7 +166,7 @@ namespace AquaPic.Modules
                             lightingStates.Add (state);
                         }
 
-                        if (string.Equals (lightingType, "dimming", StringComparison.InvariantCultureIgnoreCase)) {
+                        if (obj.ContainsKey ("dimmingCard")) {
                             var channel = IndividualControl.Empty;
                             text = (string)obj["dimmingCard"];
                             if (text.IsNotEmpty ()) {
@@ -191,42 +190,18 @@ namespace AquaPic.Modules
                                 }
                             }
 
-                            float minDimmingOutput = 0f;
-                            text = (string)obj["minDimmingOutput"];
-                            if (text.IsNotEmpty ()) {
-                                try {
-                                    minDimmingOutput = Convert.ToSingle (text);
-                                } catch {
-                                    //
-                                }
-                            }
-
-                            float maxDimmingOutput = 100f;
-                            text = (string)obj["maxDimmingOutput"];
-                            if (text.IsNotEmpty ()) {
-                                try {
-                                    maxDimmingOutput = Convert.ToSingle (text);
-                                } catch {
-                                    //
-                                }
-                            }
-
                             AddLight (
                                 name,
                                 plug,
                                 channel,
                                 lightingStates.ToArray (),
-                                minDimmingOutput,
-                                maxDimmingOutput,
-                                AnalogType.ZeroTen,
                                 highTempLockout);
                         } else {
                             AddLight (
                                 name,
                                 plug,
                                 lightingStates.ToArray (),
-                                highTempLockout
-                            );
+                                highTempLockout);
                         }
                     }
                 }
@@ -249,8 +224,8 @@ namespace AquaPic.Modules
             string name,
             IndividualControl plug,
             LightingState[] lightingStates,
-            bool highTempLockout = true
-        ) {
+            bool highTempLockout = true) 
+        {
             fixtures[name] = new LightingFixture (
                 name,
                 plug,
@@ -263,19 +238,13 @@ namespace AquaPic.Modules
             IndividualControl plug,
             IndividualControl channel,
             LightingState[] lightingStates,
-            float minDimmingOutput = 0.0f,
-            float maxDimmingOutput = 100.0f,
-            AnalogType type = AnalogType.ZeroTen,
-            bool highTempLockout = true
-        ) {
+            bool highTempLockout = true) 
+        {
             fixtures[name] = new DimmingLightingFixture (
                 name,
                 plug,
                 channel,
                 lightingStates,
-                minDimmingOutput,
-                maxDimmingOutput,
-                type,
                 highTempLockout);
         }
 
@@ -456,50 +425,6 @@ namespace AquaPic.Modules
             throw new ArgumentException ("fixtureName");
         }
 
-        public static float GetMaxDimmingLevel (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
-            if (fixture != null)
-                return fixture.maxDimmingOutput;
-
-            throw new ArgumentException ("fixtureName");
-        }
-
-        public static void SetMaxDimmingLevel (string fixtureName, float maxDimmingLevel) {
-            CheckFixtureKey (fixtureName);
-
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
-            if (fixture != null) {
-                fixture.maxDimmingOutput = maxDimmingLevel;
-                return;
-            }
-
-            throw new ArgumentException ("fixtureName");
-        }
-
-        public static float GetMinDimmingLevel (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
-            if (fixture != null)
-                return fixture.minDimmingOutput;
-
-            throw new ArgumentException ("fixtureName");
-        }
-
-        public static void SetMinDimmingLevel (string fixtureName, float minDimmingLevel) {
-            CheckFixtureKey (fixtureName);
-
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
-            if (fixture != null) {
-                fixture.minDimmingOutput = minDimmingLevel;
-                return;
-            }
-
-            throw new ArgumentException ("fixtureName");
-        }
-
         /**************************************************************************************************************/
         /* Dimming Modes                                                                                              */
         /**************************************************************************************************************/
@@ -526,35 +451,9 @@ namespace AquaPic.Modules
         }
 
         /**************************************************************************************************************/
-        /* Dimming Types                                                                                              */
-        /**************************************************************************************************************/
-        public static AnalogType GetDimmingType (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
-            if (fixture != null)
-                return AquaPicDrivers.AnalogOutput.GetChannelType (fixture.channel);
-
-            throw new ArgumentException ("fixtureName");
-        }
-
-        public static void SetDimmingType (string fixtureName, AnalogType analogType) {
-            CheckFixtureKey (fixtureName);
-
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
-            if (fixture != null) {
-                AquaPicDrivers.AnalogOutput.SetChannelType (fixture.channel, analogType);
-                return;
-            }
-
-            throw new ArgumentException ("fixtureName");
-        }
-
-        /**************************************************************************************************************/
         /* Lighting States                                                                                            */
         /**************************************************************************************************************/
-        public static LightingState[] GetLightingStates (string fixtureName)
-        {
+        public static LightingState[] GetLightingStates (string fixtureName) {
             CheckFixtureKey (fixtureName);
             var lightingStates = new List<LightingState> ();
             lightingStates.AddRange (fixtures [fixtureName].lightingStates);

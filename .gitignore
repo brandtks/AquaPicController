@@ -10,7 +10,7 @@ Properties/
 *.suo
 .directory
 *.swp
-.vs/
+.vs*/
 PrePackage/
 AquaPic.run
 mybuild

@@ -118,65 +118,13 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (AquaPicDrivers.AnalogOutput.GetAllAvaiableChannels ());
             AddOptionalSetting (c);
 
-            t = new SettingsTextBox ("Max Dimming");
-            if ((this.fixtureName.IsNotEmpty ()) && (isDimming))
-                t.textBox.text = Lighting.GetMaxDimmingLevel (this.fixtureName).ToString ();
-            else
-                t.textBox.text = "100.0";
-            t.textBox.TextChangedEvent += (sender, args) => {
-                try {
-                    float max = Convert.ToSingle (args.text);
-                    float min = Convert.ToSingle (((SettingsTextBox)settings["Min Dimming"]).textBox.text);
-
-                    if (max < min) {
-                        MessageBox.Show ("Maximum cannot be less than minimum");
-                        args.keepText = false;
-                    }
-                } catch {
-                    MessageBox.Show ("Improper float format");
-                    args.keepText = false;
-                }
-            };
-            AddOptionalSetting (t);
-
-            t = new SettingsTextBox ("Min Dimming");
-            if ((this.fixtureName.IsNotEmpty ()) && (isDimming))
-                t.textBox.text = Lighting.GetMinDimmingLevel (this.fixtureName).ToString ();
-            else
-                t.textBox.text = "0.0";
-            t.textBox.TextChangedEvent += (sender, args) => {
-                try {
-                    float min = Convert.ToSingle (args.text);
-                    float max = Convert.ToSingle (((SettingsTextBox)settings["Max Dimming"]).textBox.text);
-
-                    if (min > max) {
-                        MessageBox.Show ("Minimum cannot be greater than maximum");
-                        args.keepText = false;
-                    }
-                } catch {
-                    MessageBox.Show ("Improper float format");
-                    args.keepText = false;
-                }
-            };
-            AddOptionalSetting (t);
-
-            s = new SettingsSelectorSwitch ("Dimming Type", "0-10V", "PWM");
-            if ((this.fixtureName.IsNotEmpty ()) && (isDimming)) {
-                if (Lighting.GetDimmingType (fixtureName) == AnalogType.ZeroTen)
-                    s.selectorSwitch.currentSelected = 0;
-                else
-                    s.selectorSwitch.currentSelected = 1;
-            } else
-                s.selectorSwitch.currentSelected = 0;
-            AddOptionalSetting (s);
-
             DrawSettings ();
         }
 
         protected void ParseOutlet (string s, ref string g, ref int i) {
             int idx = s.IndexOf ('.');
             g = s.Substring (0, idx);
-            i = Convert.ToByte (s.Substring (idx + 2));
+            i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
         protected void ParseChannnel (string s, ref string g, ref int i) {
@@ -212,18 +160,6 @@ namespace AquaPic.UserInterface
             var chStr = ((SettingsComboBox)settings["Dimming Channel"]).combo.activeText;
             var chIc = IndividualControl.Empty;
 
-            var maxDimming = Convert.ToSingle (((SettingsTextBox)settings["Max Dimming"]).textBox.text);
-            var minDimming = Convert.ToSingle (((SettingsTextBox)settings["Min Dimming"]).textBox.text);
-
-            AnalogType aType = AnalogType.ZeroTen;
-            try {
-                var s = settings["Dimming Type"] as SettingsSelectorSwitch;
-                if (s.selectorSwitch.currentSelected != 0)
-                    aType = AnalogType.PWM;
-            } catch {
-                return false;
-            }
-
             var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
             var ja = jo["lightingFixtures"] as JArray;
 
@@ -250,17 +186,13 @@ namespace AquaPic.UserInterface
 
                     ParseChannnel (chStr, ref chIc.Group, ref chIc.Individual);
 
-                    Lighting.AddLight (name, outletIc, chIc, lightingStates, minDimming, maxDimming, aType, highTempLockout);
+                    Lighting.AddLight (name, outletIc, chIc, lightingStates, highTempLockout);
                 } else {
                     Lighting.AddLight (name, outletIc, lightingStates, highTempLockout);
                 }
 
 
                 JObject jobj = new JObject ();
-                if (dimmingFixture)
-                    jobj.Add (new JProperty ("type", "dimming"));
-                else
-                    jobj.Add (new JProperty ("type", "notDimmable"));
                 jobj.Add (new JProperty ("name", name));
                 jobj.Add (new JProperty ("powerStrip", outletIc.Group));
                 jobj.Add (new JProperty ("outlet", outletIc.Individual.ToString ()));
@@ -268,8 +200,6 @@ namespace AquaPic.UserInterface
                 if (dimmingFixture) {
                     jobj.Add (new JProperty ("dimmingCard", chIc.Group));
                     jobj.Add (new JProperty ("channel", chIc.Individual.ToString ()));
-                    jobj.Add (new JProperty ("minDimmingOutput", minDimming.ToString ()));
-                    jobj.Add (new JProperty ("maxDimmingOutput", maxDimming.ToString ()));
                 }
 
                 ja.Add (jobj);
@@ -277,6 +207,7 @@ namespace AquaPic.UserInterface
                 fixtureName = name;
             } else {
                 bool isDimming = Lighting.IsDimmingFixture (fixtureName);
+                // isDimming and dimmingFixture must match, whether that's true or false
                 if (isDimming == dimmingFixture) {
                     string oldName = fixtureName;
                     if (oldName != name) {
@@ -294,11 +225,6 @@ namespace AquaPic.UserInterface
                     Lighting.SetFixtureTemperatureLockout (fixtureName, highTempLockout);
 
                     if (dimmingFixture) {
-                        Lighting.SetMaxDimmingLevel (fixtureName, maxDimming);
-                        Lighting.SetMinDimmingLevel (fixtureName, minDimming);
-
-                        Lighting.SetDimmingType (fixtureName, aType);
-
                         if (!chStr.StartsWith ("Current:")) {
                             ParseChannnel (chStr, ref chIc.Group, ref chIc.Individual);
                             Lighting.SetDimmingChannelIndividualControl (fixtureName, chIc);
@@ -320,9 +246,6 @@ namespace AquaPic.UserInterface
                     if (dimmingFixture) {
                         ja[arrIdx]["dimmingCard"] = chIc.Group;
                         ja[arrIdx]["channel"] = chIc.Individual.ToString ();
-                        ja[arrIdx]["minDimmingOutput"] = minDimming.ToString ();
-                        ja[arrIdx]["maxDimmingOutput"] = maxDimming.ToString ();
-                        ja[arrIdx]["analogType"] = aType.ToString ();
                     }
                 } else {
                     MessageBox.Show ("Can't change dimmablility");
