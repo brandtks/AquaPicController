@@ -63,7 +63,7 @@ namespace AquaPic.Modules
                             }
                         // If start is after end then that means that the start is next day
                         } else {
-                            var midnight = new Time (11, 59, 59);
+                            var midnight = new Time (23, 59, 59);
 
                             if ((now.After (this.lightingStates[i].startTime) && now.Before (midnight)) || 
                                 (now.After (Time.TimeZero) && now.Before (this.lightingStates [i].endTime))) {
@@ -89,18 +89,35 @@ namespace AquaPic.Modules
                     return false;
                 }
 
+                var state = lightingStates[currentState];
                 var now = Time.TimeNow;
-                if (now.Before (lightingStates[currentState].endTime)) { // Still in current lighting state
-                    if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
-                        return false;
-                    }
 
-                    // State is anything but off
-                    return true;
+                if (state.startTime.Before (state.endTime)) {
+                    if (now.Before (lightingStates[currentState].endTime)) { // Still in current lighting state
+                        if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
+                            return false;
+                        }
+
+                        // State is anything but off
+                        return true;
+                    }
+                } else {
+                    var midnight = new Time (23, 59, 59);
+                    if ((now.After (state.startTime) && now.Before (midnight)) ||
+                        (now.After (Time.TimeZero) && now.Before (state.endTime))) {
+
+                        if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
+                            return false;
+                        }
+
+                        // State is anything but off
+                        return true;
+                    }
                 }
 
                 // Now in next state
                 currentState = ++currentState % lightingStates.Length;
+                Console.WriteLine ("{0} is in state {1}", name, currentState);
                 if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
                     return false;
                 }

@@ -34,24 +34,24 @@ namespace AquaPic.UserInterface
 {
     public class LightingWindow : SceneBase
     {
-        private string fixtureName;
-        private TouchComboBox combo;
-        private TouchSelectorSwitch modeSelector;
-        private TouchLayeredProgressBar dimmingProgressBar;
-        private TouchLabel dimmingHeader;
-        private TouchLabel actualTextBox;
-        private TouchLabel actualLabel;
-        private TouchLabel requestedLabel;
-        private TouchLabel requestedTextLabel;
-        private TouchTextBox requestedTextBox;
-        private TouchLabel autoTextBox;
-        private TouchLabel autoLabel;
-        private TouchLabel outletStateLabel;
-        private TouchSelectorSwitch outletSelectorSwitch;
-        private TouchButton fixtureSettingBtn;
-        private bool isDimmingFixture;
-        private bool dimmingIsManual;
-        private LightingStateDisplay lightingStateDisplay;
+        string fixtureName;
+        TouchComboBox combo;
+        TouchSelectorSwitch modeSelector;
+        TouchLayeredProgressBar dimmingProgressBar;
+        TouchLabel dimmingHeader;
+        TouchLabel actualTextBox;
+        TouchLabel actualLabel;
+        TouchLabel requestedLabel;
+        TouchLabel requestedTextLabel;
+        TouchTextBox requestedTextBox;
+        TouchLabel autoTextBox;
+        TouchLabel autoLabel;
+        TouchLabel outletStateLabel;
+        TouchSelectorSwitch outletSelectorSwitch;
+        TouchButton fixtureSettingBtn;
+        bool isDimmingFixture;
+        bool dimmingIsManual;
+        LightingStateDisplay lightingStateDisplay;
 
         public LightingWindow (params object[] options) : base (false) {
             sceneTitle = "Lighting";
@@ -70,12 +70,6 @@ namespace AquaPic.UserInterface
                 }
             }
 
-            outletStateLabel = new TouchLabel ();
-            outletStateLabel.WidthRequest = 250;
-            outletStateLabel.textSize = 14;
-            Put (outletStateLabel, 55, 37);
-            outletStateLabel.Show ();
-
             outletSelectorSwitch = new TouchSelectorSwitch (0, 3, 0, TouchOrientation.Horizontal);
             outletSelectorSwitch.sliderSize = MySliderSize.Large;
             outletSelectorSwitch.WidthRequest = 180;
@@ -88,11 +82,18 @@ namespace AquaPic.UserInterface
             Put (outletSelectorSwitch, 605, 77);
             outletSelectorSwitch.Show ();
 
+            outletStateLabel = new TouchLabel ();
+            outletStateLabel.textAlignment = TouchAlignment.Center;
+            outletStateLabel.WidthRequest = 180;
+            outletStateLabel.textSize = 14;
+            Put (outletStateLabel, 605, 110);
+            outletStateLabel.Show ();
+
             dimmingHeader = new TouchLabel ();
             dimmingHeader.textAlignment = TouchAlignment.Center;
             dimmingHeader.WidthRequest = 180;
             dimmingHeader.text = "Dimming Control";
-            Put (dimmingHeader, 605, 113);
+            Put (dimmingHeader, 605, 148);
             dimmingHeader.Show ();
 
             modeSelector = new TouchSelectorSwitch (2);
@@ -103,7 +104,7 @@ namespace AquaPic.UserInterface
             modeSelector.sliderColorOptions[0] = "grey2";
             modeSelector.sliderColorOptions[1] = "pri";
             modeSelector.SelectorChangedEvent += OnDimmingModeSelectorChanged;
-            Put (modeSelector, 605, 138);
+            Put (modeSelector, 605, 173);
             modeSelector.Show ();
 
             dimmingProgressBar = new TouchLayeredProgressBar ();
@@ -112,8 +113,8 @@ namespace AquaPic.UserInterface
             dimmingProgressBar.drawPrimaryWhenEqual = false;
             dimmingProgressBar.ProgressChangedEvent += OnProgressChanged;
             dimmingProgressBar.ProgressChangingEvent += OnProgressChanging;
-            dimmingProgressBar.HeightRequest = 319;
-            Put (dimmingProgressBar, 755, 138);
+            dimmingProgressBar.HeightRequest = 280;
+            Put (dimmingProgressBar, 755, 173);
             dimmingProgressBar.Show ();
 
             actualTextBox = new TouchLabel ();
@@ -122,7 +123,7 @@ namespace AquaPic.UserInterface
             actualTextBox.textColor = "pri";
             actualTextBox.textAlignment = TouchAlignment.Center;
             actualTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
-            Put (actualTextBox, 605, 174);
+            Put (actualTextBox, 605, 209);
             actualTextBox.Show ();
 
             actualLabel = new TouchLabel ();
@@ -130,7 +131,7 @@ namespace AquaPic.UserInterface
             actualLabel.text = "Current";
             actualLabel.textColor = "grey3";
             actualLabel.textAlignment = TouchAlignment.Center;
-            Put (actualLabel, 605, 209);
+            Put (actualLabel, 605, 244);
             actualLabel.Show ();
 
             requestedLabel = new TouchLabel ();
@@ -139,7 +140,7 @@ namespace AquaPic.UserInterface
             requestedLabel.textColor = "seca";
             requestedLabel.textAlignment = TouchAlignment.Center;
             requestedLabel.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
-            Put (requestedLabel, 605, 237);
+            Put (requestedLabel, 605, 272);
             requestedLabel.Show ();
 
             requestedTextBox = new TouchTextBox ();
@@ -162,7 +163,7 @@ namespace AquaPic.UserInterface
             requestedTextBox.textAlignment = TouchAlignment.Center;
             requestedTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
             requestedTextBox.Visible = false;
-            Put (requestedTextBox, 620, 234);
+            Put (requestedTextBox, 620, 279);
             requestedTextBox.Show ();
 
             requestedTextLabel = new TouchLabel ();
@@ -170,7 +171,7 @@ namespace AquaPic.UserInterface
             requestedTextLabel.text = "Requested";
             requestedTextLabel.textColor = "grey3";
             requestedTextLabel.textAlignment = TouchAlignment.Center;
-            Put (requestedTextLabel, 605, 272);
+            Put (requestedTextLabel, 605, 307);
             requestedTextLabel.Show ();
 
             autoTextBox = new TouchLabel ();
@@ -180,7 +181,7 @@ namespace AquaPic.UserInterface
             autoTextBox.textColor = "grey4";
             autoTextBox.textAlignment = TouchAlignment.Center;
             autoTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
-            Put (autoTextBox, 605, 300);
+            Put (autoTextBox, 605, 335);
             autoTextBox.Show ();
 
             autoLabel = new TouchLabel ();
@@ -189,7 +190,7 @@ namespace AquaPic.UserInterface
             autoLabel.text = "Auto";
             autoLabel.textColor = "grey3";
             autoLabel.textAlignment = TouchAlignment.Center;
-            Put (autoLabel, 605, 335);
+            Put (autoLabel, 605, 370);
             autoLabel.Show ();
 
             fixtureSettingBtn = new TouchButton ();
@@ -225,15 +226,16 @@ namespace AquaPic.UserInterface
             fixtureSettingBtn.Show ();
 
             lightingStateDisplay = new LightingStateDisplay ();
-            Put (lightingStateDisplay, 55, 120);
+            lightingStateDisplay.SetSizeRequest (540, 360);
+            Put (lightingStateDisplay, 55, 90);
             lightingStateDisplay.Show ();
 
             combo = new TouchComboBox (Lighting.GetAllFixtureNames ());
-            combo.activeIndex = 0;
-            combo.WidthRequest = 200;
             combo.comboList.Add ("New fixture...");
+            combo.activeIndex = 0;
+            combo.WidthRequest = 250;
             combo.ComboChangedEvent += OnComboChanged;
-            Put (combo, 550, 35);
+            Put (combo, 500, 35);
             combo.Show ();
 
             if (fixtureName.IsNotEmpty ()) {
@@ -281,7 +283,7 @@ namespace AquaPic.UserInterface
                     outletStateLabel.textColor = "secb";
                 }
 
-                lightingStateDisplay.lightingStates = Lighting.GetLightingStates (fixtureName);
+                lightingStateDisplay.SetStates (Lighting.GetLightingStates (fixtureName));
                 lightingStateDisplay.QueueDraw ();
 
                 isDimmingFixture = Lighting.IsDimmingFixture (fixtureName);

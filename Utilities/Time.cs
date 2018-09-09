@@ -42,6 +42,12 @@ namespace GoodtimeDevelopment.Utilites
             }
         }
 
+        public double totalMinutes {
+            get {
+                return ToTimeSpan ().TotalMinutes;
+            }
+        }
+
         protected int _second;
         public int second {
             get {

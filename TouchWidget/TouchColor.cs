@@ -34,9 +34,9 @@ namespace GoodtimeDevelopment.TouchWidget
         public double B { get; set; }
         public double A { get; set; }
 
-        private string colorName;
+        string colorName;
 
-        private static Dictionary<string, int[]> colorLookup = new Dictionary<string, int[]> () {
+        static Dictionary<string, int[]> colorLookup = new Dictionary<string, int[]> () {
             { "pri", new int[3] {103, 227, 0}}, // greenish 67E300 {103, 227, 0}
             { "seca", new int[3] {2, 142, 155}}, // blueish 028E9B {2, 142, 155}
             { "secb", new int[3] {255, 154, 64}}, // orangish FF9A40 {255, 154, 64}
@@ -49,12 +49,12 @@ namespace GoodtimeDevelopment.TouchWidget
             { "grey4", new int[3] {217, 217, 217}}
         };
 
-        public TouchColor (string color, double A = 1.0) {
+        public TouchColor (string color, double A = 1d) {
             colorName = color.ToLower ();
             if (colorLookup.ContainsKey (colorName)) {
-                R = (double)colorLookup[colorName][0] / 255.0;
-                G = (double)colorLookup[colorName][1] / 255.0;
-                B = (double)colorLookup[colorName][2] / 255.0;
+                R = colorLookup[colorName][0] / 255d;
+                G = colorLookup[colorName][1] / 255d;
+                B = colorLookup[colorName][2] / 255d;
             } else {
                 Gdk.Color c = new Gdk.Color ();
                 var colorFound = Gdk.Color.Parse (color, ref c);
@@ -77,20 +77,20 @@ namespace GoodtimeDevelopment.TouchWidget
             this.A = A;
         }
 
-        public TouchColor (byte R, byte G, byte B, double A = 1.0) {
+        public TouchColor (int R, int G, int B, double A = 1d) {
             colorName = string.Empty;
-            this.R = (double)R / 255.0;
-            this.G = (double)G / 255.0;
-            this.B = (double)B / 255.0;
+            this.R = R / 255d;
+            this.G = G / 255d;
+            this.B = B / 255d;
             this.A = A;
         }
 
-        public TouchColor (TouchColor colorCopy) {
-            colorName = colorCopy.colorName;
-            R = colorCopy.R;
-            G = colorCopy.G;
-            B = colorCopy.B;
-            A = colorCopy.A;
+        public TouchColor (TouchColor touchColor) {
+            colorName = touchColor.colorName;
+            R = touchColor.R;
+            G = touchColor.G;
+            B = touchColor.B;
+            A = touchColor.A;
         }
 
         public static implicit operator TouchColor (string name) {

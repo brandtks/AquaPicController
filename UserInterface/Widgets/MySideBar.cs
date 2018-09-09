@@ -223,8 +223,7 @@ namespace AquaPic.UserInterface
                 clicked = true;
                 yDeltaPercentage = 0.0;
                 offset = 0.0;
-                int clickX;
-                GetPointer (out clickX, out clickY);
+                clickY = args.Event.Y.ToInt ();
                 clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
             }
         }
@@ -241,8 +240,8 @@ namespace AquaPic.UserInterface
                 Visible = true;
                 ExpandEvent?.Invoke (this, new EventArgs ());
             } else {
-                int x, y;
-                GetPointer (out x, out y);
+                int x = args.Event.X.ToInt ();
+                int y = args.Event.Y.ToInt ();
 
                 if (y.WithinRange (clickY, 25)) {
                     if (x <= 250) {

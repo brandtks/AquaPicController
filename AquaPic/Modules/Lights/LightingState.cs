@@ -31,7 +31,7 @@ namespace AquaPic.Modules
     {
         On,
         Off,
-        [Description("Linear Ramp")]
+        [Description ("Linear Ramp")]
         LinearRamp,
         [Description ("Half Parabola Ramp")]
         HalfParabolaRamp,
@@ -47,11 +47,17 @@ namespace AquaPic.Modules
             get {
                 return timePeriod.startTime;
             }
+            set {
+                timePeriod.startTime = value;
+            }
         }
 
         public Time endTime {
             get {
                 return timePeriod.endTime;
+            }
+            set {
+                timePeriod.endTime = value;
             }
         }
 
@@ -72,10 +78,25 @@ namespace AquaPic.Modules
             LightingStateType type,
             float startingDimmingLevel,
             float endingDimmingLevel)
-            : this (startTime, endTime, type) 
+            : this (startTime, endTime, type)
         {
             this.startingDimmingLevel = startingDimmingLevel;
             this.endingDimmingLevel = endingDimmingLevel;
+        }
+
+        public LightingState (LightingState lightingState) {
+            timePeriod = new TimePeriod (lightingState.timePeriod);
+            type = lightingState.type;
+            startingDimmingLevel = lightingState.startingDimmingLevel;
+            endingDimmingLevel = lightingState.endingDimmingLevel;
+        }
+
+        public override string ToString () {
+            return string.Format ("{0} at {1} to {2} at {3}",
+                                  startTime.ToShortTimeString (),
+                                  startingDimmingLevel,
+                                  endTime.ToShortTimeString (),
+                                  endingDimmingLevel);
         }
     }
 }

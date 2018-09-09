@@ -28,31 +28,17 @@ namespace AquaPic.Runtime
 {
     public class TimePeriod
     {
-        public string startTimeDescriptor;
-        protected Time _startTime;
-        public Time startTime {
-            get {
-                return _startTime;
-            }
-        }
-
-        public string endTimeDescriptor;
-        protected Time _endTime;
-        public Time endTime {
-            get {
-                return _endTime;
-            }
-        }
+        public Time startTime;
+        public Time endTime;
 
         public TimePeriod (string startTimeDescriptor, string endTimeDescriptor) {
-            this.startTimeDescriptor = startTimeDescriptor;
-            this.endTimeDescriptor = endTimeDescriptor;
-            ParseTimeDescriptors ();
+            startTime = ParseTimeDescriptor (startTimeDescriptor);
+            endTime = ParseTimeDescriptor (endTimeDescriptor);
         }
 
-        public void ParseTimeDescriptors () {
-            _startTime = ParseTimeDescriptor (startTimeDescriptor);
-            _endTime = ParseTimeDescriptor (endTimeDescriptor);
+        public TimePeriod (TimePeriod timePeriod) {
+            startTime = new Time (timePeriod.startTime);
+            endTime = new Time (timePeriod.endTime);
         }
 
         protected Time ParseTimeDescriptor (string timeDescriptor) {
@@ -80,6 +66,8 @@ namespace AquaPic.Runtime
                 } else {
                     throw new Exception ("Can not parse time period");
                 }
+            } else {
+                throw new Exception ("Can not parse time period");
             }
 
             return time;
