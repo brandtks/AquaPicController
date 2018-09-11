@@ -41,6 +41,7 @@ namespace AquaPic.UserInterface
         const int graphVericalEdgeWidth = 40;
         const int graphHorizontalEdgeWidth = 60;
         int graphLeftRelative, graphRightRelative, graphTopRelative, graphBottomRelative;
+        double minutesPerPixel;
 
         List<StateInfo> stateInfos;
 
@@ -81,10 +82,14 @@ namespace AquaPic.UserInterface
             graphBottomRelative = height - graphHorizontalEdgeWidth;
             var midY = (graphBottomRelative - graphHorizontalEdgeWidth) / 2 + graphTop;
 
+            minutesPerPixel = 1440d / (graphRightRelative - graphLeftRelative);
+
             using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                /*
                 cr.Rectangle (left, top, width, height);
                 TouchColor.SetSource (cr, "grey1");
                 cr.Stroke ();
+                */
 
                 // Draw the graph outline
                 cr.MoveTo (graphLeft - 5, graphTop);
@@ -120,6 +125,9 @@ namespace AquaPic.UserInterface
                 text.alignment = TouchAlignment.Right;
                 text.Render (this, left, graphBottom - 13, textWidth);
 
+                var timeXPos = Time.TimeNow.totalMinutes.Map (0, 1440, graphLeft, graphRight);
+                double timeYPos = graphBottom;
+
                 // Draw the states
                 bool firstTimeThrough = true, lastOnSecondLine = false;
                 for (var i = 0; i < stateInfos.Count; ++i) {
@@ -147,7 +155,7 @@ namespace AquaPic.UserInterface
 
                         if (firstTimeThrough) {
                             cr.MoveTo (startXPos, startYPos);
-                            cr.Arc (startXPos, startYPos, 3, -Math.PI, Math.PI);
+                            cr.Arc (startXPos, startYPos, 3, 0 , 2 * Math.PI);
                             cr.ClosePath ();
                             TouchColor.SetSource (cr, "secb");
                             cr.Fill ();
@@ -158,6 +166,10 @@ namespace AquaPic.UserInterface
                         case LightingStateType.LinearRamp: {
                                 if (state.startTime.Before (state.endTime)) {
                                     cr.LineTo (endXPos, endYPos);
+
+                                    if ((timeXPos > startXPos) && (timeXPos < endXPos)) {
+                                        timeYPos = ((timeXPos - startXPos) / period).Map (0, 1, startYPos, endYPos);
+                                    }
                                 } else {
                                     var rightRatio = rightPart / period;
                                     var rightYPos = startYPos + (rightRatio * delta);
@@ -175,22 +187,37 @@ namespace AquaPic.UserInterface
 
                                 if (state.startTime.Before (state.endTime)) {
                                     for (var phase = 1; phase <= period; ++phase) {
+                                        var currentXPos = startXPos + phase;
                                         var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
                                         interYPos = startYPos - delta * Math.Sin (radian);
-                                        cr.LineTo (startXPos + phase, interYPos);
+                                        cr.LineTo (currentXPos, interYPos);
+
+                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                            timeYPos = interYPos;
+                                        }
                                     }
                                 } else {
                                     for (var phase = 1; phase <= rightPart; ++phase) {
+                                        var currentXPos = startXPos + phase;
                                         var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
                                         interYPos = startYPos - delta * Math.Sin (radian);
-                                        cr.LineTo (startXPos + phase, interYPos);
+                                        cr.LineTo (currentXPos, interYPos);
+
+                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                            timeYPos = interYPos;
+                                        }
                                     }
 
                                     cr.MoveTo (graphLeft, interYPos);
                                     for (var phase = rightPart; phase <= period; ++phase) {
+                                        var currentXPos = interXPos + phase;
                                         var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
                                         interYPos = startYPos - delta * Math.Sin (radian);
-                                        cr.LineTo (interXPos + phase, interYPos);
+                                        cr.LineTo (currentXPos, interYPos);
+
+                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                            timeYPos = interYPos;
+                                        }
                                     }
                                 }
                                 endYPos = (float)interYPos;
@@ -212,23 +239,38 @@ namespace AquaPic.UserInterface
                                 double interYPos = graphBottom;
                                 if (state.startTime.Before (state.endTime)) {
                                     for (var phase = 1; phase <= period; ++phase) {
+                                        var currentXPos = startXPos + phase;
                                         var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
                                         interYPos = basePoint - delta * Math.Sin (radian);
-                                        cr.LineTo (startXPos + phase, interYPos);
+                                        cr.LineTo (currentXPos, interYPos);
+
+                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                            timeYPos = interYPos;
+                                        }
                                     }
                                     cr.LineTo (endXPos, endYPos);
                                 } else {
                                     for (var phase = 1; phase <= rightPart; ++phase) {
+                                        var currentXPos = startXPos + phase;
                                         var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
                                         interYPos = basePoint - delta * Math.Sin (radian);
-                                        cr.LineTo (startXPos + phase, interYPos);
+                                        cr.LineTo (currentXPos, interYPos);
+
+                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                            timeYPos = interYPos;
+                                        }
                                     }
 
                                     cr.MoveTo (graphLeft, interYPos);
                                     for (var phase = rightPart; phase <= period; ++phase) {
+                                        var currentXPos = interXPos + phase;
                                         var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
                                         interYPos = basePoint - delta * Math.Sin (radian);
-                                        cr.LineTo (interXPos + phase, interYPos);
+                                        cr.LineTo (currentXPos, interYPos);
+
+                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                            timeYPos = interYPos;
+                                        }
                                     }
                                 }
                                 break;
@@ -237,22 +279,30 @@ namespace AquaPic.UserInterface
                             endYPos = startYPos;
                             if (state.startTime.Before (state.endTime)) {
                                 cr.LineTo (endXPos, startYPos);
+
+                                if ((timeXPos > startXPos) && (timeXPos < endXPos)) {
+                                    timeYPos = startYPos;
+                                }
                             } else {
                                 cr.LineTo (graphRight, startYPos);
 
                                 cr.MoveTo (graphLeft, startYPos);
                                 cr.LineTo (endXPos, startYPos);
+
+                                if (((timeXPos > startXPos) && (timeXPos < graphLeft)) || (timeXPos < endXPos)) {
+                                    timeYPos = startYPos;
+                                }
                             }
                             break;
                         }
-                        TouchColor.SetSource (cr, "secb", 0.5);
+                        TouchColor.SetSource (cr, "secb");
                         cr.Stroke ();
 
                         cr.MoveTo (endXPos, endYPos);
-                        cr.Arc (endXPos, endYPos, 3, -Math.PI, Math.PI);
+                        cr.Arc (endXPos, endYPos, 3, 0, 2 * Math.PI);
                         cr.ClosePath ();
                         cr.Fill ();
-
+             
                         if (selectedState == -1) {
                             // Only the first state needs the starting time drawn. All other states the start time 
                             // is the same as the last end time.
@@ -409,7 +459,7 @@ namespace AquaPic.UserInterface
                             TouchGlobal.DrawRoundedRectangle (cr, startButtonX, graphBottom - 10, 80, 20, 8);
                             var color = new TouchColor ("pri");
                             if (startButtonClicked) {
-                                color.ModifyColor (1.25);
+                                color.ModifyColor (0.75);
                             }
                             color.SetSource (cr);
                             cr.Fill ();
@@ -417,12 +467,12 @@ namespace AquaPic.UserInterface
                             TouchGlobal.DrawRoundedRectangle (cr, endButtonX, graphBottom - 10, 80, 20, 8);
                             color = new TouchColor ("pri");
                             if (endButtonClicked) {
-                                color.ModifyColor (1.25);
+                                color.ModifyColor (0.75);
                             }
                             color.SetSource (cr);
                             cr.Fill ();
 
-                            cr.Rectangle (startXPos - 80, graphBottom + 15, 80, 25);
+                            cr.Rectangle (startButtonX, graphBottom + 15, 80, 25);
                             TouchColor.SetSource (cr, "grey4");
                             cr.FillPreserve ();
                             TouchColor.SetSource (cr, "black");
@@ -431,9 +481,9 @@ namespace AquaPic.UserInterface
                             text = new TouchText (state.startTime.ToShortTimeString ());
                             text.alignment = TouchAlignment.Center;
                             text.font.color = "black";
-                            text.Render (this, startXPos.ToInt () - 80, graphBottom + 18, 80);
+                            text.Render (this, startButtonX.ToInt (), graphBottom + 18, 80);
 
-                            cr.Rectangle (endXPos, graphBottom + 15, 80, 25);
+                            cr.Rectangle (endButtonX, graphBottom + 15, 80, 25);
                             TouchColor.SetSource (cr, "grey4");
                             cr.FillPreserve ();
                             TouchColor.SetSource (cr, "black");
@@ -442,18 +492,16 @@ namespace AquaPic.UserInterface
                             text = new TouchText (state.endTime.ToShortTimeString ());
                             text.alignment = TouchAlignment.Center;
                             text.font.color = "black";
-                            text.Render (this, endXPos.ToInt (), graphBottom + 18, 80);
+                            text.Render (this, endButtonX.ToInt (), graphBottom + 18, 80);
                         }
                     }
                 }
 
-                /*
-                var xPos = Time.TimeNow.ToTimeSpan ().TotalMinutes.Map (0, 1440, graphLeft, graphRight);
-                cr.MoveTo (xPos, graphBottom);
-                cr.LineTo (xPos, graphTop);
+                cr.MoveTo (timeXPos, timeYPos);
+                cr.Arc (timeXPos, timeYPos, 3, 0, 2 * Math.PI);
                 TouchColor.SetSource (cr, "seca");
-                cr.Stroke ();
-                */
+                cr.ClosePath ();
+                cr.Fill ();
             }
         }
 
@@ -549,8 +597,6 @@ namespace AquaPic.UserInterface
                             }
                         }
                     }
-
-                    QueueDraw ();
                 }
             }
 
@@ -558,6 +604,8 @@ namespace AquaPic.UserInterface
             clickHappenedOnEntity = false;
             startButtonClicked = false;
             endButtonClicked = false;
+
+            QueueDraw ();
         }
 
         protected bool OnTimerEvent () {
@@ -565,59 +613,130 @@ namespace AquaPic.UserInterface
                 int x, y;
                 GetPointer (out x, out y);
 
-                double yDelta = clickY - y;
-                double xDelta = clickX - x;
+                var yDelta = clickY - y;
+                var xDelta = x- clickX;
 
                 if (startButtonClicked) {
-                    var newStartMinutes = x.Map (graphLeftRelative, graphRightRelative, 0, 1440);
-                    if (newStartMinutes < 0) {
-                        newStartMinutes = 1440;
-                    } else if (newStartMinutes > 1440) {
-                        newStartMinutes = 0;
-                    }
-
                     var stateInfo = stateInfos[selectedState];
+
                     var currentState = stateInfo.lightingState;
                     var currentStateStartMinutes = currentState.startTime.totalMinutes;
                     var currentStateEndMinutes = currentState.endTime.totalMinutes;
-                    double currentTotalMinutes;
-                    if (currentStateStartMinutes < currentStateEndMinutes) {
-                        currentTotalMinutes = currentStateEndMinutes - newStartMinutes;
-                    } else {
-                        currentTotalMinutes = (1440 - newStartMinutes) + currentStateEndMinutes;
-                    }
-
-                    if (currentTotalMinutes < 15) {
-                        newStartMinutes = currentStateStartMinutes.ToInt ();
-                    }
 
                     var previousState = stateInfo.previous.lightingState;
                     var previousStateStartMinutes = previousState.startTime.totalMinutes;
                     var previousStateEndMinutes = previousState.endTime.totalMinutes;
 
-                    double previousStateLength;
-                    if (previousStateStartMinutes < previousStateEndMinutes) {
-                        previousStateLength = newStartMinutes - previousStateStartMinutes;
-                    } else {
-                        previousStateLength = (1440 - previousStateStartMinutes) + newStartMinutes;
+                    var newStartMinutes = xDelta * minutesPerPixel + currentStateStartMinutes;
+                    bool crossedMidnight = false;
+                    if (newStartMinutes < 0) {
+                        newStartMinutes = 1439;
+                        crossedMidnight = true;
+                    } else if (newStartMinutes > 1439) {
+                        newStartMinutes = 0;
+                        crossedMidnight = true;
                     }
 
-                    if (previousState.type != LightingStateType.Off) {
-                        if (previousStateLength < 15) {
-                            newStartMinutes = currentStateStartMinutes.ToInt ();
+                    if (!crossedMidnight) {
+                        double currentTotalMinutes;
+                        if (currentStateStartMinutes < currentStateEndMinutes) {
+                            currentTotalMinutes = currentStateEndMinutes - newStartMinutes;
+                        } else {
+                            currentTotalMinutes = (1440 - newStartMinutes) + currentStateEndMinutes;
+                        }
+
+                        if (currentTotalMinutes < 1) {
+                            newStartMinutes = currentStateStartMinutes;
+                        }
+
+                        double previousStateLength;
+                        if (previousStateStartMinutes < previousStateEndMinutes) {
+                            previousStateLength = newStartMinutes - previousStateStartMinutes;
+                        } else {
+                            previousStateLength = (1440 - previousStateStartMinutes) + newStartMinutes;
+                        }
+
+                        if (previousStateLength < 1) {
+                            newStartMinutes = currentStateStartMinutes;
                         }
                     } else {
-                        if (previousStateLength < 0) {
-                            newStartMinutes = currentStateStartMinutes.ToInt ();
+                        var currentDifference = Math.Abs (currentStateEndMinutes - newStartMinutes);
+                        var previousDifference = Math.Abs (previousStateStartMinutes - newStartMinutes);
+
+                        if ((currentDifference < 1) || (previousDifference < 1)) {
+                            if (newStartMinutes < 1) {
+                                newStartMinutes = 1439;
+                            } else if (newStartMinutes > 1438) {
+                                newStartMinutes = 0;
+                            }
                         }
                     }
 
-                    var startTime = new Time (new TimeSpan (0, newStartMinutes, 0));
-                    Console.WriteLine ("Start time: {0}", startTime.ToShortTimeString ());
-
+                    var startTime = new Time (new TimeSpan (0, newStartMinutes.ToInt (), 0));
                     currentState.startTime = startTime;
                     previousState.endTime = startTime;
+                } else if (endButtonClicked) {
+                    var stateInfo = stateInfos[selectedState];
+
+                    var currentState = stateInfo.lightingState;
+                    var currentStateStartMinutes = currentState.startTime.totalMinutes;
+                    var currentStateEndMinutes = currentState.endTime.totalMinutes;
+
+                    var nextState = stateInfo.next.lightingState;
+                    var nextStateStartMinutes = nextState.startTime.totalMinutes;
+                    var nextStateEndMinutes = nextState.endTime.totalMinutes;
+
+                    var newEndMinutes = xDelta * minutesPerPixel + currentStateEndMinutes;
+                    bool crossedMidnight = false;
+                    if (newEndMinutes < 0) {
+                        newEndMinutes = 1439;
+                        crossedMidnight = true;
+                    } else if (newEndMinutes > 1439) {
+                        newEndMinutes = 0;
+                        crossedMidnight = true;
+                    }
+
+                    if (!crossedMidnight) {
+                        double currentTotalMinutes;
+                        if (currentStateStartMinutes < currentStateEndMinutes) {
+                            currentTotalMinutes = newEndMinutes - currentStateStartMinutes;
+                        } else {
+                            currentTotalMinutes = (1440 - currentStateStartMinutes) + newEndMinutes;
+                        }
+
+                        if (currentTotalMinutes < 1) {
+                            newEndMinutes = currentStateEndMinutes;
+                        }
+
+                        double nextStateLength;
+                        if (nextStateStartMinutes < nextStateEndMinutes) {
+                            nextStateLength = nextStateEndMinutes - newEndMinutes;
+                        } else {
+                            nextStateLength = (1440 - newEndMinutes) + nextStateEndMinutes;
+                        }
+
+                        if (nextStateLength < 1) {
+                            newEndMinutes = currentStateEndMinutes;
+                        }
+                    } else {
+                        var currentDifference = Math.Abs (newEndMinutes - currentStateStartMinutes);
+                        var previousDifference = Math.Abs (nextStateEndMinutes - newEndMinutes);
+
+                        if ((currentDifference < 1) || (previousDifference < 1)) {
+                            if (newEndMinutes < 1) {
+                                newEndMinutes = 1439;
+                            } else if (newEndMinutes > 1438) {
+                                newEndMinutes = 0;
+                            }
+                        }
+                    }
+
+                    var endTime = new Time (new TimeSpan (0, newEndMinutes.ToInt (), 0));
+                    currentState.endTime = endTime;
+                    nextState.startTime = endTime;
                 }
+
+                clickX = x;
 
                 QueueDraw ();
             }
