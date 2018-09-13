@@ -97,13 +97,26 @@ namespace GoodtimeDevelopment.TouchWidget
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
-                int height = Allocation.Height;
-                int width = Allocation.Width;
-                int top = Allocation.Top;
-                int left = Allocation.Left;
+                var left = Allocation.Left;
+                var width = Allocation.Width;
+                var top = Allocation.Top;
+                var bottom = Allocation.Bottom;
+                var height = Allocation.Height;
+
+                var outlineColor = new TouchColor (buttonColor);
+                outlineColor.ModifyColor (0.5);
+                var highlightColor = new TouchColor (buttonColor);
+                highlightColor.ModifyColor (1.4);
 
                 TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
-                buttonColor.SetSource (cr);
+                outlineColor.SetSource (cr);
+                cr.StrokePreserve ();
+
+                var grad = new LinearGradient (left, top, left, bottom);
+                grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
+
+                cr.SetSource (grad);
                 cr.Fill ();
 
                 render.Render (this, left + 3, top, width - 6, height);

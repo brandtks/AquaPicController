@@ -161,6 +161,10 @@ namespace GoodtimeDevelopment.TouchWidget
             }
         }
 
+        public Color ToCairoColor () {
+            return new Color (R, G, B, A);
+        }
+
         public static Color NewCairoColor (string color, double a = 1.0) {
             TouchColor c;
 
