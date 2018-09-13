@@ -116,16 +116,8 @@ namespace GoodtimeDevelopment.TouchWidget
 
         protected void OnTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
             if (enableTouch) {
-                TouchNumberInput t;
-
                 var parent = Toplevel as Window;
-                if (parent != null) {
-                    if (parent.IsTopLevel)
-                        t = new TouchNumberInput (includeTimeFunctions, parent);
-                    else
-                        t = new TouchNumberInput (includeTimeFunctions);
-                } else
-                    t = new TouchNumberInput (includeTimeFunctions);
+                var t = new TouchNumberInput (includeTimeFunctions, parent);
 
                 if (!string.IsNullOrWhiteSpace (name))
                     t.Title = name;
