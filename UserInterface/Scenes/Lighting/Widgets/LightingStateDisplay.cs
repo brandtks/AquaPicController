@@ -456,20 +456,44 @@ namespace AquaPic.UserInterface
                             stateInfo.startButtonXPos = startButtonX - left;
                             stateInfo.endButtonXPos = endButtonX - left;
 
+                            // State start adjustment button
                             TouchGlobal.DrawRoundedRectangle (cr, startButtonX, graphBottom - 10, 80, 20, 8);
                             var color = new TouchColor ("pri");
+                            color.ModifyColor (0.5);
+                            color.SetSource (cr);
+                            cr.StrokePreserve ();
+
+                            color = new TouchColor ("pri");
                             if (startButtonClicked) {
                                 color.ModifyColor (0.75);
                             }
-                            color.SetSource (cr);
+
+                            var highlightColor = new TouchColor (color);
+                            highlightColor.ModifyColor (1.25);
+                            var grad = new LinearGradient (startButtonX, graphBottom - 10, startButtonX, graphBottom + 10);
+                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                            grad.AddColorStop (0.2, color.ToCairoColor ());
+                            cr.SetSource (grad);
                             cr.Fill ();
 
+                            // State end adjustment button
                             TouchGlobal.DrawRoundedRectangle (cr, endButtonX, graphBottom - 10, 80, 20, 8);
                             color = new TouchColor ("pri");
-                            if (endButtonClicked) {
+                            color.ModifyColor (0.5);
+                            color.SetSource (cr);
+                            cr.StrokePreserve ();
+
+                            color = new TouchColor ("pri");
+                            if (startButtonClicked) {
                                 color.ModifyColor (0.75);
                             }
-                            color.SetSource (cr);
+
+                            highlightColor = new TouchColor (color);
+                            highlightColor.ModifyColor (1.25);
+                            grad = new LinearGradient (endButtonX, graphBottom - 10, endButtonX, graphBottom + 10);
+                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                            grad.AddColorStop (0.2, color.ToCairoColor ());
+                            cr.SetSource (grad);
                             cr.Fill ();
 
                             cr.Rectangle (startButtonX, graphBottom + 15, 80, 25);
@@ -498,7 +522,7 @@ namespace AquaPic.UserInterface
                 }
 
                 cr.MoveTo (timeXPos, timeYPos);
-                cr.Arc (timeXPos, timeYPos, 3, 0, 2 * Math.PI);
+                cr.Arc (timeXPos, timeYPos, 6, 0, 2 * Math.PI);
                 TouchColor.SetSource (cr, "seca");
                 cr.ClosePath ();
                 cr.Fill ();
@@ -600,8 +624,49 @@ namespace AquaPic.UserInterface
                 }
             }
 
+            if (selectedState != -1) {
+                if ((x > stateInfos[selectedState].startButtonXPos) &&
+                    (x < stateInfos[selectedState].startButtonXPos + 80) &&
+                    (y > graphBottomRelative + 15) &&
+                    (y < graphBottomRelative + 40)) 
+                {
+                    var parent = Toplevel as Window;
+                    var t = new TouchNumberInput (true, parent);
+                    t.Title = "Start Time";
+                    t.TextSetEvent += (o, a) => {
+                        try {
+                            stateInfos[selectedState].lightingState.startTime = Time.Parse (a.text);
+                            stateInfos[selectedState].previous.lightingState.endTime = stateInfos[selectedState].lightingState.startTime;
+                        } catch {
+                            a.keepText = false;
+                        }
+                    };
+
+                    t.Run ();
+                    t.Destroy ();
+                } else if ((x > stateInfos[selectedState].endButtonXPos) &&
+                           (x < stateInfos[selectedState].endButtonXPos + 80) &&
+                           (y > graphBottomRelative + 15) &&
+                           (y < graphBottomRelative + 40)) 
+                {
+                    var parent = Toplevel as Window;
+                    var t = new TouchNumberInput (true, parent);
+                    t.Title = "End Time";
+                    t.TextSetEvent += (o, a) => {
+                        try {
+                            stateInfos[selectedState].lightingState.endTime = Time.Parse (a.text);
+                            stateInfos[selectedState].next.lightingState.startTime = stateInfos[selectedState].lightingState.endTime;
+                        } catch {
+                            a.keepText = false;
+                        }
+                    };
+
+                    t.Run ();
+                    t.Destroy ();
+                }
+            }
+
             clicked = false;
-            clickHappenedOnEntity = false;
             startButtonClicked = false;
             endButtonClicked = false;
 
@@ -610,8 +675,7 @@ namespace AquaPic.UserInterface
 
         protected bool OnTimerEvent () {
             if (clicked) {
-                int x, y;
-                GetPointer (out x, out y);
+                GetPointer (out int x, out int y);
 
                 var yDelta = clickY - y;
                 var xDelta = x- clickX;
