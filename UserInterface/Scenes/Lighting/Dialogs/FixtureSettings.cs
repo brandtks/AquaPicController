@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using Gtk;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -41,8 +42,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public FixtureSettings (string fixtureName, bool includeDelete)
-            : base (fixtureName, includeDelete) {
+        public FixtureSettings (string fixtureName, bool includeDelete, Window parent)
+            : base (fixtureName, includeDelete, parent) {
             this.fixtureName = fixtureName;
 
             var t = new SettingsTextBox ("Name");

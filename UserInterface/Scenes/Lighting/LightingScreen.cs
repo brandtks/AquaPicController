@@ -198,7 +198,8 @@ namespace AquaPic.UserInterface
             fixtureSettingBtn.SetSizeRequest (30, 30);
             fixtureSettingBtn.buttonColor = "pri";
             fixtureSettingBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new FixtureSettings (fixtureName, fixtureName.IsNotEmpty ());
+                var parent = Toplevel as Window;
+                var s = new FixtureSettings (fixtureName, fixtureName.IsNotEmpty (), parent);
                 s.Run ();
                 var newFixtureName = s.newOrUpdatedFixtureName;
                 var outcome = s.outcome;
@@ -362,7 +363,8 @@ namespace AquaPic.UserInterface
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New fixture...") {
-                var s = new FixtureSettings (string.Empty, false);
+                var parent = Toplevel as Window;
+                var s = new FixtureSettings (string.Empty, false, parent);
                 s.Run ();
                 var newFixtureName = s.newOrUpdatedFixtureName;
                 var outcome = s.outcome;
