@@ -485,7 +485,7 @@ namespace AquaPic.UserInterface
                             cr.StrokePreserve ();
 
                             color = new TouchColor ("pri");
-                            if (startButtonClicked) {
+                            if (endButtonClicked) {
                                 color.ModifyColor (0.75);
                             }
 
@@ -722,14 +722,10 @@ namespace AquaPic.UserInterface
             var previousStartTime = stateInfos[selectedState].previous.lightingState.startTime;
 
             var difference = Math.Abs (newStartTime.ToTimeSpan ().Subtract (endTime.ToTimeSpan ()).TotalMinutes);
-            if (difference < 1 || difference > 1439) {
-                timeOkay = false;
-            }
+            timeOkay = (difference >= 1 && difference <= 1439);
 
             difference = Math.Abs (newStartTime.ToTimeSpan ().Subtract (previousStartTime.ToTimeSpan ()).TotalMinutes);
-            if (difference < 1 || difference > 1439) {
-                timeOkay = false;
-            }
+            timeOkay &= (difference >= 1 && difference <= 1439);
 
             if (timeOkay) {
                 stateInfos[selectedState].lightingState.startTime = newStartTime;
@@ -740,9 +736,7 @@ namespace AquaPic.UserInterface
                     totalLength += stateInfo.lightingState.lengthInMinutes;
                 }
 
-                if (totalLength > 1440) {
-                    timeOkay = false;
-                }
+                timeOkay = totalLength <= 1440;
 
                 if (!timeOkay) {
                     stateInfos[selectedState].lightingState.startTime = oldStartTime;
@@ -761,14 +755,10 @@ namespace AquaPic.UserInterface
             var nextEndTime = stateInfos[selectedState].next.lightingState.endTime;
 
             var difference = Math.Abs (newEndTime.ToTimeSpan ().Subtract (startTime.ToTimeSpan ()).TotalMinutes);
-            if (difference < 1 || difference > 1439) {
-                timeOkay = false;
-            }
+            timeOkay = (difference >= 1 && difference <= 1439);
 
             difference = Math.Abs (newEndTime.ToTimeSpan ().Subtract (nextEndTime.ToTimeSpan ()).TotalMinutes);
-            if (difference < 1 || difference > 1439) {
-                timeOkay = false;
-            }
+            timeOkay &= (difference >= 1 && difference <= 1439);
 
             if (timeOkay) {
                 stateInfos[selectedState].lightingState.endTime = newEndTime;
@@ -779,9 +769,7 @@ namespace AquaPic.UserInterface
                     totalLength += stateInfo.lightingState.lengthInMinutes;
                 }
 
-                if (totalLength > 1440) {
-                    timeOkay = false;
-                }
+                timeOkay = totalLength <= 1440;
 
                 if (!timeOkay) {
                     stateInfos[selectedState].lightingState.endTime = oldEndTime;
