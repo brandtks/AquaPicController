@@ -637,17 +637,9 @@ namespace AquaPic.UserInterface
                     t.Title = "Start Time";
                     t.TextSetEvent += (o, a) => {
                         try {
-                            var newStartTime = Time.Parse (a.text);
-                            var oldEndTime = stateInfos[selectedState].lightingState.endTime;
-                            var difference = Math.Abs (newStartTime.ToTimeSpan ().Subtract (oldEndTime.ToTimeSpan ()).TotalMinutes);
-                            if (difference < 1) {
+                            if (!SetNewStartTime (Time.Parse (a.text))) {
                                 a.keepText = false;
-                                MessageBox.Show ("Invalid start time. Too close to end time");
-                            }
-
-                            if (a.keepText) {
-                                stateInfos[selectedState].lightingState.startTime = newStartTime;
-                                stateInfos[selectedState].previous.lightingState.endTime = newStartTime;
+                                MessageBox.Show ("Invalid Start Time");
                             }
                         } catch {
                             a.keepText = false;
@@ -693,123 +685,23 @@ namespace AquaPic.UserInterface
                 var xDelta = x- clickX;
 
                 if (startButtonClicked) {
-                    var stateInfo = stateInfos[selectedState];
-
-                    var currentState = stateInfo.lightingState;
-                    var currentStateStartMinutes = currentState.startTime.totalMinutes;
-                    var currentStateEndMinutes = currentState.endTime.totalMinutes;
-
-                    var previousState = stateInfo.previous.lightingState;
-                    var previousStateStartMinutes = previousState.startTime.totalMinutes;
-                    var previousStateEndMinutes = previousState.endTime.totalMinutes;
-
-                    var newStartMinutes = xDelta * minutesPerPixel + currentStateStartMinutes;
-                    bool crossedMidnight = false;
+                    var newStartMinutes = xDelta * minutesPerPixel + stateInfos[selectedState].lightingState.startTime.totalMinutes;
                     if (newStartMinutes < 0) {
                         newStartMinutes = 1439;
-                        crossedMidnight = true;
                     } else if (newStartMinutes > 1439) {
                         newStartMinutes = 0;
-                        crossedMidnight = true;
                     }
-
-                    if (!crossedMidnight) {
-                        double currentTotalMinutes;
-                        if (currentStateStartMinutes < currentStateEndMinutes) {
-                            currentTotalMinutes = currentStateEndMinutes - newStartMinutes;
-                        } else {
-                            currentTotalMinutes = (1440 - newStartMinutes) + currentStateEndMinutes;
-                        }
-
-                        if (currentTotalMinutes < 1) {
-                            newStartMinutes = currentStateStartMinutes;
-                        }
-
-                        double previousStateLength;
-                        if (previousStateStartMinutes < previousStateEndMinutes) {
-                            previousStateLength = newStartMinutes - previousStateStartMinutes;
-                        } else {
-                            previousStateLength = (1440 - previousStateStartMinutes) + newStartMinutes;
-                        }
-
-                        if (previousStateLength < 1) {
-                            newStartMinutes = currentStateStartMinutes;
-                        }
-                    } else {
-                        var currentDifference = Math.Abs (currentStateEndMinutes - newStartMinutes);
-                        var previousDifference = Math.Abs (previousStateStartMinutes - newStartMinutes);
-
-                        if ((currentDifference < 1) || (previousDifference < 1)) {
-                            if (newStartMinutes < 1) {
-                                newStartMinutes = 1439;
-                            } else if (newStartMinutes > 1438) {
-                                newStartMinutes = 0;
-                            }
-                        }
-                    }
-
-                    var startTime = new Time (new TimeSpan (0, newStartMinutes.ToInt (), 0));
-                    currentState.startTime = startTime;
-                    previousState.endTime = startTime;
+                    var newStartTime = new Time (new TimeSpan (0, newStartMinutes.ToInt (), 0));
+                    SetNewStartTime (newStartTime);
                 } else if (endButtonClicked) {
-                    var stateInfo = stateInfos[selectedState];
-
-                    var currentState = stateInfo.lightingState;
-                    var currentStateStartMinutes = currentState.startTime.totalMinutes;
-                    var currentStateEndMinutes = currentState.endTime.totalMinutes;
-
-                    var nextState = stateInfo.next.lightingState;
-                    var nextStateStartMinutes = nextState.startTime.totalMinutes;
-                    var nextStateEndMinutes = nextState.endTime.totalMinutes;
-
-                    var newEndMinutes = xDelta * minutesPerPixel + currentStateEndMinutes;
-                    bool crossedMidnight = false;
+                    var newEndMinutes = xDelta * minutesPerPixel + stateInfos[selectedState].lightingState.endTime.totalMinutes;
                     if (newEndMinutes < 0) {
                         newEndMinutes = 1439;
-                        crossedMidnight = true;
                     } else if (newEndMinutes > 1439) {
                         newEndMinutes = 0;
-                        crossedMidnight = true;
                     }
-
-                    if (!crossedMidnight) {
-                        double currentTotalMinutes;
-                        if (currentStateStartMinutes < currentStateEndMinutes) {
-                            currentTotalMinutes = newEndMinutes - currentStateStartMinutes;
-                        } else {
-                            currentTotalMinutes = (1440 - currentStateStartMinutes) + newEndMinutes;
-                        }
-
-                        if (currentTotalMinutes < 1) {
-                            newEndMinutes = currentStateEndMinutes;
-                        }
-
-                        double nextStateLength;
-                        if (nextStateStartMinutes < nextStateEndMinutes) {
-                            nextStateLength = nextStateEndMinutes - newEndMinutes;
-                        } else {
-                            nextStateLength = (1440 - newEndMinutes) + nextStateEndMinutes;
-                        }
-
-                        if (nextStateLength < 1) {
-                            newEndMinutes = currentStateEndMinutes;
-                        }
-                    } else {
-                        var currentDifference = Math.Abs (newEndMinutes - currentStateStartMinutes);
-                        var previousDifference = Math.Abs (nextStateEndMinutes - newEndMinutes);
-
-                        if ((currentDifference < 1) || (previousDifference < 1)) {
-                            if (newEndMinutes < 1) {
-                                newEndMinutes = 1439;
-                            } else if (newEndMinutes > 1438) {
-                                newEndMinutes = 0;
-                            }
-                        }
-                    }
-
-                    var endTime = new Time (new TimeSpan (0, newEndMinutes.ToInt (), 0));
-                    currentState.endTime = endTime;
-                    nextState.startTime = endTime;
+                    var newEndTime = new Time (new TimeSpan (0, newEndMinutes.ToInt (), 0));
+                    SetNewEndTime (newEndTime);
                 }
 
                 clickX = x;
@@ -818,6 +710,84 @@ namespace AquaPic.UserInterface
             }
 
             return clicked;
+        }
+
+        bool SetNewStartTime (Time newStartTime) {
+            var timeOkay = true;
+
+            var oldStartTime = stateInfos[selectedState].lightingState.startTime;
+            var endTime = stateInfos[selectedState].lightingState.endTime;
+            var previousStartTime = stateInfos[selectedState].previous.lightingState.startTime;
+
+            var difference = Math.Abs (newStartTime.ToTimeSpan ().Subtract (endTime.ToTimeSpan ()).TotalMinutes);
+            if (difference < 1 || difference > 1439) {
+                timeOkay = false;
+            }
+
+            difference = Math.Abs (newStartTime.ToTimeSpan ().Subtract (previousStartTime.ToTimeSpan ()).TotalMinutes);
+            if (difference < 1 || difference > 1439) {
+                timeOkay = false;
+            }
+
+            if (timeOkay) {
+                stateInfos[selectedState].lightingState.startTime = newStartTime;
+                stateInfos[selectedState].previous.lightingState.endTime = newStartTime;
+
+                var totalLength = 0d;
+                foreach (var stateInfo in stateInfos) {
+                    totalLength += stateInfo.lightingState.lengthInMinutes;
+                }
+
+                if (totalLength > 1440) {
+                    timeOkay = false;
+                }
+
+                if (!timeOkay) {
+                    stateInfos[selectedState].lightingState.startTime = oldStartTime;
+                    stateInfos[selectedState].previous.lightingState.endTime = oldStartTime;
+                }
+            }
+
+            return timeOkay;
+        }
+
+        bool SetNewEndTime (Time newEndTime) {
+            var timeOkay = true;
+
+            var oldEndTime = stateInfos[selectedState].lightingState.endTime;
+            var startTime = stateInfos[selectedState].lightingState.startTime;
+            var nextEndTime = stateInfos[selectedState].next.lightingState.endTime;
+
+            var difference = Math.Abs (newEndTime.ToTimeSpan ().Subtract (startTime.ToTimeSpan ()).TotalMinutes);
+            if (difference < 1 || difference > 1439) {
+                timeOkay = false;
+            }
+
+            difference = Math.Abs (newEndTime.ToTimeSpan ().Subtract (nextEndTime.ToTimeSpan ()).TotalMinutes);
+            if (difference < 1 || difference > 1439) {
+                timeOkay = false;
+            }
+
+            if (timeOkay) {
+                stateInfos[selectedState].lightingState.endTime = newEndTime;
+                stateInfos[selectedState].next.lightingState.startTime = newEndTime;
+
+                var totalLength = 0d;
+                foreach (var stateInfo in stateInfos) {
+                    totalLength += stateInfo.lightingState.lengthInMinutes;
+                }
+
+                if (totalLength > 1440) {
+                    timeOkay = false;
+                }
+
+                if (!timeOkay) {
+                    stateInfos[selectedState].lightingState.endTime = oldEndTime;
+                    stateInfos[selectedState].next.lightingState.startTime = oldEndTime;
+                }
+            }
+
+            return timeOkay;
         }
 
         class StateInfo
