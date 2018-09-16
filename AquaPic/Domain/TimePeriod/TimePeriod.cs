@@ -30,6 +30,14 @@ namespace AquaPic.Runtime
     {
         public Time startTime;
         public Time endTime;
+        public double lengthInMinutes {
+            get {
+                if (startTime.Before (endTime)) {
+                    return endTime.totalMinutes - startTime.totalMinutes;
+                } 
+                return (1440 - startTime.totalMinutes) + endTime.totalMinutes;
+            }
+        }
 
         public TimePeriod (string startTimeDescriptor, string endTimeDescriptor) {
             startTime = ParseTimeDescriptor (startTimeDescriptor);

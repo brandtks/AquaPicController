@@ -61,6 +61,12 @@ namespace AquaPic.Modules
             }
         }
 
+        public double lengthInMinutes {
+            get {
+                return timePeriod.lengthInMinutes;
+            }
+        }
+
         public LightingStateType type;
         public float startingDimmingLevel;
         public float endingDimmingLevel;
