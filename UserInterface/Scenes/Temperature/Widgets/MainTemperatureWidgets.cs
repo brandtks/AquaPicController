@@ -43,8 +43,7 @@ namespace AquaPic.UserInterface
             eventbox.VisibleWindow = false;
             eventbox.SetSizeRequest (WidthRequest, HeightRequest);
             eventbox.ButtonReleaseEvent += (o, args) => {
-                var topWidget = this.Toplevel;
-                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Temperature", topWidget, AquaPicGui.AquaPicUserInterface.currentScene);
+                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Temperature", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
             };
             Put (eventbox, 0, 0);
             eventbox.Show ();

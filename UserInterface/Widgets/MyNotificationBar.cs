@@ -129,8 +129,7 @@ namespace AquaPic.UserInterface
 
         protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
             if ((args.Event.X >= 0.0) && (args.Event.X <= 250.0)) {
-                var tl = this.Toplevel;
-                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Alarms", tl, AquaPicGui.AquaPicUserInterface.currentScene);
+                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Alarms", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
             }
         }
 

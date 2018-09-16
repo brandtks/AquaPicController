@@ -138,11 +138,6 @@ namespace AquaPic.UserInterface
 
         protected void OnClearButtonRelease (object sender, ButtonReleaseEventArgs args) {
             var parent = Toplevel as Window;
-            if (parent != null) {
-                if (!parent.IsTopLevel)
-                    parent = null;
-            }
-
             var ms = new TouchDialog ("Save events before clearing", parent);
 
             ms.Response += (o, a) => {
@@ -152,11 +147,7 @@ namespace AquaPic.UserInterface
                 } else if (a.ResponseId == ResponseType.No) {
                     ms.Destroy ();
 
-                    var parent2 = this.Toplevel as Gtk.Window;
-                    if (parent != null) {
-                        if (!parent.IsTopLevel)
-                            parent = null;
-                    }
+                    var parent2 = Toplevel as Window;
                     var d = new TouchDialog ("Are you sure you want to clear all the contents of the event logger", parent2);
 
                     d.Response += (obj, arg) => {

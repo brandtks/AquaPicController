@@ -317,11 +317,6 @@ namespace AquaPic.UserInterface
 
             if (message.IsNotEmpty ()) {
                 var parent = Toplevel as Window;
-                if (parent != null) {
-                    if (!parent.IsTopLevel)
-                        parent = null;
-                }
-
                 var ms = new TouchDialog (message + "\n" +
                     "Are you sure you want to use this configuration", parent);
 

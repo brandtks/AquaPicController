@@ -212,11 +212,6 @@ namespace AquaPic.UserInterface
         protected override bool OnDelete (object sender) {
             if (groupName == Temperature.defaultTemperatureGroup) {
                 var parent = Toplevel as Window;
-                if (parent != null) {
-                    if (!parent.IsTopLevel)
-                        parent = null;
-                }
-
                 var ms = new TouchDialog (groupName + " is the default temperature group.\n" +
                     "Are you sure you want to delete this group", parent);
 

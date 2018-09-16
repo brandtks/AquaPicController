@@ -116,11 +116,6 @@ namespace AquaPic.UserInterface
                 GetCardData ();
             } else {
                 var parent = Toplevel as Window;
-                if (parent != null) {
-                    if (!parent.IsTopLevel)
-                        parent = null;
-                }
-
                 var numberInput = new TouchNumberInput (false, parent);
                 numberInput.Title = "Address";
 
@@ -158,11 +153,6 @@ namespace AquaPic.UserInterface
             if (card.IsNotEmpty ()) {
                 if (AquaPicDrivers.DigitalInput.CheckCardEmpty (card)) {
                     var parent = Toplevel as Window;
-                    if (parent != null) {
-                        if (!parent.IsTopLevel)
-                            parent = null;
-                    }
-
                     var ms = new TouchDialog ("Are you sure you with to delete " + card, parent);
 
                     ms.Response += (o, a) => {

@@ -69,8 +69,7 @@ namespace AquaPic.UserInterface
                     b.text = "Back\n" + lastScreen;
 
                     b.ButtonReleaseEvent += (o, args) => {
-                        var tl = this.Toplevel;
-                        AquaPicGui.AquaPicUserInterface.ChangeScreens (lastScreen, tl, AquaPicGui.AquaPicUserInterface.currentScene);
+                        AquaPicGui.AquaPicUserInterface.ChangeScreens (lastScreen, Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
                     };
                     Put (b, 575, 405);
                     b.Show ();

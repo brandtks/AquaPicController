@@ -65,9 +65,7 @@ namespace AquaPic.UserInterface
 
         protected void OnButtonClick (object sender, ButtonReleaseEventArgs args) {
             TouchButton b = sender as TouchButton;
-
-            var tl = this.Toplevel;
-            AquaPicGui.AquaPicUserInterface.ChangeScreens (b.text, tl, AquaPicGui.AquaPicUserInterface.currentScene);
+            AquaPicGui.AquaPicUserInterface.ChangeScreens (b.text, Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
         }
     }
 }

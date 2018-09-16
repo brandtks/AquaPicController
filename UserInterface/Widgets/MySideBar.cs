@@ -247,8 +247,7 @@ namespace AquaPic.UserInterface
                     if (x <= 250) {
                         if (y.WithinRange (Allocation.Height / 2 + Allocation.Top, 15)) {
                             if (windows[highlighedScreenIndex] != AquaPicGui.AquaPicUserInterface.currentScene) {
-                                var topWidget = this.Toplevel;
-                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], topWidget, AquaPicGui.AquaPicUserInterface.currentScene);
+                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
                             } else {
                                 CollapseMenu ();
                             }
@@ -267,8 +266,7 @@ namespace AquaPic.UserInterface
                             }
 
                             if (windows[highlighedScreenIndex] != AquaPicGui.AquaPicUserInterface.currentScene) {
-                                var topWidget = this.Toplevel;
-                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], topWidget, AquaPicGui.AquaPicUserInterface.currentScene);
+                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
                             } else {
                                 CollapseMenu ();
                             }
