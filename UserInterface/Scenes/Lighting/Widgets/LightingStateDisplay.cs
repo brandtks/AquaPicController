@@ -637,7 +637,7 @@ namespace AquaPic.UserInterface
                     t.Title = "Start Time";
                     t.TextSetEvent += (o, a) => {
                         try {
-                            if (!SetNewStartTime (Time.Parse (a.text))) {
+                            if (!ValidateAndSetStartTime (Time.Parse (a.text))) {
                                 a.keepText = false;
                                 MessageBox.Show ("Invalid Start Time");
                             }
@@ -658,8 +658,10 @@ namespace AquaPic.UserInterface
                     t.Title = "End Time";
                     t.TextSetEvent += (o, a) => {
                         try {
-                            stateInfos[selectedState].lightingState.endTime = Time.Parse (a.text);
-                            stateInfos[selectedState].next.lightingState.startTime = stateInfos[selectedState].lightingState.endTime;
+                            if (!ValidateAndSetEndTime (Time.Parse (a.text))) {
+                                a.keepText = false;
+                                MessageBox.Show ("Invalid End Time");
+                            }
                         } catch {
                             a.keepText = false;
                         }
@@ -692,7 +694,7 @@ namespace AquaPic.UserInterface
                         newStartMinutes = 0;
                     }
                     var newStartTime = new Time (new TimeSpan (0, newStartMinutes.ToInt (), 0));
-                    SetNewStartTime (newStartTime);
+                    ValidateAndSetStartTime (newStartTime);
                 } else if (endButtonClicked) {
                     var newEndMinutes = xDelta * minutesPerPixel + stateInfos[selectedState].lightingState.endTime.totalMinutes;
                     if (newEndMinutes < 0) {
@@ -701,7 +703,7 @@ namespace AquaPic.UserInterface
                         newEndMinutes = 0;
                     }
                     var newEndTime = new Time (new TimeSpan (0, newEndMinutes.ToInt (), 0));
-                    SetNewEndTime (newEndTime);
+                    ValidateAndSetEndTime (newEndTime);
                 }
 
                 clickX = x;
@@ -712,7 +714,7 @@ namespace AquaPic.UserInterface
             return clicked;
         }
 
-        bool SetNewStartTime (Time newStartTime) {
+        bool ValidateAndSetStartTime (Time newStartTime) {
             var timeOkay = true;
 
             var oldStartTime = stateInfos[selectedState].lightingState.startTime;
@@ -751,7 +753,7 @@ namespace AquaPic.UserInterface
             return timeOkay;
         }
 
-        bool SetNewEndTime (Time newEndTime) {
+        bool ValidateAndSetEndTime (Time newEndTime) {
             var timeOkay = true;
 
             var oldEndTime = stateInfos[selectedState].lightingState.endTime;
