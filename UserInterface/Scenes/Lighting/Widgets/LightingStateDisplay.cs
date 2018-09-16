@@ -470,11 +470,12 @@ namespace AquaPic.UserInterface
 
                             var highlightColor = new TouchColor (color);
                             highlightColor.ModifyColor (1.25);
-                            var grad = new LinearGradient (startButtonX, graphBottom - 10, startButtonX, graphBottom + 10);
-                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
-                            grad.AddColorStop (0.2, color.ToCairoColor ());
-                            cr.SetSource (grad);
-                            cr.Fill ();
+                            using (var grad = new LinearGradient (startButtonX, graphBottom - 10, startButtonX, graphBottom + 10)) {
+                                grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                                grad.AddColorStop (0.2, color.ToCairoColor ());
+                                cr.SetSource (grad);
+                                cr.Fill ();
+                            }
 
                             // State end adjustment button
                             TouchGlobal.DrawRoundedRectangle (cr, endButtonX, graphBottom - 10, 80, 20, 8);
@@ -490,11 +491,12 @@ namespace AquaPic.UserInterface
 
                             highlightColor = new TouchColor (color);
                             highlightColor.ModifyColor (1.25);
-                            grad = new LinearGradient (endButtonX, graphBottom - 10, endButtonX, graphBottom + 10);
-                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
-                            grad.AddColorStop (0.2, color.ToCairoColor ());
-                            cr.SetSource (grad);
-                            cr.Fill ();
+                            using (var grad = new LinearGradient (endButtonX, graphBottom - 10, endButtonX, graphBottom + 10)) {
+                                grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                                grad.AddColorStop (0.2, color.ToCairoColor ());
+                                cr.SetSource (grad);
+                                cr.Fill ();
+                            }
 
                             cr.Rectangle (startButtonX, graphBottom + 15, 80, 25);
                             TouchColor.SetSource (cr, "grey4");
@@ -635,8 +637,18 @@ namespace AquaPic.UserInterface
                     t.Title = "Start Time";
                     t.TextSetEvent += (o, a) => {
                         try {
-                            stateInfos[selectedState].lightingState.startTime = Time.Parse (a.text);
-                            stateInfos[selectedState].previous.lightingState.endTime = stateInfos[selectedState].lightingState.startTime;
+                            var newStartTime = Time.Parse (a.text);
+                            var oldEndTime = stateInfos[selectedState].lightingState.endTime;
+                            var difference = Math.Abs (newStartTime.ToTimeSpan ().Subtract (oldEndTime.ToTimeSpan ()).TotalMinutes);
+                            if (difference < 1) {
+                                a.keepText = false;
+                                MessageBox.Show ("Invalid start time. Too close to end time");
+                            }
+
+                            if (a.keepText) {
+                                stateInfos[selectedState].lightingState.startTime = newStartTime;
+                                stateInfos[selectedState].previous.lightingState.endTime = newStartTime;
+                            }
                         } catch {
                             a.keepText = false;
                         }

@@ -112,12 +112,12 @@ namespace GoodtimeDevelopment.TouchWidget
                 outlineColor.SetSource (cr);
                 cr.StrokePreserve ();
 
-                var grad = new LinearGradient (left, top, left, bottom);
-                grad.AddColorStop (0, highlightColor.ToCairoColor ());
-                grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
-
-                cr.SetSource (grad);
-                cr.Fill ();
+                using (var grad = new LinearGradient (left, top, left, bottom)) {
+                    grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                    grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
+                    cr.SetSource (grad);
+                    cr.Fill ();
+                }
 
                 render.Render (this, left + 3, top, width - 6, height);
             }
