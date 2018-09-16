@@ -123,10 +123,11 @@ namespace AquaPic.UserInterface
             if (owner == "Power") {
                 string n = string.Format ("{0}.p{1}", ic.Group, ic.Individual);
                 OutletSettings os;
+                var parent = Toplevel as Window;
                 if (n == outletName.text)
-                    os = new OutletSettings (outletName.text, false, ic);
+                    os = new OutletSettings (outletName.text, false, ic, parent);
                 else
-                    os = new OutletSettings (outletName.text, true, ic);
+                    os = new OutletSettings (outletName.text, true, ic, parent);
 
                 os.Run ();
 

@@ -53,11 +53,11 @@ namespace AquaPic.UserInterface
         public TouchButton cancelButton;
         public TouchButton deleteButton;
 
-        public TouchSettingsDialog (string name, Window parent = null) : this (name, false, 320, parent) { }
+        public TouchSettingsDialog (string name, Window parent) : this (name, false, 320, parent) { }
 
-        public TouchSettingsDialog (string name, bool includeDelete, Window parent = null) : this (name, includeDelete, 320, parent) { }
+        public TouchSettingsDialog (string name, bool includeDelete, Window parent) : this (name, includeDelete, 320, parent) { }
 
-        public TouchSettingsDialog (string name, bool includeDelete, int height, Window parent = null) : base ("Settings", parent, DialogFlags.DestroyWithParent){
+        public TouchSettingsDialog (string name, bool includeDelete, int height, Window parent) : base ("Settings", parent, DialogFlags.DestroyWithParent){
             Name = "AquaPic.Settings." + name;
             Title = name + " Settings";
             WindowPosition = (WindowPosition)4;

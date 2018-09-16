@@ -122,7 +122,8 @@ namespace AquaPic.UserInterface
             globalSettingsBtn.SetSizeRequest (30, 30);
             globalSettingsBtn.buttonColor = "pri";
             globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new TemperatureGroupSettings (groupName, !groupName.IsEmpty ());
+                var parent = Toplevel as Window;
+                var s = new TemperatureGroupSettings (groupName, !groupName.IsEmpty (), parent);
                 s.Run ();
                 var newGroupName = s.temperatureGroupName;
                 var outcome = s.outcome;
@@ -170,7 +171,8 @@ namespace AquaPic.UserInterface
             heaterSetupBtn.SetSizeRequest (30, 30);
             heaterSetupBtn.buttonColor = "pri";
             heaterSetupBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new HeaterSettings (heaterName, heaterName.IsNotEmpty ());
+                var parent = Toplevel as Window;
+                var s = new HeaterSettings (heaterName, heaterName.IsNotEmpty (), parent);
                 s.Run ();
                 var newHeaterName = s.newOrUpdatedHeaterName;
                 var outcome = s.outcome;
@@ -214,7 +216,8 @@ namespace AquaPic.UserInterface
             probeSetupBtn.SetSizeRequest (30, 30);
             probeSetupBtn.buttonColor = "pri";
             probeSetupBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new ProbeSettings (probeName, probeName.IsNotEmpty ());
+                var parent = Toplevel as Window;
+                var s = new ProbeSettings (probeName, probeName.IsNotEmpty (), parent);
                 s.Run ();
                 var newProbeName = s.newOrUpdatedProbeName;
                 var outcome = s.outcome;
@@ -360,8 +363,8 @@ namespace AquaPic.UserInterface
         protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New heater...") {
                 var heaterCount = Temperature.heaterCount;
-
-                var s = new HeaterSettings (string.Empty, false);
+                var parent = Toplevel as Window;
+                var s = new HeaterSettings (string.Empty, false, parent);
                 s.Run ();
                 var newHeaterName = s.newOrUpdatedHeaterName;
                 var outcome = s.outcome;
@@ -385,7 +388,8 @@ namespace AquaPic.UserInterface
 
         protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New probe...") {
-                var s = new ProbeSettings (string.Empty, false);
+                var parent = Toplevel as Window;
+                var s = new ProbeSettings (string.Empty, false, parent);
                 s.Run ();
                 var newProbeName = s.newOrUpdatedProbeName;
                 var outcome = s.outcome;
@@ -409,7 +413,8 @@ namespace AquaPic.UserInterface
 
         protected void OnGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New group...") {
-                var s = new TemperatureGroupSettings (string.Empty, false);
+                var parent = Toplevel as Window;
+                var s = new TemperatureGroupSettings (string.Empty, false, parent);
                 s.Run ();
                 var newGroupName = s.temperatureGroupName;
                 var outcome = s.outcome;

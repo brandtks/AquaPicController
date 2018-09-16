@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using Gtk;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -41,8 +42,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public AnalogSensorSettings (string name, bool includeDelete)
-            : base (name, includeDelete) {
+        public AnalogSensorSettings (string name, bool includeDelete, Window parent)
+            : base (name, includeDelete, parent) {
             analogSensorName = name;
             var analogSensorNameNotEmpty = analogSensorName.IsNotEmpty ();
 

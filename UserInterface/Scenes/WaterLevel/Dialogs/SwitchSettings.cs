@@ -43,8 +43,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public SwitchSettings (string name, bool includeDelete)
-            : base (name, includeDelete) {
+        public SwitchSettings (string name, bool includeDelete, Window parent)
+            : base (name, includeDelete, parent) {
             switchName = name;
 
             var t = new SettingsTextBox ("Name");

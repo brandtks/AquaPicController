@@ -24,7 +24,6 @@
 using System;
 using System.IO;
 using Gtk;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -41,8 +40,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public TemperatureGroupSettings (string name, bool includeDelete)
-            : base (name + " Temperature", includeDelete) {
+        public TemperatureGroupSettings (string name, bool includeDelete, Window parent)
+            : base (name + " Temperature", includeDelete, parent) {
             groupName = name;
 
             var t = new SettingsTextBox ("Name");

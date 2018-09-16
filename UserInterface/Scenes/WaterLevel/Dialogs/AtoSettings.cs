@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using Gtk;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -39,8 +40,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public AtoSettings (string name, bool includeDelete)
-            : base (name + " Auto Top Off", includeDelete) {
+        public AtoSettings (string name, bool includeDelete, Window parent)
+            : base (name + " Auto Top Off", includeDelete, parent) {
             groupName = name;
 
             var t = new SettingsTextBox ("Name");

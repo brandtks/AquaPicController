@@ -23,6 +23,7 @@
 
 using System;
 using System.IO;
+using Gtk;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -41,8 +42,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public HeaterSettings (string heaterName, bool includeDelete)
-            : base (heaterName, includeDelete) {
+        public HeaterSettings (string heaterName, bool includeDelete, Window parent)
+            : base (heaterName, includeDelete, parent) {
             this.heaterName = heaterName;
 
             var t = new SettingsTextBox ("Name");

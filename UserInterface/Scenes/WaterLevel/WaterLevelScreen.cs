@@ -95,7 +95,8 @@ namespace AquaPic.UserInterface
             globalSettingsBtn.SetSizeRequest (30, 30);
             globalSettingsBtn.buttonColor = "pri";
             globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new WaterGroupSettings (groupName, groupName.IsNotEmpty ());
+                var parent = Toplevel as Window;
+                var s = new WaterGroupSettings (groupName, groupName.IsNotEmpty (), parent);
                 s.Run ();
                 var newGroupName = s.waterLevelGroupName;
                 var outcome = s.outcome;
@@ -141,7 +142,8 @@ namespace AquaPic.UserInterface
             atoSettingsBtn.SetSizeRequest (30, 30);
             atoSettingsBtn.buttonColor = "pri";
             atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new AtoSettings (atoGroupName, atoGroupName.IsNotEmpty ());
+                var parent = Toplevel as Window;
+                var s = new AtoSettings (atoGroupName, atoGroupName.IsNotEmpty (), parent);
                 s.Run ();
                 var newAtoGroupName = s.atoGroupName;
                 var outcome = s.outcome;
@@ -215,7 +217,8 @@ namespace AquaPic.UserInterface
             settingsBtn.SetSizeRequest (30, 30);
             settingsBtn.buttonColor = "pri";
             settingsBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new AnalogSensorSettings (analogSensorName, analogSensorName.IsNotEmpty ());
+                var parent = Toplevel as Window;
+                var s = new AnalogSensorSettings (analogSensorName, analogSensorName.IsNotEmpty (), parent);
                 s.Run ();
                 var newAnalogSensorName = s.newOrUpdatedAnalogSensorName;
                 var outcome = s.outcome;
@@ -321,7 +324,8 @@ namespace AquaPic.UserInterface
             switchSetupBtn.SetSizeRequest (30, 30);
             switchSetupBtn.buttonColor = "pri";
             switchSetupBtn.ButtonReleaseEvent += (o, args) => {
-                var s = new SwitchSettings (switchName, switchName.IsNotEmpty ());
+                var parent = Toplevel as Window;
+                var s = new SwitchSettings (switchName, switchName.IsNotEmpty (), parent);
                 s.Run ();
                 var newSwitchName = s.newOrUpdatedFloatSwitchName;
                 var outcome = s.outcome;
@@ -440,7 +444,8 @@ namespace AquaPic.UserInterface
 
         protected void OnGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New group...") {
-                var s = new WaterGroupSettings (string.Empty, false);
+                var parent = Toplevel as Window;
+                var s = new WaterGroupSettings (string.Empty, false, parent);
                 s.Run ();
                 var newGroupName = s.waterLevelGroupName;
                 var outcome = s.outcome;
@@ -463,7 +468,8 @@ namespace AquaPic.UserInterface
 
         protected void OnAtoGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New ATO...") {
-                var s = new AtoSettings (string.Empty, false);
+                var parent = Toplevel as Window;
+                var s = new AtoSettings (string.Empty, false, parent);
                 s.Run ();
                 var newGroupName = s.atoGroupName;
                 var outcome = s.outcome;
@@ -485,7 +491,8 @@ namespace AquaPic.UserInterface
 
         protected void OnAnalogSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New level sensor...") {
-                var s = new AnalogSensorSettings (string.Empty, false);
+                var parent = Toplevel as Window;
+                var s = new AnalogSensorSettings (string.Empty, false, parent);
                 s.Run ();
                 var newAnalogSensorName = s.newOrUpdatedAnalogSensorName;
                 var outcome = s.outcome;
@@ -507,7 +514,8 @@ namespace AquaPic.UserInterface
 
         protected void OnSwitchComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New switch...") {
-                var s = new SwitchSettings (string.Empty, false);
+                var parent = Toplevel as Window;
+                var s = new SwitchSettings (string.Empty, false, parent);
                 s.Run ();
                 var newSwitchName = s.newOrUpdatedFloatSwitchName;
                 var outcome = s.outcome;

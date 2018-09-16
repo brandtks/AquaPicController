@@ -41,8 +41,8 @@ namespace AquaPic.UserInterface
         public TextView tv;
         public IndividualControl ic;
 
-        public OutletSettings (string name, bool includeDelete, IndividualControl ic)
-            : base (name, includeDelete, 400) {
+        public OutletSettings (string name, bool includeDelete, IndividualControl ic, Window parent)
+            : base (name, includeDelete, 400, parent) {
             this.ic = ic;
 
             tv = new TextView ();
