@@ -490,7 +490,7 @@ namespace AquaPic.UserInterface
                             }
 
                             highlightColor = new TouchColor (color);
-                            highlightColor.ModifyColor (1.25);
+                            highlightColor.ModifyColor (1.1);
                             using (var grad = new LinearGradient (endButtonX, graphBottom - 10, endButtonX, graphBottom + 10)) {
                                 grad.AddColorStop (0, highlightColor.ToCairoColor ());
                                 grad.AddColorStop (0.2, color.ToCairoColor ());
