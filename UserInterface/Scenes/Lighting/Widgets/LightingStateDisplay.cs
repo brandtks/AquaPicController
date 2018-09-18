@@ -33,13 +33,14 @@ namespace AquaPic.UserInterface
 {
     public class LightingStateDisplay : EventBox
     {
-        bool clicked, startButtonClicked, endButtonClicked;
+        bool clicked, startButtonClicked, endButtonClicked, deleteButtonClicked;
         uint clickTimer;
         int clickX, clickY;
         int selectedState;
 
         const int graphVericalEdgeWidth = 40;
-        const int graphHorizontalEdgeWidth = 60;
+        const int graphTopEdgeWidth = 60;
+        const int graphBottomEdgeWidth = 40;
         int graphLeftRelative, graphRightRelative, graphTopRelative, graphBottomRelative;
         double minutesPerPixel;
 
@@ -51,7 +52,7 @@ namespace AquaPic.UserInterface
             SetSizeRequest (540, 360);
 
             graphLeftRelative = graphVericalEdgeWidth;
-            graphTopRelative = graphHorizontalEdgeWidth;
+            graphTopRelative = graphTopEdgeWidth;
             selectedState = -1;
             stateInfos = new List<StateInfo> ();
 
@@ -75,21 +76,19 @@ namespace AquaPic.UserInterface
             var midX = (graphRightRelative - graphVericalEdgeWidth) / 2 + graphLeft;
 
             var top = Allocation.Top;
-            var graphTop = top + graphHorizontalEdgeWidth;
+            var graphTop = top + graphTopEdgeWidth;
             var bottom = Allocation.Bottom;
-            var graphBottom = bottom - graphHorizontalEdgeWidth;
+            var graphBottom = bottom - graphBottomEdgeWidth;
             var height = Allocation.Height;
-            graphBottomRelative = height - graphHorizontalEdgeWidth;
-            var midY = (graphBottomRelative - graphHorizontalEdgeWidth) / 2 + graphTop;
+            graphBottomRelative = height - graphBottomEdgeWidth;
+            var midY = (graphBottomRelative - graphTopEdgeWidth) / 2 + graphTop;
 
             minutesPerPixel = 1440d / (graphRightRelative - graphLeftRelative);
 
             using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
-                /*
                 cr.Rectangle (left, top, width, height);
                 TouchColor.SetSource (cr, "grey1");
                 cr.Stroke ();
-                */
 
                 // Draw the graph outline
                 cr.MoveTo (graphLeft - 5, graphTop);
@@ -355,7 +354,6 @@ namespace AquaPic.UserInterface
                                     break;
                                 }
                             case LightingStateType.ParabolaRamp: {
-                                    delta = Math.Abs (delta);
                                     double interYPos = graphBottom;
 
                                     if (state.startTime.Before (state.endTime)) {
@@ -385,7 +383,6 @@ namespace AquaPic.UserInterface
                                     break;
                                 }
                             case LightingStateType.HalfParabolaRamp: {
-                                    delta = Math.Abs (delta);
                                     double mapFrom1, mapFrom2, basePoint;
                                     if (startYPos <= endYPos) {
                                         mapFrom1 = 1d;
@@ -498,6 +495,7 @@ namespace AquaPic.UserInterface
                                 cr.Fill ();
                             }
 
+                            // Start time textbox
                             cr.Rectangle (startButtonX, graphBottom + 15, 80, 25);
                             TouchColor.SetSource (cr, "grey4");
                             cr.FillPreserve ();
@@ -509,6 +507,7 @@ namespace AquaPic.UserInterface
                             text.font.color = "black";
                             text.Render (this, startButtonX.ToInt (), graphBottom + 18, 80);
 
+                            // End time textbox
                             cr.Rectangle (endButtonX, graphBottom + 15, 80, 25);
                             TouchColor.SetSource (cr, "grey4");
                             cr.FillPreserve ();
@@ -519,6 +518,39 @@ namespace AquaPic.UserInterface
                             text.alignment = TouchAlignment.Center;
                             text.font.color = "black";
                             text.Render (this, endButtonX.ToInt (), graphBottom + 18, 80);
+
+                            // Delete button
+                            double deleteButtonX, deleteButtonY;
+                            if (state.startTime.Before (state.endTime)) {
+                                deleteButtonX = period / 2 + startXPos;
+                            } else {
+                                if (rightPart > (period / 2)) {
+                                    deleteButtonX = rightPart / 2 + startXPos;
+                                } else {
+                                    deleteButtonX = (period - rightPart) / 2 + graphLeft;
+                                }
+                            }
+
+                            if (startYPos > endYPos) {
+                                deleteButtonY = (graphBottom - endYPos) / 2 + endYPos;
+                            } else {
+                                deleteButtonY = (graphBottom - startYPos) / 2 + startYPos;
+                            }
+
+                            stateInfo.deleteButtonXPos = deleteButtonX - left;
+                            stateInfo.deleteButtonYPos = deleteButtonY - top;
+
+                            cr.MoveTo (deleteButtonX, deleteButtonY);
+                            cr.Arc (deleteButtonX, deleteButtonY, 15, 0, 2 * Math.PI);
+                            TouchColor.SetSource (cr, "compl");
+                            cr.Fill ();
+
+                            cr.MoveTo (deleteButtonX - 6, deleteButtonY - 6);
+                            cr.LineTo (deleteButtonX + 6, deleteButtonY + 6);
+                            cr.MoveTo (deleteButtonX + 6, deleteButtonY - 6);
+                            cr.LineTo (deleteButtonX - 6, deleteButtonY + 6);
+                            TouchColor.SetSource (cr, "grey2");
+                            cr.Stroke ();
                         }
                     }
                 }
@@ -565,8 +597,9 @@ namespace AquaPic.UserInterface
             clickY = args.Event.Y.ToInt ();
 
             if (selectedState != -1) {
+                var stateInfo = stateInfos[selectedState];
+
                 if ((clickY > graphBottomRelative - 10) && (clickY < graphBottomRelative + 10)) {
-                    var stateInfo = stateInfos[selectedState];
                     if ((clickX > stateInfo.startButtonXPos) && (clickX < stateInfo.startButtonXPos + 80)) {
                         startButtonClicked = true;
                         clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
@@ -577,6 +610,11 @@ namespace AquaPic.UserInterface
                         clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
                     }
                 }
+
+                if ((clickX > stateInfo.deleteButtonXPos - 12) && (clickX < stateInfo.deleteButtonXPos + 12) &&
+                    (clickY > stateInfo.deleteButtonYPos - 12) && (clickY < stateInfo.deleteButtonYPos + 12)) {
+                    deleteButtonClicked = true;
+                }
             }
         }
 
@@ -584,13 +622,11 @@ namespace AquaPic.UserInterface
             var x = args.Event.X;
             var y = args.Event.Y;
 
-            var clickHappenedOnEntity = startButtonClicked | endButtonClicked;
+            var clickHappenedOnEntity = startButtonClicked | endButtonClicked | deleteButtonClicked;
             if (!clickHappenedOnEntity) {
                 // The release happened on the graph
-                if ((x > graphLeftRelative) && 
-                    (x < graphRightRelative) &&
-                    (y > graphTopRelative) &&
-                    (y < graphBottomRelative)) {
+                if ((x > graphLeftRelative) && (x < graphRightRelative) &&
+                    (y > graphTopRelative) && (y < graphBottomRelative)) {
                     for (var i = 0; i < stateInfos.Count; ++i) {
                         var stateInfo = stateInfos[i];
                         var state = stateInfo.lightingState;
@@ -624,14 +660,11 @@ namespace AquaPic.UserInterface
                         }
                     }
                 }
-            }
+            } else {
+                var stateInfo = stateInfos[selectedState];
 
-            if (selectedState != -1) {
-                if ((x > stateInfos[selectedState].startButtonXPos) &&
-                    (x < stateInfos[selectedState].startButtonXPos + 80) &&
-                    (y > graphBottomRelative + 15) &&
-                    (y < graphBottomRelative + 40)) 
-                {
+                if ((x > stateInfo.startButtonXPos) && (x < stateInfo.startButtonXPos + 80) &&
+                    (y > graphBottomRelative + 15) && (y < graphBottomRelative + 40)) {
                     var parent = Toplevel as Window;
                     var t = new TouchNumberInput (true, parent);
                     t.Title = "Start Time";
@@ -648,11 +681,8 @@ namespace AquaPic.UserInterface
 
                     t.Run ();
                     t.Destroy ();
-                } else if ((x > stateInfos[selectedState].endButtonXPos) &&
-                           (x < stateInfos[selectedState].endButtonXPos + 80) &&
-                           (y > graphBottomRelative + 15) &&
-                           (y < graphBottomRelative + 40)) 
-                {
+                } else if ((x > stateInfo.endButtonXPos) && (x < stateInfo.endButtonXPos + 80) &&
+                    (y > graphBottomRelative + 15) && (y < graphBottomRelative + 40)) {
                     var parent = Toplevel as Window;
                     var t = new TouchNumberInput (true, parent);
                     t.Title = "End Time";
@@ -669,12 +699,26 @@ namespace AquaPic.UserInterface
 
                     t.Run ();
                     t.Destroy ();
+                } else if ((x > stateInfo.deleteButtonXPos - 12) && (x < stateInfo.deleteButtonXPos + 12) &&
+                    (y > stateInfo.deleteButtonYPos - 12) && (y < stateInfo.deleteButtonYPos + 12)) {
+                    var parent = Toplevel as Window;
+                    var ms = new TouchDialog ("Are you sure you want to delete the state", parent);
+                    ms.Response += (o, a) => {
+                        if (a.ResponseId == ResponseType.Yes) {
+                            RemoveState (selectedState);
+                            selectedState = -1;
+                        }
+                    };
+
+                    ms.Run ();
+                    ms.Destroy ();
                 }
             }
 
             clicked = false;
             startButtonClicked = false;
             endButtonClicked = false;
+            deleteButtonClicked = false;
 
             QueueDraw ();
         }
@@ -780,6 +824,37 @@ namespace AquaPic.UserInterface
             return timeOkay;
         }
 
+        void RemoveState (int state) {
+            if (stateInfos.Count > 0) {
+                var stateInfo = stateInfos[state];
+                stateInfos.RemoveAt (state);
+                stateInfo.previous.next = stateInfo.next;
+                stateInfo.next.previous = stateInfo.previous;
+
+                if ((stateInfo.previous.lightingState.type != LightingStateType.Off) &&
+                    (stateInfo.next.lightingState.type != LightingStateType.Off)) {
+                    var period = stateInfo.lightingState.lengthInMinutes;
+                    var startMinutes = stateInfo.lightingState.startTime.totalMinutes;
+                    var midMinutes = period / 2 + startMinutes;
+                    if (startMinutes > 1439) {
+                        startMinutes -= 1439;
+                    }
+                    var midTime = new Time (new TimeSpan (0, midMinutes.ToInt (), 0));
+                    stateInfo.previous.lightingState.endTime = midTime;
+                    stateInfo.next.lightingState.startTime = midTime;
+                } else if ((stateInfo.previous.lightingState.type == LightingStateType.Off) &&
+                    (stateInfo.next.lightingState.type != LightingStateType.Off)) {
+                    stateInfo.next.lightingState.startTime = stateInfo.lightingState.startTime;
+                } else if ((stateInfo.previous.lightingState.type != LightingStateType.Off) &&
+                    (stateInfo.next.lightingState.type == LightingStateType.Off)) {
+                    stateInfo.previous.lightingState.endTime = stateInfo.lightingState.endTime;
+                } else {
+                    var nextStateIndex = stateInfos.IndexOf (stateInfo.next);
+                    RemoveState (nextStateIndex);
+                }
+            }
+        }
+
         class StateInfo
         {
             public StateInfo previous;
@@ -787,6 +862,7 @@ namespace AquaPic.UserInterface
             public LightingState lightingState;
             public double startStateXPos, endStateXPos;
             public double startButtonXPos, endButtonXPos;
+            public double deleteButtonXPos, deleteButtonYPos;
         }
     }
 }
