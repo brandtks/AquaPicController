@@ -38,7 +38,7 @@ namespace AquaPic.UserInterface
         int clickX, clickY;
         int selectedState;
 
-        const int graphVericalEdgeWidth = 40;
+        const int graphLeftEdgeWidth = 80;
         const int graphTopEdgeWidth = 60;
         const int graphBottomEdgeWidth = 40;
         int graphLeftRelative, graphRightRelative, graphTopRelative, graphBottomRelative;
@@ -51,7 +51,7 @@ namespace AquaPic.UserInterface
             VisibleWindow = false;
             SetSizeRequest (540, 360);
 
-            graphLeftRelative = graphVericalEdgeWidth;
+            graphLeftRelative = graphLeftEdgeWidth;
             graphTopRelative = graphTopEdgeWidth;
             selectedState = -1;
             stateInfos = new List<StateInfo> ();
@@ -68,12 +68,12 @@ namespace AquaPic.UserInterface
 
         protected void onExpose (object sender, ExposeEventArgs args) {
             var left = Allocation.Left;
-            var graphLeft = left + graphVericalEdgeWidth;
+            var graphLeft = left + graphLeftEdgeWidth;
             var right = Allocation.Right;
-            var graphRight = right - graphVericalEdgeWidth;
+            var graphRight = right;
             var width = Allocation.Width;
-            graphRightRelative = width - graphVericalEdgeWidth;
-            var midX = (graphRightRelative - graphVericalEdgeWidth) / 2 + graphLeft;
+            graphRightRelative = width;
+            var midX = (graphRightRelative - graphLeftEdgeWidth) / 2 + graphLeft;
 
             var top = Allocation.Top;
             var graphTop = top + graphTopEdgeWidth;
@@ -111,7 +111,7 @@ namespace AquaPic.UserInterface
                 cr.Stroke ();
 
                 // Draw the y axis labels
-                var textWidth = graphVericalEdgeWidth - 7;
+                var textWidth = graphLeftEdgeWidth - 7;
                 var text = new TouchText ("100%");
                 text.alignment = TouchAlignment.Right;
                 text.Render (this, left, graphTop - 12, textWidth);
@@ -645,7 +645,7 @@ namespace AquaPic.UserInterface
                             }
                         } else {
                             if (((x > stateInfo.startStateXPos) && (x < graphRightRelative)) ||
-                                ((x > graphVericalEdgeWidth) && (x < stateInfo.endStateXPos))) {
+                                ((x > graphLeftEdgeWidth) && (x < stateInfo.endStateXPos))) {
                                 if (state.type != LightingStateType.Off) {
                                     if (selectedState == i) {
                                         selectedState = -1;
