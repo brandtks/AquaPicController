@@ -487,6 +487,8 @@ namespace AquaPic.UserInterface
                     stateInfo.startButtonYPos = startButtonY - top;
                     stateInfo.endButtonXPos = endButtonX - left;
                     stateInfo.endButtonYPos = endButtonY - top;
+                    stateInfo.startTextXPos = startTextX - left;
+                    stateInfo.endTextXPos = endTextX - left;
 
                     // State start adjustment button
                     cr.MoveTo (startButtonX, startButtonY);
@@ -513,7 +515,7 @@ namespace AquaPic.UserInterface
                     cr.Fill ();
 
                     // Start time textbox
-                    cr.Rectangle (startTextX, graphBottom + 5, 80, 25);
+                    cr.Rectangle (startTextX, graphBottom + 10, 80, 25);
                     TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
                     TouchColor.SetSource (cr, "black");
@@ -522,10 +524,10 @@ namespace AquaPic.UserInterface
                     text = new TouchText (state.startTime.ToShortTimeString ());
                     text.alignment = TouchAlignment.Center;
                     text.font.color = "black";
-                    text.Render (this, startTextX.ToInt (), graphBottom + 8, 80);
+                    text.Render (this, startTextX.ToInt (), graphBottom + 13, 80);
 
                     // End time textbox
-                    cr.Rectangle (endTextX, graphBottom + 5, 80, 25);
+                    cr.Rectangle (endTextX, graphBottom + 10, 80, 25);
                     TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
                     TouchColor.SetSource (cr, "black");
@@ -534,7 +536,7 @@ namespace AquaPic.UserInterface
                     text = new TouchText (state.endTime.ToShortTimeString ());
                     text.alignment = TouchAlignment.Center;
                     text.font.color = "black";
-                    text.Render (this, endTextX.ToInt (), graphBottom + 8, 80);
+                    text.Render (this, endTextX.ToInt (), graphBottom + 13, 80);
 
                     // Delete button
                     double deleteButtonX, deleteButtonY;
@@ -678,46 +680,52 @@ namespace AquaPic.UserInterface
                         }
                     }
                 }
+
+                if (selectedState != -1) {
+                    var stateInfo = stateInfos[selectedState];
+
+                    if ((x > stateInfo.startTextXPos) && (x < stateInfo.startTextXPos + 80) &&
+                    (y > graphBottomRelative + 10) && (y < graphBottomRelative + 35)) {
+                        var parent = Toplevel as Window;
+                        var t = new TouchNumberInput (true, parent);
+                        t.Title = "Start Time";
+                        t.TextSetEvent += (o, a) => {
+                            try {
+                                if (!ValidateAndSetStartTime (Time.Parse (a.text))) {
+                                    a.keepText = false;
+                                    MessageBox.Show ("Invalid Start Time");
+                                }
+                            } catch {
+                                a.keepText = false;
+                            }
+                        };
+
+                        t.Run ();
+                        t.Destroy ();
+                    } else if ((x > stateInfo.endTextXPos) && (x < stateInfo.endTextXPos + 80) &&
+                        (y > graphBottomRelative + 10) && (y < graphBottomRelative + 35)) {
+                        var parent = Toplevel as Window;
+                        var t = new TouchNumberInput (true, parent);
+                        t.Title = "End Time";
+                        t.TextSetEvent += (o, a) => {
+                            try {
+                                if (!ValidateAndSetEndTime (Time.Parse (a.text))) {
+                                    a.keepText = false;
+                                    MessageBox.Show ("Invalid End Time");
+                                }
+                            } catch {
+                                a.keepText = false;
+                            }
+                        };
+
+                        t.Run ();
+                        t.Destroy ();
+                    }
+                }
             } else {
                 var stateInfo = stateInfos[selectedState];
 
-                if ((x > stateInfo.startButtonXPos) && (x < stateInfo.startButtonXPos + 80) &&
-                    (y > graphBottomRelative + 15) && (y < graphBottomRelative + 40)) {
-                    var parent = Toplevel as Window;
-                    var t = new TouchNumberInput (true, parent);
-                    t.Title = "Start Time";
-                    t.TextSetEvent += (o, a) => {
-                        try {
-                            if (!ValidateAndSetStartTime (Time.Parse (a.text))) {
-                                a.keepText = false;
-                                MessageBox.Show ("Invalid Start Time");
-                            }
-                        } catch {
-                            a.keepText = false;
-                        }
-                    };
-
-                    t.Run ();
-                    t.Destroy ();
-                } else if ((x > stateInfo.endButtonXPos) && (x < stateInfo.endButtonXPos + 80) &&
-                    (y > graphBottomRelative + 15) && (y < graphBottomRelative + 40)) {
-                    var parent = Toplevel as Window;
-                    var t = new TouchNumberInput (true, parent);
-                    t.Title = "End Time";
-                    t.TextSetEvent += (o, a) => {
-                        try {
-                            if (!ValidateAndSetEndTime (Time.Parse (a.text))) {
-                                a.keepText = false;
-                                MessageBox.Show ("Invalid End Time");
-                            }
-                        } catch {
-                            a.keepText = false;
-                        }
-                    };
-
-                    t.Run ();
-                    t.Destroy ();
-                } else if ((x > stateInfo.deleteButtonXPos - 12) && (x < stateInfo.deleteButtonXPos + 12) &&
+                if ((x > stateInfo.deleteButtonXPos - 12) && (x < stateInfo.deleteButtonXPos + 12) &&
                     (y > stateInfo.deleteButtonYPos - 12) && (y < stateInfo.deleteButtonYPos + 12)) {
                     var parent = Toplevel as Window;
                     var ms = new TouchDialog ("Are you sure you want to delete the state", parent);
@@ -879,7 +887,9 @@ namespace AquaPic.UserInterface
             public StateInfo next;
             public LightingState lightingState;
             public double startStateXPos, endStateXPos;
-            public double startButtonXPos, startButtonYPos, endButtonXPos, endButtonYPos;
+            public double startButtonXPos, startButtonYPos;
+            public double startTextXPos, endTextXPos;
+            public double endButtonXPos, endButtonYPos;
             public double deleteButtonXPos, deleteButtonYPos;
         }
     }
