@@ -127,6 +127,9 @@ namespace AquaPic.UserInterface
                 var timeXPos = Time.TimeNow.totalMinutes.Map (0, 1440, graphLeft, graphRight);
                 double timeYPos = graphBottom;
 
+                double startYPosSelected = 0, endYPosSelected = 0, startXPosSelected = 0, endXPosSelected = 0;
+                double rightPartSelected = 0, periodSelected = 0, deltaSelected = 0, interXPosSelected = 0;
+
                 // Draw the states
                 bool firstTimeThrough = true, lastOnSecondLine = false;
                 for (var i = 0; i < stateInfos.Count; ++i) {
@@ -152,7 +155,7 @@ namespace AquaPic.UserInterface
                         var delta = endYPos - startYPos;
                         var interXPos = graphLeft - rightPart;
 
-                        if (firstTimeThrough) {
+                        if (firstTimeThrough && (selectedState != i)) {
                             cr.MoveTo (startXPos, startYPos);
                             cr.Arc (startXPos, startYPos, 3, 0 , 2 * Math.PI);
                             cr.ClosePath ();
@@ -297,10 +300,12 @@ namespace AquaPic.UserInterface
                         TouchColor.SetSource (cr, "secb");
                         cr.Stroke ();
 
-                        cr.MoveTo (endXPos, endYPos);
-                        cr.Arc (endXPos, endYPos, 3, 0, 2 * Math.PI);
-                        cr.ClosePath ();
-                        cr.Fill ();
+                        if (selectedState != i) {
+                            cr.MoveTo (endXPos, endYPos);
+                            cr.Arc (endXPos, endYPos, 3, 0, 2 * Math.PI);
+                            cr.ClosePath ();
+                            cr.Fill ();
+                        }
              
                         if (selectedState == -1) {
                             // Only the first state needs the starting time drawn. All other states the start time 
@@ -333,226 +338,236 @@ namespace AquaPic.UserInterface
                         }
 
                         if (i == selectedState) {
-                            cr.MoveTo (startXPos, graphBottom);
-                            cr.LineTo (startXPos, startYPos);
-                            switch (state.type) {
-                            case LightingStateType.LinearRamp: {
-                                    if (state.startTime.Before (state.endTime)) {
-                                        cr.LineTo (endXPos, endYPos);
-                                    } else {
-                                        var rightRatio = rightPart / period;
-                                        var rightYPos = startYPos + (rightRatio * delta);
-
-                                        cr.LineTo (graphRight, rightYPos);
-                                        cr.LineTo (graphRight, graphBottom);
-                                        cr.ClosePath ();
-
-                                        cr.MoveTo (graphLeft, graphBottom);
-                                        cr.LineTo (graphLeft, rightYPos);
-                                        cr.LineTo (endXPos, endYPos);
-                                    }
-                                    break;
-                                }
-                            case LightingStateType.ParabolaRamp: {
-                                    double interYPos = graphBottom;
-
-                                    if (state.startTime.Before (state.endTime)) {
-                                        for (var phase = 1; phase <= period; ++phase) {
-                                            var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                            interYPos = startYPos - delta * Math.Sin (radian);
-                                            cr.LineTo (startXPos + phase, interYPos);
-                                        }
-                                    } else {
-                                        for (var phase = 1; phase <= rightPart; ++phase) {
-                                            var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                            interYPos = startYPos - delta * Math.Sin (radian);
-                                            cr.LineTo (startXPos + phase, interYPos);
-                                        }
-                                        cr.LineTo (graphRight, graphBottom);
-                                        cr.ClosePath ();
-
-                                        cr.MoveTo (graphLeft, graphBottom);
-                                        cr.LineTo (graphLeft, interYPos);
-                                        for (var phase = rightPart; phase <= period; ++phase) {
-                                            var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                            interYPos = startYPos - delta * Math.Sin (radian);
-                                            cr.LineTo (interXPos + phase, interYPos);
-                                        }
-                                    }
-                                    endYPos = (float)interYPos;
-                                    break;
-                                }
-                            case LightingStateType.HalfParabolaRamp: {
-                                    double mapFrom1, mapFrom2, basePoint;
-                                    if (startYPos <= endYPos) {
-                                        mapFrom1 = 1d;
-                                        mapFrom2 = 0d;
-                                        basePoint = endYPos;
-                                    } else {
-                                        mapFrom1 = 0d;
-                                        mapFrom2 = 1d;
-                                        basePoint = startYPos;
-                                    }
-
-                                    double interYPos = graphBottom;
-                                    if (state.startTime.Before (state.endTime)) {
-                                        for (var phase = 1; phase <= period; ++phase) {
-                                            var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
-                                            interYPos = basePoint - delta * Math.Sin (radian);
-                                            cr.LineTo (startXPos + phase, interYPos);
-                                        }
-                                        cr.LineTo (endXPos, endYPos);
-                                    } else {
-                                        for (var phase = 1; phase <= rightPart; ++phase) {
-                                            var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
-                                            interYPos = basePoint - delta * Math.Sin (radian);
-                                            cr.LineTo (startXPos + phase, interYPos);
-                                        }
-                                        cr.LineTo (graphRight, graphBottom);
-                                        cr.ClosePath ();
-
-                                        cr.MoveTo (graphLeft, graphBottom);
-                                        cr.LineTo (graphLeft, interYPos);
-                                        for (var phase = rightPart; phase <= period; ++phase) {
-                                            var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
-                                            interYPos = basePoint - delta * Math.Sin (radian);
-                                            cr.LineTo (interXPos + phase, interYPos);
-                                        }
-                                    }
-
-                                    break;
-                                }
-                            case LightingStateType.On:
-                                endYPos = startYPos;
-                                if (state.startTime.Before (state.endTime)) {
-                                    cr.LineTo (endXPos, startYPos);
-                                } else {
-                                    cr.LineTo (graphRight, startYPos);
-                                    cr.LineTo (graphRight, graphBottom);
-                                    cr.ClosePath ();
-
-                                    cr.MoveTo (graphLeft, graphBottom);
-                                    cr.LineTo (graphLeft, startYPos);
-                                    cr.LineTo (endXPos, startYPos);
-                                }
-                                break;
-                            }
-                            cr.LineTo (endXPos, graphBottom);
-                            cr.ClosePath ();
-                            TouchColor.SetSource (cr, "grey2", 0.5);
-                            cr.Fill ();
-
-                            double startButtonX, endButtonX;
-                            if (period < 84) {
-                                startButtonX = startXPos - 80 + (period - 2) / 2;
-                                endButtonX = endXPos - (period - 2) / 2;
-                            } else {
-                                startButtonX = startXPos - 40;
-                                endButtonX = endXPos - 40;
-                            }
-                            stateInfo.startButtonXPos = startButtonX - left;
-                            stateInfo.endButtonXPos = endButtonX - left;
-
-                            // State start adjustment button
-                            TouchGlobal.DrawRoundedRectangle (cr, startButtonX, graphBottom - 10, 80, 20, 8);
-                            var color = new TouchColor ("pri");
-                            color.ModifyColor (0.5);
-                            color.SetSource (cr);
-                            cr.StrokePreserve ();
-
-                            color = new TouchColor ("pri");
-                            if (startButtonClicked) {
-                                color.ModifyColor (0.75);
-                            }
-
-                            var highlightColor = new TouchColor (color);
-                            highlightColor.ModifyColor (1.25);
-                            using (var grad = new LinearGradient (startButtonX, graphBottom - 10, startButtonX, graphBottom + 10)) {
-                                grad.AddColorStop (0, highlightColor.ToCairoColor ());
-                                grad.AddColorStop (0.2, color.ToCairoColor ());
-                                cr.SetSource (grad);
-                                cr.Fill ();
-                            }
-
-                            // State end adjustment button
-                            TouchGlobal.DrawRoundedRectangle (cr, endButtonX, graphBottom - 10, 80, 20, 8);
-                            color = new TouchColor ("pri");
-                            color.ModifyColor (0.5);
-                            color.SetSource (cr);
-                            cr.StrokePreserve ();
-
-                            color = new TouchColor ("pri");
-                            if (endButtonClicked) {
-                                color.ModifyColor (0.75);
-                            }
-
-                            highlightColor = new TouchColor (color);
-                            highlightColor.ModifyColor (1.1);
-                            using (var grad = new LinearGradient (endButtonX, graphBottom - 10, endButtonX, graphBottom + 10)) {
-                                grad.AddColorStop (0, highlightColor.ToCairoColor ());
-                                grad.AddColorStop (0.2, color.ToCairoColor ());
-                                cr.SetSource (grad);
-                                cr.Fill ();
-                            }
-
-                            // Start time textbox
-                            cr.Rectangle (startButtonX, graphBottom + 15, 80, 25);
-                            TouchColor.SetSource (cr, "grey4");
-                            cr.FillPreserve ();
-                            TouchColor.SetSource (cr, "black");
-                            cr.Stroke ();
-
-                            text = new TouchText (state.startTime.ToShortTimeString ());
-                            text.alignment = TouchAlignment.Center;
-                            text.font.color = "black";
-                            text.Render (this, startButtonX.ToInt (), graphBottom + 18, 80);
-
-                            // End time textbox
-                            cr.Rectangle (endButtonX, graphBottom + 15, 80, 25);
-                            TouchColor.SetSource (cr, "grey4");
-                            cr.FillPreserve ();
-                            TouchColor.SetSource (cr, "black");
-                            cr.Stroke ();
-
-                            text = new TouchText (state.endTime.ToShortTimeString ());
-                            text.alignment = TouchAlignment.Center;
-                            text.font.color = "black";
-                            text.Render (this, endButtonX.ToInt (), graphBottom + 18, 80);
-
-                            // Delete button
-                            double deleteButtonX, deleteButtonY;
-                            if (state.startTime.Before (state.endTime)) {
-                                deleteButtonX = period / 2 + startXPos;
-                            } else {
-                                if (rightPart > (period / 2)) {
-                                    deleteButtonX = rightPart / 2 + startXPos;
-                                } else {
-                                    deleteButtonX = (period - rightPart) / 2 + graphLeft;
-                                }
-                            }
-
-                            if (startYPos > endYPos) {
-                                deleteButtonY = (graphBottom - endYPos) / 2 + endYPos;
-                            } else {
-                                deleteButtonY = (graphBottom - startYPos) / 2 + startYPos;
-                            }
-
-                            stateInfo.deleteButtonXPos = deleteButtonX - left;
-                            stateInfo.deleteButtonYPos = deleteButtonY - top;
-
-                            cr.MoveTo (deleteButtonX, deleteButtonY);
-                            cr.Arc (deleteButtonX, deleteButtonY, 15, 0, 2 * Math.PI);
-                            TouchColor.SetSource (cr, "compl");
-                            cr.Fill ();
-
-                            cr.MoveTo (deleteButtonX - 6, deleteButtonY - 6);
-                            cr.LineTo (deleteButtonX + 6, deleteButtonY + 6);
-                            cr.MoveTo (deleteButtonX + 6, deleteButtonY - 6);
-                            cr.LineTo (deleteButtonX - 6, deleteButtonY + 6);
-                            TouchColor.SetSource (cr, "grey2");
-                            cr.Stroke ();
+                            startYPosSelected = startYPos;
+                            endYPosSelected = endYPos;
+                            startXPosSelected = startXPos;
+                            endXPosSelected = endXPos;
+                            rightPartSelected = rightPart;
+                            periodSelected = period;
+                            deltaSelected = delta;
+                            interXPosSelected = interXPos;
                         }
                     }
+                }
+
+                if (selectedState != -1) {
+                    var stateInfo = stateInfos[selectedState];
+                    var state = stateInfo.lightingState;
+
+                    cr.MoveTo (startXPosSelected, graphBottom);
+                    cr.LineTo (startXPosSelected, startYPosSelected);
+                    switch (state.type) {
+                    case LightingStateType.LinearRamp: {
+                            if (state.startTime.Before (state.endTime)) {
+                                cr.LineTo (endXPosSelected, endYPosSelected);
+                            } else {
+                                var rightRatio = rightPartSelected / periodSelected;
+                                var rightYPos = startYPosSelected + (rightRatio * deltaSelected);
+
+                                cr.LineTo (graphRight, rightYPos);
+                                cr.LineTo (graphRight, graphBottom);
+                                cr.ClosePath ();
+
+                                cr.MoveTo (graphLeft, graphBottom);
+                                cr.LineTo (graphLeft, rightYPos);
+                                cr.LineTo (endXPosSelected, endYPosSelected);
+                            }
+                            break;
+                        }
+                    case LightingStateType.ParabolaRamp: {
+                            double interYPos = graphBottom;
+
+                            if (state.startTime.Before (state.endTime)) {
+                                for (var phase = 1; phase <= periodSelected; ++phase) {
+                                    var radian = (phase / periodSelected).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+                                    interYPos = startYPosSelected - deltaSelected * Math.Sin (radian);
+                                    cr.LineTo (startXPosSelected + phase, interYPos);
+                                }
+                            } else {
+                                for (var phase = 1; phase <= rightPartSelected; ++phase) {
+                                    var radian = (phase / periodSelected).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+                                    interYPos = startYPosSelected - deltaSelected * Math.Sin (radian);
+                                    cr.LineTo (startXPosSelected + phase, interYPos);
+                                }
+                                cr.LineTo (graphRight, graphBottom);
+                                cr.ClosePath ();
+
+                                cr.MoveTo (graphLeft, graphBottom);
+                                cr.LineTo (graphLeft, interYPos);
+                                for (var phase = rightPartSelected; phase <= periodSelected; ++phase) {
+                                    var radian = (phase / periodSelected).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+                                    interYPos = startYPosSelected - deltaSelected * Math.Sin (radian);
+                                    cr.LineTo (interXPosSelected + phase, interYPos);
+                                }
+                            }
+                            endYPosSelected = (float)interYPos;
+                            break;
+                        }
+                    case LightingStateType.HalfParabolaRamp: {
+                            double mapFrom1, mapFrom2, basePoint;
+                            if (startYPosSelected <= endYPosSelected) {
+                                mapFrom1 = 1d;
+                                mapFrom2 = 0d;
+                                basePoint = endYPosSelected;
+                            } else {
+                                mapFrom1 = 0d;
+                                mapFrom2 = 1d;
+                                basePoint = startYPosSelected;
+                            }
+
+                            double interYPos = graphBottom;
+                            if (state.startTime.Before (state.endTime)) {
+                                for (var phase = 1; phase <= periodSelected; ++phase) {
+                                    var radian = (phase / periodSelected).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+                                    interYPos = basePoint - deltaSelected * Math.Sin (radian);
+                                    cr.LineTo (startXPosSelected + phase, interYPos);
+                                }
+                                cr.LineTo (endXPosSelected, endYPosSelected);
+                            } else {
+                                for (var phase = 1; phase <= rightPartSelected; ++phase) {
+                                    var radian = (phase / periodSelected).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+                                    interYPos = basePoint - deltaSelected * Math.Sin (radian);
+                                    cr.LineTo (startXPosSelected + phase, interYPos);
+                                }
+                                cr.LineTo (graphRight, graphBottom);
+                                cr.ClosePath ();
+
+                                cr.MoveTo (graphLeft, graphBottom);
+                                cr.LineTo (graphLeft, interYPos);
+                                for (var phase = rightPartSelected; phase <= periodSelected; ++phase) {
+                                    var radian = (phase / periodSelected).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+                                    interYPos = basePoint - deltaSelected * Math.Sin (radian);
+                                    cr.LineTo (interXPosSelected + phase, interYPos);
+                                }
+                            }
+
+                            break;
+                        }
+                    case LightingStateType.On:
+                        endYPosSelected = startYPosSelected;
+                        if (state.startTime.Before (state.endTime)) {
+                            cr.LineTo (endXPosSelected, startYPosSelected);
+                        } else {
+                            cr.LineTo (graphRight, startYPosSelected);
+                            cr.LineTo (graphRight, graphBottom);
+                            cr.ClosePath ();
+
+                            cr.MoveTo (graphLeft, graphBottom);
+                            cr.LineTo (graphLeft, startYPosSelected);
+                            cr.LineTo (endXPosSelected, startYPosSelected);
+                        }
+                        break;
+                    }
+                    cr.LineTo (endXPosSelected, graphBottom);
+                    cr.ClosePath ();
+                    TouchColor.SetSource (cr, "grey2", 0.5);
+                    cr.Fill ();
+
+                    double startButtonX, endButtonX, startButtonY, endButtonY, startTextX, endTextX;
+                    if (periodSelected < 32) {
+                        startButtonX = startXPosSelected - 16 + periodSelected / 2;
+                        endButtonX = endXPosSelected + 16 - periodSelected / 2;
+                    } else {
+                        startButtonX = startXPosSelected;
+                        endButtonX = endXPosSelected;
+                    }
+
+                    startButtonY = startYPosSelected;
+                    endButtonY = endYPosSelected;
+
+                    if (periodSelected < 84) {
+                        startTextX = startXPosSelected - 80 + (periodSelected - 2) / 2;
+                        endTextX = endXPosSelected - (periodSelected - 2) / 2;
+                    } else {
+                        startTextX = startXPosSelected - 40;
+                        endTextX = endXPosSelected - 40;
+                    }
+
+                    stateInfo.startButtonXPos = startButtonX - left;
+                    stateInfo.startButtonYPos = startButtonY - top;
+                    stateInfo.endButtonXPos = endButtonX - left;
+                    stateInfo.endButtonYPos = endButtonY - top;
+
+                    // State start adjustment button
+                    cr.MoveTo (startButtonX, startButtonY);
+                    cr.Arc (startButtonX, startButtonY, 15, 0, 2 * Math.PI);
+                    cr.ClosePath ();
+                    
+                    var color = new TouchColor ("secb");
+                    if (startButtonClicked) {
+                        color.ModifyColor (0.75);
+                    }
+                    color.SetSource (cr);
+                    cr.Fill ();
+
+                    // State end adjustment button
+                    cr.MoveTo (endButtonX, endButtonY);
+                    cr.Arc (endButtonX, endButtonY, 15, 0, 2 * Math.PI);
+                    cr.ClosePath ();
+
+                    color = new TouchColor ("secb");
+                    if (endButtonClicked) {
+                        color.ModifyColor (0.75);
+                    }
+                    color.SetSource (cr);
+                    cr.Fill ();
+
+                    // Start time textbox
+                    cr.Rectangle (startTextX, graphBottom + 5, 80, 25);
+                    TouchColor.SetSource (cr, "grey4");
+                    cr.FillPreserve ();
+                    TouchColor.SetSource (cr, "black");
+                    cr.Stroke ();
+
+                    text = new TouchText (state.startTime.ToShortTimeString ());
+                    text.alignment = TouchAlignment.Center;
+                    text.font.color = "black";
+                    text.Render (this, startTextX.ToInt (), graphBottom + 8, 80);
+
+                    // End time textbox
+                    cr.Rectangle (endTextX, graphBottom + 5, 80, 25);
+                    TouchColor.SetSource (cr, "grey4");
+                    cr.FillPreserve ();
+                    TouchColor.SetSource (cr, "black");
+                    cr.Stroke ();
+
+                    text = new TouchText (state.endTime.ToShortTimeString ());
+                    text.alignment = TouchAlignment.Center;
+                    text.font.color = "black";
+                    text.Render (this, endTextX.ToInt (), graphBottom + 8, 80);
+
+                    // Delete button
+                    double deleteButtonX, deleteButtonY;
+                    if (state.startTime.Before (state.endTime)) {
+                        deleteButtonX = periodSelected / 2 + startXPosSelected;
+                    } else {
+                        if (rightPartSelected > (periodSelected / 2)) {
+                            deleteButtonX = rightPartSelected / 2 + startXPosSelected;
+                        } else {
+                            deleteButtonX = (periodSelected - rightPartSelected) / 2 + graphLeft;
+                        }
+                    }
+
+                    if (startYPosSelected > endYPosSelected) {
+                        deleteButtonY = (graphBottom - endYPosSelected) / 2 + endYPosSelected;
+                    } else {
+                        deleteButtonY = (graphBottom - startYPosSelected) / 2 + startYPosSelected;
+                    }
+
+                    stateInfo.deleteButtonXPos = deleteButtonX - left;
+                    stateInfo.deleteButtonYPos = deleteButtonY - top;
+
+                    cr.MoveTo (deleteButtonX, deleteButtonY);
+                    cr.Arc (deleteButtonX, deleteButtonY, 15, 0, 2 * Math.PI);
+                    TouchColor.SetSource (cr, "compl");
+                    cr.Fill ();
+
+                    cr.MoveTo (deleteButtonX - 6, deleteButtonY - 6);
+                    cr.LineTo (deleteButtonX + 6, deleteButtonY + 6);
+                    cr.MoveTo (deleteButtonX + 6, deleteButtonY - 6);
+                    cr.LineTo (deleteButtonX - 6, deleteButtonY + 6);
+                    TouchColor.SetSource (cr, "grey2");
+                    cr.Stroke ();
                 }
 
                 cr.MoveTo (timeXPos, timeYPos);
@@ -588,6 +603,9 @@ namespace AquaPic.UserInterface
                         stateInfos[i].next = stateInfos[next];
                     }
                 }
+            } else if (stateInfos.Count == 1) {
+                stateInfos[0].next = stateInfos[0];
+                stateInfos[1].previous = stateInfos[0];
             }
         }
 
@@ -599,16 +617,16 @@ namespace AquaPic.UserInterface
             if (selectedState != -1) {
                 var stateInfo = stateInfos[selectedState];
 
-                if ((clickY > graphBottomRelative - 10) && (clickY < graphBottomRelative + 10)) {
-                    if ((clickX > stateInfo.startButtonXPos) && (clickX < stateInfo.startButtonXPos + 80)) {
-                        startButtonClicked = true;
-                        clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
-                    }
+                if ((clickX > stateInfo.startButtonXPos - 12) && (clickX < stateInfo.startButtonXPos + 12) && 
+                    (clickY > stateInfo.startButtonYPos - 12) && (clickY < stateInfo.startButtonYPos + 12)) {
+                    startButtonClicked = true;
+                    clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
+                }
 
-                    if ((clickX > stateInfo.endButtonXPos) && (clickX < stateInfo.endButtonXPos + 80)) {
-                        endButtonClicked = true;
-                        clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
-                    }
+                if ((clickX > stateInfo.endButtonXPos - 12) && (clickX < stateInfo.endButtonXPos + 12) &&
+                    (clickY > stateInfo.endButtonYPos - 12) && (clickY < stateInfo.endButtonYPos + 12)) {
+                    endButtonClicked = true;
+                    clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
                 }
 
                 if ((clickX > stateInfo.deleteButtonXPos - 12) && (clickX < stateInfo.deleteButtonXPos + 12) &&
@@ -861,7 +879,7 @@ namespace AquaPic.UserInterface
             public StateInfo next;
             public LightingState lightingState;
             public double startStateXPos, endStateXPos;
-            public double startButtonXPos, endButtonXPos;
+            public double startButtonXPos, startButtonYPos, endButtonXPos, endButtonYPos;
             public double deleteButtonXPos, deleteButtonYPos;
         }
     }
