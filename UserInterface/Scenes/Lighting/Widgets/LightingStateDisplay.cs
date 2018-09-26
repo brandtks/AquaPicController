@@ -42,9 +42,10 @@ namespace AquaPic.UserInterface
         const int graphTopEdgeWidth = 60;
         const int graphBottomEdgeWidth = 40;
         int graphLeftRelative, graphRightRelative, graphTopRelative, graphBottomRelative;
-        double minutesPerPixel;
+        double minutesPerPixel, dimmingPerPixel;
 
         List<StateInfo> stateInfos;
+        bool dimmingFixture;
 
         public LightingStateDisplay () {
             Visible = true;
@@ -84,6 +85,7 @@ namespace AquaPic.UserInterface
             var midY = (graphBottomRelative - graphTopEdgeWidth) / 2 + graphTop;
 
             minutesPerPixel = 1440d / (graphRightRelative - graphLeftRelative);
+            dimmingPerPixel = 100d / (graphBottomRelative - graphTopRelative);
 
             using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 cr.Rectangle (left, top, width, height);
@@ -111,18 +113,21 @@ namespace AquaPic.UserInterface
                 cr.Stroke ();
 
                 // Draw the y axis labels
-                var textWidth = graphLeftEdgeWidth - 7;
-                var text = new TouchText ("100%");
-                text.alignment = TouchAlignment.Right;
-                text.Render (this, left, graphTop - 12, textWidth);
+                TouchText text;
+                if (selectedState == -1 || !dimmingFixture) {
+                    var textWidth = graphLeftEdgeWidth - 7;
+                    text = new TouchText ("100%");
+                    text.alignment = TouchAlignment.Right;
+                    text.Render (this, left, graphTop - 12, textWidth);
 
-                text = new TouchText ("50%");
-                text.alignment = TouchAlignment.Right;
-                text.Render (this, left, midY - 12, textWidth);
+                    text = new TouchText ("50%");
+                    text.alignment = TouchAlignment.Right;
+                    text.Render (this, left, midY - 12, textWidth);
 
-                text = new TouchText ("0%");
-                text.alignment = TouchAlignment.Right;
-                text.Render (this, left, graphBottom - 13, textWidth);
+                    text = new TouchText ("0%");
+                    text.alignment = TouchAlignment.Right;
+                    text.Render (this, left, graphBottom - 13, textWidth);
+                }
 
                 var timeXPos = Time.TimeNow.totalMinutes.Map (0, 1440, graphLeft, graphRight);
                 double timeYPos = graphBottom;
@@ -155,7 +160,7 @@ namespace AquaPic.UserInterface
                         var delta = endYPos - startYPos;
                         var interXPos = graphLeft - rightPart;
 
-                        if (firstTimeThrough && (selectedState != i)) {
+                        if (selectedState != i) {
                             cr.MoveTo (startXPos, startYPos);
                             cr.Arc (startXPos, startYPos, 3, 0 , 2 * Math.PI);
                             cr.ClosePath ();
@@ -463,7 +468,7 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey2", 0.5);
                     cr.Fill ();
 
-                    double startButtonX, endButtonX, startButtonY, endButtonY, startTextX, endTextX;
+                    double startButtonX, endButtonX, startButtonY, endButtonY;
                     if (periodSelected < 32) {
                         startButtonX = startXPosSelected - 16 + periodSelected / 2;
                         endButtonX = endXPosSelected + 16 - periodSelected / 2;
@@ -475,20 +480,10 @@ namespace AquaPic.UserInterface
                     startButtonY = startYPosSelected;
                     endButtonY = endYPosSelected;
 
-                    if (periodSelected < 84) {
-                        startTextX = startXPosSelected - 80 + (periodSelected - 2) / 2;
-                        endTextX = endXPosSelected - (periodSelected - 2) / 2;
-                    } else {
-                        startTextX = startXPosSelected - 40;
-                        endTextX = endXPosSelected - 40;
-                    }
-
                     stateInfo.startButtonXPos = startButtonX - left;
                     stateInfo.startButtonYPos = startButtonY - top;
                     stateInfo.endButtonXPos = endButtonX - left;
                     stateInfo.endButtonYPos = endButtonY - top;
-                    stateInfo.startTextXPos = startTextX - left;
-                    stateInfo.endTextXPos = endTextX - left;
 
                     // State start adjustment button
                     cr.MoveTo (startButtonX, startButtonY);
@@ -514,8 +509,20 @@ namespace AquaPic.UserInterface
                     color.SetSource (cr);
                     cr.Fill ();
 
+                    double startTimeTextX, endTimeTextX;
+                    if (periodSelected < 84) {
+                        startTimeTextX = startXPosSelected - 80 + (periodSelected - 2) / 2;
+                        endTimeTextX = endXPosSelected - (periodSelected - 2) / 2;
+                    } else {
+                        startTimeTextX = startXPosSelected - 40;
+                        endTimeTextX = endXPosSelected - 40;
+                    }
+
+                    stateInfo.startTimeTextXPos = startTimeTextX - left;
+                    stateInfo.endTimeTextXPos = endTimeTextX - left;
+
                     // Start time textbox
-                    cr.Rectangle (startTextX, graphBottom + 10, 80, 25);
+                    cr.Rectangle (startTimeTextX, graphBottom + 10, 80, 25);
                     TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
                     TouchColor.SetSource (cr, "black");
@@ -524,10 +531,10 @@ namespace AquaPic.UserInterface
                     text = new TouchText (state.startTime.ToShortTimeString ());
                     text.alignment = TouchAlignment.Center;
                     text.font.color = "black";
-                    text.Render (this, startTextX.ToInt (), graphBottom + 13, 80);
+                    text.Render (this, startTimeTextX.ToInt (), graphBottom + 13, 80);
 
                     // End time textbox
-                    cr.Rectangle (endTextX, graphBottom + 10, 80, 25);
+                    cr.Rectangle (endTimeTextX, graphBottom + 10, 80, 25);
                     TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
                     TouchColor.SetSource (cr, "black");
@@ -536,7 +543,19 @@ namespace AquaPic.UserInterface
                     text = new TouchText (state.endTime.ToShortTimeString ());
                     text.alignment = TouchAlignment.Center;
                     text.font.color = "black";
-                    text.Render (this, endTextX.ToInt (), graphBottom + 13, 80);
+                    text.Render (this, endTimeTextX.ToInt (), graphBottom + 13, 80);
+
+                    double startDimmingTextY, endDimmingTextY;
+                    if (deltaSelected < 29) {
+                        startDimmingTextY = startYPosSelected - 12.5 + (deltaSelected - 2) / 2;
+                        endDimmingTextY = endYPosSelected - (deltaSelected - 2) / 2;
+                    } else {
+                        startDimmingTextY = startYPosSelected - 12.5;
+                        endDimmingTextY = endYPosSelected - 12.5;
+                    }
+
+                    stateInfo.startTimeTextXPos = startTimeTextX - left;
+                    stateInfo.endTimeTextXPos = endTimeTextX - left;
 
                     // Delete button
                     double deleteButtonX, deleteButtonY;
@@ -580,7 +599,7 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public void SetStates (LightingState[] lightingStates) {
+        public void SetStates (LightingState[] lightingStates, bool dimmingFixture) {
             stateInfos.Clear ();
             selectedState = -1;
             for (int i = 0; i < lightingStates.Length; ++i) {
@@ -609,6 +628,8 @@ namespace AquaPic.UserInterface
                 stateInfos[0].next = stateInfos[0];
                 stateInfos[1].previous = stateInfos[0];
             }
+
+            this.dimmingFixture = dimmingFixture;
         }
 
         protected void OnButtonPress (object sender, ButtonPressEventArgs args) {
@@ -644,6 +665,48 @@ namespace AquaPic.UserInterface
 
             var clickHappenedOnEntity = startButtonClicked | endButtonClicked | deleteButtonClicked;
             if (!clickHappenedOnEntity) {
+                if (selectedState != -1) {
+                    var stateInfo = stateInfos[selectedState];
+
+                    if ((x > stateInfo.startTimeTextXPos) && (x < stateInfo.startTimeTextXPos + 80) &&
+                    (y > graphBottomRelative + 10) && (y < graphBottomRelative + 35)) {
+                        var parent = Toplevel as Window;
+                        var t = new TouchNumberInput (true, parent);
+                        t.Title = "Start Time";
+                        t.TextSetEvent += (o, a) => {
+                            try {
+                                if (!ValidateAndSetStartTime (Time.Parse (a.text))) {
+                                    a.keepText = false;
+                                    MessageBox.Show ("Invalid Start Time");
+                                }
+                            } catch {
+                                a.keepText = false;
+                            }
+                        };
+
+                        t.Run ();
+                        t.Destroy ();
+                    } else if ((x > stateInfo.endTimeTextXPos) && (x < stateInfo.endTimeTextXPos + 80) &&
+                        (y > graphBottomRelative + 10) && (y < graphBottomRelative + 35)) {
+                        var parent = Toplevel as Window;
+                        var t = new TouchNumberInput (true, parent);
+                        t.Title = "End Time";
+                        t.TextSetEvent += (o, a) => {
+                            try {
+                                if (!ValidateAndSetEndTime (Time.Parse (a.text))) {
+                                    a.keepText = false;
+                                    MessageBox.Show ("Invalid End Time");
+                                }
+                            } catch {
+                                a.keepText = false;
+                            }
+                        };
+
+                        t.Run ();
+                        t.Destroy ();
+                    }
+                }
+
                 // The release happened on the graph
                 if ((x > graphLeftRelative) && (x < graphRightRelative) &&
                     (y > graphTopRelative) && (y < graphBottomRelative)) {
@@ -681,47 +744,7 @@ namespace AquaPic.UserInterface
                     }
                 }
 
-                if (selectedState != -1) {
-                    var stateInfo = stateInfos[selectedState];
 
-                    if ((x > stateInfo.startTextXPos) && (x < stateInfo.startTextXPos + 80) &&
-                    (y > graphBottomRelative + 10) && (y < graphBottomRelative + 35)) {
-                        var parent = Toplevel as Window;
-                        var t = new TouchNumberInput (true, parent);
-                        t.Title = "Start Time";
-                        t.TextSetEvent += (o, a) => {
-                            try {
-                                if (!ValidateAndSetStartTime (Time.Parse (a.text))) {
-                                    a.keepText = false;
-                                    MessageBox.Show ("Invalid Start Time");
-                                }
-                            } catch {
-                                a.keepText = false;
-                            }
-                        };
-
-                        t.Run ();
-                        t.Destroy ();
-                    } else if ((x > stateInfo.endTextXPos) && (x < stateInfo.endTextXPos + 80) &&
-                        (y > graphBottomRelative + 10) && (y < graphBottomRelative + 35)) {
-                        var parent = Toplevel as Window;
-                        var t = new TouchNumberInput (true, parent);
-                        t.Title = "End Time";
-                        t.TextSetEvent += (o, a) => {
-                            try {
-                                if (!ValidateAndSetEndTime (Time.Parse (a.text))) {
-                                    a.keepText = false;
-                                    MessageBox.Show ("Invalid End Time");
-                                }
-                            } catch {
-                                a.keepText = false;
-                            }
-                        };
-
-                        t.Run ();
-                        t.Destroy ();
-                    }
-                }
             } else {
                 var stateInfo = stateInfos[selectedState];
 
@@ -765,6 +788,11 @@ namespace AquaPic.UserInterface
                     }
                     var newStartTime = new Time (new TimeSpan (0, newStartMinutes.ToInt (), 0));
                     ValidateAndSetStartTime (newStartTime);
+
+                    if (dimmingFixture) {
+                        var newDimmingLevel = yDelta * dimmingPerPixel + stateInfos[selectedState].lightingState.startingDimmingLevel;
+                        SetStartDimmingLevel (newDimmingLevel);
+                    }
                 } else if (endButtonClicked) {
                     var newEndMinutes = xDelta * minutesPerPixel + stateInfos[selectedState].lightingState.endTime.totalMinutes;
                     if (newEndMinutes < 0) {
@@ -774,9 +802,15 @@ namespace AquaPic.UserInterface
                     }
                     var newEndTime = new Time (new TimeSpan (0, newEndMinutes.ToInt (), 0));
                     ValidateAndSetEndTime (newEndTime);
+
+                    if (dimmingFixture) {
+                        var newDimmingLevel = yDelta * dimmingPerPixel + stateInfos[selectedState].lightingState.endingDimmingLevel;
+                        SetEndDimmingLevel (newDimmingLevel);
+                    }
                 }
 
                 clickX = x;
+                clickY = y;
 
                 QueueDraw ();
             }
@@ -817,6 +851,20 @@ namespace AquaPic.UserInterface
             return timeOkay;
         }
 
+        void SetStartDimmingLevel (double newStartDimmingLevel) {
+            var stateInfo = stateInfos[selectedState];
+            var state = stateInfo.lightingState;
+            var type = state.type;
+            var newDimmingLevel = (float)newStartDimmingLevel.Constrain (0, 100);
+
+            if (type == LightingStateType.On) {
+                state.startingDimmingLevel = newDimmingLevel;
+                state.endingDimmingLevel = newDimmingLevel;
+            } else {
+                state.startingDimmingLevel = newDimmingLevel;
+            }
+        }
+
         bool ValidateAndSetEndTime (Time newEndTime) {
             var timeOkay = true;
 
@@ -848,6 +896,20 @@ namespace AquaPic.UserInterface
             }
 
             return timeOkay;
+        }
+
+        void SetEndDimmingLevel (double newStartDimmingLevel) {
+            var stateInfo = stateInfos[selectedState];
+            var state = stateInfo.lightingState;
+            var type = state.type;
+            var newDimmingLevel = (float)newStartDimmingLevel.Constrain (0, 100);
+
+            if (type == LightingStateType.On) {
+                state.startingDimmingLevel = newDimmingLevel;
+                state.endingDimmingLevel = newDimmingLevel;
+            } else {
+                state.endingDimmingLevel = newDimmingLevel;
+            }
         }
 
         void RemoveState (int state) {
@@ -888,8 +950,9 @@ namespace AquaPic.UserInterface
             public LightingState lightingState;
             public double startStateXPos, endStateXPos;
             public double startButtonXPos, startButtonYPos;
-            public double startTextXPos, endTextXPos;
             public double endButtonXPos, endButtonYPos;
+            public double startTimeTextXPos, endTimeTextXPos;
+            public double startDimmingTextXPos, endDimmingTextXPos;
             public double deleteButtonXPos, deleteButtonYPos;
         }
     }

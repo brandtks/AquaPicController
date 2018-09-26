@@ -284,10 +284,11 @@ namespace AquaPic.UserInterface
                     outletStateLabel.textColor = "secb";
                 }
 
-                lightingStateDisplay.SetStates (Lighting.GetLightingStates (fixtureName));
+                isDimmingFixture = Lighting.IsDimmingFixture (fixtureName);
+
+                lightingStateDisplay.SetStates (Lighting.GetLightingStates (fixtureName), isDimmingFixture);
                 lightingStateDisplay.QueueDraw ();
 
-                isDimmingFixture = Lighting.IsDimmingFixture (fixtureName);
                 if (isDimmingFixture) {
                     dimmingHeader.Visible = true;
                     modeSelector.Visible = true;
