@@ -33,7 +33,7 @@ namespace AquaPic.UserInterface
 {
     public class LightingStateDisplay : EventBox
     {
-        bool clicked, startButtonClicked, endButtonClicked, deleteButtonClicked;
+        bool clicked, startButtonClicked, endButtonClicked, deleteButtonClicked, movedOutOfXRange, movedOutOfYRange;
         uint clickTimer;
         int clickX, clickY;
         int selectedState;
@@ -468,17 +468,10 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey2", 0.5);
                     cr.Fill ();
 
-                    double startButtonX, endButtonX, startButtonY, endButtonY;
-                    if (periodSelected < 32) {
-                        startButtonX = startXPosSelected - 16 + periodSelected / 2;
-                        endButtonX = endXPosSelected + 16 - periodSelected / 2;
-                    } else {
-                        startButtonX = startXPosSelected;
-                        endButtonX = endXPosSelected;
-                    }
-
-                    startButtonY = startYPosSelected;
-                    endButtonY = endYPosSelected;
+                    var startButtonX = startXPosSelected;
+                    var endButtonX = endXPosSelected;
+                    var startButtonY = startYPosSelected;
+                    var endButtonY = endYPosSelected;
 
                     stateInfo.startButtonXPos = startButtonX - left;
                     stateInfo.startButtonYPos = startButtonY - top;
@@ -844,6 +837,8 @@ namespace AquaPic.UserInterface
             startButtonClicked = false;
             endButtonClicked = false;
             deleteButtonClicked = false;
+            movedOutOfXRange = false;
+            movedOutOfYRange = false;
 
             QueueDraw ();
         }
@@ -853,40 +848,57 @@ namespace AquaPic.UserInterface
                 GetPointer (out int x, out int y);
 
                 var yDelta = clickY - y;
-                var xDelta = x- clickX;
+                var xDelta = x - clickX;
+
+                if (!movedOutOfXRange && Math.Abs(xDelta) > 5) {
+                    movedOutOfXRange = true;
+                }
+
+                if (!movedOutOfYRange && Math.Abs (yDelta) > 5) {
+                    movedOutOfYRange = true;
+                }
 
                 if (startButtonClicked) {
-                    var newStartMinutes = xDelta * minutesPerPixel + stateInfos[selectedState].lightingState.startTime.totalMinutes;
-                    if (newStartMinutes < 0) {
-                        newStartMinutes = 1439;
-                    } else if (newStartMinutes > 1439) {
-                        newStartMinutes = 0;
+                    if (movedOutOfXRange) {
+                        var newStartMinutes = xDelta * minutesPerPixel + stateInfos[selectedState].lightingState.startTime.totalMinutes;
+                        if (newStartMinutes < 0) {
+                            newStartMinutes = 1439;
+                        } else if (newStartMinutes > 1439) {
+                            newStartMinutes = 0;
+                        }
+                        var newStartTime = new Time (new TimeSpan (0, newStartMinutes.ToInt (), 0));
+                        ValidateAndSetStartTime (newStartTime);
                     }
-                    var newStartTime = new Time (new TimeSpan (0, newStartMinutes.ToInt (), 0));
-                    ValidateAndSetStartTime (newStartTime);
 
-                    if (dimmingFixture) {
+                    if (dimmingFixture && movedOutOfYRange) {
                         var newDimmingLevel = yDelta * dimmingPerPixel + stateInfos[selectedState].lightingState.startingDimmingLevel;
                         SetStartDimmingLevel (newDimmingLevel);
                     }
                 } else if (endButtonClicked) {
-                    var newEndMinutes = xDelta * minutesPerPixel + stateInfos[selectedState].lightingState.endTime.totalMinutes;
-                    if (newEndMinutes < 0) {
-                        newEndMinutes = 1439;
-                    } else if (newEndMinutes > 1439) {
-                        newEndMinutes = 0;
+                    if (movedOutOfXRange) {
+                        var newEndMinutes = xDelta * minutesPerPixel + stateInfos[selectedState].lightingState.endTime.totalMinutes;
+                        if (newEndMinutes < 0) {
+                            newEndMinutes = 1439;
+                        } else if (newEndMinutes > 1439) {
+                            newEndMinutes = 0;
+                        }
+                        var newEndTime = new Time (new TimeSpan (0, newEndMinutes.ToInt (), 0));
+                        ValidateAndSetEndTime (newEndTime);
                     }
-                    var newEndTime = new Time (new TimeSpan (0, newEndMinutes.ToInt (), 0));
-                    ValidateAndSetEndTime (newEndTime);
 
-                    if (dimmingFixture) {
+                    if (dimmingFixture && movedOutOfYRange) {
                         var newDimmingLevel = yDelta * dimmingPerPixel + stateInfos[selectedState].lightingState.endingDimmingLevel;
                         SetEndDimmingLevel (newDimmingLevel);
                     }
                 }
 
-                clickX = x;
-                clickY = y;
+                if (movedOutOfXRange) {
+                    clickX = x;
+                }
+
+                if (movedOutOfYRange) {
+                    clickY = y;
+                }
 
                 QueueDraw ();
             }
