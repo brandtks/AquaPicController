@@ -509,6 +509,7 @@ namespace AquaPic.UserInterface
                     color.SetSource (cr);
                     cr.Fill ();
 
+                    // Time text boxes
                     double startTimeTextX, endTimeTextX;
                     if (periodSelected < 84) {
                         startTimeTextX = startXPosSelected - 80 + (periodSelected - 2) / 2;
@@ -522,7 +523,7 @@ namespace AquaPic.UserInterface
                     stateInfo.endTimeTextXPos = endTimeTextX - left;
 
                     // Start time textbox
-                    cr.Rectangle (startTimeTextX, graphBottom + 10, 80, 25);
+                    cr.Rectangle (startTimeTextX, graphBottom + 7, 80, 25);
                     TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
                     TouchColor.SetSource (cr, "black");
@@ -531,10 +532,10 @@ namespace AquaPic.UserInterface
                     text = new TouchText (state.startTime.ToShortTimeString ());
                     text.alignment = TouchAlignment.Center;
                     text.font.color = "black";
-                    text.Render (this, startTimeTextX.ToInt (), graphBottom + 13, 80);
+                    text.Render (this, startTimeTextX.ToInt (), graphBottom + 10, 80);
 
                     // End time textbox
-                    cr.Rectangle (endTimeTextX, graphBottom + 10, 80, 25);
+                    cr.Rectangle (endTimeTextX, graphBottom + 7, 80, 25);
                     TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
                     TouchColor.SetSource (cr, "black");
@@ -543,19 +544,63 @@ namespace AquaPic.UserInterface
                     text = new TouchText (state.endTime.ToShortTimeString ());
                     text.alignment = TouchAlignment.Center;
                     text.font.color = "black";
-                    text.Render (this, endTimeTextX.ToInt (), graphBottom + 13, 80);
+                    text.Render (this, endTimeTextX.ToInt (), graphBottom + 10, 80);
 
-                    double startDimmingTextY, endDimmingTextY;
-                    if (deltaSelected < 29) {
-                        startDimmingTextY = startYPosSelected - 12.5 + (deltaSelected - 2) / 2;
-                        endDimmingTextY = endYPosSelected - (deltaSelected - 2) / 2;
+                    // Dimming textboxes
+                    if (dimmingFixture) {
+                        // All light state types that are some sort of ramp have an integer value of 10 or greater
+                        var showEndDimmingLevel = (int)stateInfo.lightingState.type >= 10;
+
+                        double startDimmingTextY = 0, endDimmingTextY = 0;
+                        if (showEndDimmingLevel) {
+                            if (deltaSelected < 29) {
+                                if (startYPosSelected < endYPosSelected) {
+                                    startDimmingTextY = startYPosSelected - 25 + (deltaSelected - 2) / 2;
+                                    endDimmingTextY = endYPosSelected - (deltaSelected - 2) / 2;
+                                } else {
+                                    startDimmingTextY = startYPosSelected - (deltaSelected - 2) / 2;
+                                    endDimmingTextY = endYPosSelected - 25 + (deltaSelected - 2) / 2;
+                                }
+                            } else {
+                                startDimmingTextY = startYPosSelected - 12.5;
+                                endDimmingTextY = endYPosSelected - 12.5;
+                            }
+                        } else {
+                            startDimmingTextY = startYPosSelected - 12.5;
+                        }
+
+                        stateInfo.startDimmingTextYPos = startDimmingTextY - top;
+                        stateInfo.endDimmingTextYPos = endDimmingTextY - top;
+
+                        // Start dimming textbox
+                        cr.Rectangle (left, startDimmingTextY, 73, 25);
+                        TouchColor.SetSource (cr, "grey4");
+                        cr.FillPreserve ();
+                        TouchColor.SetSource (cr, "black");
+                        cr.Stroke ();
+
+                        text = new TouchText (state.startingDimmingLevel.ToString ());
+                        text.alignment = TouchAlignment.Center;
+                        text.font.color = "black";
+                        text.Render (this, left, startDimmingTextY.ToInt () + 3, 73);
+
+                        // End dimming textbox
+                        if (showEndDimmingLevel) {
+                            cr.Rectangle (left, endDimmingTextY, 73, 25);
+                            TouchColor.SetSource (cr, "grey4");
+                            cr.FillPreserve ();
+                            TouchColor.SetSource (cr, "black");
+                            cr.Stroke ();
+
+                            text = new TouchText (state.endingDimmingLevel.ToString ());
+                            text.alignment = TouchAlignment.Center;
+                            text.font.color = "black";
+                            text.Render (this, left, endDimmingTextY.ToInt () + 3, 73);
+                        }
                     } else {
-                        startDimmingTextY = startYPosSelected - 12.5;
-                        endDimmingTextY = endYPosSelected - 12.5;
+                        stateInfo.startDimmingTextYPos = 0;
+                        stateInfo.endDimmingTextYPos = 0;
                     }
-
-                    stateInfo.startTimeTextXPos = startTimeTextX - left;
-                    stateInfo.endTimeTextXPos = endTimeTextX - left;
 
                     // Delete button
                     double deleteButtonX, deleteButtonY;
@@ -663,47 +708,97 @@ namespace AquaPic.UserInterface
             var x = args.Event.X;
             var y = args.Event.Y;
 
-            var clickHappenedOnEntity = startButtonClicked | endButtonClicked | deleteButtonClicked;
-            if (!clickHappenedOnEntity) {
+            if (deleteButtonClicked) {
+                var stateInfo = stateInfos[selectedState];
+
+                if ((x > stateInfo.deleteButtonXPos - 12) && (x < stateInfo.deleteButtonXPos + 12) &&
+                    (y > stateInfo.deleteButtonYPos - 12) && (y < stateInfo.deleteButtonYPos + 12)) {
+                    var parent = Toplevel as Window;
+                    var ms = new TouchDialog ("Are you sure you want to delete the state", parent);
+                    ms.Response += (o, a) => {
+                        if (a.ResponseId == ResponseType.Yes) {
+                            RemoveState (selectedState);
+                            selectedState = -1;
+                        }
+                    };
+
+                    ms.Run ();
+                    ms.Destroy ();
+                }
+            } else if (!(startButtonClicked | endButtonClicked)) {
                 if (selectedState != -1) {
                     var stateInfo = stateInfos[selectedState];
 
-                    if ((x > stateInfo.startTimeTextXPos) && (x < stateInfo.startTimeTextXPos + 80) &&
-                    (y > graphBottomRelative + 10) && (y < graphBottomRelative + 35)) {
-                        var parent = Toplevel as Window;
-                        var t = new TouchNumberInput (true, parent);
-                        t.Title = "Start Time";
-                        t.TextSetEvent += (o, a) => {
-                            try {
-                                if (!ValidateAndSetStartTime (Time.Parse (a.text))) {
+                    if ((y > graphBottomRelative + 7) && (y < graphBottomRelative + 32)) {
+                        if ((x > stateInfo.startTimeTextXPos) && (x < stateInfo.startTimeTextXPos + 80)) {
+                            var parent = Toplevel as Window;
+                            var t = new TouchNumberInput (true, parent);
+                            t.Title = "Start Time";
+                            t.TextSetEvent += (o, a) => {
+                                try {
+                                    if (!ValidateAndSetStartTime (Time.Parse (a.text))) {
+                                        a.keepText = false;
+                                        MessageBox.Show ("Invalid Start Time");
+                                    }
+                                } catch {
                                     a.keepText = false;
+                                }
+                            };
+
+                            t.Run ();
+                            t.Destroy ();
+                        } else if ((x > stateInfo.endTimeTextXPos) && (x < stateInfo.endTimeTextXPos + 80)) {
+                            var parent = Toplevel as Window;
+                            var t = new TouchNumberInput (true, parent);
+                            t.Title = "End Time";
+                            t.TextSetEvent += (o, a) => {
+                                try {
+                                    if (!ValidateAndSetEndTime (Time.Parse (a.text))) {
+                                        a.keepText = false;
+                                        MessageBox.Show ("Invalid End Time");
+                                    }
+                                } catch {
+                                    a.keepText = false;
+                                }
+                            };
+
+                            t.Run ();
+                            t.Destroy ();
+                        }
+                    } else if ((x > graphLeftRelative - 80) && (x < graphLeftRelative - 7)) {
+                        if ((y > stateInfo.startDimmingTextYPos) && (y < stateInfo.startDimmingTextYPos + 35)) {
+                            var parent = Toplevel as Window;
+                            var t = new TouchNumberInput (true, parent);
+                            t.Title = "Start Dimming Level";
+                            t.TextSetEvent += (o, a) => {
+                                try {
+                                    var newDimmingLevel = Convert.ToSingle (a.text);
+                                    SetStartDimmingLevel (newDimmingLevel);
+                                } catch {
                                     MessageBox.Show ("Invalid Start Time");
-                                }
-                            } catch {
-                                a.keepText = false;
-                            }
-                        };
-
-                        t.Run ();
-                        t.Destroy ();
-                    } else if ((x > stateInfo.endTimeTextXPos) && (x < stateInfo.endTimeTextXPos + 80) &&
-                        (y > graphBottomRelative + 10) && (y < graphBottomRelative + 35)) {
-                        var parent = Toplevel as Window;
-                        var t = new TouchNumberInput (true, parent);
-                        t.Title = "End Time";
-                        t.TextSetEvent += (o, a) => {
-                            try {
-                                if (!ValidateAndSetEndTime (Time.Parse (a.text))) {
                                     a.keepText = false;
-                                    MessageBox.Show ("Invalid End Time");
                                 }
-                            } catch {
-                                a.keepText = false;
-                            }
-                        };
+                            };
 
-                        t.Run ();
-                        t.Destroy ();
+                            t.Run ();
+                            t.Destroy ();
+                        } else if ((y > stateInfo.endDimmingTextYPos) && (y < stateInfo.endDimmingTextYPos + 35)) {
+                            var parent = Toplevel as Window;
+                            var t = new TouchNumberInput (true, parent);
+                            t.Title = "End Dimming Level";
+                            t.TextSetEvent += (o, a) => {
+                                try {
+                                    var newDimmingLevel = Convert.ToSingle (a.text);
+                                    SetEndDimmingLevel (newDimmingLevel);
+                                } catch {
+                                    MessageBox.Show ("Invalid Start Time");
+                                    a.keepText = false;
+                                }
+                            };
+
+                            t.Run ();
+                            t.Destroy ();
+                        }
                     }
                 }
 
@@ -742,25 +837,6 @@ namespace AquaPic.UserInterface
                             }
                         }
                     }
-                }
-
-
-            } else {
-                var stateInfo = stateInfos[selectedState];
-
-                if ((x > stateInfo.deleteButtonXPos - 12) && (x < stateInfo.deleteButtonXPos + 12) &&
-                    (y > stateInfo.deleteButtonYPos - 12) && (y < stateInfo.deleteButtonYPos + 12)) {
-                    var parent = Toplevel as Window;
-                    var ms = new TouchDialog ("Are you sure you want to delete the state", parent);
-                    ms.Response += (o, a) => {
-                        if (a.ResponseId == ResponseType.Yes) {
-                            RemoveState (selectedState);
-                            selectedState = -1;
-                        }
-                    };
-
-                    ms.Run ();
-                    ms.Destroy ();
                 }
             }
 
@@ -952,7 +1028,7 @@ namespace AquaPic.UserInterface
             public double startButtonXPos, startButtonYPos;
             public double endButtonXPos, endButtonYPos;
             public double startTimeTextXPos, endTimeTextXPos;
-            public double startDimmingTextXPos, endDimmingTextXPos;
+            public double startDimmingTextYPos, endDimmingTextYPos;
             public double deleteButtonXPos, deleteButtonYPos;
         }
     }

@@ -29,14 +29,14 @@ namespace AquaPic.Modules
 {
     public enum LightingStateType
     {
-        On,
-        Off,
+        On = 1,
+        Off = 2,
         [Description ("Linear Ramp")]
-        LinearRamp,
+        LinearRamp = 10,
         [Description ("Half Parabola Ramp")]
-        HalfParabolaRamp,
+        HalfParabolaRamp = 11,
         [Description ("Parabola Ramp")]
-        ParabolaRamp,
+        ParabolaRamp = 12,
     }
 
     public class LightingState
