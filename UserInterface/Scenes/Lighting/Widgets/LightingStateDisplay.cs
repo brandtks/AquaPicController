@@ -33,6 +33,8 @@ namespace AquaPic.UserInterface
 {
     public class LightingStateDisplay : EventBox
     {
+        #region Properties
+
         bool clicked, startButtonClicked, endButtonClicked, deleteButtonClicked, movedOutOfXRange, movedOutOfYRange;
         uint clickTimer;
         int clickX, clickY;
@@ -46,6 +48,8 @@ namespace AquaPic.UserInterface
 
         List<StateInfo> stateInfos;
         bool dimmingFixture;
+
+        #endregion // Properties
 
         public LightingStateDisplay () {
             Visible = true;
@@ -468,6 +472,8 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey2", 0.5);
                     cr.Fill ();
 
+                    #region Start End Buttons
+
                     var startButtonX = startXPosSelected;
                     var endButtonX = endXPosSelected;
                     var startButtonY = startYPosSelected;
@@ -502,7 +508,10 @@ namespace AquaPic.UserInterface
                     color.SetSource (cr);
                     cr.Fill ();
 
-                    // Time text boxes
+                    #endregion // Start End Buttons
+
+                    #region Time Textboxes
+
                     double startTimeTextX, endTimeTextX;
                     if (periodSelected < 84) {
                         startTimeTextX = startXPosSelected - 80 + (periodSelected - 2) / 2;
@@ -538,6 +547,8 @@ namespace AquaPic.UserInterface
                     text.alignment = TouchAlignment.Center;
                     text.font.color = "black";
                     text.Render (this, endTimeTextX.ToInt (), graphBottom + 10, 80);
+
+                    #endregion // Time Textboxes
 
                     // Dimming textboxes
                     if (dimmingFixture) {
@@ -575,7 +586,7 @@ namespace AquaPic.UserInterface
                         text = new TouchText (state.startingDimmingLevel.ToString ());
                         text.alignment = TouchAlignment.Center;
                         text.font.color = "black";
-                        text.Render (this, left, startDimmingTextY.ToInt () + 3, 73);
+                        text.Render (this, left, startDimmingTextY.ToInt () + 2, 73);
 
                         // End dimming textbox
                         if (showEndDimmingLevel) {
@@ -588,8 +599,10 @@ namespace AquaPic.UserInterface
                             text = new TouchText (state.endingDimmingLevel.ToString ());
                             text.alignment = TouchAlignment.Center;
                             text.font.color = "black";
-                            text.Render (this, left, endDimmingTextY.ToInt () + 3, 73);
+                            text.Render (this, left, endDimmingTextY.ToInt () + 2, 73);
                         }
+
+
                     } else {
                         stateInfo.startDimmingTextYPos = 0;
                         stateInfo.endDimmingTextYPos = 0;
@@ -719,6 +732,8 @@ namespace AquaPic.UserInterface
                     ms.Destroy ();
                 }
             } else if (!(startButtonClicked | endButtonClicked)) {
+                var releasedHappenedOnSomeEnitity = false;
+
                 if (selectedState != -1) {
                     var stateInfo = stateInfos[selectedState];
 
@@ -740,6 +755,8 @@ namespace AquaPic.UserInterface
 
                             t.Run ();
                             t.Destroy ();
+
+                            releasedHappenedOnSomeEnitity = true;
                         } else if ((x > stateInfo.endTimeTextXPos) && (x < stateInfo.endTimeTextXPos + 80)) {
                             var parent = Toplevel as Window;
                             var t = new TouchNumberInput (true, parent);
@@ -757,6 +774,8 @@ namespace AquaPic.UserInterface
 
                             t.Run ();
                             t.Destroy ();
+
+                            releasedHappenedOnSomeEnitity = true;
                         }
                     } else if ((x > graphLeftRelative - 80) && (x < graphLeftRelative - 7)) {
                         if ((y > stateInfo.startDimmingTextYPos) && (y < stateInfo.startDimmingTextYPos + 35)) {
@@ -775,6 +794,8 @@ namespace AquaPic.UserInterface
 
                             t.Run ();
                             t.Destroy ();
+
+                            releasedHappenedOnSomeEnitity = true;
                         } else if ((y > stateInfo.endDimmingTextYPos) && (y < stateInfo.endDimmingTextYPos + 35)) {
                             var parent = Toplevel as Window;
                             var t = new TouchNumberInput (true, parent);
@@ -791,6 +812,8 @@ namespace AquaPic.UserInterface
 
                             t.Run ();
                             t.Destroy ();
+
+                            releasedHappenedOnSomeEnitity = true;
                         }
                     }
                 }
@@ -829,7 +852,9 @@ namespace AquaPic.UserInterface
                                 break;
                             }
                         }
-                    }
+                    } 
+                } else if (!releasedHappenedOnSomeEnitity) {
+                    selectedState = -1;
                 }
             }
 
@@ -850,11 +875,11 @@ namespace AquaPic.UserInterface
                 var yDelta = clickY - y;
                 var xDelta = x - clickX;
 
-                if (!movedOutOfXRange && Math.Abs(xDelta) > 5) {
+                if (!movedOutOfXRange && Math.Abs(xDelta) > 6) {
                     movedOutOfXRange = true;
                 }
 
-                if (!movedOutOfYRange && Math.Abs (yDelta) > 5) {
+                if (!movedOutOfYRange && Math.Abs (yDelta) > 6) {
                     movedOutOfYRange = true;
                 }
 
