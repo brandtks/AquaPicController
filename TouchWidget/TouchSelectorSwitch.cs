@@ -70,30 +70,34 @@ namespace GoodtimeDevelopment.TouchWidget
         public event SelectorChangedEventHandler SelectorChangedEvent;
 
         public TouchSelectorSwitch (int id, int selectionCount, int currentSelectedIndex, TouchOrientation orientation) {
-            this.Visible = true;
-            this.VisibleWindow = false;
+            Visible = true;
+            VisibleWindow = false;
 
             this.id = (byte)id;
             _selectionCount = selectionCount;
-            this.currentSelected = currentSelectedIndex;
+            currentSelected = currentSelectedIndex;
             this.orientation = orientation;
-            this.sliderSize = MySliderSize.Large;
+            sliderSize = MySliderSize.Large;
 
-            this.backgoundColorOptions = new TouchColor[_selectionCount];
-            for (int i = 0; i < backgoundColorOptions.Length; ++i)
-                this.backgoundColorOptions[i] = new TouchColor ("grey0");
+            backgoundColorOptions = new TouchColor[_selectionCount];
+            for (int i = 0; i < backgoundColorOptions.Length; ++i) {
+                backgoundColorOptions[i] = new TouchColor ("grey0");
+            }
 
-            this.textColorOptions = new TouchColor[_selectionCount];
-            for (int i = 0; i < backgoundColorOptions.Length; ++i)
-                this.textColorOptions[i] = new TouchColor ("white");
+            textColorOptions = new TouchColor[_selectionCount];
+            for (int i = 0; i < backgoundColorOptions.Length; ++i) {
+                textColorOptions[i] = new TouchColor ("white");
+            }
 
-            this.sliderColorOptions = new TouchColor[_selectionCount];
-            for (int i = 0; i < sliderColorOptions.Length; ++i)
-                this.sliderColorOptions[i] = new TouchColor ("grey4");
+            sliderColorOptions = new TouchColor[_selectionCount];
+            for (int i = 0; i < sliderColorOptions.Length; ++i) {
+                sliderColorOptions[i] = new TouchColor ("grey4");
+            }
 
-            this.textOptions = new string[_selectionCount];
-            for (int i = 0; i < textOptions.Length; ++i)
-                this.textOptions[i] = string.Empty;
+            textOptions = new string[_selectionCount];
+            for (int i = 0; i < textOptions.Length; ++i) {
+                textOptions[i] = string.Empty;
+            }
 
             clicked = false;
             clickTimer = 0;
