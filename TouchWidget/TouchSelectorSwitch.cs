@@ -267,11 +267,10 @@ namespace GoodtimeDevelopment.TouchWidget
                     }
                 }
             } else {
-                int y = (int)args.Event.Y;
-                int sliderSize = Allocation.Width;
-                int sliderLength = Allocation.Height - sliderSize;
-                int sliderMax = Allocation.Height;
-                int seperation = sliderLength / (_selectionCount - 1);
+                var y = (int)args.Event.Y;
+                var sliderLength = Allocation.Height - Allocation.Width;
+                var sliderMax = Allocation.Height;
+                var seperation = sliderLength / (_selectionCount - 1);
 
                 if (y < 0)
                     currentSelected = 0;
@@ -279,8 +278,8 @@ namespace GoodtimeDevelopment.TouchWidget
                     currentSelected = _selectionCount - 1;
                 else {
                     for (int i = 0; i < _selectionCount; ++i) {
-                        int leftBoundery = i * seperation;
-                        int rightBoundery = (i + 1) * seperation;
+                        var leftBoundery = i * seperation;
+                        var rightBoundery = (i + 1) * seperation;
                         if ((y >= leftBoundery) && (y <= rightBoundery)) {
                             currentSelected = i;
                             break;
@@ -291,18 +290,18 @@ namespace GoodtimeDevelopment.TouchWidget
 
             QueueDraw ();
 
-            if (SelectorChangedEvent != null)
-                SelectorChangedEvent (this, new SelectorChangedEventArgs (currentSelected, id));
+            SelectorChangedEvent?.Invoke (this, new SelectorChangedEventArgs (currentSelected, id));
         }
 
         protected bool OnTimerEvent () {
             if (clicked) {
                 int x, y;
                 GetPointer (out x, out y);
-                if (orientation == TouchOrientation.Horizontal)
+                if (orientation == TouchOrientation.Horizontal) {
                     click2 = x;
-                else
+                } else {
                     click2 = y;
+                }
 
                 QueueDraw ();
             }
