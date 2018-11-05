@@ -51,7 +51,7 @@ namespace AquaPic.UserInterface
         TouchButton fixtureSettingBtn;
         bool isDimmingFixture;
         bool dimmingIsManual;
-        LightingStateDisplay lightingStateDisplay;
+        LightingStateWidget lightingStateWidget;
 
         public LightingWindow (params object[] options) : base (false) {
             sceneTitle = "Lighting";
@@ -227,10 +227,10 @@ namespace AquaPic.UserInterface
             Put (fixtureSettingBtn, 755, 35);
             fixtureSettingBtn.Show ();
 
-            lightingStateDisplay = new LightingStateDisplay ();
-            lightingStateDisplay.SetSizeRequest (540, 360);
-            Put (lightingStateDisplay, 55, 90);
-            lightingStateDisplay.Show ();
+            lightingStateWidget = new LightingStateWidget ();
+            lightingStateWidget.SetSizeRequest (540, 360);
+            Put (lightingStateWidget, 55, 90);
+            lightingStateWidget.Show ();
 
             combo = new TouchComboBox (Lighting.GetAllFixtureNames ());
             combo.comboList.Add ("New fixture...");
@@ -287,8 +287,8 @@ namespace AquaPic.UserInterface
 
                 isDimmingFixture = Lighting.IsDimmingFixture (fixtureName);
 
-                lightingStateDisplay.SetStates (Lighting.GetLightingStates (fixtureName), isDimmingFixture);
-                lightingStateDisplay.QueueDraw ();
+                lightingStateWidget.SetStates (Lighting.GetLightingStates (fixtureName), isDimmingFixture);
+                lightingStateWidget.QueueDraw ();
 
                 if (isDimmingFixture) {
                     dimmingHeader.Visible = true;

@@ -80,6 +80,7 @@
     <Compile Include="Widgets\MyNotificationBar.cs" />
     <Compile Include="Widgets\MySideBar.cs" />
     <Compile Include="Scenes\Lighting\Widgets\LightingStateDisplay.cs" />
+    <Compile Include="Scenes\Lighting\Widgets\LightingStateWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
