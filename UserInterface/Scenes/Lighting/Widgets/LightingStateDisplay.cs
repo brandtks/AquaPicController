@@ -35,7 +35,9 @@ namespace AquaPic.UserInterface
     {
         #region Properties
 
-        bool clicked, startButtonClicked, endButtonClicked, deleteButtonClicked, movedOutOfXRange, movedOutOfYRange;
+        bool clicked, startButtonClicked, endButtonClicked, 
+            deleteButtonClicked, movedOutOfXRange, movedOutOfYRange,
+            adjustDimmingTogether;
         uint clickTimer;
         int clickX, clickY;
         int selectedState;
@@ -60,6 +62,7 @@ namespace AquaPic.UserInterface
             graphTopRelative = graphTopEdgeWidth;
             selectedState = -1;
             stateInfos = new List<StateInfo> ();
+            adjustDimmingTogether = true;
 
             ExposeEvent += onExpose;
             ButtonPressEvent += OnButtonPress;
@@ -138,6 +141,8 @@ namespace AquaPic.UserInterface
 
                 double startYPosSelected = 0, endYPosSelected = 0, startXPosSelected = 0, endXPosSelected = 0;
                 double rightPartSelected = 0, periodSelected = 0, deltaSelected = 0, interXPosSelected = 0;
+
+                #region General State Render
 
                 // Draw the states
                 bool firstTimeThrough = true, lastOnSecondLine = false;
@@ -359,9 +364,13 @@ namespace AquaPic.UserInterface
                     }
                 }
 
+                #endregion
+
                 if (selectedState != -1) {
                     var stateInfo = stateInfos[selectedState];
                     var state = stateInfo.lightingState;
+
+                    #region Render Selected State
 
                     cr.MoveTo (startXPosSelected, graphBottom);
                     cr.LineTo (startXPosSelected, startYPosSelected);
@@ -472,6 +481,8 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey2", 0.5);
                     cr.Fill ();
 
+#endregion
+
                     #region Start End Buttons
 
                     var startButtonX = startXPosSelected;
@@ -488,13 +499,24 @@ namespace AquaPic.UserInterface
                     cr.MoveTo (startButtonX, startButtonY);
                     cr.Arc (startButtonX, startButtonY, 15, 0, 2 * Math.PI);
                     cr.ClosePath ();
-                    
+
                     var color = new TouchColor ("secb");
                     if (startButtonClicked) {
                         color.ModifyColor (0.75);
                     }
-                    color.SetSource (cr);
-                    cr.Fill ();
+                    var highlightColor = new TouchColor (color);
+                    highlightColor.ModifyColor (1.4);
+                    var outlineColor = new TouchColor (color);
+                    outlineColor.ModifyColor (0.5);
+
+                    outlineColor.SetSource (cr);
+                    cr.StrokePreserve ();
+                    using (var grad = new RadialGradient (startButtonX, startButtonY + 10, 25, startButtonX, startButtonY + 10, 0)) {
+                        grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.35, color.ToCairoColor ());
+                        cr.SetSource (grad);
+                        cr.Fill ();
+                    }
 
                     // State end adjustment button
                     cr.MoveTo (endButtonX, endButtonY);
@@ -505,8 +527,19 @@ namespace AquaPic.UserInterface
                     if (endButtonClicked) {
                         color.ModifyColor (0.75);
                     }
-                    color.SetSource (cr);
-                    cr.Fill ();
+                    highlightColor = new TouchColor (color);
+                    highlightColor.ModifyColor (1.4);
+                    outlineColor = new TouchColor (color);
+                    outlineColor.ModifyColor (0.5);
+
+                    outlineColor.SetSource (cr);
+                    cr.StrokePreserve ();
+                    using (var grad = new RadialGradient (endButtonX, endButtonY + 10, 25, endButtonX, endButtonY + 10, 0)) {
+                        grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.35, color.ToCairoColor ());
+                        cr.SetSource (grad);
+                        cr.Fill ();
+                    }
 
                     #endregion // Start End Buttons
 
@@ -549,6 +582,8 @@ namespace AquaPic.UserInterface
                     text.Render (this, endTimeTextX.ToInt (), graphBottom + 10, 80);
 
                     #endregion // Time Textboxes
+
+                    #region Dimming Textboxes
 
                     // Dimming textboxes
                     if (dimmingFixture) {
@@ -608,6 +643,10 @@ namespace AquaPic.UserInterface
                         stateInfo.endDimmingTextYPos = 0;
                     }
 
+                    #endregion
+
+                    #region Delete Button
+
                     // Delete button
                     double deleteButtonX, deleteButtonY;
                     if (state.startTime.Before (state.endTime)) {
@@ -631,8 +670,24 @@ namespace AquaPic.UserInterface
 
                     cr.MoveTo (deleteButtonX, deleteButtonY);
                     cr.Arc (deleteButtonX, deleteButtonY, 15, 0, 2 * Math.PI);
-                    TouchColor.SetSource (cr, "compl");
-                    cr.Fill ();
+
+                    color = new TouchColor ("compl");
+                    if (deleteButtonClicked) {
+                        color.ModifyColor (0.75);
+                    }
+                    highlightColor = new TouchColor (color);
+                    highlightColor.ModifyColor (1.4);
+                    outlineColor = new TouchColor (color);
+                    outlineColor.ModifyColor (0.5);
+
+                    outlineColor.SetSource (cr);
+                    cr.StrokePreserve ();
+                    using (var grad = new RadialGradient (deleteButtonX, deleteButtonY + 10, 25, deleteButtonX, deleteButtonY + 10, 0)) {
+                        grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.35, color.ToCairoColor ());
+                        cr.SetSource (grad);
+                        cr.Fill ();
+                    }
 
                     cr.MoveTo (deleteButtonX - 6, deleteButtonY - 6);
                     cr.LineTo (deleteButtonX + 6, deleteButtonY + 6);
@@ -640,6 +695,8 @@ namespace AquaPic.UserInterface
                     cr.LineTo (deleteButtonX - 6, deleteButtonY + 6);
                     TouchColor.SetSource (cr, "grey2");
                     cr.Stroke ();
+
+                    #endregion
                 }
 
                 cr.MoveTo (timeXPos, timeYPos);
@@ -708,6 +765,7 @@ namespace AquaPic.UserInterface
                     deleteButtonClicked = true;
                 }
             }
+            QueueDraw ();
         }
 
         protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
@@ -731,7 +789,9 @@ namespace AquaPic.UserInterface
                     ms.Run ();
                     ms.Destroy ();
                 }
-            } else if (!(startButtonClicked | endButtonClicked)) {
+            } else if (startButtonClicked | endButtonClicked) {
+                //
+            } else {
                 var releasedHappenedOnSomeEnitity = false;
 
                 if (selectedState != -1) {
@@ -821,6 +881,7 @@ namespace AquaPic.UserInterface
                 // The release happened on the graph
                 if ((x > graphLeftRelative) && (x < graphRightRelative) &&
                     (y > graphTopRelative) && (y < graphBottomRelative)) {
+
                     for (var i = 0; i < stateInfos.Count; ++i) {
                         var stateInfo = stateInfos[i];
                         var state = stateInfo.lightingState;
@@ -852,7 +913,7 @@ namespace AquaPic.UserInterface
                                 break;
                             }
                         }
-                    } 
+                    }
                 } else if (!releasedHappenedOnSomeEnitity) {
                     selectedState = -1;
                 }
@@ -965,16 +1026,38 @@ namespace AquaPic.UserInterface
         }
 
         void SetStartDimmingLevel (double newStartDimmingLevel) {
-            var stateInfo = stateInfos[selectedState];
+            var newDimmingLevel = (float)newStartDimmingLevel.Constrain (0, 100);
+            SetStartDimmingLevel (stateInfos[selectedState], newDimmingLevel);
+        }
+
+        void SetStartDimmingLevel (StateInfo stateInfo, float newDimmingLevel) {
             var state = stateInfo.lightingState;
             var type = state.type;
-            var newDimmingLevel = (float)newStartDimmingLevel.Constrain (0, 100);
 
             if (type == LightingStateType.On) {
-                state.startingDimmingLevel = newDimmingLevel;
-                state.endingDimmingLevel = newDimmingLevel;
-            } else {
-                state.startingDimmingLevel = newDimmingLevel;
+                if (state.startingDimmingLevel != newDimmingLevel) {
+                    state.startingDimmingLevel = newDimmingLevel;
+
+                    if (adjustDimmingTogether) {
+                        SetEndDimmingLevel (stateInfo.previous, newDimmingLevel);
+                    }
+                }
+
+                if (state.endingDimmingLevel != newDimmingLevel) {
+                    state.endingDimmingLevel = newDimmingLevel;
+
+                    if (adjustDimmingTogether) {
+                        SetStartDimmingLevel (stateInfo.next, newDimmingLevel);
+                    }
+                }
+            } else if (type != LightingStateType.Off) {
+                if (state.startingDimmingLevel != newDimmingLevel) {
+                    state.startingDimmingLevel = newDimmingLevel;
+
+                    if (adjustDimmingTogether) {
+                        SetEndDimmingLevel (stateInfo.previous, newDimmingLevel);
+                    }
+                }
             }
         }
 
@@ -1011,17 +1094,39 @@ namespace AquaPic.UserInterface
             return timeOkay;
         }
 
-        void SetEndDimmingLevel (double newStartDimmingLevel) {
-            var stateInfo = stateInfos[selectedState];
+        void SetEndDimmingLevel (double newEndDimmingLevel) {
+            var newDimmingLevel = (float)newEndDimmingLevel.Constrain (0, 100);
+            SetEndDimmingLevel (stateInfos[selectedState], newDimmingLevel);
+        }
+
+        void SetEndDimmingLevel (StateInfo stateInfo, float newDimmingLevel) {
             var state = stateInfo.lightingState;
             var type = state.type;
-            var newDimmingLevel = (float)newStartDimmingLevel.Constrain (0, 100);
 
             if (type == LightingStateType.On) {
-                state.startingDimmingLevel = newDimmingLevel;
-                state.endingDimmingLevel = newDimmingLevel;
-            } else {
-                state.endingDimmingLevel = newDimmingLevel;
+                if (state.startingDimmingLevel != newDimmingLevel) {
+                    state.startingDimmingLevel = newDimmingLevel;
+
+                    if (adjustDimmingTogether) {
+                        SetEndDimmingLevel (stateInfo.previous, newDimmingLevel);
+                    }
+                }
+
+                if (state.endingDimmingLevel != newDimmingLevel) {
+                    state.endingDimmingLevel = newDimmingLevel;
+
+                    if (adjustDimmingTogether) {
+                        SetStartDimmingLevel (stateInfo.next, newDimmingLevel);
+                    }
+                }
+            } else if (type != LightingStateType.Off) {
+                if (state.endingDimmingLevel != newDimmingLevel) {
+                    state.endingDimmingLevel = newDimmingLevel;
+
+                    if (adjustDimmingTogether) {
+                        SetStartDimmingLevel (stateInfo.next, newDimmingLevel);
+                    }
+                }
             }
         }
 
