@@ -154,7 +154,8 @@ namespace AquaPic.UserInterface
                         newLevel = 100.0f;
                     Lighting.SetDimmingLevel (fixtureName, newLevel);
                 } catch (Exception ex) {
-                    MessageBox.Show (ex.ToString ());
+                    MessageBox.Show (ex.Message);
+                    args.keepText = false;
                 }
             };
             requestedTextBox.SetSizeRequest (110, 36);
@@ -163,7 +164,7 @@ namespace AquaPic.UserInterface
             requestedTextBox.textAlignment = TouchAlignment.Center;
             requestedTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Percentage;
             requestedTextBox.Visible = false;
-            Put (requestedTextBox, 620, 279);
+            Put (requestedTextBox, 620, 272);
             requestedTextBox.Show ();
 
             requestedTextLabel = new TouchLabel ();
