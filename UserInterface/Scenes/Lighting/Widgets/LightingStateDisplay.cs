@@ -31,16 +31,48 @@ using AquaPic.Modules;
 
 namespace AquaPic.UserInterface
 {
+    public delegate void LightingStateSelectionChangedHandler (object sender, LightingStateSelectionArgs args);
+
+    public class LightingStateSelectionArgs
+    {
+        public LightingState lightingState;
+        public bool stateSelected;
+
+        public LightingStateSelectionArgs (LightingState lightingState, bool stateSelected) {
+            this.lightingState = lightingState;
+            this.stateSelected = stateSelected;
+        }
+    }
+
     public class LightingStateDisplay : EventBox
     {
         #region Properties
 
-        bool clicked, startButtonClicked, endButtonClicked, 
-            deleteButtonClicked, movedOutOfXRange, movedOutOfYRange,
-            adjustDimmingTogether;
+        public bool adjustDimmingTogether;
+
+        public event LightingStateSelectionChangedHandler LightingStateSelectionChanged;
+
+        bool clicked, startButtonClicked, endButtonClicked,
+        deleteButtonClicked, movedOutOfXRange, movedOutOfYRange;
         uint clickTimer;
         int clickX, clickY;
-        int selectedState;
+
+        int _selectedState;
+        int selectedState {
+            get {
+                return _selectedState;
+            }
+            set {
+                _selectedState = value;
+                LightingStateSelectionArgs args;
+                if (_selectedState == -1) {
+                    args = new LightingStateSelectionArgs (null, false);
+                } else {
+                    args = new LightingStateSelectionArgs (stateInfos[_selectedState].lightingState, true);
+                }
+                LightingStateSelectionChanged?.Invoke (this, args);
+            }
+        }
 
         const int graphLeftEdgeWidth = 80;
         const int graphTopEdgeWidth = 60;
@@ -481,7 +513,7 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey2", 0.5);
                     cr.Fill ();
 
-#endregion
+                    #endregion
 
                     #region Start End Buttons
 
