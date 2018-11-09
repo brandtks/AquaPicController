@@ -34,14 +34,39 @@ namespace AquaPic.UserInterface
     public class LightingStateWidget : Fixed
     {
         public LightingStateDisplay lightingStateDisplay;
+        TouchSelectorSwitch adjustDimmingTogetherSelector;
 
         public LightingStateWidget () {
             SetSizeRequest (540, 360);
 
             lightingStateDisplay = new LightingStateDisplay ();
             lightingStateDisplay.SetSizeRequest (540, 360);
+            lightingStateDisplay.LightingStateSelectionChanged += (obj, args) => {
+                if (args.stateSelected) {
+                    adjustDimmingTogetherSelector.Visible = true;
+                } else {
+                    adjustDimmingTogetherSelector.Visible = false;
+                }
+            };
             Put (lightingStateDisplay, 0, 0);
             lightingStateDisplay.Show ();
+
+            adjustDimmingTogetherSelector = new TouchSelectorSwitch ();
+            adjustDimmingTogetherSelector.SetSizeRequest (140, 30);
+            adjustDimmingTogetherSelector.sliderSize = MySliderSize.Large;
+            adjustDimmingTogetherSelector.textOptions[0] = "Separate";
+            adjustDimmingTogetherSelector.textOptions[1] = "Together";
+            adjustDimmingTogetherSelector.sliderColorOptions[0] = "grey2";
+            adjustDimmingTogetherSelector.sliderColorOptions[1] = "pri";
+            adjustDimmingTogetherSelector.currentSelected = 1;
+            adjustDimmingTogetherSelector.SelectorChangedEvent += (obj, args) => {
+                if (args.currentSelectedIndex == 1) {
+                    lightingStateDisplay.adjustDimmingTogether = true;
+                } else {
+                    lightingStateDisplay.adjustDimmingTogether = false;
+                }
+            };
+            Put (adjustDimmingTogetherSelector, 10, 10);
 
             Show ();
         }
