@@ -115,9 +115,11 @@ namespace GoodtimeDevelopment.TouchWidget
             ButtonReleaseEvent += OnSelectorRelease;
         }
 
+        public TouchSelectorSwitch (int id, int selectionCount) : this (id, selectionCount, 0, TouchOrientation.Horizontal) { }
+
         public TouchSelectorSwitch (int selectionCount) : this (0, selectionCount, 0, TouchOrientation.Horizontal) { }
 
-        public TouchSelectorSwitch (int id, int selectionCount) : this (id, selectionCount, 0, TouchOrientation.Horizontal) { }
+        public TouchSelectorSwitch () : this (0, 2, 0, TouchOrientation.Horizontal) { }
 
         public void AddSelectedColorOption (int selectionIndex, string newColor) {
             backgoundColorOptions[selectionIndex] = newColor;
