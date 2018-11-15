@@ -540,16 +540,16 @@ namespace AquaPic.UserInterface
                     var outlineColor = new TouchColor (color);
                     outlineColor.ModifyColor (0.5);
                     var highlightColor = new TouchColor (color);
-                    highlightColor.ModifyColor (1.4);
+                    highlightColor.ModifyColor (1.2);
                     var lowlightColor = new TouchColor (color);
                     lowlightColor.ModifyColor (0.75);
 
                     outlineColor.SetSource (cr);
                     cr.StrokePreserve ();
-                    using (var grad = new RadialGradient (startButtonX, startButtonY - 20, 0, startButtonX, startButtonY - 10, 35)) {
+                    using (var grad = new RadialGradient (startButtonX, startButtonY - 10, 0, startButtonX, startButtonY - 10, 25)) {
                         grad.AddColorStop (0, highlightColor.ToCairoColor ());
                         grad.AddColorStop (0.35, color.ToCairoColor ());
-                        grad.AddColorStop (0.7, lowlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.75, lowlightColor.ToCairoColor ());
                         cr.SetSource (grad);
                         cr.Fill ();
                     }
@@ -567,7 +567,7 @@ namespace AquaPic.UserInterface
                     outlineColor = new TouchColor (color);
                     outlineColor.ModifyColor (0.5);
                     highlightColor = new TouchColor (color);
-                    highlightColor.ModifyColor (1.4);
+                    highlightColor.ModifyColor (1.2);
                     lowlightColor = new TouchColor (color);
                     lowlightColor.ModifyColor (0.75);
 
