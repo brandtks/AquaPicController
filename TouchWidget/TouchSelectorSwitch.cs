@@ -228,7 +228,7 @@ namespace GoodtimeDevelopment.TouchWidget
                     if (!string.IsNullOrWhiteSpace (textOptions[i])) {
                         render.font.color = textColorOptions[i];
                         render.text = textOptions[i];
-                        render.Render (this, x, Allocation.Top + 6, seperation);
+                        render.Render (this, x, Allocation.Top + 4, seperation);
                     }
 
                     x += seperation;
