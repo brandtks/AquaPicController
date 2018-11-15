@@ -70,18 +70,9 @@ namespace GoodtimeDevelopment.TouchWidget
         }
         public int maxListHeight;
 
-        private bool listDropdown;
-        private bool secondClick;
-        private int highlighted;
-        private int height;
-        private int listOffset;
-        private int scrollBarHeight;
-        private bool includeScrollBar;
-        private bool scrollBarClicked;
-        private bool scrollBarMoved;
-        private bool scrollBarUpClicked;
-        private bool scrollBarDownClicked;
-        private int clickY;
+        bool listDropdown, secondClick, includeScrollBar, scrollBarClicked,
+            scrollBarMoved, scrollBarUpClicked, scrollBarDownClicked;
+        int highlighted, height, listOffset, scrollBarHeight, clickY;
 
         public event ComboBoxChangedEventHandler ComboChangedEvent;
 
@@ -122,15 +113,15 @@ namespace GoodtimeDevelopment.TouchWidget
                     int listHeight;
 
                     if (comboList.Count > maxListHeight) {
-                        listHeight = (maxListHeight + 1) * height;
+                        listHeight = maxListHeight * height;
                         includeScrollBar = true;
                     } else if (comboList.Count > 0) {
-                        listHeight = (comboList.Count + 1) * height;
+                        listHeight = comboList.Count * height;
                     } else {
                         listHeight = 2 * height;
                     }
-
-                    HeightRequest = listHeight + 2;
+                    listHeight += height;
+                    HeightRequest = listHeight + height + 2;
 
                     int radius = height / 2;
                     cr.MoveTo (left, top + radius);
@@ -140,17 +131,60 @@ namespace GoodtimeDevelopment.TouchWidget
                     cr.LineTo (left + width, top + listHeight);
                     cr.LineTo (left, top + listHeight);
                     cr.ClosePath ();
-                    cr.SetSourceRGB (0.85, 0.85, 0.85);
+                    TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
                     cr.LineWidth = 0.85;
-                    cr.SetSourceRGB (0.0, 0.0, 0.0);
+                    TouchColor.SetSource (cr, "black");
                     cr.Stroke ();
 
                     DrawDownButton (cr, left, top, width);
 
                     if (includeScrollBar) {
                         int x = left + width - height - 1;
+                        listHeight -= height;
 
+                        cr.Rectangle (x, top + height, height + 1, listHeight - 15);
+                        TouchColor.SetSource (cr, "grey1");
+                        cr.Fill ();
+
+                        /*
+                        cr.Rectangle (x, top + height, height, height);
+                        TouchColor buttonColor = "grey3";
+                        var highlightColor = new TouchColor (buttonColor);
+                        highlightColor.ModifyColor (1.4);
+                        var lowlightColor = new TouchColor (buttonColor);
+                        lowlightColor.ModifyColor (0.75);
+                        using (var grad = new LinearGradient (x, top, x, top + 2 * height)) {
+                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                            grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
+                            grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                            cr.SetSource (grad);
+                            cr.Fill ();
+                        }
+
+                        scrollBarHeight = (listHeight - 3 * height) / comboList.Count;
+                        var scrollBarTop = top + (2 * height) + (scrollBarHeight * listOffset);
+                        cr.Rectangle (x, scrollBarTop, height + 1, scrollBarHeight);
+                        using (var grad = new LinearGradient (x, scrollBarTop, x, scrollBarTop + scrollBarHeight)) {
+                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                            grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
+                            grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                            cr.SetSource (grad);
+                            cr.Fill ();
+                        }
+
+                        var buttonTop = top + listHeight - height;
+                        cr.Rectangle (x, buttonTop, height, height);
+                        using (var grad = new LinearGradient (x, buttonTop, x, buttonTop + height)) {
+                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                            grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
+                            grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                            cr.SetSource (grad);
+                            cr.Fill ();
+                        }
+                        *
+
+                        /*
                         cr.Rectangle (x, top + height, height, listHeight - height - 1);
                         TouchColor.SetSource (cr, "grey3");
                         cr.Fill ();
@@ -171,7 +205,9 @@ namespace GoodtimeDevelopment.TouchWidget
                         cr.Rectangle (x, top + (2 * height) + (scrollBarHeight * listOffset), height + 1, scrollBarHeight * maxListHeight);
                         TouchColor.SetSource (cr, "grey1");
                         cr.Fill ();
+                        */
 
+                        /*
                         int triOffset = 7;
                         int triSize = height - 12;
                         int y = top + height + triOffset + triSize;
@@ -199,6 +235,7 @@ namespace GoodtimeDevelopment.TouchWidget
                             TouchColor.SetSource (cr, "grey1");
                         }
                         cr.Fill ();
+                        */
                     }
 
 #if !TEST_HIGHLIGHT
@@ -216,7 +253,7 @@ namespace GoodtimeDevelopment.TouchWidget
                     }
 #endif
 
-                    TouchText textRender = new TouchText ();
+                    var textRender = new TouchText ();
                     textRender.font.color = "black";
                     if (includeScrollBar) {
                         for (int i = 0; i < maxListHeight; ++i) {
@@ -235,10 +272,10 @@ namespace GoodtimeDevelopment.TouchWidget
                     HeightRequest = height;
 
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width - 2, height, height / 2);
-                    cr.SetSourceRGB (0.85, 0.85, 0.85);
+                    TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
-                    cr.LineWidth = 0.85;
-                    cr.SetSourceRGB (0.0, 0.0, 0.0);
+                    cr.LineWidth = 1;
+                    TouchColor.SetSource (cr, "black");
                     cr.Stroke ();
 
                     DrawDownButton (cr, left, top, width);
@@ -248,25 +285,19 @@ namespace GoodtimeDevelopment.TouchWidget
                 bool writeStringCond2 = (comboList.Count > 0) && (activeIndex >= 0);
 
                 if (writeStringCond1 || writeStringCond2) {
-                    string text;
-                    if (writeStringCond1) {
-                        text = nonActiveMessage;
-                    } else {
-                        text = comboList[activeIndex];
-                    }
-
-                    TouchText t = new TouchText (text);
+                    string text = writeStringCond1 ? nonActiveMessage : comboList[activeIndex];
+                    var t = new TouchText (text);
                     t.textWrap = TouchTextWrap.Shrink;
                     t.font.color = "black";
-                    int w = width - height - 10;
+                    var w = width - height - 10;
                     t.Render (this, left + 10, top, w, height);
                 }
             }
         }
 
-        private void DrawDownButton (Context cr, int left, int top, int width) {
-            int x = left + (width - height);
-            int radius = height / 2;
+        void DrawDownButton (Context cr, int left, int top, int width) {
+            var x = left + (width - height);
+            var radius = height / 2;
             cr.MoveTo (x, top);
             cr.LineTo (x + radius, top);
             if (listDropdown) {
@@ -278,23 +309,41 @@ namespace GoodtimeDevelopment.TouchWidget
             cr.LineTo (x, top + height);
             cr.ClosePath ();
 
-            if (listDropdown) {
-                TouchColor.SetSource (cr, "grey2");
-            } else {
-                TouchColor.SetSource (cr, "grey1");
+            TouchColor backgroundColor = "grey1";
+            var outlineColor = new TouchColor (backgroundColor);
+            outlineColor.ModifyColor (0.5);
+            var highlightColor = new TouchColor (backgroundColor);
+            highlightColor.ModifyColor (1.4);
+            var lowlightColor = new TouchColor (backgroundColor);
+            lowlightColor.ModifyColor (0.75);
+
+            using (var grad = new LinearGradient (x, top, x, top + height)) {
+                grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                grad.AddColorStop (0.2, backgroundColor.ToCairoColor ());
+                grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                cr.SetSource (grad);
+                cr.FillPreserve ();
             }
-            cr.FillPreserve ();
-            cr.LineWidth = 0.85;
-            TouchColor.SetSource (cr, "black");
+
+            outlineColor.SetSource (cr);
+            cr.LineWidth = 1;
             cr.Stroke ();
 
             int triOffset = 7;
             int triSize = height - 12;
             int y = top + triOffset;
-            x += (triOffset - 3);
-            cr.MoveTo (x, y);
-            cr.LineTo (x + triSize, y);
-            cr.LineTo (x + triSize / 2, y + triSize);
+            if (listDropdown) {
+                x += height / 2;
+                cr.MoveTo (x, y);
+                cr.LineTo (x + triSize / 2, y + triSize);
+                cr.LineTo (x - triSize / 2, y + triSize);
+            } else {
+                x += (triOffset - 3);
+                cr.MoveTo (x, y);
+                cr.LineTo (x + triSize, y);
+                cr.LineTo (x + triSize / 2, y + triSize);
+            }
+
             cr.ClosePath ();
             TouchColor.SetSource (cr, "seca");
             cr.Fill ();
@@ -326,6 +375,7 @@ namespace GoodtimeDevelopment.TouchWidget
             } else {
                 secondClick = false;
             }
+
 #if !RPI_BUILD
             GLib.Timeout.Add (20, OnTimerEvent);
 #endif
@@ -405,9 +455,8 @@ namespace GoodtimeDevelopment.TouchWidget
 
                         var newIndex = activeIndex;
                         var comboChangedEventArgs = new ComboBoxChangedEventArgs (activeIndex, comboList[activeIndex]);
-                        if (ComboChangedEvent != null) {
-                            ComboChangedEvent (this, comboChangedEventArgs);
-                        }
+
+                        ComboChangedEvent?.Invoke(this, comboChangedEventArgs);
 
                         if (!comboChangedEventArgs.keepChange || (newIndex != activeIndex)) {
                             activeIndex = previousIndex;
