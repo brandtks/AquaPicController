@@ -32,9 +32,9 @@ namespace GoodtimeDevelopment.TouchWidget
     public class SelectorChangedEventArgs : EventArgs
     {
         public int currentSelectedIndex;
-        public byte id;
+        public int id;
 
-        public SelectorChangedEventArgs (int currentSelectedIndex, byte id) {
+        public SelectorChangedEventArgs (int currentSelectedIndex, int id) {
             this.currentSelectedIndex = currentSelectedIndex;
             this.id = id;
         }
@@ -48,16 +48,11 @@ namespace GoodtimeDevelopment.TouchWidget
 
     public class TouchSelectorSwitch : EventBox
     {
-        private bool clicked;
-        private uint clickTimer;
-        private int click1, click2;
+        bool clicked;
+        uint clickTimer;
+        int click1, click2;
 
-        private int _selectionCount;
-        public int selectionCount {
-            get {
-                return _selectionCount;
-            }
-        }
+        public int selectionCount { get; }
         public int currentSelected;
         public TouchOrientation orientation;
         public MySliderSize sliderSize;
@@ -65,7 +60,7 @@ namespace GoodtimeDevelopment.TouchWidget
         public TouchColor[] textColorOptions;
         public TouchColor[] sliderColorOptions;
         public string[] textOptions;
-        public byte id;
+        public int id;
 
         public event SelectorChangedEventHandler SelectorChangedEvent;
 
@@ -73,28 +68,28 @@ namespace GoodtimeDevelopment.TouchWidget
             Visible = true;
             VisibleWindow = false;
 
-            this.id = (byte)id;
-            _selectionCount = selectionCount;
+            this.id = id;
+            this.selectionCount = selectionCount;
             currentSelected = currentSelectedIndex;
             this.orientation = orientation;
             sliderSize = MySliderSize.Large;
 
-            backgoundColorOptions = new TouchColor[_selectionCount];
+            backgoundColorOptions = new TouchColor[this.selectionCount];
             for (int i = 0; i < backgoundColorOptions.Length; ++i) {
                 backgoundColorOptions[i] = new TouchColor ("grey0");
             }
 
-            textColorOptions = new TouchColor[_selectionCount];
+            textColorOptions = new TouchColor[this.selectionCount];
             for (int i = 0; i < backgoundColorOptions.Length; ++i) {
                 textColorOptions[i] = new TouchColor ("white");
             }
 
-            sliderColorOptions = new TouchColor[_selectionCount];
+            sliderColorOptions = new TouchColor[this.selectionCount];
             for (int i = 0; i < sliderColorOptions.Length; ++i) {
                 sliderColorOptions[i] = new TouchColor ("grey4");
             }
 
-            textOptions = new string[_selectionCount];
+            textOptions = new string[this.selectionCount];
             for (int i = 0; i < textOptions.Length; ++i) {
                 textOptions[i] = string.Empty;
             }
@@ -149,14 +144,14 @@ namespace GoodtimeDevelopment.TouchWidget
                     if (sliderSize == MySliderSize.Small)
                         sliderWidth = height;
                     else {
-                        sliderWidth = width / _selectionCount;
-                        sliderWidth += (_selectionCount - 2) * 8;
+                        sliderWidth = width / selectionCount;
+                        sliderWidth += (selectionCount - 2) * 8;
                     }
 
                     sliderLength = width - sliderWidth;
                     sliderMax = left + sliderLength;
 
-                    seperation = sliderLength / (_selectionCount - 1);
+                    seperation = sliderLength / (selectionCount - 1);
 
                     seperation *= currentSelected;
 
@@ -173,14 +168,14 @@ namespace GoodtimeDevelopment.TouchWidget
                     if (sliderSize == MySliderSize.Small)
                         sliderWidth = width;
                     else {
-                        sliderWidth = height / _selectionCount;
-                        sliderWidth += (_selectionCount - 2) * 8;
+                        sliderWidth = height / selectionCount;
+                        sliderWidth += (selectionCount - 2) * 8;
                     }
 
                     sliderLength = height - sliderWidth;
                     sliderMax = top + sliderLength;
 
-                    seperation = sliderLength / (_selectionCount - 1);
+                    seperation = sliderLength / (selectionCount - 1);
 
                     seperation *= currentSelected;
 
@@ -202,8 +197,8 @@ namespace GoodtimeDevelopment.TouchWidget
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
                 backgoundColorOptions[currentSelected].SetSource (cr);
                 cr.FillPreserve ();
-                cr.LineWidth = 1;
-                cr.SetSourceRGB (0.0, 0.0, 0.0);
+                cr.LineWidth = 1.1;
+                TouchColor.SetSource (cr, "black");
                 cr.Stroke ();
 
                 // Slider
@@ -230,25 +225,26 @@ namespace GoodtimeDevelopment.TouchWidget
                 var lowlightColor = new TouchColor (sliderColor);
                 lowlightColor.ModifyColor (0.75);
 
-                outlineColor.SetSource (cr);
-                cr.StrokePreserve ();
-
                 using (var grad = new LinearGradient (sliderLeft, sliderTop, sliderLeft, sliderBottom)) {
                     grad.AddColorStop (0, highlightColor.ToCairoColor ());
                     grad.AddColorStop (0.2, sliderColor.ToCairoColor ());
                     grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
                     cr.SetSource (grad);
-                    cr.Fill ();
+                    cr.FillPreserve ();
                 }
+
+                outlineColor.SetSource (cr);
+                cr.LineWidth = 0.9;
+                cr.Stroke ();
 
                 // Text Labels
                 var render = new TouchText ();
                 render.textWrap = TouchTextWrap.Shrink;
                 render.alignment = TouchAlignment.Center;
 
-                seperation = Allocation.Width / _selectionCount;
+                seperation = Allocation.Width / selectionCount;
                 x = Allocation.Left;
-                for (int i = 0; i < _selectionCount; ++i) {
+                for (int i = 0; i < selectionCount; ++i) {
                     if (!string.IsNullOrWhiteSpace (textOptions[i])) {
                         render.font.color = textColorOptions[i];
                         render.text = textOptions[i];
@@ -276,14 +272,14 @@ namespace GoodtimeDevelopment.TouchWidget
             if (orientation == TouchOrientation.Horizontal) {
                 int x = (int)args.Event.X;
                 int sliderLength = Allocation.Width;
-                int seperation = sliderLength / _selectionCount;
+                int seperation = sliderLength / selectionCount;
 
                 if (x < 0) {
                     currentSelected = 0;
                 } else if (x > sliderLength) {
-                    currentSelected = _selectionCount - 1;
+                    currentSelected = selectionCount - 1;
                 } else {
-                    for (int i = 0; i < _selectionCount; ++i) {
+                    for (int i = 0; i < selectionCount; ++i) {
                         int leftBoundery = i * seperation;
                         int rightBoundery = (i + 1) * seperation;
                         if ((x >= leftBoundery) && (x <= rightBoundery)) {
@@ -296,14 +292,14 @@ namespace GoodtimeDevelopment.TouchWidget
                 var y = (int)args.Event.Y;
                 var sliderLength = Allocation.Height - Allocation.Width;
                 var sliderMax = Allocation.Height;
-                var seperation = sliderLength / (_selectionCount - 1);
+                var seperation = sliderLength / (selectionCount - 1);
 
                 if (y < 0)
                     currentSelected = 0;
                 else if (y > sliderMax)
-                    currentSelected = _selectionCount - 1;
+                    currentSelected = selectionCount - 1;
                 else {
-                    for (int i = 0; i < _selectionCount; ++i) {
+                    for (int i = 0; i < selectionCount; ++i) {
                         var leftBoundery = i * seperation;
                         var rightBoundery = (i + 1) * seperation;
                         if ((y >= leftBoundery) && (y <= rightBoundery)) {
