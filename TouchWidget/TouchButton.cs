@@ -103,6 +103,8 @@ namespace GoodtimeDevelopment.TouchWidget
                 var bottom = Allocation.Bottom;
                 var height = Allocation.Height;
 
+                TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
+
                 var outlineColor = new TouchColor (buttonColor);
                 outlineColor.ModifyColor (0.5);
                 var highlightColor = new TouchColor (buttonColor);
@@ -110,17 +112,17 @@ namespace GoodtimeDevelopment.TouchWidget
                 var lowlightColor = new TouchColor (buttonColor);
                 lowlightColor.ModifyColor (0.75);
 
-                TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
-                outlineColor.SetSource (cr);
-                cr.StrokePreserve ();
-
                 using (var grad = new LinearGradient (left, top, left, bottom)) {
                     grad.AddColorStop (0, highlightColor.ToCairoColor ());
                     grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
                     grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
                     cr.SetSource (grad);
-                    cr.Fill ();
+                    cr.FillPreserve ();
                 }
+
+                outlineColor.SetSource (cr);
+                cr.LineWidth = 1;
+                cr.Stroke ();
 
                 render.Render (this, left + 3, top, width - 6, height);
             }
