@@ -536,16 +536,20 @@ namespace AquaPic.UserInterface
                     if (startButtonClicked) {
                         color.ModifyColor (0.75);
                     }
-                    var highlightColor = new TouchColor (color);
-                    highlightColor.ModifyColor (1.4);
+
                     var outlineColor = new TouchColor (color);
                     outlineColor.ModifyColor (0.5);
+                    var highlightColor = new TouchColor (color);
+                    highlightColor.ModifyColor (1.4);
+                    var lowlightColor = new TouchColor (color);
+                    lowlightColor.ModifyColor (0.75);
 
                     outlineColor.SetSource (cr);
                     cr.StrokePreserve ();
-                    using (var grad = new RadialGradient (startButtonX, startButtonY + 10, 25, startButtonX, startButtonY + 10, 0)) {
+                    using (var grad = new RadialGradient (startButtonX, startButtonY - 10, 0, startButtonX, startButtonY - 10, 25)) {
                         grad.AddColorStop (0, highlightColor.ToCairoColor ());
                         grad.AddColorStop (0.35, color.ToCairoColor ());
+                        grad.AddColorStop (0.75, lowlightColor.ToCairoColor ());
                         cr.SetSource (grad);
                         cr.Fill ();
                     }
@@ -559,16 +563,20 @@ namespace AquaPic.UserInterface
                     if (endButtonClicked) {
                         color.ModifyColor (0.75);
                     }
-                    highlightColor = new TouchColor (color);
-                    highlightColor.ModifyColor (1.4);
+
                     outlineColor = new TouchColor (color);
                     outlineColor.ModifyColor (0.5);
+                    highlightColor = new TouchColor (color);
+                    highlightColor.ModifyColor (1.4);
+                    lowlightColor = new TouchColor (color);
+                    lowlightColor.ModifyColor (0.75);
 
                     outlineColor.SetSource (cr);
                     cr.StrokePreserve ();
-                    using (var grad = new RadialGradient (endButtonX, endButtonY + 10, 25, endButtonX, endButtonY + 10, 0)) {
+                    using (var grad = new RadialGradient (endButtonX, endButtonY - 10, 0, endButtonX, endButtonY - 10, 25)) {
                         grad.AddColorStop (0, highlightColor.ToCairoColor ());
                         grad.AddColorStop (0.35, color.ToCairoColor ());
+                        grad.AddColorStop (0.75, lowlightColor.ToCairoColor ());
                         cr.SetSource (grad);
                         cr.Fill ();
                     }
