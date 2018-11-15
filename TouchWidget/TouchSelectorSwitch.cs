@@ -207,18 +207,42 @@ namespace GoodtimeDevelopment.TouchWidget
                 cr.Stroke ();
 
                 // Slider
-                if (orientation == TouchOrientation.Horizontal)
+                double sliderLeft, sliderTop, sliderBottom;
+                if (orientation == TouchOrientation.Horizontal) {
+                    sliderLeft = x;
+                    sliderTop = y;
+                    sliderBottom = y + height;
+
                     TouchGlobal.DrawRoundedRectangle (cr, x, y, sliderWidth, height, height / 2);
-                else
+                } else {
+                    sliderLeft = x;
+                    sliderTop = y;
+                    sliderBottom = y + sliderWidth;
+
                     TouchGlobal.DrawRoundedRectangle (cr, x, y, width, sliderWidth, width / 2);
-                sliderColorOptions[currentSelected].SetSource (cr);
-                cr.FillPreserve ();
-                cr.LineWidth = 1;
-                cr.SetSourceRGB (0.0, 0.0, 0.0);
-                cr.Stroke ();
+                }
+
+                var sliderColor = sliderColorOptions[currentSelected];
+                var outlineColor = new TouchColor (sliderColor);
+                outlineColor.ModifyColor (0.5);
+                var highlightColor = new TouchColor (sliderColor);
+                highlightColor.ModifyColor (1.4);
+                var lowlightColor = new TouchColor (sliderColor);
+                lowlightColor.ModifyColor (0.75);
+
+                outlineColor.SetSource (cr);
+                cr.StrokePreserve ();
+
+                using (var grad = new LinearGradient (sliderLeft, sliderTop, sliderLeft, sliderBottom)) {
+                    grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                    grad.AddColorStop (0.2, sliderColor.ToCairoColor ());
+                    grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                    cr.SetSource (grad);
+                    cr.Fill ();
+                }
 
                 // Text Labels
-                TouchText render = new TouchText ();
+                var render = new TouchText ();
                 render.textWrap = TouchTextWrap.Shrink;
                 render.alignment = TouchAlignment.Center;
 
