@@ -113,15 +113,15 @@ namespace GoodtimeDevelopment.TouchWidget
                     int listHeight;
 
                     if (comboList.Count > maxListHeight) {
-                        listHeight = maxListHeight * height;
+                        listHeight = (maxListHeight + 1) * height;
                         includeScrollBar = true;
                     } else if (comboList.Count > 0) {
-                        listHeight = comboList.Count * height;
+                        listHeight = (comboList.Count + 1) * height;
                     } else {
                         listHeight = 2 * height;
                     }
-                    listHeight += height;
-                    HeightRequest = listHeight + height + 2;
+
+                    HeightRequest = listHeight + 2;
 
                     int radius = height / 2;
                     cr.MoveTo (left, top + radius);
@@ -133,81 +133,74 @@ namespace GoodtimeDevelopment.TouchWidget
                     cr.ClosePath ();
                     TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
-                    cr.LineWidth = 0.85;
                     TouchColor.SetSource (cr, "black");
+                    cr.LineWidth = 1;
                     cr.Stroke ();
 
                     DrawDownButton (cr, left, top, width);
 
                     if (includeScrollBar) {
-                        int x = left + width - height - 1;
+                        int x = left + width - height;
                         listHeight -= height;
 
-                        cr.Rectangle (x, top + height, height + 1, listHeight - 15);
-                        TouchColor.SetSource (cr, "grey1");
+                        cr.Rectangle (x, top + height, height, listHeight);
+                        TouchColor.SetSource (cr, "grey3");
                         cr.Fill ();
 
-                        /*
                         cr.Rectangle (x, top + height, height, height);
-                        TouchColor buttonColor = "grey3";
+                        TouchColor buttonColor = "grey1";
+                        var outlineColor = new TouchColor (buttonColor);
+                        outlineColor.ModifyColor (0.5);
                         var highlightColor = new TouchColor (buttonColor);
                         highlightColor.ModifyColor (1.4);
                         var lowlightColor = new TouchColor (buttonColor);
                         lowlightColor.ModifyColor (0.75);
-                        using (var grad = new LinearGradient (x, top, x, top + 2 * height)) {
-                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
-                            grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
+                        using (var grad = new LinearGradient (x, top + height, x, top + 2 * height)) {
+                            grad.AddColorStop (0.0, buttonColor.ToCairoColor ());
                             grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
                             cr.SetSource (grad);
-                            cr.Fill ();
+                            cr.FillPreserve ();
                         }
+                        outlineColor.SetSource (cr);
+                        cr.LineWidth = 1;
+                        cr.Stroke ();
 
-                        scrollBarHeight = (listHeight - 3 * height) / comboList.Count;
-                        var scrollBarTop = top + (2 * height) + (scrollBarHeight * listOffset);
-                        cr.Rectangle (x, scrollBarTop, height + 1, scrollBarHeight);
-                        using (var grad = new LinearGradient (x, scrollBarTop, x, scrollBarTop + scrollBarHeight)) {
-                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
-                            grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
-                            grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
-                            cr.SetSource (grad);
-                            cr.Fill ();
-                        }
-
-                        var buttonTop = top + listHeight - height;
+                        var buttonTop = top + listHeight;
                         cr.Rectangle (x, buttonTop, height, height);
                         using (var grad = new LinearGradient (x, buttonTop, x, buttonTop + height)) {
                             grad.AddColorStop (0, highlightColor.ToCairoColor ());
                             grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
                             grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
                             cr.SetSource (grad);
-                            cr.Fill ();
+                            cr.FillPreserve ();
                         }
-                        *
-
-                        /*
-                        cr.Rectangle (x, top + height, height, listHeight - height - 1);
-                        TouchColor.SetSource (cr, "grey3");
-                        cr.Fill ();
-
-                        cr.MoveTo (x, top + (2 * height));
-                        cr.LineTo (x + height + 1, top + (2 * height));
-                        cr.ClosePath ();
-                        TouchColor.SetSource (cr, "black");
+                        outlineColor.SetSource (cr);
+                        cr.LineWidth = 1;
                         cr.Stroke ();
 
-                        cr.MoveTo (x, top + listHeight - height);
-                        cr.LineTo (x + height + 1, top + listHeight - height);
-                        cr.ClosePath ();
-                        TouchColor.SetSource (cr, "black");
+                        scrollBarHeight = (listHeight - 2 * height) / comboList.Count;
+                        var scrollBarActualHeight = scrollBarHeight * maxListHeight;
+                        var scrollBarTop = top + (2 * height) + (scrollBarHeight * listOffset);
+                        //cr.Rectangle (x, scrollBarTop, height, scrollBarActualHeight);
+                        TouchGlobal.DrawRoundedRectangle (cr, x, scrollBarTop, height, scrollBarActualHeight, height / 3);
+                        buttonColor = "grey2";
+                        outlineColor = new TouchColor (buttonColor);
+                        outlineColor.ModifyColor (0.5);
+                        highlightColor = new TouchColor (buttonColor);
+                        highlightColor.ModifyColor (1.3);
+                        lowlightColor = new TouchColor (buttonColor);
+                        lowlightColor.ModifyColor (0.75);
+                        using (var grad = new LinearGradient (x, scrollBarTop, x, scrollBarTop + scrollBarActualHeight)) {
+                            grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                            grad.AddColorStop (0.1, buttonColor.ToCairoColor ());
+                            grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                            cr.SetSource (grad);
+                            cr.FillPreserve ();
+                        }
+                        outlineColor.SetSource (cr);
+                        cr.LineWidth = 1;
                         cr.Stroke ();
 
-                        scrollBarHeight = (listHeight - 3 * height) / comboList.Count;
-                        cr.Rectangle (x, top + (2 * height) + (scrollBarHeight * listOffset), height + 1, scrollBarHeight * maxListHeight);
-                        TouchColor.SetSource (cr, "grey1");
-                        cr.Fill ();
-                        */
-
-                        /*
                         int triOffset = 7;
                         int triSize = height - 12;
                         int y = top + height + triOffset + triSize;
@@ -224,7 +217,7 @@ namespace GoodtimeDevelopment.TouchWidget
                         }
                         cr.Fill ();
 
-                        y = top + listHeight - height + triOffset;
+                        y = top + listHeight + triOffset;
                         cr.MoveTo (x, y);
                         cr.LineTo (x + triSize, y);
                         cr.LineTo (x + triSize / 2, y + triSize);
@@ -235,23 +228,18 @@ namespace GoodtimeDevelopment.TouchWidget
                             TouchColor.SetSource (cr, "grey1");
                         }
                         cr.Fill ();
-                        */
                     }
 
-#if !TEST_HIGHLIGHT
                     if (highlighted != -1) {
-                        int highlightedWidth;
+                        var highlightedWidth = width - 2;
                         if (includeScrollBar) {
-                            highlightedWidth = width - 2 - height;
-                        } else {
-                            highlightedWidth = width - 2;
+                            highlightedWidth -= height;
                         }
-                        int y = top + height + (height * highlighted);
+                        var y = top + height + (height * highlighted);
                         cr.Rectangle (left + 1, y + 1, highlightedWidth, height - 2);
                         TouchColor.SetSource (cr, "pri");
                         cr.Fill ();
                     }
-#endif
 
                     var textRender = new TouchText ();
                     textRender.font.color = "black";
@@ -309,6 +297,7 @@ namespace GoodtimeDevelopment.TouchWidget
             cr.LineTo (x, top + height);
             cr.ClosePath ();
 
+            //TouchColor backgroundColor = listDropdown ? "grey3" : "grey1";
             TouchColor backgroundColor = "grey1";
             var outlineColor = new TouchColor (backgroundColor);
             outlineColor.ModifyColor (0.5);
@@ -320,7 +309,9 @@ namespace GoodtimeDevelopment.TouchWidget
             using (var grad = new LinearGradient (x, top, x, top + height)) {
                 grad.AddColorStop (0, highlightColor.ToCairoColor ());
                 grad.AddColorStop (0.2, backgroundColor.ToCairoColor ());
-                grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                if (!(listDropdown && includeScrollBar)) {
+                    grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                }
                 cr.SetSource (grad);
                 cr.FillPreserve ();
             }
