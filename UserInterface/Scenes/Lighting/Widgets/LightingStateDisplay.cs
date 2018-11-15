@@ -546,10 +546,10 @@ namespace AquaPic.UserInterface
 
                     outlineColor.SetSource (cr);
                     cr.StrokePreserve ();
-                    using (var grad = new RadialGradient (startButtonX, startButtonY - 10, 0, startButtonX, startButtonY - 10, 25)) {
+                    using (var grad = new RadialGradient (startButtonX, startButtonY - 20, 0, startButtonX, startButtonY - 10, 35)) {
                         grad.AddColorStop (0, highlightColor.ToCairoColor ());
                         grad.AddColorStop (0.35, color.ToCairoColor ());
-                        grad.AddColorStop (0.75, lowlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.7, lowlightColor.ToCairoColor ());
                         cr.SetSource (grad);
                         cr.Fill ();
                     }
