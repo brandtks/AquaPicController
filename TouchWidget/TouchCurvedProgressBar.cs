@@ -81,11 +81,10 @@ namespace GoodtimeDevelopment.TouchWidget
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 int x = Allocation.Left;
                 int width = Allocation.Width;
                 int height = Allocation.Height;
-                //int right = x + width;
                 int radius = barWidth / 2;
                 int bigRadius;
 
@@ -97,10 +96,10 @@ namespace GoodtimeDevelopment.TouchWidget
                     int originY = Allocation.Top + height - radius;
 
                     cr.MoveTo (originX - bigRadius + barWidth, originY);
-                    cr.Arc (originX - bigRadius + radius, originY, radius, (0.0).ToRadians (), (180.0).ToRadians ());
-                    cr.Arc (originX, originY, bigRadius, (180.0).ToRadians (), (0.0).ToRadians ());
-                    cr.Arc (originX + bigRadius - radius, originY, radius, (0.0).ToRadians (), (180.0).ToRadians ());
-                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, (0.0).ToRadians (), (180.0).ToRadians ());
+                    cr.Arc (originX - bigRadius + radius, originY, radius, 0, Math.PI);
+                    cr.Arc (originX, originY, bigRadius, Math.PI, 0);
+                    cr.Arc (originX + bigRadius - radius, originY, radius, 0, Math.PI);
+                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, 0, Math.PI);
                     cr.ClosePath ();
                     backgroundColor.SetSource (cr);
                     cr.Fill ();
@@ -110,44 +109,44 @@ namespace GoodtimeDevelopment.TouchWidget
                     double y2 = TouchGlobal.CalcY (originY, bigRadius - radius, r);
 
                     cr.MoveTo (originX - bigRadius + barWidth, originY);
-                    cr.Arc (originX - bigRadius + radius, originY, radius, (0.0).ToRadians (), (180.0).ToRadians ());
-                    cr.Arc (originX, originY, bigRadius, (180.0).ToRadians (), r);
+                    cr.Arc (originX - bigRadius + radius, originY, radius, 0, Math.PI);
+                    cr.Arc (originX, originY, bigRadius, Math.PI, r);
                     cr.Arc (x2, y2, radius, r, r + Math.PI);
-                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, r, (180.0).ToRadians ());
+                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, r, Math.PI);
                     cr.LineTo (x, originY);
                     cr.ClosePath ();
                     progressColor.SetSource (cr);
                     cr.Fill ();
                 } else if (curveStyle == CurveStyle.ThreeQuarterCurve) {
-                    int below = (0.45 * (double)height).ToInt ();
+                    int below = (0.45 * height).ToInt ();
                     bigRadius = height - below - 2;
                     int originX = x + (width / 2);
                     int originY = Allocation.Top + height - below;
 
-                    double x2 = TouchGlobal.CalcX (originX, bigRadius - radius, (135.0).ToRadians ());
-                    double y2 = TouchGlobal.CalcY (originY, bigRadius - radius, (135.0).ToRadians ());
+                    double x2 = TouchGlobal.CalcX (originX, bigRadius - radius, 3 * Math.PI / 4);
+                    double y2 = TouchGlobal.CalcY (originY, bigRadius - radius, 3 * Math.PI / 4);
 
                     cr.MoveTo (x2, y2);
-                    cr.Arc (x2, y2, radius, (-45.0).ToRadians (), (135.0).ToRadians ());
-                    cr.Arc (originX, originY, bigRadius, (135.0).ToRadians (), (45.0).ToRadians ());
-                    x2 = TouchGlobal.CalcX (originX, bigRadius - radius, (45.0).ToRadians ());
-                    y2 = TouchGlobal.CalcY (originY, bigRadius - radius, (45.0).ToRadians ());
-                    cr.Arc (x2, y2, radius, (45.0).ToRadians (), (-135.0).ToRadians ());
-                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, (45.0).ToRadians (), (135.0).ToRadians ());
+                    cr.Arc (x2, y2, radius, 7 * Math.PI / 4, 3 * Math.PI / 4);
+                    cr.Arc (originX, originY, bigRadius, 3 * Math.PI / 4, Math.PI / 4);
+                    x2 = TouchGlobal.CalcX (originX, bigRadius - radius, Math.PI / 4);
+                    y2 = TouchGlobal.CalcY (originY, bigRadius - radius, Math.PI / 4);
+                    cr.Arc (x2, y2, radius, Math.PI / 4, (-135.0).ToRadians ());
+                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, Math.PI / 4, 3 * Math.PI / 4);
                     cr.ClosePath ();
                     backgroundColor.SetSource (cr);
                     cr.Fill ();
 
                     double r = (_progress * 270.0 + 135.0).ToRadians ();
 
-                    x2 = TouchGlobal.CalcX (originX, bigRadius - radius, (135.0).ToRadians ());
-                    y2 = TouchGlobal.CalcY (originY, bigRadius - radius, (135.0).ToRadians ());
-                    cr.Arc (x2, y2, radius, (-45.0).ToRadians (), (135.0).ToRadians ());
-                    cr.Arc (originX, originY, bigRadius, (135.0).ToRadians (), r);
+                    x2 = TouchGlobal.CalcX (originX, bigRadius - radius, 3 * Math.PI / 4);
+                    y2 = TouchGlobal.CalcY (originY, bigRadius - radius, 3 * Math.PI / 4);
+                    cr.Arc (x2, y2, radius, 7 * Math.PI / 4, 3 * Math.PI / 4);
+                    cr.Arc (originX, originY, bigRadius, 3 * Math.PI / 4, r);
                     x2 = TouchGlobal.CalcX (originX, bigRadius - radius, r);
                     y2 = TouchGlobal.CalcY (originY, bigRadius - radius, r);
                     cr.Arc (x2, y2, radius, r, r + Math.PI);
-                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, r, (135.0).ToRadians ());
+                    cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, r, 3 * Math.PI / 4);
                     cr.ClosePath ();
                     progressColor.SetSource (cr);
                     cr.Fill ();
