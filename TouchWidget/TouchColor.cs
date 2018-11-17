@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using Cairo;
+using GoodtimeDevelopment.Utilites;
 
 namespace GoodtimeDevelopment.TouchWidget
 {
@@ -97,20 +98,13 @@ namespace GoodtimeDevelopment.TouchWidget
             return new TouchColor (name);
         }
 
-        public void ModifyAlpha (double a) {
-            A = a;
-        }
-
         public void ModifyColor (double ratio) {
             R *= (float)ratio;
-            if (R > 1.0f)
-                R = 1.0f;
+            R.Constrain (0, 1);
             G *= (float)ratio;
-            if (G > 1.0f)
-                G = 1.0f;
+            G.Constrain (0, 1);
             B *= (float)ratio;
-            if (B > 1.0f)
-                B = 1.0f;
+            B.Constrain (0, 1);
         }
 
         public TouchColor Blend (TouchColor otherColor, float amount) {
