@@ -102,7 +102,7 @@ namespace GoodtimeDevelopment.TouchWidget
                 int width = Allocation.Width;
                 int height = Allocation.Height;
 
-                TouchGlobal.DrawRoundedRectangle (cr, left + 4, top + 4, width - 2, height - 2, 3);
+                TouchGlobal.DrawRoundedRectangle (cr, left + 4, top + 4, width - 1, height - 1, 3);
                 var shadowColor = new TouchColor (backgroundColor);
                 shadowColor.ModifyColor (0.5);
                 shadowColor.A = 0.4;
