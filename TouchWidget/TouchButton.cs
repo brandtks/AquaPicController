@@ -132,7 +132,7 @@ namespace GoodtimeDevelopment.TouchWidget
             if (args.Event.Type == Gdk.EventType.ButtonPress) {
                 if (clickAction == ButtonClickAction.NoTransparency) {
                     unmodifiedColor = new TouchColor (buttonColor);
-                    buttonColor.ModifyAlpha (1.0);
+                    buttonColor.A = 1;
                 } else if (clickAction == ButtonClickAction.Brighten) {
                     unmodifiedColor = new TouchColor (buttonColor);
                     buttonColor.ModifyColor (1.25);
