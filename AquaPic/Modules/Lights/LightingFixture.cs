@@ -38,6 +38,7 @@ namespace AquaPic.Modules
             public bool highTempLockout;
             public IndividualControl powerOutlet;
             public LightingState[] lightingStates;
+            public LightingState[] savedLightingStates;
             public int currentState;
 
             public LightingFixture (
@@ -50,34 +51,19 @@ namespace AquaPic.Modules
                 this.powerOutlet = powerOutlet;
                 this.highTempLockout = highTempLockout;
 
-                this.lightingStates = lightingStates;
-                currentState = -1;
-                if (this.lightingStates.Length > 0) {
-                    var now = Time.TimeNow;
-                    for (int i = 0; i < this.lightingStates.Length; ++i) {
-                        // Check if the start time is before the end time, 
-                        if (this.lightingStates [i].startTime.Before (this.lightingStates [i].endTime)) {
-                            if (now.After (this.lightingStates [i].startTime) && now.Before (this.lightingStates [i].endTime)) {
-                                currentState = i;
-                                break;
-                            }
-                        // If start is after end then that means that the start is next day
-                        } else {
-                            var midnight = new Time (23, 59, 59);
-
-                            if ((now.After (this.lightingStates[i].startTime) && now.Before (midnight)) || 
-                                (now.After (Time.TimeZero) && now.Before (this.lightingStates [i].endTime))) {
-                                currentState = i;
-                                break;
-                            }
-                        }
-                    }
-                }
-
                 plugState = MyState.Off;
                 var plugControl = Power.AddOutlet (this.powerOutlet, this.name, MyState.Off, "Lighting");
                 plugControl.StateGetter = OnPlugStateGetter;
                 Power.AddHandlerOnStateChange (this.powerOutlet, OnLightingPlugStateChange);
+
+                UpdateLightingStates (lightingStates, false);
+            }
+
+            public void UpdateLightingStates (LightingState[] lightingStates, bool temporaryChange) {
+                savedLightingStates = temporaryChange ? this.lightingStates : (new LightingState[0]);
+                this.lightingStates = lightingStates;
+                currentState = -1;
+                CheckCurrentState ();
             }
 
             public bool OnPlugStateGetter () {
@@ -89,35 +75,8 @@ namespace AquaPic.Modules
                     return false;
                 }
 
-                var state = lightingStates[currentState];
-                var now = Time.TimeNow;
+                CheckCurrentState ();
 
-                if (state.startTime.Before (state.endTime)) {
-                    if (now.Before (lightingStates[currentState].endTime)) { // Still in current lighting state
-                        if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
-                            return false;
-                        }
-
-                        // State is anything but off
-                        return true;
-                    }
-                } else {
-                    var midnight = new Time (23, 59, 59);
-                    if ((now.After (state.startTime) && now.Before (midnight)) ||
-                        (now.After (Time.TimeZero) && now.Before (state.endTime))) {
-
-                        if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
-                            return false;
-                        }
-
-                        // State is anything but off
-                        return true;
-                    }
-                }
-
-                // Now in next state
-                currentState = ++currentState % lightingStates.Length;
-                Console.WriteLine ("{0} is in state {1}", name, currentState);
                 if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
                     return false;
                 }
@@ -129,6 +88,67 @@ namespace AquaPic.Modules
             public void OnLightingPlugStateChange (object sender, StateChangeEventArgs args) {
                 plugState = args.state;
             }
+
+            public void CheckCurrentState () {
+                currentState = CheckCurrentState (lightingStates, currentState);
+
+                // There are saved states
+                if (savedLightingStates.Length > 0) {
+                    // Get the current saved state
+                    var savedCurrentState = CheckCurrentState (savedLightingStates, -1);
+
+                    if (savedLightingStates[savedCurrentState].type == LightingStateType.Off) {
+                        if (lightingStates[currentState].type == LightingStateType.Off) {
+                            // If both the saved and in use states are off, return the saved states to service
+                            UpdateLightingStates (savedLightingStates, false);
+                        }
+                    }
+                }
+            }
+
+            public int CheckCurrentState (LightingState[] states, int current) {
+                if (current != -1) {
+                    var state = states[current];
+                    var now = Time.TimeNow;
+
+                    if (state.startTime.Before (state.endTime)) { // current state doesn't go over midnight
+                        if (now.Before (state.endTime)) { // Still in current lighting state
+                            return current;
+                        }
+                    } else { // current state crosses midnight
+                        var midnight = new Time (23, 59, 59);
+                        if ((now.After (state.startTime) && now.Before (midnight)) ||
+                            (now.After (Time.TimeZero) && now.Before (state.endTime))) { // Still in current lighting state
+                            return current;
+                        }
+                    }
+
+                    return ++current % states.Length;
+                }
+
+                if (states.Length > 0) {
+                    var now = Time.TimeNow;
+                    for (int i = 0; i < states.Length; ++i) {
+                        // Check if the start time is before the end time, 
+                        if (states[i].startTime.Before (states[i].endTime)) {
+                            if (now.After (states[i].startTime) && now.Before (states[i].endTime)) {
+                                return i;
+                            }
+                            // If start is after end then that means that the start is next day
+                        } else {
+                            var midnight = new Time (23, 59, 59);
+
+                            if ((now.After (states[i].startTime) && now.Before (midnight)) ||
+                                (now.After (Time.TimeZero) && now.Before (states[i].endTime))) {
+                                return i;
+                            }
+                        }
+                    }
+                }
+
+                return -1;
+            }
+
         }
     }
 }
