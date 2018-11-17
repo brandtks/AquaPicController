@@ -70,12 +70,10 @@ namespace AquaPic.UserInterface
                 }
             }
 
-            outletSelectorSwitch = new TouchSelectorSwitch (0, 3, 0, TouchOrientation.Horizontal);
-            outletSelectorSwitch.sliderSize = MySliderSize.Large;
+            outletSelectorSwitch = new TouchSelectorSwitch (3);
             outletSelectorSwitch.WidthRequest = 180;
-            outletSelectorSwitch.HeightRequest = 30;
-            outletSelectorSwitch.sliderColorOptions[0] = "grey2";
             outletSelectorSwitch.sliderColorOptions[1] = "pri";
+            outletSelectorSwitch.selectedTextColorOptions[1] = "black";
             outletSelectorSwitch.sliderColorOptions[2] = "seca";
             outletSelectorSwitch.textOptions = new string[] { "Off", "Auto", "On" };
             outletSelectorSwitch.SelectorChangedEvent += OnOutletControlSelectorChanged;
@@ -96,13 +94,11 @@ namespace AquaPic.UserInterface
             Put (dimmingHeader, 605, 148);
             dimmingHeader.Show ();
 
-            modeSelector = new TouchSelectorSwitch (2);
+            modeSelector = new TouchSelectorSwitch ();
             modeSelector.SetSizeRequest (140, 30);
-            modeSelector.sliderSize = MySliderSize.Large;
-            modeSelector.textOptions[0] = "Manual";
-            modeSelector.textOptions[1] = "Auto";
-            modeSelector.sliderColorOptions[0] = "grey2";
             modeSelector.sliderColorOptions[1] = "pri";
+            modeSelector.selectedTextColorOptions[1] = "black";
+            modeSelector.textOptions = new string[] { "Manual", "Auto" };
             modeSelector.SelectorChangedEvent += OnDimmingModeSelectorChanged;
             Put (modeSelector, 605, 173);
             modeSelector.Show ();
@@ -228,8 +224,7 @@ namespace AquaPic.UserInterface
             fixtureSettingBtn.Show ();
 
             lightingStateWidget = new LightingStateWidget ();
-            lightingStateWidget.SetSizeRequest (540, 360);
-            Put (lightingStateWidget, 55, 90);
+            Put (lightingStateWidget, 55, 77);
             lightingStateWidget.Show ();
 
             combo = new TouchComboBox (Lighting.GetAllFixtureNames ());
@@ -286,8 +281,7 @@ namespace AquaPic.UserInterface
                 }
 
                 isDimmingFixture = Lighting.IsDimmingFixture (fixtureName);
-
-                lightingStateWidget.SetStates (Lighting.GetLightingStates (fixtureName), isDimmingFixture);
+                lightingStateWidget.SetStates (fixtureName);
                 lightingStateWidget.QueueDraw ();
 
                 if (isDimmingFixture) {

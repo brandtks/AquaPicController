@@ -22,57 +22,133 @@
 #endregion // License
 
 using System;
-using System.Collections.Generic;
 using Gtk;
-using Cairo;
 using GoodtimeDevelopment.TouchWidget;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
 
 namespace AquaPic.UserInterface
 {
     public class LightingStateWidget : Fixed
     {
-        public LightingStateDisplay lightingStateDisplay;
+        LightingStateDisplay lightingStateDisplay;
         TouchSelectorSwitch adjustDimmingTogetherSelector;
+        TouchLabel adjustDimmingTogetherLabel;
+        TouchButton acceptChangesButton;
+        TouchButton undoChangesButton;
+        TouchButton deleteStateButton;
+        string fixtureName;
 
         public LightingStateWidget () {
-            SetSizeRequest (540, 360);
+            SetSizeRequest (540, 380);
 
             lightingStateDisplay = new LightingStateDisplay ();
-            lightingStateDisplay.SetSizeRequest (540, 360);
+            lightingStateDisplay.SetSizeRequest (540, 380);
             lightingStateDisplay.LightingStateSelectionChanged += (obj, args) => {
                 if (args.stateSelected) {
                     adjustDimmingTogetherSelector.Visible = true;
+                    adjustDimmingTogetherLabel.Visible = true;
+                    deleteStateButton.Visible = true;
                 } else {
                     adjustDimmingTogetherSelector.Visible = false;
+                    adjustDimmingTogetherLabel.Visible = false;
+                    deleteStateButton.Visible = false;
                 }
+            };
+            lightingStateDisplay.LightingStateInfoChanged += (obj, hasChanged) => {
+                if (hasChanged) {
+                    acceptChangesButton.buttonColor = "pri";
+                    undoChangesButton.buttonColor = "pri";
+                } else {
+                    acceptChangesButton.buttonColor = "grey1";
+                    undoChangesButton.buttonColor = "grey1";
+                }
+                acceptChangesButton.QueueDraw ();
+                undoChangesButton.QueueDraw ();
             };
             Put (lightingStateDisplay, 0, 0);
             lightingStateDisplay.Show ();
 
             adjustDimmingTogetherSelector = new TouchSelectorSwitch ();
-            adjustDimmingTogetherSelector.SetSizeRequest (140, 30);
+            adjustDimmingTogetherSelector.SetSizeRequest (180, 30);
             adjustDimmingTogetherSelector.sliderSize = MySliderSize.Large;
             adjustDimmingTogetherSelector.textOptions[0] = "Separate";
             adjustDimmingTogetherSelector.textOptions[1] = "Together";
-            adjustDimmingTogetherSelector.sliderColorOptions[0] = "grey2";
             adjustDimmingTogetherSelector.sliderColorOptions[1] = "pri";
+            adjustDimmingTogetherSelector.selectedTextColorOptions[1] = "black";
             adjustDimmingTogetherSelector.currentSelected = 1;
             adjustDimmingTogetherSelector.SelectorChangedEvent += (obj, args) => {
-                if (args.currentSelectedIndex == 1) {
-                    lightingStateDisplay.adjustDimmingTogether = true;
-                } else {
-                    lightingStateDisplay.adjustDimmingTogether = false;
+                lightingStateDisplay.adjustDimmingTogether = args.currentSelectedIndex == 1;
+            };
+            Put (adjustDimmingTogetherSelector, 0, 350);
+
+            adjustDimmingTogetherLabel = new TouchLabel ();
+            adjustDimmingTogetherLabel.text = "Adjust Dimming";
+            adjustDimmingTogetherLabel.WidthRequest = 180;
+            adjustDimmingTogetherLabel.textAlignment = TouchAlignment.Center;
+            Put (adjustDimmingTogetherLabel, 0, 328);
+
+            acceptChangesButton = new TouchButton ();
+            acceptChangesButton.text = "Accept";
+            acceptChangesButton.buttonColor = "grey1";
+            acceptChangesButton.SetSizeRequest (60, 40);
+            acceptChangesButton.ButtonReleaseEvent += (obj, args) => {
+                if (lightingStateDisplay.hasStateInfoChanged) {
+                    var parent = Toplevel as Window;
+                    var ms = new TouchDialog ("Do you want to make the changes permanent", parent);
+                    ms.Response += (o, a) => {
+                        Lighting.SetLightingStates (fixtureName, lightingStateDisplay.lightingStates, a.ResponseId == ResponseType.No);
+                        lightingStateDisplay.selectedState = -1;
+                        lightingStateDisplay.hasStateInfoChanged = false;
+                        lightingStateDisplay.QueueDraw ();
+                    };
+
+                    ms.Run ();
+                    ms.Destroy ();
                 }
             };
-            Put (adjustDimmingTogetherSelector, 10, 10);
+            Put (acceptChangesButton, 480, 340);
+            acceptChangesButton.Show ();
+
+            undoChangesButton = new TouchButton ();
+            undoChangesButton.text = "Undo";
+            undoChangesButton.buttonColor = "grey1";
+            undoChangesButton.SetSizeRequest (60, 40);
+            undoChangesButton.ButtonReleaseEvent += (obj, args) => {
+                if (lightingStateDisplay.hasStateInfoChanged) {
+                    SetStates (fixtureName);
+                    lightingStateDisplay.QueueDraw ();
+                }
+            };
+            Put (undoChangesButton, 415, 340);
+            undoChangesButton.Show ();
+
+            deleteStateButton = new TouchButton ();
+            deleteStateButton.text = "Delete";
+            deleteStateButton.SetSizeRequest (60, 40);
+            deleteStateButton.buttonColor = "compl";
+            deleteStateButton.textColor = "white";
+            deleteStateButton.ButtonReleaseEvent += (obj, args) => {
+                var parent = Toplevel as Window;
+                var ms = new TouchDialog ("Are you sure you want to delete the state", parent);
+                ms.Response += (o, a) => {
+                    if (a.ResponseId == ResponseType.Yes) {
+                        lightingStateDisplay.RemoveSelectedState ();
+                    }
+                };
+
+                ms.Run ();
+                ms.Destroy ();
+            };
+            Put (deleteStateButton, 350, 340);
 
             Show ();
         }
 
-        public void SetStates (LightingState[] lightingStates, bool dimmingFixture) {
-            lightingStateDisplay.SetStates (lightingStates, dimmingFixture);
+        public void SetStates (string fixtureName) {
+            this.fixtureName = fixtureName;
+            lightingStateDisplay.SetStates (
+                Lighting.GetLightingStates (fixtureName), 
+                Lighting.IsDimmingFixture (fixtureName));
         }
     }
 }
