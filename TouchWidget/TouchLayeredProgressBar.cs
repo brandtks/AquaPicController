@@ -83,108 +83,25 @@ namespace GoodtimeDevelopment.TouchWidget
                 int width = Allocation.Width;
                 int height = Allocation.Height;
 
-                if (orientation == TouchOrientation.Vertical) {
-                    TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
-                    colorBackground.SetSource (cr);
-                    cr.Fill ();
-                }
+                radius = orientation == TouchOrientation.Vertical ? width / 2 : height / 2;
+
+                TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
+                colorBackground.SetSource (cr);
+                cr.Fill ();
 
                 if (currentProgress > currentProgressSecondary) {
-                    DrawPrimary (cr);
-                    DrawSecondary (cr);
+                    DrawProgressBar (cr, currentProgress, colorProgress);
+                    DrawProgressBar (cr, currentProgressSecondary, colorProgressSecondary);
                 } else if (currentProgress < currentProgressSecondary) {
-                    DrawSecondary (cr);
-                    DrawPrimary (cr);
+                    DrawProgressBar (cr, currentProgressSecondary, colorProgressSecondary);
+                    DrawProgressBar (cr, currentProgress, colorProgress);
                 } else {
-                    if (drawPrimaryWhenEqual)
-                        DrawPrimary (cr);
-                    else
-                        DrawSecondary (cr);
+                    if (drawPrimaryWhenEqual) {
+                        DrawProgressBar (cr, currentProgress, colorProgress);
+                    } else {
+                        DrawProgressBar (cr, currentProgressSecondary, colorProgressSecondary);
+                    }
                 }
-            }
-        }
-
-        protected void DrawPrimary (Context cr) {
-            if (orientation == TouchOrientation.Vertical) {
-                int left = Allocation.Left;
-                int top = Allocation.Top;
-                int width = Allocation.Width;
-                int height = Allocation.Height;
-                int radius, bottom;
-                double difference;
-
-                radius = width / 2;
-                bottom = top + height;
-
-                difference = (height - width) * currentProgress;
-                top += (height - width - difference.ToInt ());
-
-                cr.MoveTo (left, bottom - radius);
-                cr.ArcNegative (left + radius, bottom - radius, radius, Math.PI, 0);
-                cr.LineTo (left + width, top + radius);
-                cr.ArcNegative (left + radius, top + radius, radius, 0, Math.PI);
-                cr.ClosePath ();
-
-                var outlineColor = new TouchColor (colorProgress);
-                outlineColor.ModifyColor (0.5);
-                var highlightColor = new TouchColor (colorProgress);
-                highlightColor.ModifyColor (1.4);
-                var lowlightColor = new TouchColor (colorProgress);
-                lowlightColor.ModifyColor (0.75);
-
-                using (var grad = new LinearGradient (left, top, left, bottom)) {
-                    grad.AddColorStop (0, highlightColor.ToCairoColor ());
-                    grad.AddColorStop (0.2, colorProgress.ToCairoColor ());
-                    grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
-                    cr.SetSource (grad);
-                    cr.FillPreserve ();
-                }
-
-                outlineColor.SetSource (cr);
-                cr.LineWidth = 1;
-                cr.Stroke ();
-            }
-        }
-
-        protected void DrawSecondary (Context cr) {
-            if (orientation == TouchOrientation.Vertical) {
-                int left = Allocation.Left;
-                int top = Allocation.Top;
-                int width = Allocation.Width;
-                int height = Allocation.Height;
-                int radius, bottom;
-                double difference;
-
-                radius = width / 2;
-                bottom = top + height;
-
-                difference = ((height - width) * currentProgressSecondary);
-                top += ((height - width) - difference.ToInt ());
-
-                cr.MoveTo (left, bottom - radius);
-                cr.ArcNegative (left + radius, bottom - radius, radius, Math.PI, 0);
-                cr.LineTo (left + width, top + radius);
-                cr.ArcNegative (left + radius, top + radius, radius, 0, Math.PI);
-                cr.ClosePath ();
-
-                var outlineColor = new TouchColor (colorProgressSecondary);
-                outlineColor.ModifyColor (0.5);
-                var highlightColor = new TouchColor (colorProgressSecondary);
-                highlightColor.ModifyColor (1.4);
-                var lowlightColor = new TouchColor (colorProgressSecondary);
-                lowlightColor.ModifyColor (0.75);
-
-                using (var grad = new LinearGradient (left, top, left, bottom)) {
-                    grad.AddColorStop (0, highlightColor.ToCairoColor ());
-                    grad.AddColorStop (0.2, colorProgressSecondary.ToCairoColor ());
-                    grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
-                    cr.SetSource (grad);
-                    cr.FillPreserve ();
-                }
-
-                outlineColor.SetSource (cr);
-                cr.LineWidth = 1;
-                cr.Stroke ();
             }
         }
     }
