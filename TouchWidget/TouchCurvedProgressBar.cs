@@ -144,7 +144,6 @@ namespace GoodtimeDevelopment.TouchWidget
                     y2 = TouchGlobal.CalcY (originY, bigRadius - radius, r);
                     cr.Arc (x2, y2, radius, r, r + Math.PI);
                     cr.ArcNegative (originX, originY, bigRadius - barWidth + fudgeFactor, r, 3 * Math.PI / 4);
-                    cr.ClosePath ();
 
                     var outlineColor = new TouchColor (progressColor);
                     outlineColor.ModifyColor (0.5);
