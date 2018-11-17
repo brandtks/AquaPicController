@@ -56,7 +56,7 @@ namespace GoodtimeDevelopment.TouchWidget
         }
 
         public void Render (object sender, int x, int y, int width, int height) {
-            Bin widget = sender as Bin;
+            var widget = sender as Bin;
             Pango.Layout l = new Pango.Layout (widget.PangoContext);
 
             l.FontDescription = Pango.FontDescription.FromString (font.fontName + " " + font.size.ToString ());
