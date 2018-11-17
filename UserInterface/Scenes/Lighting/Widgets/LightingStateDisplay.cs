@@ -528,7 +528,7 @@ namespace AquaPic.UserInterface
                     stateInfo.endButtonYPos = endButtonY - top;
 
                     // State start adjustment button
-                    cr.MoveTo (startButtonX, startButtonY);
+                    cr.MoveTo (startButtonX + 15, startButtonY);
                     cr.Arc (startButtonX, startButtonY, 15, 0, 2 * Math.PI);
                     cr.ClosePath ();
 
@@ -544,18 +544,20 @@ namespace AquaPic.UserInterface
                     var lowlightColor = new TouchColor (color);
                     lowlightColor.ModifyColor (0.75);
 
-                    outlineColor.SetSource (cr);
-                    cr.StrokePreserve ();
                     using (var grad = new RadialGradient (startButtonX, startButtonY - 10, 0, startButtonX, startButtonY - 10, 25)) {
                         grad.AddColorStop (0, highlightColor.ToCairoColor ());
                         grad.AddColorStop (0.35, color.ToCairoColor ());
                         grad.AddColorStop (0.75, lowlightColor.ToCairoColor ());
                         cr.SetSource (grad);
-                        cr.Fill ();
+                        cr.FillPreserve ();
                     }
 
+                    outlineColor.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
+
                     // State end adjustment button
-                    cr.MoveTo (endButtonX, endButtonY);
+                    cr.MoveTo (endButtonX + 15, endButtonY);
                     cr.Arc (endButtonX, endButtonY, 15, 0, 2 * Math.PI);
                     cr.ClosePath ();
 
@@ -571,15 +573,17 @@ namespace AquaPic.UserInterface
                     lowlightColor = new TouchColor (color);
                     lowlightColor.ModifyColor (0.75);
 
-                    outlineColor.SetSource (cr);
-                    cr.StrokePreserve ();
                     using (var grad = new RadialGradient (endButtonX, endButtonY - 10, 0, endButtonX, endButtonY - 10, 25)) {
                         grad.AddColorStop (0, highlightColor.ToCairoColor ());
                         grad.AddColorStop (0.35, color.ToCairoColor ());
                         grad.AddColorStop (0.75, lowlightColor.ToCairoColor ());
                         cr.SetSource (grad);
-                        cr.Fill ();
+                        cr.FillPreserve ();
                     }
+
+                    outlineColor.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
 
                     #endregion // Start End Buttons
 
@@ -598,28 +602,43 @@ namespace AquaPic.UserInterface
                     stateInfo.endTimeTextXPos = endTimeTextX - left;
 
                     // Start time textbox
-                    cr.Rectangle (startTimeTextX, graphBottom + 7, 80, 25);
+                    TouchGlobal.DrawRoundedRectangle (cr, startTimeTextX + 4, graphBottom + 11, 80, 25, 3);
+                    var shadowColor = new TouchColor ("grey4");
+                    shadowColor.ModifyColor (0.5);
+                    shadowColor.A = 0.4;
+                    shadowColor.SetSource (cr);
+                    cr.Fill ();
+
+                    TouchGlobal.DrawRoundedRectangle (cr, startTimeTextX, graphBottom + 7, 80, 25, 3);
                     TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
-                    TouchColor.SetSource (cr, "black");
+
+                    TouchColor.SetSource (cr, "grey0");
+                    cr.LineWidth = 1;
                     cr.Stroke ();
 
                     text = new TouchText (state.startTime.ToShortTimeString ());
                     text.alignment = TouchAlignment.Center;
                     text.font.color = "black";
-                    text.Render (this, startTimeTextX.ToInt (), graphBottom + 10, 80);
+                    text.Render (this, startTimeTextX.ToInt (), graphBottom + 9, 80);
 
                     // End time textbox
-                    cr.Rectangle (endTimeTextX, graphBottom + 7, 80, 25);
+                    TouchGlobal.DrawRoundedRectangle (cr, endTimeTextX + 4, graphBottom + 11, 79, 24, 3);
+                    shadowColor.SetSource (cr);
+                    cr.Fill ();
+
+                    TouchGlobal.DrawRoundedRectangle (cr, endTimeTextX, graphBottom + 7, 79, 24, 3);
                     TouchColor.SetSource (cr, "grey4");
                     cr.FillPreserve ();
-                    TouchColor.SetSource (cr, "black");
+
+                    TouchColor.SetSource (cr, "grey0");
+                    cr.LineWidth = 1;
                     cr.Stroke ();
 
                     text = new TouchText (state.endTime.ToShortTimeString ());
                     text.alignment = TouchAlignment.Center;
                     text.font.color = "black";
-                    text.Render (this, endTimeTextX.ToInt (), graphBottom + 10, 80);
+                    text.Render (this, endTimeTextX.ToInt (), graphBottom + 9, 80);
 
                     #endregion // Time Textboxes
 
@@ -652,10 +671,16 @@ namespace AquaPic.UserInterface
                         stateInfo.endDimmingTextYPos = endDimmingTextY - top;
 
                         // Start dimming textbox
-                        cr.Rectangle (left, startDimmingTextY, 73, 25);
+                        TouchGlobal.DrawRoundedRectangle (cr, left + 4, startDimmingTextY + 4, 72, 24, 3);
+                        shadowColor.SetSource (cr);
+                        cr.Fill ();
+
+                        TouchGlobal.DrawRoundedRectangle (cr, left, startDimmingTextY, 73, 25, 3);
                         TouchColor.SetSource (cr, "grey4");
                         cr.FillPreserve ();
-                        TouchColor.SetSource (cr, "black");
+
+                        TouchColor.SetSource (cr, "grey0");
+                        cr.LineWidth = 1;
                         cr.Stroke ();
 
                         text = new TouchText (state.startingDimmingLevel.ToString ());
@@ -665,10 +690,16 @@ namespace AquaPic.UserInterface
 
                         // End dimming textbox
                         if (showEndDimmingLevel) {
-                            cr.Rectangle (left, endDimmingTextY, 73, 25);
+                            TouchGlobal.DrawRoundedRectangle (cr, left + 4, endDimmingTextY + 4, 72, 24, 3);
+                            shadowColor.SetSource (cr);
+                            cr.Fill ();
+
+                            TouchGlobal.DrawRoundedRectangle (cr, left, endDimmingTextY, 73, 25, 3);
                             TouchColor.SetSource (cr, "grey4");
                             cr.FillPreserve ();
+
                             TouchColor.SetSource (cr, "black");
+                            cr.LineWidth = 1;
                             cr.Stroke ();
 
                             text = new TouchText (state.endingDimmingLevel.ToString ());
@@ -708,26 +739,32 @@ namespace AquaPic.UserInterface
                     stateInfo.deleteButtonXPos = deleteButtonX - left;
                     stateInfo.deleteButtonYPos = deleteButtonY - top;
 
-                    cr.MoveTo (deleteButtonX, deleteButtonY);
+                    cr.MoveTo (deleteButtonX + 15, deleteButtonY);
                     cr.Arc (deleteButtonX, deleteButtonY, 15, 0, 2 * Math.PI);
 
                     color = new TouchColor ("compl");
                     if (deleteButtonClicked) {
                         color.ModifyColor (0.75);
                     }
-                    highlightColor = new TouchColor (color);
-                    highlightColor.ModifyColor (1.4);
+
                     outlineColor = new TouchColor (color);
                     outlineColor.ModifyColor (0.5);
+                    highlightColor = new TouchColor (color);
+                    highlightColor.ModifyColor (1.2);
+                    lowlightColor = new TouchColor (color);
+                    lowlightColor.ModifyColor (0.75);
 
-                    outlineColor.SetSource (cr);
-                    cr.StrokePreserve ();
-                    using (var grad = new RadialGradient (deleteButtonX, deleteButtonY + 10, 25, deleteButtonX, deleteButtonY + 10, 0)) {
+                    using (var grad = new RadialGradient (deleteButtonX, deleteButtonY - 10, 0, deleteButtonX, deleteButtonY - 10, 25)) {
                         grad.AddColorStop (0, highlightColor.ToCairoColor ());
                         grad.AddColorStop (0.35, color.ToCairoColor ());
+                        grad.AddColorStop (0.75, lowlightColor.ToCairoColor ());
                         cr.SetSource (grad);
-                        cr.Fill ();
+                        cr.FillPreserve ();
                     }
+
+                    outlineColor.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
 
                     cr.MoveTo (deleteButtonX - 6, deleteButtonY - 6);
                     cr.LineTo (deleteButtonX + 6, deleteButtonY + 6);
