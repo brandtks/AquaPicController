@@ -31,7 +31,16 @@ namespace GoodtimeDevelopment.TouchWidget
     public class TouchLayeredProgressBar : TouchProgressBar
     {
         public TouchColor colorProgressSecondary;
-        public float currentProgressSecondary;
+        float _currentProgressSecondary;
+        public float currentProgressSecondary {
+            get {
+                return _currentProgressSecondary;
+            }
+            set {
+                _currentProgressSecondary = value;
+                _currentProgressSecondary.Constrain (0, 1);
+            }
+        }
         public bool drawPrimaryWhenEqual;
 
         public TouchLayeredProgressBar (
@@ -58,9 +67,9 @@ namespace GoodtimeDevelopment.TouchWidget
         }
 
         public TouchLayeredProgressBar ()
-            : base (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f, false, TouchOrientation.Vertical) {
+            : base (new TouchColor ("grey4"), new TouchColor ("pri"), 0, false, TouchOrientation.Vertical) {
             colorProgressSecondary = new TouchColor ("seca");
-            currentProgressSecondary = 0.0f;
+            currentProgressSecondary = 0;
             drawPrimaryWhenEqual = true;
 
             ExposeEvent -= OnExpose;
@@ -68,14 +77,13 @@ namespace GoodtimeDevelopment.TouchWidget
         }
 
         protected void OnExposeSecondary (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 int left = Allocation.Left;
                 int top = Allocation.Top;
                 int width = Allocation.Width;
                 int height = Allocation.Height;
 
-                if (_orient == TouchOrientation.Vertical) {
-                    //cr.Rectangle (left, top, width, height);
+                if (orientation == TouchOrientation.Vertical) {
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
                     colorBackground.SetSource (cr);
                     cr.Fill ();
@@ -97,7 +105,7 @@ namespace GoodtimeDevelopment.TouchWidget
         }
 
         protected void DrawPrimary (Context cr) {
-            if (_orient == TouchOrientation.Vertical) {
+            if (orientation == TouchOrientation.Vertical) {
                 int left = Allocation.Left;
                 int top = Allocation.Top;
                 int width = Allocation.Width;
@@ -112,27 +120,34 @@ namespace GoodtimeDevelopment.TouchWidget
                 top += (height - width - difference.ToInt ());
 
                 cr.MoveTo (left, bottom - radius);
-                cr.ArcNegative (left + radius, bottom - radius, radius, (180.0).ToRadians (), (0.0).ToRadians ());
+                cr.ArcNegative (left + radius, bottom - radius, radius, Math.PI, 0);
                 cr.LineTo (left + width, top + radius);
-                cr.ArcNegative (left + radius, top + radius, radius, (0.0).ToRadians (), (180.0).ToRadians ());
+                cr.ArcNegative (left + radius, top + radius, radius, 0, Math.PI);
                 cr.ClosePath ();
 
-                colorProgress.SetSource (cr);
-                cr.Fill ();
+                var outlineColor = new TouchColor (colorProgress);
+                outlineColor.ModifyColor (0.5);
+                var highlightColor = new TouchColor (colorProgress);
+                highlightColor.ModifyColor (1.4);
+                var lowlightColor = new TouchColor (colorProgress);
+                lowlightColor.ModifyColor (0.75);
+
+                using (var grad = new LinearGradient (left, top, left, bottom)) {
+                    grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                    grad.AddColorStop (0.2, colorProgress.ToCairoColor ());
+                    grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                    cr.SetSource (grad);
+                    cr.FillPreserve ();
+                }
+
+                outlineColor.SetSource (cr);
+                cr.LineWidth = 1;
+                cr.Stroke ();
             }
         }
 
         protected void DrawSecondary (Context cr) {
-            if (_orient == TouchOrientation.Vertical) {
-                /*
-                int height = Allocation.Height;
-                int difference = (int)(height * currentProgressSecondary);
-                int top = Allocation.Top;
-                top += (height - difference);
-                cr.Rectangle (Allocation.Left, top, Allocation.Width, difference);
-                colorProgressSecondary.SetSource (cr);
-                cr.Fill ();
-                */
+            if (orientation == TouchOrientation.Vertical) {
                 int left = Allocation.Left;
                 int top = Allocation.Top;
                 int width = Allocation.Width;
@@ -147,13 +162,29 @@ namespace GoodtimeDevelopment.TouchWidget
                 top += ((height - width) - difference.ToInt ());
 
                 cr.MoveTo (left, bottom - radius);
-                cr.ArcNegative (left + radius, bottom - radius, radius, (180.0).ToRadians (), (0.0).ToRadians ());
+                cr.ArcNegative (left + radius, bottom - radius, radius, Math.PI, 0);
                 cr.LineTo (left + width, top + radius);
-                cr.ArcNegative (left + radius, top + radius, radius, (0.0).ToRadians (), (180.0).ToRadians ());
+                cr.ArcNegative (left + radius, top + radius, radius, 0, Math.PI);
                 cr.ClosePath ();
 
-                colorProgressSecondary.SetSource (cr);
-                cr.Fill ();
+                var outlineColor = new TouchColor (colorProgressSecondary);
+                outlineColor.ModifyColor (0.5);
+                var highlightColor = new TouchColor (colorProgressSecondary);
+                highlightColor.ModifyColor (1.4);
+                var lowlightColor = new TouchColor (colorProgressSecondary);
+                lowlightColor.ModifyColor (0.75);
+
+                using (var grad = new LinearGradient (left, top, left, bottom)) {
+                    grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                    grad.AddColorStop (0.2, colorProgressSecondary.ToCairoColor ());
+                    grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                    cr.SetSource (grad);
+                    cr.FillPreserve ();
+                }
+
+                outlineColor.SetSource (cr);
+                cr.LineWidth = 1;
+                cr.Stroke ();
             }
         }
     }

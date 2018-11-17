@@ -41,19 +41,14 @@ namespace GoodtimeDevelopment.TouchWidget
 
     public class TouchProgressBar : EventBox
     {
-        protected TouchOrientation _orient;
-        private float _currentProgress;
+        float _currentProgress;
         public float currentProgress {
             get {
                 return _currentProgress;
             }
             set {
-                if (value < 0.0f)
-                    _currentProgress = 0.0f;
-                else if (value > 1.0f)
-                    _currentProgress = 1.0f;
-                else
-                    _currentProgress = value;
+                _currentProgress = value;
+                _currentProgress.Constrain (0, 1);
             }
         }
 
@@ -64,8 +59,9 @@ namespace GoodtimeDevelopment.TouchWidget
         public event ProgressChangeEventHandler ProgressChangedEvent;
         public event ProgressChangeEventHandler ProgressChangingEvent;
 
-        private uint timerId;
-        private bool clicked;
+        uint timerId;
+        bool clicked;
+        protected TouchOrientation orientation;
 
         public TouchProgressBar (
             TouchColor colorBackground,
@@ -74,18 +70,18 @@ namespace GoodtimeDevelopment.TouchWidget
             bool enableTouch,
             TouchOrientation orientation
         ) {
-            this.Visible = true;
-            this.VisibleWindow = false;
+            Visible = true;
+            VisibleWindow = false;
 
             this.colorBackground = colorBackground;
             this.colorProgress = colorProgress;
-            this._currentProgress = currentProgress;
+            _currentProgress = currentProgress;
             this.enableTouch = enableTouch;
-            _orient = orientation;
+            this.orientation = orientation;
             timerId = 0;
             clicked = false;
 
-            if (_orient == TouchOrientation.Vertical) {
+            if (this.orientation == TouchOrientation.Vertical) {
                 SetSizeRequest (30, 200);
             } else {
                 SetSizeRequest (200, 30);
@@ -103,16 +99,16 @@ namespace GoodtimeDevelopment.TouchWidget
             base.Dispose ();
         }
 
-        public TouchProgressBar ()
-            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f, false, TouchOrientation.Vertical) {
+        public TouchProgressBar (TouchOrientation orientation)
+            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0f, false, orientation) {
         }
 
-        public TouchProgressBar (TouchOrientation orientation)
-            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0.0f, false, orientation) {
+        public TouchProgressBar ()
+            : this (new TouchColor ("grey4"), new TouchColor ("pri"), 0f, false, TouchOrientation.Vertical) {
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 int left = Allocation.Left;
                 int top = Allocation.Top;
                 int width = Allocation.Width;
@@ -120,7 +116,7 @@ namespace GoodtimeDevelopment.TouchWidget
                 int radius, bottom = top + height;
                 double difference;
 
-                if (_orient == TouchOrientation.Vertical) {
+                if (orientation == TouchOrientation.Vertical) {
                     radius = width / 2;
 
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, radius);
@@ -131,12 +127,29 @@ namespace GoodtimeDevelopment.TouchWidget
                     top += (height - width - difference.ToInt ());
 
                     cr.MoveTo (left, bottom - radius);
-                    cr.ArcNegative (left + radius, bottom - radius, radius, (180.0).ToRadians (), (0.0).ToRadians ());
+                    cr.ArcNegative (left + radius, bottom - radius, radius, Math.PI, 0);
                     cr.LineTo (left + width, top + radius);
-                    cr.ArcNegative (left + radius, top + radius, radius, (0.0).ToRadians (), (180.0).ToRadians ());
+                    cr.ArcNegative (left + radius, top + radius, radius, 0, Math.PI);
                     cr.ClosePath ();
-                    colorProgress.SetSource (cr);
-                    cr.Fill ();
+
+                    var outlineColor = new TouchColor (colorProgress);
+                    outlineColor.ModifyColor (0.5);
+                    var highlightColor = new TouchColor (colorProgress);
+                    highlightColor.ModifyColor (1.4);
+                    var lowlightColor = new TouchColor (colorProgress);
+                    lowlightColor.ModifyColor (0.75);
+
+                    using (var grad = new LinearGradient (left, top, left, bottom)) {
+                        grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.2, colorProgress.ToCairoColor ());
+                        grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                        cr.SetSource (grad);
+                        cr.FillPreserve ();
+                    }
+
+                    outlineColor.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
                 } else {
                     radius = height / 2;
 
@@ -147,12 +160,29 @@ namespace GoodtimeDevelopment.TouchWidget
                     difference = ((width - height) * _currentProgress);
 
                     cr.MoveTo (left + radius, top);
-                    cr.ArcNegative (left + radius, top + radius, radius, (-90.0).ToRadians (), (90.0).ToRadians ());
+                    cr.ArcNegative (left + radius, top + radius, radius, 3 * Math.PI / 2, Math.PI / 2);
                     cr.LineTo (left + difference + height - radius, bottom);
-                    cr.ArcNegative (left + difference + height - radius, top + radius, radius, (90.0).ToRadians (), (-90.0).ToRadians ());
+                    cr.ArcNegative (left + difference + height - radius, top + radius, radius, Math.PI / 2, 3 * Math.PI / 2);
                     cr.ClosePath ();
-                    colorProgress.SetSource (cr);
-                    cr.Fill ();
+
+                    var outlineColor = new TouchColor (colorProgress);
+                    outlineColor.ModifyColor (0.5);
+                    var highlightColor = new TouchColor (colorProgress);
+                    highlightColor.ModifyColor (1.4);
+                    var lowlightColor = new TouchColor (colorProgress);
+                    lowlightColor.ModifyColor (0.75);
+
+                    using (var grad = new LinearGradient (left, top, left, bottom)) {
+                        grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.2, colorProgress.ToCairoColor ());
+                        grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                        cr.SetSource (grad);
+                        cr.FillPreserve ();
+                    }
+
+                    outlineColor.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
                 }
             }
         }
@@ -166,28 +196,15 @@ namespace GoodtimeDevelopment.TouchWidget
 
         protected void OnProgressBarRelease (object o, ButtonReleaseEventArgs args) {
             clicked = false;
-
-            if (ProgressChangedEvent != null)
-                ProgressChangedEvent (this, new ProgressChangeEventArgs (_currentProgress));
+            ProgressChangedEvent?.Invoke (this, new ProgressChangeEventArgs (_currentProgress));
         }
 
         protected bool OnTimerEvent () {
             if (clicked) {
-                int x, y;
-                GetPointer (out x, out y);
-                if (_orient == TouchOrientation.Vertical)
-                    _currentProgress = (float)(Allocation.Height - y) / (float)Allocation.Height;
-                else
-                    _currentProgress = (float)x / (float)Allocation.Width;
-
-                if (_currentProgress > 1.0f)
-                    _currentProgress = 1.0f;
-                if (_currentProgress < 0.0f)
-                    _currentProgress = 0.0f;
-
-                if (ProgressChangingEvent != null)
-                    ProgressChangingEvent (this, new ProgressChangeEventArgs (_currentProgress));
-
+                GetPointer (out int x, out int y);
+                _currentProgress = orientation == TouchOrientation.Vertical ? (Allocation.Height - y) / Allocation.Height : x / Allocation.Width;
+                _currentProgress.Constrain (0, 1);
+                ProgressChangingEvent?.Invoke (this, new ProgressChangeEventArgs (_currentProgress));
                 QueueDraw ();
             }
 
