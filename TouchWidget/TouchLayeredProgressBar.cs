@@ -37,8 +37,7 @@ namespace GoodtimeDevelopment.TouchWidget
                 return _currentProgressSecondary;
             }
             set {
-                _currentProgressSecondary = value;
-                _currentProgressSecondary.Constrain (0, 1);
+                _currentProgressSecondary = value.Constrain (0, 1);
             }
         }
         public bool drawPrimaryWhenEqual;

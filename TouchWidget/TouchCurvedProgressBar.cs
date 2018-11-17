@@ -42,8 +42,7 @@ namespace GoodtimeDevelopment.TouchWidget
                 return _progress;
             }
             set {
-                _progress = value;
-                _progress.Constrain (0, 1);
+                _progress = value.Constrain (0, 1); ;
             }
         }
 

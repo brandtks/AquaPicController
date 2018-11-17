@@ -101,7 +101,7 @@ namespace AquaPic.UserInterface
                 { "Home", new SceneData ("Home", true, (options) => {return new HomeWindow (options);}) }
             };
 
-            _currentScene = "Chemistry";
+            _currentScene = "Lighting";
 
             f = new Fixed ();
             f.SetSizeRequest (800, 480);

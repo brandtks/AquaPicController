@@ -114,7 +114,7 @@ namespace AquaPic.Modules
                     autoDimmingLevel = lightingStates [currentState].startingDimmingLevel;
                 }
 
-                autoDimmingLevel.Constrain (0, 100);
+                autoDimmingLevel = autoDimmingLevel.Constrain (0, 100);
                 if (plugState == MyState.On) {
                     if (dimmingMode == Mode.Auto) {
                         requestedDimmingLevel = autoDimmingLevel;
