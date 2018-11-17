@@ -31,15 +31,15 @@ namespace AquaPic.UserInterface
 {
     public class DeluxeTimerWidget : Fixed
     {
-        private IntervalTimer[] timers;
-        private TimerTab[] tabs;
-        private int timerIndex;
-        private TouchTextBox minutes;
-        private TouchTextBox seconds;
-        private TouchUpDownButtons minUpDown;
-        private TouchUpDownButtons secUpDown;
-        private TouchButton startStopButton;
-        private TouchButton resetButton;
+        IntervalTimer[] timers;
+        TimerTab[] tabs;
+        int timerIndex;
+        TouchTextBox minutes;
+        TouchTextBox seconds;
+        TouchUpDownButtons minUpDown;
+        TouchUpDownButtons secUpDown;
+        TouchButton startStopButton;
+        TouchButton resetButton;
 
         public DeluxeTimerWidget (string name) {
             timerIndex = 0;
@@ -302,7 +302,7 @@ namespace AquaPic.UserInterface
             startStopButton.QueueDraw ();
         }
 
-        private class TimerTab : EventBox
+        class TimerTab : EventBox
         {
             public TouchColor color;
             public string text;
