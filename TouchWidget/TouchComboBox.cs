@@ -213,7 +213,7 @@ namespace GoodtimeDevelopment.TouchWidget
                         if (scrollBarUpClicked) {
                             TouchColor.SetSource (cr, "pri");
                         } else {
-                            TouchColor.SetSource (cr, "grey1");
+                            TouchColor.SetSource (cr, "grey2");
                         }
                         cr.Fill ();
 
@@ -225,7 +225,7 @@ namespace GoodtimeDevelopment.TouchWidget
                         if (scrollBarDownClicked) {
                             TouchColor.SetSource (cr, "pri");
                         } else {
-                            TouchColor.SetSource (cr, "grey1");
+                            TouchColor.SetSource (cr, "grey2");
                         }
                         cr.Fill ();
                     }
