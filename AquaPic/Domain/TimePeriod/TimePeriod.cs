@@ -49,6 +49,11 @@ namespace AquaPic.Runtime
             endTime = new Time (timePeriod.endTime);
         }
 
+        public TimePeriod (Time startTime, Time endTime) {
+            this.startTime = startTime;
+            this.endTime = endTime;
+        }
+
         protected Time ParseTimeDescriptor (string timeDescriptor) {
             var time = Time.TimeZero;
             var segments = timeDescriptor.Split (' ');

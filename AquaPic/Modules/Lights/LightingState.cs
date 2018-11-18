@@ -102,6 +102,18 @@ namespace AquaPic.Modules
             endingDimmingLevel = lightingState.endingDimmingLevel;
         }
 
+        public LightingState (Time startTime, Time endTime, LightingStateType type) {
+            timePeriod = new TimePeriod (startTime, endTime);
+            this.type = type;
+            if (this.type == LightingStateType.Off) {
+                startingDimmingLevel = 0;
+                endingDimmingLevel = 0;
+            } else {
+                startingDimmingLevel = 100;
+                endingDimmingLevel = 100;
+            }
+        }
+
         public override string ToString () {
             return string.Format ("{4}: {0} at {1} to {2} at {3}",
                                   startTime.ToShortTimeString (),
