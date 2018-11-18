@@ -96,7 +96,10 @@ namespace AquaPic.UserInterface
                     var parent = Toplevel as Window;
                     var ms = new TouchDialog ("Do you want to make the changes permanent", parent);
                     ms.Response += (o, a) => {
-                        Lighting.SetLightingStates (fixtureName, lightingStateDisplay.lightingStates, a.ResponseId == ResponseType.No);
+                        Lighting.SetLightingStates (
+                            fixtureName, 
+                            lightingStateDisplay.lightingStates, 
+                            a.ResponseId == ResponseType.No);
                         lightingStateDisplay.selectedState = -1;
                         lightingStateDisplay.hasStateInfoChanged = false;
                         lightingStateDisplay.QueueDraw ();
@@ -116,7 +119,6 @@ namespace AquaPic.UserInterface
             undoChangesButton.ButtonReleaseEvent += (obj, args) => {
                 if (lightingStateDisplay.hasStateInfoChanged) {
                     SetStates (fixtureName);
-                    lightingStateDisplay.QueueDraw ();
                 }
             };
             Put (undoChangesButton, 370, 340);
@@ -147,7 +149,7 @@ namespace AquaPic.UserInterface
         public void SetStates (string fixtureName) {
             this.fixtureName = fixtureName;
             lightingStateDisplay.SetStates (
-                Lighting.GetLightingStates (fixtureName), 
+                Lighting.GetLightingStates (fixtureName),
                 Lighting.IsDimmingFixture (fixtureName));
         }
     }

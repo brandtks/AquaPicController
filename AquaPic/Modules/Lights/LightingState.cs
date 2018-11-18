@@ -74,8 +74,13 @@ namespace AquaPic.Modules
         public LightingState (string startTimeDescriptor, string endTimeDescriptor, LightingStateType type) {
             timePeriod = new TimePeriod (startTimeDescriptor, endTimeDescriptor);
             this.type = type;
-            startingDimmingLevel = 100f;
-            endingDimmingLevel = 100f;
+            if (this.type == LightingStateType.Off) {
+                startingDimmingLevel = 0;
+                endingDimmingLevel = 0;
+            } else {
+                startingDimmingLevel = 100;
+                endingDimmingLevel = 100;
+            }
         }
 
         public LightingState (
@@ -98,11 +103,12 @@ namespace AquaPic.Modules
         }
 
         public override string ToString () {
-            return string.Format ("{0} at {1} to {2} at {3}",
+            return string.Format ("{4}: {0} at {1} to {2} at {3}",
                                   startTime.ToShortTimeString (),
                                   startingDimmingLevel,
                                   endTime.ToShortTimeString (),
-                                  endingDimmingLevel);
+                                  endingDimmingLevel,
+                                  Utils.GetDescription (type));
         }
     }
 }
