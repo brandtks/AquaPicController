@@ -53,7 +53,7 @@ namespace AquaPic.UserInterface
         public event LightingStateInfoChangedHandler LightingStateInfoChanged;
 
         const int graphLeftEdgeWidth = 80;
-        const int graphTopEdgeWidth = 40;
+        const int graphTopEdgeWidth = 50;
         const int graphBottomEdgeWidth = 90;
 
         int _selectedState;
@@ -99,12 +99,12 @@ namespace AquaPic.UserInterface
 
         public bool adjustDimmingTogether;
 
-
-
-        bool clicked, startButtonClicked, endButtonClicked, movedOutOfXRange, movedOutOfYRange, dimmingFixture;
+        bool clicked, startButtonClicked, endButtonClicked, linearClicked, halfParabolaClicked, fullParabolaClicked, onClicked, entityClicked, 
+            movedOutOfXRange, movedOutOfYRange, dimmingFixture;
         uint clickTimer;
-        int graphLeftRelative, graphRightRelative, graphTopRelative, graphBottomRelative, clickX, clickY;
+        int graphLeftRelative, graphRightRelative, graphTopRelative, graphBottomRelative, clickX, clickY, addedStateIndex;
         double minutesPerPixel, dimmingPerPixel;
+        LightingStateType newStateType;
 
         #endregion // Properties
 
@@ -115,6 +115,7 @@ namespace AquaPic.UserInterface
             graphLeftRelative = graphLeftEdgeWidth;
             graphTopRelative = graphTopEdgeWidth;
             selectedState = -1;
+            addedStateIndex = -1;
             stateInfos = new List<StateInfo> ();
             adjustDimmingTogether = true;
 
@@ -739,6 +740,74 @@ namespace AquaPic.UserInterface
                     }
 
                     #endregion
+                } else {
+                    #region Linear Ramp Button
+
+                    var buttonX = left + 135;
+                    TouchGlobal.DrawRoundedRectangle (cr, buttonX, top + 1, 80, 40, 3);
+                    cr.MoveTo (buttonX + 25, top + 35);
+                    cr.LineTo (buttonX + 55, top + 5);
+
+                    TouchColor color = "secb";
+                    if (linearClicked) {
+                        color.ModifyColor (0.75);
+                    }
+                    color.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
+
+                    #endregion
+
+                    #region Half Parabola Ramp Button
+
+                    buttonX += 90;
+                    TouchGlobal.DrawRoundedRectangle (cr, buttonX, top + 1, 80, 40, 3);
+                    cr.MoveTo (buttonX + 25, top + 35);
+                    cr.Arc (buttonX + 55, top + 35, 30, Math.PI, 3 * Math.PI / 2);
+
+                    color = "secb";
+                    if (halfParabolaClicked) {
+                        color.ModifyColor (0.75);
+                    }
+                    color.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
+
+                    #endregion
+
+                    #region Full Parabola Ramp Button
+
+                    buttonX += 90;
+                    TouchGlobal.DrawRoundedRectangle (cr, buttonX, top + 1, 80, 40, 3);
+                    cr.MoveTo (buttonX + 10, top + 35);
+                    cr.Arc (buttonX + 40, top + 35, 30, Math.PI, 0);
+
+                    color = "secb";
+                    if (fullParabolaClicked) {
+                        color.ModifyColor (0.75);
+                    }
+                    color.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
+
+                    #endregion
+
+                    #region On Button
+
+                    buttonX += 90;
+                    TouchGlobal.DrawRoundedRectangle (cr, buttonX, top + 1, 80, 40, 3);
+                    cr.MoveTo (buttonX + 25, top + 20);
+                    cr.LineTo (buttonX + 55, top + 20);
+
+                    color = "secb";
+                    if (onClicked) {
+                        color.ModifyColor (0.75);
+                    }
+                    color.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
+
+                    #endregion
                 }
 
                 cr.MoveTo (timeXPos, timeYPos);
@@ -752,6 +821,7 @@ namespace AquaPic.UserInterface
         public void SetStates (LightingState[] lightingStates, bool dimmingFixture) {
             stateInfos.Clear ();
             selectedState = -1;
+            addedStateIndex = -1;
             hasStateInfoChanged = false;
 
             for (int i = 0; i < lightingStates.Length; ++i) {
@@ -792,17 +862,36 @@ namespace AquaPic.UserInterface
             if (selectedState != -1) {
                 var stateInfo = stateInfos[selectedState];
 
-                if ((clickX > stateInfo.startButtonXPos - 12) && (clickX < stateInfo.startButtonXPos + 12) && 
+                if ((clickX > stateInfo.startButtonXPos - 12) && (clickX < stateInfo.startButtonXPos + 12) &&
                     (clickY > stateInfo.startButtonYPos - 12) && (clickY < stateInfo.startButtonYPos + 12)) {
                     startButtonClicked = true;
-                    clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
                 }
 
                 if ((clickX > stateInfo.endButtonXPos - 12) && (clickX < stateInfo.endButtonXPos + 12) &&
                     (clickY > stateInfo.endButtonYPos - 12) && (clickY < stateInfo.endButtonYPos + 12)) {
                     endButtonClicked = true;
-                    clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
                 }
+            } else {
+                if ((clickY > 0) && (clickY < 40)) {
+                    if ((clickX > 135) && (clickX < 215)) {
+                        linearClicked = true;
+                        newStateType = LightingStateType.LinearRamp;
+                    } else if ((clickX > 225) && (clickX < 305)) {
+                        halfParabolaClicked = true;
+                        newStateType = LightingStateType.HalfParabolaRamp;
+                    } else if ((clickX > 315) && (clickX < 395)) {
+                        fullParabolaClicked = true;
+                        newStateType = LightingStateType.ParabolaRamp;
+                    } else if ((clickX > 405) && (clickX < 485)) {
+                        onClicked = true;
+                        newStateType = LightingStateType.On;
+                    }
+                }
+            }
+
+            entityClicked = startButtonClicked | endButtonClicked | linearClicked | halfParabolaClicked | fullParabolaClicked | onClicked;
+            if (entityClicked) {
+                clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
             }
 
             QueueDraw ();
@@ -812,7 +901,7 @@ namespace AquaPic.UserInterface
             var x = args.Event.X;
             var y = args.Event.Y;
 
-            if (!startButtonClicked & !endButtonClicked) {
+            if (!entityClicked) {
                 var releasedHappenedOnSomeEnitity = false;
 
                 if (selectedState != -1) {
@@ -943,6 +1032,12 @@ namespace AquaPic.UserInterface
             clicked = false;
             startButtonClicked = false;
             endButtonClicked = false;
+            linearClicked = false;
+            halfParabolaClicked = false;
+            fullParabolaClicked = false;
+            onClicked = false;
+            entityClicked = false;
+            addedStateIndex = -1;
             movedOutOfXRange = false;
             movedOutOfYRange = false;
 
@@ -995,6 +1090,14 @@ namespace AquaPic.UserInterface
                     if (dimmingFixture && movedOutOfYRange) {
                         var newDimmingLevel = yDelta * dimmingPerPixel + stateInfos[selectedState].lightingState.endingDimmingLevel;
                         SetEndDimmingLevel (newDimmingLevel);
+                    }
+                } else if (entityClicked) {
+                    if ((clickX > graphLeftRelative) && (clickX < graphRightRelative) &&
+                        (clickY > graphTopRelative) && (clickY < graphBottomRelative)) {
+
+                        var newMinutes = (clickX - graphLeftRelative) * minutesPerPixel;
+                        var newGeneralTime = new Time (new TimeSpan (0, newMinutes.ToInt (), 0));
+                        AddState (newGeneralTime, newStateType);
                     }
                 }
 
@@ -1175,22 +1278,163 @@ namespace AquaPic.UserInterface
                     var period = stateInfo.lightingState.lengthInMinutes;
                     var startMinutes = stateInfo.lightingState.startTime.totalMinutes;
                     var midMinutes = period / 2 + startMinutes;
-                    if (startMinutes > 1439) {
-                        startMinutes -= 1439;
-                    }
                     var midTime = new Time (new TimeSpan (0, midMinutes.ToInt (), 0));
                     stateInfo.previous.lightingState.endTime = midTime;
                     stateInfo.next.lightingState.startTime = midTime;
                 } else if ((stateInfo.previous.lightingState.type == LightingStateType.Off) &&
                     (stateInfo.next.lightingState.type != LightingStateType.Off)) {
-                    stateInfo.next.lightingState.startTime = stateInfo.lightingState.startTime;
+                    stateInfo.previous.lightingState.startTime = stateInfo.lightingState.startTime;
                 } else if ((stateInfo.previous.lightingState.type != LightingStateType.Off) &&
                     (stateInfo.next.lightingState.type == LightingStateType.Off)) {
-                    stateInfo.previous.lightingState.endTime = stateInfo.lightingState.endTime;
+                    stateInfo.next.lightingState.endTime = stateInfo.lightingState.endTime;
                 } else {
                     var nextStateIndex = stateInfos.IndexOf (stateInfo.next);
                     RemoveState (nextStateIndex);
                 }
+            }
+        }
+
+        void AddState (Time generalTime, LightingStateType type) {
+            if (addedStateIndex != -1) {
+                RemoveState (addedStateIndex);
+            }
+
+            for (int i = 0; i < stateInfos.Count; ++i) {
+                var state = stateInfos[i].lightingState;
+                var previous = stateInfos[i].previous.lightingState;
+                var next = stateInfos[i].next.lightingState;
+
+                LightingState newState;
+                if (state.startTime.Before (state.endTime)) {
+                    if (generalTime.After (state.startTime) && generalTime.After (state.endTime)) {
+
+                        var differenceToNext = Math.Abs (generalTime.totalMinutes - next.startTime.totalMinutes);
+                        var differenceToPrevious = Math.Abs (generalTime.totalMinutes - previous.endTime.totalMinutes);
+                        var stateLength = state.lengthInMinutes.ToInt ().Constrain (2, int.MaxValue);
+
+                        newState = new LightingState (state);
+                        newState.type = type;
+
+                        if (state.type == LightingStateType.Off) {
+                            if (differenceToNext < differenceToPrevious) {
+                                if (stateLength > 30) {
+                                    newState.startTime.AddMinutes (-15);
+                                } else {
+                                    newState.startTime.AddMinutes (-stateLength / 2);
+                                }
+
+                                state.endTime = new Time (newState.startTime);
+
+
+                            } else {
+                                if (stateLength > 30) {
+                                    newState.endTime.AddMinutes (15);
+                                } else {
+                                    newState.endTime.AddMinutes (stateLength / 2);
+                                }
+                                state.startTime = new Time (newState.endTime);
+                            }
+                        } else if (previous.type == LightingStateType.Off) {
+                            if (differenceToPrevious < differenceToNext) {
+                                stateLength = previous.lengthInMinutes.ToInt ().Constrain (2, int.MaxValue);
+                                if (stateLength > 30) {
+                                    newState.startTime.AddMinutes (-15);
+                                } else {
+                                    newState.startTime.AddMinutes (-stateLength / 2);
+                                }
+
+                                previous.endTime = new Time (newState.startTime);
+                            } else {
+                                if (stateLength > 15) {
+                                    newState.startTime.AddMinutes (-8);
+                                } else {
+                                    newState.startTime.AddMinutes (-stateLength / 2);
+                                }
+
+                                stateLength = next.lengthInMinutes.ToInt ().Constrain (2, int.MaxValue);
+                                if (stateLength > 15) {
+                                    newState.endTime.AddMinutes (7);
+                                } else {
+                                    newState.endTime.AddMinutes (stateLength / 2);
+                                }
+
+                                state.endTime = new Time (newState.startTime);
+                                next.startTime = new Time (newState.endTime);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void AddStateAtEnd (StateInfo stateInfo, LightingStateType type) {
+            var state = stateInfo.lightingState;
+            var stateLength = state.lengthInMinutes.ToInt ();
+
+            if (stateLength <= 1) {
+                // The state is too short to add a new state
+                // Add it to the next state
+                AddStateToNext (stateInfo);
+            } else {
+                var newState = new LightingState (state);
+                newState.type = type;
+
+                if (stateLength > 30) {
+                    newState.startTime.AddMinutes (-15);
+                } else {
+                    newState.startTime.AddMinutes (-stateLength / 2);
+                }
+
+                state.endTime = new Time (newState.startTime);
+
+                if (dimmingFixture) {
+                    switch (type) {
+                    case LightingStateType.On:
+                    case LightingStateType.ParabolaRamp:
+                        newState.startingDimmingLevel = stateInfo.next.lightingState.startingDimmingLevel;
+                        newState.endingDimmingLevel = stateInfo.next.lightingState.startingDimmingLevel;
+                        break;
+                    case LightingStateType.HalfParabolaRamp:
+                    case LightingStateType.LinearRamp:
+                        newState.startingDimmingLevel = stateInfo.lightingState.endingDimmingLevel;
+                        newState.endingDimmingLevel = stateInfo.next.lightingState.startingDimmingLevel;
+                        break;
+                    default:
+                        newState.startingDimmingLevel = 0;
+                        newState.endingDimmingLevel = 0;
+                        break;
+                    }
+                } else {
+                    if (type != LightingStateType.Off) {
+                        newState.startingDimmingLevel = 100;
+                        newState.endingDimmingLevel = 100;
+                    } else {
+                        newState.startingDimmingLevel = 0;
+                        newState.endingDimmingLevel = 0;
+                    }
+                }
+
+                var newStateInfo = new StateInfo ();
+                newStateInfo.lightingState = newState;
+                newStateInfo.previous = stateInfo;
+                newStateInfo.next = stateInfo.next;
+                stateInfo.next = newStateInfo;
+                stateInfos.Insert (stateInfos.IndexOf (stateInfo), newStateInfo);
+            }
+        }
+
+        void AddStateAtBeginning (StateInfo stateInfo) {
+
+        }
+
+        void AddStateToNext (StateInfo stateInfo) {
+            var next = stateInfo.next;
+            var nextStateLength = next.lightingState.lengthInMinutes.ToInt ();
+
+            if (nextStateLength <= 1) {
+                AddStateToNext (next.next);
+            } else {
+                AddStateAtBeginning (next);
             }
         }
 

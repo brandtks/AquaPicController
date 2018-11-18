@@ -90,7 +90,7 @@ namespace AquaPic.UserInterface
             acceptChangesButton = new TouchButton ();
             acceptChangesButton.text = "Accept";
             acceptChangesButton.buttonColor = "grey1";
-            acceptChangesButton.SetSizeRequest (60, 40);
+            acceptChangesButton.SetSizeRequest (80, 40);
             acceptChangesButton.ButtonReleaseEvent += (obj, args) => {
                 if (lightingStateDisplay.hasStateInfoChanged) {
                     var parent = Toplevel as Window;
@@ -106,25 +106,25 @@ namespace AquaPic.UserInterface
                     ms.Destroy ();
                 }
             };
-            Put (acceptChangesButton, 480, 340);
+            Put (acceptChangesButton, 460, 340);
             acceptChangesButton.Show ();
 
             undoChangesButton = new TouchButton ();
             undoChangesButton.text = "Undo";
             undoChangesButton.buttonColor = "grey1";
-            undoChangesButton.SetSizeRequest (60, 40);
+            undoChangesButton.SetSizeRequest (80, 40);
             undoChangesButton.ButtonReleaseEvent += (obj, args) => {
                 if (lightingStateDisplay.hasStateInfoChanged) {
                     SetStates (fixtureName);
                     lightingStateDisplay.QueueDraw ();
                 }
             };
-            Put (undoChangesButton, 415, 340);
+            Put (undoChangesButton, 370, 340);
             undoChangesButton.Show ();
 
             deleteStateButton = new TouchButton ();
             deleteStateButton.text = "Delete";
-            deleteStateButton.SetSizeRequest (60, 40);
+            deleteStateButton.SetSizeRequest (80, 40);
             deleteStateButton.buttonColor = "compl";
             deleteStateButton.textColor = "white";
             deleteStateButton.ButtonReleaseEvent += (obj, args) => {
@@ -139,7 +139,7 @@ namespace AquaPic.UserInterface
                 ms.Run ();
                 ms.Destroy ();
             };
-            Put (deleteStateButton, 350, 340);
+            Put (deleteStateButton, 280, 340);
 
             Show ();
         }
