@@ -81,13 +81,13 @@ namespace AquaPic.UserInterface
                 cr.LineTo (0, 17);
                 cr.ClosePath ();
 
-                Gradient pat = new LinearGradient (0, 19, width, 19);
-                pat.AddColorStop (0.0, TouchColor.NewCairoColor ("grey2", 0.35));
-                pat.AddColorStop (0.5, TouchColor.NewCairoColor ("pri"));
-                pat.AddColorStop (1.0, TouchColor.NewCairoColor ("grey2", 0.35));
-                cr.SetSource (pat);
-                cr.Fill ();
-                pat.Dispose ();
+                using (var pat = new LinearGradient (0, 19, width, 19)) {
+                    pat.AddColorStop (0.0, TouchColor.NewCairoColor ("grey2", 0.35));
+                    pat.AddColorStop (0.5, TouchColor.NewCairoColor ("pri"));
+                    pat.AddColorStop (1.0, TouchColor.NewCairoColor ("grey2", 0.35));
+                    cr.SetSource (pat);
+                    cr.Fill ();
+                }
 
                 TouchText textRender = new TouchText (DateTime.Now.ToLongTimeString ());
                 textRender.alignment = TouchAlignment.Right;
@@ -129,8 +129,7 @@ namespace AquaPic.UserInterface
 
         protected void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
             if ((args.Event.X >= 0.0) && (args.Event.X <= 250.0)) {
-                var tl = this.Toplevel;
-                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Alarms", tl, AquaPicGui.AquaPicUserInterface.currentScene);
+                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Alarms", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
             }
         }
 

@@ -269,12 +269,7 @@ namespace AquaPic.UserInterface
 
             if (testIdx != -1) {
                 if (!tests[testIdx].InProcedure) {
-                    var parent = this.Toplevel as Gtk.Window;
-                    if (parent != null) {
-                        if (!parent.IsTopLevel)
-                            parent = null;
-                    }
-
+                    var parent = Toplevel as Window;
                     var ms = new TouchDialog (
                          "Are you sure you want to quit in the middle of a procedure",
                          parent);
@@ -330,45 +325,28 @@ namespace AquaPic.UserInterface
                     enableStepButton = false;
                     stepButton.QueueDraw ();
                 } else if (stepButton.text == "Enter titration level") {
-                    var parent = this.Toplevel as Gtk.Window;
-                    if (parent != null) {
-                        if (!parent.IsTopLevel) {
-                            parent = null;
+                    var number = 0d;
+                    var parent = Toplevel as Window;
+                    var t = new TouchNumberInput (false, parent);
+                    t.TextSetEvent += (o, a) => {
+                        try {
+                            number = Convert.ToDouble (a.text);
+                        } catch {
+                            a.keepText = false;
                         }
-                    }
+                    };
+                    t.Run ();
+                    t.Destroy ();
 
-                    double number = -1;
-                    int failCount = 3;
-                    while ((number == -1) && (failCount != 0)) {
-                        var t = new TouchNumberInput (false, parent);
-                        t.TextSetEvent += (o, a) => {
-                            try {
-                                number = Convert.ToDouble (a.text);
-                            } catch {
-                                number = -1;
-                            }
-                        };
-                        t.Run ();
-                        t.Destroy ();
-
-                        if (number == -1) {
-                            --failCount;
-                        }
-                    }
-
-                    if (failCount != 0) {
-                        if (actionOption == 1) {
-                            tests[testIdx].level1 = number;
-                        } else {
-                            tests[testIdx].level2 = number;
-                        }
-
-                        stepButton.text = "Next";
-                        stepButton.buttonColor = "seca";
-                        NextStep ();
+                    if (actionOption == 1) {
+                        tests[testIdx].level1 = number;
                     } else {
-                        MessageBox.Show ("Too much fail");
+                        tests[testIdx].level2 = number;
                     }
+
+                    stepButton.text = "Next";
+                    stepButton.buttonColor = "seca";
+                    NextStep ();
                 } else {
                     if (testIdx != -1) {
                         if (tests[testIdx].NotStarted) {
@@ -393,12 +371,7 @@ namespace AquaPic.UserInterface
                 if (tests[testIdx].Done) {
                     restart = true;
                 } else {
-                    var parent = this.Toplevel as Window;
-                    if (parent != null) {
-                        if (!parent.IsTopLevel)
-                            parent = null;
-                    }
-
+                    var parent = Toplevel as Window;
                     var ms = new TouchDialog (
                         "Are you sure you want to quit in the middle of a procedure",
                         parent);

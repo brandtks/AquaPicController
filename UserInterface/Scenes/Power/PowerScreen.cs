@@ -143,7 +143,8 @@ namespace AquaPic.UserInterface
                     Power.AddHandlerOnStateChange (ic, PlugStateChange);
                 }
             } else {
-                var s = new PowerSettings (string.Empty);
+                var parent = Toplevel as Window;
+                var s = new PowerSettings (string.Empty, false, parent);
                 s.Run ();
 
                 if (s.outcome == TouchSettingsOutcome.Added) {
@@ -167,7 +168,8 @@ namespace AquaPic.UserInterface
 
         protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
             if (powerStripName.IsNotEmpty ()) {
-                var s = new PowerSettings (powerStripName, Power.CheckPowerStipEmpty (powerStripName));
+                var parent = Toplevel as Window;
+                var s = new PowerSettings (powerStripName, Power.CheckPowerStipEmpty (powerStripName), parent);
                 s.Run ();
 
                 if (s.outcome == TouchSettingsOutcome.Deleted) {

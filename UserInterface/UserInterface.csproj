@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>UserInterface</RootNamespace>
     <AssemblyName>UserInterface</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <ReleaseVersion>0.1.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -80,12 +80,12 @@
     <Compile Include="Widgets\MyNotificationBar.cs" />
     <Compile Include="Widgets\MySideBar.cs" />
     <Compile Include="Scenes\Lighting\Widgets\LightingStateDisplay.cs" />
+    <Compile Include="Scenes\Lighting\Widgets\LightingStateWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Scenes\Plugin.Disable\EditPluginScreen.cs" />
     <None Include="Scenes\Plugin.Disable\PluginScreen.cs" />
-    <None Include="Scenes\Lighting\Dialogs\LightingSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dialogs\" />

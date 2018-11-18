@@ -32,9 +32,9 @@ namespace GoodtimeDevelopment.TouchWidget
     public class SelectorChangedEventArgs : EventArgs
     {
         public int currentSelectedIndex;
-        public byte id;
+        public int id;
 
-        public SelectorChangedEventArgs (int currentSelectedIndex, byte id) {
+        public SelectorChangedEventArgs (int currentSelectedIndex, int id) {
             this.currentSelectedIndex = currentSelectedIndex;
             this.id = id;
         }
@@ -48,52 +48,51 @@ namespace GoodtimeDevelopment.TouchWidget
 
     public class TouchSelectorSwitch : EventBox
     {
-        private bool clicked;
-        private uint clickTimer;
-        private int click1, click2;
+        bool clicked;
+        uint clickTimer;
+        int click1, click2;
 
-        private int _selectionCount;
-        public int selectionCount {
-            get {
-                return _selectionCount;
-            }
-        }
+        public int selectionCount { get; }
         public int currentSelected;
         public TouchOrientation orientation;
         public MySliderSize sliderSize;
-        public TouchColor[] backgoundColorOptions;
-        public TouchColor[] textColorOptions;
+        public TouchColor[] backgoundTextColorOptions;
+        public TouchColor[] selectedTextColorOptions;
         public TouchColor[] sliderColorOptions;
         public string[] textOptions;
-        public byte id;
+        public int id;
 
         public event SelectorChangedEventHandler SelectorChangedEvent;
 
         public TouchSelectorSwitch (int id, int selectionCount, int currentSelectedIndex, TouchOrientation orientation) {
-            this.Visible = true;
-            this.VisibleWindow = false;
+            Visible = true;
+            VisibleWindow = false;
 
-            this.id = (byte)id;
-            _selectionCount = selectionCount;
-            this.currentSelected = currentSelectedIndex;
+            this.id = id;
+            this.selectionCount = selectionCount;
+            currentSelected = currentSelectedIndex;
             this.orientation = orientation;
-            this.sliderSize = MySliderSize.Large;
+            sliderSize = MySliderSize.Large;
 
-            this.backgoundColorOptions = new TouchColor[_selectionCount];
-            for (int i = 0; i < backgoundColorOptions.Length; ++i)
-                this.backgoundColorOptions[i] = new TouchColor ("grey0");
+            backgoundTextColorOptions = new TouchColor[this.selectionCount];
+            for (int i = 0; i < backgoundTextColorOptions.Length; ++i) {
+                backgoundTextColorOptions[i] = new TouchColor ("white");
+            }
 
-            this.textColorOptions = new TouchColor[_selectionCount];
-            for (int i = 0; i < backgoundColorOptions.Length; ++i)
-                this.textColorOptions[i] = new TouchColor ("white");
+            selectedTextColorOptions = new TouchColor[this.selectionCount];
+            for (int i = 0; i < backgoundTextColorOptions.Length; ++i) {
+                selectedTextColorOptions[i] = new TouchColor ("white");
+            }
 
-            this.sliderColorOptions = new TouchColor[_selectionCount];
-            for (int i = 0; i < sliderColorOptions.Length; ++i)
-                this.sliderColorOptions[i] = new TouchColor ("grey4");
+            sliderColorOptions = new TouchColor[this.selectionCount];
+            for (int i = 0; i < sliderColorOptions.Length; ++i) {
+                sliderColorOptions[i] = new TouchColor ("grey2");
+            }
 
-            this.textOptions = new string[_selectionCount];
-            for (int i = 0; i < textOptions.Length; ++i)
-                this.textOptions[i] = string.Empty;
+            textOptions = new string[this.selectionCount];
+            for (int i = 0; i < textOptions.Length; ++i) {
+                textOptions[i] = string.Empty;
+            }
 
             clicked = false;
             clickTimer = 0;
@@ -101,9 +100,9 @@ namespace GoodtimeDevelopment.TouchWidget
             click2 = 0;
 
             if (this.orientation == TouchOrientation.Horizontal) {
-                SetSizeRequest (80, 20);
+                SetSizeRequest (80, 30);
             } else {
-                SetSizeRequest (20, 80);
+                SetSizeRequest (30, 80);
             }
 
             ExposeEvent += OnExpose;
@@ -111,17 +110,11 @@ namespace GoodtimeDevelopment.TouchWidget
             ButtonReleaseEvent += OnSelectorRelease;
         }
 
-        public TouchSelectorSwitch (int selectionCount) : this (0, selectionCount, 0, TouchOrientation.Horizontal) { }
-
         public TouchSelectorSwitch (int id, int selectionCount) : this (id, selectionCount, 0, TouchOrientation.Horizontal) { }
 
-        public void AddSelectedColorOption (int selectionIndex, string newColor) {
-            backgoundColorOptions[selectionIndex] = newColor;
-        }
+        public TouchSelectorSwitch (int selectionCount) : this (0, selectionCount, 0, TouchOrientation.Horizontal) { }
 
-        public void AddSelectedColorOption (int selectionIndex, double R, double G, double B) {
-            backgoundColorOptions[selectionIndex] = new TouchColor (R, G, B);
-        }
+        public TouchSelectorSwitch () : this (0, 2, 0, TouchOrientation.Horizontal) { }
 
         public override void Dispose () {
             if (clickTimer != 0) {
@@ -143,14 +136,14 @@ namespace GoodtimeDevelopment.TouchWidget
                     if (sliderSize == MySliderSize.Small)
                         sliderWidth = height;
                     else {
-                        sliderWidth = width / _selectionCount;
-                        sliderWidth += (_selectionCount - 2) * 8;
+                        sliderWidth = width / selectionCount;
+                        sliderWidth += (selectionCount - 2) * 8;
                     }
 
                     sliderLength = width - sliderWidth;
                     sliderMax = left + sliderLength;
 
-                    seperation = sliderLength / (_selectionCount - 1);
+                    seperation = sliderLength / (selectionCount - 1);
 
                     seperation *= currentSelected;
 
@@ -167,14 +160,14 @@ namespace GoodtimeDevelopment.TouchWidget
                     if (sliderSize == MySliderSize.Small)
                         sliderWidth = width;
                     else {
-                        sliderWidth = height / _selectionCount;
-                        sliderWidth += (_selectionCount - 2) * 8;
+                        sliderWidth = height / selectionCount;
+                        sliderWidth += (selectionCount - 2) * 8;
                     }
 
                     sliderLength = height - sliderWidth;
                     sliderMax = top + sliderLength;
 
-                    seperation = sliderLength / (_selectionCount - 1);
+                    seperation = sliderLength / (selectionCount - 1);
 
                     seperation *= currentSelected;
 
@@ -190,39 +183,66 @@ namespace GoodtimeDevelopment.TouchWidget
                 }
 
                 // Background 
-                if (orientation == TouchOrientation.Horizontal)
+                if (orientation == TouchOrientation.Horizontal) {
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, height / 2);
-                else
+                } else {
                     TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, width / 2);
-                backgoundColorOptions[currentSelected].SetSource (cr);
+                }
+                TouchColor.SetSource (cr, "grey0");
                 cr.FillPreserve ();
+
+                TouchColor.SetSource (cr, "black");
                 cr.LineWidth = 1;
-                cr.SetSourceRGB (0.0, 0.0, 0.0);
                 cr.Stroke ();
 
                 // Slider
-                if (orientation == TouchOrientation.Horizontal)
+                double sliderLeft, sliderTop, sliderBottom;
+                if (orientation == TouchOrientation.Horizontal) {
+                    sliderLeft = x;
+                    sliderTop = y;
+                    sliderBottom = y + height;
+
                     TouchGlobal.DrawRoundedRectangle (cr, x, y, sliderWidth, height, height / 2);
-                else
+                } else {
+                    sliderLeft = x;
+                    sliderTop = y;
+                    sliderBottom = y + sliderWidth;
+
                     TouchGlobal.DrawRoundedRectangle (cr, x, y, width, sliderWidth, width / 2);
-                sliderColorOptions[currentSelected].SetSource (cr);
-                cr.FillPreserve ();
-                cr.LineWidth = 1;
-                cr.SetSourceRGB (0.0, 0.0, 0.0);
+                }
+
+                var sliderColor = sliderColorOptions[currentSelected];
+                var outlineColor = new TouchColor (sliderColor);
+                outlineColor.ModifyColor (0.5);
+                var highlightColor = new TouchColor (sliderColor);
+                highlightColor.ModifyColor (1.4);
+                var lowlightColor = new TouchColor (sliderColor);
+                lowlightColor.ModifyColor (0.75);
+
+                using (var grad = new LinearGradient (sliderLeft, sliderTop, sliderLeft, sliderBottom)) {
+                    grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                    grad.AddColorStop (0.2, sliderColor.ToCairoColor ());
+                    grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                    cr.SetSource (grad);
+                    cr.FillPreserve ();
+                }
+
+                outlineColor.SetSource (cr);
+                cr.LineWidth = 0.9;
                 cr.Stroke ();
 
                 // Text Labels
-                TouchText render = new TouchText ();
+                var render = new TouchText ();
                 render.textWrap = TouchTextWrap.Shrink;
                 render.alignment = TouchAlignment.Center;
 
-                seperation = Allocation.Width / _selectionCount;
+                seperation = Allocation.Width / selectionCount;
                 x = Allocation.Left;
-                for (int i = 0; i < _selectionCount; ++i) {
+                for (int i = 0; i < selectionCount; ++i) {
                     if (!string.IsNullOrWhiteSpace (textOptions[i])) {
-                        render.font.color = textColorOptions[i];
+                        render.font.color = i == currentSelected ? selectedTextColorOptions[i] : backgoundTextColorOptions[i];
                         render.text = textOptions[i];
-                        render.Render (this, x, Allocation.Top + 6, seperation);
+                        render.Render (this, x, Allocation.Top + 4, seperation);
                     }
 
                     x += seperation;
@@ -233,11 +253,7 @@ namespace GoodtimeDevelopment.TouchWidget
         protected void OnSelectorPress (object o, ButtonPressEventArgs args) {
             clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
             clicked = true;
-
-            if (orientation == TouchOrientation.Horizontal)
-                click1 = (int)args.Event.X;
-            else
-                click1 = (int)args.Event.Y;
+            click1 = orientation == TouchOrientation.Horizontal ? (int)args.Event.X : (int)args.Event.Y;
         }
 
         protected void OnSelectorRelease (object o, ButtonReleaseEventArgs args) {
@@ -246,14 +262,14 @@ namespace GoodtimeDevelopment.TouchWidget
             if (orientation == TouchOrientation.Horizontal) {
                 int x = (int)args.Event.X;
                 int sliderLength = Allocation.Width;
-                int seperation = sliderLength / _selectionCount;
+                int seperation = sliderLength / selectionCount;
 
                 if (x < 0) {
                     currentSelected = 0;
                 } else if (x > sliderLength) {
-                    currentSelected = _selectionCount - 1;
+                    currentSelected = selectionCount - 1;
                 } else {
-                    for (int i = 0; i < _selectionCount; ++i) {
+                    for (int i = 0; i < selectionCount; ++i) {
                         int leftBoundery = i * seperation;
                         int rightBoundery = (i + 1) * seperation;
                         if ((x >= leftBoundery) && (x <= rightBoundery)) {
@@ -263,20 +279,19 @@ namespace GoodtimeDevelopment.TouchWidget
                     }
                 }
             } else {
-                int y = (int)args.Event.Y;
-                int sliderSize = Allocation.Width;
-                int sliderLength = Allocation.Height - sliderSize;
-                int sliderMax = Allocation.Height;
-                int seperation = sliderLength / (_selectionCount - 1);
+                var y = (int)args.Event.Y;
+                var sliderLength = Allocation.Height - Allocation.Width;
+                var sliderMax = Allocation.Height;
+                var seperation = sliderLength / (selectionCount - 1);
 
                 if (y < 0)
                     currentSelected = 0;
                 else if (y > sliderMax)
-                    currentSelected = _selectionCount - 1;
+                    currentSelected = selectionCount - 1;
                 else {
-                    for (int i = 0; i < _selectionCount; ++i) {
-                        int leftBoundery = i * seperation;
-                        int rightBoundery = (i + 1) * seperation;
+                    for (int i = 0; i < selectionCount; ++i) {
+                        var leftBoundery = i * seperation;
+                        var rightBoundery = (i + 1) * seperation;
                         if ((y >= leftBoundery) && (y <= rightBoundery)) {
                             currentSelected = i;
                             break;
@@ -287,18 +302,18 @@ namespace GoodtimeDevelopment.TouchWidget
 
             QueueDraw ();
 
-            if (SelectorChangedEvent != null)
-                SelectorChangedEvent (this, new SelectorChangedEventArgs (currentSelected, id));
+            SelectorChangedEvent?.Invoke (this, new SelectorChangedEventArgs (currentSelected, id));
         }
 
         protected bool OnTimerEvent () {
             if (clicked) {
                 int x, y;
                 GetPointer (out x, out y);
-                if (orientation == TouchOrientation.Horizontal)
+                if (orientation == TouchOrientation.Horizontal) {
                     click2 = x;
-                else
+                } else {
                     click2 = y;
+                }
 
                 QueueDraw ();
             }

@@ -27,7 +27,6 @@ using Cairo;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Globals;
 
 namespace AquaPic.UserInterface
 {
@@ -83,7 +82,7 @@ namespace AquaPic.UserInterface
                 int width = Allocation.Width;
                 int height = Allocation.Height;
 
-                double originY = (double)top + ((double)height / 2);
+                double originY = top + (height / 2d);
                 double originX = -850.105;
                 double radius = 1075.105;
 
@@ -102,12 +101,28 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey3", 0.80);
                     cr.Fill ();
 
-                    TouchGlobal.DrawRoundedRectangle (cr, left - 50, (height / 2) - 30 + top, 300, 60, 20);
-                    TouchColor.SetSource (cr, "pri");
-                    cr.LineWidth = 4;
-                    cr.StrokePreserve ();
-                    TouchColor.SetSource (cr, "grey4");
-                    cr.Fill ();
+                    var currentWindowTop = (height / 2) - 30 + top;
+                    TouchGlobal.DrawRoundedRectangle (cr, left - 50, currentWindowTop, 300, 60, 20);
+
+                    var color = new TouchColor ("grey3");
+                    var outlineColor = new TouchColor (color);
+                    outlineColor.ModifyColor (0.5);
+                    var highlightColor = new TouchColor (color);
+                    highlightColor.ModifyColor (1.1);
+                    var lowlightColor = new TouchColor (color);
+                    lowlightColor.ModifyColor (0.75);
+
+                    using (var grad = new LinearGradient (left, currentWindowTop, left, currentWindowTop + 60)) {
+                        grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.15, color.ToCairoColor ());
+                        grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                        cr.SetSource (grad);
+                        cr.FillPreserve ();
+                    }
+
+                    outlineColor.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
 
                     // Menu Button
                     cr.MoveTo (right + 5, top);
@@ -116,8 +131,20 @@ namespace AquaPic.UserInterface
                     cr.ArcNegative (right - 100, top + 20, 20, 0, Math.PI / 2);
                     cr.LineTo (right + 5, top + 40);
                     cr.ClosePath ();
-                    TouchColor.SetSource (cr, "grey4", 0.80);
-                    cr.Fill ();
+
+                    color = new TouchColor ("grey4", 0.8);
+                    highlightColor = new TouchColor (color);
+                    highlightColor.ModifyColor (1.3);
+                    lowlightColor = new TouchColor (color);
+                    lowlightColor.ModifyColor (0.75);
+
+                    using (var grad = new LinearGradient (right - 120, top, right - 120, top + 40)) {
+                        grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.2, color.ToCairoColor ());
+                        grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                        cr.SetSource (grad);
+                        cr.Fill ();
+                    }
 
                     // Home Button
                     cr.MoveTo (right + 5, bottom + 5);
@@ -126,8 +153,14 @@ namespace AquaPic.UserInterface
                     cr.Arc (right - 145, bottom - 20, 20, 0, -Math.PI / 2);
                     cr.LineTo (right + 5, bottom - 40);
                     cr.ClosePath ();
-                    TouchColor.SetSource (cr, "grey4", 0.80);
-                    cr.Fill ();
+
+                    using (var grad = new LinearGradient (right - 165, bottom - 40, right - 165, bottom)) {
+                        grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.2, color.ToCairoColor ());
+                        grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                        cr.SetSource (grad);
+                        cr.Fill ();
+                    }
 
                     var t = new TouchText (windows[highlighedScreenIndex]);
                     t.font.color = "pri";
@@ -153,7 +186,7 @@ namespace AquaPic.UserInterface
                         double textWidth = 210 - CalcX (radius, radians);
 
                         t.text = windows[drawIndex];
-                        t.font.size = 16 - ((double)i * 0.75).ToInt ();
+                        t.font.size = 16 - (i * 0.75).ToInt ();
                         int textY = (height / 2) + top + 25 + (i * 50) - (offset * 50.0).ToInt ();
 
                         t.Render (
@@ -223,8 +256,7 @@ namespace AquaPic.UserInterface
                 clicked = true;
                 yDeltaPercentage = 0.0;
                 offset = 0.0;
-                int clickX;
-                GetPointer (out clickX, out clickY);
+                clickY = args.Event.Y.ToInt ();
                 clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
             }
         }
@@ -241,15 +273,14 @@ namespace AquaPic.UserInterface
                 Visible = true;
                 ExpandEvent?.Invoke (this, new EventArgs ());
             } else {
-                int x, y;
-                GetPointer (out x, out y);
+                int x = args.Event.X.ToInt ();
+                int y = args.Event.Y.ToInt ();
 
                 if (y.WithinRange (clickY, 25)) {
                     if (x <= 250) {
                         if (y.WithinRange (Allocation.Height / 2 + Allocation.Top, 15)) {
                             if (windows[highlighedScreenIndex] != AquaPicGui.AquaPicUserInterface.currentScene) {
-                                var topWidget = this.Toplevel;
-                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], topWidget, AquaPicGui.AquaPicUserInterface.currentScene);
+                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
                             } else {
                                 CollapseMenu ();
                             }
@@ -268,8 +299,7 @@ namespace AquaPic.UserInterface
                             }
 
                             if (windows[highlighedScreenIndex] != AquaPicGui.AquaPicUserInterface.currentScene) {
-                                var topWidget = this.Toplevel;
-                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], topWidget, AquaPicGui.AquaPicUserInterface.currentScene);
+                                AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
                             } else {
                                 CollapseMenu ();
                             }

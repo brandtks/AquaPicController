@@ -43,8 +43,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public SwitchSettings (string name, bool includeDelete)
-            : base (name, includeDelete) {
+        public SwitchSettings (string name, bool includeDelete, Window parent)
+            : base (name, includeDelete, parent) {
             switchName = name;
 
             var t = new SettingsTextBox ("Name");
@@ -317,11 +317,6 @@ namespace AquaPic.UserInterface
 
             if (message.IsNotEmpty ()) {
                 var parent = Toplevel as Window;
-                if (parent != null) {
-                    if (!parent.IsTopLevel)
-                        parent = null;
-                }
-
                 var ms = new TouchDialog (message + "\n" +
                     "Are you sure you want to use this configuration", parent);
 

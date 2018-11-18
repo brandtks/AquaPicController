@@ -97,14 +97,32 @@ namespace GoodtimeDevelopment.TouchWidget
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
-                int height = Allocation.Height;
-                int width = Allocation.Width;
-                int top = Allocation.Top;
-                int left = Allocation.Left;
+                var left = Allocation.Left;
+                var width = Allocation.Width;
+                var top = Allocation.Top;
+                var bottom = Allocation.Bottom;
+                var height = Allocation.Height;
 
                 TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, 4.0);
-                buttonColor.SetSource (cr);
-                cr.Fill ();
+
+                var outlineColor = new TouchColor (buttonColor);
+                outlineColor.ModifyColor (0.5);
+                var highlightColor = new TouchColor (buttonColor);
+                highlightColor.ModifyColor (1.4);
+                var lowlightColor = new TouchColor (buttonColor);
+                lowlightColor.ModifyColor (0.75);
+
+                using (var grad = new LinearGradient (left, top, left, bottom)) {
+                    grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                    grad.AddColorStop (0.2, buttonColor.ToCairoColor ());
+                    grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                    cr.SetSource (grad);
+                    cr.FillPreserve ();
+                }
+
+                outlineColor.SetSource (cr);
+                cr.LineWidth = 1;
+                cr.Stroke ();
 
                 render.Render (this, left + 3, top, width - 6, height);
             }
@@ -114,7 +132,7 @@ namespace GoodtimeDevelopment.TouchWidget
             if (args.Event.Type == Gdk.EventType.ButtonPress) {
                 if (clickAction == ButtonClickAction.NoTransparency) {
                     unmodifiedColor = new TouchColor (buttonColor);
-                    buttonColor.ModifyAlpha (1.0);
+                    buttonColor.A = 1;
                 } else if (clickAction == ButtonClickAction.Brighten) {
                     unmodifiedColor = new TouchColor (buttonColor);
                     buttonColor.ModifyColor (1.25);

@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using Gtk;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -39,8 +40,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public WaterGroupSettings (string name, bool includeDelete)
-            : base (name + " Water", includeDelete) {
+        public WaterGroupSettings (string name, bool includeDelete, Window parent)
+            : base (name + " Water", includeDelete, parent) {
             groupName = name;
 
             var t = new SettingsTextBox ("Name");

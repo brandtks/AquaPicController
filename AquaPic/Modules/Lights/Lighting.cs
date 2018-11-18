@@ -456,8 +456,15 @@ namespace AquaPic.Modules
         public static LightingState[] GetLightingStates (string fixtureName) {
             CheckFixtureKey (fixtureName);
             var lightingStates = new List<LightingState> ();
-            lightingStates.AddRange (fixtures [fixtureName].lightingStates);
+            foreach (var state in fixtures[fixtureName].lightingStates) {
+                lightingStates.Add (new LightingState (state));
+            }
             return lightingStates.ToArray ();
+        }
+
+        public static void SetLightingStates (string fixtureName, LightingState[] lightingStates, bool temporaryChange = true) {
+            CheckFixtureKey (fixtureName);
+            fixtures[fixtureName].UpdateLightingStates (lightingStates, temporaryChange);
         }
     }
 }

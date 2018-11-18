@@ -53,11 +53,11 @@ namespace AquaPic.UserInterface
         public TouchButton cancelButton;
         public TouchButton deleteButton;
 
-        public TouchSettingsDialog (string name) : this (name, false, 320) { }
+        public TouchSettingsDialog (string name, Window parent) : this (name, false, 320, parent) { }
 
-        public TouchSettingsDialog (string name, bool includeDelete) : this (name, includeDelete, 320) { }
+        public TouchSettingsDialog (string name, bool includeDelete, Window parent) : this (name, includeDelete, 320, parent) { }
 
-        public TouchSettingsDialog (string name, bool includeDelete, int height) {
+        public TouchSettingsDialog (string name, bool includeDelete, int height, Window parent) : base ("Settings", parent, DialogFlags.DestroyWithParent){
             Name = "AquaPic.Settings." + name;
             Title = name + " Settings";
             WindowPosition = (WindowPosition)4;
@@ -85,7 +85,7 @@ namespace AquaPic.UserInterface
 
             ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
-            foreach (Widget w in this.Children) {
+            foreach (Widget w in Children) {
                 Remove (w);
                 w.Dispose ();
             }
@@ -132,13 +132,8 @@ namespace AquaPic.UserInterface
                 deleteButton.text = "Delete";
                 deleteButton.buttonColor = "compl";
                 deleteButton.ButtonReleaseEvent += (obj, args) => {
-                    var parent = this.Toplevel as Gtk.Window;
-                    if (parent != null) {
-                        if (!parent.IsTopLevel)
-                            parent = null;
-                    }
-
-                    var ms = new TouchDialog ("Are you sure you with to delete " + name, parent);
+                    var topParent = Toplevel as Window;
+                    var ms = new TouchDialog ("Are you sure you with to delete " + name, topParent);
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {

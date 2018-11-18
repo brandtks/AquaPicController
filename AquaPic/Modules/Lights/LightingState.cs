@@ -29,14 +29,14 @@ namespace AquaPic.Modules
 {
     public enum LightingStateType
     {
-        On,
-        Off,
-        [Description("Linear Ramp")]
-        LinearRamp,
+        On = 1,
+        Off = 2,
+        [Description ("Linear Ramp")]
+        LinearRamp = 10,
         [Description ("Half Parabola Ramp")]
-        HalfParabolaRamp,
+        HalfParabolaRamp = 11,
         [Description ("Parabola Ramp")]
-        ParabolaRamp,
+        ParabolaRamp = 12,
     }
 
     public class LightingState
@@ -47,11 +47,23 @@ namespace AquaPic.Modules
             get {
                 return timePeriod.startTime;
             }
+            set {
+                timePeriod.startTime = value;
+            }
         }
 
         public Time endTime {
             get {
                 return timePeriod.endTime;
+            }
+            set {
+                timePeriod.endTime = value;
+            }
+        }
+
+        public double lengthInMinutes {
+            get {
+                return timePeriod.lengthInMinutes;
             }
         }
 
@@ -62,8 +74,13 @@ namespace AquaPic.Modules
         public LightingState (string startTimeDescriptor, string endTimeDescriptor, LightingStateType type) {
             timePeriod = new TimePeriod (startTimeDescriptor, endTimeDescriptor);
             this.type = type;
-            startingDimmingLevel = 100f;
-            endingDimmingLevel = 100f;
+            if (this.type == LightingStateType.Off) {
+                startingDimmingLevel = 0;
+                endingDimmingLevel = 0;
+            } else {
+                startingDimmingLevel = 100;
+                endingDimmingLevel = 100;
+            }
         }
 
         public LightingState (
@@ -72,10 +89,38 @@ namespace AquaPic.Modules
             LightingStateType type,
             float startingDimmingLevel,
             float endingDimmingLevel)
-            : this (startTime, endTime, type) 
+            : this (startTime, endTime, type)
         {
             this.startingDimmingLevel = startingDimmingLevel;
             this.endingDimmingLevel = endingDimmingLevel;
+        }
+
+        public LightingState (LightingState lightingState) {
+            timePeriod = new TimePeriod (lightingState.timePeriod);
+            type = lightingState.type;
+            startingDimmingLevel = lightingState.startingDimmingLevel;
+            endingDimmingLevel = lightingState.endingDimmingLevel;
+        }
+
+        public LightingState (Time startTime, Time endTime, LightingStateType type) {
+            timePeriod = new TimePeriod (startTime, endTime);
+            this.type = type;
+            if (this.type == LightingStateType.Off) {
+                startingDimmingLevel = 0;
+                endingDimmingLevel = 0;
+            } else {
+                startingDimmingLevel = 100;
+                endingDimmingLevel = 100;
+            }
+        }
+
+        public override string ToString () {
+            return string.Format ("{4}: {0} at {1} to {2} at {3}",
+                                  startTime.ToShortTimeString (),
+                                  startingDimmingLevel,
+                                  endTime.ToShortTimeString (),
+                                  endingDimmingLevel,
+                                  Utils.GetDescription (type));
         }
     }
 }

@@ -42,6 +42,12 @@ namespace GoodtimeDevelopment.Utilites
             }
         }
 
+        public double totalMinutes {
+            get {
+                return ToTimeSpan ().TotalMinutes;
+            }
+        }
+
         protected int _second;
         public int second {
             get {
@@ -59,6 +65,12 @@ namespace GoodtimeDevelopment.Utilites
         public static Time TimeZero {
             get {
                 return new Time (TimeSpan.Zero);
+            }
+        }
+
+        public static Time TimeMidnight {
+            get {
+                return new Time (23, 59, 59, 999);
             }
         }
 
@@ -141,6 +153,7 @@ namespace GoodtimeDevelopment.Utilites
             _minute = timeSpan.Minutes;
             _second = timeSpan.Seconds;
             _millisecond = timeSpan.Milliseconds;
+            WrapAroundMidnight ();
         }
 
         public void AddMinutes (int numberOfMinutes) {
@@ -149,6 +162,7 @@ namespace GoodtimeDevelopment.Utilites
             _minute = timeSpan.Minutes;
             _second = timeSpan.Seconds;
             _millisecond = timeSpan.Milliseconds;
+            WrapAroundMidnight ();
         }
 
         public void AddSeconds (int numberOfSeconds) {
@@ -157,6 +171,7 @@ namespace GoodtimeDevelopment.Utilites
             _minute = timeSpan.Minutes;
             _second = timeSpan.Seconds;
             _millisecond = timeSpan.Milliseconds;
+            WrapAroundMidnight ();
         }
 
         public void AddMilliSeconds (int numberOfMilliSeconds) {
@@ -165,6 +180,7 @@ namespace GoodtimeDevelopment.Utilites
             _minute = timeSpan.Minutes;
             _second = timeSpan.Seconds;
             _millisecond = timeSpan.Milliseconds;
+            WrapAroundMidnight ();
         }
 
         public void AddTime (Time time) {
@@ -173,6 +189,14 @@ namespace GoodtimeDevelopment.Utilites
             _minute = timeSpan.Minutes;
             _second = timeSpan.Seconds;
             _millisecond = timeSpan.Milliseconds;
+            WrapAroundMidnight ();
+        }
+
+        public void WrapAroundMidnight () {
+            if ((_hour < 0) || (_minute < 0) || (_second < 0) || (_millisecond < 0)) {
+                var midnight = new Time (24, 0, 0, 0);
+                AddTime (midnight);
+            } 
         }
 
         public Time Negate () {

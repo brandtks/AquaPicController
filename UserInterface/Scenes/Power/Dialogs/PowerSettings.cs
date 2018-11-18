@@ -23,6 +23,7 @@
 
 using System;
 using System.Globalization;
+using Gtk;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -41,8 +42,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public PowerSettings (string powerStripName, bool includeDelete = false)
-            : base ("New Power Strip", includeDelete) {
+        public PowerSettings (string powerStripName, bool includeDelete, Window parent)
+            : base ("New Power Strip", includeDelete, parent) {
             this.powerStripName = powerStripName;
 
             if (powerStripName.IsEmpty ()) {

@@ -101,23 +101,21 @@ namespace GoodtimeDevelopment.TouchWidget
             var btn = new TouchButton ();
             btn.text = "Yes";
             btn.HeightRequest = 30;
-            btn.ButtonReleaseEvent += (o, args) =>
-                this.Respond (ResponseType.Yes);
-            this.ActionArea.Add (btn);
+            btn.ButtonReleaseEvent += (o, args) => Respond (ResponseType.Yes);
+            ActionArea.Add (btn);
 
             btn = new TouchButton ();
             btn.text = "No";
             btn.HeightRequest = 30;
-            btn.ButtonReleaseEvent += (o, args) =>
-                this.Respond (ResponseType.No);
-            this.ActionArea.Add (btn);
+            btn.ButtonReleaseEvent += (o, args) => Respond (ResponseType.No);
+            ActionArea.Add (btn);
 
             var label = new Label ();
             label.LineWrap = true;
             label.Text = msg;
             label.ModifyFg (StateType.Normal, TouchColor.NewGtkColor ("white"));
             label.ModifyFont (Pango.FontDescription.FromString ("Sans 11"));
-            this.VBox.Add (label);
+            VBox.Add (label);
             label.Show ();
         }
 

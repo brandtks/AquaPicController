@@ -263,11 +263,6 @@ namespace AquaPic.UserInterface
 		protected void OnDeleteButtonRelease (object sender, ButtonReleaseEventArgs args) {
 			if (widgetCombo.activeIndex >= 0) {
 				var parent = Toplevel as Window;
-				if (parent != null) {
-					if (!parent.IsTopLevel)
-						parent = null;
-				}
-
 				var ms = new TouchDialog ("Are you sure you with to delete " + widgetCombo.activeText, parent);
 
 				ms.Response += (o, a) => {

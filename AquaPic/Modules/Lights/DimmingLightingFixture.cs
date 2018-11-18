@@ -71,50 +71,54 @@ namespace AquaPic.Modules
             }
 
             public float CalculateDimmingLevel () {
-                DateSpan start, end, now = DateSpan.Now;
-                if (lightingStates [currentState].startTime.Before (lightingStates [currentState].endTime)) {
-                    start = new DateSpan (lightingStates [currentState].startTime);
-                    end = new DateSpan (lightingStates [currentState].endTime);
+                if (currentState == -1) {
+                    autoDimmingLevel = 0;
                 } else {
-                    var otherDay = DateSpan.Now;
-                    // its after midnight
-                    if (now.Before (lightingStates[currentState].endTime)) {
-                        otherDay.AddDays (-1);
-                        start = new DateSpan (otherDay, lightingStates[currentState].startTime);
+                    DateSpan start, end, now = DateSpan.Now;
+                    if (lightingStates[currentState].startTime.Before (lightingStates[currentState].endTime)) {
+                        start = new DateSpan (lightingStates[currentState].startTime);
                         end = new DateSpan (lightingStates[currentState].endTime);
                     } else {
-                        otherDay.AddDays (1);
-                        start = new DateSpan (lightingStates[currentState].startTime);
-                        end = new DateSpan (otherDay, lightingStates[currentState].endTime);
+                        var otherDay = DateSpan.Now;
+                        // its after midnight
+                        if (now.Before (lightingStates[currentState].endTime)) {
+                            otherDay.AddDays (-1);
+                            start = new DateSpan (otherDay, lightingStates[currentState].startTime);
+                            end = new DateSpan (lightingStates[currentState].endTime);
+                        } else {
+                            otherDay.AddDays (1);
+                            start = new DateSpan (lightingStates[currentState].startTime);
+                            end = new DateSpan (otherDay, lightingStates[currentState].endTime);
+                        }
+                    }
+
+                    if (lightingStates[currentState].type == LightingStateType.LinearRamp) {
+                        autoDimmingLevel = Utils.CalcLinearRamp (
+                            start,
+                            end,
+                            now,
+                            lightingStates[currentState].startingDimmingLevel,
+                            lightingStates[currentState].endingDimmingLevel);
+                    } else if (lightingStates[currentState].type == LightingStateType.HalfParabolaRamp) {
+                        autoDimmingLevel = Utils.CalcHalfParabola (
+                            start,
+                            end,
+                            now,
+                            lightingStates[currentState].startingDimmingLevel,
+                            lightingStates[currentState].endingDimmingLevel);
+                    } else if (lightingStates[currentState].type == LightingStateType.ParabolaRamp) {
+                        autoDimmingLevel = Utils.CalcParabola (
+                            start,
+                            end,
+                            now,
+                            lightingStates[currentState].startingDimmingLevel,
+                            lightingStates[currentState].endingDimmingLevel);
+                    } else if (lightingStates[currentState].type == LightingStateType.On) {
+                        autoDimmingLevel = lightingStates[currentState].startingDimmingLevel;
                     }
                 }
 
-                if (lightingStates [currentState].type == LightingStateType.LinearRamp) {
-                    autoDimmingLevel = Utils.CalcLinearRamp (
-                        start,
-                        end,
-                        now,
-                        lightingStates [currentState].startingDimmingLevel,
-                        lightingStates [currentState].endingDimmingLevel);
-                } else if (lightingStates [currentState].type == LightingStateType.HalfParabolaRamp) {
-                    autoDimmingLevel = Utils.CalcHalfParabola (
-                        start,
-                        end,
-                        now,
-                        lightingStates [currentState].startingDimmingLevel,
-                        lightingStates [currentState].endingDimmingLevel);
-                } else if (lightingStates [currentState].type == LightingStateType.ParabolaRamp) {
-                    autoDimmingLevel = Utils.CalcParabola (
-                        start,
-                        end,
-                        now,
-                        lightingStates [currentState].startingDimmingLevel,
-                        lightingStates [currentState].endingDimmingLevel);
-                } else if (lightingStates [currentState].type == LightingStateType.On) {
-                    autoDimmingLevel = lightingStates [currentState].startingDimmingLevel;
-                }
-
-                autoDimmingLevel.Constrain (0, 100);
+                autoDimmingLevel = autoDimmingLevel.Constrain (0, 100);
                 if (plugState == MyState.On) {
                     if (dimmingMode == Mode.Auto) {
                         requestedDimmingLevel = autoDimmingLevel;

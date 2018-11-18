@@ -47,10 +47,130 @@ namespace GoodtimeDevelopment.Utilites.Test
         }
 
         [Test]
+        public void AddHoursTest () {
+            var t1 = new Time (0, 0, 0, 0);
+            t1.AddHours (1);
+            var t2 = new Time (1, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (23, 0, 0, 0);
+            t1.AddHours (1);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 0, 0);
+            t1.AddHours (24);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (1, 0, 0, 0);
+            t1.AddHours (-1);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 0, 0);
+            t1.AddHours (-1);
+            t2 = new Time (23, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+        }
+
+        [Test]
         public void AddMinutesTest () {
             var t1 = new Time (0, 0, 0, 0);
             t1.AddMinutes (30);
-            Assert.AreEqual (30, t1.minute);
+            var t2 = new Time (0, 30, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (23, 30, 0, 0);
+            t1.AddMinutes (30);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 0, 0);
+            t1.AddMinutes (60);
+            t2 = new Time (1, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 15, 0, 0);
+            t1.AddMinutes (-15);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (1, 0, 0, 0);
+            t1.AddMinutes (-60);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 15, 0, 0);
+            t1.AddMinutes (-30);
+            t2 = new Time (23, 45, 0, 0);
+            Assert.AreEqual (t2, t1);
+        }
+
+        [Test]
+        public void AddSecondsTest () {
+            var t1 = new Time (0, 0, 0, 0);
+            t1.AddSeconds (30);
+            var t2 = new Time (0, 0, 30, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (23, 59, 30, 0);
+            t1.AddSeconds (30);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 0, 0);
+            t1.AddSeconds (60);
+            t2 = new Time (0, 1, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 15, 0);
+            t1.AddSeconds (-15);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 1, 0, 0);
+            t1.AddSeconds (-60);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 15, 0);
+            t1.AddSeconds (-30);
+            t2 = new Time (23, 59, 45, 0);
+            Assert.AreEqual (t2, t1);
+        }
+
+        [Test]
+        public void AddMilliSecondsTest () {
+            var t1 = new Time (0, 0, 0, 0);
+            t1.AddMilliSeconds (500);
+            var t2 = new Time (0, 0, 0, 500);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (23, 59, 59, 500);
+            t1.AddMilliSeconds (500);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 0, 0);
+            t1.AddMilliSeconds (1000);
+            t2 = new Time (0, 0, 1, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 0, 500);
+            t1.AddMilliSeconds (500);
+            t2 = new Time (0, 0, 1, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 1, 0);
+            t1.AddMilliSeconds (-1000);
+            t2 = new Time (0, 0, 0, 0);
+            Assert.AreEqual (t2, t1);
+
+            t1 = new Time (0, 0, 0, 500);
+            t1.AddMilliSeconds (-1000);
+            t2 = new Time (23, 59, 59, 500);
+            Assert.AreEqual (t2, t1);
         }
 
         [Test]

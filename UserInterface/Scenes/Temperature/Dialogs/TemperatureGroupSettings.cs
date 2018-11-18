@@ -24,7 +24,6 @@
 using System;
 using System.IO;
 using Gtk;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -41,8 +40,8 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public TemperatureGroupSettings (string name, bool includeDelete)
-            : base (name + " Temperature", includeDelete) {
+        public TemperatureGroupSettings (string name, bool includeDelete, Window parent)
+            : base (name + " Temperature", includeDelete, parent) {
             groupName = name;
 
             var t = new SettingsTextBox ("Name");
@@ -212,11 +211,6 @@ namespace AquaPic.UserInterface
         protected override bool OnDelete (object sender) {
             if (groupName == Temperature.defaultTemperatureGroup) {
                 var parent = Toplevel as Window;
-                if (parent != null) {
-                    if (!parent.IsTopLevel)
-                        parent = null;
-                }
-
                 var ms = new TouchDialog (groupName + " is the default temperature group.\n" +
                     "Are you sure you want to delete this group", parent);
 

@@ -421,7 +421,7 @@ namespace AquaPic.UserInterface
                     btn.QueueDraw ();
 
                     valTb.enableTouch = true;
-                    valTb.bkgndColor = "seca";
+                    valTb.backgroundColor = "seca";
                     valTb.TextChangedEvent += OnValueTextBoxTextChanged;
                     valTb.QueueDraw ();
 
@@ -432,7 +432,7 @@ namespace AquaPic.UserInterface
 
                     if (calState != CalibrationState.FullScaleActual) {
                         valTb.enableTouch = false;
-                        valTb.bkgndColor = "grey4";
+                        valTb.backgroundColor = "grey4";
                         valTb.text = GetCalibrationValue ().ToString ("F2");
                         valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
                         valTb.QueueDraw ();

@@ -110,13 +110,13 @@ namespace AquaPic.UserInterface
             f.Put (current, 0, 0);
             current.Show ();
 
-            notification = new MyNotificationBar ();
-            f.Put (notification, 0, 0);
-            notification.Show ();
-
             side = new MySideBar (scenes, _currentScene);
             f.Put (side, 0, 20);
             side.Show ();
+
+            notification = new MyNotificationBar ();
+            f.Put (notification, 0, 0);
+            notification.Show ();
 
             Add (f);
             f.Show ();

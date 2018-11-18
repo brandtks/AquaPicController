@@ -86,12 +86,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnCloseButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            var parent = this.Toplevel as Gtk.Window;
-            if (parent != null) {
-                if (!parent.IsTopLevel)
-                    parent = null;
-            }
-
+            var parent = Toplevel as Window;
             var ms = new TouchDialog ("Are you sure?\nClosing application ends all controller functionality!", parent);
 
             ms.Response += (o, a) => {

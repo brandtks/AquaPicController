@@ -66,7 +66,7 @@ namespace GoodtimeDevelopment.TouchWidget
                 textRender.alignment = value;
             }
         }
-        public TouchColor bkgndColor;
+        public TouchColor backgroundColor;
         public bool enableTouch;
         public bool includeTimeFunctions;
         public event TextSetEventHandler TextChangedEvent;
@@ -76,8 +76,7 @@ namespace GoodtimeDevelopment.TouchWidget
             Visible = true;
             VisibleWindow = false;
 
-            WidthRequest = 100;
-            HeightRequest = 30;
+            SetSizeRequest (100, 30);
 
             textRender = new TouchText ();
             textRender.textWrap = TouchTextWrap.Shrink;
@@ -87,7 +86,7 @@ namespace GoodtimeDevelopment.TouchWidget
             textColor = new TouchColor ("black");
             textAlignment = TouchAlignment.Left;
 
-            bkgndColor = "grey4";
+            backgroundColor = "grey4";
 
             enableTouch = false;
             includeTimeFunctions = false;
@@ -97,17 +96,25 @@ namespace GoodtimeDevelopment.TouchWidget
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 int left = Allocation.Left;
                 int top = Allocation.Top;
                 int width = Allocation.Width;
                 int height = Allocation.Height;
 
+                TouchGlobal.DrawRoundedRectangle (cr, left + 4, top + 4, width - 1, height - 1, 3);
+                var shadowColor = new TouchColor (backgroundColor);
+                shadowColor.ModifyColor (0.5);
+                shadowColor.A = 0.4;
+                shadowColor.SetSource (cr);
+                cr.Fill ();
+
                 TouchGlobal.DrawRoundedRectangle (cr, left, top, width, height, 3);
-                bkgndColor.SetSource (cr);
+                backgroundColor.SetSource (cr);
                 cr.FillPreserve ();
-                cr.SetSourceRGB (0.0, 0.0, 0.0);
-                cr.LineWidth = 0.75;
+
+                TouchColor.SetSource (cr, "grey0");
+                cr.LineWidth = 1;
                 cr.Stroke ();
 
                 textRender.Render (this, left + 3, top, width - 6, height);
@@ -116,16 +123,8 @@ namespace GoodtimeDevelopment.TouchWidget
 
         protected void OnTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
             if (enableTouch) {
-                TouchNumberInput t;
-
                 var parent = Toplevel as Window;
-                if (parent != null) {
-                    if (parent.IsTopLevel)
-                        t = new TouchNumberInput (includeTimeFunctions, parent);
-                    else
-                        t = new TouchNumberInput (includeTimeFunctions);
-                } else
-                    t = new TouchNumberInput (includeTimeFunctions);
+                var t = new TouchNumberInput (includeTimeFunctions, parent);
 
                 if (!string.IsNullOrWhiteSpace (name))
                     t.Title = name;
@@ -133,8 +132,9 @@ namespace GoodtimeDevelopment.TouchWidget
                 t.TextSetEvent += (sender, a) => {
                     TextChangedEvent?.Invoke (this, a);
 
-                    if (a.keepText)
+                    if (a.keepText) {
                         text = a.text;
+                    }
                 };
 
                 t.Run ();
