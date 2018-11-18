@@ -1384,9 +1384,31 @@ namespace AquaPic.UserInterface
                     }
                 }
             } else if (stateInfos.Count == 1) {
-
+                RemoveState (0);
+                AddState (generalTime);
             } else {
+                var stateTime = new Time (generalTime);
+                stateTime.AddHours (-1);
+                var endTime = new Time (generalTime);
+                endTime.AddHours (1);
+                var newState = new LightingState (stateTime, endTime, newStateType);
+                var offState = new LightingState (endTime, stateTime, LightingStateType.Off);
 
+                var newStateInfo = new StateInfo ();
+                newStateInfo.lightingState = newState;
+
+                var offStateInfo = new StateInfo ();
+                offStateInfo.lightingState = offState;
+
+                newStateInfo.next = offStateInfo;
+                newStateInfo.previous = offStateInfo;
+
+                offStateInfo.next = newStateInfo;
+                offStateInfo.previous = newStateInfo;
+
+                stateInfos.Add (newStateInfo);
+                stateInfos.Add (offStateInfo);
+                addedStateIndex = 0;
             }
         }
 
@@ -1456,9 +1478,7 @@ namespace AquaPic.UserInterface
                 return AddStateToNext (stateInfo, length);
             }
 
-            var newState = new LightingState (state);
-            newState.type = newStateType;
-            newState.startTime = new Time (newState.endTime);
+            var newState = new LightingState (new Time (state.endTime), new Time (state.endTime), newStateType);
 
             if (stateLength > (length * 2)) {
                 newState.startTime.AddMinutes (-length);
@@ -1537,9 +1557,7 @@ namespace AquaPic.UserInterface
                 return AddStateToPrevious (stateInfo, length);
             }
 
-            var newState = new LightingState (state);
-            newState.type = newStateType;
-            newState.endTime = new Time (newState.startTime);
+            var newState = new LightingState (new Time (state.startTime), new Time (state.startTime), newStateType);
 
             if (stateLength > (length * 2)) {
                 newState.endTime.AddMinutes (length);
@@ -1586,25 +1604,23 @@ namespace AquaPic.UserInterface
 
         void AddStateAtTimePoint (StateInfo stateInfo, Time generalTime, double timeToStart, double timeToEnd) {
             var state = stateInfo.lightingState;
-            var newState = new LightingState (state);
-            newState.type = newStateType;
-            newState.startTime = new Time (generalTime);
-            newState.endTime = new Time (generalTime);
+
+            var startTime = new Time (generalTime);
+            var endTime = new Time (generalTime);
             if (timeToStart > 120) {
-                newState.startTime.AddMinutes (-60);
+                startTime.AddMinutes (-60);
             } else {
-                newState.startTime.AddMinutes (-timeToStart.ToInt () / 2);
+                startTime.AddMinutes (-timeToStart.ToInt () / 2);
             }
 
             if (timeToEnd > 120) {
-                newState.endTime.AddMinutes (60);
+                endTime.AddMinutes (60);
             } else {
-                newState.endTime.AddMinutes (timeToEnd.ToInt () / 2);
+                endTime.AddMinutes (timeToEnd.ToInt () / 2);
             }
 
-            var newNextState = new LightingState (state);
-            newNextState.startTime = new Time (newState.endTime);
-            newNextState.endTime = new Time (state.endTime);
+            var newState = new LightingState (startTime, endTime, newStateType);
+            var newNextState = new LightingState (new Time (newState.endTime), new Time (state.endTime), state.type);
 
             state.endTime = new Time (newState.startTime);
 

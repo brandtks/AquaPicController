@@ -202,6 +202,7 @@ namespace AquaPic.UserInterface
                     jobj.Add (new JProperty ("dimmingCard", chIc.Group));
                     jobj.Add (new JProperty ("channel", chIc.Individual.ToString ()));
                 }
+                jobj.Add (new JProperty ("events", new JArray ()));
 
                 ja.Add (jobj);
 
