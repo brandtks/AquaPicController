@@ -68,6 +68,12 @@ namespace GoodtimeDevelopment.Utilites
             }
         }
 
+        public static Time TimeMidnight {
+            get {
+                return new Time (23, 59, 59, 999);
+            }
+        }
+
         public static Time TimeNow {
             get {
                 var now = DateTime.Now;
