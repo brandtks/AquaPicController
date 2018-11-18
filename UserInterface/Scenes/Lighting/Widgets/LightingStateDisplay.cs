@@ -100,7 +100,7 @@ namespace AquaPic.UserInterface
 
         public bool adjustDimmingTogether;
 
-        bool clicked, startButtonClicked, endButtonClicked, linearClicked, halfParabolaClicked, fullParabolaClicked, onClicked, offClicked, entityClicked, 
+        bool clicked, startButtonClicked, endButtonClicked, linearClicked, halfParabolaClicked, fullParabolaClicked, onClicked, offClicked, entityClicked,
             movedOutOfXRange, movedOutOfYRange, dimmingFixture;
         uint clickTimer;
         int graphLeftRelative, graphRightRelative, graphTopRelative, graphBottomRelative, clickX, clickY, addedStateIndex;
@@ -230,7 +230,7 @@ namespace AquaPic.UserInterface
 
                         if (selectedState != i) {
                             cr.MoveTo (startXPos, startYPos);
-                            cr.Arc (startXPos, startYPos, 3, 0 , 2 * Math.PI);
+                            cr.Arc (startXPos, startYPos, 3, 0, 2 * Math.PI);
                             cr.ClosePath ();
                             TouchColor.SetSource (cr, "secb");
                             cr.Fill ();
@@ -383,7 +383,7 @@ namespace AquaPic.UserInterface
                             cr.ClosePath ();
                             cr.Fill ();
                         }
-             
+
                         if (selectedState == -1) {
                             // Only the first state needs the starting time drawn. All other states the start time 
                             // is the same as the last end time.
@@ -1088,9 +1088,9 @@ namespace AquaPic.UserInterface
             onClicked = false;
             offClicked = false;
             entityClicked = false;
-            addedStateIndex = -1;
             movedOutOfXRange = false;
             movedOutOfYRange = false;
+            addedStateIndex = -1;
             SaveStateInfos ();
 
             QueueDraw ();
@@ -1103,7 +1103,7 @@ namespace AquaPic.UserInterface
                 var yDelta = clickY - y;
                 var xDelta = x - clickX;
 
-                if (!movedOutOfXRange && Math.Abs(xDelta) > 6) {
+                if (!movedOutOfXRange && Math.Abs (xDelta) > 6) {
                     movedOutOfXRange = true;
                 }
 
@@ -1356,62 +1356,29 @@ namespace AquaPic.UserInterface
             if (stateInfos.Count >= 2) {
                 foreach (var stateInfo in stateInfos) {
                     var state = stateInfo.lightingState;
-                    var next = stateInfo.next.lightingState;
-                    var previous = stateInfo.previous.lightingState;
-
-                    var differenceToNext = Math.Abs (generalTime.totalMinutes - next.startTime.totalMinutes);
-                    var differenceToPrevious = Math.Abs (generalTime.totalMinutes - previous.endTime.totalMinutes);
 
                     if (state.startTime.Before (state.endTime)) {
                         if (generalTime.After (state.startTime) && generalTime.Before (state.endTime)) {
-                            if (differenceToNext < differenceToPrevious) {
-                                if (newStateType != LightingStateType.Off ||
-                                    (state.type != LightingStateType.Off && next.type != LightingStateType.Off)) {
-                                    LightingState newState;
-                                    if (differenceToNext < 60) {
-                                        newState = AddStateAtEnd (stateInfo, 60);
-                                        var secondNewState = AddStateToNext (stateInfo, 60);
-                                        newState.endTime = secondNewState.endTime;
-                                        newState.endingDimmingLevel = secondNewState.endingDimmingLevel;
-                                    } else {
-                                        newState = AddStateAtEnd (stateInfo, 120);
-                                    }
+                            var timeToEnd = Math.Abs (generalTime.totalMinutes - state.endTime.totalMinutes);
+                            var timeToStart = Math.Abs (generalTime.totalMinutes - state.startTime.totalMinutes);
 
-                                    var newStateInfo = new StateInfo ();
-                                    newStateInfo.lightingState = newState;
-                                    newStateInfo.previous = stateInfo;
-                                    newStateInfo.next = stateInfo.next;
-                                    newStateInfo.next.previous = newStateInfo;
-                                    stateInfo.next = newStateInfo;
+                            PlaceNewState (stateInfo, generalTime, timeToStart, timeToEnd);
+                            break;
+                        }
+                    } else {
+                        if (generalTime.After (state.endTime) && generalTime.Before (Time.TimeMidnight)) {
+                            var timeToEnd = Math.Abs (generalTime.totalMinutes - Time.TimeMidnight.totalMinutes) + state.endTime.totalMinutes;
+                            var timeToStart = Math.Abs (generalTime.totalMinutes - state.startTime.totalMinutes);
 
-                                    addedStateIndex = stateInfos.IndexOf (stateInfo) + 1;
-                                    stateInfos.Insert (addedStateIndex, newStateInfo);
-                                }
-                            } else {
-                                if (newStateType != LightingStateType.Off ||
-                                    (state.type != LightingStateType.Off && previous.type != LightingStateType.Off)) {
-                                    LightingState newState;
-                                    if (differenceToPrevious < 60) {
-                                        newState = AddStateAtBeginning (stateInfo, 60);
-                                        var secondNewState = AddStateToPrevious (stateInfo, 60);
-                                        newState.startTime = secondNewState.startTime;
-                                        newState.startingDimmingLevel = secondNewState.startingDimmingLevel;
-                                    } else {
-                                        newState = AddStateAtBeginning (stateInfo, 120);
-                                    }
+                            PlaceNewState (stateInfo, generalTime, timeToStart, timeToEnd);
+                            break;
+                        } 
 
-                                    var newStateInfo = new StateInfo ();
-                                    newStateInfo.lightingState = newState;
-                                    newStateInfo.next = stateInfo;
-                                    newStateInfo.previous = stateInfo.previous;
-                                    newStateInfo.previous.next = newStateInfo;
-                                    stateInfo.previous = newStateInfo;
+                        if (generalTime.After (Time.TimeZero) && generalTime.Before (state.startTime)) {
+                            var timeToEnd = Math.Abs (generalTime.totalMinutes - state.endTime.totalMinutes);
+                            var timeToStart = Math.Abs (generalTime.totalMinutes - Time.TimeZero.totalMinutes) + state.startTime.totalMinutes;
 
-                                    addedStateIndex = stateInfos.IndexOf (stateInfo);
-                                    stateInfos.Insert (addedStateIndex, newStateInfo);
-                                }
-                            }
-
+                            PlaceNewState (stateInfo, generalTime, timeToStart, timeToEnd);
                             break;
                         }
                     }
@@ -1421,6 +1388,62 @@ namespace AquaPic.UserInterface
             } else {
 
             }
+        }
+
+        void PlaceNewState (StateInfo stateInfo, Time generalTime, double timeToStart, double timeToEnd) {
+            var state = stateInfo.lightingState;
+            var next = stateInfo.next.lightingState;
+            var previous = stateInfo.previous.lightingState;
+
+            if (state.type == LightingStateType.Off && newStateType != LightingStateType.Off) {
+                if (timeToEnd < timeToStart) {
+                    if (timeToEnd < 120) {
+                        AddStateAtEnd (stateInfo, timeToEnd);
+                    } else {
+                        AddStateAtTimePoint (stateInfo, generalTime, timeToStart, timeToEnd);
+                    }
+                } else {
+                    if (timeToStart < 120) {
+                        AddStateAtBeginning (stateInfo, timeToStart);
+                    } else {
+                        AddStateAtTimePoint (stateInfo, generalTime, timeToStart, timeToEnd);
+                    }
+                }
+            } else {
+                if (timeToEnd < timeToStart) {
+                    if (newStateType != LightingStateType.Off ||
+                        (state.type != LightingStateType.Off && next.type != LightingStateType.Off)) {
+                        AddStateAtEnd (stateInfo, timeToEnd);
+                    }
+                } else {
+                    if (newStateType != LightingStateType.Off ||
+                        (state.type != LightingStateType.Off && previous.type != LightingStateType.Off)) {
+                        AddStateAtBeginning (stateInfo, timeToStart);
+                    }
+                }
+            }
+        }
+
+        void AddStateAtEnd (StateInfo stateInfo, double timeToEnd) {
+            LightingState newState;
+            if (timeToEnd < 60) {
+                newState = AddStateAtEnd (stateInfo, 60);
+                var secondNewState = AddStateToNext (stateInfo, 60);
+                newState.endTime = secondNewState.endTime;
+                newState.endingDimmingLevel = secondNewState.endingDimmingLevel;
+            } else {
+                newState = AddStateAtEnd (stateInfo, 120);
+            }
+
+            var newStateInfo = new StateInfo ();
+            newStateInfo.lightingState = newState;
+            newStateInfo.previous = stateInfo;
+            newStateInfo.next = stateInfo.next;
+            newStateInfo.next.previous = newStateInfo;
+            stateInfo.next = newStateInfo;
+
+            addedStateIndex = stateInfos.IndexOf (stateInfo) + 1;
+            stateInfos.Insert (addedStateIndex, newStateInfo);
         }
 
         LightingState AddStateAtEnd (StateInfo stateInfo, int length) {
@@ -1481,6 +1504,29 @@ namespace AquaPic.UserInterface
             return newState;
         }
 
+        void AddStateAtBeginning (StateInfo stateInfo, double timeToStart) {
+            LightingState newState;
+            if (timeToStart < 60) {
+                newState = AddStateAtBeginning (stateInfo, 60);
+                var secondNewState = AddStateToPrevious (stateInfo, 60);
+                newState.startTime = secondNewState.startTime;
+                newState.startingDimmingLevel = secondNewState.startingDimmingLevel;
+            } else {
+                newState = AddStateAtBeginning (stateInfo, 120);
+            }
+
+            var newStateInfo = new StateInfo ();
+            newStateInfo.lightingState = newState;
+
+            newStateInfo.next = stateInfo;
+            newStateInfo.previous = stateInfo.previous;
+            newStateInfo.previous.next = newStateInfo;
+            stateInfo.previous = newStateInfo;
+
+            addedStateIndex = stateInfos.IndexOf (stateInfo);
+            stateInfos.Insert (addedStateIndex, newStateInfo);
+        }
+
         LightingState AddStateAtBeginning (StateInfo stateInfo, int length) {
             var state = stateInfo.lightingState;
             var stateLength = state.lengthInMinutes.ToInt ();
@@ -1536,6 +1582,49 @@ namespace AquaPic.UserInterface
             }
 
             return newState;
+        }
+
+        void AddStateAtTimePoint (StateInfo stateInfo, Time generalTime, double timeToStart, double timeToEnd) {
+            var state = stateInfo.lightingState;
+            var newState = new LightingState (state);
+            newState.type = newStateType;
+            newState.startTime = new Time (generalTime);
+            newState.endTime = new Time (generalTime);
+            if (timeToStart > 120) {
+                newState.startTime.AddMinutes (-60);
+            } else {
+                newState.startTime.AddMinutes (-timeToStart.ToInt () / 2);
+            }
+
+            if (timeToEnd > 120) {
+                newState.endTime.AddMinutes (60);
+            } else {
+                newState.endTime.AddMinutes (timeToEnd.ToInt () / 2);
+            }
+
+            var newNextState = new LightingState (state);
+            newNextState.startTime = new Time (newState.endTime);
+            newNextState.endTime = new Time (state.endTime);
+
+            state.endTime = new Time (newState.startTime);
+
+            var newStateInfo = new StateInfo ();
+            newStateInfo.lightingState = newState;
+            var newNextStateInfo = new StateInfo ();
+            newNextStateInfo.lightingState = newNextState;
+
+            newStateInfo.previous = stateInfo;
+            newStateInfo.next = newNextStateInfo;
+
+            newNextStateInfo.previous = newStateInfo;
+            newNextStateInfo.next = stateInfo.next;
+
+            stateInfo.next = newStateInfo;
+
+            addedStateIndex = stateInfos.IndexOf (stateInfo) + 1;
+            stateInfos.Insert (addedStateIndex, newStateInfo);
+
+            stateInfos.Insert (addedStateIndex + 1, newNextStateInfo);
         }
 
         LightingState AddStateToNext (StateInfo stateInfo, int length) {
