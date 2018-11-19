@@ -94,15 +94,24 @@ namespace AquaPic.UserInterface
             acceptChangesButton.ButtonReleaseEvent += (obj, args) => {
                 if (lightingStateDisplay.hasStateInfoChanged) {
                     var parent = Toplevel as Window;
-                    var ms = new TouchDialog ("Do you want to make the changes permanent", parent);
+                    var ms = new TouchDialog ("Do you want to make the changes permanent", parent, new string[] { "Yes", "No", "Cancel" });
                     ms.Response += (o, a) => {
-                        Lighting.SetLightingStates (
-                            fixtureName, 
-                            lightingStateDisplay.lightingStates, 
-                            a.ResponseId == ResponseType.No);
-                        lightingStateDisplay.selectedState = -1;
-                        lightingStateDisplay.hasStateInfoChanged = false;
-                        lightingStateDisplay.QueueDraw ();
+                        if (a.ResponseId != ResponseType.Cancel) {
+                            var makeChangePermanant = a.ResponseId == ResponseType.Yes;
+
+                            Lighting.SetLightingStates (
+                                fixtureName,
+                                lightingStateDisplay.lightingStates,
+                                !makeChangePermanant);
+
+                            if (makeChangePermanant) {
+                                Lighting.SaveFixtureSettingsToFile (fixtureName);
+                            }
+
+                            lightingStateDisplay.selectedState = -1;
+                            lightingStateDisplay.hasStateInfoChanged = false;
+                            lightingStateDisplay.QueueDraw ();
+                        }
                     };
 
                     ms.Run ();

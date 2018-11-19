@@ -23,13 +23,11 @@
 
 using System;
 using Gtk;
-using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
 using AquaPic.Globals;
 using AquaPic.Drivers;
-using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
@@ -161,9 +159,6 @@ namespace AquaPic.UserInterface
             var chStr = ((SettingsComboBox)settings["Dimming Channel"]).combo.activeText;
             var chIc = IndividualControl.Empty;
 
-            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
-            var ja = jo["lightingFixtures"] as JArray;
-
             if (fixtureName.IsEmpty ()) {
                 if (name == "Enter name") {
                     MessageBox.Show ("Invalid probe name");
@@ -191,20 +186,6 @@ namespace AquaPic.UserInterface
                 } else {
                     Lighting.AddLight (name, outletIc, lightingStates, highTempLockout);
                 }
-
-
-                JObject jobj = new JObject ();
-                jobj.Add (new JProperty ("name", name));
-                jobj.Add (new JProperty ("powerStrip", outletIc.Group));
-                jobj.Add (new JProperty ("outlet", outletIc.Individual.ToString ()));
-                jobj.Add (new JProperty ("highTempLockout", highTempLockout.ToString ()));
-                if (dimmingFixture) {
-                    jobj.Add (new JProperty ("dimmingCard", chIc.Group));
-                    jobj.Add (new JProperty ("channel", chIc.Individual.ToString ()));
-                }
-                jobj.Add (new JProperty ("events", new JArray ()));
-
-                ja.Add (jobj);
 
                 fixtureName = name;
             } else {
@@ -234,43 +215,17 @@ namespace AquaPic.UserInterface
                         chIc = Lighting.GetDimmingChannelIndividualControl (fixtureName);
                     }
 
-                    int arrIdx = SettingsHelper.FindSettingsInArray (ja, oldName);
-                    if (arrIdx == -1) {
-                        MessageBox.Show ("Something went wrong");
-                        return false;
-                    }
-
-                    ja[arrIdx]["name"] = name;
-                    ja[arrIdx]["powerStrip"] = outletIc.Group;
-                    ja[arrIdx]["outlet"] = outletIc.Individual.ToString ();
-                    ja[arrIdx]["highTempLockout"] = highTempLockout.ToString ();
-
-                    if (dimmingFixture) {
-                        ja[arrIdx]["dimmingCard"] = chIc.Group;
-                        ja[arrIdx]["channel"] = chIc.Individual.ToString ();
-                    }
+                    Lighting.SaveFixtureSettingsToFile (fixtureName, oldName);
                 } else {
                     MessageBox.Show ("Can't change dimmablility");
                     return false;
                 }
             }
 
-            SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
-            var ja = jo["lightingFixtures"] as JArray;
-
-            int arrIdx = SettingsHelper.FindSettingsInArray (ja, fixtureName);
-            if (arrIdx == -1) {
-                MessageBox.Show ("Something went wrong");
-                return false;
-            }
-
-            ja.RemoveAt (arrIdx);
-            SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
             Lighting.RemoveLight (fixtureName);
             return true;
         }
