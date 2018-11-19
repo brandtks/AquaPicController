@@ -61,6 +61,18 @@ namespace AquaPic.Modules
             }
         }
 
+        public string startTimeDescriptor {
+            get {
+                return timePeriod.startTimeDescriptor;
+            }
+        }
+
+        public string endTimeDescriptor {
+            get {
+                return timePeriod.endTimeDescriptor;
+            }
+        }
+
         public double lengthInMinutes {
             get {
                 return timePeriod.lengthInMinutes;

@@ -30,6 +30,19 @@ namespace AquaPic.Runtime
     {
         public Time startTime;
         public Time endTime;
+
+        public string startTimeDescriptor {
+            get {
+                return string.Format ("{0:D2}:{1:D2}", startTime.hour, startTime.minute);
+            }
+        }
+
+        public string endTimeDescriptor {
+            get {
+                return string.Format ("{0:D2}:{1:D2}", endTime.hour, endTime.minute);
+            }
+        }
+
         public double lengthInMinutes {
             get {
                 if (startTime.Before (endTime)) {
