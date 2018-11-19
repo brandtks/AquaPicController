@@ -76,6 +76,9 @@ namespace GoodtimeDevelopment.TouchWidget
     public class TouchDialog : Dialog
     {
         public TouchDialog (string msg, Window parent)
+            : this (msg, parent, new string[] { "Yes", "No" }) { }
+
+        public TouchDialog (string msg, Window parent, string[] buttons)
             : base (string.Empty, parent, DialogFlags.DestroyWithParent) {
             ModifyBg (StateType.Normal, TouchColor.NewGtkColor ("grey0"));
 
@@ -98,17 +101,19 @@ namespace GoodtimeDevelopment.TouchWidget
             };
 #endif
 
-            var btn = new TouchButton ();
-            btn.text = "Yes";
-            btn.HeightRequest = 30;
-            btn.ButtonReleaseEvent += (o, args) => Respond (ResponseType.Yes);
-            ActionArea.Add (btn);
+            foreach (var button in buttons) {
+                try {
+                    var response = (ResponseType)Enum.Parse (typeof (ResponseType), button);
 
-            btn = new TouchButton ();
-            btn.text = "No";
-            btn.HeightRequest = 30;
-            btn.ButtonReleaseEvent += (o, args) => Respond (ResponseType.No);
-            ActionArea.Add (btn);
+                    var btn = new TouchButton ();
+                    btn.text = button;
+                    btn.HeightRequest = 30;
+                    btn.ButtonReleaseEvent += (o, args) => Respond (response);
+                    ActionArea.Add (btn);
+                } catch {
+                    //
+                }
+            }
 
             var label = new Label ();
             label.LineWrap = true;
