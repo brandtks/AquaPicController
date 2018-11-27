@@ -57,7 +57,7 @@ namespace AquaPic.UserInterface
 
         public TouchSettingsDialog (string name, bool includeDelete, Window parent) : this (name, includeDelete, 320, parent) { }
 
-        public TouchSettingsDialog (string name, bool includeDelete, int height, Window parent) : base ("Settings", parent, DialogFlags.DestroyWithParent){
+        public TouchSettingsDialog (string name, bool includeDelete, int height, Window parent) : base ("Settings", parent, DialogFlags.DestroyWithParent) {
             Name = "AquaPic.Settings." + name;
             Title = name + " Settings";
             WindowPosition = (WindowPosition)4;
