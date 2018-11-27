@@ -180,8 +180,13 @@ namespace AquaPic.UserInterface
             atoClearFailBtn.buttonColor = "compl";
             atoClearFailBtn.ButtonReleaseEvent += (o, args) => {
                 if (atoGroupName.IsNotEmpty ()) {
-                    if (!AutoTopOff.ClearAtoAlarm (atoGroupName))
-                        MessageBox.Show ("Please acknowledge alarms first");
+                    if (AutoTopOff.GetAtoGroupState (atoGroupName) == AutoTopOffState.Cooldown) {
+                        AutoTopOff.ResetCooldownTime (atoGroupName);
+                    } else {
+                        if (!AutoTopOff.ClearAtoAlarm (atoGroupName)) {
+                            MessageBox.Show ("Please acknowledge alarms first");
+                        }
+                    }
                 }
             };
             Put (atoClearFailBtn, 70, 405);
@@ -552,7 +557,8 @@ namespace AquaPic.UserInterface
                         AutoTopOff.GetAtoGroupState (atoGroupName),
                         AutoTopOff.GetAtoGroupAtoTime (atoGroupName).SecondsToString ());
 
-                    if (Alarm.CheckAlarming (AutoTopOff.GetAtoGroupFailAlarmIndex (atoGroupName))) {
+                    if (Alarm.CheckAlarming (AutoTopOff.GetAtoGroupFailAlarmIndex (atoGroupName)) ||
+                        AutoTopOff.GetAtoGroupState (atoGroupName) == AutoTopOffState.Cooldown) {
                         atoClearFailBtn.Visible = true;
                         atoClearFailBtn.Show ();
                     } else {
