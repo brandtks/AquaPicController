@@ -37,6 +37,7 @@ namespace AquaPic.UserInterface
         List<LinePlotWidget> linePlots;
         List<BarPlotWidget> barPlots;
         List<CurvedBarPlotWidget> curvedBarPlots;
+        List<ButtonWidget> buttons;
 
         public HomeWindow (params object[] options) : base () {
             showTitle = false;
@@ -65,6 +66,7 @@ namespace AquaPic.UserInterface
             linePlots = new List<LinePlotWidget> ();
             barPlots = new List<BarPlotWidget> ();
             curvedBarPlots = new List<CurvedBarPlotWidget> ();
+            buttons = new List<ButtonWidget> ();
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "mainScreen.json");
@@ -145,6 +147,8 @@ namespace AquaPic.UserInterface
                                 Put (b, x, y);
                                 b.Show ();
 
+                                buttons.Add (b);
+
                                 break;
                             }
                         default:
@@ -173,18 +177,21 @@ namespace AquaPic.UserInterface
         protected void Update () {
             foreach (var lp in linePlots) {
                 lp.OnUpdate ();
-                lp.QueueDraw ();
             }
 
             foreach (var bp in barPlots) {
                 bp.OnUpdate ();
-                bp.QueueDraw ();
             }
 
             foreach (var curvedBarPlot in curvedBarPlots) {
                 curvedBarPlot.OnUpdate ();
-                curvedBarPlot.QueueDraw ();
             }
+
+            foreach (var b in buttons) {
+                b.buttonColor = Bit.Check (b.text) ? "pri" : "seca";
+            }
+
+            QueueDraw ();
         }
 
     }
