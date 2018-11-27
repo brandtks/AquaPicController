@@ -287,10 +287,10 @@ namespace AquaPic.Modules
 
             SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
 
+            // Now remove any main screen widgets associated with the fixture
             ja = SettingsHelper.OpenSettingsFile ("mainScreen") as JArray;
             arrIdx = SettingsHelper.FindSettingsInArray (ja, fixtureName);
             if (arrIdx != -1) {
-                Console.WriteLine ("Removing main screen widget");
                 ja.RemoveAt (arrIdx);
                 SettingsHelper.SaveSettingsFile ("mainScreen", ja);
             }
@@ -410,6 +410,14 @@ namespace AquaPic.Modules
 
             fixtures.Remove (oldFixtureName);
             fixtures[newFixtureName] = fixture;
+
+            // Rename the main screen widget if it exists
+            var ja = SettingsHelper.OpenSettingsFile ("mainScreen") as JArray;
+            var arrIdx = SettingsHelper.FindSettingsInArray (ja, oldFixtureName);
+            if (arrIdx != -1) {
+                ja[arrIdx]["name"] = newFixtureName;
+                SettingsHelper.SaveSettingsFile ("mainScreen", ja);
+            }
         }
 
         /**************************************************************************************************************/
