@@ -140,6 +140,10 @@ namespace GoodtimeDevelopment.TouchWidget
                     DrawDownButton (cr, left, top, width);
 
                     if (includeScrollBar) {
+                        if (listOffset + maxListHeight > comboList.Count) {
+                            listOffset = 0;
+                        }
+
                         int x = left + width - height;
                         listHeight -= height;
 
@@ -181,7 +185,7 @@ namespace GoodtimeDevelopment.TouchWidget
                         scrollBarHeight = (listHeight - 2 * height) / comboList.Count;
                         var scrollBarActualHeight = scrollBarHeight * maxListHeight;
                         var scrollBarTop = top + (2 * height) + (scrollBarHeight * listOffset);
-                        //cr.Rectangle (x, scrollBarTop, height, scrollBarActualHeight);
+
                         TouchGlobal.DrawRoundedRectangle (cr, x, scrollBarTop, height, scrollBarActualHeight, height / 3);
                         buttonColor = "grey2";
                         outlineColor = new TouchColor (buttonColor);

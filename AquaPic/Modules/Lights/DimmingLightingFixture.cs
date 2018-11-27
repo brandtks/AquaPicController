@@ -127,7 +127,7 @@ namespace AquaPic.Modules
                     currentDimmingLevel = rocl.RateOfChange (requestedDimmingLevel);
                 }
 
-                return currentDimmingLevel;
+                return currentDimmingLevel.Map (0, 100, 0, 4096);
             }
 
             public void OnLightingPlugModeChange (object sender, ModeChangeEventArgs args) {
