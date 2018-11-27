@@ -48,9 +48,7 @@ namespace AquaPic.UserInterface
 
             public HomeSettingsWidget newWidget;
 
-            public AddHomeWidget () {
-                Name = "Add Home Screen Widget";
-                Title = "Add Home Screen Widget";
+            public AddHomeWidget (Window parent) : base ("Add Home Screen Widget", parent, DialogFlags.DestroyWithParent) {
                 WindowPosition = (WindowPosition)4;
                 SetSizeRequest (600, 160);
 

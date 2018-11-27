@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Gtk;
-using Cairo;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
@@ -35,21 +34,19 @@ namespace AquaPic.UserInterface
 {
     partial class HomeSettings : Dialog
     {
-        private Fixed fix;
-        private TouchButton saveBtn;
-        private TouchButton cancelButton;
-		private TouchButton deleteButton;
-        private TouchComboBox widgetCombo;
-        private TileBoard board;
-        private SettingsTextBox rowTextBox;
-        private SettingsTextBox columnTextBox;
-        private TouchUpDownButtons rowUpDownBtn;
-        private TouchUpDownButtons columnUpDownBtn;
-        private List<HomeSettingsWidget> widgets;
+        Fixed fix;
+        TouchButton saveBtn;
+        TouchButton cancelButton;
+		TouchButton deleteButton;
+        TouchComboBox widgetCombo;
+        TileBoard board;
+        SettingsTextBox rowTextBox;
+        SettingsTextBox columnTextBox;
+        TouchUpDownButtons rowUpDownBtn;
+        TouchUpDownButtons columnUpDownBtn;
+        List<HomeSettingsWidget> widgets;
 
-        public HomeSettings () {
-            Name = "Home Screen Widget Placement";
-            Title = "Home Screen Widget Placement";
+        public HomeSettings (Window parent) : base ("Home Screen Widget Placement", parent, DialogFlags.DestroyWithParent) {
             WindowPosition = (WindowPosition)4;
             SetSizeRequest (600, 320);
 
@@ -291,7 +288,8 @@ namespace AquaPic.UserInterface
             if (board.containsNoConflictTiles) {
                 if (args.activeIndex != -1) {
                     if (args.activeText == "Add new") {
-                        var s = new AddHomeWidget ();
+                        var parent = Toplevel as Window;
+                        var s = new AddHomeWidget (parent);
                         s.Run ();
                         var newWidget = s.newWidget;
                         s.Destroy ();

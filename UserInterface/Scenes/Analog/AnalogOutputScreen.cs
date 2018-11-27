@@ -89,7 +89,7 @@ namespace AquaPic.UserInterface
 
                 int i = 0;
                 foreach (var d in displays) {
-                    d.currentValue = values[i];
+                    d.currentValue = values[i] * 10;
                     d.QueueDraw ();
 
                     ++i;
@@ -225,7 +225,7 @@ namespace AquaPic.UserInterface
                 int i = 0;
                 foreach (var d in displays) {
                     d.label.text = names[i];
-                    d.currentValue = values[i];
+                    d.currentValue = values[i] * 10;
                     d.typeLabel.text = Utils.GetDescription (types[i]);
 
                     if (modes[i] == Mode.Auto) {

@@ -314,7 +314,8 @@ namespace AquaPic.UserInterface
                                 CollapseMenu ();
                             }
                         } else if ((x >= 640) && (y >= 420)) {
-                            var s = new HomeSettings ();
+                            var parent = Toplevel as Window;
+                            var s = new HomeSettings (parent);
                             s.Run ();
                             s.Destroy ();
                             s.Dispose ();
