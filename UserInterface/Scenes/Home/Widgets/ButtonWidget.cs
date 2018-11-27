@@ -34,11 +34,8 @@ namespace AquaPic.UserInterface
             SetSizeRequest (100, 82);
 
             text = name;
-            bool s1 = Bit.Check (text);
-            if (s1)
-                buttonColor = "pri";
-            else
-                buttonColor = "seca";
+            bool b = Bit.Check (text);
+            buttonColor = b ? "pri" : "seca";
 
             ButtonReleaseEvent += OnButtonRelease;
         }
