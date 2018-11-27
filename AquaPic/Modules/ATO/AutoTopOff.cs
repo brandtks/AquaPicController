@@ -260,6 +260,11 @@ namespace AquaPic.Modules
             return atoGroups[name].ClearAlarm ();
         }
 
+        public static void ResetCooldownTime (string name) {
+            CheckAtoGroupKey (name);
+            atoGroups[name].ResetCooldown ();
+        }
+
         /***Getters****************************************************************************************************/
         /***Names***/
         public static string[] GetAllAtoGroupNames () {
