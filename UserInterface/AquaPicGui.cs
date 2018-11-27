@@ -137,15 +137,9 @@ namespace AquaPic.UserInterface
             if (!scenes.ContainsKey (name))
                 throw new Exception ("Screen does not exist");
 
-            if (_currentScene == name) {
-                Logger.Add ("Changing screen to current screen: {0}", name);
-            }
-
             _currentScene = name;
 
-            if (ChangeSceneEvent != null) {
-                ChangeSceneEvent (scenes[name], options);
-            }
+            ChangeSceneEvent?.Invoke (scenes[name], options);
         }
 
         public void ShowDecoration () {
