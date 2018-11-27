@@ -152,12 +152,6 @@ namespace AquaPic.UserInterface
             dimmingPerPixel = 100d / (graphBottomRelative - graphTopRelative);
 
             using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
-                /*
-                cr.Rectangle (left, top, width, height);
-                TouchColor.SetSource (cr, "grey1");
-                cr.Stroke ();
-                */
-
                 // Draw the graph outline
                 cr.MoveTo (graphLeft - 5, graphTop);
                 cr.LineTo (graphLeft, graphTop);
@@ -263,7 +257,7 @@ namespace AquaPic.UserInterface
                                 if (state.startTime.Before (state.endTime)) {
                                     for (var phase = 1; phase <= period; ++phase) {
                                         var currentXPos = startXPos + phase;
-                                        var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+                                        var radian = (phase / period).Map (0, 1, 0, Math.PI).Constrain (0, Math.PI);
                                         interYPos = startYPos - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
@@ -274,7 +268,7 @@ namespace AquaPic.UserInterface
                                 } else {
                                     for (var phase = 1; phase <= rightPart; ++phase) {
                                         var currentXPos = startXPos + phase;
-                                        var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+                                        var radian = (phase / period).Map (0, 1, 0, Math.PI).Constrain (0, Math.PI);
                                         interYPos = startYPos - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
@@ -286,7 +280,7 @@ namespace AquaPic.UserInterface
                                     cr.MoveTo (graphLeft, interYPos);
                                     for (var phase = rightPart; phase <= period; ++phase) {
                                         var currentXPos = interXPos + phase;
-                                        var radian = (phase / period).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
+                                        var radian = (phase / period).Map (0, 1, 0, Math.PI).Constrain (0, Math.PI);
                                         interYPos = startYPos - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
@@ -315,7 +309,7 @@ namespace AquaPic.UserInterface
                                 if (state.startTime.Before (state.endTime)) {
                                     for (var phase = 1; phase <= period; ++phase) {
                                         var currentXPos = startXPos + phase;
-                                        var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+                                        var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, Math.PI / 2).Constrain (0, Math.PI / 2);
                                         interYPos = basePoint - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
@@ -327,7 +321,7 @@ namespace AquaPic.UserInterface
                                 } else {
                                     for (var phase = 1; phase <= rightPart; ++phase) {
                                         var currentXPos = startXPos + phase;
-                                        var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+                                        var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, Math.PI / 2).Constrain (0, Math.PI / 2);
                                         interYPos = basePoint - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
@@ -339,7 +333,7 @@ namespace AquaPic.UserInterface
                                     cr.MoveTo (graphLeft, interYPos);
                                     for (var phase = rightPart; phase <= period; ++phase) {
                                         var currentXPos = interXPos + phase;
-                                        var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, 90).Constrain (0, 90).ToRadians ();
+                                        var radian = (phase / period).Map (mapFrom1, mapFrom2, 0, Math.PI / 2).Constrain (0, Math.PI / 2);
                                         interYPos = basePoint - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
@@ -370,6 +364,7 @@ namespace AquaPic.UserInterface
                             }
                             break;
                         }
+
                         if (i != addedStateIndex) {
                             TouchColor.SetSource (cr, "secb");
                         } else {
@@ -387,10 +382,32 @@ namespace AquaPic.UserInterface
                         if (selectedState == -1) {
                             // Only the first state needs the starting time drawn. All other states the start time 
                             // is the same as the last end time.
-                            if (firstTimeThrough) {
+                            // Or if the previous state was off the start time needs to be rendered
+                            if (firstTimeThrough || stateInfo.previous.lightingState.type == LightingStateType.Off) {
+                                // If the start and end of the state are close together draw the end at alterating elevations
+                                int startTextYPos;
+
+                                if (firstTimeThrough) {
+                                    startTextYPos = graphBottom;
+                                } else {
+                                    var lastPeriod = stateInfo.previous.lightingState.lengthInMinutes;
+                                    if (lastPeriod < 80) {
+                                        if (lastOnSecondLine) {
+                                            startTextYPos = graphBottom;
+                                            lastOnSecondLine = false;
+                                        } else {
+                                            startTextYPos = graphBottom + 18;
+                                            lastOnSecondLine = true;
+                                        }
+                                    } else {
+                                        startTextYPos = graphBottom;
+                                        lastOnSecondLine = false;
+                                    }
+                                }
+
                                 text = new TouchText (state.startTime.ToShortTimeString ());
                                 text.alignment = TouchAlignment.Center;
-                                text.Render (this, startXPos.ToInt () - 50, graphBottom, 100);
+                                text.Render (this, startXPos.ToInt () - 50, startTextYPos, 100);
                                 firstTimeThrough = false;
                             }
 
