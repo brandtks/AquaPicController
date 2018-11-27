@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Gtk;
 using GoodtimeDevelopment.Utilites;
@@ -109,19 +110,25 @@ namespace AquaPic.UserInterface
 
                 moduleComboBox = new SettingsComboBox ("Module");
                 moduleComboBox.combo.nonActiveMessage = "Please select module";
+                moduleComboBox.combo.maxListHeight = 3;
                 moduleComboBox.combo.ComboChangedEvent += OnModuleComboChanged;
                 moduleComboBox.Visible = false;
+                moduleComboBox.ButtonReleaseEvent += (o, args) => SwapTypeComboToTop ();
                 fix.Put (moduleComboBox, 5, 40);
 
                 nameComboBox = new SettingsComboBox ("Name");
                 nameComboBox.combo.nonActiveMessage = "Please select name";
+                nameComboBox.combo.maxListHeight = 3;
                 nameComboBox.combo.ComboChangedEvent += OnModuleComboChanged;
                 nameComboBox.Visible = false;
+                nameComboBox.ButtonReleaseEvent += (o, args) => SwapTypeComboToTop ();
                 fix.Put (nameComboBox, 5, 40);
 
                 groupComboBox = new SettingsComboBox ("Group");
                 groupComboBox.combo.nonActiveMessage = "Please select group";
+                groupComboBox.combo.maxListHeight = 3;
                 groupComboBox.Visible = false;
+                groupComboBox.ButtonReleaseEvent += (o, args) => SwapTypeComboToTop ();
                 fix.Put (groupComboBox, 305, 40);
 
                 typeCombo = new TouchComboBox ();
@@ -136,11 +143,6 @@ namespace AquaPic.UserInterface
                 typeCombo.ComboChangedEvent += OnTypeComboChanged;
                 fix.Put (typeCombo, 195, 5);
                 typeCombo.Show ();
-
-                ExposeEvent += (obj, args) => {
-                    typeCombo.Visible = false;
-                    typeCombo.Visible = true;
-                };
 
                 Add (fix);
                 fix.Show ();
@@ -253,7 +255,12 @@ namespace AquaPic.UserInterface
                 Destroy ();
             }
 
-
+            protected void SwapTypeComboToTop () {
+                int x = typeCombo.Allocation.Left;
+                int y = typeCombo.Allocation.Top;
+                fix.Remove (typeCombo);
+                fix.Put (typeCombo, x, y);
+            }
         }
     }
 }
