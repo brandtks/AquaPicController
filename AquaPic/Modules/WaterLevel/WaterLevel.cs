@@ -728,9 +728,6 @@ namespace AquaPic.Modules
             if (fullScaleActual < 0.0f)
                 throw new ArgumentException ("Full scale actual can't be less than zero");
 
-            if (fullScaleActual > 15.0f)
-                throw new ArgumentException ("Full scale actual can't be greater than 15");
-
             analogLevelSensors[name].zeroScaleValue = zeroValue;
             analogLevelSensors[name].fullScaleActual = fullScaleActual;
             analogLevelSensors[name].fullScaleValue = fullScaleValue;

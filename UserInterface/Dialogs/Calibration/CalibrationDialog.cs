@@ -57,12 +57,12 @@ namespace AquaPic.UserInterface
 
     public class CalibrationDialog : Gtk.Dialog
     {
-        private TextView tv;
-        private TouchTextBox valTb;
-        private TouchButton actionBtn, skipBtn;
-        private uint timerId;
-        private bool forced, init;
-        private CalibrationState calState;
+        TextView tv;
+        TouchTextBox valTb;
+        TouchButton actionBtn, skipBtn;
+        uint timerId;
+        bool forced, init;
+        CalibrationState calState;
 
         protected Fixed fix;
 
@@ -78,12 +78,12 @@ namespace AquaPic.UserInterface
 
         public CalibrationDialog (
             string name,
+            Window parent, 
             GetCalibrationValueHandler GetCalibrationValue,
             CalibrationState startingState = CalibrationState.ZeroValue
-        ) {
+        ) : base (name + " Calibration", parent, DialogFlags.DestroyWithParent) {
             Name = "AquaPic.Calibration." + name;
-            Title = name + " Calibration";
-            WindowPosition = (Gtk.WindowPosition)4;
+            WindowPosition = (WindowPosition)4;
             SetSizeRequest (600, 300);
 
 #if RPI_BUILD
@@ -149,9 +149,11 @@ namespace AquaPic.UserInterface
             valTb = new TouchTextBox ();
             valTb.SetSizeRequest (110, 30);
             valTb.textAlignment = TouchAlignment.Center;
+            valTb.backgroundColor = "grey1";
             if (calState == CalibrationState.ZeroActual) {
-                valTb.text = "Actual";
+                valTb.text = "Enter Actual";
                 valTb.enableTouch = true;
+                valTb.backgroundColor = "grey4";
                 valTb.TextChangedEvent += OnValueTextBoxTextChanged;
             } else {
                 valTb.text = GetCalibrationValue ().ToString ("F2");
@@ -262,7 +264,7 @@ namespace AquaPic.UserInterface
         protected void OnActionButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
             switch (calState) {
             case CalibrationState.ZeroActual:
-                if (valTb.text == "Actual")
+                if (valTb.text == "Enter Actual")
                     MessageBox.Show ("Please enter the zero actual value");
                 else {
                     calArgs.zeroActual = Convert.ToDouble (valTb.text);
@@ -279,7 +281,7 @@ namespace AquaPic.UserInterface
                 MoveToNextState ();
                 break;
             case CalibrationState.FullScaleActual:
-                if (valTb.text == "Actual")
+                if (valTb.text == "Enter Actual")
                     MessageBox.Show ("Please enter the full scale actual value");
                 else {
                     calArgs.fullScaleActual = Convert.ToDouble (valTb.text);
@@ -293,8 +295,7 @@ namespace AquaPic.UserInterface
                 else
                     calArgs.fullScaleValue = Convert.ToDouble (valTb.text);
 
-                if (CalibrationCompleteEvent != null)
-                    CalibrationCompleteEvent (calArgs);
+                CalibrationCompleteEvent?.Invoke (calArgs);
 
                 Destroy ();
                 break;
@@ -316,8 +317,8 @@ namespace AquaPic.UserInterface
             case CalibrationState.ZeroActual:
                 if (!forced) {
                     valTb.enableTouch = false;
+                    valTb.backgroundColor = "grey1";
                     valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
-
                 }
                 valTb.text = GetCalibrationValue ().ToString ("F2");
                 valTb.QueueDraw ();
@@ -347,9 +348,10 @@ namespace AquaPic.UserInterface
             case CalibrationState.ZeroValue:
                 if (!forced) {
                     valTb.enableTouch = true;
+                    valTb.backgroundColor = "grey1";
                     valTb.TextChangedEvent += OnValueTextBoxTextChanged;
                 }
-                valTb.text = "Actual";
+                valTb.text = "Enter Actual";
                 valTb.QueueDraw ();
 
                 actionBtn.text = "Full Scale Actual";
@@ -376,6 +378,7 @@ namespace AquaPic.UserInterface
             case CalibrationState.FullScaleActual:
                 if (!forced) {
                     valTb.enableTouch = false;
+                    valTb.backgroundColor = "grey1";
                     valTb.TextChangedEvent -= OnValueTextBoxTextChanged;
                 }
 
@@ -421,7 +424,7 @@ namespace AquaPic.UserInterface
                     btn.QueueDraw ();
 
                     valTb.enableTouch = true;
-                    valTb.backgroundColor = "seca";
+                    valTb.backgroundColor = "grey4";
                     valTb.TextChangedEvent += OnValueTextBoxTextChanged;
                     valTb.QueueDraw ();
 

@@ -47,6 +47,7 @@ namespace AquaPic.UserInterface
         List<HomeSettingsWidget> widgets;
 
         public HomeSettings (Window parent) : base ("Home Screen Widget Placement", parent, DialogFlags.DestroyWithParent) {
+            Name = "AquaPic.Home.Settings.Widget.Placement";
             WindowPosition = (WindowPosition)4;
             SetSizeRequest (600, 320);
 

@@ -56,7 +56,7 @@ namespace AquaPic.Sensors
         public float fullScaleActual;
         public float fullScaleValue;
 
-        private int _sensorDisconnectedAlarmIndex;
+        int _sensorDisconnectedAlarmIndex;
         public int sensorDisconnectedAlarmIndex {
             get {
                 return _sensorDisconnectedAlarmIndex;

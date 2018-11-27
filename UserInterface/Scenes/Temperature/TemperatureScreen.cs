@@ -249,8 +249,10 @@ namespace AquaPic.UserInterface
             b.SetSizeRequest (100, 60);
             b.ButtonReleaseEvent += (o, args) => {
                 if (probeName.IsNotEmpty ()) {
+                    var parent = Toplevel as Window;
                     var cal = new CalibrationDialog (
                         probeName + " Probe",
+                        parent, 
                         () => {
                             return AquaPicDrivers.AnalogInput.GetChannelValue (Temperature.GetTemperatureProbeIndividualControl (probeName));
                         },

@@ -259,8 +259,10 @@ namespace AquaPic.UserInterface
             b.SetSizeRequest (100, 60);
             b.ButtonReleaseEvent += (o, args) => {
                 if (analogSensorName.IsNotEmpty ()) {
+                    var parent = Toplevel as Window;
                     var cal = new CalibrationDialog (
                         "Water Level Sensor",
+                        parent, 
                         () => {
                             return AquaPicDrivers.AnalogInput.GetChannelValue (
                                 WaterLevel.GetAnalogLevelSensorIndividualControl (analogSensorName)
