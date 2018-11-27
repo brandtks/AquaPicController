@@ -31,6 +31,7 @@ using AquaPic.UserInterface;
 using AquaPic.Drivers;
 using AquaPic.Modules;
 using AquaPic.SerialBus;
+using AquaPic.Globals;
 
 namespace AquaPic
 {
@@ -112,6 +113,28 @@ namespace AquaPic
                 Logger.AddError (ex.ToString ());
                 return;
             }
+#endif
+
+#if DEBUG
+            AquaPicDrivers.AnalogInput.SetChannelMode ("Right Overflow, Temperature Probe", Mode.Manual);
+            AquaPicDrivers.AnalogInput.SetChannelValue ("Right Overflow, Temperature Probe", 2796.5);
+            AquaPicDrivers.AnalogInput.SetChannelMode ("Left Overflow, Temperature Probe", Mode.Manual);
+            AquaPicDrivers.AnalogInput.SetChannelValue ("Left Overflow, Temperature Probe", 2796.5);
+            AquaPicDrivers.AnalogInput.SetChannelMode ("Sump, Temperature Probe", Mode.Manual);
+            AquaPicDrivers.AnalogInput.SetChannelValue ("Sump, Temperature Probe", 2796.5);
+            AquaPicDrivers.AnalogInput.SetChannelMode ("Salt Mixing, Temperature Probe", Mode.Manual);
+            AquaPicDrivers.AnalogInput.SetChannelValue ("Salt Mixing, Temperature Probe", 2796.5);
+
+            AquaPicDrivers.AnalogInput.SetChannelMode ("Return Chamber, Water Level Sensor", Mode.Manual);
+            AquaPicDrivers.AnalogInput.SetChannelValue ("Return Chamber, Water Level Sensor", 1803);
+            AquaPicDrivers.AnalogInput.SetChannelMode ("ATO Reservoir, Water Level Sensor", Mode.Manual);
+            AquaPicDrivers.AnalogInput.SetChannelValue ("ATO Reservoir, Water Level Sensor", 3878);
+
+            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump High", Mode.Manual);
+            AquaPicDrivers.DigitalInput.SetChannelValue ("Sump High", true);
+            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump Low", Mode.Manual);
+            AquaPicDrivers.DigitalInput.SetChannelValue ("Sump Low", true);
+            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump ATO", Mode.Manual);
 #endif
 
             // Run the control
