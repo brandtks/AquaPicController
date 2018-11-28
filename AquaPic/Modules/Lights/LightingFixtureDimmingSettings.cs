@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2018 Goodtime Development
+    Copyright (c) 2017 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,12 +22,18 @@
 #endregion // License
 
 using System;
+using GoodtimeDevelopment.Utilites;
+using AquaPic.Globals;
+using AquaPic.Drivers;
+using AquaPic.Runtime;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Modules
 {
-    public class SettingValidationMethod
+    public class LightingFixtureSettings
     {
-        public SettingValidationMethod () {
-        }
+        public string name;
+        public IndividualControl powerOutlet;
+        public bool highTempLockout;
+
     }
 }

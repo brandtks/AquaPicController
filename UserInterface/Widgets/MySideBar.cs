@@ -237,12 +237,28 @@ namespace AquaPic.UserInterface
                     TouchColor.SetSource (cr, "grey2", 0.25);
                     cr.Fill ();
 
-                    TouchGlobal.DrawRoundedRectangle (cr, left - 50, (height / 2) - 30 + top, 85, 60, 20);
-                    TouchColor.SetSource (cr, "pri");
-                    cr.LineWidth = 0.75;
-                    cr.StrokePreserve ();
-                    TouchColor.SetSource (cr, "grey3");
-                    cr.Fill ();
+                    var topEdge = (height / 2) - 30 + top;
+                    TouchGlobal.DrawRoundedRectangle (cr, left - 50, topEdge, 80, 60, 22);
+
+                    var color = new TouchColor ("grey3");
+                    var outlineColor = new TouchColor (color);
+                    outlineColor.ModifyColor (0.5);
+                    var highlightColor = new TouchColor (color);
+                    highlightColor.ModifyColor (1.1);
+                    var lowlightColor = new TouchColor (color);
+                    lowlightColor.ModifyColor (0.75);
+
+                    using (var grad = new LinearGradient (left, topEdge, left, topEdge + 60)) {
+                        grad.AddColorStop (0, highlightColor.ToCairoColor ());
+                        grad.AddColorStop (0.15, color.ToCairoColor ());
+                        grad.AddColorStop (0.85, lowlightColor.ToCairoColor ());
+                        cr.SetSource (grad);
+                        cr.FillPreserve ();
+                    }
+
+                    outlineColor.SetSource (cr);
+                    cr.LineWidth = 1;
+                    cr.Stroke ();
                 }
             }
         }
