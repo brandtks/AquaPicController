@@ -31,54 +31,13 @@ namespace AquaPic.Modules
 {
     public partial class WaterLevel
     {
-        private class WaterLevelGroup
+        class WaterLevelGroup
         {
-            public WaterLevelGroupSettings settings;
-
-            public string name {
-                get {
-                    return settings.name;
-                }
-                set {
-                    settings.name = value;
-                }
-            }
-
-            public float highAnalogAlarmSetpoint {
-                get {
-                    return settings.highAnalogAlarmSetpoint;
-                }
-                set {
-                    settings.highAnalogAlarmSetpoint = value;
-                }
-            }
-
-            public float lowAnalogAlarmSetpoint {
-                get {
-                    return settings.lowAnalogAlarmSetpoint;
-                }
-                set {
-                    settings.lowAnalogAlarmSetpoint = value;
-                }
-            }
-
-            public bool enableHighAnalogAlarm {
-                get {
-                    return settings.enableHighAnalogAlarm;
-                }
-                set {
-                    settings.enableHighAnalogAlarm = value;
-                }
-            }
-
-            public bool enableLowAnalogAlarm {
-                get {
-                    return settings.enableLowAnalogAlarm;
-                }
-                set {
-                    settings.enableLowAnalogAlarm = value;
-                }
-            }
+            public string name;
+            public float highAnalogAlarmSetpoint;
+            public float lowAnalogAlarmSetpoint;
+            public bool enableHighAnalogAlarm;
+            public bool enableLowAnalogAlarm;
 
             public float level;
             public IDataLogger dataLogger;
@@ -94,8 +53,6 @@ namespace AquaPic.Modules
                 float lowAnalogAlarmSetpoint,
                 bool enableLowAnalogAlarm
             ) {
-                settings = new WaterLevelGroupSettings ();
-
                 this.name = name;
                 level = 0.0f;
                 dataLogger = Factory.GetDataLogger (string.Format ("{0}WaterLevel", this.name.RemoveWhitespace ()));

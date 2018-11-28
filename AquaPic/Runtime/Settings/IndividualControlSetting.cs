@@ -24,29 +24,40 @@
 using System;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.Runtime
 {
-    public class BoolSetting : ISetting<bool>
+    public class IndividualControlSetting : ISetting<IndividualControl>
     {
-        public bool Read (JObject jobj, string[] keys, bool defaultValue = false) {
-            if (keys.Length < 1) {
-                throw new ArgumentException ("keys can not be empty", nameof(keys));
+        public IndividualControl Read (JObject jobj, string[] keys) {
+            if (keys.Length < 2) {
+                throw new ArgumentException ("keys must include at least two keys", nameof(keys));
             }
 
-            var value = defaultValue;
+            var value = IndividualControl.Empty;
             var text = (string)jobj[keys[0]];
             if (text.IsNotEmpty ()) {
                 try {
-                    value = Convert.ToBoolean (text);
+                    value.Group = text;
                 } catch {
                     //
                 }
             }
+
+            text = (string)jobj[keys[1]];
+            if (text.IsNotEmpty ()) {
+                try {
+                    value.Individual = Convert.ToInt32 (text);
+                } catch {
+                    value = IndividualControl.Empty;
+                }
+            }
+
             return value;
         }
 
-        public void Write (bool value, JObject jobj, string[] keys) {
+        public void Write (IndividualControl value, JObject jobj, string[] keys) {
             if (keys.Length < 1) {
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }

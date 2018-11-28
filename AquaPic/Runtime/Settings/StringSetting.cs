@@ -22,23 +22,35 @@
 #endregion // License
 
 using System;
+using Newtonsoft.Json.Linq;
+using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Runtime
 {
-    public class StringSetting
+    public class StringSetting : ISetting<string>
     {
-        public string stringVariable;
+        public string Read (JObject jobj, string[] keys) {
+            if (keys.Length < 1) {
+                throw new ArgumentException ("keys can not be empty", nameof (keys));
+            }
 
-        public static implicit operator StringSetting (string stringVariable) {
-            return new StringSetting (stringVariable);
+            var value = string.Empty;
+            var text = (string)jobj[keys[0]];
+            if (text.IsNotEmpty ()) {
+                try {
+                    value = text;
+                } catch {
+                    //
+                }
+            }
+            return value;
         }
 
-        public static implicit operator string (StringSetting stringSetting) {
-            return stringSetting.stringVariable;
-        }
-
-        public StringSetting (string stringVariable) {
-            this.stringVariable = stringVariable;
+        public void Write (string value, JObject jobj, string[] keys) {
+            if (keys.Length < 1) {
+                throw new ArgumentException ("keys can not be empty", nameof (keys));
+            }
+            jobj[keys[0]] = value;
         }
     }
 }

@@ -23,6 +23,7 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 
@@ -61,6 +62,42 @@ namespace AquaPic.Runtime
                 }
             }
             return arrayIndex;
+        }
+
+        public static bool AddEntityToArray (string fileName, string arrayName, IGroupSettings settings) {
+            var successful = false;
+            var jo = OpenSettingsFile (fileName) as JObject;
+            if (jo != null) {
+                var ja = jo[arrayName] as JArray;
+                if (ja != null) {
+                    Type settingsType = settings.GetType ();
+                    PropertyInfo[] publicProperties = settingsType.GetProperties (BindingFlags.Public);
+                    foreach (var property in publicProperties) {
+                        var attribute = property.GetCustomAttributes (typeof (PropertySetting), true);
+                        if (attribute != null && attribute.Length > 0) {
+
+                        }
+                    }
+                }
+            }
+            return successful;
+        }
+
+        public static bool DeleteEntityInArray (string fileName, string arrayName, string entityName) {
+            var successful = false;
+            var jo = OpenSettingsFile (fileName) as JObject;
+            if (jo != null) {
+                var ja = jo[arrayName] as JArray;
+                if (ja != null) {
+                    var arrayIndex = FindSettingsInArray (ja, entityName);
+                    if (arrayIndex != -1) {
+                        ja.RemoveAt (arrayIndex);
+                        SaveSettingsFile (fileName, jo);
+                        successful = true;
+                    }
+                }
+            }
+            return successful;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace AquaPic.Modules
 {
     public partial class Lighting
     {
-        public class DimmingLightingFixture : LightingFixture
+        public class LightingFixtureDimming : LightingFixture
         {
             public float currentDimmingLevel;
             public float autoDimmingLevel;
@@ -39,7 +39,7 @@ namespace AquaPic.Modules
             public Mode dimmingMode;
             public RateOfChangeLimiter rocl;
 
-            public DimmingLightingFixture (
+            public LightingFixtureDimming (
                 string name,
                 IndividualControl plug,
                 IndividualControl channel,

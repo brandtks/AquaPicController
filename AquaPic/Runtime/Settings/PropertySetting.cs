@@ -49,15 +49,4 @@ namespace AquaPic.Runtime
         public PropertySetting (Type setting)
            : this (setting, new string[] { }, false) { }
     }
-
-    public class GroupSetting : Attribute
-    {
-        public string fileName;
-        public string groupArrayName;
-
-        public GroupSetting (string fileName, string groupArrayName) {
-            this.fileName = fileName;
-            this.groupArrayName = groupArrayName;
-        }
-    }
 }

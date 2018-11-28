@@ -73,8 +73,6 @@ namespace AquaPic.Modules
                     foreach (var jt in ja) {
                         JObject obj = jt as JObject;
 
-                        var lightingType = (string)obj["type"];
-
                         var name = (string)obj["name"];
 
                         var plug = IndividualControl.Empty;
@@ -236,7 +234,7 @@ namespace AquaPic.Modules
                 highTempLockout);
 
             if (saveToFile) {
-                SaveNewFixtureSettingsToFile (name);
+                AddFixtureSettingsToFile (name);
             }
         }
 
@@ -248,7 +246,7 @@ namespace AquaPic.Modules
             bool highTempLockout,
             bool saveToFile = true) 
         {
-            fixtures[name] = new DimmingLightingFixture (
+            fixtures[name] = new LightingFixtureDimming (
                 name,
                 plug,
                 channel,
@@ -256,7 +254,7 @@ namespace AquaPic.Modules
                 highTempLockout);
 
             if (saveToFile) {
-                SaveNewFixtureSettingsToFile (name);
+                AddFixtureSettingsToFile (name);
             }
         }
 
@@ -267,7 +265,7 @@ namespace AquaPic.Modules
             Power.RemoveOutlet (fixture.powerOutlet);
             Power.RemoveHandlerOnStateChange (fixture.powerOutlet, fixture.OnLightingPlugStateChange);
 
-            DimmingLightingFixture dimmingFixture = fixture as DimmingLightingFixture;
+            LightingFixtureDimming dimmingFixture = fixture as LightingFixtureDimming;
             if (dimmingFixture != null) {
                 Power.RemoveHandlerOnModeChange (dimmingFixture.powerOutlet, dimmingFixture.OnLightingPlugModeChange);
                 AquaPicDrivers.AnalogOutput.RemoveChannel (dimmingFixture.channel);
@@ -275,6 +273,7 @@ namespace AquaPic.Modules
 
             fixtures.Remove (fixtureName);
 
+            /*
             var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
             var ja = jo["lightingFixtures"] as JArray;
 
@@ -286,12 +285,14 @@ namespace AquaPic.Modules
             }
 
             SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
+            */
+            SettingsHelper.DeleteEntityInArray ("lightingProperties", "lightingFixtures", fixtureName);
 
             // Now remove any main screen widgets associated with the fixture
-            ja = SettingsHelper.OpenSettingsFile ("mainScreen") as JArray;
-            arrIdx = SettingsHelper.FindSettingsInArray (ja, fixtureName);
-            if (arrIdx != -1) {
-                ja.RemoveAt (arrIdx);
+            var ja = SettingsHelper.OpenSettingsFile ("mainScreen") as JArray;
+            var arrayIndex = SettingsHelper.FindSettingsInArray (ja, fixtureName);
+            if (arrayIndex != -1) {
+                ja.RemoveAt (arrayIndex);
                 SettingsHelper.SaveSettingsFile ("mainScreen", ja);
             }
         }
@@ -315,7 +316,7 @@ namespace AquaPic.Modules
             return !CheckFixtureKeyNoThrow (fixtureName);
         }
 
-        protected static void SaveNewFixtureSettingsToFile (string fixtureName) {
+        protected static void AddFixtureSettingsToFile (string fixtureName) {
             CheckFixtureKey (fixtureName);
 
             JObject jobj = new JObject ();
@@ -324,7 +325,7 @@ namespace AquaPic.Modules
             jobj.Add (new JProperty ("outlet", fixtures[fixtureName].powerOutlet.Individual.ToString ()));
             jobj.Add (new JProperty ("highTempLockout", fixtures[fixtureName].highTempLockout.ToString ()));
 
-            var dimmingFixture = fixtures[fixtureName] as DimmingLightingFixture;
+            var dimmingFixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (dimmingFixture != null) {
                 jobj.Add (new JProperty ("dimmingCard", dimmingFixture.channel.Group));
                 jobj.Add (new JProperty ("channel", dimmingFixture.channel.Individual.ToString ()));
@@ -356,7 +357,7 @@ namespace AquaPic.Modules
                 ja[arrIdx]["outlet"] = fixture.powerOutlet.Individual.ToString ();
                 ja[arrIdx]["highTempLockout"] = fixture.highTempLockout.ToString ();
 
-                var dimmingFixture = fixture as DimmingLightingFixture;
+                var dimmingFixture = fixture as LightingFixtureDimming;
                 if (dimmingFixture != null) {
                     ja[arrIdx]["dimmingCard"] = dimmingFixture.channel.Group;
                     ja[arrIdx]["channel"] = dimmingFixture.channel.Individual.ToString ();
@@ -403,7 +404,7 @@ namespace AquaPic.Modules
 
             fixture.name = newFixtureName;
             Power.SetOutletName (fixture.powerOutlet, fixture.name);
-            DimmingLightingFixture dimmingFixture = fixture as DimmingLightingFixture;
+            LightingFixtureDimming dimmingFixture = fixture as LightingFixtureDimming;
             if (dimmingFixture != null) {
                 AquaPicDrivers.AnalogOutput.SetChannelName (dimmingFixture.channel, fixture.name);
             }
@@ -439,7 +440,7 @@ namespace AquaPic.Modules
         public static IndividualControl GetDimmingChannelIndividualControl (string fixtureName) {
             CheckFixtureKey (fixtureName);
 
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
+            var fixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (fixture != null) {
                 return fixture.channel;
             }
@@ -450,7 +451,7 @@ namespace AquaPic.Modules
         public static void SetDimmingChannelIndividualControl (string fixtureName, IndividualControl ic) {
             CheckFixtureKey (fixtureName);
 
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
+            var fixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (fixture != null) {
                 AnalogType type = AquaPicDrivers.AnalogOutput.GetChannelType (fixture.channel);
                 AquaPicDrivers.AnalogOutput.RemoveChannel (fixture.channel);
@@ -483,7 +484,7 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         public static bool IsDimmingFixture (string fixtureName) {
             CheckFixtureKey (fixtureName);
-            return fixtures[fixtureName] is DimmingLightingFixture;
+            return fixtures[fixtureName] is LightingFixtureDimming;
         }
 
         /**************************************************************************************************************/
@@ -492,7 +493,7 @@ namespace AquaPic.Modules
         public static float GetCurrentDimmingLevel (string fixtureName) {
             CheckFixtureKey (fixtureName);
 
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
+            var fixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (fixture != null)
                 return fixture.currentDimmingLevel;
 
@@ -502,7 +503,7 @@ namespace AquaPic.Modules
         public static float GetAutoDimmingLevel (string fixtureName) {
             CheckFixtureKey (fixtureName);
 
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
+            var fixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (fixture != null)
                 return fixture.autoDimmingLevel;
 
@@ -512,7 +513,7 @@ namespace AquaPic.Modules
         public static float GetRequestedDimmingLevel (string fixtureName) {
             CheckFixtureKey (fixtureName);
 
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
+            var fixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (fixture != null)
                 return fixture.requestedDimmingLevel;
 
@@ -522,7 +523,7 @@ namespace AquaPic.Modules
         public static void SetDimmingLevel (string fixtureName, float level) {
             CheckFixtureKey (fixtureName);
 
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
+            var fixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (fixture != null) {
                 if (fixture.dimmingMode == Mode.Manual)
                     fixture.requestedDimmingLevel = level;
@@ -538,7 +539,7 @@ namespace AquaPic.Modules
         public static Mode GetDimmingMode (string fixtureName) {
             CheckFixtureKey (fixtureName);
 
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
+            var fixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (fixture != null)
                 return fixture.dimmingMode;
 
@@ -548,7 +549,7 @@ namespace AquaPic.Modules
         public static void SetDimmingMode (string fixtureName, Mode mode) {
             CheckFixtureKey (fixtureName);
 
-            var fixture = fixtures[fixtureName] as DimmingLightingFixture;
+            var fixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (fixture != null) {
                 fixture.dimmingMode = mode;
                 return;

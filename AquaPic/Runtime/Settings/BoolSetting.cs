@@ -22,23 +22,35 @@
 #endregion // License
 
 using System;
+using Newtonsoft.Json.Linq;
+using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Runtime
 {
-    public class BoolSetting
+    public class BoolSetting : ISetting<bool>
     {
-        public bool boolVariable;
+        public bool Read (JObject jobj, string[] keys) {
+            if (keys.Length < 1) {
+                throw new ArgumentException ("keys can not be empty", nameof(keys));
+            }
 
-        public static implicit operator BoolSetting (bool boolVariable) {
-            return new BoolSetting (boolVariable);
+            var value = false;
+            var text = (string)jobj[keys[0]];
+            if (text.IsNotEmpty ()) {
+                try {
+                    value = Convert.ToBoolean (text);
+                } catch {
+                    //
+                }
+            }
+            return value;
         }
 
-        public static implicit operator bool (BoolSetting boolSetting) {
-            return boolSetting.boolVariable;
-        }
-
-        public BoolSetting (bool boolVariable) {
-            this.boolVariable = boolVariable;
+        public void Write (bool value, JObject jobj, string[] keys) {
+            if (keys.Length < 1) {
+                throw new ArgumentException ("keys can not be empty", nameof (keys));
+            }
+            jobj[keys[0]] = value.ToString ();
         }
     }
 }

@@ -28,12 +28,10 @@ namespace AquaPic.Modules
 {
     public class WaterLevelGroupSettings
     {
-        public StringSetting name;
-
-        public FloatSetting highAnalogAlarmSetpoint;
-        public BoolSetting enableHighAnalogAlarm;
-
-        public FloatSetting lowAnalogAlarmSetpoint;
-        public BoolSetting enableLowAnalogAlarm;
+        public string name;
+        public float highAnalogAlarmSetpoint;
+        public bool enableHighAnalogAlarm;
+        public float lowAnalogAlarmSetpoint;
+        public bool enableLowAnalogAlarm;
     }
 }

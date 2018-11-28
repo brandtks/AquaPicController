@@ -22,23 +22,35 @@
 #endregion // License
 
 using System;
+using Newtonsoft.Json.Linq;
+using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Runtime
 {
-    public class FloatSetting
+    public class FloatSetting : ISetting<float>
     {
-        public float floatVariable;
+        public float Read (JObject jobj, string[] keys) {
+            if (keys.Length < 1) {
+                throw new ArgumentException ("keys can not be empty", nameof (keys));
+            }
 
-        public static implicit operator FloatSetting (float floatVariable) {
-            return new FloatSetting (floatVariable);
+            var value = 0f;
+            var text = (string)jobj[keys[0]];
+            if (text.IsNotEmpty ()) {
+                try {
+                    value = Convert.ToSingle (text);
+                } catch {
+                    //
+                }
+            }
+            return value;
         }
 
-        public static implicit operator float (FloatSetting floatSetting) {
-            return floatSetting.floatVariable;
-        }
-
-        public FloatSetting (float floatVariable) {
-            this.floatVariable = floatVariable;
+        public void Write (float value, JObject jobj, string[] keys) {
+            if (keys.Length < 1) {
+                throw new ArgumentException ("keys can not be empty", nameof (keys));
+            }
+            jobj[keys[0]] = value.ToString ();
         }
     }
 }

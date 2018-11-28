@@ -146,7 +146,7 @@
     <Compile Include="Domain\Operands\IOperand.cs" />
     <Compile Include="Runtime\Settings\SettingsHelper.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroupSettings.cs" />
-    <Compile Include="Runtime\Settings\SettingsAttributes.cs" />
+    <Compile Include="Runtime\Settings\PropertySetting.cs" />
     <Compile Include="Runtime\Settings\StringSetting.cs" />
     <Compile Include="Runtime\Settings\FloatSetting.cs" />
     <Compile Include="Runtime\Settings\BoolSetting.cs" />
@@ -161,7 +161,11 @@
     <Compile Include="Modules\Lights\Lighting.cs" />
     <Compile Include="Modules\Lights\LightingFixture.cs" />
     <Compile Include="Modules\Lights\LightingState.cs" />
-    <Compile Include="Modules\Lights\DimmingLightingFixture.cs" />
+    <Compile Include="Modules\Lights\LightingFixtureDimming.cs" />
+    <Compile Include="Modules\Lights\LightingFixtureSettings.cs" />
+    <Compile Include="Runtime\Settings\ISetting.cs" />
+    <Compile Include="Runtime\Settings\IndividualControlSetting.cs" />
+    <Compile Include="Runtime\Settings\IGroupSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

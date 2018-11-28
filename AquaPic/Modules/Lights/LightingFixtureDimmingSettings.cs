@@ -22,18 +22,12 @@
 #endregion // License
 
 using System;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
-using AquaPic.Drivers;
-using AquaPic.Runtime;
 
 namespace AquaPic.Modules
 {
-    public class LightingFixtureSettings
+    public class LightingFixtureDimmingSettings
     {
-        public string name;
-        public IndividualControl powerOutlet;
-        public bool highTempLockout;
 
     }
 }
