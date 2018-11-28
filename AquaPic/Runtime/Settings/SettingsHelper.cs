@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Newtonsoft.Json.Linq;
@@ -70,14 +71,21 @@ namespace AquaPic.Runtime
             if (jo != null) {
                 var ja = jo[arrayName] as JArray;
                 if (ja != null) {
-                    Type settingsType = settings.GetType ();
-                    PropertyInfo[] publicProperties = settingsType.GetProperties (BindingFlags.Public);
-                    foreach (var property in publicProperties) {
-                        var attribute = property.GetCustomAttributes (typeof (PropertySetting), true);
-                        if (attribute != null && attribute.Length > 0) {
+                    var jobj = new JObject ();
+                    var reflectedSettings = GetReflectedSettings (settings);
+                    foreach (var reflectedSetting in reflectedSettings) {
+                        Console.WriteLine ("Setting: {0}", reflectedSetting);
+                        var setting = reflectedSetting.setting;
 
+                        if (!setting.optional || (setting.optional && reflectedSetting.value != null)) {
+                            foreach (var key in setting.keys) {
+                                jobj.Add (new JProperty (key, reflectedSetting.value.ToString ()));
+                            }
                         }
                     }
+                    ja.Add (jobj);
+                    SaveSettingsFile (fileName, jo);
+                    successful = true;
                 }
             }
             return successful;
@@ -98,6 +106,30 @@ namespace AquaPic.Runtime
                 }
             }
             return successful;
+        }
+
+        public static bool UpdateEntityInArray (string fileName, string arrayName, string oldEntityName, IGroupSettings settings) {
+            var successful = DeleteEntityInArray (fileName, arrayName, oldEntityName);
+            if (successful) {
+                successful = AddEntityToArray (fileName, arrayName, settings);
+            }
+            return successful;
+        }
+
+        public static List<ReflectedSetting> GetReflectedSettings (IGroupSettings settings) {
+            var reflectedSettings = new List<ReflectedSetting> ();
+            Type settingsType = settings.GetType ();
+            PropertyInfo[] publicProperties = settingsType.GetProperties (BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
+            foreach (var property in publicProperties) {
+                Console.WriteLine ("property: {0}", property);
+                var attribute = property.GetCustomAttributes (typeof (PropertySetting), false);
+                if (attribute != null && attribute.Length > 0) {
+                    var setting = (PropertySetting)attribute[0];
+                    var value = property.GetValue (settings);
+                    reflectedSettings.Add (new ReflectedSetting (setting, value));
+                }
+            }
+            return reflectedSettings;
         }
     }
 }

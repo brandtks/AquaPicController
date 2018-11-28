@@ -319,6 +319,7 @@ namespace AquaPic.Modules
         protected static void AddFixtureSettingsToFile (string fixtureName) {
             CheckFixtureKey (fixtureName);
 
+            /*
             JObject jobj = new JObject ();
             jobj.Add (new JProperty ("name", fixtureName));
             jobj.Add (new JProperty ("powerStrip", fixtures[fixtureName].powerOutlet.Group));
@@ -337,6 +338,9 @@ namespace AquaPic.Modules
             ja.Add (jobj);
 
             SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
+            */
+
+            SettingsHelper.AddEntityToArray ("lightingProperties", "lightingFixtures", GetLightingFixtureSettings (fixtureName));
         }
 
         public static void SaveFixtureSettingsToFile (string fixtureName) {
@@ -346,6 +350,7 @@ namespace AquaPic.Modules
         public static void SaveFixtureSettingsToFile (string fixtureName, string savedFixtureName) {
             CheckFixtureKey (fixtureName);
 
+            /*
             var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
             var ja = jo["lightingFixtures"] as JArray;
 
@@ -381,6 +386,9 @@ namespace AquaPic.Modules
             } else {
                 Logger.AddError ("Tried to save a lighting fixture that wasn't in the setting file");
             }
+            */
+
+            SettingsHelper.UpdateEntityInArray ("lightingProperties", "lightingFixtures", savedFixtureName, GetLightingFixtureSettings (fixtureName));
         }
 
         /**************************************************************************************************************/
@@ -561,7 +569,7 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Lighting States                                                                                            */
         /**************************************************************************************************************/
-        public static LightingState[] GetLightingStates (string fixtureName) {
+        public static LightingState[] GetLightingFixtureLightingStates (string fixtureName) {
             CheckFixtureKey (fixtureName);
             var lightingStates = new List<LightingState> ();
             foreach (var state in fixtures[fixtureName].lightingStates) {
@@ -570,12 +578,26 @@ namespace AquaPic.Modules
             return lightingStates.ToArray ();
         }
 
-        public static void SetLightingStates (string fixtureName, LightingState[] lightingStates, bool temporaryChange = true) {
+        public static void SetLightingFixtureLightingStates (string fixtureName, LightingState[] lightingStates, bool temporaryChange = true) {
             CheckFixtureKey (fixtureName);
             fixtures[fixtureName].UpdateLightingStates (lightingStates, temporaryChange);
         }
 
-
+        /**************************************************************************************************************/
+        /* Settings                                                                                                   */
+        /**************************************************************************************************************/
+        public static LightingFixtureSettings GetLightingFixtureSettings (string fixtureName) {
+            CheckFixtureKey (fixtureName);
+            var settings = new LightingFixtureSettings ();
+            settings.name = fixtureName;
+            settings.powerOutlet = GetFixtureOutletIndividualControl (fixtureName);
+            settings.highTempLockout = GetFixtureTemperatureLockout (fixtureName);
+            settings.lightingStates = GetLightingFixtureLightingStates (fixtureName);
+            if (IsDimmingFixture (fixtureName)) {
+                settings.dimmingOutlet = GetDimmingChannelIndividualControl (fixtureName);
+            }
+            return settings;
+        }
     }
 }
 

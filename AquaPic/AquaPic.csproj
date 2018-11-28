@@ -166,6 +166,8 @@
     <Compile Include="Runtime\Settings\ISetting.cs" />
     <Compile Include="Runtime\Settings\IndividualControlSetting.cs" />
     <Compile Include="Runtime\Settings\IGroupSettings.cs" />
+    <Compile Include="Tests\Runtime\Settings\SettingsHelperTest.cs" />
+    <Compile Include="Runtime\Settings\ReflectedSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -188,6 +190,8 @@
     <Folder Include="Tests\Domain\" />
     <Folder Include="Tests\Domain\Timer\" />
     <Folder Include="Tests\Domain\TimePeriod\" />
+    <Folder Include="Tests\Runtime\" />
+    <Folder Include="Tests\Runtime\Settings\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">

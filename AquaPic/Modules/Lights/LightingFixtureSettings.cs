@@ -32,20 +32,20 @@ namespace AquaPic.Modules
 {
     public class LightingFixtureSettings : IGroupSettings
     {
-        [PropertySetting (typeof(StringSetting), "name")]
-        public string name;
+        [PropertySetting (typeof (StringSetting), "name")]
+        public string name { get; set; }
 
         [PropertySetting (typeof (IndividualControlSetting), new string[] { "powerStrip", "outlet" })]
         public IndividualControl powerOutlet;
 
         [PropertySetting (typeof (BoolSetting), "highTempLockout")]
-        public bool highTempLockout;
-
-        [PropertySetting (typeof (IndividualControlSetting), new string[] { "dimmingCard", "channel" }, true)]
-        public IndividualControl dimmingOutlet;
+        public bool highTempLockout { get; set; }
 
         [PropertySetting (typeof (LightingStatesSetting))]
-        public LightingState[] lightingStates;
+        public LightingState[] lightingStates { get; set; }
+
+        [PropertySetting (typeof (IndividualControlSetting), new string[] { "dimmingCard", "channel" }, true)]
+        public IndividualControl dimmingOutlet { get; set; }
     }
 
     public class LightingStatesSetting : ISetting<LightingState[]>
@@ -114,7 +114,7 @@ namespace AquaPic.Modules
             var fixtureName = string.Empty;
             var fixtures = Lighting.GetAllFixtureNames ();
             foreach (var fixture in fixtures) {
-                var lightingStates = Lighting.GetLightingStates (fixture);
+                var lightingStates = Lighting.GetLightingFixtureLightingStates (fixture);
                 if (value.Equals (lightingStates)) {
                     fixtureName = fixture;
                 }

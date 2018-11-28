@@ -99,7 +99,7 @@ namespace AquaPic.UserInterface
                         if (a.ResponseId != ResponseType.Cancel) {
                             var makeChangePermanant = a.ResponseId == ResponseType.Yes;
 
-                            Lighting.SetLightingStates (
+                            Lighting.SetLightingFixtureLightingStates (
                                 fixtureName,
                                 lightingStateDisplay.lightingStates,
                                 !makeChangePermanant);
@@ -158,7 +158,7 @@ namespace AquaPic.UserInterface
         public void SetStates (string fixtureName) {
             this.fixtureName = fixtureName;
             lightingStateDisplay.SetStates (
-                Lighting.GetLightingStates (fixtureName),
+                Lighting.GetLightingFixtureLightingStates (fixtureName),
                 Lighting.IsDimmingFixture (fixtureName));
         }
     }
