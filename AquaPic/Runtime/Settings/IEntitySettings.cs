@@ -22,13 +22,10 @@
 #endregion // License
 
 using System;
-using Newtonsoft.Json.Linq;
 
 namespace AquaPic.Runtime
 {
-    public interface ISetting<T>
+    public interface IEntitySettings
     {
-        T Read (JObject jobj, string[] keys);
-        void Write (T value, JObject jobj, string[] keys);
     }
 }

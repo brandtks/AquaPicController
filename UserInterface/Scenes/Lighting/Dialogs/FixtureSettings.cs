@@ -215,7 +215,7 @@ namespace AquaPic.UserInterface
                         chIc = Lighting.GetDimmingChannelIndividualControl (fixtureName);
                     }
 
-                    Lighting.SaveFixtureSettingsToFile (fixtureName, oldName);
+                    Lighting.UpdateFixtureSettingsToFile (fixtureName, oldName);
                 } else {
                     MessageBox.Show ("Can't change dimmablility");
                     return false;

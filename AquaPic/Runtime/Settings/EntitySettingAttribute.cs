@@ -22,31 +22,35 @@
 #endregion // License
 
 using System;
+using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Runtime
 {
-    public class PropertySetting : Attribute
+    public class EntitySettingAttribute : Attribute
     {
-        public ISetting<object> setting;
+        public Type mutatorType;
         public string[] keys;
         public bool optional;
 
-        public PropertySetting (Type setting, string[] keys, bool optional) {
-            this.setting = (ISetting<object>)Activator.CreateInstance (setting); ;
+        public EntitySettingAttribute (Type mutatorType, string[] keys, bool optional) {
+            if (!mutatorType.TypeIs (typeof (ISettingMutator<>))) {
+                throw new ArgumentException ("The mutator type must derive ISettingMutator<T>", nameof (mutatorType));
+            }
+            this.mutatorType = mutatorType;
             this.keys = keys;
             this.optional = optional;
         }
 
-        public PropertySetting (Type setting, string keys, bool optional)
-            : this (setting, new string[] { keys }, optional) { }
+        public EntitySettingAttribute (Type mutatorType, string key, bool optional)
+            : this (mutatorType, new string[] { key }, optional) { }
 
-        public PropertySetting (Type setting, string[] keys)
-            : this (setting, keys, false) { }
+        public EntitySettingAttribute (Type mutatorType, string[] keys)
+            : this (mutatorType, keys, false) { }
 
-        public PropertySetting (Type setting, string keys)
-            : this (setting, new string[] { keys }, false) { }
+        public EntitySettingAttribute (Type mutatorType, string key)
+            : this (mutatorType, new string[] { key }, false) { }
 
-        public PropertySetting (Type setting)
-           : this (setting, new string[] { }, false) { }
+        public EntitySettingAttribute (Type mutatorType)
+            : this (mutatorType, new string[] { }, false) { }
     }
 }

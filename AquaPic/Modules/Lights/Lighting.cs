@@ -66,144 +66,9 @@ namespace AquaPic.Modules
             path = Path.Combine (path, "lightingProperties.json");
 
             if (File.Exists (path)) {
-                using (StreamReader reader = File.OpenText (path)) {
-                    var jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
-
-                    var ja = jo["lightingFixtures"] as JArray;
-                    foreach (var jt in ja) {
-                        JObject obj = jt as JObject;
-
-                        var name = (string)obj["name"];
-
-                        var plug = IndividualControl.Empty;
-                        var text = (string)obj["powerStrip"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                plug.Group = text;
-                            } catch {
-                                //
-                            }
-                        }
-
-                        if (plug.Group.IsNotEmpty ()) {
-                            text = (string)obj["outlet"];
-                            if (text.IsEmpty ()) {
-                                plug = IndividualControl.Empty;
-                            } else {
-                                try {
-                                    plug.Individual = Convert.ToInt32 (text);
-                                } catch {
-                                    plug = IndividualControl.Empty;
-                                }
-                            }
-                        }
-
-                        bool highTempLockout = true;
-                        text = (string)obj["highTempLockout"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                highTempLockout = Convert.ToBoolean (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var lightingStates = new List<LightingState> ();
-                        var jaEvents = obj["events"] as JArray;
-                        foreach (var jtEvent in jaEvents) {
-                            JObject joEvent = jtEvent as JObject;
-
-                            var startTimeDescriptor = (string)joEvent["startTimeDescriptor"];
-                            var endTimeDescriptor = (string)joEvent["endTimeDescriptor"];
-   
-                            var type = LightingStateType.Off;
-                            text = (string)joEvent["type"];
-                            if (text.IsNotEmpty ()) {
-                                try {
-                                    type = (LightingStateType)Enum.Parse (typeof (LightingStateType), text);
-                                } catch {
-                                    //
-                                }
-                            }
-
-                            LightingState state;
-                            if (joEvent.ContainsKey ("startingDimmingLevel")) {
-                                var startingDimmingLevel = 0.0f;
-                                text = (string)joEvent["startingDimmingLevel"];
-                                if (text.IsNotEmpty ()) {
-                                    try {
-                                        startingDimmingLevel = Convert.ToSingle (text);
-                                    } catch {
-                                        //
-                                    }
-                                }
-
-                                var endingDimmingLevel = 0.0f;
-                                text = (string)joEvent["endingDimmingLevel"];
-                                if (text.IsNotEmpty ()) {
-                                    try {
-                                        endingDimmingLevel = Convert.ToSingle (text);
-                                    } catch {
-                                        //
-                                    }
-                                }
-
-                                state = new LightingState (
-                                    startTimeDescriptor,
-                                    endTimeDescriptor,
-                                    type,
-                                    startingDimmingLevel,
-                                    endingDimmingLevel);
-
-                            } else {
-                                state = new LightingState (
-                                    startTimeDescriptor,
-                                    endTimeDescriptor,
-                                    type);
-                            }
-                            lightingStates.Add (state);
-                        }
-
-                        if (obj.ContainsKey ("dimmingCard")) {
-                            var channel = IndividualControl.Empty;
-                            text = (string)obj["dimmingCard"];
-                            if (text.IsNotEmpty ()) {
-                                try {
-                                    channel.Group = text;
-                                } catch {
-                                    //
-                                }
-                            }
-
-                            if (channel.Group.IsNotEmpty ()) {
-                                text = (string)obj["channel"];
-                                if (text.IsEmpty ()) {
-                                    channel = IndividualControl.Empty;
-                                } else {
-                                    try {
-                                        channel.Individual = Convert.ToInt32 (text);
-                                    } catch {
-                                        channel = IndividualControl.Empty;
-                                    }
-                                }
-                            }
-
-                            AddLight (
-                                name,
-                                plug,
-                                channel,
-                                lightingStates.ToArray (),
-                                highTempLockout,
-                                false);
-                        } else {
-                            AddLight (
-                                name,
-                                plug,
-                                lightingStates.ToArray (),
-                                highTempLockout,
-                                false);
-                        }
-                    }
+                var fixturesSettings = SettingsHelper.ReadAllSettingsInArray< LightingFixtureSettings> ("lightingProperties", "lightingFixtures");
+                foreach (var settings in fixturesSettings) {
+                    AddLight (settings, false);
                 }
             } else {
                 Logger.Add ("Lighting settings file did not exist, created new lighting settings");
@@ -220,16 +85,35 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Lighting fixtures                                                                                          */
         /**************************************************************************************************************/
+        public static void AddLight (LightingFixtureSettings settings, bool saveToFile = true) {
+            if (settings.dimmingOutlet.IsNotEmpty ()) {
+                AddLight (
+                    settings.name,
+                    settings.powerOutlet,
+                    settings.dimmingOutlet,
+                    settings.lightingStates,
+                    settings.highTempLockout,
+                    saveToFile);
+            } else {
+                AddLight (
+                    settings.name,
+                    settings.powerOutlet,
+                    settings.lightingStates,
+                    settings.highTempLockout,
+                    saveToFile);
+            }
+        }
+
         public static void AddLight (
             string name,
-            IndividualControl plug,
+            IndividualControl powerOutlet,
             LightingState[] lightingStates,
             bool highTempLockout,
             bool saveToFile = true) 
         {
             fixtures[name] = new LightingFixture (
                 name,
-                plug,
+                powerOutlet,
                 lightingStates,
                 highTempLockout);
 
@@ -240,7 +124,7 @@ namespace AquaPic.Modules
 
         public static void AddLight (
             string name,
-            IndividualControl plug,
+            IndividualControl powerOutlet,
             IndividualControl channel,
             LightingState[] lightingStates,
             bool highTempLockout,
@@ -248,7 +132,7 @@ namespace AquaPic.Modules
         {
             fixtures[name] = new LightingFixtureDimming (
                 name,
-                plug,
+                powerOutlet,
                 channel,
                 lightingStates,
                 highTempLockout);
@@ -273,20 +157,7 @@ namespace AquaPic.Modules
 
             fixtures.Remove (fixtureName);
 
-            /*
-            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
-            var ja = jo["lightingFixtures"] as JArray;
-
-            int arrIdx = SettingsHelper.FindSettingsInArray (ja, fixtureName);
-            if (arrIdx != -1) {
-                ja.RemoveAt (arrIdx);
-            } else {
-                Logger.AddError ("Tried to delete a lighting fixture that wasn't in the setting file");
-            }
-
-            SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
-            */
-            SettingsHelper.DeleteEntityInArray ("lightingProperties", "lightingFixtures", fixtureName);
+            SettingsHelper.DeleteSettingsFromArray ("lightingProperties", "lightingFixtures", fixtureName);
 
             // Now remove any main screen widgets associated with the fixture
             var ja = SettingsHelper.OpenSettingsFile ("mainScreen") as JArray;
@@ -295,6 +166,20 @@ namespace AquaPic.Modules
                 ja.RemoveAt (arrayIndex);
                 SettingsHelper.SaveSettingsFile ("mainScreen", ja);
             }
+        }
+
+        protected static void AddFixtureSettingsToFile (string fixtureName) {
+            CheckFixtureKey (fixtureName);
+            SettingsHelper.AddSettingsToArray ("lightingProperties", "lightingFixtures", GetLightingFixtureSettings (fixtureName));
+        }
+
+        public static void UpdateFixtureSettingsToFile (string fixtureName) {
+            UpdateFixtureSettingsToFile (fixtureName, fixtureName);
+        }
+
+        public static void UpdateFixtureSettingsToFile (string fixtureName, string savedFixtureName) {
+            CheckFixtureKey (fixtureName);
+            SettingsHelper.UpdateSettingsInArray ("lightingProperties", "lightingFixtures", savedFixtureName, GetLightingFixtureSettings (fixtureName));
         }
 
         public static void CheckFixtureKey (string fixtureName) {
@@ -314,81 +199,6 @@ namespace AquaPic.Modules
 
         public static bool FixtureNameOk (string fixtureName) {
             return !CheckFixtureKeyNoThrow (fixtureName);
-        }
-
-        protected static void AddFixtureSettingsToFile (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-
-            /*
-            JObject jobj = new JObject ();
-            jobj.Add (new JProperty ("name", fixtureName));
-            jobj.Add (new JProperty ("powerStrip", fixtures[fixtureName].powerOutlet.Group));
-            jobj.Add (new JProperty ("outlet", fixtures[fixtureName].powerOutlet.Individual.ToString ()));
-            jobj.Add (new JProperty ("highTempLockout", fixtures[fixtureName].highTempLockout.ToString ()));
-
-            var dimmingFixture = fixtures[fixtureName] as LightingFixtureDimming;
-            if (dimmingFixture != null) {
-                jobj.Add (new JProperty ("dimmingCard", dimmingFixture.channel.Group));
-                jobj.Add (new JProperty ("channel", dimmingFixture.channel.Individual.ToString ()));
-            }
-            jobj.Add (new JProperty ("events", new JArray ()));
-
-            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
-            var ja = jo["lightingFixtures"] as JArray;
-            ja.Add (jobj);
-
-            SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
-            */
-
-            SettingsHelper.AddEntityToArray ("lightingProperties", "lightingFixtures", GetLightingFixtureSettings (fixtureName));
-        }
-
-        public static void SaveFixtureSettingsToFile (string fixtureName) {
-            SaveFixtureSettingsToFile (fixtureName, fixtureName);
-        }
-
-        public static void SaveFixtureSettingsToFile (string fixtureName, string savedFixtureName) {
-            CheckFixtureKey (fixtureName);
-
-            /*
-            var jo = SettingsHelper.OpenSettingsFile ("lightingProperties") as JObject;
-            var ja = jo["lightingFixtures"] as JArray;
-
-            int arrIdx = SettingsHelper.FindSettingsInArray (ja, savedFixtureName);
-            if (arrIdx != -1) {
-                var fixture = fixtures[fixtureName];
-                ja[arrIdx]["name"] = fixture.name;
-                ja[arrIdx]["powerStrip"] = fixture.powerOutlet.Group;
-                ja[arrIdx]["outlet"] = fixture.powerOutlet.Individual.ToString ();
-                ja[arrIdx]["highTempLockout"] = fixture.highTempLockout.ToString ();
-
-                var dimmingFixture = fixture as LightingFixtureDimming;
-                if (dimmingFixture != null) {
-                    ja[arrIdx]["dimmingCard"] = dimmingFixture.channel.Group;
-                    ja[arrIdx]["channel"] = dimmingFixture.channel.Individual.ToString ();
-                }
-
-                var jarr = new JArray ();
-                foreach (var state in fixture.lightingStates) {
-                    JObject jobj = new JObject ();
-                    jobj.Add (new JProperty ("startTimeDescriptor", state.startTimeDescriptor));
-                    jobj.Add (new JProperty ("endTimeDescriptor", state.endTimeDescriptor));
-                    jobj.Add (new JProperty ("type", state.type.ToString ()));
-                    if (dimmingFixture != null) {
-                        jobj.Add (new JProperty ("startingDimmingLevel", state.startingDimmingLevel.ToString ()));
-                        jobj.Add (new JProperty ("endingDimmingLevel", state.endingDimmingLevel.ToString ()));
-                    }
-                    jarr.Add (jobj);
-                }
-                ja[arrIdx]["events"] = jarr;
-
-                SettingsHelper.SaveSettingsFile ("lightingProperties", jo);
-            } else {
-                Logger.AddError ("Tried to save a lighting fixture that wasn't in the setting file");
-            }
-            */
-
-            SettingsHelper.UpdateEntityInArray ("lightingProperties", "lightingFixtures", savedFixtureName, GetLightingFixtureSettings (fixtureName));
         }
 
         /**************************************************************************************************************/

@@ -27,14 +27,14 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Runtime
 {
-    public class BoolSetting : ISetting<bool>
+    public class BoolMutator : ISettingMutator<bool>
     {
         public bool Read (JObject jobj, string[] keys) {
             if (keys.Length < 1) {
                 throw new ArgumentException ("keys can not be empty", nameof(keys));
             }
 
-            var value = false;
+            var value = Default ();
             var text = (string)jobj[keys[0]];
             if (text.IsNotEmpty ()) {
                 try {
@@ -51,6 +51,21 @@ namespace AquaPic.Runtime
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
             jobj[keys[0]] = value.ToString ();
+        }
+
+        public bool Valid (bool value) {
+            return true;
+        }
+
+        public virtual bool Default () {
+            return false;
+        }
+    }
+
+    public class BoolMutatorDefaultTrue : BoolMutator
+    {
+        public override bool Default () {
+            return true;
         }
     }
 }

@@ -27,14 +27,14 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Runtime
 {
-    public class FloatSetting : ISetting<float>
+    public class FloatMutator : ISettingMutator<float>
     {
         public float Read (JObject jobj, string[] keys) {
             if (keys.Length < 1) {
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
 
-            var value = 0f;
+            var value = Default ();
             var text = (string)jobj[keys[0]];
             if (text.IsNotEmpty ()) {
                 try {
@@ -51,6 +51,14 @@ namespace AquaPic.Runtime
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
             jobj[keys[0]] = value.ToString ();
+        }
+
+        public bool Valid (float value) {
+            return true;
+        }
+
+        public virtual float Default () {
+            return 0f;
         }
     }
 }

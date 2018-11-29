@@ -30,25 +30,25 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Modules
 {
-    public class LightingFixtureSettings : IGroupSettings
+    public class LightingFixtureSettings : IEntitySettings
     {
-        [PropertySetting (typeof (StringSetting), "name")]
+        [EntitySetting (typeof (StringMutator), "name")]
         public string name { get; set; }
 
-        [PropertySetting (typeof (IndividualControlSetting), new string[] { "powerStrip", "outlet" })]
-        public IndividualControl powerOutlet;
+        [EntitySetting (typeof (IndividualControlMutator), new string[] { "powerStrip", "outlet" })]
+        public IndividualControl powerOutlet { get; set; }
 
-        [PropertySetting (typeof (BoolSetting), "highTempLockout")]
+        [EntitySetting (typeof (BoolMutatorDefaultTrue), "highTempLockout")]
         public bool highTempLockout { get; set; }
 
-        [PropertySetting (typeof (LightingStatesSetting))]
+        [EntitySetting (typeof (LightingStatesMutator))]
         public LightingState[] lightingStates { get; set; }
 
-        [PropertySetting (typeof (IndividualControlSetting), new string[] { "dimmingCard", "channel" }, true)]
+        [EntitySetting (typeof (IndividualControlMutator), new string[] { "dimmingCard", "channel" }, true)]
         public IndividualControl dimmingOutlet { get; set; }
     }
 
-    public class LightingStatesSetting : ISetting<LightingState[]>
+    public class LightingStatesMutator : ISettingMutator<LightingState[]>
     {
         public LightingState[] Read (JObject jobj, string[] keys) {
             var lightingStates = new List<LightingState> ();
@@ -135,6 +135,14 @@ namespace AquaPic.Modules
                 ja.Add (jo);
             }
             jobj["events"] = ja;
+        }
+
+        public bool Valid (LightingState[] states) {
+            return true;
+        }
+
+        public LightingState[] Default () {
+            return new LightingState[0];
         }
     }
 }

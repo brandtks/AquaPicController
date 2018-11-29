@@ -24,44 +24,41 @@
 using System;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Globals;
 
 namespace AquaPic.Runtime
 {
-    public class IndividualControlSetting : ISetting<IndividualControl>
+    public class StringMutator : ISettingMutator<string>
     {
-        public IndividualControl Read (JObject jobj, string[] keys) {
-            if (keys.Length < 2) {
-                throw new ArgumentException ("keys must include at least two keys", nameof(keys));
+        public string Read (JObject jobj, string[] keys) {
+            if (keys.Length < 1) {
+                throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
 
-            var value = IndividualControl.Empty;
+            var value = Default ();
             var text = (string)jobj[keys[0]];
             if (text.IsNotEmpty ()) {
                 try {
-                    value.Group = text;
+                    value = text;
                 } catch {
                     //
                 }
             }
-
-            text = (string)jobj[keys[1]];
-            if (text.IsNotEmpty ()) {
-                try {
-                    value.Individual = Convert.ToInt32 (text);
-                } catch {
-                    value = IndividualControl.Empty;
-                }
-            }
-
             return value;
         }
 
-        public void Write (IndividualControl value, JObject jobj, string[] keys) {
+        public void Write (string value, JObject jobj, string[] keys) {
             if (keys.Length < 1) {
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
-            jobj[keys[0]] = value.ToString ();
+            jobj[keys[0]] = value;
+        }
+
+        public bool Valid (string value) {
+            return value.IsNotEmpty ();
+        }
+
+        public string Default () {
+            return string.Empty;
         }
     }
 }

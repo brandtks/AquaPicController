@@ -105,7 +105,7 @@ namespace AquaPic.UserInterface
                                 !makeChangePermanant);
 
                             if (makeChangePermanant) {
-                                Lighting.SaveFixtureSettingsToFile (fixtureName);
+                                Lighting.UpdateFixtureSettingsToFile (fixtureName);
                             }
 
                             lightingStateDisplay.selectedState = -1;

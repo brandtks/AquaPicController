@@ -33,7 +33,7 @@ namespace AquaPic.Runtime
     public class SettingsHelper
     {
         public static JToken OpenSettingsFile (string fileName) {
-            if (!fileName.EndsWith (".json")) {
+            if (!fileName.EndsWith (".json", StringComparison.InvariantCultureIgnoreCase)) {
                 fileName = string.Format ("{0}.json", fileName);
             }
             var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
@@ -44,7 +44,7 @@ namespace AquaPic.Runtime
         }
 
         public static void SaveSettingsFile (string fileName, JToken settings) {
-            if (!fileName.EndsWith (".json")) {
+            if (!fileName.EndsWith (".json", StringComparison.InvariantCultureIgnoreCase)) {
                 fileName = string.Format ("{0}.json", fileName);
             }
             var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
@@ -65,7 +65,55 @@ namespace AquaPic.Runtime
             return arrayIndex;
         }
 
-        public static bool AddEntityToArray (string fileName, string arrayName, IGroupSettings settings) {
+        public static EntitySettings[] ReadAllSettingsInArray<EntitySettings> (string fileName, string arrayName) where EntitySettings : IEntitySettings {
+            // Create a list to store all the entity settings
+            var allEntitySettings = new List<EntitySettings> ();
+
+            // Open the settings file and read in the JSON object
+            var jo = OpenSettingsFile (fileName) as JObject;
+            // If the JSON object exists
+            if (jo != null) {
+                // Get the JSON array
+                var ja = jo[arrayName] as JArray;
+                // If the JSON array exists
+                if (ja != null) {
+                    // Get the type of the entity settings
+                    var entitySettingsType = typeof (EntitySettings);
+                    // For each of the JSON tokens in the array
+                    foreach (var jt in ja) {
+                        // Convert the JSCON token to a JSON object
+                        var jobj = jt as JObject;
+                        // Create a new instance of the entity settings
+                        var setting = (EntitySettings)Activator.CreateInstance (entitySettingsType);
+                        // Use reflected to find all the properties
+                        var reflectedSettings = GetReflectedSettings (setting);
+                        // For each of the properties from the settings reflection
+                        foreach (var reflectedSetting in reflectedSettings) {
+                            // Get the custom entity setting attribute
+                            var entitySettingAttribute = reflectedSetting.entitySettingAttribute;
+                            // Get the mutator type
+                            var mutatorType = entitySettingAttribute.mutatorType;
+                            // Get the read method from the mutator type
+                            var readMethod = mutatorType.GetMethod ("Read");
+                            // Create a new instance of the mutator type
+                            var mutator = Activator.CreateInstance (mutatorType);
+                            // Invoke the read method, Read (JObject jobj, string[] keys)
+                            var value = readMethod.Invoke (mutator, new object[] { jobj, entitySettingAttribute.keys });
+                            // Find the property that is currently being read
+                            var propertyInfo = entitySettingsType.GetProperty (reflectedSetting.propertyName);
+                            // Set that property to the read value
+                            propertyInfo.SetValue (setting, value);
+                        }
+                        // Add the new settings to the list
+                        allEntitySettings.Add (setting);
+                    }
+                }
+            }
+            // convert the list to an array and return
+            return allEntitySettings.ToArray ();
+        }
+
+        public static bool AddSettingsToArray (string fileName, string arrayName, IEntitySettings settings) {
             var successful = false;
             var jo = OpenSettingsFile (fileName) as JObject;
             if (jo != null) {
@@ -74,13 +122,14 @@ namespace AquaPic.Runtime
                     var jobj = new JObject ();
                     var reflectedSettings = GetReflectedSettings (settings);
                     foreach (var reflectedSetting in reflectedSettings) {
-                        Console.WriteLine ("Setting: {0}", reflectedSetting);
-                        var setting = reflectedSetting.setting;
-
-                        if (!setting.optional || (setting.optional && reflectedSetting.value != null)) {
-                            foreach (var key in setting.keys) {
-                                jobj.Add (new JProperty (key, reflectedSetting.value.ToString ()));
-                            }
+                        var entitySettingAttribute = reflectedSetting.entitySettingAttribute;
+                        var mutatorType = entitySettingAttribute.mutatorType;
+                        var writeMethod = mutatorType.GetMethod ("Write");
+                        var validMethod = mutatorType.GetMethod ("Valid");
+                        var mutator = Activator.CreateInstance (mutatorType);
+                        var valid = (bool)validMethod.Invoke (mutator, new object[] { reflectedSetting.propertyValue });
+                        if (!entitySettingAttribute.optional || valid) {
+                            writeMethod.Invoke (mutator, new object[] { reflectedSetting.propertyValue, jobj, entitySettingAttribute.keys });
                         }
                     }
                     ja.Add (jobj);
@@ -91,7 +140,7 @@ namespace AquaPic.Runtime
             return successful;
         }
 
-        public static bool DeleteEntityInArray (string fileName, string arrayName, string entityName) {
+        public static bool DeleteSettingsFromArray (string fileName, string arrayName, string entityName) {
             var successful = false;
             var jo = OpenSettingsFile (fileName) as JObject;
             if (jo != null) {
@@ -108,28 +157,39 @@ namespace AquaPic.Runtime
             return successful;
         }
 
-        public static bool UpdateEntityInArray (string fileName, string arrayName, string oldEntityName, IGroupSettings settings) {
-            var successful = DeleteEntityInArray (fileName, arrayName, oldEntityName);
-            if (successful) {
-                successful = AddEntityToArray (fileName, arrayName, settings);
-            }
+        public static bool UpdateSettingsInArray (string fileName, string arrayName, string oldEntityName, IEntitySettings settings) {
+            var successful = DeleteSettingsFromArray (fileName, arrayName, oldEntityName);
+            successful &= AddSettingsToArray (fileName, arrayName, settings);
             return successful;
         }
 
-        public static List<ReflectedSetting> GetReflectedSettings (IGroupSettings settings) {
+        protected static List<ReflectedSetting> GetReflectedSettings (IEntitySettings settings) {
             var reflectedSettings = new List<ReflectedSetting> ();
             Type settingsType = settings.GetType ();
             PropertyInfo[] publicProperties = settingsType.GetProperties (BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
             foreach (var property in publicProperties) {
-                Console.WriteLine ("property: {0}", property);
-                var attribute = property.GetCustomAttributes (typeof (PropertySetting), false);
+                var attribute = property.GetCustomAttributes (typeof (EntitySettingAttribute), false);
                 if (attribute != null && attribute.Length > 0) {
-                    var setting = (PropertySetting)attribute[0];
-                    var value = property.GetValue (settings);
-                    reflectedSettings.Add (new ReflectedSetting (setting, value));
+                    var entitySettingAttribute = (EntitySettingAttribute)attribute[0];
+                    var propertyName = property.Name;
+                    var propertyValue = property.GetValue (settings);
+                    reflectedSettings.Add (new ReflectedSetting (entitySettingAttribute, propertyName, propertyValue));
                 }
             }
             return reflectedSettings;
+        }
+
+        protected class ReflectedSetting
+        {
+            public EntitySettingAttribute entitySettingAttribute;
+            public string propertyName;
+            public object propertyValue;
+
+            public ReflectedSetting (EntitySettingAttribute entitySettingAttribute, string propertyName, object propertyValue) {
+                this.entitySettingAttribute = entitySettingAttribute;
+                this.propertyName = propertyName;
+                this.propertyValue = propertyValue;
+            }
         }
     }
 }

@@ -24,33 +24,54 @@
 using System;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.Runtime
 {
-    public class StringSetting : ISetting<string>
+    public class IndividualControlMutator : ISettingMutator<IndividualControl>
     {
-        public string Read (JObject jobj, string[] keys) {
-            if (keys.Length < 1) {
-                throw new ArgumentException ("keys can not be empty", nameof (keys));
+        public IndividualControl Read (JObject jobj, string[] keys) {
+            if (keys.Length < 2) {
+                throw new ArgumentException ("keys must include at least two keys", nameof(keys));
             }
 
-            var value = string.Empty;
+            var value = Default ();
             var text = (string)jobj[keys[0]];
             if (text.IsNotEmpty ()) {
                 try {
-                    value = text;
+                    value.Group = text;
                 } catch {
                     //
                 }
             }
+
+            text = (string)jobj[keys[1]];
+            if (text.IsNotEmpty ()) {
+                try {
+                    value.Individual = Convert.ToInt32 (text);
+                } catch {
+                    value = Default ();
+                }
+            }
+
             return value;
         }
 
-        public void Write (string value, JObject jobj, string[] keys) {
-            if (keys.Length < 1) {
-                throw new ArgumentException ("keys can not be empty", nameof (keys));
+        public void Write (IndividualControl value, JObject jobj, string[] keys) {
+            if (keys.Length < 2) {
+                throw new ArgumentException ("keys must include at least two keys", nameof (keys));
             }
-            jobj[keys[0]] = value;
+
+            jobj[keys[0]] = value.Group;
+            jobj[keys[1]] = value.Individual.ToString ();
+        }
+
+        public bool Valid (IndividualControl value) {
+            return value.IsNotEmpty ();
+        }
+
+        public IndividualControl Default () {
+            return IndividualControl.Empty;
         }
     }
 }

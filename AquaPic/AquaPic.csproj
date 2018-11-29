@@ -146,10 +146,7 @@
     <Compile Include="Domain\Operands\IOperand.cs" />
     <Compile Include="Runtime\Settings\SettingsHelper.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroupSettings.cs" />
-    <Compile Include="Runtime\Settings\PropertySetting.cs" />
-    <Compile Include="Runtime\Settings\StringSetting.cs" />
-    <Compile Include="Runtime\Settings\FloatSetting.cs" />
-    <Compile Include="Runtime\Settings\BoolSetting.cs" />
+    <Compile Include="Runtime\Settings\EntitySettingAttribute.cs" />
     <Compile Include="Domain\Timer\IntervalTimer.cs" />
     <Compile Include="Domain\Timer\OffDelayTimer.cs" />
     <Compile Include="Domain\Timer\OnDelayTimer.cs" />
@@ -163,11 +160,13 @@
     <Compile Include="Modules\Lights\LightingState.cs" />
     <Compile Include="Modules\Lights\LightingFixtureDimming.cs" />
     <Compile Include="Modules\Lights\LightingFixtureSettings.cs" />
-    <Compile Include="Runtime\Settings\ISetting.cs" />
-    <Compile Include="Runtime\Settings\IndividualControlSetting.cs" />
-    <Compile Include="Runtime\Settings\IGroupSettings.cs" />
+    <Compile Include="Runtime\Settings\IEntitySettings.cs" />
     <Compile Include="Tests\Runtime\Settings\SettingsHelperTest.cs" />
-    <Compile Include="Runtime\Settings\ReflectedSettings.cs" />
+    <Compile Include="Runtime\Settings\Mutators\BoolMutator.cs" />
+    <Compile Include="Runtime\Settings\Mutators\FloatMutator.cs" />
+    <Compile Include="Runtime\Settings\Mutators\ISettingMutator.cs" />
+    <Compile Include="Runtime\Settings\Mutators\StringMutator.cs" />
+    <Compile Include="Runtime\Settings\Mutators\IndividualControlMutator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -192,6 +191,7 @@
     <Folder Include="Tests\Domain\TimePeriod\" />
     <Folder Include="Tests\Runtime\" />
     <Folder Include="Tests\Runtime\Settings\" />
+    <Folder Include="Runtime\Settings\Mutators\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">
