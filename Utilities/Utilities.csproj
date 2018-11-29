@@ -50,6 +50,7 @@
     <Compile Include="Tests\Utilites\DateSpanTest.cs" />
     <Compile Include="Tests\Utilites\RateOfChangeLimiterTest.cs" />
     <Compile Include="Tests\Utilites\TimeTest.cs" />
+    <Compile Include="Tests\Utilites\UtilitiesTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tests\" />
