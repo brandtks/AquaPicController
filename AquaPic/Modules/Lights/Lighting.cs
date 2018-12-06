@@ -75,8 +75,9 @@ namespace AquaPic.Modules
                 var file = File.Create (path);
                 file.Close ();
 
-                var jo = new JObject ();
-                jo.Add (new JProperty ("lightingFixtures", new JArray ()));
+                var jo = new JObject {
+                    new JProperty ("lightingFixtures", new JArray ())
+                };
 
                 File.WriteAllText (path, jo.ToString ());
             }
