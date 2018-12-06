@@ -147,23 +147,6 @@ namespace GoodtimeDevelopment.TouchWidget
             }
         }
 
-        /*
-        protected override bool OnButtonReleaseEvent (Gdk.EventButton evnt) {
-            buttonColor = unmodifiedColor;
-            QueueDraw ();
-
-            if ((evnt.X < 0) || (evnt.X > Allocation.Width)) {
-                return true;
-            }
-
-            if ((evnt.Y < 0) || (evnt.Y > Allocation.Height)) {
-                return true;
-            }
-
-            return base.OnButtonReleaseEvent (evnt);
-        }
-        */
-
         protected void OnTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
             if (unmodifiedColor != null) {
                 buttonColor = unmodifiedColor;
