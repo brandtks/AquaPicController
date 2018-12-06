@@ -84,6 +84,7 @@ namespace GoodtimeDevelopment.TouchWidget
 
             render = new TouchText ();
             buttonColor = "pri";
+            unmodifiedColor = "pri";
             text = "";
             textColor = "black";
             HeightRequest = 45;
@@ -93,10 +94,11 @@ namespace GoodtimeDevelopment.TouchWidget
 
             ExposeEvent += OnExpose;
             ButtonPressEvent += OnTouchButtonPress;
+            ButtonReleaseEvent += OnTouchButtonRelease;
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 var left = Allocation.Left;
                 var width = Allocation.Width;
                 var top = Allocation.Top;
@@ -145,6 +147,7 @@ namespace GoodtimeDevelopment.TouchWidget
             }
         }
 
+        /*
         protected override bool OnButtonReleaseEvent (Gdk.EventButton evnt) {
             buttonColor = unmodifiedColor;
             QueueDraw ();
@@ -158,6 +161,14 @@ namespace GoodtimeDevelopment.TouchWidget
             }
 
             return base.OnButtonReleaseEvent (evnt);
+        }
+        */
+
+        protected void OnTouchButtonRelease (object o, ButtonReleaseEventArgs args) {
+            if (unmodifiedColor != null) {
+                buttonColor = unmodifiedColor;
+            }
+            QueueDraw ();
         }
     }
 }
