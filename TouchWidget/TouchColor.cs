@@ -184,6 +184,13 @@ namespace GoodtimeDevelopment.TouchWidget
                 return new Gdk.Color ();
             }
         }
+
+        public override string ToString () {
+            if (colorName.IsNotEmpty ()) {
+                return string.Format ("TouchColor: {0}", colorName);
+            }
+            return string.Format ("TouchColor: {0}, {1}, {2}, {3}", R, G, B, A);
+        }
     }
 }
 
