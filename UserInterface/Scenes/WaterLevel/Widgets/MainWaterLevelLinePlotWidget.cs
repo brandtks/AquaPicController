@@ -34,19 +34,9 @@ namespace AquaPic.UserInterface
         string groupName;
         TouchLabel label;
 
-        public WaterLevelLinePlot (params object[] options)
-            : base () {
+        public WaterLevelLinePlot (params object[] options) {
             text = "Water Level";
             unitOfMeasurement = UnitsOfMeasurement.Inches;
-
-            var eventbox = new EventBox ();
-            eventbox.VisibleWindow = false;
-            eventbox.SetSizeRequest (WidthRequest, HeightRequest);
-            eventbox.ButtonReleaseEvent += (o, args) => {
-                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
-            };
-            Put (eventbox, 0, 0);
-            eventbox.Show ();
 
             label = new TouchLabel ();
             label.SetSizeRequest (152, 16);
@@ -83,6 +73,10 @@ namespace AquaPic.UserInterface
             linePlot.eventColors.Add ("low alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("high alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("disconnected alarm", new TouchColor ("compl", 0.25));
+
+            WidgetReleaseEvent += (o, args) => {
+                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
+            };
 
             OnUpdate ();
         }

@@ -28,29 +28,31 @@ using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
-    public class ButtonWidget : TouchButton
+    public class ButtonWidget : HomeWidget
     {
-        public ButtonWidget (string name) : base () {
-            SetSizeRequest (100, 82);
+        public TouchButton button;
 
-            text = name;
-            bool b = Bit.Check (text);
-            buttonColor = b ? "pri" : "seca";
-
-            ButtonReleaseEvent += OnButtonRelease;
+        public ButtonWidget (string name) {
+            button = new TouchButton ();
+            button.SetSizeRequest (100, 82);
+            button.text = name;
+            button.buttonColor = Bit.Check (button.text) ? "pri" : "seca";
+            button.ButtonReleaseEvent += OnButtonRelease;
+            Put (button, 0, 0);
+            button.Show ();
         }
 
         public virtual void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            TouchButton b = sender as TouchButton;
-            string stateText = b.text;
-            bool s = Bit.Check (stateText);
-            if (s) {
+            var b = sender as TouchButton;
+            var stateText = b.text;
+            if (Bit.Check (stateText)) {
                 Bit.Reset (stateText);
                 b.buttonColor = "seca";
             } else {
                 Bit.Set (stateText);
                 b.buttonColor = "pri";
             }
+            b.QueueDraw ();
         }
     }
 }

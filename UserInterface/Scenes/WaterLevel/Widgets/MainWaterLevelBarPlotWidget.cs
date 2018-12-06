@@ -29,20 +29,18 @@ using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {
-    public class WaterLevelWidget : BarPlotWidget
+    public class WaterLevelBarPlotWidget : BarPlotWidget
     {
         string groupName;
         TouchLabel label;
 
-        public WaterLevelWidget (params object[] options)
-            : base () {
+        public WaterLevelBarPlotWidget (params object[] options) {
             text = "Water Level";
             unitOfMeasurement = UnitsOfMeasurement.Inches;
 
             label = new TouchLabel ();
             label.textColor = "compl";
             label.text = "Disconnected";
-            label.WidthRequest = 199;
             label.textAlignment = TouchAlignment.Center;
             label.textRender.orientation = TouchOrientation.Vertical;
             Put (label, 60, 9);
@@ -62,14 +60,9 @@ namespace AquaPic.UserInterface
                 text = groupName;
             }
 
-            var eventbox = new EventBox ();
-            eventbox.VisibleWindow = false;
-            eventbox.SetSizeRequest (WidthRequest, HeightRequest);
-            eventbox.ButtonReleaseEvent += (o, args) => {
+            WidgetReleaseEvent += (o, args) => {
                 AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
             };
-            Put (eventbox, 0, 0);
-            eventbox.Show ();
 
             fullScale = 15.0f;
             OnUpdate ();

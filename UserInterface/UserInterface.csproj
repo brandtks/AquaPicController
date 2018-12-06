@@ -40,10 +40,8 @@
     <Compile Include="Scenes\Chemistry\ChemistryScreen.cs" />
     <Compile Include="Scenes\Digital\DigitalInputScreen.cs" />
     <Compile Include="Scenes\Digital\Widgets\DigitalDisplay.cs" />
-    <Compile Include="Scenes\Home\Dialogs\AddHomeWidget.cs" />
-    <Compile Include="Scenes\Home\Dialogs\HomeSettings.cs" />
-    <Compile Include="Scenes\Home\Dialogs\HomeSettingsWidget.cs" />
-    <Compile Include="Scenes\Home\Dialogs\TileBoard.cs" />
+    <Compile Include="Scenes\Home\Dialogs\AddHomeWidgetDialog.cs" />
+    <Compile Include="Scenes\Home\Dialogs\HomeSettingsDialog.cs" />
     <Compile Include="Scenes\Home\HomeScreen.cs" />
     <Compile Include="Scenes\Home\Widgets\BarPlotWidget.cs" />
     <Compile Include="Scenes\Home\Widgets\ButtonWidget.cs" />
@@ -53,7 +51,7 @@
     <Compile Include="Scenes\Home\Widgets\LinePlotWidget.cs" />
     <Compile Include="Scenes\Lighting\Dialogs\FixtureSettings.cs" />
     <Compile Include="Scenes\Lighting\LightingScreen.cs" />
-    <Compile Include="Scenes\Lighting\Widgets\MainLightingWidgets.cs" />
+    <Compile Include="Scenes\Lighting\Widgets\MainLightingCurvedBarPlotWidgets.cs" />
     <Compile Include="Scenes\Logger\LoggerScreen.cs" />
     <Compile Include="Scenes\Menu\MenuScreen.cs" />
     <Compile Include="Scenes\Power\Dialogs\OutletSettings.cs" />
@@ -81,6 +79,9 @@
     <Compile Include="Widgets\MySideBar.cs" />
     <Compile Include="Scenes\Lighting\Widgets\LightingStateDisplay.cs" />
     <Compile Include="Scenes\Lighting\Widgets\LightingStateWidget.cs" />
+    <Compile Include="Scenes\Home\Dialogs\HomeWidgetDialogDomain\TileBoard.cs" />
+    <Compile Include="Scenes\Home\Dialogs\HomeWidgetDialogDomain\HomeSettingsWidget.cs" />
+    <Compile Include="Scenes\Home\Widgets\HomeWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -91,6 +92,7 @@
     <Folder Include="Dialogs\" />
     <Folder Include="Scenes\" />
     <Folder Include="Widgets\" />
+    <Folder Include="Scenes\Home\Dialogs\HomeWidgetDialogDomain\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AquaPic\AquaPic.csproj">

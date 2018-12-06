@@ -47,7 +47,7 @@ namespace AquaPic.UserInterface
         }
     }
 
-    public class LinePlotWidget : Fixed
+    public class LinePlotWidget : HomeWidget
     {
         public string text {
             get {

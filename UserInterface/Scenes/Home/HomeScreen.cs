@@ -42,27 +42,6 @@ namespace AquaPic.UserInterface
         public HomeWindow (params object[] options) : base () {
             showTitle = false;
 
-            if (Lighting.fixtureCount > 0) {
-                var names = Lighting.GetAllFixtureNames ();
-                foreach (var name in names) {
-                    if (Lighting.IsDimmingFixture (name)) {
-                        if (!HomeWindowWidgets.curvedBarPlots.ContainsKey (name)) {
-                            HomeWindowWidgets.curvedBarPlots.Add (
-                                name,
-                                new CurvedBarPlotData (() => {
-                                    return new DimmingLightBarPlot (
-                                        name,
-                                        () => {
-                                            return Lighting.GetCurrentDimmingLevel (name);
-                                        }
-                                    );
-                                })
-                            );
-                        }
-                    }
-                }
-            }
-
             linePlots = new List<LinePlotWidget> ();
             barPlots = new List<BarPlotWidget> ();
             curvedBarPlots = new List<CurvedBarPlotWidget> ();
@@ -125,10 +104,11 @@ namespace AquaPic.UserInterface
                                 break;
                             }
                         case "CurvedBarPlot": {
-                                string name = (string)jo["name"];
+                                var name = (string)jo["name"];
+                                var group = (string)jo["group"];
 
                                 if (HomeWindowWidgets.curvedBarPlots.ContainsKey (name)) {
-                                    var bp = HomeWindowWidgets.curvedBarPlots[name].CreateInstance ();
+                                    var bp = HomeWindowWidgets.curvedBarPlots[name].CreateInstance (group);
                                     Put (bp, x, y);
                                     bp.Show ();
 
@@ -188,7 +168,7 @@ namespace AquaPic.UserInterface
             }
 
             foreach (var b in buttons) {
-                b.buttonColor = Bit.Check (b.text) ? "pri" : "seca";
+                b.button.buttonColor = Bit.Check (b.button.text) ? "pri" : "seca";
             }
 
             QueueDraw ();

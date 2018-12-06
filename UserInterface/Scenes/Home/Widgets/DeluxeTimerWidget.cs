@@ -29,7 +29,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
-    public class DeluxeTimerWidget : Fixed
+    public class DeluxeTimerWidget : HomeWidget
     {
         IntervalTimer[] timers;
         TimerTab[] tabs;
@@ -164,12 +164,14 @@ namespace AquaPic.UserInterface
             startStopButton.SetSizeRequest (98, 51);
             startStopButton.ButtonReleaseEvent += OnStartStopButtonRelease;
             Put (startStopButton, 209, 57);
+            startStopButton.Show ();
 
             resetButton = new TouchButton ();
             resetButton.SetSizeRequest (98, 51);
             resetButton.text = "Reset";
             resetButton.ButtonReleaseEvent += OnResetButtonRelease;
             Put (resetButton, 209, 113);
+            resetButton.Show ();
 
             if (timers[timerIndex].enabled)
                 UpdateTime (timers[timerIndex].secondsRemaining, false);

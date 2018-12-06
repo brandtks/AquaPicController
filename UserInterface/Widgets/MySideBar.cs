@@ -331,7 +331,7 @@ namespace AquaPic.UserInterface
                             }
                         } else if ((x >= 640) && (y >= 420)) {
                             var parent = Toplevel as Window;
-                            var s = new HomeSettings (parent);
+                            var s = new HomeSettingsDialog (parent);
                             s.Run ();
                             s.Destroy ();
                             s.Dispose ();

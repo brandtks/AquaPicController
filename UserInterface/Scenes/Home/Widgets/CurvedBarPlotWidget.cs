@@ -28,25 +28,25 @@ using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {
-    public delegate CurvedBarPlotWidget CreateCurevedBarPlotHandler ();
+    public delegate CurvedBarPlotWidget CreateCurvedBarPlotHandler (params object[] options);
 
     public class CurvedBarPlotData
     {
-        public CreateCurevedBarPlotHandler CreateInstanceEvent;
+        public CreateCurvedBarPlotHandler CreateInstanceEvent;
 
-        public CurvedBarPlotData (CreateCurevedBarPlotHandler CreateInstanceEvent) {
+        public CurvedBarPlotData (CreateCurvedBarPlotHandler CreateInstanceEvent) {
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 
-        public CurvedBarPlotWidget CreateInstance () {
-            if (CreateInstanceEvent != null)
-                return CreateInstanceEvent ();
-            else
-                throw new Exception ("No bar plot constructor implemented");
+        public CurvedBarPlotWidget CreateInstance (params object[] options) {
+            if (CreateInstanceEvent != null) {
+                return CreateInstanceEvent (options);
+            }
+            throw new Exception ("No bar plot constructor implemented");
         }
     }
 
-    public class CurvedBarPlotWidget : Fixed
+    public class CurvedBarPlotWidget : HomeWidget
     {
         public string text {
             get { return label.text; }

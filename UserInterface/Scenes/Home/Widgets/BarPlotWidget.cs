@@ -46,7 +46,7 @@ namespace AquaPic.UserInterface
         }
     }
 
-    public class BarPlotWidget : Fixed
+    public class BarPlotWidget : HomeWidget
     {
         public string text {
             get { return nameLabel.text; }
@@ -92,6 +92,7 @@ namespace AquaPic.UserInterface
             nameLabel.text = "Plot";
             nameLabel.textColor = "grey3";
             nameLabel.HeightRequest = 151;
+            nameLabel.WidthRequest = 5;
             nameLabel.textAlignment = TouchAlignment.Center;
             nameLabel.textRender.textWrap = TouchTextWrap.Shrink;
             nameLabel.textRender.orientation = TouchOrientation.Vertical;

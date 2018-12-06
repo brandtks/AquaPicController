@@ -34,19 +34,9 @@ namespace AquaPic.UserInterface
         string groupName;
         TouchLabel label;
 
-        public TemperatureLinePlot (params object[] options)
-            : base () {
+        public TemperatureLinePlot (params object[] options) {
             text = "Temperature";
             unitOfMeasurement = UnitsOfMeasurement.Degrees;
-
-            var eventbox = new EventBox ();
-            eventbox.VisibleWindow = false;
-            eventbox.SetSizeRequest (WidthRequest, HeightRequest);
-            eventbox.ButtonReleaseEvent += (o, args) => {
-                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Temperature", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
-            };
-            Put (eventbox, 0, 0);
-            eventbox.Show ();
 
             label = new TouchLabel ();
             label.SetSizeRequest (152, 16);
@@ -85,6 +75,10 @@ namespace AquaPic.UserInterface
             linePlot.eventColors.Add ("disconnected alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("low alarm", new TouchColor ("compl", 0.5));
             linePlot.eventColors.Add ("high alarm", new TouchColor ("compl", 0.5));
+
+            WidgetReleaseEvent += (o, args) => {
+                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Temperature", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
+            };
 
             OnUpdate ();
         }
