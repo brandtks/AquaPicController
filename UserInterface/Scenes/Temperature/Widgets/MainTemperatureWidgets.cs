@@ -34,7 +34,7 @@ namespace AquaPic.UserInterface
         string groupName;
         TouchLabel label;
 
-        public TemperatureLinePlot (params object[] options) {
+        public TemperatureLinePlot (string groupName, int row, int column) : base (row, column) {
             text = "Temperature";
             unitOfMeasurement = UnitsOfMeasurement.Degrees;
 
@@ -45,28 +45,24 @@ namespace AquaPic.UserInterface
             label.textHorizontallyCentered = true;
             Put (label, 155, 63);
 
-            groupName = string.Empty;
-            if (options.Length >= 1) {
-                groupName = options[0] as string;
-                if (groupName != null) {
-                    if (!Temperature.CheckTemperatureGroupKeyNoThrow (groupName)) {
-                        groupName = Temperature.defaultTemperatureGroup;
-                    }
-                } else {
-                    groupName = Temperature.defaultTemperatureGroup;
-                }
-            } else {
-                groupName = Temperature.defaultTemperatureGroup;
+            this.groupName = groupName;
+            if (!Temperature.CheckTemperatureGroupKeyNoThrow (this.groupName)) {
+                this.groupName = Temperature.defaultTemperatureGroup;
             }
 
-            if (!groupName.IsEmpty ()) {
-                linePlot.LinkDataLogger (Temperature.GetTemperatureGroupDataLogger (groupName));
+            if (!this.groupName.IsEmpty ()) {
+                var dataLogger = Temperature.GetTemperatureGroupDataLogger (this.groupName);
+                linePlot.LinkDataLogger (dataLogger);
 
                 Destroyed += (obj, args) => {
-                    linePlot.UnLinkDataLogger (Temperature.GetTemperatureGroupDataLogger (groupName));
+                    linePlot.UnLinkDataLogger (dataLogger);
                 };
 
-                text = string.Format ("{0} Temperature", groupName);
+                text = string.Format ("{0} Temperature", this.groupName);
+
+                WidgetReleaseEvent += (o, args) => {
+                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Temperature", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.groupName);
+                };
             }
 
             linePlot.eventColors.Add ("no probes", new TouchColor ("secb", 0.25));
@@ -75,15 +71,9 @@ namespace AquaPic.UserInterface
             linePlot.eventColors.Add ("disconnected alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("low alarm", new TouchColor ("compl", 0.5));
             linePlot.eventColors.Add ("high alarm", new TouchColor ("compl", 0.5));
-
-            WidgetReleaseEvent += (o, args) => {
-                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Temperature", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
-            };
-
-            OnUpdate ();
         }
 
-        public override void OnUpdate () {
+        public override void Update () {
             if (groupName.IsNotEmpty ()) {
                 if (Temperature.AreTemperatureProbesConnected (groupName)) {
                     currentValue = Temperature.GetTemperatureGroupTemperature (groupName);

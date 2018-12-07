@@ -28,11 +28,11 @@ using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
-    public class ButtonWidget : HomeWidget
+    public class ButtonWidget : HomeWidget, IHomeWidgetUpdatable
     {
         public TouchButton button;
 
-        public ButtonWidget (string name) {
+        public ButtonWidget (string name, int row, int column) : base ("Button", row, column) {
             button = new TouchButton ();
             button.SetSizeRequest (100, 82);
             button.text = name;
@@ -53,6 +53,10 @@ namespace AquaPic.UserInterface
                 b.buttonColor = "pri";
             }
             b.QueueDraw ();
+        }
+
+        public void Update () {
+            button.buttonColor = Bit.Check (button.text) ? "pri" : "seca";
         }
     }
 }

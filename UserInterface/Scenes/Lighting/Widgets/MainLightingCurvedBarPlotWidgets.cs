@@ -33,27 +33,21 @@ namespace AquaPic.UserInterface
     {
         string fixtureName;
 
-        public DimmingLightCurvedBarPlot (params object[] options) {
+        public DimmingLightCurvedBarPlot (string fixtureName, int row, int column) : base (row, column) {
             text = "Lighting";
             unitOfMeasurement = UnitsOfMeasurement.Percentage;
 
-            fixtureName = string.Empty;
-            if (options.Length >= 1) {
-                var fixtureNameOption = options[0] as string;
-                if (fixtureNameOption != null) {
-                    if (Lighting.CheckFixtureKeyNoThrow (fixtureNameOption) &&
-                        Lighting.IsDimmingFixture (fixtureNameOption)) {
-                        fixtureName = fixtureNameOption;
-                        text = fixtureName;
-                        WidgetReleaseEvent += (o, args) => {
-                            AquaPicGui.AquaPicUserInterface.ChangeScreens ("Lighting", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, fixtureName);
-                        };
-                    }
-                }
+            this.fixtureName = fixtureName;
+            if (Lighting.CheckFixtureKeyNoThrow (this.fixtureName) &&
+                Lighting.IsDimmingFixture (this.fixtureName)) {
+                text = this.fixtureName;
+                WidgetReleaseEvent += (o, args) => {
+                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Lighting", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.fixtureName);
+                };
             }
         }
 
-        public override void OnUpdate () {
+        public override void Update () {
             if (fixtureName.IsNotEmpty ()) {
                 currentValue = Lighting.GetCurrentDimmingLevel (fixtureName);
             }

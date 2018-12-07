@@ -28,7 +28,7 @@ using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {
-    public delegate LinePlotWidget CreateLinePlotHandler (params object[] options);
+    public delegate LinePlotWidget CreateLinePlotHandler (string groupName, int row, int column);
 
     public class LinePlotData
     {
@@ -38,16 +38,16 @@ namespace AquaPic.UserInterface
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 
-        public LinePlotWidget CreateInstance (params object[] options) {
+        public LinePlotWidget CreateInstance (string groupName, int row, int column) {
             if (CreateInstanceEvent != null) {
-                return CreateInstanceEvent (options);
+                return CreateInstanceEvent (groupName, row, column);
             }
 
             throw new Exception ("No line plot constructor implemented");
         }
     }
 
-    public class LinePlotWidget : HomeWidget
+    public class LinePlotWidget : HomeWidget, IHomeWidgetUpdatable
     {
         public string text {
             get {
@@ -80,7 +80,7 @@ namespace AquaPic.UserInterface
         protected TouchLabel textBox;
         protected TouchLinePlot linePlot;
 
-        public LinePlotWidget () {
+        public LinePlotWidget (int row, int column) : base ("LinePlot", row, column) {
             SetSizeRequest (310, 82);
 
             var box1 = new TouchGraphicalBox (310, 82);
@@ -113,7 +113,7 @@ namespace AquaPic.UserInterface
             ShowAll ();
         }
 
-        public virtual void OnUpdate () {
+        public virtual void Update () {
             throw new Exception ("Update method not implemented");
         }
     }

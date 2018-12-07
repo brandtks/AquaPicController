@@ -25,20 +25,87 @@ using System;
 using Gtk;
 using Cairo;
 using GoodtimeDevelopment.TouchWidget;
-using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
     public class HomeWidget : Fixed
     {
         public event ButtonReleaseEventHandler WidgetReleaseEvent;
+
         public EventBox touchArea;
+        public string type;
+        HomeWidgetPlacement placement;
+
+        public Tuple<int, int>[] pairs {
+            get {
+                return placement.ToRowColumnPairs ();
+            }
+        }
+
+        public int rowOrigin {
+            get {
+                return placement.rowOrigin;
+            }
+            set {
+                placement.rowOrigin = value;
+            }
+        }
+
+        public int columnOrigin {
+            get {
+                return placement.columnOrigin;
+            }
+            set {
+                placement.columnOrigin = value;
+            }
+        }
+
+        public int width {
+            get {
+                return placement.width;
+            }
+        }
+
+        public int height {
+            get {
+                return placement.height;
+            }
+        }
 
         uint clickTimer;
-        bool clicked, longHold, selected;
+        bool clicked, selected;
+        int holdCounter;
 
-        public HomeWidget () {
+        public HomeWidget (string type, int row, int column) {
             SetSizeRequest (100, 82);
+
+            this.type = type;
+            placement = new HomeWidgetPlacement (row, column);
+
+            switch (type) {
+            case "Timer": 
+                placement.width = 3;
+                placement.height = 2;
+                break;
+            case "LinePlot":
+                placement.width = 3;
+                placement.height = 1;
+                break;
+            case "BarPlot": 
+                placement.width = 1;
+                placement.height = 2;
+                break;
+            case "CurvedBarPlot": 
+                placement.width = 2;
+                placement.height = 2;
+                break;
+            case "Button":
+                placement.width = 1;
+                placement.height = 1;
+                break;
+            default:
+                throw new Exception (string.Format ("Unknown home widget type {0}", type));
+            }
         }
 
         protected override void OnShown () {
@@ -74,15 +141,15 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnTouchAreaButtonPress (object sender, ButtonPressEventArgs args) {
-            longHold = false;
+            holdCounter = 0;
             selected = false;
             clicked = true;
-            clickTimer = GLib.Timeout.Add (1000, OnTimerEvent);
+            clickTimer = GLib.Timeout.Add (20, OnTimerEvent);
         }
 
         protected void OnTouchAreaButtonRelease (object sender, ButtonReleaseEventArgs args) {
             clicked = false;
-            if (!longHold) {
+            if (!selected) {
                 if (WidgetReleaseEvent != null) {
                     WidgetReleaseEvent (sender, args);
                 } else {
@@ -104,19 +171,54 @@ namespace AquaPic.UserInterface
                         }
                     }
                 }
-            } else {
-                selected = false;
             }
+            selected = false;
             QueueDraw ();
         }
 
         protected bool OnTimerEvent () {
             if (clicked) {
-                longHold = true;
-                selected = true;
-                QueueDraw ();
+                if (!selected) {
+                    ++holdCounter;
+                    if (holdCounter > 50) {
+                        selected = true;
+                    }
+                }
             }
-            return false;
+            QueueDraw ();
+            return clicked;
+        }
+
+        private class HomeWidgetPlacement
+        {
+            public int rowOrigin;
+            public int columnOrigin;
+            public int width;
+            public int height;
+
+            public HomeWidgetPlacement (int rowOrigin, int columnOrigin) : this (rowOrigin, columnOrigin, 1, 1) { }
+
+            public HomeWidgetPlacement (int rowOrigin, int columnOrigin, int width, int height) {
+                this.rowOrigin = rowOrigin;
+                this.columnOrigin = columnOrigin;
+                this.width = width;
+                this.height = height;
+            }
+
+            public Tuple<int, int>[] ToRowColumnPairs () {
+                var pairs = new Tuple<int, int>[width * height];
+                for (int i = 0; i < pairs.Length; ++i) {
+                    int row;
+                    if (height != 1) {
+                        row = rowOrigin + (i / (pairs.Length / height));
+                    } else {
+                        row = rowOrigin;
+                    }
+                    var column = columnOrigin + (i % width);
+                    pairs[i] = new Tuple<int, int> (row, column);
+                }
+                return pairs;
+            }
         }
     }
 }

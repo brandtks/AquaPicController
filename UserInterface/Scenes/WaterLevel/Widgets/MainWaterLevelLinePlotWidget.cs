@@ -34,7 +34,7 @@ namespace AquaPic.UserInterface
         string groupName;
         TouchLabel label;
 
-        public WaterLevelLinePlot (params object[] options) {
+        public WaterLevelLinePlot (string groupName, int row, int column) : base (row, column) {
             text = "Water Level";
             unitOfMeasurement = UnitsOfMeasurement.Inches;
 
@@ -45,25 +45,24 @@ namespace AquaPic.UserInterface
             label.textHorizontallyCentered = true;
             Put (label, 155, 63);
 
-            groupName = string.Empty;
-            if (options.Length >= 1) {
-                var groupNameOption = options[0] as string;
-                if (groupNameOption != null) {
-                    if (WaterLevel.CheckWaterLevelGroupKeyNoThrow (groupNameOption)) {
-                        groupName = groupNameOption;
-                    }
-                }
+            this.groupName = groupName;
+            if (!WaterLevel.CheckWaterLevelGroupKeyNoThrow (this.groupName)) {
+                this.groupName = string.Empty;
             }
 
-            if (groupName.IsNotEmpty ()) {
-                var dataLogger = WaterLevel.GetWaterLevelGroupDataLogger (groupName);
+            if (this.groupName.IsNotEmpty ()) {
+                var dataLogger = WaterLevel.GetWaterLevelGroupDataLogger (this.groupName);
                 linePlot.LinkDataLogger (dataLogger);
 
                 Destroyed += (obj, args) => {
                     linePlot.UnLinkDataLogger (dataLogger);
                 };
 
-                text = string.Format ("{0} Water Level", groupName);
+                text = string.Format ("{0} Water Level", this.groupName);
+
+                WidgetReleaseEvent += (o, args) => {
+                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.groupName);
+                };
             }
 
             linePlot.rangeMargin = 1;
@@ -73,15 +72,9 @@ namespace AquaPic.UserInterface
             linePlot.eventColors.Add ("low alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("high alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("disconnected alarm", new TouchColor ("compl", 0.25));
-
-            WidgetReleaseEvent += (o, args) => {
-                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
-            };
-
-            OnUpdate ();
         }
 
-        public override void OnUpdate () {
+        public override void Update () {
             if (groupName.IsNotEmpty ()) {
                 if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (groupName)) {
                     textBox.text = "--";

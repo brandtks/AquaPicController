@@ -34,7 +34,7 @@ namespace AquaPic.UserInterface
         string groupName;
         TouchLabel label;
 
-        public WaterLevelBarPlotWidget (params object[] options) {
+        public WaterLevelBarPlotWidget (string groupName, int row, int column) : base (row, column) {
             text = "Water Level";
             unitOfMeasurement = UnitsOfMeasurement.Inches;
 
@@ -46,29 +46,22 @@ namespace AquaPic.UserInterface
             Put (label, 60, 9);
             label.Show ();
 
-            groupName = string.Empty;
-            if (options.Length >= 1) {
-                var groupNameOption = options[0] as string;
-                if (groupNameOption != null) {
-                    if (WaterLevel.CheckWaterLevelGroupKeyNoThrow (groupNameOption)) {
-                        groupName = groupNameOption;
-                    }
-                }
+            this.groupName = groupName;
+            if (!WaterLevel.CheckWaterLevelGroupKeyNoThrow (this.groupName)) {
+                this.groupName = string.Empty;
             }
 
-            if (groupName.IsNotEmpty ()) {
-                text = groupName;
+            if (this.groupName.IsNotEmpty ()) {
+                text = this.groupName;
+                WidgetReleaseEvent += (o, args) => {
+                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.groupName);
+                };
             }
-
-            WidgetReleaseEvent += (o, args) => {
-                AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
-            };
 
             fullScale = 15.0f;
-            OnUpdate ();
         }
 
-        public override void OnUpdate () {
+        public override void Update () {
             if (groupName.IsNotEmpty ()) {
                 if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (groupName)) {
                     textBox.text = "--";

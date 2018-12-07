@@ -28,7 +28,7 @@ using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {
-    public delegate BarPlotWidget CreateBarPlotHandler (params object[] options);
+    public delegate BarPlotWidget CreateBarPlotHandler (string groupName, int row, int column);
 
     public class BarPlotData
     {
@@ -38,15 +38,14 @@ namespace AquaPic.UserInterface
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 
-        public BarPlotWidget CreateInstance (params object[] options) {
+        public BarPlotWidget CreateInstance (string groupName, int row, int column) {
             if (CreateInstanceEvent != null)
-                return CreateInstanceEvent (options);
-            else
-                throw new Exception ("No bar plot constructor implemented");
+                return CreateInstanceEvent (groupName, row, column);
+            throw new Exception ("No bar plot constructor implemented");
         }
     }
 
-    public class BarPlotWidget : HomeWidget
+    public class BarPlotWidget : HomeWidget, IHomeWidgetUpdatable
     {
         public string text {
             get { return nameLabel.text; }
@@ -80,7 +79,7 @@ namespace AquaPic.UserInterface
         protected TouchLabel textBox;
         protected TouchLabel nameLabel;
 
-        public BarPlotWidget () {
+        public BarPlotWidget (int row, int column) : base ("BarPlot", row, column) {
             SetSizeRequest (100, 169);
 
             var box = new TouchGraphicalBox (100, 169);
@@ -115,7 +114,7 @@ namespace AquaPic.UserInterface
             Put (textBox, 0, 49);
         }
 
-        public virtual void OnUpdate () {
+        public virtual void Update () {
             throw new Exception ("Update method not implemented");
         }
     }
