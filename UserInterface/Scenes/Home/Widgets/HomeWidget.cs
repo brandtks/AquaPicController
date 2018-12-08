@@ -28,12 +28,18 @@ using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {
+    public delegate void RequestNewTileLocationHandler (int x, int y);
+    public delegate void WidgetSelectedHandler (HomeWidget widget);
+    public delegate void WidgetUnselectedHandler (HomeWidget widget);
+
     public class HomeWidget : Fixed
     {
         public event ButtonReleaseEventHandler WidgetReleaseEvent;
+        public event RequestNewTileLocationHandler RequestNewTileLocationEvent;
+        public event WidgetSelectedHandler WidgetSelectedEvent;
+        public event WidgetUnselectedHandler WidgetUnselectedEvent;
 
         public EventBox touchArea;
-        public string type;
         HomeWidgetPlacement placement;
 
         public Tuple<int, int>[] pairs {
@@ -42,21 +48,45 @@ namespace AquaPic.UserInterface
             }
         }
 
-        public int rowOrigin {
+        public int row {
             get {
-                return placement.rowOrigin;
+                return placement.row;
             }
             set {
-                placement.rowOrigin = value;
+                placement.row = value;
             }
         }
 
-        public int columnOrigin {
+        public int column {
             get {
-                return placement.columnOrigin;
+                return placement.column;
             }
             set {
-                placement.columnOrigin = value;
+                placement.column = value;
+            }
+        }
+
+        public int columnWidth {
+            get {
+                return placement.columnWidth;
+            }
+        }
+
+        public int rowHeight {
+            get {
+                return placement.rowHeight;
+            }
+        }
+
+        public int x {
+            get {
+                return placement.x;
+            }
+        }
+
+        public int y {
+            get {
+                return placement.y;
             }
         }
 
@@ -79,29 +109,28 @@ namespace AquaPic.UserInterface
         public HomeWidget (string type, int row, int column) {
             SetSizeRequest (100, 82);
 
-            this.type = type;
             placement = new HomeWidgetPlacement (row, column);
 
             switch (type) {
             case "Timer": 
-                placement.width = 3;
-                placement.height = 2;
+                placement.columnWidth = 3;
+                placement.rowHeight = 2;
                 break;
             case "LinePlot":
-                placement.width = 3;
-                placement.height = 1;
+                placement.columnWidth = 3;
+                placement.rowHeight = 1;
                 break;
             case "BarPlot": 
-                placement.width = 1;
-                placement.height = 2;
+                placement.columnWidth = 1;
+                placement.rowHeight = 2;
                 break;
             case "CurvedBarPlot": 
-                placement.width = 2;
-                placement.height = 2;
+                placement.columnWidth = 2;
+                placement.rowHeight = 2;
                 break;
             case "Button":
-                placement.width = 1;
-                placement.height = 1;
+                placement.columnWidth = 1;
+                placement.rowHeight = 1;
                 break;
             default:
                 throw new Exception (string.Format ("Unknown home widget type {0}", type));
@@ -116,9 +145,6 @@ namespace AquaPic.UserInterface
                 touchArea.ButtonPressEvent += OnTouchAreaButtonPress;
                 touchArea.ButtonReleaseEvent += OnTouchAreaButtonRelease;
                 touchArea.ExposeEvent += OnTouchAreaExpose;
-                touchArea.DragBegin += (o, args) => {
-                    Console.WriteLine ("Dragging object");
-                };
                 Put (touchArea, 0, 0);
                 touchArea.Show ();
             }
@@ -153,26 +179,25 @@ namespace AquaPic.UserInterface
                 if (WidgetReleaseEvent != null) {
                     WidgetReleaseEvent (sender, args);
                 } else {
-                    var x = args.Event.X;
-                    var y = args.Event.Y;
+                    var releaseX = args.Event.X;
+                    var releaseY = args.Event.Y;
                     for (int i = Children.Length - 1; i >= 0; --i) {
                         var child = Children[i];
-                        if (child != touchArea) {
-                            if (child.Visible) {
-                                var left = child.Allocation.X - Allocation.X;
-                                var right = left + child.Allocation.Width;
-                                var top = child.Allocation.Y - Allocation.Y;
-                                var bottom = top + child.Allocation.Height;
-                                if (x > left && x < right && y > top && y < bottom) {
-                                    child.ProcessEvent (args.Event);
-                                    break;
-                                }
+                        if (child != touchArea && child.Visible) {
+                            var left = child.Allocation.X - Allocation.X;
+                            var right = left + child.Allocation.Width;
+                            var top = child.Allocation.Y - Allocation.Y;
+                            var bottom = top + child.Allocation.Height;
+                            if (releaseX > left && releaseX < right && releaseY > top && releaseY < bottom) {
+                                child.ProcessEvent (args.Event);
+                                break;
                             }
                         }
                     }
                 }
             }
             selected = false;
+            WidgetUnselectedEvent?.Invoke (this);
             QueueDraw ();
         }
 
@@ -182,43 +207,18 @@ namespace AquaPic.UserInterface
                     ++holdCounter;
                     if (holdCounter > 50) {
                         selected = true;
+                        WidgetSelectedEvent?.Invoke (this);
                     }
                 }
+
+                if (selected) {
+                    GetPointer (out int currentX, out int currentY);
+                    RequestNewTileLocationEvent?.Invoke (currentX + Allocation.Left, currentY + Allocation.Top);
+                }
             }
+
             QueueDraw ();
             return clicked;
-        }
-
-        private class HomeWidgetPlacement
-        {
-            public int rowOrigin;
-            public int columnOrigin;
-            public int width;
-            public int height;
-
-            public HomeWidgetPlacement (int rowOrigin, int columnOrigin) : this (rowOrigin, columnOrigin, 1, 1) { }
-
-            public HomeWidgetPlacement (int rowOrigin, int columnOrigin, int width, int height) {
-                this.rowOrigin = rowOrigin;
-                this.columnOrigin = columnOrigin;
-                this.width = width;
-                this.height = height;
-            }
-
-            public Tuple<int, int>[] ToRowColumnPairs () {
-                var pairs = new Tuple<int, int>[width * height];
-                for (int i = 0; i < pairs.Length; ++i) {
-                    int row;
-                    if (height != 1) {
-                        row = rowOrigin + (i / (pairs.Length / height));
-                    } else {
-                        row = rowOrigin;
-                    }
-                    var column = columnOrigin + (i % width);
-                    pairs[i] = new Tuple<int, int> (row, column);
-                }
-                return pairs;
-            }
         }
     }
 }

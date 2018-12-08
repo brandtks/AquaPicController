@@ -83,6 +83,7 @@
     <Compile Include="Scenes\Home\Dialogs\HomeWidgetDialogDomain\HomeSettingsWidget.cs" />
     <Compile Include="Scenes\Home\Widgets\HomeWidget.cs" />
     <Compile Include="Scenes\Home\Widgets\IHomeWidgetUpdatable.cs" />
+    <Compile Include="Scenes\Home\Widgets\HomeWidgetPlacement.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

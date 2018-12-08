@@ -27,6 +27,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
+using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
@@ -34,11 +35,14 @@ namespace AquaPic.UserInterface
     public class HomeWindow : SceneBase
     {
         List<HomeWidget> widgets;
+        TileBoard tileBoard;
+        NewWidgetLocation newWidgetLocation;
 
         public HomeWindow (params object[] options) {
             showTitle = false;
 
             widgets = new List<HomeWidget> ();
+            tileBoard = new TileBoard ();
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "mainScreen.json");
@@ -112,9 +116,13 @@ namespace AquaPic.UserInterface
                         }
 
                         if (widget != null) {
-                            Put (widget, column * 105 + 50, row * 87 + 32);
+                            Put (widget, widget.x, widget.y);
                             widget.Show ();
                             widgets.Add (widget);
+                            tileBoard.OccupyTiles (widget);
+                            widget.WidgetSelectedEvent += OnWidgetSelected;
+                            widget.WidgetUnselectedEvent += OnWidgetUnselected;
+                            widget.RequestNewTileLocationEvent += OnRequestNewTileLocation;
                         }
                     }
                 }
@@ -137,14 +145,147 @@ namespace AquaPic.UserInterface
 
         protected void Update () {
             foreach (var widget in widgets) {
-                var updateWidget = widget as IHomeWidgetUpdatable;
-                if (updateWidget != null) {
+                if (widget is IHomeWidgetUpdatable updateWidget) {
                     updateWidget.Update ();
                 }
             }
             QueueDraw ();
         }
 
+        protected void OnRequestNewTileLocation (int x, int y) {
+            var pair = HomeWidgetPlacement.GetRowColumn (x, y);
+
+            var newRow = pair.Item1;
+            var newColumn = pair.Item2;
+
+            if (newRow == newWidgetLocation.placement.row && newColumn == newWidgetLocation.placement.column) {
+                return;
+            }
+
+            if (newRow >= 0 && (newRow + newWidgetLocation.placement.rowHeight <= 5) &&
+                newColumn >= 0 && (newColumn + newWidgetLocation.placement.columnWidth <= 7)) {
+                if (!newWidgetLocation.Visible) {
+                    newWidgetLocation.Visible = true;
+                }
+
+                tileBoard.FreeTiles (newWidgetLocation);
+                newWidgetLocation.placement.row = newRow;
+                newWidgetLocation.placement.column = newColumn;
+                tileBoard.OccupyTiles (newWidgetLocation);
+
+                if (tileBoard.containsConflictTiles) {
+                    newWidgetLocation.color = "compl";
+                } else {
+                    newWidgetLocation.color = "grey2";
+                }
+                Remove (newWidgetLocation);
+                Put (newWidgetLocation, newWidgetLocation.placement.x, newWidgetLocation.placement.y);
+                newWidgetLocation.Show ();
+            }
+        }
+
+        protected void OnWidgetSelected (HomeWidget widget) {
+            newWidgetLocation = new NewWidgetLocation (widget);
+            newWidgetLocation.color = "grey2";
+            Put (newWidgetLocation, widget.x, widget.y);
+            newWidgetLocation.Visible = false;
+        }
+
+        protected void OnWidgetUnselected (HomeWidget widget) {
+            if (!tileBoard.containsConflictTiles) {
+                Remove (widget);
+                Put (widget, newWidgetLocation.placement.x, newWidgetLocation.placement.y);
+            }
+            newWidgetLocation.Visible = false;
+        }
+
+        private class TileBoard
+        {
+            Tile[,] tiles;
+
+            public bool containsConflictTiles {
+                get {
+                    foreach (var tile in tiles) {
+                        if (tile.status == TileStatus.Conflict) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            }
+
+            public TileBoard () {
+                tiles = new Tile[5, 7];
+                for (int row = 0; row < 5; ++row) {
+                    for (int column = 0; column < 7; ++column) {
+                        tiles[row, column] = new Tile ();
+                    }
+                }
+            }
+
+            public void OccupyTiles (HomeWidget widget) {
+                OccupyTiles (widget.pairs);
+            }
+
+            public void OccupyTiles (NewWidgetLocation newWidgetLocation) {
+                OccupyTiles (newWidgetLocation.placement.ToRowColumnPairs ());
+            }
+
+            public void OccupyTiles (Tuple<int, int>[] pairs) {
+                foreach (var pair in pairs) {
+                    if (tiles[pair.Item1, pair.Item2].status == TileStatus.Free) {
+                        tiles[pair.Item1, pair.Item2].status = TileStatus.Occupied;
+                    } else if (tiles[pair.Item1, pair.Item2].status == TileStatus.Occupied) {
+                        tiles[pair.Item1, pair.Item2].status = TileStatus.Conflict;
+                    } else {
+                        throw new Exception (string.Format ("The status was {0}", tiles[pair.Item1, pair.Item2].status));
+                    }
+                }
+            }
+
+            public void FreeTiles (HomeWidget widget) {
+                FreeTiles (widget.pairs);
+            }
+
+            public void FreeTiles (NewWidgetLocation newWidgetLocation) {
+                FreeTiles (newWidgetLocation.placement.ToRowColumnPairs ());
+            }
+
+            public void FreeTiles (Tuple<int, int>[] pairs) {
+                foreach (var pair in pairs) {
+                    if (tiles[pair.Item1, pair.Item2].status == TileStatus.Conflict) {
+                        tiles[pair.Item1, pair.Item2].status = TileStatus.Occupied;
+                    } else {
+                        tiles[pair.Item1, pair.Item2].status = TileStatus.Free;
+                    }
+                }
+            }
+
+            enum TileStatus
+            {
+                Free,
+                Occupied,
+                Conflict
+            }
+
+            private class Tile
+            {
+                public TileStatus status;
+
+                public Tile () {
+                    status = TileStatus.Free;
+                }
+            }
+        }
+
+        private class NewWidgetLocation : TouchGraphicalBox
+        {
+            public HomeWidgetPlacement placement;
+
+            public NewWidgetLocation (HomeWidget widget) : base (widget.width, widget.height) {
+                placement = new HomeWidgetPlacement (widget.row, widget.column, widget.columnWidth, widget.rowHeight);
+            }
+        }
     }
 }
 
