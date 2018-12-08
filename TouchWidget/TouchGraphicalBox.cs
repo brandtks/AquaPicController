@@ -38,7 +38,7 @@ namespace GoodtimeDevelopment.TouchWidget
 
             WidthRequest = width;
             HeightRequest = height;
-            this.color = "grey2";
+            color = "grey2";
             transparency = 0.55f;
 
             ExposeEvent += OnExpose;
