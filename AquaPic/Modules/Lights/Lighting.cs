@@ -213,6 +213,16 @@ namespace AquaPic.Modules
             return names.ToArray ();
         }
 
+        public static string[] GetAllDimmingFixtureNames () {
+            List<string> names = new List<string> ();
+            foreach (var fixture in fixtures.Values) {
+                if (fixture is LightingFixtureDimming) {
+                    names.Add (fixture.name);
+                }
+            }
+            return names.ToArray ();
+        }
+
         public static void SetFixtureName (string oldFixtureName, string newFixtureName) {
             CheckFixtureKey (oldFixtureName);
             if (!FixtureNameOk (newFixtureName)) {
