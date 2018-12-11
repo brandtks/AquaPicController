@@ -261,7 +261,7 @@ namespace AquaPic.UserInterface
                                         interYPos = startYPos - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
-                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                        if (currentXPos.WithinSetpoint (timeXPos, 1)) {
                                             timeYPos = interYPos;
                                         }
                                     }
@@ -272,7 +272,7 @@ namespace AquaPic.UserInterface
                                         interYPos = startYPos - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
-                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                        if (currentXPos.WithinSetpoint (timeXPos, 1)) {
                                             timeYPos = interYPos;
                                         }
                                     }
@@ -284,7 +284,7 @@ namespace AquaPic.UserInterface
                                         interYPos = startYPos - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
-                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                        if (currentXPos.WithinSetpoint (timeXPos, 1)) {
                                             timeYPos = interYPos;
                                         }
                                     }
@@ -313,7 +313,7 @@ namespace AquaPic.UserInterface
                                         interYPos = basePoint - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
-                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                        if (currentXPos.WithinSetpoint (timeXPos, 1)) {
                                             timeYPos = interYPos;
                                         }
                                     }
@@ -325,7 +325,7 @@ namespace AquaPic.UserInterface
                                         interYPos = basePoint - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
-                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                        if (currentXPos.WithinSetpoint (timeXPos, 1)) {
                                             timeYPos = interYPos;
                                         }
                                     }
@@ -337,7 +337,7 @@ namespace AquaPic.UserInterface
                                         interYPos = basePoint - delta * Math.Sin (radian);
                                         cr.LineTo (currentXPos, interYPos);
 
-                                        if (currentXPos.WithinRange (timeXPos, 1)) {
+                                        if (currentXPos.WithinSetpoint (timeXPos, 1)) {
                                             timeYPos = interYPos;
                                         }
                                     }
