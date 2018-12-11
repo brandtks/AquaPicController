@@ -201,12 +201,20 @@ namespace GoodtimeDevelopment.Utilites
             return (int)Math.Floor (value + 0.5);
         }
 
-        public static bool WithinRange (this double value, double setpoint, double deadband) {
-            return ((value <= (setpoint + deadband)) && (value >= (setpoint - deadband)));
+        public static bool WithinSetpoint (this double value, double setpoint, double deadband) {
+            return (value <= (setpoint + deadband)) && (value >= (setpoint - deadband));
         }
 
-        public static bool WithinRange (this int value, int setpoint, int deadband) {
-            return ((value <= (setpoint + deadband)) && (value >= (setpoint - deadband)));
+        public static bool WithinSetpoint (this int value, int setpoint, int deadband) {
+            return (value <= (setpoint + deadband)) && (value >= (setpoint - deadband));
+        }
+
+        public static bool WithinRange (this double value, double lower, double upper) {
+            return value >= lower && value <= upper;
+        }
+
+        public static bool WithinRange (this int value, int lower, int upper) {
+            return value >= lower && value <= upper;
         }
 
         public static bool MaskToBoolean (byte mask, int shift) {

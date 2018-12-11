@@ -35,5 +35,20 @@ namespace GoodtimeDevelopment.Utilites.Test
             Assert.True (typeof (int[]).TypeIs (typeof (IList<>)));
             Assert.False (typeof (int[]).TypeIs (typeof (int)));
         }
+
+        [Test]
+        public void WithinRangeTest () {
+            Assert.True (90.WithinRange (90, 100));
+            Assert.True (95.WithinRange (90, 100));
+            Assert.True (100.WithinRange (90, 100));
+            Assert.False (89.WithinRange (90, 100));
+            Assert.False (101.WithinRange (90, 100));
+
+            Assert.True (90d.WithinRange (90, 100));
+            Assert.True (95d.WithinRange (90, 100));
+            Assert.True (100d.WithinRange (90, 100));
+            Assert.False (89.999.WithinRange (90, 100));
+            Assert.False (100.001.WithinRange (90, 100));
+        }
     }
 }
