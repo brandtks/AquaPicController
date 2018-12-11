@@ -24,11 +24,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using AquaPic.Runtime;
+using GoodtimeDevelopment.TouchWidget;
+using GoodtimeDevelopment.Utilites;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using GoodtimeDevelopment.Utilites;
-using GoodtimeDevelopment.TouchWidget;
-using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
@@ -37,12 +38,13 @@ namespace AquaPic.UserInterface
         List<HomeWidget> widgets;
         TileBoard tileBoard;
         NewWidgetLocation newWidgetLocation;
+        TouchButton trashButton;
 
         public HomeWindow (params object[] options) {
             showTitle = false;
 
             widgets = new List<HomeWidget> ();
-            tileBoard = new TileBoard ();
+            tileBoard = new TileBoard (5, 7);
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "mainScreen.json");
@@ -134,6 +136,13 @@ namespace AquaPic.UserInterface
                 File.WriteAllText (path, ja.ToString ());
             }
 
+            trashButton = new TouchButton ();
+            trashButton.SetSizeRequest (60, 60);
+            trashButton.text = "Trash";
+            trashButton.buttonColor = "compl";
+            trashButton.Visible = false;
+            Put (trashButton, 20, 410); 
+
             Update ();
             Show ();
         }
@@ -189,14 +198,21 @@ namespace AquaPic.UserInterface
             newWidgetLocation.color = "grey2";
             Put (newWidgetLocation, widget.x, widget.y);
             newWidgetLocation.Visible = false;
+
+            Remove (trashButton);
+            Put (trashButton, 40, 400);
+            trashButton.Visible = true;
         }
 
         protected void OnWidgetUnselected (HomeWidget widget) {
             if (!tileBoard.containsConflictTiles) {
+                widget.row = newWidgetLocation.placement.row;
+                widget.column = newWidgetLocation.placement.column;
                 Remove (widget);
-                Put (widget, newWidgetLocation.placement.x, newWidgetLocation.placement.y);
+                Put (widget, widget.x, widget.y);
             }
             newWidgetLocation.Visible = false;
+            trashButton.Visible = false;
         }
 
         private class TileBoard
@@ -214,10 +230,10 @@ namespace AquaPic.UserInterface
                 }
             }
 
-            public TileBoard () {
-                tiles = new Tile[5, 7];
-                for (int row = 0; row < 5; ++row) {
-                    for (int column = 0; column < 7; ++column) {
+            public TileBoard (int rows, int columns) {
+                tiles = new Tile[rows, columns];
+                for (var row = 0; row < rows; ++row) {
+                    for (var column = 0; column < columns; ++column) {
                         tiles[row, column] = new Tile ();
                     }
                 }

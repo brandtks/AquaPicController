@@ -25,6 +25,7 @@ using System;
 using Gtk;
 using Cairo;
 using GoodtimeDevelopment.TouchWidget;
+using Gdk;
 
 namespace AquaPic.UserInterface
 {
@@ -175,7 +176,9 @@ namespace AquaPic.UserInterface
 
         protected void OnTouchAreaButtonRelease (object sender, ButtonReleaseEventArgs args) {
             clicked = false;
-            if (!selected) {
+            if (selected) {
+                WidgetUnselectedEvent?.Invoke (this);
+            } else {
                 if (WidgetReleaseEvent != null) {
                     WidgetReleaseEvent (sender, args);
                 } else {
@@ -196,8 +199,8 @@ namespace AquaPic.UserInterface
                     }
                 }
             }
+
             selected = false;
-            WidgetUnselectedEvent?.Invoke (this);
             QueueDraw ();
         }
 
