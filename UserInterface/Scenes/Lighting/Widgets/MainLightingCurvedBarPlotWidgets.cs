@@ -34,7 +34,7 @@ namespace AquaPic.UserInterface
         string fixtureName;
 
         public DimmingLightCurvedBarPlot (string fixtureName, int row, int column) : base (row, column) {
-            text = "Lighting";
+            text = "No Light";
             unitOfMeasurement = UnitsOfMeasurement.Percentage;
 
             this.fixtureName = fixtureName;
@@ -44,6 +44,8 @@ namespace AquaPic.UserInterface
                 WidgetReleaseEvent += (o, args) => {
                     AquaPicGui.AquaPicUserInterface.ChangeScreens ("Lighting", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.fixtureName);
                 };
+            } else {
+                this.fixtureName = string.Empty;
             }
         }
 
