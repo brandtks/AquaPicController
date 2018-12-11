@@ -223,7 +223,7 @@ namespace AquaPic.UserInterface
                     t.Render (this, right - 120, bottom - 40, 115, 40);
 
                     // Settings Text
-                    t.text = Convert.ToChar (0x2699).ToString ();
+                    t.text = "\u2699";
                     t.alignment = TouchAlignment.Center;
                     t.Render (this, right - 160, bottom - 40, 40, 40);
                 } else {
