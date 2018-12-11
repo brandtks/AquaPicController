@@ -148,9 +148,9 @@ namespace AquaPic.UserInterface
 
                     // Home Button
                     cr.MoveTo (right + 5, bottom + 5);
-                    cr.LineTo (right - 165, bottom + 5);
-                    cr.LineTo (right - 165, bottom - 20);
-                    cr.Arc (right - 145, bottom - 20, 20, 0, -Math.PI / 2);
+                    cr.LineTo (right - 120, bottom + 5);
+                    cr.LineTo (right - 120, bottom - 20);
+                    cr.Arc (right - 100, bottom - 20, 20, 0, -Math.PI / 2);
                     cr.LineTo (right + 5, bottom - 40);
                     cr.ClosePath ();
 
@@ -221,11 +221,6 @@ namespace AquaPic.UserInterface
                     // Home Text
                     t.text = "Home";
                     t.Render (this, right - 120, bottom - 40, 115, 40);
-
-                    // Settings Text
-                    t.text = "\u2699";
-                    t.alignment = TouchAlignment.Center;
-                    t.Render (this, right - 160, bottom - 40, 40, 40);
                 } else {
                     cr.Arc (originX - 208, originY, radius, 0, 2 * Math.PI);
                     cr.ClosePath ();
@@ -292,9 +287,9 @@ namespace AquaPic.UserInterface
                 int x = args.Event.X.ToInt ();
                 int y = args.Event.Y.ToInt ();
 
-                if (y.WithinRange (clickY, 25)) {
+                if (y.WithinSetpoint (clickY, 25)) {
                     if (x <= 250) {
-                        if (y.WithinRange (Allocation.Height / 2 + Allocation.Top, 15)) {
+                        if (y.WithinSetpoint (Allocation.Height / 2 + Allocation.Top, 15)) {
                             if (windows[highlighedScreenIndex] != AquaPicGui.AquaPicUserInterface.currentScene) {
                                 AquaPicGui.AquaPicUserInterface.ChangeScreens (windows[highlighedScreenIndex], Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
                             } else {
@@ -329,13 +324,6 @@ namespace AquaPic.UserInterface
                             } else {
                                 CollapseMenu ();
                             }
-                        } else if ((x >= 640) && (y >= 420)) {
-                            var parent = Toplevel as Window;
-                            var s = new HomeSettingsDialog (parent);
-                            s.Run ();
-                            s.Destroy ();
-                            s.Dispose ();
-                            AquaPicGui.AquaPicUserInterface.ChangeScreens ("Home", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene);
                         } else {
                             CollapseMenu ();
                         }
