@@ -24,7 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using Gtk;
 using AquaPic.Runtime;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
@@ -39,12 +39,23 @@ namespace AquaPic.UserInterface
         TileBoard tileBoard;
         NewWidgetLocation newWidgetLocation;
         TouchButton trashButton;
+        EventBox emptySpaceEventBox;
+        bool hoveredOverTrash;
+        uint emptySpacePressTime;
 
         public HomeWindow (params object[] options) {
             showTitle = false;
 
             widgets = new List<HomeWidget> ();
             tileBoard = new TileBoard (5, 7);
+
+            emptySpaceEventBox = new EventBox ();
+            emptySpaceEventBox.SetSizeRequest (800, 480);
+            emptySpaceEventBox.VisibleWindow = false;
+            emptySpaceEventBox.ButtonPressEvent += OnEmptySpaceEventBoxButtonPressed;
+            emptySpaceEventBox.ButtonReleaseEvent += OnEmptySpaceEventBoxButtonReleased;
+            Put (emptySpaceEventBox, 0, 0);
+            emptySpaceEventBox.Show ();
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "mainScreen.json");
@@ -59,6 +70,11 @@ namespace AquaPic.UserInterface
                         var name = (string)jo["name"];
                         var type = (string)jo["type"];
 
+                        var group = string.Empty;
+                        if (jo.ContainsKey ("group")) {
+                            group = (string)jo["group"];
+                        }
+
                         var column = -1;
                         var row = -1;
                         try {
@@ -69,53 +85,7 @@ namespace AquaPic.UserInterface
                             continue;
                         }
 
-                        HomeWidget widget = null;
-                        switch (type) {
-                        case "Timer": {
-                                widget = new DeluxeTimerWidget (name, row, column);
-                                break;
-                            }
-                        case "LinePlot": {
-                                var group = (string)jo["group"];
-
-                                if (HomeWindowWidgets.linePlots.ContainsKey (name)) {
-                                    widget = HomeWindowWidgets.linePlots[name].CreateInstance (group, row, column);
-                                } else {
-                                    Logger.AddWarning (string.Format ("Unknown line plot for main window: {0}", name));
-                                }
-
-                                break;
-                            }
-                        case "BarPlot": {
-                                var group = (string)jo["group"];
-
-                                if (HomeWindowWidgets.barPlots.ContainsKey (name)) {
-                                    widget = HomeWindowWidgets.barPlots[name].CreateInstance (group, row, column);
-                                } else {
-                                    Logger.AddWarning (string.Format ("Unknown bar plot for main window: {0}", name));
-                                }
-
-                                break;
-                            }
-                        case "CurvedBarPlot": {
-                                var group = (string)jo["group"];
-
-                                if (HomeWindowWidgets.curvedBarPlots.ContainsKey (name)) {
-                                    widget = HomeWindowWidgets.curvedBarPlots[name].CreateInstance (group, row, column);
-                                } else {
-                                    Logger.AddWarning (string.Format ("Unknown bar plot for main window: {0}", name));
-                                }
-
-                                break;
-                            }
-                        case "Button": {
-                                widget = new ButtonWidget (name, row, column);
-                                break;
-                            }
-                        default:
-                            Logger.AddWarning (string.Format ("Unknown widget for main window: {0}", type));
-                            break;
-                        }
+                        var widget = HomeWindowWidgets.GetNewHomeWidget (type, name, group, row, column);
 
                         if (widget != null) {
                             Put (widget, widget.x, widget.y);
@@ -137,11 +107,12 @@ namespace AquaPic.UserInterface
             }
 
             trashButton = new TouchButton ();
-            trashButton.SetSizeRequest (60, 60);
+            trashButton.SetSizeRequest (40, 40);
             trashButton.text = "Trash";
             trashButton.buttonColor = "compl";
+            trashButton.buttonColor.ModifyColor (0.75);
             trashButton.Visible = false;
-            Put (trashButton, 20, 410); 
+            Put (trashButton, 755, 435);
 
             Update ();
             Show ();
@@ -162,6 +133,17 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnRequestNewTileLocation (int x, int y) {
+            if (x.WithinRange (755, 795) && y.WithinRange (435, 475)) {
+                hoveredOverTrash = true;
+                trashButton.buttonColor = "compl";
+                return;
+            }
+
+            if (hoveredOverTrash) {
+                hoveredOverTrash = false;
+                trashButton.buttonColor.ModifyColor (0.75);
+            }
+
             var pair = HomeWidgetPlacement.GetRowColumn (x, y);
 
             var newRow = pair.Item1;
@@ -200,19 +182,78 @@ namespace AquaPic.UserInterface
             newWidgetLocation.Visible = false;
 
             Remove (trashButton);
-            Put (trashButton, 40, 400);
+            Put (trashButton, 755, 435);
             trashButton.Visible = true;
+            hoveredOverTrash = false;
         }
 
         protected void OnWidgetUnselected (HomeWidget widget) {
-            if (!tileBoard.containsConflictTiles) {
-                widget.row = newWidgetLocation.placement.row;
-                widget.column = newWidgetLocation.placement.column;
+            if (hoveredOverTrash) {
                 Remove (widget);
-                Put (widget, widget.x, widget.y);
+                widgets.Remove (widget);
+            } else {
+                if (!tileBoard.containsConflictTiles) {
+                    widget.row = newWidgetLocation.placement.row;
+                    widget.column = newWidgetLocation.placement.column;
+                    Remove (widget);
+                    Put (widget, widget.x, widget.y);
+                }
             }
             newWidgetLocation.Visible = false;
             trashButton.Visible = false;
+        }
+
+        protected void OnEmptySpaceEventBoxButtonPressed (object sender, ButtonPressEventArgs args) {
+            emptySpacePressTime = args.Event.Time;
+        }
+
+        protected void OnEmptySpaceEventBoxButtonReleased (object sender, ButtonReleaseEventArgs args) {
+            if (args.Event.Time - emptySpacePressTime < 1000) {
+                return; 
+            }
+
+            var parent = Toplevel as Window;
+            var addHomeWidgetDialog = new AddHomeWidgetDialog (parent);
+            addHomeWidgetDialog.Run ();
+            var newWidgetSettings = addHomeWidgetDialog.newWidget;
+            addHomeWidgetDialog.Destroy ();
+            addHomeWidgetDialog.Dispose ();
+
+            if (newWidgetSettings == null) {
+                return;
+            }
+
+            var pair = HomeWidgetPlacement.GetRowColumn (args.Event.X.ToInt (), args.Event.Y.ToInt ());
+
+            var row = pair.Item1;
+            var column = pair.Item2;
+
+            var widget = HomeWindowWidgets.GetNewHomeWidget (
+                newWidgetSettings.type, 
+                newWidgetSettings.name, 
+                newWidgetSettings.group, 
+                row, 
+                column);
+
+            if (widget != null) {
+                if (row < 0 && (row + widget.rowHeight > 5) && column < 0 && (column + widget.columnWidth > 7)) {
+                    MessageBox.Show ("Not enough room on the screen for that widget");
+                } else {
+                    tileBoard.OccupyTiles (widget);
+
+                    if (tileBoard.containsConflictTiles) {
+                        tileBoard.FreeTiles (widget);
+                        MessageBox.Show ("Widget conflicts with other widgets");
+                    } else {
+                        Put (widget, widget.x, widget.y);
+                        widget.Show ();
+                        widgets.Add (widget);
+                        widget.WidgetSelectedEvent += OnWidgetSelected;
+                        widget.WidgetUnselectedEvent += OnWidgetUnselected;
+                        widget.RequestNewTileLocationEvent += OnRequestNewTileLocation;
+                    }
+                }
+            }
         }
 
         private class TileBoard

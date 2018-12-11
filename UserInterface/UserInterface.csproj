@@ -41,7 +41,6 @@
     <Compile Include="Scenes\Digital\DigitalInputScreen.cs" />
     <Compile Include="Scenes\Digital\Widgets\DigitalDisplay.cs" />
     <Compile Include="Scenes\Home\Dialogs\AddHomeWidgetDialog.cs" />
-    <Compile Include="Scenes\Home\Dialogs\HomeSettingsDialog.cs" />
     <Compile Include="Scenes\Home\HomeScreen.cs" />
     <Compile Include="Scenes\Home\Widgets\BarPlotWidget.cs" />
     <Compile Include="Scenes\Home\Widgets\ButtonWidget.cs" />
@@ -84,6 +83,7 @@
     <Compile Include="Scenes\Home\Widgets\HomeWidget.cs" />
     <Compile Include="Scenes\Home\Widgets\IHomeWidgetUpdatable.cs" />
     <Compile Include="Scenes\Home\Widgets\HomeWidgetPlacement.cs" />
+    <Compile Include="Scenes\Home\Dialogs\HomeWidgetDialogDomain\NewHomeWidgetSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
