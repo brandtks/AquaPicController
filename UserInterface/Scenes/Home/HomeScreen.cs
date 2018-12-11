@@ -237,7 +237,7 @@ namespace AquaPic.UserInterface
 
             if (widget != null) {
                 if (row < 0 && (row + widget.rowHeight > 5) && column < 0 && (column + widget.columnWidth > 7)) {
-                    MessageBox.Show ("Not enough room on the screen for that widget");
+                    MessageBox.Show ("Not enough room on the screen for widget");
                 } else {
                     tileBoard.OccupyTiles (widget);
 
