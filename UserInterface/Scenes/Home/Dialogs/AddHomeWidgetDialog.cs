@@ -203,6 +203,11 @@ namespace AquaPic.UserInterface
                         groupComboBox.combo.comboList.Clear ();
                         groupComboBox.combo.comboList.AddRange (WaterLevel.GetAllWaterLevelGroupNames ());
                         groupComboBox.combo.activeIndex = -1;
+                    } else if (args.activeText == "Lighting") {
+                        groupComboBox.Visible = true;
+                        groupComboBox.combo.comboList.Clear ();
+                        groupComboBox.combo.comboList.AddRange (Lighting.GetAllDimmingFixtureNames ());
+                        groupComboBox.combo.activeIndex = -1;
                     } else {
                         groupComboBox.Visible = false;
                     }
