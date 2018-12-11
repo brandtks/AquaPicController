@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
@@ -45,6 +46,56 @@ namespace AquaPic.UserInterface
             curvedBarPlots = new Dictionary<string, CurvedBarPlotData> {
                 { "Lighting", new CurvedBarPlotData ((fixtureName, row, column) => {return new DimmingLightCurvedBarPlot (fixtureName, row, column);}) }
             };
+        }
+
+        public static HomeWidget GetNewHomeWidget (string type, string name, int row, int column) {
+            return GetNewHomeWidget (type, name, string.Empty, row, column);
+        }
+
+        public static HomeWidget GetNewHomeWidget (string type, string name, string group, int row, int column) {
+            HomeWidget widget = null;
+            switch (type) {
+            case "Timer": {
+                    widget = new DeluxeTimerWidget (name, row, column);
+                    break;
+                }
+            case "LinePlot": {
+                    if (linePlots.ContainsKey (name)) {
+                        widget = linePlots[name].CreateInstance (group, row, column);
+                    } else {
+                        Logger.AddWarning (string.Format ("Unknown line plot for main window: {0}", name));
+                    }
+
+                    break;
+                }
+            case "BarPlot": {
+                    if (barPlots.ContainsKey (name)) {
+                        widget = barPlots[name].CreateInstance (group, row, column);
+                    } else {
+                        Logger.AddWarning (string.Format ("Unknown bar plot for main window: {0}", name));
+                    }
+
+                    break;
+                }
+            case "CurvedBarPlot": {
+                    if (curvedBarPlots.ContainsKey (name)) {
+                        widget = curvedBarPlots[name].CreateInstance (group, row, column);
+                    } else {
+                        Logger.AddWarning (string.Format ("Unknown bar plot for main window: {0}", name));
+                    }
+
+                    break;
+                }
+            case "Button": {
+                    widget = new ButtonWidget (name, row, column);
+                    break;
+                }
+            default:
+                Logger.AddWarning (string.Format ("Unknown widget for main window: {0}", type));
+                break;
+            }
+
+            return widget;
         }
     }
 }
