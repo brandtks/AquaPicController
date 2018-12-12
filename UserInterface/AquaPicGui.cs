@@ -58,7 +58,7 @@ namespace AquaPic.UserInterface
 
         protected AquaPicGui () : base (WindowType.Toplevel) {
             Name = "AquaPicGUI";
-            Title = "AquaPic Controller Version 1";
+            Title = "AquaPic Controller Version 0";
             WindowPosition = WindowPosition.Center;
             SetSizeRequest (800, 480);
             Resizable = false;
