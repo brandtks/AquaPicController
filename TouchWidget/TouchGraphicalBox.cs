@@ -29,25 +29,34 @@ namespace GoodtimeDevelopment.TouchWidget
 {
     public class TouchGraphicalBox : EventBox
     {
-        public string color;
-        public float transparency;
+        public TouchColor color;
+        public double transparency {
+            get {
+                return color.A;
+            }
+            set {
+                color.A = value;
+            }
+        }
 
         public TouchGraphicalBox (int width, int height) {
             Visible = true;
             VisibleWindow = false;
 
-            WidthRequest = width;
-            HeightRequest = height;
+            SetSizeRequest (width, height);
             color = "grey2";
             transparency = 0.55f;
 
             ExposeEvent += OnExpose;
         }
 
+        public TouchGraphicalBox ()
+            : this (800, 480) { }
+
         protected virtual void OnExpose (object sender, ExposeEventArgs args) {
             using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
                 cr.Rectangle (Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
-                TouchColor.SetSource (cr, color, transparency);
+                color.SetSource (cr);
                 cr.Fill ();
             }
         }
