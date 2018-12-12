@@ -32,6 +32,15 @@ namespace AquaPic.Runtime
 {
     public class SettingsHelper
     {
+        public static bool SettingsFileExists (string fileName) {
+            if (!fileName.EndsWith (".json", StringComparison.InvariantCultureIgnoreCase)) {
+                fileName = string.Format ("{0}.json", fileName);
+            }
+            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
+            path = Path.Combine (path, fileName);
+            return File.Exists (path);
+        }
+
         public static JToken OpenSettingsFile (string fileName) {
             if (!fileName.EndsWith (".json", StringComparison.InvariantCultureIgnoreCase)) {
                 fileName = string.Format ("{0}.json", fileName);
@@ -43,12 +52,17 @@ namespace AquaPic.Runtime
             return JToken.Parse (json);
         }
 
-        public static void SaveSettingsFile (string fileName, JToken settings) {
+        public static void WriteSettingsFile (string fileName, JToken settings) {
             if (!fileName.EndsWith (".json", StringComparison.InvariantCultureIgnoreCase)) {
                 fileName = string.Format ("{0}.json", fileName);
             }
             var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, fileName);
+
+            if (!File.Exists (path)) {
+                var file = File.Create (path);
+                file.Close ();
+            }
 
             File.WriteAllText (path, settings.ToString ());
         }
@@ -133,7 +147,7 @@ namespace AquaPic.Runtime
                         }
                     }
                     ja.Add (jobj);
-                    SaveSettingsFile (fileName, jo);
+                    WriteSettingsFile (fileName, jo);
                     successful = true;
                 }
             }
@@ -149,7 +163,7 @@ namespace AquaPic.Runtime
                     var arrayIndex = FindSettingsInArray (ja, entityName);
                     if (arrayIndex != -1) {
                         ja.RemoveAt (arrayIndex);
-                        SaveSettingsFile (fileName, jo);
+                        WriteSettingsFile (fileName, jo);
                         successful = true;
                     }
                 }

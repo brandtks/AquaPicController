@@ -283,7 +283,7 @@ namespace AquaPic.UserInterface
                 ja[arrIdx]["waterLevelGroupName"] = groupName;
             }
 
-            SettingsHelper.SaveSettingsFile ("waterLevelProperties", jo);
+            SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
             return true;
         }
 
@@ -298,7 +298,7 @@ namespace AquaPic.UserInterface
             }
 
             ja.RemoveAt (arrIdx);
-            SettingsHelper.SaveSettingsFile ("waterLevelProperties", jo);
+            SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
             WaterLevel.RemoveFloatSwitch (switchName);
             return true;
         }

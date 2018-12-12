@@ -130,7 +130,7 @@ namespace AquaPic.UserInterface
                 jao[0] = alarmOnPowerLoss.ToString ();
             }
 
-            SettingsHelper.SaveSettingsFile ("equipment", ja);
+            SettingsHelper.WriteSettingsFile ("equipment", ja);
             return true;
         }
 
@@ -142,7 +142,7 @@ namespace AquaPic.UserInterface
                 return false;
             }
             ja.RemoveAt (index);
-            SettingsHelper.SaveSettingsFile ("equipment", ja);
+            SettingsHelper.WriteSettingsFile ("equipment", ja);
             Power.RemovePowerStrip (powerStripName);
             return true;
         }

@@ -68,7 +68,7 @@ namespace AquaPic.UserInterface
                                     new JProperty ("options", string.Empty)
                                 };
                         ja.Add (jo);
-                        SettingsHelper.SaveSettingsFile ("equipment", ja);
+                        SettingsHelper.WriteSettingsFile ("equipment", ja);
                         keepText = true;
                     }
                 } catch {
@@ -88,7 +88,7 @@ namespace AquaPic.UserInterface
             }
 
             ja.RemoveAt (index);
-            SettingsHelper.SaveSettingsFile ("equipment", ja);
+            SettingsHelper.WriteSettingsFile ("equipment", ja);
             cardDriver.RemoveCard (card);
             return true;
         }

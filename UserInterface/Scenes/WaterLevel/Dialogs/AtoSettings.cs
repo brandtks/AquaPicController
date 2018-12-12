@@ -325,7 +325,7 @@ namespace AquaPic.UserInterface
                 ja[arrIdx]["minimumCooldown"] = minimumCooldown.ToString ();
             }
 
-            SettingsHelper.SaveSettingsFile ("autoTopOffProperties", jo);
+            SettingsHelper.WriteSettingsFile ("autoTopOffProperties", jo);
             return true;
         }
     }

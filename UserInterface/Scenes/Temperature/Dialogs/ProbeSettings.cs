@@ -169,7 +169,7 @@ namespace AquaPic.UserInterface
                 ja[arrayIndex]["temperatureGroup"] = temperatureGroupName;
             }
 
-            SettingsHelper.SaveSettingsFile ("tempProperties", jo);
+            SettingsHelper.WriteSettingsFile ("tempProperties", jo);
             return true;
         }
 
@@ -184,7 +184,7 @@ namespace AquaPic.UserInterface
             }
 
             ja.RemoveAt (arrayIndex);
-            SettingsHelper.SaveSettingsFile ("tempProperties", jo);
+            SettingsHelper.WriteSettingsFile ("tempProperties", jo);
             Temperature.RemoveTemperatureProbe (probeName);
             return true;
         }

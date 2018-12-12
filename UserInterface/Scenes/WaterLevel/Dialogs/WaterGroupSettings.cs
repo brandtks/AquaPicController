@@ -208,7 +208,7 @@ namespace AquaPic.UserInterface
                 ja[arrIdx]["enableLowAnalogAlarm"] = enableLowAnalogAlarm.ToString ();
             }
 
-            SettingsHelper.SaveSettingsFile ("waterLevelProperties", jo);
+            SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
             return true;
         }
 
@@ -223,7 +223,7 @@ namespace AquaPic.UserInterface
             }
 
             ja.RemoveAt (arrIdx);
-            SettingsHelper.SaveSettingsFile ("waterLevelProperties", jo);
+            SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
             WaterLevel.RemoveWaterLevelGroup (groupName);
             return true;
         }

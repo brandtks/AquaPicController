@@ -146,7 +146,7 @@ namespace AquaPic.UserInterface
                 ja.Add (jo);
             }
 
-            SettingsHelper.SaveSettingsFile ("mainScreen", ja);
+            SettingsHelper.WriteSettingsFile ("mainScreen", ja);
 
             base.Dispose ();
         }
