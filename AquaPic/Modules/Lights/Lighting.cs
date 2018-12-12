@@ -65,7 +65,7 @@ namespace AquaPic.Modules
             path = Path.Combine (path, "lightingProperties.json");
 
             if (File.Exists (path)) {
-                var fixturesSettings = SettingsHelper.ReadAllSettingsInArray< LightingFixtureSettings> ("lightingProperties", "lightingFixtures");
+                var fixturesSettings = SettingsHelper.ReadAllSettingsInArray<LightingFixtureSettings> ("lightingProperties", "lightingFixtures");
                 foreach (var settings in fixturesSettings) {
                     AddLight (settings, false);
                 }
