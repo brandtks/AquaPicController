@@ -53,7 +53,7 @@ namespace AquaPic.UserInterface
         }
 
         public SceneBase (bool addTimer = true) {
-            SetSizeRequest (800, 416);
+            SetSizeRequest (800, 480);
 
             label = new TouchLabel ();
             label.text = "NO TITLE";
