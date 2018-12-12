@@ -41,11 +41,11 @@ namespace AquaPic.Modules
         [EntitySetting (typeof (BoolMutatorDefaultTrue), "highTempLockout")]
         public bool highTempLockout { get; set; }
 
-        [EntitySetting (typeof (LightingStatesMutator))]
-        public LightingState[] lightingStates { get; set; }
-
         [EntitySetting (typeof (IndividualControlMutator), new string[] { "dimmingCard", "channel" }, true)]
         public IndividualControl dimmingOutlet { get; set; }
+
+        [EntitySetting (typeof (LightingStatesMutator))]
+        public LightingState[] lightingStates { get; set; }
     }
 
     public class LightingStatesMutator : ISettingMutator<LightingState[]>
@@ -111,27 +111,14 @@ namespace AquaPic.Modules
         }
 
         public void Write(LightingState[] value, JObject jobj, string[] keys) {
-            var fixtureName = string.Empty;
-            var fixtures = Lighting.GetAllFixtureNames ();
-            foreach (var fixture in fixtures) {
-                var lightingStates = Lighting.GetLightingFixtureLightingStates (fixture);
-                if (value.Equals (lightingStates)) {
-                    fixtureName = fixture;
-                }
-            }
-
-            var dimmingFixture = fixtureName.IsNotEmpty () ? Lighting.IsDimmingFixture (fixtureName) : false;
-
             var ja = new JArray ();
             foreach (var state in value) {
                 JObject jo = new JObject ();
                 jo.Add (new JProperty ("startTimeDescriptor", state.startTimeDescriptor));
                 jo.Add (new JProperty ("endTimeDescriptor", state.endTimeDescriptor));
                 jo.Add (new JProperty ("type", state.type.ToString ()));
-                if (dimmingFixture) {
-                    jo.Add (new JProperty ("startingDimmingLevel", state.startingDimmingLevel.ToString ()));
-                    jo.Add (new JProperty ("endingDimmingLevel", state.endingDimmingLevel.ToString ()));
-                }
+                jo.Add (new JProperty ("startingDimmingLevel", state.startingDimmingLevel.ToString ()));
+                jo.Add (new JProperty ("endingDimmingLevel", state.endingDimmingLevel.ToString ()));
                 ja.Add (jo);
             }
             jobj["events"] = ja;

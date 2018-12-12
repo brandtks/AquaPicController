@@ -49,9 +49,8 @@ namespace AquaPic.Modules
                 if (fixtures.Count > 0) {
                     var first = fixtures.First ();
                     return first.Key;
-                } else {
-                    return string.Empty;
                 }
+                return string.Empty;
             }
         }
 

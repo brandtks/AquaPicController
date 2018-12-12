@@ -62,8 +62,33 @@ namespace AquaPic.Modules
             public void UpdateLightingStates (LightingState[] lightingStates, bool temporaryChange) {
                 savedLightingStates = temporaryChange ? this.lightingStates : (new LightingState[0]);
                 this.lightingStates = lightingStates;
+                EnsureLastStateIsOff ();
                 currentState = -1;
                 CheckCurrentState ();
+            }
+
+            protected void EnsureLastStateIsOff () {
+                if (lightingStates.Length == 0) {
+                    return;
+                }
+
+                bool atLeastOneOffStateExists = false;
+                foreach (var state in lightingStates) {
+                    atLeastOneOffStateExists |= state.type == LightingStateType.Off;
+                }
+
+                if (!atLeastOneOffStateExists) {
+                    return;
+                }
+
+                while (lightingStates[lightingStates.Length - 1].type != LightingStateType.Off) {
+
+                    var lastState = lightingStates[lightingStates.Length - 1];
+                    for (var i = lightingStates.Length - 1; i > 0; --i) {
+                        lightingStates[i] = lightingStates[i - 1];
+                    }
+                    lightingStates[0] = lastState;
+                }
             }
 
             public bool OnPlugStateGetter () {
