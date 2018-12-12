@@ -26,12 +26,21 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Modules
 {
-    public class WaterLevelGroupSettings
+    public class WaterLevelGroupSettings : IEntitySettings
     {
-        public string name;
-        public float highAnalogAlarmSetpoint;
-        public bool enableHighAnalogAlarm;
-        public float lowAnalogAlarmSetpoint;
-        public bool enableLowAnalogAlarm;
+        [EntitySetting (typeof (StringMutator), "name")]
+        public string name { get; set; }
+
+        [EntitySetting (typeof (FloatMutator), "highAnalogAlarmSetpoint")]
+        public float highAnalogAlarmSetpoint { get; set; }
+
+        [EntitySetting (typeof (BoolMutatorDefaultTrue), "enableHighAnalogAlarm")]
+        public bool enableHighAnalogAlarm { get; set; }
+
+        [EntitySetting (typeof (FloatMutator), "lowAnalogAlarmSetpoint")]
+        public float lowAnalogAlarmSetpoint { get; set; }
+
+        [EntitySetting (typeof (BoolMutatorDefaultTrue), "enableLowAnalogAlarm")]
+        public bool enableLowAnalogAlarm { get; set; }
     }
 }

@@ -23,11 +23,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Globals;
 using AquaPic.Drivers;
@@ -61,24 +58,19 @@ namespace AquaPic.Modules
 
             fixtures = new Dictionary<string, LightingFixture> ();
 
-            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = Path.Combine (path, "lightingProperties.json");
-
-            if (File.Exists (path)) {
+            if (SettingsHelper.SettingsFileExists ("lightingProperties")) {
                 var fixturesSettings = SettingsHelper.ReadAllSettingsInArray<LightingFixtureSettings> ("lightingProperties", "lightingFixtures");
                 foreach (var settings in fixturesSettings) {
                     AddLight (settings, false);
                 }
             } else {
                 Logger.Add ("Lighting settings file did not exist, created new lighting settings");
-                var file = File.Create (path);
-                file.Close ();
 
                 var jo = new JObject {
                     new JProperty ("lightingFixtures", new JArray ())
                 };
 
-                File.WriteAllText (path, jo.ToString ());
+                SettingsHelper.WriteSettingsFile ("lightingProperties", jo);
             }
         }
 
@@ -111,6 +103,10 @@ namespace AquaPic.Modules
             bool highTempLockout,
             bool saveToFile = true) 
         {
+            if (!FixtureNameOk (name)) {
+                throw new Exception (string.Format ("Lighting Fixture {0} already exists", name));
+            }
+
             fixtures[name] = new LightingFixture (
                 name,
                 powerOutlet,
@@ -125,15 +121,19 @@ namespace AquaPic.Modules
         public static void AddLight (
             string name,
             IndividualControl powerOutlet,
-            IndividualControl channel,
+            IndividualControl dimmingOutlet,
             LightingState[] lightingStates,
             bool highTempLockout,
             bool saveToFile = true) 
         {
+            if (!FixtureNameOk (name)) {
+                throw new Exception (string.Format ("Lighting Fixture {0} already exists", name));
+            }
+
             fixtures[name] = new LightingFixtureDimming (
                 name,
                 powerOutlet,
-                channel,
+                dimmingOutlet,
                 lightingStates,
                 highTempLockout);
 
@@ -158,28 +158,6 @@ namespace AquaPic.Modules
             fixtures.Remove (fixtureName);
 
             SettingsHelper.DeleteSettingsFromArray ("lightingProperties", "lightingFixtures", fixtureName);
-
-            // Now remove any main screen widgets associated with the fixture
-            var ja = SettingsHelper.OpenSettingsFile ("mainScreen") as JArray;
-            var arrayIndex = SettingsHelper.FindSettingsInArray (ja, fixtureName);
-            if (arrayIndex != -1) {
-                ja.RemoveAt (arrayIndex);
-                SettingsHelper.SaveSettingsFile ("mainScreen", ja);
-            }
-        }
-
-        protected static void AddFixtureSettingsToFile (string fixtureName) {
-            CheckFixtureKey (fixtureName);
-            SettingsHelper.AddSettingsToArray ("lightingProperties", "lightingFixtures", GetLightingFixtureSettings (fixtureName));
-        }
-
-        public static void UpdateFixtureSettingsToFile (string fixtureName) {
-            UpdateFixtureSettingsToFile (fixtureName, fixtureName);
-        }
-
-        public static void UpdateFixtureSettingsToFile (string fixtureName, string savedFixtureName) {
-            CheckFixtureKey (fixtureName);
-            SettingsHelper.UpdateSettingsInArray ("lightingProperties", "lightingFixtures", savedFixtureName, GetLightingFixtureSettings (fixtureName));
         }
 
         public static void CheckFixtureKey (string fixtureName) {
@@ -245,7 +223,7 @@ namespace AquaPic.Modules
             var arrIdx = SettingsHelper.FindSettingsInArray (ja, oldFixtureName);
             if (arrIdx != -1) {
                 ja[arrIdx]["name"] = newFixtureName;
-                SettingsHelper.SaveSettingsFile ("mainScreen", ja);
+                SettingsHelper.WriteSettingsFile ("mainScreen", ja);
             }
         }
 
@@ -417,6 +395,20 @@ namespace AquaPic.Modules
                 settings.dimmingOutlet = GetDimmingChannelIndividualControl (fixtureName);
             }
             return settings;
+        }
+
+        protected static void AddFixtureSettingsToFile (string fixtureName) {
+            CheckFixtureKey (fixtureName);
+            SettingsHelper.AddSettingsToArray ("lightingProperties", "lightingFixtures", GetLightingFixtureSettings (fixtureName));
+        }
+
+        public static void UpdateFixtureSettingsToFile (string fixtureName) {
+            UpdateFixtureSettingsToFile (fixtureName, fixtureName);
+        }
+
+        public static void UpdateFixtureSettingsToFile (string fixtureName, string savedFixtureName) {
+            CheckFixtureKey (fixtureName);
+            SettingsHelper.UpdateSettingsInArray ("lightingProperties", "lightingFixtures", savedFixtureName, GetLightingFixtureSettings (fixtureName));
         }
     }
 }

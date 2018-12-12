@@ -28,7 +28,6 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Drivers;
 using AquaPic.Runtime;
 using AquaPic.Globals;
 using AquaPic.Sensors;
@@ -117,7 +116,15 @@ namespace AquaPic.Modules
             var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, "waterLevelProperties.json");
 
-            if (File.Exists (path)) {
+            if (SettingsHelper.SettingsFileExists ("waterLevelProperties")) {
+                /**************************************************************************************************/
+                /* Water Level Groups                                                                             */
+                /**************************************************************************************************/
+                var settings = SettingsHelper.ReadAllSettingsInArray<WaterLevelGroupSettings> ("waterLevelProperties", "waterLevelGroups");
+                foreach (var setting in settings) {
+                    AddWaterLevelGroup (setting, false);
+                }
+
                 using (StreamReader reader = File.OpenText (path)) {
                     JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
 
@@ -194,62 +201,7 @@ namespace AquaPic.Modules
                         );
                     }
 
-                    /**************************************************************************************************/
-                    /* Water Level Groups                                                                             */
-                    /**************************************************************************************************/
-                    ja = (JArray)jo["waterLevelGroups"];
-                    foreach (var jt in ja) {
-                        JObject obj = jt as JObject;
 
-                        var name = (string)obj["name"];
-
-                        var highAnalogAlarmSetpoint = 0f;
-                        var text = (string)obj["highAnalogAlarmSetpoint"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                highAnalogAlarmSetpoint = Convert.ToSingle (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var enableHighAnalogAlarm = true;
-                        text = (string)obj["enableHighAnalogAlarm"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                enableHighAnalogAlarm = Convert.ToBoolean (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var lowAnalogAlarmSetpoint = 0f;
-                        text = (string)obj["lowAnalogAlarmSetpoint"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                lowAnalogAlarmSetpoint = Convert.ToSingle (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var enableLowAnalogAlarm = true;
-                        text = (string)obj["enableLowAnalogAlarm"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                enableLowAnalogAlarm = Convert.ToBoolean (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        AddWaterLevelGroup (
-                            name,
-                            highAnalogAlarmSetpoint,
-                            enableHighAnalogAlarm,
-                            lowAnalogAlarmSetpoint,
-                            enableLowAnalogAlarm);
-                    }
 
                     /**************************************************************************************************/
                     /* Float Switches                                                                                 */
@@ -376,25 +328,37 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Water Level Groups                                                                                         */
         /**************************************************************************************************************/
+        public static void AddWaterLevelGroup (WaterLevelGroupSettings settings, bool saveToFile = true) {
+            AddWaterLevelGroup (
+                settings.name,
+                settings.highAnalogAlarmSetpoint,
+                settings.enableHighAnalogAlarm,
+                settings.lowAnalogAlarmSetpoint,
+                settings.enableLowAnalogAlarm);
+        }
+        
         public static void AddWaterLevelGroup (
             string name,
             float highAnalogAlarmSetpoint,
             bool enableHighAnalogAlarm,
             float lowAnalogAlarmSetpoint,
-            bool enableLowAnalogAlarm
-        ) {
+            bool enableLowAnalogAlarm,
+            bool saveToFile = true)
+        {
             if (!WaterLevelGroupNameOk (name)) {
-                throw new Exception (string.Format ("Water Level Group: {0} already exists", name));
+                throw new Exception (string.Format ("Water Level Group {0} already exists", name));
             }
 
-            waterLevelGroups.Add (
+            waterLevelGroups[name] = new WaterLevelGroup (
                 name,
-                new WaterLevelGroup (
-                    name,
-                    highAnalogAlarmSetpoint,
-                    enableHighAnalogAlarm,
-                    lowAnalogAlarmSetpoint,
-                    enableLowAnalogAlarm));
+                highAnalogAlarmSetpoint,
+                enableHighAnalogAlarm,
+                lowAnalogAlarmSetpoint,
+                enableLowAnalogAlarm);
+
+            if (saveToFile) {
+
+            }
         }
 
         public static void RemoveWaterLevelGroup (string name) {
@@ -563,6 +527,32 @@ namespace AquaPic.Modules
             waterLevelGroups[name].enableLowAnalogAlarm = enableLowAnalogAlarm;
         }
 
+        /***Settings***************************************************************************************************/
+        public static WaterLevelGroupSettings GetWaterLevelGroupSettings (string name) {
+            CheckWaterLevelGroupKey (name);
+            var settings = new WaterLevelGroupSettings ();
+            settings.name = name;
+            settings.highAnalogAlarmSetpoint = GetWaterLevelGroupHighAnalogAlarmSetpoint (name);
+            settings.enableHighAnalogAlarm = GetWaterLevelGroupHighAnalogAlarmEnable (name);
+            settings.lowAnalogAlarmSetpoint = GetWaterLevelGroupLowAnalogAlarmSetpoint (name);
+            settings.enableLowAnalogAlarm = GetWaterLevelGroupLowAnalogAlarmEnable (name);
+            return settings;
+        }
+
+        protected static void AddWaterLevelGroupSettingsToFile (string name) {
+            CheckWaterLevelGroupKey (name);
+            SettingsHelper.AddSettingsToArray ("waterLevelProperties", "waterLevelGroups", GetWaterLevelGroupSettings (name));
+        }
+
+        public static void UpdateWaterLevelGroupSettingsToFile (string name) {
+            UpdateWaterLevelGroupSettingsToFile (name, name);
+        }
+
+        public static void UpdateWaterLevelGroupSettingsToFile (string name, string savedName) {
+            CheckWaterLevelGroupKey (name);
+            SettingsHelper.UpdateSettingsInArray ("waterLevelProperties", "waterLevelGroups", savedName, GetWaterLevelGroupSettings (name));
+        }
+
         /**************************************************************************************************************/
         /* Analog Level Sensor                                                                                        */
         /**************************************************************************************************************/
@@ -572,17 +562,16 @@ namespace AquaPic.Modules
             IndividualControl ic,
             float zeroScaleCalibrationValue,
             float fullScaleCalibrationActual,
-            float fullScaleCalibrationValue
-        ) {
+            float fullScaleCalibrationValue)
+        {
             if (!AnalogLevelSensorNameOk (name)) {
                 throw new Exception (string.Format ("Water Level Group: {0} already exists", name));
             }
 
-            analogLevelSensors.Add (name, new WaterLevelSensor (
+            analogLevelSensors[name] = new WaterLevelSensor (
                 name,
                 ic,
-                waterLevelGroupName
-            ));
+                waterLevelGroupName);
 
             analogLevelSensors[name].zeroScaleValue = zeroScaleCalibrationValue;
             analogLevelSensors[name].fullScaleActual = fullScaleCalibrationActual;
@@ -593,17 +582,16 @@ namespace AquaPic.Modules
             string name,
             bool enable,
             string waterLevelGroupName,
-            IndividualControl ic
-        ) {
+            IndividualControl ic)
+        {
             if (!AnalogLevelSensorNameOk (name)) {
                 throw new Exception (string.Format ("Water Level Group: {0} already exists", name));
             }
 
-            analogLevelSensors.Add (name, new WaterLevelSensor (
+            analogLevelSensors[name] = new WaterLevelSensor (
                 name,
                 ic,
-                waterLevelGroupName
-            ));
+                waterLevelGroupName);
         }
 
         public static void RemoveAnalogLevelSensor (string analogLevelSensorName) {
