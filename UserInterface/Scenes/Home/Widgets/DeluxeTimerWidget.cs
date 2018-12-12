@@ -41,7 +41,7 @@ namespace AquaPic.UserInterface
         TouchButton startStopButton;
         TouchButton resetButton;
 
-        public DeluxeTimerWidget (string name, int row, int column) : base ("Timer", row, column) {
+        public DeluxeTimerWidget (string name, int row, int column) : base ("Timer", name, row, column) {
             timerIndex = 0;
 
             SetSizeRequest (310, 169);

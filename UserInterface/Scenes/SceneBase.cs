@@ -31,7 +31,6 @@ namespace AquaPic.UserInterface
 {
     public class SceneBase : Fixed
     {
-        //Image background;
         TouchLabel label;
         protected uint timerId;
 

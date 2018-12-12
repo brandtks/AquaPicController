@@ -22,8 +22,6 @@
 #endregion // License
 
 using System;
-using System.Diagnostics;
-using Cairo;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 

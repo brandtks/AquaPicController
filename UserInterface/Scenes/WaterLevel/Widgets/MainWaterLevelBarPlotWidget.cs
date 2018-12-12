@@ -31,12 +31,12 @@ namespace AquaPic.UserInterface
 {
     public class WaterLevelBarPlotWidget : BarPlotWidget
     {
-        string groupName;
         TouchLabel label;
 
-        public WaterLevelBarPlotWidget (string groupName, int row, int column) : base (row, column) {
-            text = "Water Level";
+        public WaterLevelBarPlotWidget (string group, int row, int column) : base ("Water Level", group, row, column) {
+            text = "No Water Level";
             unitOfMeasurement = UnitsOfMeasurement.Inches;
+            fullScale = 15.0f;
 
             label = new TouchLabel ();
             label.textColor = "compl";
@@ -46,28 +46,24 @@ namespace AquaPic.UserInterface
             Put (label, 60, 9);
             label.Show ();
 
-            this.groupName = groupName;
-            if (!WaterLevel.CheckWaterLevelGroupKeyNoThrow (this.groupName)) {
-                this.groupName = string.Empty;
-            }
-
-            if (this.groupName.IsNotEmpty ()) {
-                text = this.groupName;
+            this.group = group;
+            if (WaterLevel.CheckWaterLevelGroupKeyNoThrow (this.group)) {
+                text = this.group;
                 WidgetReleaseEvent += (o, args) => {
-                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.groupName);
+                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.group);
                 };
+            } else {
+                this.group = string.Empty;
             }
-
-            fullScale = 15.0f;
         }
 
         public override void Update () {
-            if (groupName.IsNotEmpty ()) {
-                if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (groupName)) {
+            if (group.IsNotEmpty ()) {
+                if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (group)) {
                     textBox.text = "--";
                     label.Visible = true;
                 } else {
-                    currentValue = WaterLevel.GetWaterLevelGroupLevel (groupName);
+                    currentValue = WaterLevel.GetWaterLevelGroupLevel (group);
                     label.Visible = false;
                 }
             }

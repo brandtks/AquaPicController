@@ -41,6 +41,10 @@ namespace AquaPic.UserInterface
         public event WidgetUnselectedHandler WidgetUnselectedEvent;
 
         public EventBox touchArea;
+        public string type;
+        public string name;
+        public string group;
+
         HomeWidgetPlacement placement;
 
         public Tuple<int, int>[] pairs {
@@ -107,9 +111,12 @@ namespace AquaPic.UserInterface
         bool clicked, selected;
         int holdCounter;
 
-        public HomeWidget (string type, int row, int column) {
+        public HomeWidget (string type, string name, string group, int row, int column) {
             SetSizeRequest (100, 82);
 
+            this.type = type;
+            this.name = name;
+            this.group = group;
             placement = new HomeWidgetPlacement (row, column);
 
             switch (type) {
@@ -137,6 +144,9 @@ namespace AquaPic.UserInterface
                 throw new Exception (string.Format ("Unknown home widget type {0}", type));
             }
         }
+
+        public HomeWidget (string type, string name, int row, int column)
+            : this (type, name, string.Empty, row, column) { }
 
         protected override void OnShown () {
             if (touchArea == null) {

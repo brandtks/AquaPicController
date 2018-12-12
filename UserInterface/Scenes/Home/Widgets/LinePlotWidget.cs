@@ -28,7 +28,7 @@ using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {
-    public delegate LinePlotWidget CreateLinePlotHandler (string groupName, int row, int column);
+    public delegate LinePlotWidget CreateLinePlotHandler (string group, int row, int column);
 
     public class LinePlotData
     {
@@ -38,9 +38,9 @@ namespace AquaPic.UserInterface
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 
-        public LinePlotWidget CreateInstance (string groupName, int row, int column) {
+        public LinePlotWidget CreateInstance (string group, int row, int column) {
             if (CreateInstanceEvent != null) {
-                return CreateInstanceEvent (groupName, row, column);
+                return CreateInstanceEvent (group, row, column);
             }
 
             throw new Exception ("No line plot constructor implemented");
@@ -80,7 +80,7 @@ namespace AquaPic.UserInterface
         protected TouchLabel textBox;
         protected TouchLinePlot linePlot;
 
-        public LinePlotWidget (int row, int column) : base ("LinePlot", row, column) {
+        public LinePlotWidget (string name, string group, int row, int column) : base ("LinePlot", name, group, row, column) {
             SetSizeRequest (310, 82);
 
             var box1 = new TouchGraphicalBox (310, 82);

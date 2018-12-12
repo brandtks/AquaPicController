@@ -22,7 +22,6 @@
 #endregion // License
 
 using System;
-using System.Linq;
 using System.Text.RegularExpressions;
 using Gtk;
 using GoodtimeDevelopment.Utilites;

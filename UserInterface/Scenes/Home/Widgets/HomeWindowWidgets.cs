@@ -35,16 +35,16 @@ namespace AquaPic.UserInterface
 
         static HomeWindowWidgets () {
             linePlots = new Dictionary<string, LinePlotData> {
-                { "Temperature", new LinePlotData ((groupName, row, column) => {return new TemperatureLinePlot (groupName, row, column);}) },
-                { "Water Level", new LinePlotData ((groupName, row, column) => {return new WaterLevelLinePlot (groupName, row, column);}) }
+                { "Temperature", new LinePlotData ((group, row, column) => {return new TemperatureLinePlot (group, row, column);}) },
+                { "Water Level", new LinePlotData ((group, row, column) => {return new WaterLevelLinePlot (group, row, column);}) }
             };
 
             barPlots = new Dictionary<string, BarPlotData> {
-                { "Water Level", new BarPlotData ((groupName, row, column) => {return new WaterLevelBarPlotWidget (groupName, row, column);}) }
+                { "Water Level", new BarPlotData ((group, row, column) => {return new WaterLevelBarPlotWidget (group, row, column);}) }
             };
 
             curvedBarPlots = new Dictionary<string, CurvedBarPlotData> {
-                { "Lighting", new CurvedBarPlotData ((fixtureName, row, column) => {return new DimmingLightCurvedBarPlot (fixtureName, row, column);}) }
+                { "Lighting", new CurvedBarPlotData ((group, row, column) => {return new DimmingLightCurvedBarPlot (group, row, column);}) }
             };
         }
 

@@ -31,27 +31,28 @@ namespace AquaPic.UserInterface
 {
     public class DimmingLightCurvedBarPlot : CurvedBarPlotWidget
     {
-        string fixtureName;
-
-        public DimmingLightCurvedBarPlot (string fixtureName, int row, int column) : base (row, column) {
+        public DimmingLightCurvedBarPlot (string group, int row, int column) : base ("Lighting", group, row, column) {
             text = "No Light";
             unitOfMeasurement = UnitsOfMeasurement.Percentage;
 
-            this.fixtureName = fixtureName;
-            if (Lighting.CheckFixtureKeyNoThrow (this.fixtureName) &&
-                Lighting.IsDimmingFixture (this.fixtureName)) {
-                text = this.fixtureName;
-                WidgetReleaseEvent += (o, args) => {
-                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Lighting", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.fixtureName);
-                };
+            this.group = group;
+            if (Lighting.CheckFixtureKeyNoThrow (this.group)) {
+                if (Lighting.IsDimmingFixture (this.group)) {
+                    text = this.group;
+                    WidgetReleaseEvent += (o, args) => {
+                        AquaPicGui.AquaPicUserInterface.ChangeScreens ("Lighting", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.group);
+                    };
+                } else {
+                    this.group = string.Empty;
+                }
             } else {
-                this.fixtureName = string.Empty;
+                this.group = string.Empty;
             }
         }
 
         public override void Update () {
-            if (fixtureName.IsNotEmpty ()) {
-                currentValue = Lighting.GetCurrentDimmingLevel (fixtureName);
+            if (group.IsNotEmpty ()) {
+                currentValue = Lighting.GetCurrentDimmingLevel (group);
             }
         }
     }

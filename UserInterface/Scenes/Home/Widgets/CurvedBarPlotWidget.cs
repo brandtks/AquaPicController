@@ -28,7 +28,7 @@ using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {
-    public delegate CurvedBarPlotWidget CreateCurvedBarPlotHandler (string groupName, int row, int column);
+    public delegate CurvedBarPlotWidget CreateCurvedBarPlotHandler (string group, int row, int column);
 
     public class CurvedBarPlotData
     {
@@ -38,9 +38,9 @@ namespace AquaPic.UserInterface
             this.CreateInstanceEvent = CreateInstanceEvent;
         }
 
-        public CurvedBarPlotWidget CreateInstance (string groupName, int row, int column) {
+        public CurvedBarPlotWidget CreateInstance (string group, int row, int column) {
             if (CreateInstanceEvent != null) {
-                return CreateInstanceEvent (groupName, row, column);
+                return CreateInstanceEvent (group, row, column);
             }
             throw new Exception ("No bar plot constructor implemented");
         }
@@ -80,7 +80,7 @@ namespace AquaPic.UserInterface
         private TouchLabel textBox;
         private TouchLabel label;
 
-        public CurvedBarPlotWidget (int row, int column) : base ("CurvedBarPlot", row, column) {
+        public CurvedBarPlotWidget (string name, string group, int row, int column) : base ("CurvedBarPlot", name, group, row, column) {
             SetSizeRequest (205, 169);
 
             var box = new TouchGraphicalBox (205, 169);

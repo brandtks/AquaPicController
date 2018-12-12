@@ -23,19 +23,19 @@
 
 using System;
 using Gtk;
+using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
-using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {
-    public class WaterLevelLinePlot : LinePlotWidget
+    public class TemperatureLinePlot : LinePlotWidget
     {
         TouchLabel label;
 
-        public WaterLevelLinePlot (string group, int row, int column) : base ("Water Level", group, row, column) {
-            text = "No Water Level";
-            unitOfMeasurement = UnitsOfMeasurement.Inches;
+        public TemperatureLinePlot (string group, int row, int column) : base ("Temperature", group, row, column) {
+            text = "No Temperature";
+            unitOfMeasurement = UnitsOfMeasurement.Degrees;
 
             label = new TouchLabel ();
             label.SetSizeRequest (152, 16);
@@ -45,41 +45,41 @@ namespace AquaPic.UserInterface
             Put (label, 155, 63);
 
             this.group = group;
-            if (WaterLevel.CheckWaterLevelGroupKeyNoThrow (this.group)) {
-                var dataLogger = WaterLevel.GetWaterLevelGroupDataLogger (this.group);
+            if (!Temperature.CheckTemperatureGroupKeyNoThrow (this.group)) {
+                this.group = Temperature.defaultTemperatureGroup;
+            }
+
+            if (this.group.IsNotEmpty ()) {
+                var dataLogger = Temperature.GetTemperatureGroupDataLogger (this.group);
                 linePlot.LinkDataLogger (dataLogger);
 
                 Destroyed += (obj, args) => {
                     linePlot.UnLinkDataLogger (dataLogger);
                 };
 
-                text = string.Format ("{0} Water Level", this.group);
+                text = string.Format ("{0} Temperature", this.group);
 
                 WidgetReleaseEvent += (o, args) => {
-                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.group);
+                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Temperature", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.group);
                 };
-            } else {
-                this.group = string.Empty;
             }
 
-            linePlot.rangeMargin = 1;
-            linePlot.eventColors.Add ("probe disconnected", new TouchColor ("secb", 0.25));
-            linePlot.eventColors.Add ("ato started", new TouchColor ("seca", 0.5));
-            linePlot.eventColors.Add ("ato stopped", new TouchColor ("secc", 0.5));
-            linePlot.eventColors.Add ("low alarm", new TouchColor ("compl", 0.25));
-            linePlot.eventColors.Add ("high alarm", new TouchColor ("compl", 0.25));
+            linePlot.eventColors.Add ("no probes", new TouchColor ("secb", 0.25));
+            linePlot.eventColors.Add ("heater on", new TouchColor ("seca", 0.5));
+            linePlot.eventColors.Add ("heater off", new TouchColor ("secc", 0.5));
             linePlot.eventColors.Add ("disconnected alarm", new TouchColor ("compl", 0.25));
+            linePlot.eventColors.Add ("low alarm", new TouchColor ("compl", 0.5));
+            linePlot.eventColors.Add ("high alarm", new TouchColor ("compl", 0.5));
         }
 
         public override void Update () {
             if (group.IsNotEmpty ()) {
-                if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (group)) {
+                if (Temperature.AreTemperatureProbesConnected (group)) {
+                    currentValue = Temperature.GetTemperatureGroupTemperature (group);
+                } else {
                     textBox.text = "--";
                     label.Visible = true;
                     label.text = "Disconnected";
-                } else {
-                    currentValue = WaterLevel.GetWaterLevelGroupLevel (group); ;
-                    label.Visible = false;
                 }
             }
         }

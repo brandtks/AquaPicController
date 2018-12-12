@@ -32,7 +32,7 @@ namespace AquaPic.UserInterface
     {
         public TouchButton button;
 
-        public ButtonWidget (string name, int row, int column) : base ("Button", row, column) {
+        public ButtonWidget (string name, int row, int column) : base ("Button", name, row, column) {
             button = new TouchButton ();
             button.SetSizeRequest (100, 82);
             button.text = name;

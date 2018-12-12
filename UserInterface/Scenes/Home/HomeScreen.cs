@@ -132,16 +132,37 @@ namespace AquaPic.UserInterface
             QueueDraw ();
         }
 
+        public override void Dispose () {
+            var ja = new JArray ();
+            foreach (var widget in widgets) {
+                var jo = new JObject ();
+                jo.Add (new JProperty ("type", widget.type));
+                jo.Add (new JProperty ("name", widget.name));
+                if (widget.group.IsNotEmpty ()) {
+                    jo.Add (new JProperty ("group", widget.group));
+                }
+                jo.Add (new JProperty ("row", widget.row.ToString ()));
+                jo.Add (new JProperty ("column", widget.column.ToString ()));
+                ja.Add (jo);
+            }
+
+            SettingsHelper.SaveSettingsFile ("mainScreen", ja);
+
+            base.Dispose ();
+        }
+
         protected void OnRequestNewTileLocation (int x, int y) {
             if (x.WithinRange (755, 795) && y.WithinRange (435, 475)) {
                 hoveredOverTrash = true;
                 trashButton.buttonColor = "compl";
+                trashButton.QueueDraw ();
                 return;
             }
 
             if (hoveredOverTrash) {
                 hoveredOverTrash = false;
                 trashButton.buttonColor.ModifyColor (0.75);
+                trashButton.QueueDraw ();
             }
 
             var pair = HomeWidgetPlacement.GetRowColumn (x, y);
@@ -189,6 +210,7 @@ namespace AquaPic.UserInterface
 
         protected void OnWidgetUnselected (HomeWidget widget) {
             if (hoveredOverTrash) {
+                tileBoard.FreeTiles (newWidgetLocation);
                 Remove (widget);
                 widgets.Remove (widget);
             } else {
