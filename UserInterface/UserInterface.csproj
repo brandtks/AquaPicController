@@ -46,7 +46,6 @@
     <Compile Include="Scenes\Home\Widgets\ButtonWidget.cs" />
     <Compile Include="Scenes\Home\Widgets\CurvedBarPlotWidget.cs" />
     <Compile Include="Scenes\Home\Widgets\DeluxeTimerWidget.cs" />
-    <Compile Include="Scenes\Home\Widgets\HomeWindowWidgets.cs" />
     <Compile Include="Scenes\Home\Widgets\LinePlotWidget.cs" />
     <Compile Include="Scenes\Lighting\Dialogs\FixtureSettings.cs" />
     <Compile Include="Scenes\Lighting\LightingScreen.cs" />
@@ -80,8 +79,9 @@
     <Compile Include="Scenes\Lighting\Widgets\LightingStateWidget.cs" />
     <Compile Include="Scenes\Home\Widgets\HomeWidget.cs" />
     <Compile Include="Scenes\Home\Widgets\IHomeWidgetUpdatable.cs" />
-    <Compile Include="Scenes\Home\Widgets\HomeWidgetPlacement.cs" />
-    <Compile Include="Scenes\Home\Dialogs\NewHomeWidgetSettings.cs" />
+    <Compile Include="Scenes\Home\Common\HomeWidgetPlacement.cs" />
+    <Compile Include="Scenes\Home\Common\NewHomeWidgetSettings.cs" />
+    <Compile Include="Scenes\Home\Common\HomeWindowWidgets.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -92,6 +92,7 @@
     <Folder Include="Dialogs\" />
     <Folder Include="Scenes\" />
     <Folder Include="Widgets\" />
+    <Folder Include="Scenes\Home\Common\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AquaPic\AquaPic.csproj">
