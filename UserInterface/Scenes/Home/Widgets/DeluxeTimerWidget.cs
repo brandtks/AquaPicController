@@ -372,9 +372,9 @@ namespace AquaPic.UserInterface
             public TimerBackground (int width, int height) : base (width, height) { }
 
             protected override void OnExpose (object sender, ExposeEventArgs args) {
-                using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                     cr.Rectangle (Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
-                    TouchColor.SetSource (cr, color, transparency);
+                    color.SetSource (cr);
                     cr.Fill ();
 
                     cr.MoveTo (Allocation.Left, Allocation.Top);
