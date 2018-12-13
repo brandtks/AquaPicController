@@ -22,29 +22,34 @@
 #endregion // License
 
 using System;
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.Runtime;
 
-namespace AquaPic.Modules
+namespace AquaPic.Sensors
 {
-    public class LightingFixtureSettings : IEntitySettings
+    public class FloatSwitchSettings : IEntitySettings
     {
         [EntitySetting (typeof (StringMutator), "name")]
         public string name { get; set; }
 
-        [EntitySetting (typeof (IndividualControlMutator), new string[] { "powerStrip", "outlet" })]
-        public IndividualControl powerOutlet { get; set; }
+        [EntitySetting (typeof (IndividualControlMutator), new string[] { "inputCard", "channel" })]
+        public IndividualControl channel { get; set; }
 
-        [EntitySetting (typeof (BoolMutatorDefaultTrue), "highTempLockout")]
-        public bool highTempLockout { get; set; }
+        [EntitySetting (typeof (FloatMutator), "physicalLevel")]
+        public float physicalLevel { get; set; }
 
-        [EntitySetting (typeof (IndividualControlMutator), new string[] { "dimmingCard", "channel" }, true)]
-        public IndividualControl dimmingOutlet { get; set; }
+        [EntitySetting (typeof (SwitchTypeMutator), "switchType")]
+        public SwitchType switchType { get; set; }
 
-        [EntitySetting (typeof (LightingStatesMutator))]
-        public LightingState[] lightingStates { get; set; }
+        [EntitySetting (typeof (SwitchFunctionMutator), "switchFuntion")]
+        public SwitchFunction switchFuntion { get; set; }
+
+        [EntitySetting (typeof (UIntMutator), "timeOffset")]
+        public uint timeOffset { get; set; }
+
+        [EntitySetting (typeof (StringMutator), "waterLevelGroupName")]
+        public string waterLevelGroupName { get; set; }
     }
 }

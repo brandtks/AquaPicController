@@ -29,22 +29,6 @@ using AquaPic.Drivers;
 
 namespace AquaPic.Sensors
 {
-    public enum SwitchType
-    {
-        [Description ("Normally Opened")]
-        NormallyOpened,
-        [Description ("Normally Closed")]
-        NormallyClosed
-    }
-
-    public enum SwitchFunction
-    {
-        LowLevel,
-        HighLevel,
-        ATO,
-        Other
-    }
-
     public class FloatSwitch : ISensor<bool>
     {
         protected string _name;

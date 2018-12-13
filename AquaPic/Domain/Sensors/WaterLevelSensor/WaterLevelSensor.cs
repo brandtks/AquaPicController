@@ -81,8 +81,8 @@ namespace AquaPic.Sensors
             _level = 0.0f;
 
             zeroScaleValue = 819.2f;
-            fullScaleActual = 15.0f;
-            fullScaleValue = 4096.0f;
+            fullScaleActual = 15f;
+            fullScaleValue = 3003.73f;
 
             _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog level probe disconnected, " + name);
             Add (ic);

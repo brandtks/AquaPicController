@@ -22,6 +22,8 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 
@@ -133,6 +135,91 @@ namespace AquaPic.Modules
                                   endTime.ToShortTimeString (),
                                   endingDimmingLevel,
                                   Utils.GetDescription (type));
+        }
+    }
+
+    public class LightingStatesMutator : ISettingMutator<LightingState[]>
+    {
+        public LightingState[] Read (JObject jobj, string[] keys) {
+            var lightingStates = new List<LightingState> ();
+            var jaEvents = jobj["events"] as JArray;
+            foreach (var jtEvent in jaEvents) {
+                JObject joEvent = jtEvent as JObject;
+
+                var startTimeDescriptor = (string)joEvent["startTimeDescriptor"];
+                var endTimeDescriptor = (string)joEvent["endTimeDescriptor"];
+
+                var type = LightingStateType.Off;
+                var text = (string)joEvent["type"];
+                if (text.IsNotEmpty ()) {
+                    try {
+                        type = (LightingStateType)Enum.Parse (typeof (LightingStateType), text);
+                    } catch {
+                        //
+                    }
+                }
+
+                LightingState state;
+                if (joEvent.ContainsKey ("startingDimmingLevel")) {
+                    var startingDimmingLevel = 0.0f;
+                    text = (string)joEvent["startingDimmingLevel"];
+                    if (text.IsNotEmpty ()) {
+                        try {
+                            startingDimmingLevel = Convert.ToSingle (text);
+                        } catch {
+                            //
+                        }
+                    }
+
+                    var endingDimmingLevel = 0.0f;
+                    text = (string)joEvent["endingDimmingLevel"];
+                    if (text.IsNotEmpty ()) {
+                        try {
+                            endingDimmingLevel = Convert.ToSingle (text);
+                        } catch {
+                            //
+                        }
+                    }
+
+                    state = new LightingState (
+                        startTimeDescriptor,
+                        endTimeDescriptor,
+                        type,
+                        startingDimmingLevel,
+                        endingDimmingLevel);
+
+                } else {
+                    state = new LightingState (
+                        startTimeDescriptor,
+                        endTimeDescriptor,
+                        type);
+                }
+                lightingStates.Add (state);
+            }
+
+            return lightingStates.ToArray ();
+        }
+
+        public void Write (LightingState[] value, JObject jobj, string[] keys) {
+            var ja = new JArray ();
+            foreach (var state in value) {
+                JObject jo = new JObject ();
+                jo.Add (new JProperty ("startTimeDescriptor", state.startTimeDescriptor));
+                jo.Add (new JProperty ("endTimeDescriptor", state.endTimeDescriptor));
+                jo.Add (new JProperty ("type", state.type.ToString ()));
+                jo.Add (new JProperty ("startingDimmingLevel", state.startingDimmingLevel.ToString ()));
+                jo.Add (new JProperty ("endingDimmingLevel", state.endingDimmingLevel.ToString ()));
+                ja.Add (jo);
+            }
+            jobj["events"] = ja;
+        }
+
+        public bool Valid (LightingState[] states) {
+            return true;
+        }
+
+        public LightingState[] Default () {
+            return new LightingState[0];
         }
     }
 }

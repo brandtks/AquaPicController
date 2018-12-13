@@ -113,185 +113,32 @@ namespace AquaPic.Modules
             analogLevelSensors = new Dictionary<string, WaterLevelSensor> ();
             floatSwitches = new Dictionary<string, FloatSwitch> ();
 
-            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = Path.Combine (path, "waterLevelProperties.json");
-
             if (SettingsHelper.SettingsFileExists ("waterLevelProperties")) {
                 /**************************************************************************************************/
                 /* Water Level Groups                                                                             */
                 /**************************************************************************************************/
-                var settings = SettingsHelper.ReadAllSettingsInArray<WaterLevelGroupSettings> ("waterLevelProperties", "waterLevelGroups");
-                foreach (var setting in settings) {
+                var groupSettings = SettingsHelper.ReadAllSettingsInArray<WaterLevelGroupSettings> ("waterLevelProperties", "waterLevelGroups");
+                foreach (var setting in groupSettings) {
                     AddWaterLevelGroup (setting, false);
                 }
 
-                using (StreamReader reader = File.OpenText (path)) {
-                    JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
+                /**************************************************************************************************/
+                /* Analog Sensors                                                                                 */
+                /**************************************************************************************************/
+                var analogSettings = SettingsHelper.ReadAllSettingsInArray<WaterLevelSensorSettings> ("waterLevelProperties", "analogSensors");
+                foreach (var setting in analogSettings) {
+                    AddAnalogLevelSensor (setting, false);
+                }
 
-                    /**************************************************************************************************/
-                    /* Analog Sensors                                                                                 */
-                    /**************************************************************************************************/
-                    var ja = (JArray)jo["analogSensors"];
-                    foreach (var jt in ja) {
-                        JObject obj = jt as JObject;
-
-                        var name = (string)obj["name"];
-                        var waterLevelGroupName = (string)obj["waterLevelGroupName"];
-
-                        var ic = IndividualControl.Empty;
-                        var text = (string)obj["inputCard"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                ic.Group = text;
-                            } catch {
-                                //
-                            }
-                        }
-
-                        if (ic.Group.IsNotEmpty ()) {
-                            text = (string)obj["channel"];
-                            if (text.IsEmpty ()) {
-                                ic = IndividualControl.Empty;
-                            } else {
-                                try {
-                                    ic.Individual = Convert.ToInt32 (text);
-                                } catch {
-                                    ic = IndividualControl.Empty;
-                                }
-                            }
-                        }
-
-                        var zeroScaleCalibrationValue = 819.2f;
-                        text = (string)obj["zeroScaleCalibrationValue"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                zeroScaleCalibrationValue = Convert.ToSingle (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var fullScaleCalibrationActual = 10.0f;
-                        text = (string)obj["fullScaleCalibrationActual"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                fullScaleCalibrationActual = Convert.ToSingle (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var fullScaleCalibrationValue = 3003.73f;
-                        text = (string)obj["fullScaleCalibrationValue"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                fullScaleCalibrationValue = Convert.ToSingle (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        AddAnalogLevelSensor (
-                            name,
-                            waterLevelGroupName,
-                            ic,
-                            zeroScaleCalibrationValue,
-                            fullScaleCalibrationActual,
-                            fullScaleCalibrationValue
-                        );
-                    }
-
-
-
-                    /**************************************************************************************************/
-                    /* Float Switches                                                                                 */
-                    /**************************************************************************************************/
-                    ja = (JArray)jo["floatSwitches"];
-                    foreach (var jt in ja) {
-                        JObject obj = jt as JObject;
-
-                        var name = (string)obj["name"];
-
-                        var ic = IndividualControl.Empty;
-                        var text = (string)obj["inputCard"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                ic.Group = text;
-                            } catch {
-                                //
-                            }
-                        }
-
-                        if (ic.Group.IsNotEmpty ()) {
-                            text = (string)obj["channel"];
-                            if (text.IsEmpty ()) {
-                                ic = IndividualControl.Empty;
-                            } else {
-                                try {
-                                    ic.Individual = Convert.ToInt32 (text);
-                                } catch {
-                                    ic = IndividualControl.Empty;
-                                }
-                            }
-                        }
-
-                        var physicalLevel = 0f;
-                        text = (string)obj["physicalLevel"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                physicalLevel = Convert.ToSingle (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var type = SwitchType.NormallyOpened;
-                        text = (string)obj["switchType"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                type = (SwitchType)Enum.Parse (typeof (SwitchType), text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var function = SwitchFunction.Other;
-                        text = (string)obj["switchFuntion"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                function = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var timeOffset = 0u;
-                        text = (string)obj["timeOffset"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                timeOffset = Timer.ParseTime (text);
-                            } catch {
-                                //
-                            }
-                        }
-
-                        var waterLevelGroupName = (string)obj["waterLevelGroupName"];
-
-                        if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed)) {
-                            Logger.AddWarning ("High level switch should be normally closed");
-                        } else if ((function == SwitchFunction.LowLevel) && (type != SwitchType.NormallyClosed)) {
-                            Logger.AddWarning ("Low level switch should be normally closed");
-                        } else if ((function == SwitchFunction.ATO) && (type != SwitchType.NormallyOpened)) {
-                            Logger.AddWarning ("ATO switch should be normally opened");
-                        }
-
-                        AddFloatSwitch (name, ic, physicalLevel, type, function, timeOffset, waterLevelGroupName);
-                    }
+                /**************************************************************************************************/
+                /* Float Switches                                                                                 */
+                /**************************************************************************************************/
+                var switchSettings = SettingsHelper.ReadAllSettingsInArray<FloatSwitchSettings> ("waterLevelProperties", "floatSwitches");
+                foreach (var setting in switchSettings) {
+                    AddFloatSwitch (setting, false);
                 }
             } else {
                 Logger.Add ("Water level settings file did not exist, created new water level settings");
-                var file = File.Create (path);
-                file.Close ();
 
                 var jo = new JObject ();
                 jo.Add (new JProperty ("waterLevelGroups", new JArray ()));
@@ -299,7 +146,7 @@ namespace AquaPic.Modules
                 jo.Add (new JProperty ("analogSensors", new JArray ()));
                 jo.Add (new JProperty ("floatSwitches", new JArray ()));
 
-                File.WriteAllText (path, jo.ToString ());
+                SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
             }
 
             TaskManager.AddCyclicInterrupt ("Water Level", 1000, Run);
@@ -357,7 +204,7 @@ namespace AquaPic.Modules
                 enableLowAnalogAlarm);
 
             if (saveToFile) {
-
+                //
             }
         }
 
@@ -556,13 +403,25 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Analog Level Sensor                                                                                        */
         /**************************************************************************************************************/
+        public static void AddAnalogLevelSensor (WaterLevelSensorSettings settings, bool saveToFile = true) {
+            AddAnalogLevelSensor (
+                settings.name,
+                settings.waterLevelGroupName,
+                settings.channel,
+                settings.zeroScaleCalibrationValue,
+                settings.fullScaleCalibrationActual,
+                settings.fullScaleCalibrationValue,
+                saveToFile);
+        }
+
         public static void AddAnalogLevelSensor (
             string name,
             string waterLevelGroupName,
             IndividualControl ic,
             float zeroScaleCalibrationValue,
             float fullScaleCalibrationActual,
-            float fullScaleCalibrationValue)
+            float fullScaleCalibrationValue,
+            bool saveToFile = true)
         {
             if (!AnalogLevelSensorNameOk (name)) {
                 throw new Exception (string.Format ("Water Level Group: {0} already exists", name));
@@ -576,6 +435,10 @@ namespace AquaPic.Modules
             analogLevelSensors[name].zeroScaleValue = zeroScaleCalibrationValue;
             analogLevelSensors[name].fullScaleActual = fullScaleCalibrationActual;
             analogLevelSensors[name].fullScaleValue = fullScaleCalibrationValue;
+
+            if (saveToFile) {
+
+            }
         }
 
         public static void AddAnalogLevelSensor (
@@ -752,6 +615,18 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Float Switches                                                                                             */
         /**************************************************************************************************************/
+        public static void AddFloatSwitch (FloatSwitchSettings settings, bool saveToFile = true) {
+            AddFloatSwitch (
+                settings.name,
+                settings.channel,
+                settings.physicalLevel,
+                settings.switchType,
+                settings.switchFuntion,
+                settings.timeOffset,
+                settings.waterLevelGroupName,
+                saveToFile);
+        }
+
         public static void AddFloatSwitch (
             string name,
             IndividualControl channel,
@@ -759,20 +634,33 @@ namespace AquaPic.Modules
             SwitchType type,
             SwitchFunction function,
             uint timeOffset,
-            string waterLevelGroupName
-        ) {
+            string waterLevelGroupName,
+            bool saveToFile = true)
+        {
             if (!FloatSwitchNameOk (name)) {
                 throw new Exception (string.Format ("Float Switch: {0} already exists", name));
             }
 
-            floatSwitches.Add (name, new FloatSwitch (
+            if ((function == SwitchFunction.HighLevel) && (type != SwitchType.NormallyClosed)) {
+                Logger.AddWarning ("High level switch should be normally closed");
+            } else if ((function == SwitchFunction.LowLevel) && (type != SwitchType.NormallyClosed)) {
+                Logger.AddWarning ("Low level switch should be normally closed");
+            } else if ((function == SwitchFunction.ATO) && (type != SwitchType.NormallyOpened)) {
+                Logger.AddWarning ("ATO switch should be normally opened");
+            }
+
+            floatSwitches[name] = new FloatSwitch (
                 name,
                 type,
                 function,
                 physicalLevel,
                 channel,
                 timeOffset,
-                waterLevelGroupName));
+                waterLevelGroupName);
+
+            if (saveToFile) {
+
+            }
         }
 
         public static void RemoveFloatSwitch (string floatSwitchName) {
