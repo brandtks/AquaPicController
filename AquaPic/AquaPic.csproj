@@ -160,6 +160,7 @@
     <Compile Include="Domain\Sensors\WaterLevelSensor\WaterLevelSensorSettings.cs" />
     <Compile Include="Domain\Sensors\TemperatureProbe\TemperatureProbe.cs" />
     <Compile Include="Domain\Sensors\PhProbe\PhProbe.cs" />
+    <Compile Include="Modules\ATO\AutoTopOffGroupSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

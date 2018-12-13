@@ -22,13 +22,12 @@
 #endregion // License
 
 using System;
-using Gtk;
-using Cairo;
+using AquaPic.Drivers;
+using AquaPic.Globals;
+using AquaPic.Modules;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Drivers;
-using AquaPic.Modules;
-using AquaPic.Globals;
+using Gtk;
 
 namespace AquaPic.UserInterface
 {
@@ -217,6 +216,7 @@ namespace AquaPic.UserInterface
             }
 
             GetFixtureData ();
+            lightingStateWidget.SetStates (fixtureName);
             Show ();
         }
 
@@ -256,8 +256,6 @@ namespace AquaPic.UserInterface
                 }
 
                 isDimmingFixture = Lighting.IsDimmingFixture (fixtureName);
-                lightingStateWidget.SetStates (fixtureName);
-                lightingStateWidget.QueueDraw ();
 
                 if (isDimmingFixture) {
                     dimmingHeader.Visible = true;
@@ -351,8 +349,10 @@ namespace AquaPic.UserInterface
                 fixtureName = e.activeText;
             }
 
-            combo.QueueDraw ();
             GetFixtureData ();
+            lightingStateWidget.SetStates (fixtureName);
+            lightingStateWidget.QueueDraw ();
+            combo.QueueDraw ();
         }
 
         protected override bool OnUpdateTimer () {
@@ -458,6 +458,8 @@ namespace AquaPic.UserInterface
 
             combo.QueueDraw ();
             GetFixtureData ();
+            lightingStateWidget.SetStates (fixtureName);
+            lightingStateWidget.QueueDraw ();
         }
 
         protected void OnProgressChanged (object sender, ProgressChangeEventArgs args) {

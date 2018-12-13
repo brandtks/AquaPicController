@@ -43,9 +43,9 @@ namespace AquaPic.UserInterface
             var t = new SettingsTextBox ("Name");
             t.textBox.text = fixtureName.IsNotEmpty () ? fixtureName : "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
-                if (string.IsNullOrWhiteSpace (args.text))
+                if (args.text.IsEmpty ()) {
                     args.keepText = false;
-                else if (!Lighting.FixtureNameOk (args.text)) {
+                } else if (!Lighting.FixtureNameOk (args.text)) {
                     MessageBox.Show ("Heater name already exists");
                     args.keepText = false;
                 }
@@ -64,12 +64,8 @@ namespace AquaPic.UserInterface
 
             var s = new SettingsSelectorSwitch ("Temp Lockout");
             if (fixtureName.IsNotEmpty ()) {
-                if (settings.highTempLockout)
-                    s.selectorSwitch.currentSelected = 0;
-                else
-                    s.selectorSwitch.currentSelected = 1;
-            } else
-                s.selectorSwitch.currentSelected = 0;
+                s.selectorSwitch.currentSelected = settings.highTempLockout ? 0 : 1;
+            }
             AddSetting (s);
 
             bool isDimming = settings.dimmingChannel.IsNotEmpty ();
@@ -101,44 +97,35 @@ namespace AquaPic.UserInterface
         protected override bool OnSave (object sender) {
             var fixtureSettings = new LightingFixtureSettings ();
 
-            fixtureSettings.name = ((SettingsTextBox)settings["Name"]).textBox.text;
+            fixtureSettings.name = (string)settings["Name"].setting;
             if (fixtureSettings.name == "Enter name") {
                 MessageBox.Show ("Please enter a fixture name");
                 return false;
             }
 
-            var outletCombo = ((SettingsComboBox)settings["Outlet"]).combo;
-            if (outletCombo.activeIndex == -1) {
+            var outletString = (string)settings["Outlet"].setting;
+            if (outletString.IsEmpty ()) {
                 MessageBox.Show ("Please select a power outlet");
                 return false;
             }
-            var outletString = outletCombo.activeText;
             fixtureSettings.powerOutlet = ParseIndividualControl (outletString);
 
-            fixtureSettings.highTempLockout = false;
-            if (((SettingsSelectorSwitch)settings["Temp Lockout"]).selectorSwitch.currentSelected == 0) {
-                fixtureSettings.highTempLockout = true;
-            }
-
-            bool dimmingFixture = false;
-            if (((SettingsSelectorSwitch)settings["Dimming Fixture"]).selectorSwitch.currentSelected == 0) {
-                dimmingFixture = true;
-            }
+            fixtureSettings.highTempLockout = (int)settings["Temp Lockout"].setting == 0;
+            bool dimmingFixture = (int)settings["Dimming Fixture"].setting == 0;
 
             fixtureSettings.dimmingChannel = IndividualControl.Empty;
             if (dimmingFixture) {
-                var channelCombo = ((SettingsComboBox)settings["Dimming Channel"]).combo;
-                if (channelCombo.activeIndex == -1) {
+                var channelString = (string)settings["Dimming Channel"].setting;
+                if (channelString.IsEmpty ()) {
                     MessageBox.Show ("Please select a dimming channel");
                     return false;
                 }
-                var channelString = channelCombo.activeText;
                 fixtureSettings.dimmingChannel = ParseIndividualControl (channelString);
             }
 
             fixtureSettings.lightingStates = new LightingState[0];
 
-            Lighting.UpdateLighting (fixtureName, fixtureSettings);
+            Lighting.UpdateLight (fixtureName, fixtureSettings);
             fixtureName = fixtureSettings.name;
 
             return true;

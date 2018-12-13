@@ -51,6 +51,9 @@ namespace AquaPic.Modules
             }
         }
 
+        const string settingsFile = "lightingProperties";
+        const string settingsArrayName = "lightingFixtures";
+
         static Lighting () { }
 
         public static void Init () {
@@ -58,8 +61,8 @@ namespace AquaPic.Modules
 
             fixtures = new Dictionary<string, LightingFixture> ();
 
-            if (SettingsHelper.SettingsFileExists ("lightingProperties")) {
-                var fixturesSettings = SettingsHelper.ReadAllSettingsInArray<LightingFixtureSettings> ("lightingProperties", "lightingFixtures");
+            if (SettingsHelper.SettingsFileExists (settingsFile)) {
+                var fixturesSettings = SettingsHelper.ReadAllSettingsInArray<LightingFixtureSettings> (settingsFile, settingsArrayName);
                 foreach (var settings in fixturesSettings) {
                     AddLight (settings, false);
                 }
@@ -67,10 +70,10 @@ namespace AquaPic.Modules
                 Logger.Add ("Lighting settings file did not exist, created new lighting settings");
 
                 var jo = new JObject {
-                    new JProperty ("lightingFixtures", new JArray ())
+                    new JProperty (settingsArrayName, new JArray ())
                 };
 
-                SettingsHelper.WriteSettingsFile ("lightingProperties", jo);
+                SettingsHelper.WriteSettingsFile (settingsFile, jo);
             }
         }
 
@@ -98,7 +101,7 @@ namespace AquaPic.Modules
             }
 
             if (saveToFile) {
-                AddFixtureSettingsToFile (settings.name);
+                AddFixtureSettingsToFile (settings);
             }
         }
 
@@ -130,7 +133,7 @@ namespace AquaPic.Modules
                 highTempLockout);
         }
 
-        public static void UpdateLighting (string fixtureName, LightingFixtureSettings settings) {
+        public static void UpdateLight (string fixtureName, LightingFixtureSettings settings) {
             if (CheckFixtureKeyNoThrow (fixtureName)) {
                 settings.lightingStates = GetLightingFixtureLightingStates (fixtureName);
                 RemoveLight (fixtureName);
@@ -141,8 +144,8 @@ namespace AquaPic.Modules
         public static void RemoveLight (string fixtureName) {
             CheckFixtureKey (fixtureName);
             fixtures[fixtureName].Remove ();
-            DeleteFixtureSettingsFromFile (fixtureName);
             fixtures.Remove (fixtureName);
+            DeleteFixtureSettingsFromFile (fixtureName);
         }
 
         public static void CheckFixtureKey (string fixtureName) {
@@ -327,16 +330,16 @@ namespace AquaPic.Modules
             return settings;
         }
 
-        protected static void AddFixtureSettingsToFile (string fixtureName) {
-            SettingsHelper.AddSettingsToArray ("lightingProperties", "lightingFixtures", GetLightingFixtureSettings (fixtureName));
+        protected static void AddFixtureSettingsToFile (LightingFixtureSettings settings) {
+            SettingsHelper.AddSettingsToArray (settingsFile, settingsArrayName, settings);
         }
 
         protected static void UpdateFixtureSettingsToFile (string fixtureName) {
-            SettingsHelper.UpdateSettingsInArray ("lightingProperties", "lightingFixtures", fixtureName, GetLightingFixtureSettings (fixtureName));
+            SettingsHelper.UpdateSettingsInArray (settingsFile, settingsArrayName, fixtureName, GetLightingFixtureSettings (fixtureName));
         }
 
         protected static void DeleteFixtureSettingsFromFile (string fixtureName) {
-            SettingsHelper.DeleteSettingsFromArray ("lightingProperties", "lightingFixtures", fixtureName);
+            SettingsHelper.DeleteSettingsFromArray (settingsFile, settingsArrayName, fixtureName);
         }
     }
 }
