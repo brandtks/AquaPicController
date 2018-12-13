@@ -47,7 +47,17 @@ namespace AquaPic.UserInterface
         public event SaveHandler DeleteButtonEvent;
         public Dictionary<string, SettingsWidget> settings;
         public bool includeDelete;
-        public bool showOptional;
+        public bool _showOptional;
+
+        public bool showOptional {
+            get {
+                return _showOptional;
+            }
+            set {
+                _showOptional = value;
+                UpdateSettingsVisibility ();
+            }
+        }
         public TouchSettingsOutcome outcome;
 
         public TouchButton saveBtn;
@@ -165,11 +175,6 @@ namespace AquaPic.UserInterface
             showOptional = true;
 
             Show ();
-        }
-
-        public override void Destroy () {
-            base.Destroy ();
-            Dispose ();
         }
 
         protected void DrawSettings () {

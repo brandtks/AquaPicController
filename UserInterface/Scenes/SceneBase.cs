@@ -73,12 +73,12 @@ namespace AquaPic.UserInterface
             return false;
         }
 
-        public override void Dispose () {
+        public override void Destroy () {
             GLib.Source.Remove (timerId);
             foreach (var w in Children) {
-                w.Dispose ();
+                w.Destroy ();
             }
-            base.Dispose ();
+            base.Destroy ();
         }
     }
 }

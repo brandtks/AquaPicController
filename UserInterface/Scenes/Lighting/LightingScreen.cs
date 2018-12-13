@@ -194,32 +194,7 @@ namespace AquaPic.UserInterface
             fixtureSettingBtn.text = Convert.ToChar (0x2699).ToString ();
             fixtureSettingBtn.SetSizeRequest (30, 30);
             fixtureSettingBtn.buttonColor = "pri";
-            fixtureSettingBtn.ButtonReleaseEvent += (o, args) => {
-                var parent = Toplevel as Window;
-                var s = new FixtureSettings (fixtureName, fixtureName.IsNotEmpty (), parent);
-                s.Run ();
-                var newFixtureName = s.newOrUpdatedFixtureName;
-                var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
-
-                if ((outcome == TouchSettingsOutcome.Modified) && (newFixtureName != fixtureName)) {
-                    var index = combo.comboList.IndexOf (fixtureName);
-                    combo.comboList[index] = newFixtureName;
-                    fixtureName = newFixtureName;
-                } else if (outcome == TouchSettingsOutcome.Added) {
-                    combo.comboList.Insert (combo.comboList.Count - 1, newFixtureName);
-                    combo.activeText = newFixtureName;
-                    fixtureName = newFixtureName;
-                } else if (outcome == TouchSettingsOutcome.Deleted) {
-                    combo.comboList.Remove (fixtureName);
-                    fixtureName = Lighting.defaultFixture;
-                    combo.activeText = fixtureName;
-                }
-
-                combo.QueueDraw ();
-                GetFixtureData ();
-            };
+            fixtureSettingBtn.ButtonReleaseEvent += OnFixtureSettingsButtonReleased;
             Put (fixtureSettingBtn, 755, 35);
             fixtureSettingBtn.Show ();
 
@@ -360,12 +335,10 @@ namespace AquaPic.UserInterface
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New fixture...") {
                 var parent = Toplevel as Window;
-                var s = new FixtureSettings (string.Empty, false, parent);
+                var s = new FixtureSettings (new LightingFixtureSettings (), parent);
                 s.Run ();
-                var newFixtureName = s.newOrUpdatedFixtureName;
+                var newFixtureName = s.fixtureName;
                 var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
 
                 if (outcome == TouchSettingsOutcome.Added) {
                     combo.comboList.Insert (combo.comboList.Count - 1, newFixtureName);
@@ -459,6 +432,31 @@ namespace AquaPic.UserInterface
                 Power.SetOutletMode (ic, Mode.Auto);
             }
 
+            GetFixtureData ();
+        }
+
+        protected void OnFixtureSettingsButtonReleased (object sender, ButtonReleaseEventArgs args) {
+            var parent = Toplevel as Window;
+            var s = new FixtureSettings (Lighting.GetLightingFixtureSettings (fixtureName), parent);
+            s.Run ();
+            var newFixtureName = s.fixtureName;
+            var outcome = s.outcome;
+
+            if ((outcome == TouchSettingsOutcome.Modified) && (newFixtureName != fixtureName)) {
+                var index = combo.comboList.IndexOf (fixtureName);
+                combo.comboList[index] = newFixtureName;
+                fixtureName = newFixtureName;
+            } else if (outcome == TouchSettingsOutcome.Added) {
+                combo.comboList.Insert (combo.comboList.Count - 1, newFixtureName);
+                combo.activeText = newFixtureName;
+                fixtureName = newFixtureName;
+            } else if (outcome == TouchSettingsOutcome.Deleted) {
+                combo.comboList.Remove (fixtureName);
+                fixtureName = Lighting.defaultFixture;
+                combo.activeText = fixtureName;
+            }
+
+            combo.QueueDraw ();
             GetFixtureData ();
         }
 

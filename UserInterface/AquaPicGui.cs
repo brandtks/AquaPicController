@@ -37,24 +37,13 @@ namespace AquaPic.UserInterface
         Fixed f;
         MySideBar side;
         MyNotificationBar notification;
-
-        string _currentScene;
-        public string currentScene {
-            get {
-                return _currentScene;
-            }
-        }
+        public string currentScene { get; private set; }
 
         public Dictionary<string, SceneData> scenes;
 
         public event ChangeSceneHandler ChangeSceneEvent;
 
-        static AquaPicGui _userInterface;
-        public static AquaPicGui AquaPicUserInterface {
-            get {
-                return _userInterface;
-            }
-        }
+        public static AquaPicGui AquaPicUserInterface { get; private set; }
 
         protected AquaPicGui () : base (WindowType.Toplevel) {
             Name = "AquaPicGUI";
@@ -101,16 +90,16 @@ namespace AquaPic.UserInterface
                 { "Home", new SceneData ("Home", true, (options) => {return new HomeWindow (options);}) }
             };
 
-            _currentScene = "Home";
+            currentScene = "Home";
 
             f = new Fixed ();
             f.SetSizeRequest (800, 480);
 
-            current = scenes[_currentScene].CreateInstance ();
+            current = scenes[currentScene].CreateInstance ();
             f.Put (current, 0, 0);
             current.Show ();
 
-            side = new MySideBar (scenes, _currentScene);
+            side = new MySideBar (scenes, currentScene);
             f.Put (side, 0, 20);
             side.Show ();
 
@@ -125,9 +114,9 @@ namespace AquaPic.UserInterface
         }
 
         public static AquaPicGui CreateInstance () {
-            if (_userInterface == null) {
-                _userInterface = new AquaPicGui ();
-                return _userInterface;
+            if (AquaPicUserInterface == null) {
+                AquaPicUserInterface = new AquaPicGui ();
+                return AquaPicUserInterface;
             }
 
             throw new Exception ("User interface is already created");
@@ -137,7 +126,7 @@ namespace AquaPic.UserInterface
             if (!scenes.ContainsKey (name))
                 throw new Exception ("Screen does not exist");
 
-            _currentScene = name;
+            currentScene = name;
 
             ChangeSceneEvent?.Invoke (scenes[name], options);
         }
@@ -157,18 +146,16 @@ namespace AquaPic.UserInterface
         protected void ScreenChange (SceneData screen, params object[] options) {
             f.Remove (current);
             current.Destroy ();
-            current.Dispose ();
             current = screen.CreateInstance (options);
             f.Put (current, 0, 0);
 
             f.Remove (side);
             side.Destroy ();
-            side.Dispose ();
             side = new MySideBar ();
             f.Put (side, 0, 20);
             side.Show ();
 
-            if (_currentScene == "Logger") {
+            if (currentScene == "Logger") {
                 var logScreen = current as LoggerWindow;
                 if (logScreen != null) {
                     side.ExpandEvent += (sender, e) => {
@@ -181,7 +168,7 @@ namespace AquaPic.UserInterface
                         logScreen.tv.QueueDraw ();
                     };
                 }
-            } else if (_currentScene == "Alarms") {
+            } else if (currentScene == "Alarms") {
                 var alarmScreen = current as AlarmWindow;
                 if (alarmScreen != null) {
                     side.ExpandEvent += (sender, e) => {
@@ -198,8 +185,6 @@ namespace AquaPic.UserInterface
             }
 
             f.Remove (notification);
-            notification.Destroy ();
-            notification.Dispose ();
             notification = new MyNotificationBar ();
             f.Put (notification, 0, 0);
             notification.Show ();

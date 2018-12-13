@@ -22,8 +22,6 @@
 #endregion // License
 
 using System;
-using System.Linq;
-using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Runtime;
 
@@ -44,5 +42,13 @@ namespace AquaPic.Modules
 
         [EntitySetting (typeof (LightingStatesMutator))]
         public LightingState[] lightingStates { get; set; }
+
+        public LightingFixtureSettings () {
+            name = string.Empty;
+            powerOutlet = IndividualControl.Empty;
+            highTempLockout = true;
+            dimmingChannel = IndividualControl.Empty;
+            lightingStates = new LightingState[0];
+        }
     }
 }

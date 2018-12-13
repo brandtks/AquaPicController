@@ -185,27 +185,6 @@ namespace AquaPic.Modules
             return names.ToArray ();
         }
 
-        /*
-        public static void SetFixtureName (string oldFixtureName, string newFixtureName) {
-            CheckFixtureKey (oldFixtureName);
-            if (!FixtureNameOk (newFixtureName)) {
-                throw new Exception (string.Format ("Lighting Fixture: {0} already exists", newFixtureName));
-            }
-
-            var fixture = fixtures[oldFixtureName];
-
-            fixture.name = newFixtureName;
-            Power.SetOutletName (fixture.powerOutlet, fixture.name);
-            LightingFixtureDimming dimmingFixture = fixture as LightingFixtureDimming;
-            if (dimmingFixture != null) {
-                AquaPicDrivers.AnalogOutput.SetChannelName (dimmingFixture.channel, fixture.name);
-            }
-
-            fixtures.Remove (oldFixtureName);
-            fixtures[newFixtureName] = fixture;
-        }
-        */
-
         /**************************************************************************************************************/
         /* Individual Control                                                                                         */
         /**************************************************************************************************************/
@@ -213,16 +192,6 @@ namespace AquaPic.Modules
             CheckFixtureKey (fixtureName);
             return fixtures[fixtureName].powerOutlet;
         }
-
-        /*
-        public static void SetFixtureOutletIndividualControl (string fixtureName, IndividualControl ic) {
-            CheckFixtureKey (fixtureName);
-            Power.RemoveOutlet (fixtures[fixtureName].powerOutlet);
-            fixtures[fixtureName].powerOutlet = ic;
-            var coil = Power.AddOutlet (fixtures[fixtureName].powerOutlet, fixtures[fixtureName].name, MyState.On, "Heater");
-            coil.StateGetter = fixtures[fixtureName].OnPlugStateGetter;
-        }
-        */
 
         public static IndividualControl GetDimmingChannelIndividualControl (string fixtureName) {
             CheckFixtureKey (fixtureName);
@@ -235,26 +204,6 @@ namespace AquaPic.Modules
             throw new ArgumentException ("fixtureName");
         }
 
-        /*
-        public static void SetDimmingChannelIndividualControl (string fixtureName, IndividualControl ic) {
-            CheckFixtureKey (fixtureName);
-
-            var fixture = fixtures[fixtureName] as LightingFixtureDimming;
-            if (fixture != null) {
-                AnalogType type = AquaPicDrivers.AnalogOutput.GetChannelType (fixture.channel);
-                AquaPicDrivers.AnalogOutput.RemoveChannel (fixture.channel);
-                fixture.channel = ic;
-                AquaPicDrivers.AnalogOutput.AddChannel (fixture.channel, fixture.name);
-                AquaPicDrivers.AnalogOutput.SetChannelType (fixture.name, type);
-                var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (fixture.channel);
-                valueControl.ValueGetter = fixture.CalculateDimmingLevel;
-                return;
-            }
-
-            throw new ArgumentException ("fixtureName");
-        }
-        */
-
         /**************************************************************************************************************/
         /* High Temperature Lockout                                                                                   */
         /**************************************************************************************************************/
@@ -262,13 +211,6 @@ namespace AquaPic.Modules
             CheckFixtureKey (fixtureName);
             return fixtures[fixtureName].highTempLockout;
         }
-
-        /*
-        public static void SetFixtureTemperatureLockout (string fixtureName, bool highTempLockout) {
-            CheckFixtureKey (fixtureName);
-            fixtures[fixtureName].highTempLockout = highTempLockout;
-        }
-        */
 
         /**************************************************************************************************************/
         /* Check Dimming Fixture                                                                                      */
@@ -372,7 +314,7 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Settings                                                                                                   */
         /**************************************************************************************************************/
-        protected static LightingFixtureSettings GetLightingFixtureSettings (string fixtureName) {
+        public static LightingFixtureSettings GetLightingFixtureSettings (string fixtureName) {
             CheckFixtureKey (fixtureName);
             var settings = new LightingFixtureSettings ();
             settings.name = fixtureName;
