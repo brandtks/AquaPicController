@@ -47,6 +47,15 @@ namespace AquaPic.Sensors
 
         [EntitySetting (typeof (FloatMutatorDefaultFullScaleValue), "fullScaleCalibrationValue")]
         public float fullScaleCalibrationValue { get; set; }
+
+        public WaterLevelSensorSettings () {
+            name = string.Empty;
+            channel = IndividualControl.Empty;
+            waterLevelGroupName = string.Empty;
+            zeroScaleCalibrationValue = 819.2f;
+            fullScaleCalibrationActual = 15f;
+            fullScaleCalibrationValue = 303.73f;
+        }
     }
 
     public class FloatMutatorDefaultZeroScaleValue : FloatMutator

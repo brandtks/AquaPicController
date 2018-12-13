@@ -23,38 +23,28 @@
 
 using System;
 using Gtk;
-using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
+using AquaPic.Sensors;
 using AquaPic.Modules;
-using AquaPic.Globals;
 using AquaPic.Drivers;
-using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
 {
     public class AnalogSensorSettings : TouchSettingsDialog
     {
-        string analogSensorName;
-        public string newOrUpdatedAnalogSensorName {
-            get {
-                return analogSensorName;
-            }
-        }
+        public string analogSensorName { get; private set; }
 
-        public AnalogSensorSettings (string name, bool includeDelete, Window parent)
-            : base (name, includeDelete, parent) {
-            analogSensorName = name;
+        public AnalogSensorSettings (WaterLevelSensorSettings settings, Window parent)
+            : base (settings.name, settings.name.IsNotEmpty (), parent) 
+        {
+            analogSensorName = settings.name;
             var analogSensorNameNotEmpty = analogSensorName.IsNotEmpty ();
 
             var t = new SettingsTextBox ("Name");
-            if (analogSensorNameNotEmpty) {
-                t.textBox.text = analogSensorName;
-            } else {
-                t.textBox.text = "Enter name";
-            }
+            t.textBox.text = analogSensorName.IsNotEmpty () ? analogSensorName : "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
-                if (string.IsNullOrWhiteSpace (args.text))
+                if (args.text.IsEmpty ())
                     args.keepText = false;
                 else if (!WaterLevel.AnalogLevelSensorNameOk (args.text)) {
                     MessageBox.Show ("Switch name already exists");
@@ -64,25 +54,20 @@ namespace AquaPic.UserInterface
             AddSetting (t);
 
             var c = new SettingsComboBox ("Input Channel");
-            string[] availCh = AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ();
-            if (analogSensorNameNotEmpty) {
-                IndividualControl ic = WaterLevel.GetAnalogLevelSensorIndividualControl (name);
-                if (ic.IsNotEmpty ()) {
-                    string chName = ic.Group;
-                    chName = string.Format ("{0}.i{1}", chName, ic.Individual);
-                    c.combo.comboList.Add (string.Format ("Current: {0}", chName));
-                    c.combo.activeIndex = 0;
-                }
+            if (analogSensorName.IsNotEmpty ()) {
+                var ic = settings.channel;
+                c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", ic.Group, ic.Individual));
+                c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Select outlet";
-            c.combo.comboList.AddRange (availCh);
+            c.combo.comboList.AddRange (AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ());
             AddSetting (c);
 
             c = new SettingsComboBox ("Water Level Group");
             c.combo.comboList.AddRange (WaterLevel.GetAllWaterLevelGroupNames ());
             c.combo.comboList.Add ("None");
-            if (analogSensorNameNotEmpty) {
-                var currentWaterGroup = WaterLevel.GetAnalogLevelSensorWaterLevelGroupName (name);
+            if (analogSensorName.IsNotEmpty ()) {
+                var currentWaterGroup = settings.waterLevelGroupName;
                 if (currentWaterGroup.IsEmpty ()) {
                     currentWaterGroup = "None";
                 }
@@ -94,107 +79,38 @@ namespace AquaPic.UserInterface
             DrawSettings ();
         }
 
-        protected void ParseChannnel (string s, ref string g, ref int i) {
-            int idx = s.IndexOf ('.');
-            g = s.Substring (0, idx);
-            i = Convert.ToInt32 (s.Substring (idx + 2));
-        }
-
         protected override bool OnSave (object sender) {
-            var name = (string)settings["Name"].setting;
-            string channelName = (string)settings["Input Channel"].setting;
-            var ic = IndividualControl.Empty;
+            var sensorSettings = new WaterLevelSensorSettings ();
 
-            var groupName = (string)settings["Water Level Group"].setting;
-            if (groupName.IsEmpty ()) {
+            sensorSettings.name = (string)settings["Name"].setting;
+            if (sensorSettings.name == "Enter name") {
+                MessageBox.Show ("Invalid probe name");
+                return false;
+            }
+
+            string channelString = (string)settings["Input Channel"].setting;
+            if (channelString.IsEmpty ()) {
+                MessageBox.Show ("Please select an channel");
+                return false;
+            }
+            sensorSettings.channel = ParseIndividualControl (channelString);
+
+            sensorSettings.waterLevelGroupName = (string)settings["Water Level Group"].setting;
+            if (sensorSettings.waterLevelGroupName.IsEmpty ()) {
                 MessageBox.Show ("Please select an water level group");
                 return false;
             }
-            if (groupName == "None") {
-                groupName = string.Empty;
+            if (sensorSettings.waterLevelGroupName == "None") {
+                sensorSettings.waterLevelGroupName = string.Empty;
             }
 
-            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
-            var ja = jo["analogSensors"] as JArray;
+            WaterLevel.UpdateAnalogLevelSensor (analogSensorName, sensorSettings);
+            analogSensorName = sensorSettings.name;
 
-            if (analogSensorName.IsEmpty ()) {
-                if (name == "Enter name") {
-                    MessageBox.Show ("Invalid probe name");
-                    return false;
-                }
-
-                if (channelName.IsEmpty ()) {
-                    MessageBox.Show ("Please select an channel");
-                    return false;
-                }
-
-                ParseChannnel (channelName, ref ic.Group, ref ic.Individual);
-
-                WaterLevel.AddAnalogLevelSensor (
-                    name,
-                    groupName,
-                    ic,
-                    819.2f,
-                    10f,
-                    3003.73f
-                );
-
-                var jobj = new JObject {
-                    new JProperty ("name", name),
-                    new JProperty ("waterLevelGroupName", groupName),
-                    new JProperty ("inputCard", ic.Group),
-                    new JProperty ("channel", ic.Individual.ToString ()),
-                    new JProperty ("zeroScaleCalibrationValue", "819.2"),
-                    new JProperty ("fullScaleCalibrationActual", "10.0"),
-                    new JProperty ("fullScaleCalibrationValue", "3003.73")
-                };
-
-                ja.Add (jobj);
-                analogSensorName = name;
-            } else {
-                string oldName = analogSensorName;
-                if (analogSensorName != name) {
-                    WaterLevel.SetAnalogLevelSensorName (analogSensorName, name);
-                    analogSensorName = name;
-                }
-
-                WaterLevel.SetAnalogLevelSensorWaterLevelGroupName (analogSensorName, groupName);
-
-                if (!channelName.StartsWith ("Current:")) {
-                    ParseChannnel (channelName, ref ic.Group, ref ic.Individual);
-                    WaterLevel.SetAnalogLevelSensorIndividualControl (analogSensorName, ic);
-                } else {
-                    ic = WaterLevel.GetAnalogLevelSensorIndividualControl (analogSensorName);
-                }
-
-                int arrIdx = SettingsHelper.FindSettingsInArray (ja, oldName);
-                if (arrIdx == -1) {
-                    MessageBox.Show ("Something went wrong");
-                    return false;
-                }
-
-                ja[arrIdx]["name"] = analogSensorName;
-                ja[arrIdx]["waterLevelGroupName"] = groupName;
-                ja[arrIdx]["inputCard"] = ic.Group;
-                ja[arrIdx]["channel"] = ic.Individual.ToString ();
-            }
-
-            SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
-            var ja = jo["analogSensors"] as JArray;
-
-            int arrIdx = SettingsHelper.FindSettingsInArray (ja, analogSensorName);
-            if (arrIdx == -1) {
-                MessageBox.Show ("Something went wrong");
-                return false;
-            }
-
-            ja.RemoveAt (arrIdx);
-            SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
             WaterLevel.RemoveAnalogLevelSensor (analogSensorName);
             return true;
         }
