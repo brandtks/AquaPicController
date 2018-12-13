@@ -33,25 +33,17 @@ namespace AquaPic.UserInterface
 {
     public class AtoSettings : TouchSettingsDialog
     {
-        string groupName;
-        public string atoGroupName {
-            get {
-                return groupName;
-            }
-        }
+        public string groupName { get; private set; }
 
-        public AtoSettings (string name, bool includeDelete, Window parent)
-            : base (name + " Auto Top Off", includeDelete, parent) {
-            groupName = name;
+        public AtoSettings (AutoTopOffGroupSettings settings, Window parent)
+            : base (settings.name + " Auto Top Off", settings.name.IsNotEmpty (), parent) 
+        {
+            groupName = settings.name;
 
             var t = new SettingsTextBox ("Name");
-            if (groupName.IsNotEmpty ()) {
-                t.textBox.text = groupName;
-            } else {
-                t.textBox.text = "Enter name";
-            }
+            t.textBox.text = groupName.IsNotEmpty () ? groupName : "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
-                if (string.IsNullOrWhiteSpace (args.text))
+                if (args.text.IsEmpty ())
                     args.keepText = false;
                 else if (!AutoTopOff.AtoGroupNameOk (args.text)) {
                     MessageBox.Show ("ATO group name already exists");
@@ -62,32 +54,22 @@ namespace AquaPic.UserInterface
 
             var s = new SettingsSelectorSwitch ("Enable");
             if (groupName.IsNotEmpty ()) {
-                if (AutoTopOff.GetAtoGroupEnable (groupName)) {
-                    s.selectorSwitch.currentSelected = 0;
-                    showOptional = true;
-                } else {
-                    s.selectorSwitch.currentSelected = 1;
-                    showOptional = false;
-                }
+                s.selectorSwitch.currentSelected = settings.enable ? 0 : 1;
             }
             AddSetting (s);
 
             var c = new SettingsComboBox ("Water Group");
-            c.combo.nonActiveMessage = "Select outlet";
+            c.combo.nonActiveMessage = "Select Water Level Group";
             var availableGroups = WaterLevel.GetAllWaterLevelGroupNames ();
             c.combo.comboList.AddRange (availableGroups);
             if (groupName.IsNotEmpty ()) {
-                var index = Array.IndexOf (availableGroups, AutoTopOff.GetAtoGroupWaterLevelGroupName (groupName));
+                var index = Array.IndexOf (availableGroups, settings.waterLevelGroupName);
                 c.combo.activeIndex = index;
             }
             AddSetting (c);
 
             t = new SettingsTextBox ("Request Bit Name");
-            if (groupName.IsNotEmpty ()) {
-                t.textBox.text = AutoTopOff.GetAtoGroupRequestBitName (groupName);
-            } else {
-                t.textBox.text = "Enter name";
-            }
+            t.textBox.text = groupName.IsNotEmpty () ? settings.requestBitName : "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ()) {
                     args.keepText = false;
@@ -97,35 +79,18 @@ namespace AquaPic.UserInterface
 
             s = new SettingsSelectorSwitch ("Use Analog");
             if (groupName.IsNotEmpty ()) {
-                if (AutoTopOff.GetAtoGroupUseAnalogSensor (groupName))
-                    s.selectorSwitch.currentSelected = 0;
-                else
-                    s.selectorSwitch.currentSelected = 1;
-            } else {
-                s.selectorSwitch.currentSelected = 1;
+                s.selectorSwitch.currentSelected = settings.useAnalogSensors ? 0 : 1;
             }
             AddSetting (s);
 
             t = new SettingsTextBox ("Analog Off");
-            if (groupName.IsNotEmpty ()) {
-                t.textBox.text = AutoTopOff.GetAtoGroupAnalogOffSetpoint (groupName).ToString ();
-            } else {
-                t.textBox.text = "0";
-            }
+            t.textBox.text = groupName.IsNotEmpty () ? settings.analogOffSetpoint.ToString () : "0";
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     float offStpnt = Convert.ToSingle (args.text);
 
                     if (offStpnt < 0.0f) {
                         MessageBox.Show ("Analog on setpoint can't be negative");
-                        args.keepText = false;
-                        return;
-                    }
-
-                    float onStpnt = Convert.ToSingle (((SettingsTextBox)settings["Analog On"]).textBox.text);
-
-                    if (onStpnt >= offStpnt) {
-                        MessageBox.Show ("Analog on setpoint can't be greater than or equal to off setpoint");
                         args.keepText = false;
                         return;
                     }
@@ -137,25 +102,13 @@ namespace AquaPic.UserInterface
             AddSetting (t);
 
             t = new SettingsTextBox ("Analog On");
-            if (groupName.IsNotEmpty ()) {
-                t.textBox.text = AutoTopOff.GetAtoGroupAnalogOnSetpoint (groupName).ToString ();
-            } else {
-                t.textBox.text = "0";
-            }
+            t.textBox.text = groupName.IsNotEmpty () ? settings.analogOnSetpoint.ToString () : "0";
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     float onStpnt = Convert.ToSingle (args.text);
 
                     if (onStpnt < 0.0f) {
                         MessageBox.Show ("Analog on setpoint can't be negative");
-                        args.keepText = false;
-                        return;
-                    }
-
-                    float offStpnt = Convert.ToSingle (((SettingsTextBox)settings["Analog Off"]).textBox.text);
-
-                    if (onStpnt >= offStpnt) {
-                        MessageBox.Show ("Analog on setpoint can't be greater than or equal to off setpoint");
                         args.keepText = false;
                         return;
                     }
@@ -168,21 +121,14 @@ namespace AquaPic.UserInterface
 
             s = new SettingsSelectorSwitch ("Use Float Switch");
             if (groupName.IsNotEmpty ()) {
-                if (AutoTopOff.GetAtoGroupUseFloatSwitches (groupName))
-                    s.selectorSwitch.currentSelected = 0;
-                else
-                    s.selectorSwitch.currentSelected = 1;
-            } else {
-                s.selectorSwitch.currentSelected = 1;
+                s.selectorSwitch.currentSelected = settings.useFloatSwitches ? 0 : 1;
             }
             AddSetting (s);
 
             t = new SettingsTextBox ("Max Runtime");
-            if (groupName.IsNotEmpty ()) {
-                t.textBox.text = string.Format ("{0} mins", AutoTopOff.GetAtoGroupMaximumRuntime (groupName));
-            } else {
-                t.textBox.text = "1 min";
-            }
+            t.textBox.text = groupName.IsNotEmpty () ? 
+                string.Format ("{0} mins", settings.maximumRuntime) : 
+                "1 min";
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
@@ -198,11 +144,9 @@ namespace AquaPic.UserInterface
             AddSetting (t);
 
             t = new SettingsTextBox ("Cooldown");
-            if (groupName.IsNotEmpty ()) {
-                t.textBox.text = string.Format ("{0} mins", AutoTopOff.GetAtoGroupMinimumCooldown (groupName));
-            } else {
-                t.textBox.text = "10 mins";
-            }
+            t.textBox.text = groupName.IsNotEmpty () ?
+                string.Format ("{0} mins", settings.minimumCooldown) :
+                "10 min";
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
@@ -239,93 +183,45 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnSave (object sender) {
-            var name = (string)settings["Name"].setting;
-            if (name == "Enter name") {
+            var atoSettings = new AutoTopOffGroupSettings ();
+
+            atoSettings.name = (string)settings["Name"].setting;
+            if (atoSettings.name == "Enter name") {
                 MessageBox.Show ("Invalid ATO name");
                 return false;
             }
 
-            var enable = (int)settings["Enable"].setting == 0;
-            var waterLevelGroup = (string)settings["Water Group"].setting;
-            var requestBitName = (string)settings["Request Bit Name"].setting;
-            if (requestBitName == "Enter name") {
+            atoSettings.enable = (int)settings["Enable"].setting == 0;
+
+            atoSettings.waterLevelGroupName = (string)settings["Water Group"].setting;
+            if (atoSettings.waterLevelGroupName.IsEmpty ()) {
+                MessageBox.Show ("Please select a Water Level Group");
+                return false;
+            }
+
+            atoSettings.requestBitName = (string)settings["Request Bit Name"].setting;
+            if (atoSettings.requestBitName == "Enter name") {
                 MessageBox.Show ("Invalid request bit name");
                 return false;
             }
 
-            var useAnalogSensors = (int)settings["Use Analog"].setting == 0;
-            var analogOnSetpoint = Convert.ToSingle (settings["Analog On"].setting);
-            var analogOffSetpoint = Convert.ToSingle (settings["Analog Off"].setting);
+            atoSettings.useAnalogSensors = (int)settings["Use Analog"].setting == 0;
+            atoSettings.analogOnSetpoint = Convert.ToSingle (settings["Analog On"].setting);
+            atoSettings.analogOffSetpoint = Convert.ToSingle (settings["Analog Off"].setting);
 
-            var useFloatSwitches = (int)settings["Use Float Switch"].setting == 0;
-
-            var maximumRuntime = (uint)ParseTime ((string)settings["Max Runtime"].setting);
-            var minimumCooldown = (uint)ParseTime ((string)settings["Cooldown"].setting);
-
-            var jo = SettingsHelper.OpenSettingsFile ("autoTopOffProperties") as JObject;
-            var ja = jo["atoGroups"] as JArray;
-
-            if (groupName.IsEmpty ()) {
-                AutoTopOff.AddAtoGroup (
-                    name,
-                    enable,
-                    requestBitName,
-                    waterLevelGroup,
-                    maximumRuntime,
-                    minimumCooldown,
-                    useAnalogSensors,
-                    analogOnSetpoint,
-                    analogOffSetpoint,
-                    useFloatSwitches);
-
-                var jobj = new JObject {
-                    new JProperty ("name", name),
-                    new JProperty ("enable", enable.ToString ()),
-                    new JProperty ("waterLevelGroupName", waterLevelGroup),
-                    new JProperty ("requestBitName", requestBitName),
-                    new JProperty ("useAnalogSensors", useAnalogSensors.ToString ()),
-                    new JProperty ("analogOnSetpoint", analogOnSetpoint.ToString ()),
-                    new JProperty ("analogOffSetpoint", analogOffSetpoint.ToString ()),
-                    new JProperty ("useFloatSwitches", useFloatSwitches.ToString ()),
-                    new JProperty ("maximumRuntime", maximumRuntime.ToString ()),
-                    new JProperty ("minimumCooldown", minimumCooldown.ToString ())
-                };
-
-                ja.Add (jobj);
-                groupName = name;
-            } else {
-                if (groupName != name) {
-                    AutoTopOff.SetAtoGroupName (groupName, name);
-                    groupName = name;
-                }
-                AutoTopOff.SetAtoGroupEnable (groupName, enable);
-                AutoTopOff.SetAtoGroupWaterLevelGroupName (groupName, waterLevelGroup);
-                AutoTopOff.SetAtoGroupRequestBitName (groupName, requestBitName);
-                AutoTopOff.SetAtoGroupUseAnalogSensor (groupName, useAnalogSensors);
-                AutoTopOff.SetAtoGroupAnalogOnSetpoint (groupName, analogOnSetpoint);
-                AutoTopOff.SetAtoGroupAnalogOffSetpoint (groupName, analogOffSetpoint);
-                AutoTopOff.SetAtoGroupUseFloatSwitches (groupName, useFloatSwitches);
-                AutoTopOff.SetAtoGroupMaximumRuntime (groupName, maximumRuntime);
-                AutoTopOff.SetAtoGroupMinimumCooldown (groupName, minimumCooldown);
-
-                int arrIdx = SettingsHelper.FindSettingsInArray (ja, groupName);
-                if (arrIdx == -1) {
-                    MessageBox.Show ("Something went wrong");
-                    return false;
-                }
-
-                ja[arrIdx]["enable"] = enable.ToString ();
-                ja[arrIdx]["waterLevelGroupName"] = waterLevelGroup;
-                ja[arrIdx]["requestBitName"] = requestBitName;
-                ja[arrIdx]["useAnalogSensors"] = useAnalogSensors.ToString ();
-                ja[arrIdx]["analogOnSetpoint"] = analogOnSetpoint.ToString ();
-                ja[arrIdx]["analogOffSetpoint"] = analogOffSetpoint.ToString ();
-                ja[arrIdx]["useFloatSwitches"] = useFloatSwitches.ToString ();
-                ja[arrIdx]["maximumRuntime"] = maximumRuntime.ToString ();
-                ja[arrIdx]["minimumCooldown"] = minimumCooldown.ToString ();
+            if (atoSettings.analogOnSetpoint > atoSettings.analogOffSetpoint) {
+                MessageBox.Show ("Analog On Setpoint can not be higher than the analog off setpoint");
+                return false;
             }
 
-            SettingsHelper.WriteSettingsFile ("autoTopOffProperties", jo);
+            atoSettings.useFloatSwitches = (int)settings["Use Float Switch"].setting == 0;
+
+            atoSettings.maximumRuntime = (uint)ParseTime ((string)settings["Max Runtime"].setting);
+            atoSettings.minimumCooldown = (uint)ParseTime ((string)settings["Cooldown"].setting);
+
+            AutoTopOff.UpdateAtoGroup (groupName, atoSettings);
+            groupName = atoSettings.name;
+
             return true;
         }
     }

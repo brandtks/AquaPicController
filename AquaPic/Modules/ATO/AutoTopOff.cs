@@ -63,6 +63,9 @@ namespace AquaPic.Modules
             }
         }
 
+        const string settingsFile = "autoTopOffProperties";
+        const string settingsArrayName = "atoGroups";
+
         static AutoTopOff () { }
 
         public static void Init () {
@@ -70,122 +73,18 @@ namespace AquaPic.Modules
 
             atoGroups = new Dictionary<string, AutoTopOffGroup> ();
 
-            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = Path.Combine (path, "autoTopOffProperties.json");
-
-            if (File.Exists (path)) {
-                using (StreamReader reader = File.OpenText (path)) {
-                    JObject jo = (JObject)JToken.ReadFrom (new JsonTextReader (reader));
-
-                    var ja = (JArray)jo["atoGroups"];
-                    foreach (var jt in ja) {
-                        var name = (string)jt["name"];
-
-                        bool enable;
-                        try {
-                            enable = Convert.ToBoolean (jt["enable"]);
-                        } catch {
-                            enable = false;
-                        }
-
-                        var requestBitName = (string)jt["requestBitName"];
-                        var waterLevelGroupName = (string)jt["waterLevelGroupName"];
-
-                        uint maximumRuntime;
-                        var text = (string)jt["maximumRuntime"];
-                        if (text.IsEmpty ()) {
-                            maximumRuntime = 0U;
-                            enable = false;
-                        } else {
-                            try {
-                                maximumRuntime = Convert.ToUInt32 (text);
-                            } catch {
-                                maximumRuntime = 0U;
-                                enable = false;
-                            }
-                        }
-
-                        uint minimumCooldown;
-                        text = (string)jt["minimumCooldown"];
-                        if (text.IsEmpty ()) {
-                            minimumCooldown = uint.MaxValue;
-                            enable = false;
-                        } else {
-                            try {
-                                minimumCooldown = Convert.ToUInt32 (text);
-                            } catch {
-                                minimumCooldown = uint.MaxValue;
-                                enable = false;
-                            }
-                        }
-
-                        bool useAnalogSensors;
-                        try {
-                            useAnalogSensors = Convert.ToBoolean (jt["useAnalogSensors"]);
-                        } catch {
-                            useAnalogSensors = false;
-                        }
-
-
-                        float analogOnSetpoint;
-                        text = (string)jt["analogOnSetpoint"];
-                        if (text.IsEmpty ()) {
-                            analogOnSetpoint = 0f;
-                            useAnalogSensors = false;
-                        } else {
-                            try {
-                                analogOnSetpoint = Convert.ToSingle (text);
-                            } catch {
-                                analogOnSetpoint = 0f;
-                                useAnalogSensors = false;
-                            }
-                        }
-
-                        float analogOffSetpoint;
-                        text = (string)jt["analogOffSetpoint"];
-                        if (string.IsNullOrWhiteSpace (text)) {
-                            analogOffSetpoint = 0.0f;
-                            useAnalogSensors = false;
-                        } else {
-                            try {
-                                analogOffSetpoint = Convert.ToSingle (text);
-                            } catch {
-                                analogOffSetpoint = 0.0f;
-                                useAnalogSensors = false;
-                            }
-                        }
-
-                        bool useFloatSwitches;
-                        try {
-                            useFloatSwitches = Convert.ToBoolean (jt["useFloatSwitches"]);
-                        } catch {
-                            useFloatSwitches = false;
-                        }
-
-                        enable &= (useFloatSwitches || useAnalogSensors);
-
-                        AddAtoGroup (
-                            name,
-                            enable,
-                            requestBitName,
-                            waterLevelGroupName,
-                            maximumRuntime,
-                            minimumCooldown,
-                            useAnalogSensors,
-                            analogOnSetpoint,
-                            analogOffSetpoint,
-                            useFloatSwitches);
-                    }
+            if (SettingsHelper.SettingsFileExists (settingsFile)) {
+                var settings = SettingsHelper.ReadAllSettingsInArray<AutoTopOffGroupSettings> (settingsFile, settingsArrayName);
+                foreach (var setting in settings) {
+                    AddAtoGroup (setting, false);
                 }
             } else {
                 Logger.Add ("ATO settings file did not exist, created new ATO settings");
-                var file = File.Create (path);
-                file.Close ();
 
                 var jo = new JObject ();
-                jo.Add (new JProperty ("atoGroups", new JArray ()));
+                jo.Add (new JProperty (settingsArrayName, new JArray ()));
 
-                File.WriteAllText (path, jo.ToString ());
+                SettingsHelper.WriteSettingsFile (settingsFile, jo);
             }
 
             TaskManager.AddCyclicInterrupt ("Auto Top Off", 1000, Run);
@@ -200,6 +99,28 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Auto Top Off Groups                                                                                        */
         /**************************************************************************************************************/
+        public static void AddAtoGroup (AutoTopOffGroupSettings settings, bool saveToFile = true) {
+            if (!AtoGroupNameOk (settings.name)) {
+                throw new Exception (string.Format ("ATO Group: {0} already exists", settings.name));
+            }
+
+            atoGroups[settings.name] = new AutoTopOffGroup (
+                settings.name,
+                settings.enable,
+                settings.requestBitName,
+                settings.waterLevelGroupName,
+                settings.maximumRuntime,
+                settings.minimumCooldown,
+                settings.useAnalogSensors,
+                settings.analogOnSetpoint,
+                settings.analogOffSetpoint,
+                settings.useFloatSwitches);
+
+            if (saveToFile) {
+                AddAutoTopOffGroupSettingsToFile (settings);
+            }
+        }
+
         public static void AddAtoGroup (
             string name,
             bool enable,
@@ -210,8 +131,8 @@ namespace AquaPic.Modules
             bool useAnalogSensors,
             float analogOnSetpoint,
             float analogOffSetpoint,
-            bool useFloatSwitches
-        ) {
+            bool useFloatSwitches)
+        {
             if (!AtoGroupNameOk (name)) {
                 throw new Exception (string.Format ("ATO Group: {0} already exists", name));
             }
@@ -231,9 +152,17 @@ namespace AquaPic.Modules
             atoGroups.Add (name, atoGroup);
         }
 
+        public static void UpdateAtoGroup (string name, AutoTopOffGroupSettings settings) {
+            if (CheckAtoGroupKeyNoThrow (name)) {
+                RemoveAtoGroup (name);
+            }
+            AddAtoGroup (settings);
+        }
+
         public static void RemoveAtoGroup (string name) {
             CheckAtoGroupKey (name);
             atoGroups.Remove (name);
+            DeleteAutoTopOffGroupSettingsFromFile (name);
         }
 
         public static void CheckAtoGroupKey (string name) {
@@ -420,6 +349,31 @@ namespace AquaPic.Modules
         public static void SetAtoGroupUseFloatSwitches (string name, bool useFloatSwitches) {
             CheckAtoGroupKey (name);
             atoGroups[name].useFloatSwitches = useFloatSwitches;
+        }
+
+        /***Settings***************************************************************************************************/
+        public static AutoTopOffGroupSettings GetAutoTopOffGroupSettings (string name) {
+            CheckAtoGroupKey (name);
+            var settings = new AutoTopOffGroupSettings ();
+            settings.name = name;
+            settings.enable = GetAtoGroupEnable (name);
+            settings.requestBitName = GetAtoGroupRequestBitName (name);
+            settings.waterLevelGroupName = GetAtoGroupWaterLevelGroupName (name);
+            settings.maximumRuntime = GetAtoGroupMaximumRuntime (name);
+            settings.minimumCooldown = GetAtoGroupMinimumCooldown (name);
+            settings.useAnalogSensors = GetAtoGroupUseAnalogSensor (name);
+            settings.analogOnSetpoint = GetAtoGroupAnalogOnSetpoint (name);
+            settings.analogOffSetpoint = GetAtoGroupAnalogOffSetpoint (name);
+            settings.useFloatSwitches = GetAtoGroupUseFloatSwitches (name);
+            return settings;
+        }
+
+        protected static void AddAutoTopOffGroupSettingsToFile (AutoTopOffGroupSettings settings) {
+            SettingsHelper.AddSettingsToArray (settingsFile, settingsArrayName, settings);
+        }
+
+        protected static void DeleteAutoTopOffGroupSettingsFromFile (string name) {
+            SettingsHelper.DeleteSettingsFromArray (settingsFile, settingsArrayName, name);
         }
     }
 }

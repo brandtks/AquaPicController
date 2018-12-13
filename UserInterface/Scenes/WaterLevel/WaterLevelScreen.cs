@@ -143,12 +143,10 @@ namespace AquaPic.UserInterface
             atoSettingsBtn.buttonColor = "pri";
             atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var parent = Toplevel as Window;
-                var s = new AtoSettings (atoGroupName, atoGroupName.IsNotEmpty (), parent);
+                var s = new AtoSettings (AutoTopOff.GetAutoTopOffGroupSettings (atoGroupName), parent);
                 s.Run ();
-                var newAtoGroupName = s.atoGroupName;
+                var newAtoGroupName = s.groupName;
                 var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
 
                 if ((outcome == TouchSettingsOutcome.Modified) && (newAtoGroupName != groupName)) {
                     var index = atoGroupCombo.comboList.IndexOf (groupName);
@@ -456,8 +454,6 @@ namespace AquaPic.UserInterface
                 s.Run ();
                 var newGroupName = s.waterLevelGroupName;
                 var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
 
                 if (outcome == TouchSettingsOutcome.Added) {
                     groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, newGroupName);
@@ -476,12 +472,10 @@ namespace AquaPic.UserInterface
         protected void OnAtoGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New ATO...") {
                 var parent = Toplevel as Window;
-                var s = new AtoSettings (string.Empty, false, parent);
+                var s = new AtoSettings (new AutoTopOffGroupSettings (), parent);
                 s.Run ();
-                var newGroupName = s.atoGroupName;
+                var newGroupName = s.groupName;
                 var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
 
                 if (outcome == TouchSettingsOutcome.Added) {
                     atoGroupCombo.comboList.Insert (atoGroupCombo.comboList.Count - 1, newGroupName);

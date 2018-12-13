@@ -101,6 +101,11 @@ namespace AquaPic.Modules
             }
         }
 
+        const string settingsFile = "waterLevelProperties";
+        const string groupSettingsArrayName = "waterLevelGroups";
+        const string analogSensorSettingsArrayName = "analogSensors";
+        const string floatSwitchSettingsArrayName = "floatSwitches";
+
         /**************************************************************************************************************/
         /* Water Level                                                                                                */
         /**************************************************************************************************************/
@@ -113,11 +118,11 @@ namespace AquaPic.Modules
             analogLevelSensors = new Dictionary<string, WaterLevelSensor> ();
             floatSwitches = new Dictionary<string, FloatSwitch> ();
 
-            if (SettingsHelper.SettingsFileExists ("waterLevelProperties")) {
+            if (SettingsHelper.SettingsFileExists (settingsFile)) {
                 /**************************************************************************************************/
                 /* Water Level Groups                                                                             */
                 /**************************************************************************************************/
-                var groupSettings = SettingsHelper.ReadAllSettingsInArray<WaterLevelGroupSettings> ("waterLevelProperties", "waterLevelGroups");
+                var groupSettings = SettingsHelper.ReadAllSettingsInArray<WaterLevelGroupSettings> (settingsFile, groupSettingsArrayName);
                 foreach (var setting in groupSettings) {
                     AddWaterLevelGroup (setting, false);
                 }
@@ -125,7 +130,7 @@ namespace AquaPic.Modules
                 /**************************************************************************************************/
                 /* Analog Sensors                                                                                 */
                 /**************************************************************************************************/
-                var analogSettings = SettingsHelper.ReadAllSettingsInArray<WaterLevelSensorSettings> ("waterLevelProperties", "analogSensors");
+                var analogSettings = SettingsHelper.ReadAllSettingsInArray<WaterLevelSensorSettings> (settingsFile, analogSensorSettingsArrayName);
                 foreach (var setting in analogSettings) {
                     AddAnalogLevelSensor (setting, false);
                 }
@@ -133,7 +138,7 @@ namespace AquaPic.Modules
                 /**************************************************************************************************/
                 /* Float Switches                                                                                 */
                 /**************************************************************************************************/
-                var switchSettings = SettingsHelper.ReadAllSettingsInArray<FloatSwitchSettings> ("waterLevelProperties", "floatSwitches");
+                var switchSettings = SettingsHelper.ReadAllSettingsInArray<FloatSwitchSettings> (settingsFile, floatSwitchSettingsArrayName);
                 foreach (var setting in switchSettings) {
                     AddFloatSwitch (setting, false);
                 }
@@ -141,12 +146,12 @@ namespace AquaPic.Modules
                 Logger.Add ("Water level settings file did not exist, created new water level settings");
 
                 var jo = new JObject ();
-                jo.Add (new JProperty ("waterLevelGroups", new JArray ()));
+                jo.Add (new JProperty (groupSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty ("defaultWaterLevelGroup", string.Empty));
-                jo.Add (new JProperty ("analogSensors", new JArray ()));
-                jo.Add (new JProperty ("floatSwitches", new JArray ()));
+                jo.Add (new JProperty (analogSensorSettingsArrayName, new JArray ()));
+                jo.Add (new JProperty (floatSwitchSettingsArrayName, new JArray ()));
 
-                SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
+                SettingsHelper.WriteSettingsFile (settingsFile, jo);
             }
 
             TaskManager.AddCyclicInterrupt ("Water Level", 1000, Run);
@@ -212,7 +217,7 @@ namespace AquaPic.Modules
         public static void RemoveWaterLevelGroup (string name) {
             CheckWaterLevelGroupKey (name);
             waterLevelGroups.Remove (name);
-            SettingsHelper.DeleteSettingsFromArray ("waterLevelProperties", "waterLevelGroups", name);
+            SettingsHelper.DeleteSettingsFromArray (settingsFile, groupSettingsArrayName, name);
         }
 
         public static void CheckWaterLevelGroupKey (string name) {
@@ -390,7 +395,7 @@ namespace AquaPic.Modules
 
         protected static void AddWaterLevelGroupSettingsToFile (string name) {
             CheckWaterLevelGroupKey (name);
-            SettingsHelper.AddSettingsToArray ("waterLevelProperties", "waterLevelGroups", GetWaterLevelGroupSettings (name));
+            SettingsHelper.AddSettingsToArray (settingsFile, groupSettingsArrayName, GetWaterLevelGroupSettings (name));
         }
 
         public static void UpdateWaterLevelGroupSettingsToFile (string name) {
@@ -399,7 +404,7 @@ namespace AquaPic.Modules
 
         public static void UpdateWaterLevelGroupSettingsToFile (string name, string savedName) {
             CheckWaterLevelGroupKey (name);
-            SettingsHelper.UpdateSettingsInArray ("waterLevelProperties", "waterLevelGroups", savedName, GetWaterLevelGroupSettings (name));
+            SettingsHelper.UpdateSettingsInArray (settingsFile, groupSettingsArrayName, savedName, GetWaterLevelGroupSettings (name));
         }
 
         /**************************************************************************************************************/
@@ -456,7 +461,7 @@ namespace AquaPic.Modules
 
             analogLevelSensors[analogLevelSensorName].Remove ();
             analogLevelSensors.Remove (analogLevelSensorName);
-            SettingsHelper.DeleteSettingsFromArray ("waterLevelProperties", "analogSensors", analogLevelSensorName);
+            SettingsHelper.DeleteSettingsFromArray (settingsFile, analogSensorSettingsArrayName, analogLevelSensorName);
         }
 
         public static void CheckAnalogLevelSensorKey (string analogLevelSensorName) {
@@ -597,7 +602,7 @@ namespace AquaPic.Modules
 
         protected static void AddAnalogSensorSettingsToFile (string name) {
             CheckAnalogLevelSensorKey (name);
-            SettingsHelper.AddSettingsToArray ("waterLevelProperties", "analogSensors", GetAnalogSensorSettingsSettings (name));
+            SettingsHelper.AddSettingsToArray (settingsFile, analogSensorSettingsArrayName, GetAnalogSensorSettingsSettings (name));
         }
 
         public static void UpdateAnalogSensorSettingsToFile (string name) {
@@ -606,7 +611,7 @@ namespace AquaPic.Modules
 
         public static void UpdateAnalogSensorSettingsToFile (string name, string savedName) {
             CheckAnalogLevelSensorKey (name);
-            SettingsHelper.UpdateSettingsInArray ("waterLevelProperties", "analogSensors", savedName, GetAnalogSensorSettingsSettings (name));
+            SettingsHelper.UpdateSettingsInArray (settingsFile, analogSensorSettingsArrayName, savedName, GetAnalogSensorSettingsSettings (name));
         }
 
         /**************************************************************************************************************/
@@ -664,7 +669,7 @@ namespace AquaPic.Modules
             CheckFloatSwitchKey (floatSwitchName);
             floatSwitches[floatSwitchName].Remove ();   // this removes the physical digital input
             floatSwitches.Remove (floatSwitchName);     // this removes the entry from the dictionary
-            SettingsHelper.DeleteSettingsFromArray ("waterLevelProperties", "floatSwitches", floatSwitchName);
+            SettingsHelper.DeleteSettingsFromArray (settingsFile, floatSwitchSettingsArrayName, floatSwitchName);
         }
 
         public static void CheckFloatSwitchKey (string floatSwitchName) {
@@ -807,7 +812,7 @@ namespace AquaPic.Modules
 
         protected static void AddFloatSwitchSettingsToFile (string name) {
             CheckFloatSwitchKey (name);
-            SettingsHelper.AddSettingsToArray ("waterLevelProperties", "floatSwitches", GetFloatSwitchSettingsSettings (name));
+            SettingsHelper.AddSettingsToArray (settingsFile, floatSwitchSettingsArrayName, GetFloatSwitchSettingsSettings (name));
         }
 
         public static void UpdateFloatSwitchSettingsToFile (string name) {
@@ -816,7 +821,7 @@ namespace AquaPic.Modules
 
         public static void UpdateFloatSwitchSettingsToFile (string name, string savedName) {
             CheckFloatSwitchKey (name);
-            SettingsHelper.UpdateSettingsInArray ("waterLevelProperties", "floatSwitches", savedName, GetFloatSwitchSettingsSettings (name));
+            SettingsHelper.UpdateSettingsInArray (settingsFile, floatSwitchSettingsArrayName, savedName, GetFloatSwitchSettingsSettings (name));
         }
     }
 }
