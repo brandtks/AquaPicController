@@ -22,16 +22,14 @@
 #endregion // License
 
 using System;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using GoodtimeDevelopment.Utilites;
+using System.Linq;
+using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Runtime;
 
 namespace AquaPic.Modules
 {
-    public class LightingFixtureSettings : IEntitySettings
-    {
+    public class LightingFixtureSettings : IEntitySettings {
         [EntitySetting (typeof (StringMutator), "name")]
         public string name { get; set; }
 
@@ -42,7 +40,7 @@ namespace AquaPic.Modules
         public bool highTempLockout { get; set; }
 
         [EntitySetting (typeof (IndividualControlMutator), new string[] { "dimmingCard", "channel" }, true)]
-        public IndividualControl dimmingOutlet { get; set; }
+        public IndividualControl dimmingChannel { get; set; }
 
         [EntitySetting (typeof (LightingStatesMutator))]
         public LightingState[] lightingStates { get; set; }

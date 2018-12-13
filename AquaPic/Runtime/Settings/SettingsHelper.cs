@@ -177,7 +177,7 @@ namespace AquaPic.Runtime
             return successful;
         }
 
-        protected static List<ReflectedSetting> GetReflectedSettings (IEntitySettings settings) {
+        public static List<ReflectedSetting> GetReflectedSettings (IEntitySettings settings) {
             var reflectedSettings = new List<ReflectedSetting> ();
             Type settingsType = settings.GetType ();
             PropertyInfo[] publicProperties = settingsType.GetProperties (BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
@@ -192,18 +192,18 @@ namespace AquaPic.Runtime
             }
             return reflectedSettings;
         }
+    }
 
-        protected class ReflectedSetting
-        {
-            public EntitySettingAttribute entitySettingAttribute;
-            public string propertyName;
-            public object propertyValue;
+    public class ReflectedSetting
+    {
+        public EntitySettingAttribute entitySettingAttribute;
+        public string propertyName;
+        public object propertyValue;
 
-            public ReflectedSetting (EntitySettingAttribute entitySettingAttribute, string propertyName, object propertyValue) {
-                this.entitySettingAttribute = entitySettingAttribute;
-                this.propertyName = propertyName;
-                this.propertyValue = propertyValue;
-            }
+        public ReflectedSetting (EntitySettingAttribute entitySettingAttribute, string propertyName, object propertyValue) {
+            this.entitySettingAttribute = entitySettingAttribute;
+            this.propertyName = propertyName;
+            this.propertyValue = propertyValue;
         }
     }
 }

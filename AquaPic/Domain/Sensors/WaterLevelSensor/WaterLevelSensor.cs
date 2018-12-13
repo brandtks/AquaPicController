@@ -73,25 +73,25 @@ namespace AquaPic.Sensors
 
         public WaterLevelSensor (
             string name,
-            IndividualControl ic,
-            string waterLevelGroupName
-        ) {
-            _channel = ic;
+            IndividualControl channel,
+            string waterLevelGroupName,
+            float zeroScaleValue,
+            float fullScaleActual,
+            float fullScaleValue) 
+        {
             _name = name;
+            _channel = channel;
+            this.waterLevelGroupName = waterLevelGroupName;
             _level = 0.0f;
 
-            zeroScaleValue = 819.2f;
-            fullScaleActual = 15f;
-            fullScaleValue = 3003.73f;
+            this.zeroScaleValue = zeroScaleValue;
+            this.fullScaleActual = fullScaleActual;
+            this.fullScaleValue = fullScaleValue;
 
             _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog level probe disconnected, " + name);
-            Add (ic);
-
-            this.waterLevelGroupName = waterLevelGroupName;
+            Add (_channel);
         }
 
-        public WaterLevelSensor (string name, IndividualControl ic)
-            : this (name, ic, string.Empty) { }
 
         public void Add (IndividualControl channel) {
             if (!_channel.Equals (channel)) {
@@ -109,6 +109,7 @@ namespace AquaPic.Sensors
             if (_channel.IsNotEmpty ()) {
                 AquaPicDrivers.AnalogInput.RemoveChannel (_channel);
             }
+            Alarm.Clear (_sensorDisconnectedAlarmIndex);
         }
 
         public float Get () {

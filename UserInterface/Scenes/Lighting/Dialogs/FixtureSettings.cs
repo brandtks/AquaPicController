@@ -41,7 +41,8 @@ namespace AquaPic.UserInterface
         }
 
         public FixtureSettings (string fixtureName, bool includeDelete, Window parent)
-            : base (fixtureName, includeDelete, parent) {
+            : base (fixtureName, includeDelete, parent) 
+        {
             this.fixtureName = fixtureName;
 
             var t = new SettingsTextBox ("Name");
@@ -132,6 +133,52 @@ namespace AquaPic.UserInterface
             i = Convert.ToInt32 (s.Substring (idx + 2));
         }
 
+        protected override bool OnSave (object sender) {
+            var fixtureSettings = new LightingFixtureSettings ();
+            fixtureSettings.name = ((SettingsTextBox)settings["Name"]).textBox.text;
+            if (fixtureSettings.name == "Enter name") {
+                MessageBox.Show ("Please enter a fixture name");
+                return false;
+            }
+
+            var outletCombo = ((SettingsComboBox)settings["Outlet"]).combo;
+            if (outletCombo.activeIndex == -1) {
+                MessageBox.Show ("Please select a power outlet");
+                return false;
+            }
+            var outletString = outletCombo.activeText;
+            fixtureSettings.powerOutlet = ParseIndividualControl (outletString);
+
+            fixtureSettings.highTempLockout = false;
+            if (((SettingsSelectorSwitch)settings["Temp Lockout"]).selectorSwitch.currentSelected == 0) {
+                fixtureSettings.highTempLockout = true;
+            }
+
+            bool dimmingFixture = false;
+            if (((SettingsSelectorSwitch)settings["Dimming Fixture"]).selectorSwitch.currentSelected == 0) {
+                dimmingFixture = true;
+            }
+
+            fixtureSettings.dimmingChannel = IndividualControl.Empty;
+            if (dimmingFixture) {
+                var channelCombo = ((SettingsComboBox)settings["Dimming Channel"]).combo;
+                if (channelCombo.activeIndex == -1) {
+                    MessageBox.Show ("Please select a dimming channel");
+                    return false;
+                }
+                var channelString = channelCombo.activeText;
+                fixtureSettings.dimmingChannel = ParseIndividualControl (channelString);
+            }
+
+            fixtureSettings.lightingStates = new LightingState[0];
+
+            Lighting.UpdateLighting (fixtureName, fixtureSettings);
+            fixtureName = fixtureSettings.name;
+
+            return true;
+        }
+
+        /*
         protected override bool OnSave (object sender) {
             string name = ((SettingsTextBox)settings["Name"]).textBox.text;
 
@@ -224,6 +271,7 @@ namespace AquaPic.UserInterface
 
             return true;
         }
+        */
 
         protected override bool OnDelete (object sender) {
             Lighting.RemoveLight (fixtureName);

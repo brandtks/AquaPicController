@@ -78,86 +78,71 @@ namespace AquaPic.Modules
         /* Lighting fixtures                                                                                          */
         /**************************************************************************************************************/
         public static void AddLight (LightingFixtureSettings settings, bool saveToFile = true) {
-            if (settings.dimmingOutlet.IsNotEmpty ()) {
-                AddLight (
+            if (!FixtureNameOk (settings.name)) {
+                throw new Exception (string.Format ("Lighting Fixture {0} already exists", settings.name));
+            }
+
+            if (settings.dimmingChannel.IsNotEmpty ()) {
+                AddDimmingLight (
                     settings.name,
                     settings.powerOutlet,
-                    settings.dimmingOutlet,
+                    settings.dimmingChannel,
                     settings.lightingStates,
-                    settings.highTempLockout,
-                    saveToFile);
+                    settings.highTempLockout);
             } else {
                 AddLight (
                     settings.name,
                     settings.powerOutlet,
                     settings.lightingStates,
-                    settings.highTempLockout,
-                    saveToFile);
+                    settings.highTempLockout);
+            }
+
+            if (saveToFile) {
+                AddFixtureSettingsToFile (settings.name);
             }
         }
 
-        public static void AddLight (
+        protected static void AddLight (
             string name,
             IndividualControl powerOutlet,
             LightingState[] lightingStates,
-            bool highTempLockout,
-            bool saveToFile = true) 
+            bool highTempLockout) 
         {
-            if (!FixtureNameOk (name)) {
-                throw new Exception (string.Format ("Lighting Fixture {0} already exists", name));
-            }
-
             fixtures[name] = new LightingFixture (
                 name,
                 powerOutlet,
                 lightingStates,
                 highTempLockout);
-
-            if (saveToFile) {
-                AddFixtureSettingsToFile (name);
-            }
         }
 
-        public static void AddLight (
+        protected static void AddDimmingLight (
             string name,
             IndividualControl powerOutlet,
             IndividualControl dimmingOutlet,
             LightingState[] lightingStates,
-            bool highTempLockout,
-            bool saveToFile = true) 
+            bool highTempLockout) 
         {
-            if (!FixtureNameOk (name)) {
-                throw new Exception (string.Format ("Lighting Fixture {0} already exists", name));
-            }
-
             fixtures[name] = new LightingFixtureDimming (
                 name,
                 powerOutlet,
                 dimmingOutlet,
                 lightingStates,
                 highTempLockout);
+        }
 
-            if (saveToFile) {
-                AddFixtureSettingsToFile (name);
+        public static void UpdateLighting (string fixtureName, LightingFixtureSettings settings) {
+            if (CheckFixtureKeyNoThrow (fixtureName)) {
+                settings.lightingStates = GetLightingFixtureLightingStates (fixtureName);
+                RemoveLight (fixtureName);
             }
+            AddLight (settings);
         }
 
         public static void RemoveLight (string fixtureName) {
             CheckFixtureKey (fixtureName);
-
-            LightingFixture fixture = fixtures[fixtureName];
-            Power.RemoveOutlet (fixture.powerOutlet);
-            Power.RemoveHandlerOnStateChange (fixture.powerOutlet, fixture.OnLightingPlugStateChange);
-
-            LightingFixtureDimming dimmingFixture = fixture as LightingFixtureDimming;
-            if (dimmingFixture != null) {
-                Power.RemoveHandlerOnModeChange (dimmingFixture.powerOutlet, dimmingFixture.OnLightingPlugModeChange);
-                AquaPicDrivers.AnalogOutput.RemoveChannel (dimmingFixture.channel);
-            }
-
+            fixtures[fixtureName].Remove ();
+            DeleteFixtureSettingsFromFile (fixtureName);
             fixtures.Remove (fixtureName);
-
-            SettingsHelper.DeleteSettingsFromArray ("lightingProperties", "lightingFixtures", fixtureName);
         }
 
         public static void CheckFixtureKey (string fixtureName) {
@@ -200,6 +185,7 @@ namespace AquaPic.Modules
             return names.ToArray ();
         }
 
+        /*
         public static void SetFixtureName (string oldFixtureName, string newFixtureName) {
             CheckFixtureKey (oldFixtureName);
             if (!FixtureNameOk (newFixtureName)) {
@@ -217,15 +203,8 @@ namespace AquaPic.Modules
 
             fixtures.Remove (oldFixtureName);
             fixtures[newFixtureName] = fixture;
-
-            // Rename the main screen widget if it exists
-            var ja = SettingsHelper.OpenSettingsFile ("mainScreen") as JArray;
-            var arrIdx = SettingsHelper.FindSettingsInArray (ja, oldFixtureName);
-            if (arrIdx != -1) {
-                ja[arrIdx]["name"] = newFixtureName;
-                SettingsHelper.WriteSettingsFile ("mainScreen", ja);
-            }
         }
+        */
 
         /**************************************************************************************************************/
         /* Individual Control                                                                                         */
@@ -235,6 +214,7 @@ namespace AquaPic.Modules
             return fixtures[fixtureName].powerOutlet;
         }
 
+        /*
         public static void SetFixtureOutletIndividualControl (string fixtureName, IndividualControl ic) {
             CheckFixtureKey (fixtureName);
             Power.RemoveOutlet (fixtures[fixtureName].powerOutlet);
@@ -242,6 +222,7 @@ namespace AquaPic.Modules
             var coil = Power.AddOutlet (fixtures[fixtureName].powerOutlet, fixtures[fixtureName].name, MyState.On, "Heater");
             coil.StateGetter = fixtures[fixtureName].OnPlugStateGetter;
         }
+        */
 
         public static IndividualControl GetDimmingChannelIndividualControl (string fixtureName) {
             CheckFixtureKey (fixtureName);
@@ -254,6 +235,7 @@ namespace AquaPic.Modules
             throw new ArgumentException ("fixtureName");
         }
 
+        /*
         public static void SetDimmingChannelIndividualControl (string fixtureName, IndividualControl ic) {
             CheckFixtureKey (fixtureName);
 
@@ -271,6 +253,7 @@ namespace AquaPic.Modules
 
             throw new ArgumentException ("fixtureName");
         }
+        */
 
         /**************************************************************************************************************/
         /* High Temperature Lockout                                                                                   */
@@ -280,10 +263,12 @@ namespace AquaPic.Modules
             return fixtures[fixtureName].highTempLockout;
         }
 
+        /*
         public static void SetFixtureTemperatureLockout (string fixtureName, bool highTempLockout) {
             CheckFixtureKey (fixtureName);
             fixtures[fixtureName].highTempLockout = highTempLockout;
         }
+        */
 
         /**************************************************************************************************************/
         /* Check Dimming Fixture                                                                                      */
@@ -379,12 +364,15 @@ namespace AquaPic.Modules
         public static void SetLightingFixtureLightingStates (string fixtureName, LightingState[] lightingStates, bool temporaryChange = true) {
             CheckFixtureKey (fixtureName);
             fixtures[fixtureName].UpdateLightingStates (lightingStates, temporaryChange);
+            if (!temporaryChange) {
+                UpdateFixtureSettingsToFile (fixtureName);
+            }
         }
 
         /**************************************************************************************************************/
         /* Settings                                                                                                   */
         /**************************************************************************************************************/
-        public static LightingFixtureSettings GetLightingFixtureSettings (string fixtureName) {
+        protected static LightingFixtureSettings GetLightingFixtureSettings (string fixtureName) {
             CheckFixtureKey (fixtureName);
             var settings = new LightingFixtureSettings ();
             settings.name = fixtureName;
@@ -392,23 +380,21 @@ namespace AquaPic.Modules
             settings.highTempLockout = GetFixtureTemperatureLockout (fixtureName);
             settings.lightingStates = GetLightingFixtureLightingStates (fixtureName);
             if (IsDimmingFixture (fixtureName)) {
-                settings.dimmingOutlet = GetDimmingChannelIndividualControl (fixtureName);
+                settings.dimmingChannel = GetDimmingChannelIndividualControl (fixtureName);
             }
             return settings;
         }
 
         protected static void AddFixtureSettingsToFile (string fixtureName) {
-            CheckFixtureKey (fixtureName);
             SettingsHelper.AddSettingsToArray ("lightingProperties", "lightingFixtures", GetLightingFixtureSettings (fixtureName));
         }
 
-        public static void UpdateFixtureSettingsToFile (string fixtureName) {
-            UpdateFixtureSettingsToFile (fixtureName, fixtureName);
+        protected static void UpdateFixtureSettingsToFile (string fixtureName) {
+            SettingsHelper.UpdateSettingsInArray ("lightingProperties", "lightingFixtures", fixtureName, GetLightingFixtureSettings (fixtureName));
         }
 
-        public static void UpdateFixtureSettingsToFile (string fixtureName, string savedFixtureName) {
-            CheckFixtureKey (fixtureName);
-            SettingsHelper.UpdateSettingsInArray ("lightingProperties", "lightingFixtures", savedFixtureName, GetLightingFixtureSettings (fixtureName));
+        protected static void DeleteFixtureSettingsFromFile (string fixtureName) {
+            SettingsHelper.DeleteSettingsFromArray ("lightingProperties", "lightingFixtures", fixtureName);
         }
     }
 }

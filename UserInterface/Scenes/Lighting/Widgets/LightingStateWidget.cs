@@ -104,10 +104,6 @@ namespace AquaPic.UserInterface
                                 lightingStateDisplay.lightingStates,
                                 !makeChangePermanant);
 
-                            if (makeChangePermanant) {
-                                Lighting.UpdateFixtureSettingsToFile (fixtureName);
-                            }
-
                             lightingStateDisplay.selectedState = -1;
                             lightingStateDisplay.hasStateInfoChanged = false;
                             lightingStateDisplay.QueueDraw ();

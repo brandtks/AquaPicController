@@ -23,9 +23,10 @@
 
 using System;
 using System.Collections.Generic;
-using Cairo;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
+using GoodtimeDevelopment.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.UserInterface
 {
@@ -220,6 +221,24 @@ namespace AquaPic.UserInterface
 
         protected virtual bool OnDelete (object sender) {
             throw new NotImplementedException ();
+        }
+
+        public IndividualControl ParseIndividualControl (string individualControlString) {
+            var ic = IndividualControl.Empty;
+            if (individualControlString.IsNotEmpty ()) {
+                try {
+                    int endIndex = individualControlString.IndexOf ('.');
+                    int startIndex = 0;
+                    if (individualControlString.StartsWith ("Current: ", StringComparison.InvariantCultureIgnoreCase)) {
+                        startIndex = "Current: ".Length;
+                    }
+                    ic.Group = individualControlString.Substring (startIndex, endIndex - startIndex);
+                    ic.Individual = Convert.ToInt32 (individualControlString.Substring (endIndex + 2));
+                } catch {
+                    ic = IndividualControl.Empty;
+                }
+            }
+            return ic;
         }
     }
 }

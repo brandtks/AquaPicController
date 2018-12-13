@@ -174,6 +174,10 @@ namespace AquaPic.Modules
                 return -1;
             }
 
+            public virtual void Remove () {
+                Power.RemoveOutlet (powerOutlet);
+                Power.RemoveHandlerOnStateChange (powerOutlet, OnLightingPlugStateChange);
+            }
         }
     }
 }

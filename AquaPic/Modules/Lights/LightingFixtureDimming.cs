@@ -144,6 +144,12 @@ namespace AquaPic.Modules
                     rocl.Reset ();
                 }
             }
+
+            public override void Remove () {
+                base.Remove ();
+                Power.RemoveHandlerOnModeChange (powerOutlet, OnLightingPlugModeChange);
+                AquaPicDrivers.AnalogOutput.RemoveChannel (channel);
+            }
         }
     }
 }
