@@ -91,18 +91,21 @@ namespace AquaPic.UserInterface
             levelLabel.Show ();
 
             var globalSettingsBtn = new TouchButton ();
-            globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
+            globalSettingsBtn.text = "\u2699";
             globalSettingsBtn.SetSizeRequest (30, 30);
             globalSettingsBtn.buttonColor = "pri";
             globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
                 var parent = Toplevel as Window;
-                var s = new WaterGroupSettings (groupName, groupName.IsNotEmpty (), parent);
+                var s = new WaterGroupSettings (WaterLevel.GetWaterLevelGroupSettings (groupName), parent);
                 s.Run ();
-                var newGroupName = s.waterLevelGroupName;
+                var newGroupName = s.groupName;
                 var outcome = s.outcome;
-                s.Destroy ();
 
-                if (outcome == TouchSettingsOutcome.Added) {
+                if ((outcome == TouchSettingsOutcome.Modified) && (newGroupName != groupName)) {
+                    var index = groupCombo.comboList.IndexOf (groupName);
+                    groupCombo.comboList[index] = newGroupName;
+                    groupCombo.activeText = newGroupName;
+                } else if (outcome == TouchSettingsOutcome.Added) {
                     groupName = newGroupName;
                     groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, groupName);
                     groupCombo.activeText = groupName;
@@ -138,7 +141,7 @@ namespace AquaPic.UserInterface
             atoStateTextBox.Show ();
 
             var atoSettingsBtn = new TouchButton ();
-            atoSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
+            atoSettingsBtn.text = "\u2699";
             atoSettingsBtn.SetSizeRequest (30, 30);
             atoSettingsBtn.buttonColor = "pri";
             atoSettingsBtn.ButtonReleaseEvent += (o, args) => {
@@ -216,17 +219,15 @@ namespace AquaPic.UserInterface
             Put (analogSensorLevelTextBox, 415, 120);
 
             var settingsBtn = new TouchButton ();
-            settingsBtn.text = Convert.ToChar (0x2699).ToString ();
+            settingsBtn.text = "\u2699";
             settingsBtn.SetSizeRequest (30, 30);
             settingsBtn.buttonColor = "pri";
             settingsBtn.ButtonReleaseEvent += (o, args) => {
                 var parent = Toplevel as Window;
-                var s = new AnalogSensorSettings (analogSensorName, analogSensorName.IsNotEmpty (), parent);
+                var s = new AnalogSensorSettings (WaterLevel.GetAnalogSensorSettingsSettings (analogSensorName), parent);
                 s.Run ();
-                var newAnalogSensorName = s.newOrUpdatedAnalogSensorName;
+                var newAnalogSensorName = s.analogSensorName;
                 var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
 
                 if ((outcome == TouchSettingsOutcome.Modified) && (newAnalogSensorName != analogSensorName)) {
                     var index = analogSensorCombo.comboList.IndexOf (analogSensorName);
@@ -325,17 +326,15 @@ namespace AquaPic.UserInterface
             switchTypeLabel.Show ();
 
             var switchSetupBtn = new TouchButton ();
-            switchSetupBtn.text = Convert.ToChar (0x2699).ToString ();
+            switchSetupBtn.text = "\u2699";
             switchSetupBtn.SetSizeRequest (30, 30);
             switchSetupBtn.buttonColor = "pri";
             switchSetupBtn.ButtonReleaseEvent += (o, args) => {
                 var parent = Toplevel as Window;
-                var s = new SwitchSettings (switchName, switchName.IsNotEmpty (), parent);
+                var s = new SwitchSettings (WaterLevel.GetFloatSwitchSettingsSettings (switchName), parent);
                 s.Run ();
-                var newSwitchName = s.newOrUpdatedFloatSwitchName;
+                var newSwitchName = s.switchName;
                 var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
 
                 if ((outcome == TouchSettingsOutcome.Modified) && (newSwitchName != switchName)) {
                     var index = switchCombo.comboList.IndexOf (switchName);
@@ -450,9 +449,9 @@ namespace AquaPic.UserInterface
         protected void OnGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New group...") {
                 var parent = Toplevel as Window;
-                var s = new WaterGroupSettings (string.Empty, false, parent);
+                var s = new WaterGroupSettings (new WaterLevelGroupSettings (), parent);
                 s.Run ();
-                var newGroupName = s.waterLevelGroupName;
+                var newGroupName = s.groupName;
                 var outcome = s.outcome;
 
                 if (outcome == TouchSettingsOutcome.Added) {
@@ -493,12 +492,10 @@ namespace AquaPic.UserInterface
         protected void OnAnalogSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New level sensor...") {
                 var parent = Toplevel as Window;
-                var s = new AnalogSensorSettings (string.Empty, false, parent);
+                var s = new AnalogSensorSettings (new WaterLevelSensorSettings (), parent);
                 s.Run ();
-                var newAnalogSensorName = s.newOrUpdatedAnalogSensorName;
+                var newAnalogSensorName = s.analogSensorName;
                 var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
 
                 if (outcome == TouchSettingsOutcome.Added) {
                     analogSensorCombo.comboList.Insert (analogSensorCombo.comboList.Count - 1, newAnalogSensorName);
@@ -510,18 +507,17 @@ namespace AquaPic.UserInterface
             } else {
                 analogSensorName = e.activeText;
             }
+
             GetAnalogSensorData ();
         }
 
         protected void OnSwitchComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New switch...") {
                 var parent = Toplevel as Window;
-                var s = new SwitchSettings (string.Empty, false, parent);
+                var s = new SwitchSettings (new FloatSwitchSettings (), parent);
                 s.Run ();
-                var newSwitchName = s.newOrUpdatedFloatSwitchName;
+                var newSwitchName = s.switchName;
                 var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
 
                 if (outcome == TouchSettingsOutcome.Added) {
                     switchCombo.comboList.Insert (switchCombo.comboList.Count - 1, newSwitchName);

@@ -33,73 +33,46 @@ namespace AquaPic.UserInterface
 {
     public class WaterGroupSettings : TouchSettingsDialog
     {
-        string groupName;
-        public string waterLevelGroupName {
-            get {
-                return groupName;
-            }
-        }
+        public string groupName { get; private set; }
 
-        public WaterGroupSettings (string name, bool includeDelete, Window parent)
-            : base (name + " Water", includeDelete, parent) {
-            groupName = name;
+        public WaterGroupSettings (WaterLevelGroupSettings settings, Window parent)
+            : base (settings.name + " Water", settings.name.IsNotEmpty (), parent) 
+        {
+            groupName = settings.name;
 
             var t = new SettingsTextBox ("Name");
-            if (groupName.IsNotEmpty ()) {
-                t.textBox.text = groupName;
-                t.textBox.enableTouch = false;
-                t.textBox.TextChangedEvent += (sender, args) => {
-                    MessageBox.Show ("Can not change water group name during runtime");
+            t.textBox.text = groupName.IsNotEmpty () ? groupName : "Enter name";
+            t.textBox.TextChangedEvent += (sender, args) => {
+                if (args.text.IsEmpty ())
                     args.keepText = false;
-                };
-            } else {
-                t.textBox.text = "Enter name";
-                t.textBox.TextChangedEvent += (sender, args) => {
-                    if (string.IsNullOrWhiteSpace (args.text))
-                        args.keepText = false;
-                    else if (!WaterLevel.WaterLevelGroupNameOk (args.text)) {
-                        MessageBox.Show ("Water level group name already exists");
-                        args.keepText = false;
-                    }
-                };
-            }
+
+                if (!WaterLevel.WaterLevelGroupNameOk (args.text)) {
+                    MessageBox.Show ("Water level group name already exists");
+                    args.keepText = false;
+                }
+            };
             AddSetting (t);
 
             var b = new SettingsBlank ("blank1");
             AddSetting (b);
 
             var s = new SettingsSelectorSwitch ("Enable High Alarm");
+            s.selectorSwitch.currentSelected = 1;
             if (groupName.IsNotEmpty ()) {
-                if (WaterLevel.GetWaterLevelGroupHighAnalogAlarmEnable (groupName)) {
-                    s.selectorSwitch.currentSelected = 0;
-                } else {
-                    s.selectorSwitch.currentSelected = 1;
-                }
-            } else {
-                s.selectorSwitch.currentSelected = 1;
+                s.selectorSwitch.currentSelected = settings.enableHighAnalogAlarm ? 0 : 1;
             }
             AddSetting (s);
 
             t = new SettingsTextBox ("High Alarm");
-            if (groupName.IsNotEmpty ()) {
-                t.textBox.text = WaterLevel.GetWaterLevelGroupHighAnalogAlarmSetpoint (groupName).ToString ();
-            } else {
-                t.textBox.text = "0.0";
-            }
+            t.textBox.text = groupName.IsNotEmpty () ?
+               settings.highAnalogAlarmSetpoint.ToString () :
+               "0";
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     float highAlarmStpnt = Convert.ToSingle (args.text);
 
-                    if (highAlarmStpnt < 0.0f) {
+                    if (highAlarmStpnt < 0f) {
                         MessageBox.Show ("High alarm setpoint can't be negative");
-                        args.keepText = false;
-                        return;
-                    }
-
-                    float lowAlarmStpnt = Convert.ToSingle (((SettingsTextBox)settings["Low Alarm"]).textBox.text);
-
-                    if (lowAlarmStpnt >= highAlarmStpnt) {
-                        MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
                         args.keepText = false;
                         return;
                     }
@@ -111,37 +84,22 @@ namespace AquaPic.UserInterface
             AddSetting (t);
 
             s = new SettingsSelectorSwitch ("Enable Low Alarm");
+            s.selectorSwitch.currentSelected = 1;
             if (groupName.IsNotEmpty ()) {
-                if (WaterLevel.GetWaterLevelGroupLowAnalogAlarmEnable (groupName)) {
-                    s.selectorSwitch.currentSelected = 0;
-                } else {
-                    s.selectorSwitch.currentSelected = 1;
-                }
-            } else {
-                s.selectorSwitch.currentSelected = 1;
-            }
+                s.selectorSwitch.currentSelected = settings.enableLowAnalogAlarm ? 0 : 1;
+            } 
             AddSetting (s);
 
             t = new SettingsTextBox ("Low Alarm");
-            if (groupName.IsNotEmpty ()) {
-                t.textBox.text = WaterLevel.GetWaterLevelGroupLowAnalogAlarmSetpoint (groupName).ToString ();
-            } else {
-                t.textBox.text = "0.0";
-            }
+            t.textBox.text = groupName.IsNotEmpty () ?
+                settings.lowAnalogAlarmSetpoint.ToString () :
+                "0";
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     float lowAlarmStpnt = Convert.ToSingle (args.text);
 
-                    if (lowAlarmStpnt < 0.0f) {
+                    if (lowAlarmStpnt < 0f) {
                         MessageBox.Show ("Low alarm setpoint can't be negative");
-                        args.keepText = false;
-                        return;
-                    }
-
-                    float highAlarmStpnt = Convert.ToSingle (((SettingsTextBox)settings["High Alarm"]).textBox.text);
-
-                    if (lowAlarmStpnt >= highAlarmStpnt) {
-                        MessageBox.Show ("Low alarm setpoint can't be greater than or equal to high setpoint");
                         args.keepText = false;
                         return;
                     }
@@ -156,74 +114,26 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnSave (object sender) {
-            var name = (string)settings["Name"].setting;
+            var groupSettings = new WaterLevelGroupSettings ();
 
-            var highAnalogAlarmSetpoint = Convert.ToSingle (settings["High Alarm"].setting);
-            var enableHighAnalogAlarm = (int)settings["Enable High Alarm"].setting == 0;
-            var lowAnalogAlarmSetpoint = Convert.ToSingle (settings["Low Alarm"].setting);
-            var enableLowAnalogAlarm = (int)settings["Enable Low Alarm"].setting == 0;
-
-            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
-            var ja = jo["waterLevelGroups"] as JArray;
-
-            if (groupName.IsEmpty ()) {
-                if (name == "Enter name") {
-                    MessageBox.Show ("Invalid water group name");
-                    return false;
-                }
-
-                WaterLevel.AddWaterLevelGroup (
-                    name,
-                    highAnalogAlarmSetpoint,
-                    enableHighAnalogAlarm,
-                    lowAnalogAlarmSetpoint,
-                    enableLowAnalogAlarm);
-
-                var jobj = new JObject {
-                    new JProperty ("name", name),
-                    new JProperty ("highAnalogAlarmSetpoint", highAnalogAlarmSetpoint.ToString ()),
-                    new JProperty ("enableHighAnalogAlarm", enableHighAnalogAlarm.ToString ()),
-                    new JProperty ("lowAnalogAlarmSetpoint", lowAnalogAlarmSetpoint.ToString ()),
-                    new JProperty ("enableLowAnalogAlarm", enableLowAnalogAlarm.ToString ())
-                };
-
-                ja.Add (jobj);
-                groupName = name;
-            } else {
-                WaterLevel.SetWaterLevelGroupHighAnalogAlarmSetpoint (groupName, highAnalogAlarmSetpoint);
-                WaterLevel.SetWaterLevelGroupHighAnalogAlarmEnable (groupName, enableHighAnalogAlarm);
-                WaterLevel.SetWaterLevelGroupLowAnalogAlarmSetpoint (groupName, lowAnalogAlarmSetpoint);
-                WaterLevel.SetWaterLevelGroupLowAnalogAlarmEnable (groupName, enableLowAnalogAlarm);
-
-
-                int arrIdx = SettingsHelper.FindSettingsInArray (ja, groupName);
-                if (arrIdx == -1) {
-                    MessageBox.Show ("Something went wrong");
-                    return false;
-                }
-
-                ja[arrIdx]["highAnalogAlarmSetpoint"] = highAnalogAlarmSetpoint.ToString ();
-                ja[arrIdx]["enableHighAnalogAlarm"] = enableHighAnalogAlarm.ToString ();
-                ja[arrIdx]["lowAnalogAlarmSetpoint"] = lowAnalogAlarmSetpoint.ToString ();
-                ja[arrIdx]["enableLowAnalogAlarm"] = enableLowAnalogAlarm.ToString ();
+            groupSettings.name = (string)settings["Name"].setting;
+            if (groupSettings.name == "Enter name") {
+                MessageBox.Show ("Invalid water group name");
+                return false;
             }
 
-            SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
+            groupSettings.highAnalogAlarmSetpoint = Convert.ToSingle (settings["High Alarm"].setting);
+            groupSettings.enableHighAnalogAlarm = (int)settings["Enable High Alarm"].setting == 0;
+            groupSettings.lowAnalogAlarmSetpoint = Convert.ToSingle (settings["Low Alarm"].setting);
+            groupSettings.enableLowAnalogAlarm = (int)settings["Enable Low Alarm"].setting == 0;
+
+            WaterLevel.UpdateWaterLevelGroup (groupName, groupSettings);
+            groupName = groupSettings.name;
+
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            var jo = SettingsHelper.OpenSettingsFile ("waterLevelProperties") as JObject;
-            var ja = jo["waterLevelGroups"] as JArray;
-
-            int arrIdx = SettingsHelper.FindSettingsInArray (ja, groupName);
-            if (arrIdx == -1) {
-                MessageBox.Show ("Something went wrong");
-                return false;
-            }
-
-            ja.RemoveAt (arrIdx);
-            SettingsHelper.WriteSettingsFile ("waterLevelProperties", jo);
             WaterLevel.RemoveWaterLevelGroup (groupName);
             return true;
         }

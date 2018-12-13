@@ -23,13 +23,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
-using AquaPic.Globals;
 
 namespace AquaPic.Modules
 {
@@ -120,39 +116,6 @@ namespace AquaPic.Modules
                 AddAutoTopOffGroupSettingsToFile (settings);
             }
         }
-
-        /*
-        public static void AddAtoGroup (
-            string name,
-            bool enable,
-            string requestBitName,
-            string waterLevelGroupName,
-            uint maximumRuntime,
-            uint minimumCooldown,
-            bool useAnalogSensors,
-            float analogOnSetpoint,
-            float analogOffSetpoint,
-            bool useFloatSwitches)
-        {
-            if (!AtoGroupNameOk (name)) {
-                throw new Exception (string.Format ("ATO Group: {0} already exists", name));
-            }
-
-            var atoGroup = new AutoTopOffGroup (
-                name,
-                enable,
-                requestBitName,
-                waterLevelGroupName,
-                maximumRuntime,
-                minimumCooldown,
-                useAnalogSensors,
-                analogOnSetpoint,
-                analogOffSetpoint,
-                useFloatSwitches);
-
-            atoGroups.Add (name, atoGroup);
-        }
-        */
 
         public static void UpdateAtoGroup (string name, AutoTopOffGroupSettings settings) {
             if (CheckAtoGroupKeyNoThrow (name)) {

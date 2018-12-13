@@ -89,7 +89,7 @@ namespace AquaPic.UserInterface
                 try {
                     float offStpnt = Convert.ToSingle (args.text);
 
-                    if (offStpnt < 0.0f) {
+                    if (offStpnt < 0f) {
                         MessageBox.Show ("Analog on setpoint can't be negative");
                         args.keepText = false;
                         return;
@@ -107,7 +107,7 @@ namespace AquaPic.UserInterface
                 try {
                     float onStpnt = Convert.ToSingle (args.text);
 
-                    if (onStpnt < 0.0f) {
+                    if (onStpnt < 0f) {
                         MessageBox.Show ("Analog on setpoint can't be negative");
                         args.keepText = false;
                         return;
@@ -130,7 +130,7 @@ namespace AquaPic.UserInterface
                 string.Format ("{0} mins", settings.maximumRuntime) : 
                 "1 min";
             t.textBox.TextChangedEvent += (sender, args) => {
-                if (string.IsNullOrWhiteSpace (args.text))
+                if (args.text.IsEmpty ())
                     args.keepText = false;
 
                 var time = ParseTime (args.text);
@@ -148,7 +148,7 @@ namespace AquaPic.UserInterface
                 string.Format ("{0} mins", settings.minimumCooldown) :
                 "10 min";
             t.textBox.TextChangedEvent += (sender, args) => {
-                if (string.IsNullOrWhiteSpace (args.text))
+                if (args.text.IsEmpty ())
                     args.keepText = false;
 
                 var time = ParseTime (args.text);
@@ -172,7 +172,7 @@ namespace AquaPic.UserInterface
                 if (idx == -1)
                     time = Convert.ToInt32 (input);
                 else {
-                    string timeString = input.Substring (0, idx);
+                    var timeString = input.Substring (0, idx);
                     time = Convert.ToInt32 (timeString);
                 }
             } catch {
@@ -222,6 +222,11 @@ namespace AquaPic.UserInterface
             AutoTopOff.UpdateAtoGroup (groupName, atoSettings);
             groupName = atoSettings.name;
 
+            return true;
+        }
+
+        protected override bool OnDelete (object sender) {
+            AutoTopOff.RemoveAtoGroup (groupName);
             return true;
         }
     }
