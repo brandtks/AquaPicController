@@ -310,7 +310,7 @@ namespace AquaPic.Modules
             CheckFixtureKey (fixtureName);
             fixtures[fixtureName].UpdateLightingStates (lightingStates, temporaryChange);
             if (!temporaryChange) {
-                UpdateFixtureSettingsToFile (fixtureName);
+                UpdateFixtureSettingsInFile (fixtureName);
             }
         }
 
@@ -334,7 +334,7 @@ namespace AquaPic.Modules
             SettingsHelper.AddSettingsToArray (settingsFile, settingsArrayName, settings);
         }
 
-        protected static void UpdateFixtureSettingsToFile (string fixtureName) {
+        protected static void UpdateFixtureSettingsInFile (string fixtureName) {
             SettingsHelper.UpdateSettingsInArray (settingsFile, settingsArrayName, fixtureName, GetLightingFixtureSettings (fixtureName));
         }
 
