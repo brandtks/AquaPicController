@@ -162,14 +162,14 @@ namespace AquaPic.UserInterface
             base.OnShown ();
         }
 
-        public override void Dispose () {
+        public override void Destroy () {
             GLib.Source.Remove (clickTimer);
-            base.Dispose ();
+            base.Destroy ();
         }
 
         protected void OnTouchAreaExpose (object obj, ExposeEventArgs args) {
             if (selected) {
-                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                using (Context cr = CairoHelper.Create (GdkWindow)) {
                     cr.Rectangle (Allocation.Left, Allocation.Top, Allocation.Width, Allocation.Height);
                     TouchColor.SetSource (cr, "grey0", 0.5);
                     cr.Fill ();
@@ -222,9 +222,7 @@ namespace AquaPic.UserInterface
                         selected = true;
                         WidgetSelectedEvent?.Invoke (this);
                     }
-                }
-
-                if (selected) {
+                } else {
                     GetPointer (out int currentX, out int currentY);
                     RequestNewTileLocationEvent?.Invoke (currentX + Allocation.Left, currentY + Allocation.Top);
                 }

@@ -24,10 +24,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Gtk;
 using AquaPic.Runtime;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
+using Gtk;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -39,9 +39,9 @@ namespace AquaPic.UserInterface
         TileBoard tileBoard;
         NewWidgetLocation newWidgetLocation;
         TouchButton trashButton;
-        EventBox emptySpaceEventBox;
-        bool hoveredOverTrash;
-        uint emptySpacePressTime;
+        TouchGraphicalBox emptySpaceGraphicalBox;
+        bool hoveredOverTrash, emptySpaceClicked, emptySpaceLongHeld;
+
 
         public HomeWindow (params object[] options) {
             showTitle = false;
@@ -49,13 +49,13 @@ namespace AquaPic.UserInterface
             widgets = new List<HomeWidget> ();
             tileBoard = new TileBoard (5, 7);
 
-            emptySpaceEventBox = new EventBox ();
-            emptySpaceEventBox.SetSizeRequest (800, 480);
-            emptySpaceEventBox.VisibleWindow = false;
-            emptySpaceEventBox.ButtonPressEvent += OnEmptySpaceEventBoxButtonPressed;
-            emptySpaceEventBox.ButtonReleaseEvent += OnEmptySpaceEventBoxButtonReleased;
-            Put (emptySpaceEventBox, 0, 0);
-            emptySpaceEventBox.Show ();
+            emptySpaceGraphicalBox = new TouchGraphicalBox ();
+            emptySpaceGraphicalBox.SetSizeRequest (800, 480);
+            emptySpaceGraphicalBox.color.A = 0;
+            emptySpaceGraphicalBox.ButtonPressEvent += OnEmptySpaceEventBoxButtonPressed;
+            emptySpaceGraphicalBox.ButtonReleaseEvent += OnEmptySpaceEventBoxButtonReleased;
+            Put (emptySpaceGraphicalBox, 0, 0);
+            emptySpaceGraphicalBox.Show ();
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "mainScreen.json");
@@ -132,7 +132,7 @@ namespace AquaPic.UserInterface
             QueueDraw ();
         }
 
-        public override void Dispose () {
+        public override void Destroy () {
             var ja = new JArray ();
             foreach (var widget in widgets) {
                 var jo = new JObject ();
@@ -148,7 +148,7 @@ namespace AquaPic.UserInterface
 
             SettingsHelper.WriteSettingsFile ("mainScreen", ja);
 
-            base.Dispose ();
+            base.Destroy ();
         }
 
         protected void OnRequestNewTileLocation (int x, int y) {
@@ -186,9 +186,9 @@ namespace AquaPic.UserInterface
                 tileBoard.OccupyTiles (newWidgetLocation);
 
                 if (tileBoard.containsConflictTiles) {
-                    newWidgetLocation.color = "compl";
+                    newWidgetLocation.color = new TouchColor ("compl", 0.5); 
                 } else {
-                    newWidgetLocation.color = "grey2";
+                    newWidgetLocation.color = new TouchColor ("grey2", 0.5);
                 }
                 Remove (newWidgetLocation);
                 Put (newWidgetLocation, newWidgetLocation.placement.x, newWidgetLocation.placement.y);
@@ -198,7 +198,7 @@ namespace AquaPic.UserInterface
 
         protected void OnWidgetSelected (HomeWidget widget) {
             newWidgetLocation = new NewWidgetLocation (widget);
-            newWidgetLocation.color = "grey2";
+            newWidgetLocation.color = new TouchColor ("grey2", 0.5);
             Put (newWidgetLocation, widget.x, widget.y);
             newWidgetLocation.Visible = false;
 
@@ -226,56 +226,70 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnEmptySpaceEventBoxButtonPressed (object sender, ButtonPressEventArgs args) {
-            emptySpacePressTime = args.Event.Time;
+            emptySpaceClicked = true;
+            emptySpaceLongHeld = false;
+            GLib.Timeout.Add (1000, OnEmptySpaceTimer);
+        }
+
+        protected bool OnEmptySpaceTimer () {
+            if (emptySpaceClicked) {
+                emptySpaceLongHeld = true;
+                emptySpaceGraphicalBox.color.A = 0.25;
+                emptySpaceGraphicalBox.QueueDraw ();
+            }
+
+            return false;
         }
 
         protected void OnEmptySpaceEventBoxButtonReleased (object sender, ButtonReleaseEventArgs args) {
-            if (args.Event.Time - emptySpacePressTime < 1000) {
-                return; 
-            }
+            emptySpaceClicked = false;
 
-            var parent = Toplevel as Window;
-            var addHomeWidgetDialog = new AddHomeWidgetDialog (parent);
-            addHomeWidgetDialog.Run ();
-            var newWidgetSettings = addHomeWidgetDialog.newWidget;
-            addHomeWidgetDialog.Destroy ();
-            addHomeWidgetDialog.Dispose ();
+            if (emptySpaceLongHeld) {
+                var parent = Toplevel as Window;
+                var addHomeWidgetDialog = new AddHomeWidgetDialog (parent);
+                addHomeWidgetDialog.Run ();
+                var newWidgetSettings = addHomeWidgetDialog.newWidget;
 
-            if (newWidgetSettings == null) {
-                return;
-            }
+                emptySpaceGraphicalBox.color.A = 0;
+                emptySpaceGraphicalBox.QueueDraw ();
+                if (newWidgetSettings == null) {
+                    return;
+                }
 
-            var pair = HomeWidgetPlacement.GetRowColumn (args.Event.X.ToInt (), args.Event.Y.ToInt ());
+                var pair = HomeWidgetPlacement.GetRowColumn (args.Event.X.ToInt (), args.Event.Y.ToInt ());
 
-            var row = pair.Item1;
-            var column = pair.Item2;
+                var row = pair.Item1;
+                var column = pair.Item2;
 
-            var widget = HomeWindowWidgets.GetNewHomeWidget (
-                newWidgetSettings.type, 
-                newWidgetSettings.name, 
-                newWidgetSettings.group, 
-                row, 
-                column);
+                var widget = HomeWindowWidgets.GetNewHomeWidget (
+                    newWidgetSettings.type,
+                    newWidgetSettings.name,
+                    newWidgetSettings.group,
+                    row,
+                    column);
 
-            if (widget != null) {
-                if (row < 0 && (row + widget.rowHeight > 5) && column < 0 && (column + widget.columnWidth > 7)) {
-                    MessageBox.Show ("Not enough room on the screen for widget");
-                } else {
-                    tileBoard.OccupyTiles (widget);
-
-                    if (tileBoard.containsConflictTiles) {
-                        tileBoard.FreeTiles (widget);
-                        MessageBox.Show ("Widget conflicts with other widgets");
+                if (widget != null) {
+                    if (row < 0 && (row + widget.rowHeight > 5) && column < 0 && (column + widget.columnWidth > 7)) {
+                        MessageBox.Show ("Not enough room on the screen for widget");
                     } else {
-                        Put (widget, widget.x, widget.y);
-                        widget.Show ();
-                        widgets.Add (widget);
-                        widget.WidgetSelectedEvent += OnWidgetSelected;
-                        widget.WidgetUnselectedEvent += OnWidgetUnselected;
-                        widget.RequestNewTileLocationEvent += OnRequestNewTileLocation;
+                        tileBoard.OccupyTiles (widget);
+
+                        if (tileBoard.containsConflictTiles) {
+                            tileBoard.FreeTiles (widget);
+                            MessageBox.Show ("Widget conflicts with other widgets");
+                        } else {
+                            Put (widget, widget.x, widget.y);
+                            widget.Show ();
+                            widgets.Add (widget);
+                            widget.WidgetSelectedEvent += OnWidgetSelected;
+                            widget.WidgetUnselectedEvent += OnWidgetUnselected;
+                            widget.RequestNewTileLocationEvent += OnRequestNewTileLocation;
+                        }
                     }
                 }
             }
+
+            QueueDraw ();
         }
 
         private class TileBoard
