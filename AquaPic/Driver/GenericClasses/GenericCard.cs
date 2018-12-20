@@ -46,12 +46,7 @@ namespace AquaPic.Drivers
             }
         }
 
-        protected GenericCard (
-            string name,
-            int address,
-            int numChannels
-        )
-            : base (address, name) {
+        protected GenericCard (string name, int address, int numChannels) : base (address, name) {
             this.name = name;
 
             channels = new GenericChannel[numChannels];
@@ -121,31 +116,6 @@ namespace AquaPic.Drivers
         }
 
         /**************************************************************************************************************/
-        /* Channel Value Setters                                                                                      */
-        /**************************************************************************************************************/
-        public virtual void SetValueCommunication<CommunicationType> (int channel, CommunicationType value) {
-            throw new NotImplementedException ();
-        }
-
-        public virtual void SetAllValuesCommunication<CommunicationType> (CommunicationType[] values) {
-            throw new NotImplementedException ();
-        }
-
-        public virtual void SetChannelValue (int channel, ValueType value) {
-            CheckChannelRange (channel);
-            channels[channel].SetValue (value);
-        }
-
-        public virtual void SetAllChannelValues (ValueType[] values) {
-            if (values.Length < channelCount)
-                throw new ArgumentOutOfRangeException ("values.length");
-
-            for (int i = 0; i < channelCount; ++i) {
-                channels[i].SetValue (values[i]);
-            }
-        }
-
-        /**************************************************************************************************************/
         /* Channel Value Getters                                                                                      */
         /**************************************************************************************************************/
         public virtual void GetValueCommunication (int channel) {
@@ -173,6 +143,31 @@ namespace AquaPic.Drivers
                 values[i] = GetChannelValue (i);
             }
             return values;
+        }
+
+        /**************************************************************************************************************/
+        /* Channel Value Setters                                                                                      */
+        /**************************************************************************************************************/
+        public virtual void SetValueCommunication<CommunicationType> (int channel, CommunicationType value) {
+            throw new NotImplementedException ();
+        }
+
+        public virtual void SetAllValuesCommunication<CommunicationType> (CommunicationType[] values) {
+            throw new NotImplementedException ();
+        }
+
+        public virtual void SetChannelValue (int channel, ValueType value) {
+            CheckChannelRange (channel);
+            channels[channel].SetValue (value);
+        }
+
+        public virtual void SetAllChannelValues (ValueType[] values) {
+            if (values.Length < channelCount)
+                throw new ArgumentOutOfRangeException ("values.length");
+
+            for (int i = 0; i < channelCount; ++i) {
+                channels[i].SetValue (values[i]);
+            }
         }
 
         /**************************************************************************************************************/
