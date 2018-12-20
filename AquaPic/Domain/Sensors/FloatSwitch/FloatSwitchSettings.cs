@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2017 Goodtime Development
+    Copyright (c) 2018 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,18 +25,12 @@ using System;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
-using AquaPic.Runtime;
+
 
 namespace AquaPic.Sensors
 {
-    public class FloatSwitchSettings : IEntitySettings
+    public class FloatSwitchSettings : GenericSensorSettings
     {
-        [EntitySetting (typeof (StringMutator), "name")]
-        public string name { get; set; }
-
-        [EntitySetting (typeof (IndividualControlMutator), new string[] { "inputCard", "channel" })]
-        public IndividualControl channel { get; set; }
-
         [EntitySetting (typeof (FloatMutator), "physicalLevel")]
         public float physicalLevel { get; set; }
 

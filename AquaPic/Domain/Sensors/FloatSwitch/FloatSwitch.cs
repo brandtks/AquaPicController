@@ -22,117 +22,76 @@
 #endregion // License
 
 using System;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.Runtime;
 using AquaPic.Drivers;
 
 namespace AquaPic.Sensors
 {
-    public class FloatSwitch : ISensor<bool>
+    public class FloatSwitch : GenericSensor
     {
-        protected string _name;
-        public string name {
+        public bool activated { get; protected set; }
+        public float physicalLevel { get; protected set; }
+        public SwitchType switchType { get; protected set; }
+        public SwitchFunction switchFuntion { get; protected set; }
+
+        protected OnDelayTimer delayTimer;
+        public uint timeOffset { 
             get {
-                return _name;
+                return delayTimer.timerInterval;
+            }
+            protected set {
+                delayTimer = new OnDelayTimer (value);
             }
         }
 
-        protected OnDelayTimer _onDelayTimer;
-        public OnDelayTimer onDelayTimer {
-            get {
-                return _onDelayTimer;
-            }
-        }
-
-        protected IndividualControl _channel;
-        public IndividualControl channel {
-            get {
-                return _channel;
-            }
-        }
-
-        protected bool _activated;
-        public bool activated {
-            get {
-                return _activated;
-            }
-        }
-
-        protected SwitchType _type;
-        public SwitchType type {
-            get {
-                return _type;
-            }
-            set {
-                if (value != _type) { // when switching type activation reverses
-                    _activated = !_activated;
-                }
-                _type = value;
-            }
-        }
-
-        public SwitchFunction function;
-        public float physicalLevel;
-        public string waterLevelGroupName;
+        public string waterLevelGroupName { get; protected set; }
 
         public FloatSwitch (
             string name,
-            SwitchType type,
-            SwitchFunction function,
+            SwitchType switchType,
+            SwitchFunction switchFuntion,
             float physicalLevel,
             IndividualControl channel,
             uint timeOffset,
-            string waterLevelGroupName
-        ) {
-            _activated = false;
-            _name = name;
-            _type = type;
-            this.function = function;
+            string waterLevelGroupName) 
+            : base (name, channel)
+        {
+            activated = false;
+            this.switchType = switchType;
+            this.switchFuntion = switchFuntion;
             this.physicalLevel = physicalLevel;
-            _channel = channel;
-            _onDelayTimer = new OnDelayTimer (timeOffset);
+            delayTimer = new OnDelayTimer (timeOffset);
+            delayTimer.TimerElapsedEvent += OnDelayTimerTimerElapsedEvent;
             this.waterLevelGroupName = waterLevelGroupName;
-
-            if (_channel.IsNotEmpty ()) {
-                Add (channel);
-            }
         }
 
-        public void Add (IndividualControl channel) {
-            if (!_channel.Equals (channel))
-                Remove ();
-
-            _channel = channel;
-
-            if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.DigitalInput.AddChannel (_channel, _name);
-            }
+        public override void OnAdd () {
+            AquaPicDrivers.DigitalInput.AddChannel (channel, name);
+            AquaPicDrivers.DigitalInput.AddHandlerOnInputChannelValueChangedEvent (channel, OnInputChannelValueChanged);
         }
 
-        public void Remove () {
-            if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.DigitalInput.RemoveChannel (_channel);
-            }
+        public override void OnRemove () {
+            AquaPicDrivers.DigitalInput.RemoveChannel (channel);
+            AquaPicDrivers.DigitalInput.RemoveHandlerOnInputChannelValueChangedEvent (channel, OnInputChannelValueChanged);
         }
 
-        public bool Get () {
-            var state = AquaPicDrivers.DigitalInput.GetChannelValue (_channel);
-            bool timerFinished;
+        public override ValueType GetValue () {
+            return activated;
+        }
 
-            if (_type == SwitchType.NormallyClosed)
+        protected void OnDelayTimerTimerElapsedEvent (object sender, TimerElapsedEventArgs args) {
+            // Once the timer elapses, the activation state of the float switch can be toggled.
+            activated = !activated;
+        }
+
+        public void OnInputChannelValueChanged (object sender, InputChannelValueChangedEventArgs args) {
+            var state = Convert.ToBoolean (args.newValue);
+
+            if (switchType == SwitchType.NormallyClosed)
                 state = !state; //normally closed switches are reversed
 
-            timerFinished = _onDelayTimer.Evaluate (_activated != state); // if current state and switch activation do not match start timer
-            if (timerFinished) // once timer has finished, toggle switch activation
-                _activated = !_activated;
-
-            return _activated;
-        }
-
-        public void SetName (string name) {
-            _name = name;
-            AquaPicDrivers.DigitalInput.SetChannelName (_channel, _name);
+            delayTimer.Evaluate (activated != state); // if current state and switch activation do not match start timer
         }
     }
 }
