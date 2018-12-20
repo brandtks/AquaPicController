@@ -29,7 +29,7 @@ namespace AquaPic.Drivers
 {
     public partial class DigitalInputBase
     {
-        private class DigitalInputCard : GenericCard
+        private class DigitalInputCard : GenericInputCard
         {
             public DigitalInputCard (string name, int address)
                 : base (
@@ -53,7 +53,7 @@ namespace AquaPic.Drivers
                 byte stateMask;
                 stateMask = args.GetDataFromReadBuffer<byte> (0);
                 for (int i = 0; i < channelCount; ++i) {
-                    channels[i].SetValue (Utils.MaskToBoolean (stateMask, i));
+                    UpdateChannelValue (channels[i], Utils.MaskToBoolean (stateMask, i));
                 }
             }
 
@@ -65,7 +65,7 @@ namespace AquaPic.Drivers
             protected void GetInputCallback (CallbackArgs args) {
                 var ch = args.GetDataFromReadBuffer<byte> (0);
                 var value = args.GetDataFromReadBuffer<bool> (1);
-                channels[ch].SetValue (value);
+                UpdateChannelValue (channels[ch], value);
             }
         }
     }

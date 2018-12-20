@@ -27,7 +27,7 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogInputBase : GenericBase
+    public partial class AnalogInputBase : GenericInputBase
     {
         public static AnalogInputBase SharedAnalogInputInstance = new AnalogInputBase ();
 
@@ -36,7 +36,8 @@ namespace AquaPic.Drivers
 
         protected override void Run () {
             foreach (var card in cards.Values) {
-                card.GetAllValuesCommunication ();
+                var inputCard = card as AnalogInputCard;
+                inputCard.GetAllValuesCommunication ();
             }
         }
 

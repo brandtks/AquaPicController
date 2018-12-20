@@ -27,7 +27,7 @@ namespace AquaPic.Drivers
 {
     public partial class AnalogInputBase
     {
-        protected class AnalogInputChannel : GenericChannel
+        protected class AnalogInputChannel : GenericInputChannel
         {
             public int lowPassFilterFactor;
 

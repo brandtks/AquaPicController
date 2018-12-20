@@ -28,7 +28,7 @@ using AquaPic.Globals;
 
 namespace AquaPic.Drivers
 {
-    public partial class DigitalInputBase : GenericBase
+    public partial class DigitalInputBase : GenericInputBase
     {
         public static DigitalInputBase SharedDigitalInputInstance = new DigitalInputBase ();
 
@@ -37,7 +37,8 @@ namespace AquaPic.Drivers
 
         protected override void Run () {
             foreach (var card in cards.Values) {
-                card.GetAllValuesCommunication ();
+                var inputCard = card as DigitalInputCard;
+                inputCard.GetAllValuesCommunication ();
             }
         }
 

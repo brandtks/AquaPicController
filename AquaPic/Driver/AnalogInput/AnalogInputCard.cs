@@ -29,7 +29,7 @@ namespace AquaPic.Drivers
 {
     public partial class AnalogInputBase
     {
-        protected class AnalogInputCard : GenericCard
+        protected class AnalogInputCard : GenericInputCard
         {
             public AnalogInputCard (string name, int address)
                 : base (
@@ -56,7 +56,7 @@ namespace AquaPic.Drivers
             protected void GetValueCommunicationCallback (CallbackArgs args) {
                 byte ch = args.GetDataFromReadBuffer<byte> (0);
                 short value = args.GetDataFromReadBuffer<short> (1);
-                channels[ch].SetValue (value);
+                UpdateChannelValue (channels[ch], value);
             }
 
             public override void GetAllValuesCommunication () {
@@ -64,16 +64,13 @@ namespace AquaPic.Drivers
             }
 
             protected void GetAllValuesCommunicationCallback (CallbackArgs args) {
-                short[] values = new short[4];
+                var values = new ValueType[4];
 
                 for (int i = 0; i < values.Length; ++i) {
                     values[i] = args.GetDataFromReadBuffer<short> (i * 2);
                 }
 
-                for (int i = 0; i < channels.Length; ++i) {
-                    if (channels[i].mode == Mode.Auto)
-                        channels[i].SetValue (values[i]);
-                }
+                UpdateAllChannelValues (values);
             }
 
             public override void SetChannelValue (int channel, ValueType value) {
