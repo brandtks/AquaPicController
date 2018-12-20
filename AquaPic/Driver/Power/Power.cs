@@ -83,9 +83,7 @@ namespace AquaPic.Drivers
                         try {
                             var script = Script.CompileOutletCoilStateGetter (conditions.ToArray ());
                             var c = AddOutlet (powerStripName, outletId, name, fallback);
-                            c.StateGetter = () => {
-                                return script.OutletCoilStateGetter ();
-                            };
+                            c.StateGetter = script.OutletCoilStateGetter;
                         } catch {
                             Logger.AddInfo ("Error while adding outlet");
                         }
