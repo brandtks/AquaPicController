@@ -29,43 +29,19 @@ using AquaPic.Globals;
 
 namespace AquaPic.Sensors
 {
-    public class WaterLevelSensor : ISensor<float>
+    public class WaterLevelSensor : GenericSensor
     {
-        protected float _level;
-        public float level {
-            get {
-                return _level;
-            }
-        }
-
-        protected string _name;
-        public string name {
-            get {
-                return _name;
-            }
-        }
-
-        public IndividualControl _channel;
-        public IndividualControl channel {
-            get {
-                return _channel;
-            }
-        }
+        public float level { get; protected set; }
 
         public float zeroScaleValue;
         public float fullScaleActual;
         public float fullScaleValue;
 
-        int _sensorDisconnectedAlarmIndex;
-        public int sensorDisconnectedAlarmIndex {
-            get {
-                return _sensorDisconnectedAlarmIndex;
-            }
-        }
+        public int sensorDisconnectedAlarmIndex { get; private set; }
 
         public bool connected {
             get {
-                return !Alarm.CheckAlarming (_sensorDisconnectedAlarmIndex);
+                return !Alarm.CheckAlarming (sensorDisconnectedAlarmIndex);
             }
         }
 
@@ -78,60 +54,42 @@ namespace AquaPic.Sensors
             float zeroScaleValue,
             float fullScaleActual,
             float fullScaleValue) 
+            : base (name, channel)
         {
-            _name = name;
-            _channel = channel;
+            level = 0.0f;
             this.waterLevelGroupName = waterLevelGroupName;
-            _level = 0.0f;
-
             this.zeroScaleValue = zeroScaleValue;
             this.fullScaleActual = fullScaleActual;
             this.fullScaleValue = fullScaleValue;
-
-            _sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog level probe disconnected, " + name);
-            Add (_channel);
+            sensorDisconnectedAlarmIndex = -1;
         }
 
 
-        public void Add (IndividualControl channel) {
-            if (!_channel.Equals (channel)) {
-                Remove ();
-            }
-
-            _channel = channel;
-
-            if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.AnalogInput.AddChannel (_channel, string.Format ("{0}, Water Level Sensor", name));
-            }
+        public override void OnAdd () {
+            AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name));
+            AquaPicDrivers.AnalogInput.AddHandlerOnInputChannelValueChangedEvent (channel, OnInputChannelValueChangedEvent);
+            sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog level probe disconnected, " + name);
         }
 
-        public void Remove () {
-            if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.AnalogInput.RemoveChannel (_channel);
-            }
-            Alarm.Clear (_sensorDisconnectedAlarmIndex);
+        public override void OnRemove () {
+            AquaPicDrivers.AnalogInput.RemoveChannel (channel);
+            AquaPicDrivers.AnalogInput.RemoveHandlerOnInputChannelValueChangedEvent (channel, OnInputChannelValueChangedEvent);
+            Alarm.Clear (sensorDisconnectedAlarmIndex);
         }
 
-        public float Get () {
-            _level = AquaPicDrivers.AnalogInput.GetChannelValue (_channel);
-            _level = _level.Map (zeroScaleValue, fullScaleValue, 0.0f, fullScaleActual);
+        protected void OnInputChannelValueChangedEvent (object sender, InputChannelValueChangedEventArgs args) {
+            var newLevel = Convert.ToSingle (args.newValue);
+            level = newLevel.Map (zeroScaleValue, fullScaleValue, 0.0f, fullScaleActual);
 
-            if (_level < 0.0f) {
-                if (!Alarm.CheckAlarming (_sensorDisconnectedAlarmIndex)) {
-                    Alarm.Post (_sensorDisconnectedAlarmIndex);
+            if (level < 0.0f) {
+                if (!Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
+                    Alarm.Post (sensorDisconnectedAlarmIndex);
                 }
             } else {
-                if (Alarm.CheckAlarming (_sensorDisconnectedAlarmIndex)) {
-                    Alarm.Clear (_sensorDisconnectedAlarmIndex);
+                if (Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
+                    Alarm.Clear (sensorDisconnectedAlarmIndex);
                 }
             }
-
-            return level;
-        }
-
-        public void SetName (string name) {
-            _name = name;
-            AquaPicDrivers.AnalogInput.SetChannelName (_channel, string.Format ("{0}, Water Level Sensor", name));
         }
     }
 }

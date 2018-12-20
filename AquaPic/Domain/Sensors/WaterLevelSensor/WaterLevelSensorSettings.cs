@@ -29,13 +29,8 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Sensors
 {
-    public class WaterLevelSensorSettings : IEntitySettings {
-        [EntitySetting (typeof (StringMutator), "name")]
-        public string name { get; set; }
-
-        [EntitySetting (typeof (IndividualControlMutator), new string[] { "inputCard", "channel" })]
-        public IndividualControl channel { get; set; }
-
+    public class WaterLevelSensorSettings : GenericSensorSettings
+    {
         [EntitySetting (typeof (StringMutator), "waterLevelGroupName")]
         public string waterLevelGroupName { get; set; }
 
