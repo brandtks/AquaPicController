@@ -120,7 +120,6 @@
     <Compile Include="Modules\GenericModule\GenericModule.cs" />
     <Compile Include="Modules\GenericModule\GenericGroup.cs" />
     <Compile Include="Runtime\Logger\LogItem.cs" />
-    <Compile Include="Domain\Sensors\ISensor.cs" />
     <Compile Include="Domain\Equipment\IEquipment.cs" />
     <Compile Include="Domain\Equipment\Pump.cs" />
     <Compile Include="Domain\Bit\Bit.cs" />
@@ -130,7 +129,6 @@
     <Compile Include="Domain\Operands\IOperand.cs" />
     <Compile Include="Runtime\Settings\SettingsHelper.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroupSettings.cs" />
-    <Compile Include="Runtime\Settings\EntitySettingAttribute.cs" />
     <Compile Include="Domain\Timer\IntervalTimer.cs" />
     <Compile Include="Domain\Timer\OffDelayTimer.cs" />
     <Compile Include="Domain\Timer\OnDelayTimer.cs" />
@@ -144,16 +142,9 @@
     <Compile Include="Modules\Lights\LightingState.cs" />
     <Compile Include="Modules\Lights\LightingFixtureDimming.cs" />
     <Compile Include="Modules\Lights\LightingFixtureSettings.cs" />
-    <Compile Include="Runtime\Settings\IEntitySettings.cs" />
     <Compile Include="Tests\Runtime\Settings\SettingsHelperTest.cs" />
-    <Compile Include="Runtime\Settings\Mutators\BoolMutator.cs" />
-    <Compile Include="Runtime\Settings\Mutators\FloatMutator.cs" />
-    <Compile Include="Runtime\Settings\Mutators\ISettingMutator.cs" />
-    <Compile Include="Runtime\Settings\Mutators\StringMutator.cs" />
-    <Compile Include="Runtime\Settings\Mutators\IndividualControlMutator.cs" />
     <Compile Include="Domain\Sensors\FloatSwitch\FloatSwitch.cs" />
     <Compile Include="Domain\Sensors\FloatSwitch\FloatSwitchSettings.cs" />
-    <Compile Include="Runtime\Settings\Mutators\UIntMutator.cs" />
     <Compile Include="Domain\Sensors\FloatSwitch\SwitchType.cs" />
     <Compile Include="Domain\Sensors\FloatSwitch\SwitchFunction.cs" />
     <Compile Include="Domain\Sensors\WaterLevelSensor\WaterLevelSensor.cs" />
@@ -161,6 +152,25 @@
     <Compile Include="Domain\Sensors\TemperatureProbe\TemperatureProbe.cs" />
     <Compile Include="Domain\Sensors\PhProbe\PhProbe.cs" />
     <Compile Include="Modules\ATO\AutoTopOffGroupSettings.cs" />
+    <Compile Include="Domain\Sensors\FloatSwitch\FloatSwitchColletion.cs" />
+    <Compile Include="Domain\Sensors\Sensors.cs" />
+    <Compile Include="Domain\Sensors\WaterLevelSensor\WaterLevelSensorCollection.cs" />
+    <Compile Include="Domain\Sensors\GenericSensor\GenericSensor.cs" />
+    <Compile Include="Domain\Sensors\GenericSensor\GenericSensorCollection.cs" />
+    <Compile Include="Domain\Sensors\GenericSensor\ISensor.cs" />
+    <Compile Include="Domain\Entity\IEntitySettings.cs" />
+    <Compile Include="Domain\Entity\EntitySettingAttribute.cs" />
+    <Compile Include="Domain\Entity\Mutators\BoolMutator.cs" />
+    <Compile Include="Domain\Entity\Mutators\FloatMutator.cs" />
+    <Compile Include="Domain\Entity\Mutators\IndividualControlMutator.cs" />
+    <Compile Include="Domain\Entity\Mutators\ISettingMutator.cs" />
+    <Compile Include="Domain\Entity\Mutators\StringMutator.cs" />
+    <Compile Include="Domain\Entity\Mutators\UIntMutator.cs" />
+    <Compile Include="Driver\GenericClasses\GenericInputCard.cs" />
+    <Compile Include="Tests\Driver\Generic\GenericChannelTests.cs" />
+    <Compile Include="Driver\GenericClasses\GenericInputBase.cs" />
+    <Compile Include="Driver\GenericClasses\GenericInputChannel.cs" />
+    <Compile Include="Domain\Sensors\GenericSensor\GenericSensorSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -185,11 +195,15 @@
     <Folder Include="Tests\Domain\TimePeriod\" />
     <Folder Include="Tests\Runtime\" />
     <Folder Include="Tests\Runtime\Settings\" />
-    <Folder Include="Runtime\Settings\Mutators\" />
     <Folder Include="Domain\Sensors\FloatSwitch\" />
     <Folder Include="Domain\Sensors\WaterLevelSensor\" />
     <Folder Include="Domain\Sensors\TemperatureProbe\" />
     <Folder Include="Domain\Sensors\PhProbe\" />
+    <Folder Include="Domain\Entity\" />
+    <Folder Include="Domain\Sensors\GenericSensor\" />
+    <Folder Include="Domain\Entity\Mutators\" />
+    <Folder Include="Tests\Driver\" />
+    <Folder Include="Tests\Driver\Generic\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">
