@@ -25,7 +25,7 @@ using System;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Globals
 {
     public class FloatMutator : ISettingMutator<float>
     {

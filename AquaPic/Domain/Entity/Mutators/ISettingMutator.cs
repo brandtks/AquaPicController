@@ -24,7 +24,7 @@
 using System;
 using Newtonsoft.Json.Linq;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Globals
 {
     public interface ISettingMutator<T>
     {

@@ -23,7 +23,7 @@
 
 using System;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Globals
 {
     public interface IEntitySettings
     {

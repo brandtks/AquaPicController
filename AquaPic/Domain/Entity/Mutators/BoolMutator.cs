@@ -25,20 +25,20 @@ using System;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Globals
 {
-    public class UIntMutator : ISettingMutator<uint>
+    public class BoolMutator : ISettingMutator<bool>
     {
-        public uint Read (JObject jobj, string[] keys) {
+        public bool Read (JObject jobj, string[] keys) {
             if (keys.Length < 1) {
-                throw new ArgumentException ("keys can not be empty", nameof (keys));
+                throw new ArgumentException ("keys can not be empty", nameof(keys));
             }
 
             var value = Default ();
             var text = (string)jobj[keys[0]];
             if (text.IsNotEmpty ()) {
                 try {
-                    value = Convert.ToUInt32 (text);
+                    value = Convert.ToBoolean (text);
                 } catch {
                     //
                 }
@@ -46,19 +46,26 @@ namespace AquaPic.Runtime
             return value;
         }
 
-        public void Write (uint value, JObject jobj, string[] keys) {
+        public void Write (bool value, JObject jobj, string[] keys) {
             if (keys.Length < 1) {
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
             jobj[keys[0]] = value.ToString ();
         }
 
-        public bool Valid (uint value) {
+        public bool Valid (bool value) {
             return true;
         }
 
-        public virtual uint Default () {
-            return 0;
+        public virtual bool Default () {
+            return false;
+        }
+    }
+
+    public class BoolMutatorDefaultTrue : BoolMutator
+    {
+        public override bool Default () {
+            return true;
         }
     }
 }
