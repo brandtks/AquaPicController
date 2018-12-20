@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
+using AquaPic.Globals;
 using AquaPic.Runtime;
 
 namespace AquaPic.Modules
