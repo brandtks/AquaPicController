@@ -31,8 +31,8 @@ namespace AquaPic.Sensors
     public class GenericSensorCollection 
     {
         protected Dictionary<string, GenericSensor> sensors;
-        protected readonly string sensorSettingsFileName = AquaPicSensors.sensorSettingsFileName;
-        protected string sensorSettingsArrayName;
+        protected readonly string sensorSettingsFileName = "sensors";
+        public string sensorSettingsArrayName { get; protected set; }
 
         public GenericSensorCollection (string sensorSettingsArrayName) {
             sensors = new Dictionary<string, GenericSensor> ();
@@ -46,20 +46,25 @@ namespace AquaPic.Sensors
                 throw new Exception (string.Format ("Sensor: {0} already exists", settings.name));
             }
             var sensor = OnCreateSensor (settings);
-            sensors[settings.name] = sensor;
-            sensor.OnAdd ();
+            sensors[sensor.name] = sensor;
+            sensor.OnCreate ();
             if (saveToFile) {
                 AddSensorSettingsToFile (settings);
             }
         }
 
-        public virtual GenericSensor OnCreateSensor (GenericSensorSettings settings) => throw new NotImplementedException ();
+        protected virtual GenericSensor OnCreateSensor (GenericSensorSettings settings) => throw new NotImplementedException ();
 
         public void UpdateSensor (string name, GenericSensorSettings settings) {
             if (SensorNameExists (name)) {
+                settings = OnUpdateSensor (name, settings);
                 RemoveSensor (name);
             }
             AddSensor (settings, true);
+        }
+
+        protected virtual GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
+            return settings;
         }
 
         public void RemoveSensor (string name) {
