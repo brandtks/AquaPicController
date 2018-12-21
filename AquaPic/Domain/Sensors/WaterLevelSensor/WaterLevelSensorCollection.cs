@@ -40,7 +40,7 @@ namespace AquaPic.Sensors
             }
         }
 
-        public override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
+        protected override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
             var sensorSettings = settings as WaterLevelSensorSettings;
             if (sensorSettings == null) {
                 throw new ArgumentException ("Settings must be WaterLevelSensorSettings");
@@ -49,12 +49,20 @@ namespace AquaPic.Sensors
             var waterLevelSensor = new WaterLevelSensor (
                 sensorSettings.name,
                 sensorSettings.channel,
-                sensorSettings.waterLevelGroupName,
                 sensorSettings.zeroScaleCalibrationValue,
                 sensorSettings.fullScaleCalibrationActual,
                 sensorSettings.fullScaleCalibrationValue);
 
             return waterLevelSensor;
+        }
+
+        protected override GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
+            var levelSensor = sensors[name] as WaterLevelSensor;
+            var sensorSettings = settings as WaterLevelSensorSettings;
+            sensorSettings.zeroScaleCalibrationValue = levelSensor.zeroScaleValue;
+            sensorSettings.fullScaleCalibrationActual = levelSensor.fullScaleActual;
+            sensorSettings.fullScaleCalibrationValue = levelSensor.fullScaleValue;
+            return sensorSettings;
         }
 
         public override GenericSensorSettings GetSensorSettings (string name) {
@@ -67,6 +75,24 @@ namespace AquaPic.Sensors
             settings.fullScaleCalibrationActual = levelSensor.fullScaleActual;
             settings.fullScaleCalibrationValue = levelSensor.fullScaleValue;
             return settings;
+        }
+
+        public void SetCalibrationData (string name, float zeroScaleValue, float fullScaleActual, float fullScaleValue) {
+            CheckSensorKey (name);
+
+            if (fullScaleValue <= zeroScaleValue)
+                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
+
+            if (fullScaleActual < 0.0f)
+                throw new ArgumentException ("Full scale actual can't be less than zero");
+
+            var waterLevelSensor = sensors[name] as WaterLevelSensor;
+
+            waterLevelSensor.zeroScaleValue = zeroScaleValue;
+            waterLevelSensor.fullScaleActual = fullScaleActual;
+            waterLevelSensor.fullScaleValue = fullScaleValue;
+
+            UpdateSensorSettingsInFile (name);
         }
     }
 }

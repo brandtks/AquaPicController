@@ -22,18 +22,13 @@
 #endregion // License
 
 using System;
-using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
-using AquaPic.Runtime;
 
 namespace AquaPic.Sensors
 {
     public class WaterLevelSensorSettings : GenericSensorSettings
     {
-        [EntitySetting (typeof (StringMutator), "waterLevelGroupName")]
-        public string waterLevelGroupName { get; set; }
-
         [EntitySetting (typeof (FloatMutatorDefaultZeroScaleValue), "zeroScaleCalibrationValue")]
         public float zeroScaleCalibrationValue { get; set; }
 
@@ -46,7 +41,6 @@ namespace AquaPic.Sensors
         public WaterLevelSensorSettings () {
             name = string.Empty;
             channel = IndividualControl.Empty;
-            waterLevelGroupName = string.Empty;
             zeroScaleCalibrationValue = 819.2f;
             fullScaleCalibrationActual = 15f;
             fullScaleCalibrationValue = 303.73f;
