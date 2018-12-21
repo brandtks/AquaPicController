@@ -36,7 +36,7 @@ namespace AquaPic.Sensors
             this.channel = channel;
         }
 
-        public virtual void OnAdd () => throw new NotImplementedException ();
+        public virtual void OnCreate () => throw new NotImplementedException ();
         public virtual void OnRemove () => throw new NotImplementedException ();
 
         public virtual ValueType GetValue () => throw new NotImplementedException ();
