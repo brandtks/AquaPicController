@@ -41,7 +41,7 @@ namespace AquaPic.Sensors
             }
         }
 
-        public override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
+        protected override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
             var floatSwitchSettings = settings as FloatSwitchSettings;
             if (floatSwitchSettings == null) {
                 throw new ArgumentException ("Settings must be FloatSwitchSettings");
@@ -61,8 +61,7 @@ namespace AquaPic.Sensors
                 floatSwitchSettings.switchFuntion,
                 floatSwitchSettings.physicalLevel,
                 floatSwitchSettings.channel,
-                floatSwitchSettings.timeOffset,
-                floatSwitchSettings.waterLevelGroupName);
+                floatSwitchSettings.timeOffset);
 
             return floatSwitch;
         }
@@ -77,7 +76,6 @@ namespace AquaPic.Sensors
             settings.switchType = floatSwitch.switchType;
             settings.switchFuntion = floatSwitch.switchFuntion;
             settings.timeOffset = floatSwitch.timeOffset;
-            settings.waterLevelGroupName = floatSwitch.waterLevelGroupName;
             return settings;
         }
     }

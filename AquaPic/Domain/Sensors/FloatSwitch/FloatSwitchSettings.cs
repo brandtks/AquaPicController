@@ -42,8 +42,5 @@ namespace AquaPic.Sensors
 
         [EntitySetting (typeof (UIntMutator), "timeOffset")]
         public uint timeOffset { get; set; }
-
-        [EntitySetting (typeof (StringMutator), "waterLevelGroupName")]
-        public string waterLevelGroupName { get; set; }
     }
 }

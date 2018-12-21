@@ -45,16 +45,13 @@ namespace AquaPic.Sensors
             }
         }
 
-        public string waterLevelGroupName { get; protected set; }
-
         public FloatSwitch (
             string name,
             SwitchType switchType,
             SwitchFunction switchFuntion,
             float physicalLevel,
             IndividualControl channel,
-            uint timeOffset,
-            string waterLevelGroupName) 
+            uint timeOffset) 
             : base (name, channel)
         {
             activated = false;
@@ -63,10 +60,9 @@ namespace AquaPic.Sensors
             this.physicalLevel = physicalLevel;
             delayTimer = new OnDelayTimer (timeOffset);
             delayTimer.TimerElapsedEvent += OnDelayTimerTimerElapsedEvent;
-            this.waterLevelGroupName = waterLevelGroupName;
         }
 
-        public override void OnAdd () {
+        public override void OnCreate () {
             AquaPicDrivers.DigitalInput.AddChannel (channel, name);
             AquaPicDrivers.DigitalInput.AddHandlerOnInputChannelValueChangedEvent (channel, OnInputChannelValueChanged);
         }
