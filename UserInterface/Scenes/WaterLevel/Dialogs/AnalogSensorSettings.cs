@@ -34,19 +34,21 @@ namespace AquaPic.UserInterface
     public class AnalogSensorSettings : TouchSettingsDialog
     {
         public string analogSensorName { get; private set; }
+        string waterLevelGroupName;
 
-        public AnalogSensorSettings (WaterLevelSensorSettings settings, Window parent)
+        public AnalogSensorSettings (string waterLevelGroupName, WaterLevelSensorSettings settings, Window parent)
             : base (settings.name, settings.name.IsNotEmpty (), parent) 
         {
             analogSensorName = settings.name;
             var analogSensorNameNotEmpty = analogSensorName.IsNotEmpty ();
+            this.waterLevelGroupName = waterLevelGroupName;
 
             var t = new SettingsTextBox ("Name");
             t.textBox.text = analogSensorName.IsNotEmpty () ? analogSensorName : "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ())
                     args.keepText = false;
-                else if (!WaterLevel.AnalogLevelSensorNameOk (args.text)) {
+                else if (AquaPicSensors.WaterLevelSensors.SensorNameExists (args.text)) {
                     MessageBox.Show ("Switch name already exists");
                     args.keepText = false;
                 }
@@ -61,19 +63,6 @@ namespace AquaPic.UserInterface
             }
             c.combo.nonActiveMessage = "Select outlet";
             c.combo.comboList.AddRange (AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ());
-            AddSetting (c);
-
-            c = new SettingsComboBox ("Water Level Group");
-            c.combo.comboList.AddRange (WaterLevel.GetAllWaterLevelGroupNames ());
-            c.combo.comboList.Add ("None");
-            if (analogSensorName.IsNotEmpty ()) {
-                var currentWaterGroup = settings.waterLevelGroupName;
-                if (currentWaterGroup.IsEmpty ()) {
-                    currentWaterGroup = "None";
-                }
-                c.combo.activeText = currentWaterGroup;
-            }
-            c.combo.nonActiveMessage = "Select group";
             AddSetting (c);
 
             DrawSettings ();
@@ -95,23 +84,14 @@ namespace AquaPic.UserInterface
             }
             sensorSettings.channel = ParseIndividualControl (channelString);
 
-            sensorSettings.waterLevelGroupName = (string)settings["Water Level Group"].setting;
-            if (sensorSettings.waterLevelGroupName.IsEmpty ()) {
-                MessageBox.Show ("Please select an water level group");
-                return false;
-            }
-            if (sensorSettings.waterLevelGroupName == "None") {
-                sensorSettings.waterLevelGroupName = string.Empty;
-            }
-
-            WaterLevel.UpdateAnalogLevelSensor (analogSensorName, sensorSettings);
+            WaterLevel.UpdateWaterLevelSensorInWaterLevelGroup (waterLevelGroupName, analogSensorName, sensorSettings);
             analogSensorName = sensorSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            WaterLevel.RemoveAnalogLevelSensor (analogSensorName);
+            WaterLevel.RemoveWaterLevelSensorFromWaterLevelGroup (waterLevelGroupName, analogSensorName);
             return true;
         }
     }

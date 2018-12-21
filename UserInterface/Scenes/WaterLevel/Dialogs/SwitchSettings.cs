@@ -34,10 +34,12 @@ namespace AquaPic.UserInterface
     public class SwitchSettings : TouchSettingsDialog
     {
         public string switchName { get; private set; }
+        string waterLevelGroupName;
 
-        public SwitchSettings (FloatSwitchSettings settings, Window parent)
+        public SwitchSettings (string waterLevelGroupName, FloatSwitchSettings settings, Window parent)
             : base (settings.name, settings.name.IsNotEmpty (), parent) 
         {
+            this.waterLevelGroupName = waterLevelGroupName;
             switchName = settings.name;
 
             var t = new SettingsTextBox ("Name");
@@ -45,7 +47,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ())
                     args.keepText = false;
-                else if (!WaterLevel.FloatSwitchNameOk (args.text)) {
+                else if (AquaPicSensors.FloatSwitches.SensorNameExists (args.text)) {
                     MessageBox.Show ("Switch name already exists");
                     args.keepText = false;
                 }
@@ -117,19 +119,6 @@ namespace AquaPic.UserInterface
             };
             AddSetting (t);
 
-            c = new SettingsComboBox ("Water Level Group");
-            c.combo.comboList.AddRange (WaterLevel.GetAllWaterLevelGroupNames ());
-            c.combo.comboList.Add ("None");
-            if (switchName.IsNotEmpty ()) {
-                var currentGroupName = WaterLevel.GetFloatSwitchWaterLevelGroupName (switchName);
-                if (currentGroupName.IsEmpty ()) {
-                    currentGroupName = "None";
-                }
-                c.combo.activeText = currentGroupName;
-            }
-            c.combo.nonActiveMessage = "Select group";
-            AddSetting (c);
-
             DrawSettings ();
         }
 
@@ -196,24 +185,14 @@ namespace AquaPic.UserInterface
             }
             switchSettings.timeOffset = (uint)ParseTime (timeOffsetString);
 
-            switchSettings.waterLevelGroupName = (string)settings["Water Level Group"].setting;
-            if (switchSettings.waterLevelGroupName.IsEmpty ()) {
-                MessageBox.Show ("Please select an water level group");
-                return false;
-            }
-
-            if (switchSettings.waterLevelGroupName == "None") {
-                switchSettings.waterLevelGroupName = string.Empty;
-            }
-
-            WaterLevel.UpdateFloatSwitch (switchName, switchSettings);
+            WaterLevel.UpdateFloatSwitchInWaterLevelGroup (waterLevelGroupName, switchName, switchSettings);
             switchName = switchSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            WaterLevel.RemoveFloatSwitch (switchName);
+            WaterLevel.RemoveFloatSwitchFromWaterLevelGroup (waterLevelGroupName, switchName);
             return true;
         }
 
