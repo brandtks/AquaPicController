@@ -171,6 +171,7 @@
     <Compile Include="Driver\GenericClasses\GenericInputBase.cs" />
     <Compile Include="Driver\GenericClasses\GenericInputChannel.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericSensorSettings.cs" />
+    <Compile Include="Domain\Entity\Mutators\StringArrayMutator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
