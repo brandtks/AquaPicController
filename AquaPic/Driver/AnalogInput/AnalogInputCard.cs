@@ -77,7 +77,7 @@ namespace AquaPic.Drivers
                 CheckChannelRange (channel);
 
                 if (channels[channel].mode == Mode.Manual) {
-                    channels[channel].SetValue (value);
+                    UpdateChannelValue (channels[channel], value);
                 } else {
                     throw new Exception ("Can only modify analong input value with channel forced");
                 }

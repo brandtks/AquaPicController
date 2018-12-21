@@ -31,6 +31,16 @@ namespace AquaPic.Drivers
         public GenericInputCard (string name, int address, int numberChannels)
             : base (name, address, numberChannels) { }
 
+        public override void SetChannelValue (int channel, ValueType value) {
+            CheckChannelRange (channel);
+
+            if (channels[channel].mode == Mode.Manual) {
+                UpdateChannelValue (channels[channel], value);
+            } else {
+                throw new Exception ("Can only modify input value with channel forced");
+            }
+        }
+
         public void AddHandlerOnInputChannelValueChangedEvent (int channel, EventHandler<InputChannelValueChangedEventArgs> handler) {
             CheckChannelRange (channel);
             var inputChannel = channels[channel] as GenericInputChannel;
