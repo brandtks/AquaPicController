@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
 using AquaPic.Globals;
 
 namespace AquaPic.Modules
@@ -42,5 +43,11 @@ namespace AquaPic.Modules
 
         [EntitySetting (typeof (BoolMutatorDefaultTrue), "enableLowAnalogAlarm")]
         public bool enableLowAnalogAlarm { get; set; }
+
+        [EntitySetting (typeof (StringArrayMutator), "floatSwitches")]
+        public IEnumerable<string> floatSwitches { get; set; }
+
+        [EntitySetting (typeof (StringArrayMutator), "waterLevelSensors")]
+        public IEnumerable<string> waterLevelSensors { get; set; }
     }
 }

@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Sensors;
@@ -38,6 +39,8 @@ namespace AquaPic.Modules
             public float lowAnalogAlarmSetpoint;
             public bool enableHighAnalogAlarm;
             public bool enableLowAnalogAlarm;
+            public List<string> floatSwitches;
+            public List<string> waterLevelSensors;
 
             public float level;
             public IDataLogger dataLogger;
@@ -51,7 +54,9 @@ namespace AquaPic.Modules
                 float highAnalogAlarmSetpoint,
                 bool enableHighAnalogAlarm,
                 float lowAnalogAlarmSetpoint,
-                bool enableLowAnalogAlarm
+                bool enableLowAnalogAlarm,
+                IEnumerable<string> floatSwitches,
+                IEnumerable<string> waterLevelSensors
             ) {
                 this.name = name;
                 level = 0.0f;
@@ -75,18 +80,19 @@ namespace AquaPic.Modules
                 lowSwitchAlarmIndex = Alarm.Subscribe (string.Format ("{0} Low Water Level (Switch)", this.name));
                 Alarm.AddAlarmHandler (highSwitchAlarmIndex, OnHighAlarm);
                 Alarm.AddAlarmHandler (lowSwitchAlarmIndex, OnLowAlarm);
+
+                this.floatSwitches = new List<string> (floatSwitches);
+                this.waterLevelSensors = new List<string> (waterLevelSensors);
             }
 
             public void GroupRun () {
                 var analogSensorCount = 0;
                 level = 0;
-                foreach (var s in analogLevelSensors.Values) {
-                    if (s.waterLevelGroupName == name) {
-                        s.Get ();
-                        if (s.connected) {
-                            level += s.level;
-                            analogSensorCount++;
-                        }
+                foreach (var waterLevelSensorName in waterLevelSensors) {
+                    var waterLevelSensor = AquaPicSensors.WaterLevelSensors.GetSensor (waterLevelSensorName) as WaterLevelSensor;
+                    if (waterLevelSensor.connected) {
+                        level += waterLevelSensor.level;
+                        analogSensorCount++;
                     }
                 }
 
@@ -109,22 +115,19 @@ namespace AquaPic.Modules
                     dataLogger.AddEntry ("probe disconnected");
                 }
 
-                foreach (var s in floatSwitches.Values) {
-                    if (s.waterLevelGroupName == name) {
-                        s.Get ();
-
-                        if (s.function == SwitchFunction.HighLevel) {
-                            if (s.activated)
-                                Alarm.Post (highSwitchAlarmIndex);
-                            else {
-                                Alarm.Clear (highSwitchAlarmIndex);
-                            }
-                        } else if (s.function == SwitchFunction.LowLevel) {
-                            if (s.activated)
-                                Alarm.Post (lowSwitchAlarmIndex);
-                            else {
-                                Alarm.Clear (lowSwitchAlarmIndex);
-                            }
+                foreach (var floatSwitchName in floatSwitches) {
+                    var floatSwitch = AquaPicSensors.FloatSwitches.GetSensor (floatSwitchName) as FloatSwitch;
+                    if (floatSwitch.switchFuntion == SwitchFunction.HighLevel) {
+                        if (floatSwitch.activated)
+                            Alarm.Post (highSwitchAlarmIndex);
+                        else {
+                            Alarm.Clear (highSwitchAlarmIndex);
+                        }
+                    } else if (floatSwitch.switchFuntion == SwitchFunction.LowLevel) {
+                        if (floatSwitch.activated)
+                            Alarm.Post (lowSwitchAlarmIndex);
+                        else {
+                            Alarm.Clear (lowSwitchAlarmIndex);
                         }
                     }
                 }

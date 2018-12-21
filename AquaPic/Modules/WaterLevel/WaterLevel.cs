@@ -36,48 +36,6 @@ namespace AquaPic.Modules
     public partial class WaterLevel
     {
         static Dictionary<string, WaterLevelGroup> waterLevelGroups;
-        static Dictionary<string, WaterLevelSensor> analogLevelSensors;
-        static Dictionary<string, FloatSwitch> floatSwitches;
-
-        /**************************************************************************************************************/
-        /* Analog Water Sensors                                                                                       */
-        /**************************************************************************************************************/
-        public static int analogLevelSensorCount {
-            get {
-                return analogLevelSensors.Count;
-            }
-        }
-
-        public static string firstAnalogLevelSensor {
-            get {
-                if (analogLevelSensors.Count > 0) {
-                    var first = analogLevelSensors.First ();
-                    return first.Key;
-                }
-
-                return string.Empty;
-            }
-        }
-
-        /**************************************************************************************************************/
-        /* Float Switches                                                                                             */
-        /**************************************************************************************************************/
-        public static int floatSwitchCount {
-            get {
-                return floatSwitches.Count;
-            }
-        }
-
-        public static string firstFloatSwitch {
-            get {
-                if (floatSwitches.Count > 0) {
-                    var first = floatSwitches.First ();
-                    return first.Key;
-                } else {
-                    return string.Empty;
-                }
-            }
-        }
 
         /**************************************************************************************************************/
         /* Default water level properties                                                                             */
@@ -99,10 +57,8 @@ namespace AquaPic.Modules
             }
         }
 
-        const string settingsFileName = "waterLevelProperties";
+        const string settingsFileName = "water-level";
         const string groupSettingsArrayName = "waterLevelGroups";
-        const string analogSensorSettingsArrayName = "analogSensors";
-        const string floatSwitchSettingsArrayName = "floatSwitches";
 
         /**************************************************************************************************************/
         /* Water Level                                                                                                */
@@ -113,8 +69,6 @@ namespace AquaPic.Modules
             Logger.Add ("Initializing Water Level");
 
             waterLevelGroups = new Dictionary<string, WaterLevelGroup> ();
-            analogLevelSensors = new Dictionary<string, WaterLevelSensor> ();
-            floatSwitches = new Dictionary<string, FloatSwitch> ();
 
             if (SettingsHelper.SettingsFileExists (settingsFileName)) {
                 /**************************************************************************************************/
@@ -124,30 +78,12 @@ namespace AquaPic.Modules
                 foreach (var setting in groupSettings) {
                     AddWaterLevelGroup (setting, false);
                 }
-
-                /**************************************************************************************************/
-                /* Analog Sensors                                                                                 */
-                /**************************************************************************************************/
-                var analogSettings = SettingsHelper.ReadAllSettingsInArray<WaterLevelSensorSettings> (settingsFileName, analogSensorSettingsArrayName);
-                foreach (var setting in analogSettings) {
-                    AddAnalogLevelSensor (setting, false);
-                }
-
-                /**************************************************************************************************/
-                /* Float Switches                                                                                 */
-                /**************************************************************************************************/
-                var switchSettings = SettingsHelper.ReadAllSettingsInArray<FloatSwitchSettings> (settingsFileName, floatSwitchSettingsArrayName);
-                foreach (var setting in switchSettings) {
-                    AddFloatSwitch (setting, false);
-                }
             } else {
                 Logger.Add ("Water level settings file did not exist, created new water level settings");
 
                 var jo = new JObject ();
                 jo.Add (new JProperty (groupSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty ("defaultWaterLevelGroup", string.Empty));
-                jo.Add (new JProperty (analogSensorSettingsArrayName, new JArray ()));
-                jo.Add (new JProperty (floatSwitchSettingsArrayName, new JArray ()));
 
                 SettingsHelper.WriteSettingsFile (settingsFileName, jo);
             }
@@ -158,20 +94,6 @@ namespace AquaPic.Modules
         public static void Run () {
             foreach (var waterLevelGroup in waterLevelGroups.Values) {
                 waterLevelGroup.GroupRun ();
-            }
-
-            // Get the value of the all the analog sensors no assigned to a group
-            foreach (var analogSensor in analogLevelSensors.Values) {
-                if (!CheckWaterLevelGroupKeyNoThrow (analogSensor.waterLevelGroupName)) {
-                    analogSensor.Get ();
-                }
-            }
-
-            // Get the value of the all the float switches no assigned to a group
-            foreach (var floatSwitch in floatSwitches.Values) {
-                if (!CheckWaterLevelGroupKeyNoThrow (floatSwitch.waterLevelGroupName)) {
-                    floatSwitch.Get ();
-                }
             }
         }
 
@@ -188,7 +110,9 @@ namespace AquaPic.Modules
                 settings.highAnalogAlarmSetpoint,
                 settings.enableHighAnalogAlarm,
                 settings.lowAnalogAlarmSetpoint,
-                settings.enableLowAnalogAlarm);
+                settings.enableLowAnalogAlarm,
+                settings.floatSwitches,
+                settings.waterLevelSensors);
 
             if (saveToFile) {
                 AddWaterLevelGroupSettingsToFile (settings.name);
@@ -200,7 +124,9 @@ namespace AquaPic.Modules
             float highAnalogAlarmSetpoint,
             bool enableHighAnalogAlarm,
             float lowAnalogAlarmSetpoint,
-            bool enableLowAnalogAlarm)
+            bool enableLowAnalogAlarm,
+            IEnumerable<string> floatSwitches,
+            IEnumerable<string> waterLevelSensors)
         {
             if (!WaterLevelGroupNameOk (name)) {
                 throw new Exception (string.Format ("Water Level Group {0} already exists", name));
@@ -211,7 +137,9 @@ namespace AquaPic.Modules
                 highAnalogAlarmSetpoint,
                 enableHighAnalogAlarm,
                 lowAnalogAlarmSetpoint,
-                enableLowAnalogAlarm);
+                enableLowAnalogAlarm,
+                floatSwitches,
+                waterLevelSensors);
         }
 
         public static void UpdateWaterLevelGroup (string name, WaterLevelGroupSettings settings) {
@@ -220,20 +148,6 @@ namespace AquaPic.Modules
             }
 
             AddWaterLevelGroup (settings);
-
-            foreach (var floatSwitch in floatSwitches.Values) {
-                if (floatSwitch.waterLevelGroupName == name) {
-                    floatSwitch.waterLevelGroupName = settings.name;
-                    UpdateFloatSwitchSettingsInFile (floatSwitch.name);
-                }
-            }
-
-            foreach (var sensor in analogLevelSensors.Values) {
-                if (sensor.waterLevelGroupName == name) {
-                    sensor.waterLevelGroupName = settings.name;
-                    UpdateAnalogSensorSettingsInFile (sensor.name);
-                }
-            }
         }
 
         public static void RemoveWaterLevelGroup (string name) {
@@ -280,10 +194,11 @@ namespace AquaPic.Modules
         public static bool GetWaterLevelGroupSwitchesActivated (string name, SwitchFunction function = SwitchFunction.ATO) {
             CheckWaterLevelGroupKey (name);
             bool activated = true;
-            foreach (var s in floatSwitches.Values) {
-                if ((s.waterLevelGroupName == name) && (s.function == function)) {
+            foreach (var switchName in waterLevelGroups[name].floatSwitches) {
+                var floatSwitch = AquaPicSensors.FloatSwitches.GetSensor (switchName) as FloatSwitch;
+                if (floatSwitch.switchFuntion == function) {
                     // Using AND because we want all the switches to be activated
-                    activated &= s.activated;
+                    activated &= floatSwitch.activated;
                 }
             }
             return activated;
@@ -293,11 +208,10 @@ namespace AquaPic.Modules
         public static bool GetWaterLevelGroupAnalogSensorConnected (string name) {
             CheckWaterLevelGroupKey (name);
             bool connected = false;
-            foreach (var sensor in analogLevelSensors.Values) {
-                if (sensor.waterLevelGroupName == name) {
-                    // Using OR because we really only care that at least one sensor is connected
-                    connected |= sensor.connected;
-                }
+            foreach (var sensorName in waterLevelGroups[name].waterLevelSensors) {
+                var sensor = AquaPicSensors.WaterLevelSensors.GetSensor (sensorName) as WaterLevelSensor;
+                // Using OR because we really only care that at least one sensor is connected
+                connected |= sensor.connected;
             }
             return connected;
         }
@@ -402,304 +316,150 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Analog Level Sensor                                                                                        */
         /**************************************************************************************************************/
-        public static void AddAnalogLevelSensor (WaterLevelSensorSettings settings, bool saveToFile = true) {
-            if (!AnalogLevelSensorNameOk (settings.name)) {
-                throw new Exception (string.Format ("Analog Sensor: {0} already exists", settings.name));
-            }
-
-            analogLevelSensors[settings.name] = new WaterLevelSensor (
-                settings.name,
-                settings.channel,
-                settings.waterLevelGroupName,
-                settings.zeroScaleCalibrationValue,
-                settings.fullScaleCalibrationActual,
-                settings.fullScaleCalibrationValue);
-
-            if (saveToFile) {
-                AddAnalogSensorSettingsToFile (settings);
-            }
+        public static void AddWaterLevelSensorToWaterLevelGroup (string groupName, WaterLevelSensorSettings settings, bool saveToFile) {
+            CheckWaterLevelGroupKey (groupName);
+            waterLevelGroups[groupName].waterLevelSensors.Add (settings.name);
+            AquaPicSensors.WaterLevelSensors.AddSensor (settings, saveToFile);
         }
 
-        public static void UpdateAnalogLevelSensor (string analogLevelSensorName, WaterLevelSensorSettings settings) {
-            if (!CheckAnalogLevelSensorKeyNoThrow (analogLevelSensorName)) {
-                settings.zeroScaleCalibrationValue = GetAnalogLevelSensorZeroScaleValue (analogLevelSensorName);
-                settings.fullScaleCalibrationActual = GetAnalogLevelSensorFullScaleActual (analogLevelSensorName);
-                settings.fullScaleCalibrationValue = GetAnalogLevelSensorFullScaleValue (analogLevelSensorName);
-                RemoveAnalogLevelSensor (analogLevelSensorName);
-            }
-
-            AddAnalogLevelSensor (settings);
+        public static void UpdateWaterLevelSensorInWaterLevelGroup (string groupName, string waterLevelSensorName, WaterLevelSensorSettings settings) {
+            CheckWaterLevelGroupKey (groupName);
+            waterLevelGroups[groupName].waterLevelSensors.Remove (waterLevelSensorName);
+            waterLevelGroups[groupName].waterLevelSensors.Add (settings.name);
+            AquaPicSensors.WaterLevelSensors.UpdateSensor (waterLevelSensorName, settings);
         }
 
-        public static void RemoveAnalogLevelSensor (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-
-            analogLevelSensors[analogLevelSensorName].Remove ();
-            analogLevelSensors.Remove (analogLevelSensorName);
-            DeleteAnalogSensorSettingFromFile (analogLevelSensorName);
-        }
-
-        public static void CheckAnalogLevelSensorKey (string analogLevelSensorName) {
-            if (!analogLevelSensors.ContainsKey (analogLevelSensorName)) {
-                throw new ArgumentException ("analogLevelSensorName");
-            }
-        }
-
-        public static bool CheckAnalogLevelSensorKeyNoThrow (string analogLevelSensorName) {
-            try {
-                CheckAnalogLevelSensorKey (analogLevelSensorName);
-                return true;
-            } catch {
-                return false;
-            }
-        }
-
-        public static bool AnalogLevelSensorNameOk (string analogLevelSensorName) {
-            return !CheckAnalogLevelSensorKeyNoThrow (analogLevelSensorName);
+        public static void RemoveWaterLevelSensorFromWaterLevelGroup (string groupName, string waterLevelSensorName) {
+            CheckWaterLevelGroupKey (groupName);
+            waterLevelGroups[groupName].waterLevelSensors.Remove (waterLevelSensorName);
+            AquaPicSensors.WaterLevelSensors.RemoveSensor (waterLevelSensorName);
         }
 
         /***Getters****************************************************************************************************/
         /***Names***/
-        public static string[] GetAllAnalogLevelSensors () {
+        public static string[] GetAllWaterLevelSensorsForWaterLevelGroup (string groupName) {
+            CheckWaterLevelGroupKey (groupName);
             List<string> names = new List<string> ();
-            foreach (var analogLevelSensor in analogLevelSensors.Values) {
-                names.Add (analogLevelSensor.name);
+            foreach (var sensorName in waterLevelGroups[groupName].waterLevelSensors) {
+                names.Add (sensorName);
             }
             return names.ToArray ();
         }
 
         /***Individual Control***/
-        public static IndividualControl GetAnalogLevelSensorIndividualControl (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].channel;
+        public static IndividualControl GetAnalogLevelSensorIndividualControl (string waterLevelSensorName) {
+            return AquaPicSensors.WaterLevelSensors.GetSensor (waterLevelSensorName).channel;
         }
 
         /***Level***/
-        public static float GetAnalogLevelSensorLevel (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].level;
-        }
-
-        /***Water Level Group Name***/
-        public static string GetAnalogLevelSensorWaterLevelGroupName (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].waterLevelGroupName;
+        public static float GetAnalogLevelSensorLevel (string waterLevelSensorName) {
+            var waterLevelSensor = AquaPicSensors.WaterLevelSensors.GetSensor (waterLevelSensorName) as WaterLevelSensor;
+            return waterLevelSensor.level;
         }
 
         /***Connected***/
-        public static bool GetAnalogLevelSensorConnected (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].connected;
+        public static bool GetAnalogLevelSensorConnected (string waterLevelSensorName) {
+            var waterLevelSensor = AquaPicSensors.WaterLevelSensors.GetSensor (waterLevelSensorName) as WaterLevelSensor;
+            return waterLevelSensor.connected;
         }
 
         /***Disconnected alarm index***/
-        public static int GetAnalogLevelSensorDisconnectedAlarmIndex (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].sensorDisconnectedAlarmIndex;
+        public static int GetAnalogLevelSensorDisconnectedAlarmIndex (string waterLevelSensorName) {
+            var waterLevelSensor = AquaPicSensors.WaterLevelSensors.GetSensor (waterLevelSensorName) as WaterLevelSensor;
+            return waterLevelSensor.sensorDisconnectedAlarmIndex;
         }
 
         /***Zero scale value***/
-        public static float GetAnalogLevelSensorZeroScaleValue (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].zeroScaleValue;
+        public static float GetAnalogLevelSensorZeroScaleValue (string waterLevelSensorName) {
+            var waterLevelSensor = AquaPicSensors.WaterLevelSensors.GetSensor (waterLevelSensorName) as WaterLevelSensor;
+            return waterLevelSensor.zeroScaleValue;
         }
 
         /***Full scale actual***/
-        public static float GetAnalogLevelSensorFullScaleActual (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].fullScaleActual;
+        public static float GetAnalogLevelSensorFullScaleActual (string waterLevelSensorName) {
+            var waterLevelSensor = AquaPicSensors.WaterLevelSensors.GetSensor (waterLevelSensorName) as WaterLevelSensor;
+            return waterLevelSensor.fullScaleActual;
         }
 
         /***Full scale value***/
-        public static float GetAnalogLevelSensorFullScaleValue (string analogLevelSensorName) {
-            CheckAnalogLevelSensorKey (analogLevelSensorName);
-            return analogLevelSensors[analogLevelSensorName].fullScaleValue;
+        public static float GetAnalogLevelSensorFullScaleValue (string waterLevelSensorName) {
+            var waterLevelSensor = AquaPicSensors.WaterLevelSensors.GetSensor (waterLevelSensorName) as WaterLevelSensor;
+            return waterLevelSensor.fullScaleValue;
         }
 
         /***Setters****************************************************************************************************/
         /***Calibration data***/
-        public static bool SetCalibrationData (string name, float zeroValue, float fullScaleActual, float fullScaleValue) {
-            CheckAnalogLevelSensorKey (name);
-
-            if (fullScaleValue <= zeroValue)
-                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
-
-            if (fullScaleActual < 0.0f)
-                throw new ArgumentException ("Full scale actual can't be less than zero");
-
-            analogLevelSensors[name].zeroScaleValue = zeroValue;
-            analogLevelSensors[name].fullScaleActual = fullScaleActual;
-            analogLevelSensors[name].fullScaleValue = fullScaleValue;
-
-            UpdateAnalogSensorSettingsInFile (name);
-
+        public static bool SetCalibrationData (string name, float zeroScaleValue, float fullScaleActual, float fullScaleValue) {
+            AquaPicSensors.WaterLevelSensors.SetCalibrationData (name, zeroScaleValue, fullScaleActual, fullScaleValue);
             return true;
-        }
-
-        /***Settings***************************************************************************************************/
-        public static WaterLevelSensorSettings GetAnalogSensorSettingsSettings (string name) {
-            CheckAnalogLevelSensorKey (name);
-            var settings = new WaterLevelSensorSettings ();
-            settings.name = name;
-            settings.channel = GetAnalogLevelSensorIndividualControl (name);
-            settings.waterLevelGroupName = GetAnalogLevelSensorWaterLevelGroupName (name);
-            settings.zeroScaleCalibrationValue = GetAnalogLevelSensorZeroScaleValue (name);
-            settings.fullScaleCalibrationActual = GetAnalogLevelSensorFullScaleActual (name);
-            settings.fullScaleCalibrationValue = GetAnalogLevelSensorFullScaleValue (name);
-            return settings;
-        }
-
-        protected static void AddAnalogSensorSettingsToFile (WaterLevelSensorSettings settings) {
-            SettingsHelper.AddSettingsToArray (settingsFileName, analogSensorSettingsArrayName, settings);
-        }
-
-        protected static void UpdateAnalogSensorSettingsInFile (string name) {
-            SettingsHelper.UpdateSettingsInArray (settingsFileName, analogSensorSettingsArrayName, name, GetAnalogSensorSettingsSettings (name));
-        }
-
-        protected static void DeleteAnalogSensorSettingFromFile (string name) {
-            SettingsHelper.DeleteSettingsFromArray (settingsFileName, analogSensorSettingsArrayName, name);
         }
 
         /**************************************************************************************************************/
         /* Float Switches                                                                                             */
         /**************************************************************************************************************/
-        public static void AddFloatSwitch (FloatSwitchSettings settings, bool saveToFile = true) {
-            if (!FloatSwitchNameOk (settings.name)) {
-                throw new Exception (string.Format ("Float Switch: {0} already exists", settings.name));
-            }
-
-            if ((settings.switchFuntion == SwitchFunction.HighLevel) && (settings.switchType != SwitchType.NormallyClosed)) {
-                Logger.AddWarning ("High level switch should be normally closed");
-            } else if ((settings.switchFuntion == SwitchFunction.LowLevel) && (settings.switchType != SwitchType.NormallyClosed)) {
-                Logger.AddWarning ("Low level switch should be normally closed");
-            } else if ((settings.switchFuntion == SwitchFunction.ATO) && (settings.switchType != SwitchType.NormallyOpened)) {
-                Logger.AddWarning ("ATO switch should be normally opened");
-            }
-
-            floatSwitches[settings.name] = new FloatSwitch (
-                settings.name,
-                settings.switchType,
-                settings.switchFuntion,
-                settings.physicalLevel,
-                settings.channel,
-                settings.timeOffset,
-                settings.waterLevelGroupName);
-
-            if (saveToFile) {
-                AddFloatSwitchSettingsToFile (settings);
-            }
+        public static void AddFloatSwitchToWaterLevelGroup (string groupName, FloatSwitchSettings settings, bool saveToFile) {
+            CheckWaterLevelGroupKey (groupName);
+            waterLevelGroups[groupName].floatSwitches.Add (settings.name);
+            AquaPicSensors.FloatSwitches.AddSensor (settings, saveToFile);
         }
 
-        public static void UpdateFloatSwitch (string floatSwitchName, FloatSwitchSettings settings) {
-            if (!CheckFloatSwitchKeyNoThrow (floatSwitchName)) {
-                RemoveFloatSwitch (floatSwitchName);
-            }
-            AddFloatSwitch (settings);
+        public static void UpdateFloatSwitchInWaterLevelGroup (string groupName, string floatSwitchName, FloatSwitchSettings settings) {
+            CheckWaterLevelGroupKey (groupName);
+            waterLevelGroups[groupName].floatSwitches.Remove (floatSwitchName);
+            waterLevelGroups[groupName].floatSwitches.Add (settings.name);
+            AquaPicSensors.FloatSwitches.UpdateSensor (floatSwitchName, settings);
         }
 
-        public static void RemoveFloatSwitch (string floatSwitchName) {
-            CheckFloatSwitchKey (floatSwitchName);
-            floatSwitches[floatSwitchName].Remove ();   // this removes the physical digital input
-            floatSwitches.Remove (floatSwitchName);     // this removes the entry from the dictionary
-            SettingsHelper.DeleteSettingsFromArray (settingsFileName, floatSwitchSettingsArrayName, floatSwitchName);
-        }
-
-        public static void CheckFloatSwitchKey (string floatSwitchName) {
-            if (!floatSwitches.ContainsKey (floatSwitchName)) {
-                throw new ArgumentException ("floatSwitchName");
-            }
-        }
-
-        public static bool CheckFloatSwitchKeyNoThrow (string floatSwitchName) {
-            try {
-                CheckFloatSwitchKey (floatSwitchName);
-                return true;
-            } catch {
-                return false;
-            }
-        }
-
-        public static bool FloatSwitchNameOk (string floatSwitchName) {
-            return !CheckFloatSwitchKeyNoThrow (floatSwitchName);
+        public static void RemoveFloatSwitchFromWaterLevelGroup (string groupName, string floatSwitchName) {
+            CheckWaterLevelGroupKey (groupName);
+            waterLevelGroups[groupName].floatSwitches.Remove (floatSwitchName);
+            AquaPicSensors.FloatSwitches.RemoveSensor (floatSwitchName);
         }
 
         /***Getters****************************************************************************************************/
         /***Names***/
-        public static string[] GetAllFloatSwitches () {
+        public static string[] GetAllFloatSwitchesForWaterLevelGroup (string groupName) {
+            CheckWaterLevelGroupKey (groupName);
             List<string> names = new List<string> ();
-            foreach (var floatSwitch in floatSwitches.Values) {
-                names.Add (floatSwitch.name);
+            foreach (var sensorName in waterLevelGroups[groupName].floatSwitches) {
+                names.Add (sensorName);
             }
             return names.ToArray ();
         }
 
         /***Individual Control***/
         public static IndividualControl GetFloatSwitchIndividualControl (string floatSwitchName) {
-            CheckFloatSwitchKey (floatSwitchName);
-            return floatSwitches[floatSwitchName].channel;
+            return AquaPicSensors.FloatSwitches.GetSensor (floatSwitchName).channel;
         }
 
         /***State***/
         public static bool GetFloatSwitchState (string floatSwitchName) {
-            CheckFloatSwitchKey (floatSwitchName);
-            return floatSwitches[floatSwitchName].activated;
-        }
-
-        /***Water level group name***/
-        public static string GetFloatSwitchWaterLevelGroupName (string floatSwitchName) {
-            CheckFloatSwitchKey (floatSwitchName);
-            return floatSwitches[floatSwitchName].waterLevelGroupName;
+            var floatSwitch = AquaPicSensors.FloatSwitches.GetSensor (floatSwitchName) as FloatSwitch;
+            return floatSwitch.activated;
         }
 
         /***Type***/
         public static SwitchType GetFloatSwitchType (string floatSwitchName) {
-            CheckFloatSwitchKey (floatSwitchName);
-            return floatSwitches[floatSwitchName].type;
+            var floatSwitch = AquaPicSensors.FloatSwitches.GetSensor (floatSwitchName) as FloatSwitch;
+            return floatSwitch.switchType;
         }
 
         /***Function***/
         public static SwitchFunction GetFloatSwitchFunction (string floatSwitchName) {
-            CheckFloatSwitchKey (floatSwitchName);
-            return floatSwitches[floatSwitchName].function;
+            var floatSwitch = AquaPicSensors.FloatSwitches.GetSensor (floatSwitchName) as FloatSwitch;
+            return floatSwitch.switchFuntion;
         }
 
         /***Physical Level***/
         public static float GetFloatSwitchPhysicalLevel (string floatSwitchName) {
-            CheckFloatSwitchKey (floatSwitchName);
-            return floatSwitches[floatSwitchName].physicalLevel;
+            var floatSwitch = AquaPicSensors.FloatSwitches.GetSensor (floatSwitchName) as FloatSwitch;
+            return floatSwitch.physicalLevel;
         }
 
         /***Time Offset***/
         public static uint GetFloatSwitchTimeOffset (string floatSwitchName) {
-            CheckFloatSwitchKey (floatSwitchName);
-            return floatSwitches[floatSwitchName].onDelayTimer.timerInterval;
-        }
-
-        /***Settings***************************************************************************************************/
-        public static FloatSwitchSettings GetFloatSwitchSettingsSettings (string name) {
-            CheckFloatSwitchKey (name);
-            var settings = new FloatSwitchSettings ();
-            settings.name = name;
-            settings.channel = GetFloatSwitchIndividualControl (name);
-            settings.physicalLevel = GetFloatSwitchPhysicalLevel (name);
-            settings.switchType = GetFloatSwitchType (name);
-            settings.switchFuntion = GetFloatSwitchFunction (name);
-            settings.timeOffset = GetFloatSwitchTimeOffset (name);
-            settings.waterLevelGroupName = GetFloatSwitchWaterLevelGroupName (name);
-            return settings;
-        }
-
-        protected static void AddFloatSwitchSettingsToFile (FloatSwitchSettings settings) {
-            SettingsHelper.AddSettingsToArray (settingsFileName, floatSwitchSettingsArrayName, settings);
-        }
-
-        protected static void UpdateFloatSwitchSettingsInFile (string name) {
-            SettingsHelper.UpdateSettingsInArray (settingsFileName, floatSwitchSettingsArrayName, name, GetFloatSwitchSettingsSettings (name));
-        }
-
-        protected static void DeleteFloatSwitchSettingsFromFile (string name) {
-            SettingsHelper.DeleteSettingsFromArray (settingsFileName, floatSwitchSettingsArrayName, name);
+            var floatSwitch = AquaPicSensors.FloatSwitches.GetSensor (floatSwitchName) as FloatSwitch;
+            return floatSwitch.timeOffset;
         }
     }
 }
