@@ -32,6 +32,7 @@ using AquaPic.Drivers;
 using AquaPic.Modules;
 using AquaPic.SerialBus;
 using AquaPic.Globals;
+using AquaPic.Sensors;
 
 namespace AquaPic
 {
@@ -103,6 +104,7 @@ namespace AquaPic
             try {
 #endif
                 Hardware.AddFromJson ();
+                AquaPicSensors.AddSensors ();
                 Temperature.Init ();
                 Lighting.Init ();
                 WaterLevel.Init ();
