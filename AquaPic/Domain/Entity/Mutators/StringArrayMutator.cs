@@ -22,43 +22,45 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Globals
 {
-    public class StringMutator : ISettingMutator<string>
+    public class StringArrayMutator : ISettingMutator<IEnumerable<string>>
     {
-        public string Read (JObject jobj, string[] keys) {
+        public IEnumerable<string> Read (JObject jobj, string[] keys) {
             if (keys.Length < 1) {
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
 
-            var value = Default ();
-            var text = (string)jobj[keys[0]];
-            if (text.IsNotEmpty ()) {
-                try {
-                    value = text;
-                } catch {
-                    //
-                }
+            var values = new List<string> ();
+            var ja = jobj[keys[0]] as JArray;
+            foreach (var t in ja) {
+                values.Add ((string)t);
             }
-            return value;
+
+            return values;
         }
 
-        public void Write (string value, JObject jobj, string[] keys) {
+        public void Write (IEnumerable<string> values, JObject jobj, string[] keys) {
             if (keys.Length < 1) {
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
-            jobj[keys[0]] = value;
+            var ja = new JArray ();
+            foreach (var value in values) {
+                ja.Add (value);
+            }
+            jobj[keys[0]] = ja;
         }
 
-        public bool Valid (string value) {
-            return value.IsNotEmpty ();
+        public bool Valid (IEnumerable<string> value) {
+            return true;
         }
 
-        public string Default () {
-            return string.Empty;
+        public IEnumerable<string> Default () {
+            return new string[0];
         }
     }
 }
