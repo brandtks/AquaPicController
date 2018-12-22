@@ -29,6 +29,11 @@ namespace AquaPic.Sensors
 {
     public class GenericSensor : ValueConsumer
     {
+        public event EventHandler<SensorUpdatedEventArgs> SensorUpdatedEvent;
+        public event EventHandler<SensorRemovedEventArgs> SensorRemovedEvent;
+        public event EventHandler<ValueChangedEventArgs> ValueChangedEvent;
+        public event EventHandler<ValueUpdatedEventArgs> ValueUpdatedEvent;
+
         public string name { get; protected set; }
         public IndividualControl channel { get; protected set; }
 
@@ -43,6 +48,22 @@ namespace AquaPic.Sensors
 
         public virtual GenericSensor Clone () {
             return (GenericSensor)MemberwiseClone ();
+        }
+
+        public void Updated (string name, GenericSensorSettings settings) {
+            SensorUpdatedEvent?.Invoke (this, new SensorUpdatedEventArgs (name, settings));
+        }
+
+        public void Removed () {
+            SensorRemovedEvent?.Invoke (this, new SensorRemovedEventArgs (name));
+        }
+
+        public void ValueChanged (ValueType newValue, ValueType oldValue) {
+            ValueChangedEvent?.Invoke (Clone (), new ValueChangedEventArgs (newValue, oldValue));
+        }
+
+        public void ValueUpdated (ValueType value) {
+            ValueUpdatedEvent?.Invoke (Clone (), new ValueUpdatedEventArgs (value));
         }
     }
 }

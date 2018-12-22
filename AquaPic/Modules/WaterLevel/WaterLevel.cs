@@ -316,10 +316,10 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Analog Level Sensor                                                                                        */
         /**************************************************************************************************************/
-        public static void AddWaterLevelSensorToWaterLevelGroup (string groupName, WaterLevelSensorSettings settings, bool saveToFile) {
+        public static void AddWaterLevelSensorToWaterLevelGroup (string groupName, WaterLevelSensorSettings settings) {
             CheckWaterLevelGroupKey (groupName);
             waterLevelGroups[groupName].waterLevelSensors.Add (settings.name);
-            AquaPicSensors.WaterLevelSensors.AddSensor (settings, saveToFile);
+            AquaPicSensors.WaterLevelSensors.AddSensor (settings);
         }
 
         public static void UpdateWaterLevelSensorInWaterLevelGroup (string groupName, string waterLevelSensorName, WaterLevelSensorSettings settings) {
@@ -397,10 +397,10 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         /* Float Switches                                                                                             */
         /**************************************************************************************************************/
-        public static void AddFloatSwitchToWaterLevelGroup (string groupName, FloatSwitchSettings settings, bool saveToFile) {
+        public static void AddFloatSwitchToWaterLevelGroup (string groupName, FloatSwitchSettings settings) {
             CheckWaterLevelGroupKey (groupName);
             waterLevelGroups[groupName].floatSwitches.Add (settings.name);
-            AquaPicSensors.FloatSwitches.AddSensor (settings, saveToFile);
+            AquaPicSensors.FloatSwitches.AddSensor (settings);
         }
 
         public static void UpdateFloatSwitchInWaterLevelGroup (string groupName, string floatSwitchName, FloatSwitchSettings settings) {

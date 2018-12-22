@@ -76,8 +76,8 @@ namespace AquaPic.Sensors
         }
 
         public override void OnValueChangedEvent (object sender, ValueChangedEventArgs args) {
-            var newLevel = Convert.ToSingle (args.newValue);
-            level = newLevel.Map (zeroScaleValue, fullScaleValue, 0.0f, fullScaleActual);
+            var oldLevel = level;
+            level = ScaleRawLevel (Convert.ToSingle (args.newValue));
 
             if (level < 0.0f) {
                 if (!Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
@@ -88,6 +88,12 @@ namespace AquaPic.Sensors
                     Alarm.Clear (sensorDisconnectedAlarmIndex);
                 }
             }
+
+            ValueChanged (level, oldLevel);
+        }
+
+        protected float ScaleRawLevel (float rawValue) {
+            return rawValue.Map (zeroScaleValue, fullScaleValue, 0, fullScaleActual);
         }
     }
 }

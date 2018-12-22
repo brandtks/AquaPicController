@@ -27,12 +27,13 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Sensors;
 using AquaPic.DataLogging;
+using AquaPic.Consumers;
 
 namespace AquaPic.Modules
 {
     public partial class WaterLevel
     {
-        class WaterLevelGroup
+        class WaterLevelGroup : SensorConsumer
         {
             public string name;
             public float highAnalogAlarmSetpoint;
@@ -43,6 +44,7 @@ namespace AquaPic.Modules
             public List<string> waterLevelSensors;
 
             public float level;
+            public float summedLevel;
             public IDataLogger dataLogger;
             public int highAnalogAlarmIndex;
             public int lowAnalogAlarmIndex;
@@ -56,10 +58,11 @@ namespace AquaPic.Modules
                 float lowAnalogAlarmSetpoint,
                 bool enableLowAnalogAlarm,
                 IEnumerable<string> floatSwitches,
-                IEnumerable<string> waterLevelSensors
-            ) {
+                IEnumerable<string> waterLevelSensors) 
+            {
                 this.name = name;
-                level = 0.0f;
+                level = 0f;
+                summedLevel = 0f;
                 dataLogger = Factory.GetDataLogger (string.Format ("{0}WaterLevel", this.name.RemoveWhitespace ()));
 
                 this.highAnalogAlarmSetpoint = highAnalogAlarmSetpoint;
@@ -82,23 +85,66 @@ namespace AquaPic.Modules
                 Alarm.AddAlarmHandler (lowSwitchAlarmIndex, OnLowAlarm);
 
                 this.floatSwitches = new List<string> (floatSwitches);
+                foreach (var floatSwitch in this.floatSwitches) {
+                    AquaPicSensors.FloatSwitches.SubscribeConsumer (floatSwitch, this);
+                }
+
                 this.waterLevelSensors = new List<string> (waterLevelSensors);
+                foreach (var waterLevelSensor in this.waterLevelSensors) {
+                    AquaPicSensors.WaterLevelSensors.SubscribeConsumer (waterLevelSensor, this);
+                }
             }
 
             public void GroupRun () {
-                var analogSensorCount = 0;
-                level = 0;
-                foreach (var waterLevelSensorName in waterLevelSensors) {
-                    var waterLevelSensor = AquaPicSensors.WaterLevelSensors.GetSensor (waterLevelSensorName) as WaterLevelSensor;
-                    if (waterLevelSensor.connected) {
-                        level += waterLevelSensor.level;
-                        analogSensorCount++;
+                if (waterLevelSensors.Count > 0) {
+                    dataLogger.AddEntry (level);
+                } else {
+                    dataLogger.AddEntry ("probe disconnected");
+                }
+            }
+
+            protected void OnHighAlarm (object sender, AlarmEventArgs args) {
+                if (args.type == AlarmEventType.Posted) {
+                    dataLogger.AddEntry ("high alarm");
+                }
+            }
+
+            protected void OnLowAlarm (object sender, AlarmEventArgs args) {
+                if (args.type == AlarmEventType.Posted) {
+                    dataLogger.AddEntry ("low alarm");
+                }
+            }
+
+            public override void OnSensorUpdatedEvent (object sender, SensorUpdatedEventArgs args) {
+                if (sender is WaterLevelSensor) {
+                    if (args.name != args.settings.name) {
+                        var index = waterLevelSensors.IndexOf (args.name);
+                        waterLevelSensors[index] = args.settings.name;
+                    }
+                } else if (sender is FloatSwitch) {
+                    if (args.name != args.settings.name) {
+                        var index = floatSwitches.IndexOf (args.name);
+                        floatSwitches[index] = args.settings.name;
                     }
                 }
+            }
 
-                if (analogSensorCount > 0) {
-                    level /= analogSensorCount;
-                    dataLogger.AddEntry (level);
+            public override void OnSensorRemovedEvent (object sender, SensorRemovedEventArgs args) {
+                if (sender is WaterLevelSensor) {
+                    waterLevelSensors.Remove (args.name);
+                } else if (sender is FloatSwitch) {
+                    floatSwitches.Remove (args.name);
+                }
+            }
+
+            public override void OnValueChangedEvent (object sender, ValueChangedEventArgs args) {
+                var waterLevelSensor = sender as WaterLevelSensor;
+                if (waterLevelSensor != null) {
+                    if (waterLevelSensor.connected) {
+                        summedLevel -= (float)args.oldValue;
+                        summedLevel += (float)args.newValue;
+                        level = summedLevel / waterLevelSensors.Count;
+                    }
 
                     if (enableHighAnalogAlarm && (level > highAnalogAlarmSetpoint)) {
                         Alarm.Post (highAnalogAlarmIndex);
@@ -112,36 +158,22 @@ namespace AquaPic.Modules
                         Alarm.Clear (lowAnalogAlarmIndex);
                     }
                 } else {
-                    dataLogger.AddEntry ("probe disconnected");
-                }
-
-                foreach (var floatSwitchName in floatSwitches) {
-                    var floatSwitch = AquaPicSensors.FloatSwitches.GetSensor (floatSwitchName) as FloatSwitch;
-                    if (floatSwitch.switchFuntion == SwitchFunction.HighLevel) {
-                        if (floatSwitch.activated)
-                            Alarm.Post (highSwitchAlarmIndex);
-                        else {
-                            Alarm.Clear (highSwitchAlarmIndex);
-                        }
-                    } else if (floatSwitch.switchFuntion == SwitchFunction.LowLevel) {
-                        if (floatSwitch.activated)
-                            Alarm.Post (lowSwitchAlarmIndex);
-                        else {
-                            Alarm.Clear (lowSwitchAlarmIndex);
+                    var floatSwitch = sender as FloatSwitch;
+                    if (floatSwitch != null) {
+                        if (floatSwitch.switchFuntion == SwitchFunction.HighLevel) {
+                            if (floatSwitch.activated)
+                                Alarm.Post (highSwitchAlarmIndex);
+                            else {
+                                Alarm.Clear (highSwitchAlarmIndex);
+                            }
+                        } else if (floatSwitch.switchFuntion == SwitchFunction.LowLevel) {
+                            if (floatSwitch.activated)
+                                Alarm.Post (lowSwitchAlarmIndex);
+                            else {
+                                Alarm.Clear (lowSwitchAlarmIndex);
+                            }
                         }
                     }
-                }
-            }
-
-            protected void OnHighAlarm (object sender, AlarmEventArgs args) {
-                if (args.type == AlarmEventType.Posted) {
-                    dataLogger.AddEntry ("high alarm");
-                }
-            }
-
-            protected void OnLowAlarm (object sender, AlarmEventArgs args) {
-                if (args.type == AlarmEventType.Posted) {
-                    dataLogger.AddEntry ("low alarm");
                 }
             }
         }
