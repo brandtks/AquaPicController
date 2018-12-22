@@ -37,7 +37,7 @@ namespace AquaPic.Runtime
 
         public bool Evaluate (bool enable) {
             if (enable) {
-                if (!_enabled)
+                if (!_enabled || timerFinished)
                     Start ();
             } else {
                 if (timerFinished)
