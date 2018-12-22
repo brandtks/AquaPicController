@@ -105,10 +105,10 @@
     <Compile Include="Runtime\Logger\Logger.cs" />
     <Compile Include="Runtime\Chemistry\Chemistry.cs" />
     <Compile Include="Runtime\Chemistry\TestProcedure.cs" />
-    <Compile Include="Driver\GenericClasses\GenericChannel.cs" />
-    <Compile Include="Driver\GenericClasses\GenericCard.cs" />
-    <Compile Include="Driver\GenericClasses\CardTypeEnum.cs" />
-    <Compile Include="Driver\GenericClasses\GenericBase.cs" />
+    <Compile Include="Driver\GenericDriver\GenericChannel.cs" />
+    <Compile Include="Driver\GenericDriver\GenericCard.cs" />
+    <Compile Include="Driver\GenericDriver\CardTypeEnum.cs" />
+    <Compile Include="Driver\GenericDriver\GenericBase.cs" />
     <Compile Include="Driver\Driver.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputChannel.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroup.cs" />
@@ -166,13 +166,14 @@
     <Compile Include="Domain\Entity\Mutators\ISettingMutator.cs" />
     <Compile Include="Domain\Entity\Mutators\StringMutator.cs" />
     <Compile Include="Domain\Entity\Mutators\UIntMutator.cs" />
-    <Compile Include="Driver\GenericClasses\GenericInputCard.cs" />
+    <Compile Include="Driver\GenericDriver\GenericInputCard.cs" />
     <Compile Include="Tests\Driver\Generic\GenericChannelTests.cs" />
-    <Compile Include="Driver\GenericClasses\GenericInputBase.cs" />
-    <Compile Include="Driver\GenericClasses\GenericInputChannel.cs" />
+    <Compile Include="Driver\GenericDriver\GenericInputBase.cs" />
+    <Compile Include="Driver\GenericDriver\GenericInputChannel.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericSensorSettings.cs" />
     <Compile Include="Domain\Entity\Mutators\StringArrayMutator.cs" />
     <Compile Include="Domain\Consumers\ValueConsumer.cs" />
+    <Compile Include="Domain\Consumers\SensorConsumer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
