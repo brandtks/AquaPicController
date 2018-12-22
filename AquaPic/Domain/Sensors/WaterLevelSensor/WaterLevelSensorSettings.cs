@@ -43,7 +43,7 @@ namespace AquaPic.Sensors
             channel = IndividualControl.Empty;
             zeroScaleCalibrationValue = 819.2f;
             fullScaleCalibrationActual = 15f;
-            fullScaleCalibrationValue = 303.73f;
+            fullScaleCalibrationValue = 3003.73f;
         }
     }
 
