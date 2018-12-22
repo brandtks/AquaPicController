@@ -36,6 +36,7 @@ namespace AquaPic.Drivers
         public GenericChannel (string name, Type valueType) {
             this.name = name;
             this.valueType = valueType;
+            value = (ValueType)Activator.CreateInstance (this.valueType);
             mode = Mode.Auto;
         }
 
