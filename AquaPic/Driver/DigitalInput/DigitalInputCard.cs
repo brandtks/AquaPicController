@@ -24,6 +24,7 @@
 using System;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.SerialBus;
+using AquaPic.Globals;
 
 namespace AquaPic.Drivers
 {
@@ -53,7 +54,9 @@ namespace AquaPic.Drivers
                 byte stateMask;
                 stateMask = args.GetDataFromReadBuffer<byte> (0);
                 for (int i = 0; i < channelCount; ++i) {
-                    UpdateChannelValue (channels[i], Utils.MaskToBoolean (stateMask, i));
+                    if (channels[i].mode == Mode.Auto) {
+                        UpdateChannelValue (channels[i], Utils.MaskToBoolean (stateMask, i));
+                    }
                 }
             }
 

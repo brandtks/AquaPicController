@@ -56,7 +56,9 @@ namespace AquaPic.Drivers
             protected void GetValueCommunicationCallback (CallbackArgs args) {
                 byte ch = args.GetDataFromReadBuffer<byte> (0);
                 short value = args.GetDataFromReadBuffer<short> (1);
-                UpdateChannelValue (channels[ch], value);
+                if (channels[ch].mode == Mode.Auto) {
+                    UpdateChannelValue (channels[ch], value);
+                }
             }
 
             public override void GetAllValuesCommunication () {
@@ -70,7 +72,11 @@ namespace AquaPic.Drivers
                     values[i] = args.GetDataFromReadBuffer<short> (i * 2);
                 }
 
-                UpdateAllChannelValues (values);
+                for (int i = 0; i < channelCount; ++i) {
+                    if (channels[i].mode == Mode.Auto) {
+                        UpdateChannelValue (channels[i], values[i]);
+                    }
+                }
             }
 
             public int GetChannelLowPassFilterFactor (int channel) {
