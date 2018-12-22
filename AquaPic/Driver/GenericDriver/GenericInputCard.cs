@@ -90,16 +90,5 @@ namespace AquaPic.Drivers
                 }
             }
         }
-
-        protected virtual void UpdateAllChannelValues (ValueType[] values) {
-            if (values.Length < channels.Length) {
-                throw new ArgumentOutOfRangeException (nameof (values));
-            }
-
-            for (int i = 0; i < channels.Length; ++i) {
-                var inputChannel = channels[i] as GenericInputChannel;
-                UpdateChannelValue (inputChannel, values[i]);
-            }
-        }
     }
 }
