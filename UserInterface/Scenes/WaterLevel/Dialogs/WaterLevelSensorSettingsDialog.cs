@@ -84,14 +84,14 @@ namespace AquaPic.UserInterface
             }
             sensorSettings.channel = ParseIndividualControl (channelString);
 
-            WaterLevel.UpdateWaterLevelSensorInWaterLevelGroup (waterLevelGroupName, analogSensorName, sensorSettings);
+            AquaPicSensors.WaterLevelSensors.UpdateSensor (analogSensorName, sensorSettings);
             analogSensorName = sensorSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            WaterLevel.RemoveWaterLevelSensorFromWaterLevelGroup (waterLevelGroupName, analogSensorName);
+            AquaPicSensors.WaterLevelSensors.RemoveSensor (analogSensorName);
             return true;
         }
     }

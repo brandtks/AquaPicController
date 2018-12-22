@@ -31,12 +31,12 @@ using AquaPic.Sensors;
 
 namespace AquaPic.UserInterface
 {
-    public class SwitchSettings : TouchSettingsDialog
+    public class FloatSwitchSettings : TouchSettingsDialog
     {
         public string switchName { get; private set; }
         string waterLevelGroupName;
 
-        public SwitchSettings (string waterLevelGroupName, FloatSwitchSettings settings, Window parent)
+        public FloatSwitchSettings (string waterLevelGroupName, Sensors.FloatSwitchSettings settings, Window parent)
             : base (settings.name, settings.name.IsNotEmpty (), parent) 
         {
             this.waterLevelGroupName = waterLevelGroupName;
@@ -141,7 +141,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnSave (object sender) {
-            var switchSettings = new FloatSwitchSettings ();
+            var switchSettings = new Sensors.FloatSwitchSettings ();
 
             switchSettings.name = (string)settings["Name"].setting;
             if (switchSettings.name == "Enter name") {
