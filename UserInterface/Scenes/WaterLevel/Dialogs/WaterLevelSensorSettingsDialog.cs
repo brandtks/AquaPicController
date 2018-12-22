@@ -26,25 +26,22 @@ using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Sensors;
-using AquaPic.Modules;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class AnalogSensorSettings : TouchSettingsDialog
+    public class WaterLevelSensorSettingsDialog : TouchSettingsDialog
     {
-        public string analogSensorName { get; private set; }
-        string waterLevelGroupName;
+        public string waterLevelSensorName { get; private set; }
 
-        public AnalogSensorSettings (string waterLevelGroupName, WaterLevelSensorSettings settings, Window parent)
+        public WaterLevelSensorSettingsDialog (WaterLevelSensorSettings settings, Window parent)
             : base (settings.name, settings.name.IsNotEmpty (), parent) 
         {
-            analogSensorName = settings.name;
-            var analogSensorNameNotEmpty = analogSensorName.IsNotEmpty ();
-            this.waterLevelGroupName = waterLevelGroupName;
+            waterLevelSensorName = settings.name;
+            var analogSensorNameNotEmpty = waterLevelSensorName.IsNotEmpty ();
 
             var t = new SettingsTextBox ("Name");
-            t.textBox.text = analogSensorName.IsNotEmpty () ? analogSensorName : "Enter name";
+            t.textBox.text = waterLevelSensorName.IsNotEmpty () ? waterLevelSensorName : "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ())
                     args.keepText = false;
@@ -56,7 +53,7 @@ namespace AquaPic.UserInterface
             AddSetting (t);
 
             var c = new SettingsComboBox ("Input Channel");
-            if (analogSensorName.IsNotEmpty ()) {
+            if (waterLevelSensorName.IsNotEmpty ()) {
                 var ic = settings.channel;
                 c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", ic.Group, ic.Individual));
                 c.combo.activeIndex = 0;
@@ -84,14 +81,14 @@ namespace AquaPic.UserInterface
             }
             sensorSettings.channel = ParseIndividualControl (channelString);
 
-            AquaPicSensors.WaterLevelSensors.UpdateSensor (analogSensorName, sensorSettings);
-            analogSensorName = sensorSettings.name;
+            AquaPicSensors.WaterLevelSensors.UpdateSensor (waterLevelSensorName, sensorSettings);
+            waterLevelSensorName = sensorSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            AquaPicSensors.WaterLevelSensors.RemoveSensor (analogSensorName);
+            AquaPicSensors.WaterLevelSensors.RemoveSensor (waterLevelSensorName);
             return true;
         }
     }

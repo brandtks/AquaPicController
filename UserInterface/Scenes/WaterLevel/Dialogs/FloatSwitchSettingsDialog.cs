@@ -25,25 +25,22 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Modules;
 using AquaPic.Drivers;
 using AquaPic.Sensors;
 
 namespace AquaPic.UserInterface
 {
-    public class FloatSwitchSettings : TouchSettingsDialog
+    public class FloatSwitchSettingsDialog : TouchSettingsDialog
     {
-        public string switchName { get; private set; }
-        string waterLevelGroupName;
+        public string floatSwitchName { get; private set; }
 
-        public FloatSwitchSettings (string waterLevelGroupName, Sensors.FloatSwitchSettings settings, Window parent)
+        public FloatSwitchSettingsDialog (FloatSwitchSettings settings, Window parent)
             : base (settings.name, settings.name.IsNotEmpty (), parent) 
         {
-            this.waterLevelGroupName = waterLevelGroupName;
-            switchName = settings.name;
+            floatSwitchName = settings.name;
 
             var t = new SettingsTextBox ("Name");
-            t.textBox.text = switchName.IsNotEmpty () ? switchName : "Enter name";
+            t.textBox.text = floatSwitchName.IsNotEmpty () ? floatSwitchName : "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ())
                     args.keepText = false;
@@ -55,7 +52,7 @@ namespace AquaPic.UserInterface
             AddSetting (t);
 
             var c = new SettingsComboBox ("Input");
-            if (switchName.IsNotEmpty ()) {
+            if (floatSwitchName.IsNotEmpty ()) {
                 var ic = settings.channel;
                 c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", ic.Group, ic.Individual));
                 c.combo.activeIndex = 0;
@@ -65,7 +62,7 @@ namespace AquaPic.UserInterface
             AddSetting (c);
 
             t = new SettingsTextBox ("Physical Level");
-            t.textBox.text = switchName.IsNotEmpty () ? settings.physicalLevel.ToString () : "0";
+            t.textBox.text = floatSwitchName.IsNotEmpty () ? settings.physicalLevel.ToString () : "0";
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     var physicalLevel = Convert.ToSingle (args.text);
@@ -86,7 +83,7 @@ namespace AquaPic.UserInterface
             var types = Enum.GetNames (typeof (SwitchType));
             c.combo.comboList.AddRange (types);
             c.combo.nonActiveMessage = "Please select type";
-            if (switchName.IsNotEmpty ()) {
+            if (floatSwitchName.IsNotEmpty ()) {
                 c.combo.activeText = settings.switchType.ToString ();
             }
             AddSetting (c);
@@ -96,13 +93,13 @@ namespace AquaPic.UserInterface
             c.combo.comboList.AddRange (functions);
             c.combo.comboList.Remove ("None");
             c.combo.nonActiveMessage = "Please select function";
-            if (switchName.IsNotEmpty ()) {
+            if (floatSwitchName.IsNotEmpty ()) {
                 c.combo.activeText = settings.switchFuntion.ToString ();
             }
             AddSetting (c);
 
             t = new SettingsTextBox ("Time Offset");
-            t.textBox.text = switchName.IsNotEmpty () ? 
+            t.textBox.text = floatSwitchName.IsNotEmpty () ? 
                 string.Format ("{0} secs", settings.timeOffset / 1000) :
                 "Enter time";
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -185,14 +182,14 @@ namespace AquaPic.UserInterface
             }
             switchSettings.timeOffset = (uint)ParseTime (timeOffsetString);
 
-            WaterLevel.UpdateFloatSwitchInWaterLevelGroup (waterLevelGroupName, switchName, switchSettings);
-            switchName = switchSettings.name;
+            AquaPicSensors.FloatSwitches.UpdateSensor (floatSwitchName, switchSettings);
+            floatSwitchName = switchSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            WaterLevel.RemoveFloatSwitchFromWaterLevelGroup (waterLevelGroupName, switchName);
+            AquaPicSensors.FloatSwitches.RemoveSensor (floatSwitchName);
             return true;
         }
 
