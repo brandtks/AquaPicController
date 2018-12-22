@@ -78,8 +78,7 @@ namespace AquaPic.Runtime
 
         protected virtual bool OnTimeout () {
             if (_enabled) {
-                if (TimerElapsedEvent != null)
-                    TimerElapsedEvent (this, new TimerElapsedEventArgs ());
+                TimerElapsedEvent?.Invoke (this, new TimerElapsedEventArgs ());
             }
             return _enabled & autoReset;
         }
