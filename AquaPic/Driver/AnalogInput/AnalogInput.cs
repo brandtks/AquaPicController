@@ -36,8 +36,7 @@ namespace AquaPic.Drivers
 
         protected override void Run () {
             foreach (var card in cards.Values) {
-                var inputCard = card as AnalogInputCard;
-                inputCard.GetAllValuesCommunication ();
+                card.GetAllValuesCommunication ();
             }
         }
 
