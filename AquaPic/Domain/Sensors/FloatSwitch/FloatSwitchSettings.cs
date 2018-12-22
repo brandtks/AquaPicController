@@ -22,8 +22,6 @@
 #endregion // License
 
 using System;
-using Newtonsoft.Json.Linq;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 
 
@@ -40,7 +38,7 @@ namespace AquaPic.Sensors
         [EntitySetting (typeof (SwitchFunctionMutator), "switchFuntion")]
         public SwitchFunction switchFuntion { get; set; }
 
-        [EntitySetting (typeof (UIntMutator), "timeOffset")]
+        [EntitySetting (typeof (TimerTimeMutator), "timeOffset")]
         public uint timeOffset { get; set; }
     }
 }
