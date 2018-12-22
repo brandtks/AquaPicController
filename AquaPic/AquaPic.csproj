@@ -172,6 +172,7 @@
     <Compile Include="Driver\GenericClasses\GenericInputChannel.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericSensorSettings.cs" />
     <Compile Include="Domain\Entity\Mutators\StringArrayMutator.cs" />
+    <Compile Include="Domain\Consumers\ValueConsumer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -205,6 +206,7 @@
     <Folder Include="Domain\Entity\Mutators\" />
     <Folder Include="Tests\Driver\" />
     <Folder Include="Tests\Driver\Generic\" />
+    <Folder Include="Domain\Consumers\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">

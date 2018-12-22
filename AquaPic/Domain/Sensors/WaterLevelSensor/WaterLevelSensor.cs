@@ -26,6 +26,7 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
 using AquaPic.Globals;
+using AquaPic.Consumers;
 
 namespace AquaPic.Sensors
 {
@@ -58,20 +59,23 @@ namespace AquaPic.Sensors
             sensorDisconnectedAlarmIndex = -1;
         }
 
-
         public override void OnCreate () {
             AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name));
-            AquaPicDrivers.AnalogInput.AddHandlerOnInputChannelValueChangedEvent (channel, OnInputChannelValueChangedEvent);
+            AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
             sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog level probe disconnected, " + name);
         }
 
         public override void OnRemove () {
             AquaPicDrivers.AnalogInput.RemoveChannel (channel);
-            AquaPicDrivers.AnalogInput.RemoveHandlerOnInputChannelValueChangedEvent (channel, OnInputChannelValueChangedEvent);
+            AquaPicDrivers.AnalogInput.UnsubscribeConsumer (channel, this);
             Alarm.Clear (sensorDisconnectedAlarmIndex);
         }
 
-        protected void OnInputChannelValueChangedEvent (object sender, InputChannelValueChangedEventArgs args) {
+        public override ValueType GetValue () {
+            return level;
+        }
+
+        public override void OnValueChangedEvent (object sender, ValueChangedEventArgs args) {
             var newLevel = Convert.ToSingle (args.newValue);
             level = newLevel.Map (zeroScaleValue, fullScaleValue, 0.0f, fullScaleActual);
 

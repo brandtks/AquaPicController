@@ -25,6 +25,7 @@ using System;
 using AquaPic.Globals;
 using AquaPic.Runtime;
 using AquaPic.Drivers;
+using AquaPic.Consumers;
 
 namespace AquaPic.Sensors
 {
@@ -64,12 +65,12 @@ namespace AquaPic.Sensors
 
         public override void OnCreate () {
             AquaPicDrivers.DigitalInput.AddChannel (channel, name);
-            AquaPicDrivers.DigitalInput.AddHandlerOnInputChannelValueChangedEvent (channel, OnInputChannelValueChanged);
+            AquaPicDrivers.DigitalInput.SubscribeConsumer (channel, this);
         }
 
         public override void OnRemove () {
             AquaPicDrivers.DigitalInput.RemoveChannel (channel);
-            AquaPicDrivers.DigitalInput.RemoveHandlerOnInputChannelValueChangedEvent (channel, OnInputChannelValueChanged);
+            AquaPicDrivers.DigitalInput.UnsubscribeConsumer (channel, this);
         }
 
         public override ValueType GetValue () {
@@ -81,7 +82,7 @@ namespace AquaPic.Sensors
             activated = !activated;
         }
 
-        public void OnInputChannelValueChanged (object sender, InputChannelValueChangedEventArgs args) {
+        public override void OnValueChangedEvent (object sender, ValueChangedEventArgs args) {
             var state = Convert.ToBoolean (args.newValue);
 
             if (switchType == SwitchType.NormallyClosed)

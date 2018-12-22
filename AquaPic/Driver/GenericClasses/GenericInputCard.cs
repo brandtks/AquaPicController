@@ -22,7 +22,9 @@
 #endregion // License
 
 using System;
+using System.Reflection;
 using AquaPic.Globals;
+using AquaPic.Consumers;
 
 namespace AquaPic.Drivers
 {
@@ -30,7 +32,7 @@ namespace AquaPic.Drivers
     {
         public GenericInputCard (string name, int address, int numberChannels)
             : base (name, address, numberChannels) { }
-
+            
         public override void SetChannelValue (int channel, ValueType value) {
             CheckChannelRange (channel);
 
@@ -41,42 +43,50 @@ namespace AquaPic.Drivers
             }
         }
 
-        public void AddHandlerOnInputChannelValueChangedEvent (int channel, EventHandler<InputChannelValueChangedEventArgs> handler) {
-            CheckChannelRange (channel);
-            var inputChannel = channels[channel] as GenericInputChannel;
-            inputChannel.InputChannelValueChangedEvent += handler;
+        public override void SetAllChannelValues (ValueType[] values) {
+            if (values.Length < channels.Length) {
+                throw new ArgumentOutOfRangeException (nameof (values));
+            }
+
+            for (int i = 0; i < channels.Length; ++i) {
+                var inputChannel = channels[i] as GenericInputChannel;
+                UpdateChannelValue (inputChannel, values[i]);
+            }
         }
 
-        public void AddHandlerOnInputChannelValueUpdatedEvent (int channel, EventHandler<InputChannelValueUpdatedEventArgs> handler) {
+        public void SubscribeConsumer (int channel, ValueConsumer consumer) {
             CheckChannelRange (channel);
             var inputChannel = channels[channel] as GenericInputChannel;
-            inputChannel.InputChannelValueUpdatedEvent += handler;
+            var consumerType = consumer.GetType ();
+
+            var methodInfo = consumerType.GetMethod (nameof (consumer.OnValueChangedEvent));
+            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
+                inputChannel.InputChannelValueChangedEvent += consumer.OnValueChangedEvent;
+            }
+
+            methodInfo = consumerType.GetMethod (nameof (consumer.OnValueUpdatedEvent));
+            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
+                inputChannel.InputChannelValueUpdatedEvent += consumer.OnValueUpdatedEvent;
+            }
         }
 
-        public void RemoveHandlerOnInputChannelValueChangedEvent (int channel, EventHandler<InputChannelValueChangedEventArgs> handler) {
+        public void UnsubscribeConsumer (int channel, ValueConsumer consumer) {
             CheckChannelRange (channel);
             var inputChannel = channels[channel] as GenericInputChannel;
-            inputChannel.InputChannelValueChangedEvent -= handler;
-        }
-
-        public void RemoveHandlerOnInputChannelValueUpdatedEvent (int channel, EventHandler<InputChannelValueUpdatedEventArgs> handler) {
-            CheckChannelRange (channel);
-            var inputChannel = channels[channel] as GenericInputChannel;
-            inputChannel.InputChannelValueUpdatedEvent -= handler;
+            inputChannel.InputChannelValueChangedEvent -= consumer.OnValueChangedEvent;
+            inputChannel.InputChannelValueUpdatedEvent -= consumer.OnValueUpdatedEvent;
         }
 
         protected virtual void UpdateChannelValue (GenericChannel channel, ValueType value) {
-            if (channel.mode == Mode.Auto) {
-                var oldValue = channel.value;
-                channel.SetValue (value);
-                var newValue = channel.value;
+            var oldValue = channel.value;
+            channel.SetValue (value);
+            var newValue = channel.value;
 
-                var inputChannel = channel as GenericInputChannel;
-                if (inputChannel != null) {
-                    inputChannel.OnValueUpdated (newValue);
-                    if (!oldValue.Equals (newValue)) {
-                        inputChannel.OnValueChanged (newValue, oldValue);
-                    }
+            var inputChannel = channel as GenericInputChannel;
+            if (inputChannel != null) {
+                inputChannel.OnValueUpdated (newValue);
+                if (!oldValue.Equals (newValue)) {
+                    inputChannel.OnValueChanged (newValue, oldValue);
                 }
             }
         }

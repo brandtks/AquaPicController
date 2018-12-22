@@ -23,6 +23,7 @@
 
 using System;
 using AquaPic.Globals;
+using AquaPic.Consumers;
 
 namespace AquaPic.Drivers
 {
@@ -30,28 +31,16 @@ namespace AquaPic.Drivers
     {
         public GenericInputBase (string name, uint runtime = 1000) : base (name, runtime) { }
 
-        public void AddHandlerOnInputChannelValueChangedEvent (IndividualControl channel, EventHandler<InputChannelValueChangedEventArgs> handler) {
+        public void SubscribeConsumer (IndividualControl channel, ValueConsumer consumer) {
             CheckCardKey (channel.Group);
             var inputCard = cards[channel.Group] as GenericInputCard;
-            inputCard.AddHandlerOnInputChannelValueChangedEvent (channel.Individual, handler);
+            inputCard.SubscribeConsumer (channel.Individual, consumer);
         }
 
-        public void AddHandlerOnInputChannelValueUpdatedEvent (IndividualControl channel, EventHandler<InputChannelValueUpdatedEventArgs> handler) {
+        public void UnsubscribeConsumer (IndividualControl channel, ValueConsumer consumer) {
             CheckCardKey (channel.Group);
             var inputCard = cards[channel.Group] as GenericInputCard;
-            inputCard.AddHandlerOnInputChannelValueUpdatedEvent (channel.Individual, handler);
-        }
-
-        public void RemoveHandlerOnInputChannelValueChangedEvent (IndividualControl channel, EventHandler<InputChannelValueChangedEventArgs> handler) {
-            CheckCardKey (channel.Group);
-            var inputCard = cards[channel.Group] as GenericInputCard;
-            inputCard.RemoveHandlerOnInputChannelValueChangedEvent (channel.Individual, handler);
-        }
-
-        public void RemoveHandlerOnInputChannelValueUpdatedEvent (IndividualControl channel, EventHandler<InputChannelValueUpdatedEventArgs> handler) {
-            CheckCardKey (channel.Group);
-            var inputCard = cards[channel.Group] as GenericInputCard;
-            inputCard.RemoveHandlerOnInputChannelValueUpdatedEvent (channel.Individual, handler);
+            inputCard.UnsubscribeConsumer (channel.Individual, consumer);
         }
     }
 }

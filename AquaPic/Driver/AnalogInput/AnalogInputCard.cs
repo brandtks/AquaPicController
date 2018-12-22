@@ -73,27 +73,6 @@ namespace AquaPic.Drivers
                 UpdateAllChannelValues (values);
             }
 
-            public override void SetChannelValue (int channel, ValueType value) {
-                CheckChannelRange (channel);
-
-                if (channels[channel].mode == Mode.Manual) {
-                    UpdateChannelValue (channels[channel], value);
-                } else {
-                    throw new Exception ("Can only modify analong input value with channel forced");
-                }
-            }
-
-            public override void SetAllChannelValues (ValueType[] values) {
-                if (values.Length != channels.Length)
-                    throw new ArgumentOutOfRangeException ("values.Length");
-
-                for (int i = 0; i < channels.Length; ++i) {
-                    if (channels[i].mode == Mode.Manual) {
-                        channels[i].SetValue (values[i]);
-                    }
-                }
-            }
-
             public int GetChannelLowPassFilterFactor (int channel) {
                 CheckChannelRange (channel);
                 var analogInputChannel = channels[channel] as AnalogInputChannel;

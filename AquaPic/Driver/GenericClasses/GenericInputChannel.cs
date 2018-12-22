@@ -22,44 +22,23 @@
 #endregion // License
 
 using System;
-using AquaPic.Globals;
+using AquaPic.Consumers;
 
 namespace AquaPic.Drivers
 {
     public class GenericInputChannel : GenericChannel
     {
-        public event EventHandler<InputChannelValueChangedEventArgs> InputChannelValueChangedEvent;
-        public event EventHandler<InputChannelValueUpdatedEventArgs> InputChannelValueUpdatedEvent;
+        public event EventHandler<ValueChangedEventArgs> InputChannelValueChangedEvent;
+        public event EventHandler<ValueUpdatedEventArgs> InputChannelValueUpdatedEvent;
 
         public GenericInputChannel (string name, Type valueType) : base (name, valueType) { }
 
         public void OnValueChanged (ValueType newValue, ValueType oldValue) {
-            InputChannelValueChangedEvent?.Invoke (this, new InputChannelValueChangedEventArgs (newValue, oldValue));
+            InputChannelValueChangedEvent?.Invoke (this, new ValueChangedEventArgs (newValue, oldValue));
         }
 
         public void OnValueUpdated (ValueType newValue) {
-            InputChannelValueUpdatedEvent?.Invoke (this, new InputChannelValueUpdatedEventArgs (newValue));
-        }
-    }
-
-
-    public class InputChannelValueChangedEventArgs : EventArgs
-    {
-        public ValueType newValue;
-        public ValueType oldValue;
-
-        public InputChannelValueChangedEventArgs (ValueType newValue, ValueType oldValue) {
-            this.newValue = newValue;
-            this.oldValue = oldValue;
-        }
-    }
-
-    public class InputChannelValueUpdatedEventArgs : EventArgs
-    {
-        public ValueType value;
-
-        public InputChannelValueUpdatedEventArgs (ValueType value) {
-            this.value = value;
+            InputChannelValueUpdatedEvent?.Invoke (this, new ValueUpdatedEventArgs (newValue));
         }
     }
 }

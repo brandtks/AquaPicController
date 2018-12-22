@@ -23,10 +23,11 @@
 
 using System;
 using AquaPic.Globals;
+using AquaPic.Consumers;
 
 namespace AquaPic.Sensors
 {
-    public class GenericSensor
+    public class GenericSensor : ValueConsumer
     {
         public string name { get; protected set; }
         public IndividualControl channel { get; protected set; }
@@ -38,7 +39,6 @@ namespace AquaPic.Sensors
 
         public virtual void OnCreate () => throw new NotImplementedException ();
         public virtual void OnRemove () => throw new NotImplementedException ();
-
         public virtual ValueType GetValue () => throw new NotImplementedException ();
 
         public virtual GenericSensor Clone () {
