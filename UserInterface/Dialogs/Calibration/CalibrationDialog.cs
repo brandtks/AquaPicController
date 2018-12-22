@@ -107,7 +107,7 @@ namespace AquaPic.UserInterface
 
             foreach (var w in Children) {
                 Remove (w);
-                w.Dispose ();
+                w.Destroy ();
             }
 
             ExposeEvent += OnExpose;
@@ -204,14 +204,9 @@ namespace AquaPic.UserInterface
             Show ();
         }
 
-        public override void Dispose () {
-            GLib.Source.Remove (timerId);
-            base.Dispose ();
-        }
-
         public override void Destroy () {
+            GLib.Source.Remove (timerId);
             base.Destroy ();
-            Dispose ();
         }
 
         protected bool OnUpdateTimer () {
