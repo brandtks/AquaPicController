@@ -23,6 +23,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>RPI_BUILD</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -66,9 +67,9 @@
     <Compile Include="Scenes\Temperature\Dialogs\TemperatureGroupSettings.cs" />
     <Compile Include="Scenes\Temperature\TemperatureScreen.cs" />
     <Compile Include="Scenes\Temperature\Widgets\MainTemperatureLinePlotWidgets.cs" />
-    <Compile Include="Scenes\WaterLevel\Dialogs\AnalogSensorSettings.cs" />
+    <Compile Include="Scenes\WaterLevel\Dialogs\WaterLevelSensorSettingsDialog.cs" />
     <Compile Include="Scenes\WaterLevel\Dialogs\AtoSettings.cs" />
-    <Compile Include="Scenes\WaterLevel\Dialogs\SwitchSettings.cs" />
+    <Compile Include="Scenes\WaterLevel\Dialogs\FloatSwitchSettingsDialog.cs" />
     <Compile Include="Scenes\WaterLevel\Dialogs\WaterGroupSettings.cs" />
     <Compile Include="Scenes\WaterLevel\WaterLevelScreen.cs" />
     <Compile Include="Scenes\WaterLevel\Widgets\MainWaterLevelBarPlotWidget.cs" />
