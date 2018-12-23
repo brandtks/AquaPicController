@@ -25,11 +25,11 @@ using System;
 using System.Collections.Generic;
 using AquaPic.Globals;
 using AquaPic.Runtime;
-using AquaPic.Consumers;
+using AquaPic.PubSub;
 
 namespace AquaPic.Sensors
 {
-    public class GenericSensorCollection 
+    public class GenericSensorCollection
     {
         protected Dictionary<string, GenericSensor> sensors;
         protected readonly string sensorSettingsFileName = "sensors";
@@ -61,12 +61,14 @@ namespace AquaPic.Sensors
         protected virtual GenericSensor OnCreateSensor (GenericSensorSettings settings) => throw new NotImplementedException ();
 
         public void UpdateSensor (string name, GenericSensorSettings settings) {
+            CheckSensorKey (name);
+
             if (SensorNameExists (name)) {
                 settings = OnUpdateSensor (name, settings);
                 RemoveSensor (name, false);
             }
             AddSensor (settings, true);
-            sensors[settings.name].Updated (name, settings);
+            sensors[settings.name].NotifySensorUpdated (name, settings);
         }
 
         protected virtual GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
@@ -84,48 +86,23 @@ namespace AquaPic.Sensors
             sensors.Remove (name);
             DeleteSensorSettingsFromFile (name);
             if (callRemoveEvent) {
-                sensor.Removed ();
+                sensor.NotifySensorRemoved (name);
             }
         }
 
         public void SubscribeConsumer (string name, SensorConsumer consumer) {
             CheckSensorKey (name);
-            var sensor = sensors[name];
-            var consumerType = consumer.GetType ();
-
-            var methodInfo = consumerType.GetMethod (nameof (consumer.OnValueChangedEvent));
-            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                sensor.ValueChangedEvent += consumer.OnValueChangedEvent;
-            }
-
-            methodInfo = consumerType.GetMethod (nameof (consumer.OnValueUpdatedEvent));
-            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                sensor.ValueUpdatedEvent += consumer.OnValueUpdatedEvent;
-            }
-
-            methodInfo = consumerType.GetMethod (nameof (consumer.OnSensorUpdatedEvent));
-            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                sensor.SensorUpdatedEvent += consumer.OnSensorUpdatedEvent;
-            }
-
-            methodInfo = consumerType.GetMethod (nameof (consumer.OnSensorRemovedEvent));
-            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                sensor.SensorRemovedEvent += consumer.OnSensorRemovedEvent;
-            }
+            sensors[name].SubscribeConsumer (consumer);
         }
 
         public void UnsubscribeConsumer (string name, SensorConsumer consumer) {
             CheckSensorKey (name);
-            var sensor = sensors[name];
-            sensor.ValueChangedEvent -= consumer.OnValueChangedEvent;
-            sensor.ValueUpdatedEvent -= consumer.OnValueUpdatedEvent;
-            sensor.SensorUpdatedEvent -= consumer.OnSensorUpdatedEvent;
-            sensor.SensorRemovedEvent -= consumer.OnSensorRemovedEvent;
+            sensors[name].UnsubscribeConsumer (consumer);
         }
 
         public void CheckSensorKey (string name) {
             if (!sensors.ContainsKey (name)) {
-                throw new ArgumentException ("name");
+                throw new ArgumentException (name + " isn't a valid sensor name");
             }
         }
 
