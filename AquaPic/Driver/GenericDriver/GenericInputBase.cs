@@ -23,7 +23,7 @@
 
 using System;
 using AquaPic.Globals;
-using AquaPic.Consumers;
+using AquaPic.PubSub;
 
 namespace AquaPic.Drivers
 {
