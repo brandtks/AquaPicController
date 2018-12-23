@@ -23,7 +23,7 @@
 
 using System;
 
-namespace AquaPic.Consumers
+namespace AquaPic.PubSub
 {
     // This isn't abstract because we don't want to force override the methods
     public class ValueConsumer

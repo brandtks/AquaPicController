@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Sensors;
 
-namespace AquaPic.Consumers
+namespace AquaPic.PubSub
 {
     public class SensorConsumer : ValueConsumer
     {
