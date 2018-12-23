@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using Gtk;
+using Cairo;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;

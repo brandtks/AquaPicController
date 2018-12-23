@@ -24,6 +24,7 @@
 using System;
 using System.Text.RegularExpressions;
 using Gtk;
+using Cairo;
 using GoodtimeDevelopment.Utilites;
 using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Modules;
@@ -54,7 +55,7 @@ namespace AquaPic.UserInterface
             Decorated = false;
 
             ExposeEvent += (o, args) => {
-                using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                using (var cr = Gdk.CairoHelper.Create (GdkWindow)) {
                     cr.MoveTo (Allocation.Left, Allocation.Top);
                     cr.LineTo (Allocation.Right, Allocation.Top);
                     cr.LineTo (Allocation.Right, Allocation.Bottom);
