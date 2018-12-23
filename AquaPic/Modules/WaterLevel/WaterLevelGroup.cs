@@ -27,7 +27,7 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Sensors;
 using AquaPic.DataLogging;
-using AquaPic.Consumers;
+using AquaPic.PubSub;
 
 namespace AquaPic.Modules
 {
@@ -41,10 +41,9 @@ namespace AquaPic.Modules
             public bool enableHighAnalogAlarm;
             public bool enableLowAnalogAlarm;
             public List<string> floatSwitches;
-            public List<string> waterLevelSensors;
+            public Dictionary<string, InternalWaterLevelSensorState> waterLevelSensors;
 
             public float level;
-            public float summedLevel;
             public IDataLogger dataLogger;
             public int highAnalogAlarmIndex;
             public int lowAnalogAlarmIndex;
@@ -62,7 +61,6 @@ namespace AquaPic.Modules
             {
                 this.name = name;
                 level = 0f;
-                summedLevel = 0f;
                 dataLogger = Factory.GetDataLogger (string.Format ("{0}WaterLevel", this.name.RemoveWhitespace ()));
 
                 this.highAnalogAlarmSetpoint = highAnalogAlarmSetpoint;
@@ -89,8 +87,9 @@ namespace AquaPic.Modules
                     AquaPicSensors.FloatSwitches.SubscribeConsumer (floatSwitch, this);
                 }
 
-                this.waterLevelSensors = new List<string> (waterLevelSensors);
-                foreach (var waterLevelSensor in this.waterLevelSensors) {
+                this.waterLevelSensors = new Dictionary<string, InternalWaterLevelSensorState> ();
+                foreach (var waterLevelSensor in waterLevelSensors) {
+                    this.waterLevelSensors.Add (waterLevelSensor, new InternalWaterLevelSensorState ());
                     AquaPicSensors.WaterLevelSensors.SubscribeConsumer (waterLevelSensor, this);
                 }
             }
@@ -118,8 +117,9 @@ namespace AquaPic.Modules
             public override void OnSensorUpdatedEvent (object sender, SensorUpdatedEventArgs args) {
                 if (sender is WaterLevelSensor) {
                     if (args.name != args.settings.name) {
-                        var index = waterLevelSensors.IndexOf (args.name);
-                        waterLevelSensors[index] = args.settings.name;
+                        var sensorState = waterLevelSensors[args.name];
+                        waterLevelSensors.Remove (args.name);
+                        waterLevelSensors[args.settings.name] = sensorState;
                     }
                 } else if (sender is FloatSwitch) {
                     if (args.name != args.settings.name) {
@@ -127,36 +127,25 @@ namespace AquaPic.Modules
                         floatSwitches[index] = args.settings.name;
                     }
                 }
+                UpdateWaterLevelGroupSettingsInFile (name);
             }
 
             public override void OnSensorRemovedEvent (object sender, SensorRemovedEventArgs args) {
                 if (sender is WaterLevelSensor) {
                     waterLevelSensors.Remove (args.name);
+                    CalculateWaterLevel ();
                 } else if (sender is FloatSwitch) {
                     floatSwitches.Remove (args.name);
                 }
+                UpdateWaterLevelGroupSettingsInFile (name);
             }
 
             public override void OnValueChangedEvent (object sender, ValueChangedEventArgs args) {
                 var waterLevelSensor = sender as WaterLevelSensor;
                 if (waterLevelSensor != null) {
-                    if (waterLevelSensor.connected) {
-                        summedLevel -= (float)args.oldValue;
-                        summedLevel += (float)args.newValue;
-                        level = summedLevel / waterLevelSensors.Count;
-                    }
-
-                    if (enableHighAnalogAlarm && (level > highAnalogAlarmSetpoint)) {
-                        Alarm.Post (highAnalogAlarmIndex);
-                    } else {
-                        Alarm.Clear (highAnalogAlarmIndex);
-                    }
-
-                    if (enableLowAnalogAlarm && (level < lowAnalogAlarmSetpoint)) {
-                        Alarm.Post (lowAnalogAlarmIndex);
-                    } else {
-                        Alarm.Clear (lowAnalogAlarmIndex);
-                    }
+                    waterLevelSensors[waterLevelSensor.name].connected = waterLevelSensor.connected;
+                    waterLevelSensors[waterLevelSensor.name].level = waterLevelSensor.level;
+                    CalculateWaterLevel ();
                 } else {
                     var floatSwitch = sender as FloatSwitch;
                     if (floatSwitch != null) {
@@ -174,6 +163,41 @@ namespace AquaPic.Modules
                             }
                         }
                     }
+                }
+            }
+
+            protected void CalculateWaterLevel () {
+                level = 0;
+                var connectedWaterLevelSensors = 0;
+                foreach (var internalWaterLevelSensor in waterLevelSensors.Values) {
+                    if (internalWaterLevelSensor.connected) {
+                        level += internalWaterLevelSensor.level;
+                        connectedWaterLevelSensors++;
+                    }
+                }
+                level /= connectedWaterLevelSensors;
+
+                if (enableHighAnalogAlarm && (level > highAnalogAlarmSetpoint)) {
+                    Alarm.Post (highAnalogAlarmIndex);
+                } else {
+                    Alarm.Clear (highAnalogAlarmIndex);
+                }
+
+                if (enableLowAnalogAlarm && (level < lowAnalogAlarmSetpoint)) {
+                    Alarm.Post (lowAnalogAlarmIndex);
+                } else {
+                    Alarm.Clear (lowAnalogAlarmIndex);
+                }
+            }
+
+            public class InternalWaterLevelSensorState
+            {
+                public bool connected;
+                public float level;
+
+                public InternalWaterLevelSensorState () {
+                    connected = false;
+                    level = 0f;
                 }
             }
         }

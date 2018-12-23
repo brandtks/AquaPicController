@@ -208,7 +208,7 @@ namespace AquaPic.Modules
         public static bool GetWaterLevelGroupAnalogSensorConnected (string name) {
             CheckWaterLevelGroupKey (name);
             bool connected = false;
-            foreach (var sensorName in waterLevelGroups[name].waterLevelSensors) {
+            foreach (var sensorName in waterLevelGroups[name].waterLevelSensors.Keys) {
                 var sensor = AquaPicSensors.WaterLevelSensors.GetSensor (sensorName) as WaterLevelSensor;
                 // Using OR because we really only care that at least one sensor is connected
                 connected |= sensor.connected;
@@ -301,12 +301,18 @@ namespace AquaPic.Modules
             settings.enableHighAnalogAlarm = GetWaterLevelGroupHighAnalogAlarmEnable (name);
             settings.lowAnalogAlarmSetpoint = GetWaterLevelGroupLowAnalogAlarmSetpoint (name);
             settings.enableLowAnalogAlarm = GetWaterLevelGroupLowAnalogAlarmEnable (name);
+            settings.floatSwitches = GetAllFloatSwitchesForWaterLevelGroup (name);
+            settings.waterLevelSensors = GetAllWaterLevelSensorsForWaterLevelGroup (name);
             return settings;
         }
 
         protected static void AddWaterLevelGroupSettingsToFile (string name) {
             CheckWaterLevelGroupKey (name);
             SettingsHelper.AddSettingsToArray (settingsFileName, groupSettingsArrayName, GetWaterLevelGroupSettings (name));
+        }
+
+        protected static void UpdateWaterLevelGroupSettingsInFile (string name) {
+            SettingsHelper.UpdateSettingsInArray (settingsFileName, groupSettingsArrayName, name, GetWaterLevelGroupSettings (name));
         }
 
         protected static void DeleteWaterLevelGroupSettingsFromFile (string name) {
@@ -318,12 +324,14 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         public static void AddWaterLevelSensorToWaterLevelGroup (string groupName, string waterLevelSensorName) {
             CheckWaterLevelGroupKey (groupName);
-            waterLevelGroups[groupName].waterLevelSensors.Add (waterLevelSensorName);
+            waterLevelGroups[groupName].waterLevelSensors.Add (waterLevelSensorName, new WaterLevelGroup.InternalWaterLevelSensorState ());
+            UpdateWaterLevelGroupSettingsInFile (groupName);
         }
 
         public static void RemoveWaterLevelSensorFromWaterLevelGroup (string groupName, string waterLevelSensorName) {
             CheckWaterLevelGroupKey (groupName);
             waterLevelGroups[groupName].waterLevelSensors.Remove (waterLevelSensorName);
+            UpdateWaterLevelGroupSettingsInFile (groupName);
         }
 
         /***Getters****************************************************************************************************/
@@ -331,7 +339,7 @@ namespace AquaPic.Modules
         public static string[] GetAllWaterLevelSensorsForWaterLevelGroup (string groupName) {
             CheckWaterLevelGroupKey (groupName);
             List<string> names = new List<string> ();
-            foreach (var sensorName in waterLevelGroups[groupName].waterLevelSensors) {
+            foreach (var sensorName in waterLevelGroups[groupName].waterLevelSensors.Keys) {
                 names.Add (sensorName);
             }
             return names.ToArray ();
@@ -343,11 +351,13 @@ namespace AquaPic.Modules
         public static void AddFloatSwitchToWaterLevelGroup (string groupName, string floatSwitchName) {
             CheckWaterLevelGroupKey (groupName);
             waterLevelGroups[groupName].floatSwitches.Add (floatSwitchName);
+            UpdateWaterLevelGroupSettingsInFile (groupName);
         }
 
         public static void RemoveFloatSwitchFromWaterLevelGroup (string groupName, string floatSwitchName) {
             CheckWaterLevelGroupKey (groupName);
             waterLevelGroups[groupName].floatSwitches.Remove (floatSwitchName);
+            UpdateWaterLevelGroupSettingsInFile (groupName);
         }
 
         /***Getters****************************************************************************************************/
