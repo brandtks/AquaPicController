@@ -26,7 +26,7 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
 using AquaPic.Globals;
-using AquaPic.Consumers;
+using AquaPic.PubSub;
 
 namespace AquaPic.Sensors
 {
@@ -52,7 +52,7 @@ namespace AquaPic.Sensors
             float fullScaleValue) 
             : base (name, channel)
         {
-            level = 0.0f;
+            level = 0f;
             this.zeroScaleValue = zeroScaleValue;
             this.fullScaleActual = fullScaleActual;
             this.fullScaleValue = fullScaleValue;
@@ -79,7 +79,7 @@ namespace AquaPic.Sensors
             var oldLevel = level;
             level = ScaleRawLevel (Convert.ToSingle (args.newValue));
 
-            if (level < 0.0f) {
+            if (level < 0f) {
                 if (!Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
                     Alarm.Post (sensorDisconnectedAlarmIndex);
                 }
@@ -89,7 +89,7 @@ namespace AquaPic.Sensors
                 }
             }
 
-            ValueChanged (level, oldLevel);
+            NotifyValueChanged (level, oldLevel);
         }
 
         protected float ScaleRawLevel (float rawValue) {

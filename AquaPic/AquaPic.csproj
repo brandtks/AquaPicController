@@ -90,8 +90,6 @@
     <Compile Include="Driver\AnalogOutput\AnalogOutputChannel.cs" />
     <Compile Include="Modules\Temperature\Heater.cs" />
     <Compile Include="Modules\Temperature\Temperature.cs" />
-    <Compile Include="Globals\GlobalEnums.cs" />
-    <Compile Include="Globals\IndividualControl.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInput.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputCard.cs" />
     <Compile Include="Runtime\TaskManager\TaskManager.cs" />
@@ -172,9 +170,14 @@
     <Compile Include="Driver\GenericDriver\GenericInputChannel.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericSensorSettings.cs" />
     <Compile Include="Domain\Entity\Mutators\StringArrayMutator.cs" />
-    <Compile Include="Domain\Consumers\ValueConsumer.cs" />
-    <Compile Include="Domain\Consumers\SensorConsumer.cs" />
     <Compile Include="Domain\Entity\Mutators\TimerTimeMutator.cs" />
+    <Compile Include="Runtime\PubSub\SensorConsumer.cs" />
+    <Compile Include="Runtime\PubSub\SensorPublisher.cs" />
+    <Compile Include="Runtime\PubSub\ValueConsumer.cs" />
+    <Compile Include="Runtime\PubSub\MessageHub.cs" />
+    <Compile Include="Domain\Globals\GlobalEnums.cs" />
+    <Compile Include="Domain\Globals\IndividualControl.cs" />
+    <Compile Include="Runtime\PubSub\Subscription.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -208,7 +211,8 @@
     <Folder Include="Domain\Entity\Mutators\" />
     <Folder Include="Tests\Driver\" />
     <Folder Include="Tests\Driver\Generic\" />
-    <Folder Include="Domain\Consumers\" />
+    <Folder Include="Runtime\PubSub\" />
+    <Folder Include="Domain\Globals\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">

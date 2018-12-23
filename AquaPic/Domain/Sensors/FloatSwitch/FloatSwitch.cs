@@ -25,7 +25,7 @@ using System;
 using AquaPic.Globals;
 using AquaPic.Runtime;
 using AquaPic.Drivers;
-using AquaPic.Consumers;
+using AquaPic.PubSub;
 
 namespace AquaPic.Sensors
 {
@@ -80,7 +80,7 @@ namespace AquaPic.Sensors
         protected void OnDelayTimerTimerElapsedEvent (object sender, TimerElapsedEventArgs args) {
             // Once the timer elapses, the activation state of the float switch can be toggled.
             activated = !activated;
-            ValueChanged (activated, !activated);
+            NotifyValueChanged (activated, !activated);
         }
 
         public override void OnValueChangedEvent (object sender, ValueChangedEventArgs args) {
