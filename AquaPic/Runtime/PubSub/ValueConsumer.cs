@@ -28,26 +28,38 @@ namespace AquaPic.PubSub
     // This isn't abstract because we don't want to force override the methods
     public class ValueConsumer
     {
-        public virtual void OnValueChangedEvent (object sender, ValueChangedEventArgs args) => throw new NotImplementedException ();
-        public virtual void OnValueUpdatedEvent (object sender, ValueUpdatedEventArgs args) => throw new NotImplementedException ();
+        public Guid valueChangedGuid { get; private set; }
+        public Guid valueUpdatedGuid { get; private set; }
+
+        public virtual void OnValueChangedAction (object parm) => throw new NotImplementedException ();
+        public virtual void OnValueUpdatedAction (object parm) => throw new NotImplementedException ();
+
+        public void SetGuids (Guid valueChangedGuid, Guid valueUpdatedGuid) {
+            this.valueChangedGuid = valueChangedGuid;
+            this.valueUpdatedGuid = valueUpdatedGuid;
+        }
     }
 
-    public class ValueChangedEventArgs : EventArgs
+    public class ValueChangedEvent
     {
+        public string name;
         public ValueType newValue;
         public ValueType oldValue;
 
-        public ValueChangedEventArgs (ValueType newValue, ValueType oldValue) {
+        public ValueChangedEvent (string name, ValueType newValue, ValueType oldValue) {
+            this.name = name;
             this.newValue = newValue;
             this.oldValue = oldValue;
         }
     }
 
-    public class ValueUpdatedEventArgs : EventArgs
+    public class ValueUpdatedEvent
     {
+        public string name;
         public ValueType value;
 
-        public ValueUpdatedEventArgs (ValueType value) {
+        public ValueUpdatedEvent (string name, ValueType value) {
+            this.name = name;
             this.value = value;
         }
     }
