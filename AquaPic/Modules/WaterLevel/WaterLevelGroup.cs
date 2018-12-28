@@ -114,14 +114,15 @@ namespace AquaPic.Modules
                 }
             }
 
-            public override void OnSensorUpdatedEvent (object sender, SensorUpdatedEventArgs args) {
-                if (sender is WaterLevelSensor) {
+            public override void OnSensorUpdatedAction (object parm) {
+                var args = parm as SensorUpdatedEvent;
+                if (waterLevelSensors.ContainsKey (args.name)) {
                     if (args.name != args.settings.name) {
                         var sensorState = waterLevelSensors[args.name];
                         waterLevelSensors.Remove (args.name);
                         waterLevelSensors[args.settings.name] = sensorState;
                     }
-                } else if (sender is FloatSwitch) {
+                } else if (floatSwitches.Contains (args.name)) {
                     if (args.name != args.settings.name) {
                         var index = floatSwitches.IndexOf (args.name);
                         floatSwitches[index] = args.settings.name;
@@ -130,25 +131,27 @@ namespace AquaPic.Modules
                 UpdateWaterLevelGroupSettingsInFile (name);
             }
 
-            public override void OnSensorRemovedEvent (object sender, SensorRemovedEventArgs args) {
-                if (sender is WaterLevelSensor) {
+            public override void OnSensorRemovedAction (object parm) {
+                var args = parm as SensorRemovedEvent;
+                if (waterLevelSensors.ContainsKey (args.name)) {
                     waterLevelSensors.Remove (args.name);
                     CalculateWaterLevel ();
-                } else if (sender is FloatSwitch) {
+                } else if (floatSwitches.Contains (args.name)) {
                     floatSwitches.Remove (args.name);
                 }
                 UpdateWaterLevelGroupSettingsInFile (name);
             }
 
-            public override void OnValueChangedEvent (object sender, ValueChangedEventArgs args) {
-                var waterLevelSensor = sender as WaterLevelSensor;
-                if (waterLevelSensor != null) {
+            public override void OnValueChangedAction (object parm) {
+                var args = parm as ValueChangedEvent;
+                if (waterLevelSensors.ContainsKey (args.name)) {
+                    var waterLevelSensor = (WaterLevelSensor)AquaPicSensors.WaterLevelSensors.GetSensor (args.name);
                     waterLevelSensors[waterLevelSensor.name].connected = waterLevelSensor.connected;
                     waterLevelSensors[waterLevelSensor.name].level = waterLevelSensor.level;
                     CalculateWaterLevel ();
                 } else {
-                    var floatSwitch = sender as FloatSwitch;
-                    if (floatSwitch != null) {
+                    if (floatSwitches.Contains (args.name)) {
+                        var floatSwitch = (FloatSwitch)AquaPicSensors.FloatSwitches.GetSensor (args.name);
                         if (floatSwitch.switchFuntion == SwitchFunction.HighLevel) {
                             if (floatSwitch.activated)
                                 Alarm.Post (highSwitchAlarmIndex);
