@@ -55,7 +55,7 @@ namespace AquaPic.UserInterface
         TouchLabel switchStateLabel;
         TouchComboBox switchCombo;
 
-        public WaterLevelWindow (params object[] options) : base () {
+        public WaterLevelWindow (params object[] options) {
             sceneTitle = "Water Level";
 
             ExposeEvent += OnExpose;
@@ -64,6 +64,15 @@ namespace AquaPic.UserInterface
             /* Water Level Groups                                                                                 */
             /******************************************************************************************************/
             groupName = WaterLevel.firstWaterLevelGroup;
+
+            if (options.Length >= 3) {
+                var requestedGroup = options[2] as string;
+                if (requestedGroup != null) {
+                    if (WaterLevel.WaterLevelGroupNameOk (requestedGroup)) {
+                        groupName = requestedGroup;
+                    }
+                }
+            }
 
             var label = new TouchLabel ();
             label.text = "Groups";
