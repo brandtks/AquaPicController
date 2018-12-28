@@ -51,9 +51,8 @@ namespace AquaPic.Modules
                 if (waterLevelGroups.Count > 0) {
                     var first = waterLevelGroups.First ();
                     return first.Key;
-                } else {
-                    return string.Empty;
-                }
+                } 
+                return string.Empty;
             }
         }
 
