@@ -75,7 +75,8 @@ namespace AquaPic.Sensors
             return level;
         }
 
-        public override void OnValueChangedEvent (object sender, ValueChangedEventArgs args) {
+        public override void OnValueChangedAction (object parm) {
+            var args = parm as ValueChangedEvent;
             var oldLevel = level;
             level = ScaleRawLevel (Convert.ToSingle (args.newValue));
 

@@ -83,7 +83,8 @@ namespace AquaPic.Sensors
             NotifyValueChanged (activated, !activated);
         }
 
-        public override void OnValueChangedEvent (object sender, ValueChangedEventArgs args) {
+        public override void OnValueChangedAction (object parm) {
+            var args = parm as ValueChangedEvent;
             var state = Convert.ToBoolean (args.newValue);
 
             if (switchType == SwitchType.NormallyClosed)
