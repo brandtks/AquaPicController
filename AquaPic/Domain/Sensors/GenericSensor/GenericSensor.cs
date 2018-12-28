@@ -32,7 +32,7 @@ namespace AquaPic.Sensors
         public string name { get; protected set; }
         public IndividualControl channel { get; protected set; }
 
-        public GenericSensor (string name, IndividualControl channel) {
+        public GenericSensor (string name, IndividualControl channel) : base (name) {
             this.name = name;
             this.channel = channel;
         }
