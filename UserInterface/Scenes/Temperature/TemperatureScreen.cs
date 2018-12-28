@@ -26,9 +26,11 @@ using Gtk;
 using Cairo;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Modules;
+using AquaPic.Modules.Temperature;
 using AquaPic.Drivers;
 using AquaPic.Globals;
+using AquaPic.Sensors;
+using AquaPic.Sensors.TemperatureProbe;
 
 namespace AquaPic.UserInterface
 {
@@ -49,8 +51,7 @@ namespace AquaPic.UserInterface
         TouchLabel probeTempLabel;
         TouchComboBox probeCombo;
 
-        public TemperatureWindow (params object[] options)
-            : base () {
+        public TemperatureWindow (params object[] options) {
             sceneTitle = "Temperature";
 
             ExposeEvent += OnExpose;
@@ -59,6 +60,15 @@ namespace AquaPic.UserInterface
             /* Temperature Groups                                                                                 */
             /******************************************************************************************************/
             groupName = Temperature.defaultTemperatureGroup;
+
+            if (options.Length >= 3) {
+                var requestedGroup = options[2] as string;
+                if (requestedGroup != null) {
+                    if (Temperature.TemperatureGroupNameExists (requestedGroup)) {
+                        groupName = requestedGroup;
+                    }
+                }
+            }
 
             var label = new TouchLabel ();
             label.text = "Groups";
@@ -121,28 +131,7 @@ namespace AquaPic.UserInterface
             globalSettingsBtn.text = Convert.ToChar (0x2699).ToString ();
             globalSettingsBtn.SetSizeRequest (30, 30);
             globalSettingsBtn.buttonColor = "pri";
-            globalSettingsBtn.ButtonReleaseEvent += (o, args) => {
-                var parent = Toplevel as Window;
-                var s = new TemperatureGroupSettings (groupName, !groupName.IsEmpty (), parent);
-                s.Run ();
-                var newGroupName = s.temperatureGroupName;
-                var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
-
-                if (outcome == TouchSettingsOutcome.Added) {
-                    groupName = newGroupName;
-                    groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, groupName);
-                    groupCombo.activeText = groupName;
-                } else if (outcome == TouchSettingsOutcome.Deleted) {
-                    groupCombo.comboList.Remove (groupName);
-                    groupName = Temperature.defaultTemperatureGroup;
-                    groupCombo.activeText = groupName;
-                }
-
-                groupCombo.QueueDraw ();
-                GetGroupData ();
-            };
+            globalSettingsBtn.ButtonReleaseEvent += OnTemperatureGroupSettingsButtonReleaseEvent;
             Put (globalSettingsBtn, 358, 77);
             globalSettingsBtn.Show ();
 
@@ -202,8 +191,6 @@ namespace AquaPic.UserInterface
             /******************************************************************************************************/
             /* Temperature Probes                                                                                 */
             /******************************************************************************************************/
-            probeName = Temperature.defaultTemperatureProbe;
-
             label = new TouchLabel ();
             label.text = "Probes";
             label.textColor = "seca";
@@ -215,75 +202,14 @@ namespace AquaPic.UserInterface
             probeSetupBtn.text = Convert.ToChar (0x2699).ToString ();
             probeSetupBtn.SetSizeRequest (30, 30);
             probeSetupBtn.buttonColor = "pri";
-            probeSetupBtn.ButtonReleaseEvent += (o, args) => {
-                var parent = Toplevel as Window;
-                var s = new ProbeSettings (probeName, probeName.IsNotEmpty (), parent);
-                s.Run ();
-                var newProbeName = s.newOrUpdatedProbeName;
-                var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
-
-                if ((outcome == TouchSettingsOutcome.Modified) && (newProbeName != probeName)) {
-                    var index = probeCombo.comboList.IndexOf (probeName);
-                    probeCombo.comboList[index] = newProbeName;
-                    probeName = newProbeName;
-                } else if (outcome == TouchSettingsOutcome.Added) {
-                    probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
-                    probeCombo.activeText = newProbeName;
-                    probeName = newProbeName;
-                } else if (outcome == TouchSettingsOutcome.Deleted) {
-                    probeCombo.comboList.Remove (probeName);
-                    probeName = Temperature.defaultTemperatureProbe;
-                    probeCombo.activeText = probeName;
-                }
-
-                probeCombo.QueueDraw ();
-                GetProbeData ();
-            };
+            probeSetupBtn.ButtonReleaseEvent += OnTemperatureProbeSettingsButtonReleaseEvent;
             Put (probeSetupBtn, 755, 277);
             probeSetupBtn.Show ();
 
             var b = new TouchButton ();
             b.text = "Calibrate";
             b.SetSizeRequest (100, 60);
-            b.ButtonReleaseEvent += (o, args) => {
-                if (probeName.IsNotEmpty ()) {
-                    var parent = Toplevel as Window;
-                    var cal = new CalibrationDialog (
-                        probeName + " Probe",
-                        parent, 
-                        () => {
-                            return AquaPicDrivers.AnalogInput.GetChannelValue (Temperature.GetTemperatureProbeIndividualControl (probeName));
-                        },
-                        CalibrationState.ZeroActual);
-
-                    cal.CalibrationCompleteEvent += aa => {
-                        bool success = Temperature.SetTemperatureProbeCalibrationData (
-                            probeName,
-                            (float)aa.zeroActual,
-                            (float)aa.zeroValue,
-                            (float)aa.fullScaleActual,
-                            (float)aa.fullScaleValue);
-
-                        if (!success) {
-                            MessageBox.Show ("Something went wrong");
-                        }
-                    };
-
-                    cal.calArgs.zeroActual = Temperature.GetTemperatureProbeZeroActual (probeName);
-                    cal.calArgs.zeroValue = Temperature.GetTemperatureProbeZeroValue (probeName);
-                    cal.calArgs.fullScaleActual = Temperature.GetTemperatureProbeFullScaleActual (probeName);
-                    cal.calArgs.fullScaleValue = Temperature.GetTemperatureProbeFullScaleValue (probeName);
-
-                    cal.Run ();
-                    cal.Destroy ();
-                    cal.Dispose ();
-                } else {
-                    MessageBox.Show ("No probe selected\n" +
-                                    "Can't perfom a calibration");
-                }
-            };
+            b.ButtonReleaseEvent += OnWaterLevelSensorCalibrationButtonReleaseEvent;
             Put (b, 415, 405);
 
             probeTempLabel = new TouchLabel ();
@@ -313,7 +239,17 @@ namespace AquaPic.UserInterface
             else
                 heaterCombo.activeIndex = 0;
 
-            probeCombo = new TouchComboBox (Temperature.GetAllTemperatureProbeNames ());
+            probeCombo = new TouchComboBox ();
+            if (groupName.IsNotEmpty ()) {
+                var groupsTemperatureProbes = Temperature.GetAllTemperatureProbesForTemperatureGroup (groupName);
+                probeCombo.comboList.AddRange (groupsTemperatureProbes);
+                if (groupsTemperatureProbes.Length > 0) {
+                    probeName = groupsTemperatureProbes[0];
+                    probeCombo.activeText = probeName;
+                } else {
+                    probeName = string.Empty;
+                }
+            }
             probeCombo.WidthRequest = 200;
             probeCombo.comboList.Add ("New probe...");
             probeCombo.ComboChangedEvent += OnProbeComboChanged;
@@ -362,82 +298,6 @@ namespace AquaPic.UserInterface
             }
         }
 
-        protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.activeText == "New heater...") {
-                var heaterCount = Temperature.heaterCount;
-                var parent = Toplevel as Window;
-                var s = new HeaterSettings (string.Empty, false, parent);
-                s.Run ();
-                var newHeaterName = s.newOrUpdatedHeaterName;
-                var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
-
-                if (outcome == TouchSettingsOutcome.Added) {
-                    heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
-                    heaterCombo.activeText = newHeaterName;
-                    heaterName = newHeaterName;
-                } else {
-                    heaterCombo.activeText = heaterName;
-                }
-            } else {
-                heaterName = e.activeText;
-            }
-
-            heaterCombo.QueueDraw ();
-            GetHeaterData ();
-        }
-
-        protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.activeText == "New probe...") {
-                var parent = Toplevel as Window;
-                var s = new ProbeSettings (string.Empty, false, parent);
-                s.Run ();
-                var newProbeName = s.newOrUpdatedProbeName;
-                var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
-
-                if (outcome == TouchSettingsOutcome.Added) {
-                    probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
-                    probeCombo.activeText = newProbeName;
-                    probeName = newProbeName;
-                } else {
-                    probeCombo.activeText = probeName;
-                }
-            } else {
-                probeName = e.activeText;
-            }
-
-            probeCombo.QueueDraw ();
-            GetProbeData ();
-        }
-
-        protected void OnGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.activeText == "New group...") {
-                var parent = Toplevel as Window;
-                var s = new TemperatureGroupSettings (string.Empty, false, parent);
-                s.Run ();
-                var newGroupName = s.temperatureGroupName;
-                var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
-
-                if (outcome == TouchSettingsOutcome.Added) {
-                    groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, newGroupName);
-                    groupCombo.activeText = newGroupName;
-                    groupName = newGroupName;
-                } else {
-                    groupCombo.activeText = groupName;
-                }
-            } else {
-                groupName = e.activeText;
-            }
-
-            groupCombo.QueueDraw ();
-            GetGroupData ();
-        }
-
         protected void GetHeaterData () {
             if (heaterName.IsNotEmpty ()) {
                 if (Power.GetOutletState (Temperature.GetHeaterIndividualControl (heaterName)) == MyState.On) {
@@ -457,8 +317,9 @@ namespace AquaPic.UserInterface
 
         protected void GetProbeData () {
             if (probeName.IsNotEmpty ()) {
-                if (Temperature.IsTemperatureProbeConnected (probeName)) {
-                    probeTempTextbox.text = Temperature.GetTemperatureProbeTemperature (probeName).ToString ("F2");
+                var probe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (probeName);
+                if (probe.connected) {
+                    probeTempTextbox.text = probe.temperature.ToString ("F2");
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
                     probeTempLabel.Visible = true;
                 } else {
@@ -489,6 +350,204 @@ namespace AquaPic.UserInterface
             tempTextBox.QueueDraw ();
             tempSetpoint.QueueDraw ();
             tempDeadband.QueueDraw ();
+        }
+
+        protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            if (e.activeText == "New heater...") {
+                var heaterCount = Temperature.heaterCount;
+                var parent = Toplevel as Window;
+                var s = new HeaterSettings (string.Empty, false, parent);
+                s.Run ();
+                var newHeaterName = s.newOrUpdatedHeaterName;
+                var outcome = s.outcome;
+                s.Destroy ();
+                s.Dispose ();
+
+                if (outcome == TouchSettingsOutcome.Added) {
+                    heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
+                    heaterCombo.activeText = newHeaterName;
+                    heaterName = newHeaterName;
+                } else {
+                    heaterCombo.activeText = heaterName;
+                }
+            } else {
+                heaterName = e.activeText;
+            }
+
+            heaterCombo.QueueDraw ();
+            GetHeaterData ();
+        }
+
+        protected void OnGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            if (e.activeText == "New group...") {
+                CallTemperatureGroupSettingsDialog (true);
+            } else {
+                groupName = e.activeText;
+
+                probeCombo.comboList.Clear ();
+                if (groupName.IsNotEmpty ()) {
+                    var groupsTemperatureProbes = Temperature.GetAllTemperatureProbesForTemperatureGroup (groupName);
+                    probeCombo.comboList.AddRange (groupsTemperatureProbes);
+                    if (groupsTemperatureProbes.Length > 0) {
+                        probeName = groupsTemperatureProbes[0];
+                    } else {
+                        probeName = string.Empty;
+                    }
+                }
+                probeCombo.comboList.Add ("New level sensor...");
+                probeCombo.activeIndex = 0;
+                probeCombo.QueueDraw ();
+            }
+
+            groupCombo.QueueDraw ();
+            GetGroupData ();
+            GetProbeData ();
+        }
+
+        protected void OnTemperatureGroupSettingsButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
+            CallTemperatureGroupSettingsDialog ();
+        }
+
+        protected void CallTemperatureGroupSettingsDialog (bool forceNew = false) {
+            TemperatureGroupSettings settings;
+            if (groupName.IsNotEmpty () && !forceNew) {
+                settings = Temperature.GetTemperatureGroupSettings (groupName);
+            } else {
+                settings = new TemperatureGroupSettings ();
+            }
+            var parent = Toplevel as Window;
+            var s = new TemperatureGroupSettingsDialog (settings, parent);
+            s.Run ();
+            var newGroupName = s.groupName;
+            var outcome = s.outcome;
+
+            if ((outcome == TouchSettingsOutcome.Modified) && (newGroupName != groupName)) {
+                var index = groupCombo.comboList.IndexOf (groupName);
+                groupCombo.comboList[index] = newGroupName;
+                groupName = newGroupName;
+            } else if (outcome == TouchSettingsOutcome.Added) {
+                groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, newGroupName);
+                groupCombo.activeText = newGroupName;
+                groupName = newGroupName;
+
+                probeCombo.comboList.Clear ();
+                probeCombo.comboList.Add ("New level sensor...");
+                probeCombo.activeIndex = 0;
+                probeCombo.QueueDraw ();
+                probeName = string.Empty;
+
+            } else if (outcome == TouchSettingsOutcome.Deleted) {
+                groupCombo.comboList.Remove (groupName);
+                groupName = Temperature.defaultTemperatureGroup;
+                if (groupName.IsNotEmpty ()) {
+                    groupCombo.activeText = groupName;
+                } else {
+                    groupCombo.activeIndex = 0;
+                }
+
+                probeCombo.comboList.Clear ();
+                if (groupName.IsNotEmpty ()) {
+                    var groupsTemperatureProbes = Temperature.GetAllTemperatureProbesForTemperatureGroup (groupName);
+                    probeCombo.comboList.AddRange (groupsTemperatureProbes);
+                    if (groupsTemperatureProbes.Length > 0) {
+                        probeName = groupsTemperatureProbes[0];
+                    } else {
+                        probeName = string.Empty;
+                    }
+                }
+                probeCombo.comboList.Add ("New level sensor...");
+                probeCombo.activeIndex = 0;
+                probeCombo.QueueDraw ();
+            }
+
+            groupCombo.QueueDraw ();
+            GetGroupData ();
+            GetProbeData ();
+        }
+
+        protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            if (e.activeText == "New probe...") {
+                CallTemperatureProbeSettingsDialog ();
+            } else {
+                probeName = e.activeText;
+            }
+
+            probeCombo.QueueDraw ();
+            GetProbeData ();
+        }
+
+        protected void OnTemperatureProbeSettingsButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
+            CallTemperatureProbeSettingsDialog ();
+        }
+
+        protected void CallTemperatureProbeSettingsDialog (bool forceNew = false) {
+            TemperatureProbeSettings settings;
+            if (probeName.IsNotEmpty () && !forceNew) {
+                settings = (TemperatureProbeSettings)AquaPicSensors.TemperatureProbes.GetSensorSettings (probeName);
+            } else {
+                settings = new TemperatureProbeSettings ();
+            }
+            var parent = Toplevel as Window;
+            var s = new TemperatureProbeSettingsDialog (settings, parent);
+            s.Run ();
+            var newProbeName = s.temperatureProbeName;
+            var outcome = s.outcome;
+
+            if ((outcome == TouchSettingsOutcome.Modified) && (newProbeName != probeName)) {
+                var index = probeCombo.comboList.IndexOf (probeName);
+                probeCombo.comboList[index] = newProbeName;
+                probeName = newProbeName;
+            } else if (outcome == TouchSettingsOutcome.Added) {
+                probeCombo.comboList.Insert (probeCombo.comboList.Count - 1, newProbeName);
+                probeCombo.activeText = newProbeName;
+                probeName = newProbeName;
+            } else if (outcome == TouchSettingsOutcome.Deleted) {
+                probeCombo.comboList.Remove (probeName);
+                var groupsTemperatureProbes = Temperature.GetAllTemperatureProbesForTemperatureGroup (groupName);
+                if (groupsTemperatureProbes.Length > 0) {
+                    probeName = groupsTemperatureProbes[0];
+                    probeCombo.activeText = probeName;
+                } else {
+                    probeName = string.Empty;
+                    probeCombo.activeIndex = 0;
+                }
+            }
+
+            probeCombo.QueueDraw ();
+            GetProbeData ();
+        }
+
+        protected void OnWaterLevelSensorCalibrationButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
+            if (probeName.IsNotEmpty ()) {
+                var parent = Toplevel as Window;
+                var cal = new CalibrationDialog (
+                    "Temperature Probe",
+                    parent,
+                    () => {
+                        var channel = AquaPicSensors.TemperatureProbes.GetSensor (probeName).channel;
+                        return AquaPicDrivers.AnalogInput.GetChannelValue (channel);
+                    });
+
+                cal.CalibrationCompleteEvent += (a) => {
+                    AquaPicSensors.TemperatureProbes.SetCalibrationData (
+                        probeName,
+                        (float)a.zeroActual,
+                        (float)a.zeroValue,
+                        (float)a.fullScaleActual,
+                        (float)a.fullScaleValue);
+                };
+
+                var probe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (probeName);
+                cal.calArgs.zeroActual = probe.zeroScaleActual;
+                cal.calArgs.zeroValue = probe.zeroScaleValue;
+                cal.calArgs.fullScaleActual = probe.fullScaleActual;
+                cal.calArgs.fullScaleValue = probe.fullScaleValue;
+
+                cal.Run ();
+            } else {
+                MessageBox.Show ("No probe selected\n" +
+                                "Can't perfom a calibration");
+            }
         }
 
         protected override bool OnUpdateTimer () {
