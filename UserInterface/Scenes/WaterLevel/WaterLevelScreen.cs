@@ -68,7 +68,7 @@ namespace AquaPic.UserInterface
             if (options.Length >= 3) {
                 var requestedGroup = options[2] as string;
                 if (requestedGroup != null) {
-                    if (!WaterLevel.WaterLevelGroupNameOk (requestedGroup)) {
+                    if (WaterLevel.WaterLevelGroupNameExists (requestedGroup)) {
                         groupName = requestedGroup;
                     }
                 }

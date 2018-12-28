@@ -46,7 +46,7 @@ namespace AquaPic.UserInterface
                 if (args.text.IsEmpty ())
                     args.keepText = false;
 
-                if (!WaterLevel.WaterLevelGroupNameOk (args.text)) {
+                if (WaterLevel.WaterLevelGroupNameExists (args.text)) {
                     MessageBox.Show ("Water level group name already exists");
                     args.keepText = false;
                 }
