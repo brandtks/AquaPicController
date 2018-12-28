@@ -101,7 +101,7 @@ namespace AquaPic.Modules
         /* Water Level Groups                                                                                         */
         /**************************************************************************************************************/
         public static void AddWaterLevelGroup (WaterLevelGroupSettings settings, bool saveToFile = true) {
-            if (!WaterLevelGroupNameOk (settings.name)) {
+            if (WaterLevelGroupNameExists (settings.name)) {
                 throw new Exception (string.Format ("Water Level Group {0} already exists", settings.name));
             }
 
@@ -128,7 +128,7 @@ namespace AquaPic.Modules
             IEnumerable<string> floatSwitches,
             IEnumerable<string> waterLevelSensors)
         {
-            if (!WaterLevelGroupNameOk (name)) {
+            if (WaterLevelGroupNameExists (name)) {
                 throw new Exception (string.Format ("Water Level Group {0} already exists", name));
             }
 
@@ -171,8 +171,8 @@ namespace AquaPic.Modules
             }
         }
 
-        public static bool WaterLevelGroupNameOk (string name) {
-            return !CheckWaterLevelGroupKeyNoThrow (name);
+        public static bool WaterLevelGroupNameExists (string name) {
+            return CheckWaterLevelGroupKeyNoThrow (name);
         }
 
         /***Getters****************************************************************************************************/
