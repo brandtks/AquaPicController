@@ -64,7 +64,7 @@ namespace AquaPic.Sensors
         }
 
         public override void OnCreate () {
-            AquaPicDrivers.DigitalInput.AddChannel (channel, name);
+            AquaPicDrivers.DigitalInput.AddChannel (channel, string.Format ("{0}, Float Switch", name));
             AquaPicDrivers.DigitalInput.SubscribeConsumer (channel, this);
         }
 
