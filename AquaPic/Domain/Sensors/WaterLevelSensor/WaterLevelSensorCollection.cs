@@ -22,7 +22,6 @@
 #endregion // License
 
 using System;
-using AquaPic.Globals;
 using AquaPic.Runtime;
 
 namespace AquaPic.Sensors
