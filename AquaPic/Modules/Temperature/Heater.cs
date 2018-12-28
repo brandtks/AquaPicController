@@ -26,7 +26,7 @@ using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Runtime;
 
-namespace AquaPic.Modules
+namespace AquaPic.Modules.Temperature
 {
     public partial class Temperature
     {

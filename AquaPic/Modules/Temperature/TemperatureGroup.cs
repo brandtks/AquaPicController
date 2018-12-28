@@ -22,15 +22,19 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.DataLogging;
+using AquaPic.PubSub;
+using AquaPic.Sensors;
+using AquaPic.Sensors.TemperatureProbe;
 
-namespace AquaPic.Modules
+namespace AquaPic.Modules.Temperature
 {
     public partial class Temperature
     {
-        private class TemperatureGroup
+        private class TemperatureGroup : SensorConsumer
         {
             public string name;
             public float temperature;
@@ -44,13 +48,16 @@ namespace AquaPic.Modules
             public int highTemperatureAlarmIndex;
             public int lowTemperatureAlarmIndex;
 
+            public Dictionary<string, InternalTemperatureProbeState> temperatureProbes;
+
             public TemperatureGroup (
                 string name,
                 float highTemperatureAlarmSetpoint,
                 float lowTemperatureAlarmSetpoint,
                 float temperatureSetpoint,
-                float temperatureDeadband
-            ) {
+                float temperatureDeadband,
+                IEnumerable<string> temperatureProbes) 
+            {
                 this.name = name;
                 this.highTemperatureAlarmSetpoint = highTemperatureAlarmSetpoint;
                 this.lowTemperatureAlarmSetpoint = lowTemperatureAlarmSetpoint;
@@ -62,50 +69,95 @@ namespace AquaPic.Modules
 
                 highTemperatureAlarmIndex = Alarm.Subscribe (string.Format ("{0} high temperature", name));
                 lowTemperatureAlarmIndex = Alarm.Subscribe (string.Format ("{0} low temperature", name));
+
+                this.temperatureProbes = new Dictionary<string, InternalTemperatureProbeState> ();
+                foreach (var temperatureProbe in temperatureProbes) {
+                    this.temperatureProbes.Add (temperatureProbe, new InternalTemperatureProbeState ());
+                    AquaPicSensors.TemperatureProbes.SubscribeConsumer (temperatureProbe, this);
+                }
             }
 
             public void GroupRun () {
-                var probeCount = 0;
-
-                temperature = 0.0f;
-                foreach (var probe in probes.Values) {
-                    if (probe.temperatureGroupName == name) {
-                        probe.Get ();
-                        if (probe.temperature >= probe.zeroActual) {
-                            temperature += probe.temperature;
-                            ++probeCount;
-                        }
-                    }
-                }
-
-                if (probeCount != 0) {
-                    temperature /= probeCount;
-
-                    if (temperature > highTemperatureAlarmSetpoint) {
-                        if (!Alarm.CheckAlarming (highTemperatureAlarmIndex)) {
-                            Alarm.Post (highTemperatureAlarmIndex);
-                            dataLogger.AddEntry ("high alarm");
-                        }
-                    } else {
-                        if (Alarm.CheckAlarming (highTemperatureAlarmIndex)) {
-                            Alarm.Clear (highTemperatureAlarmIndex);
-                        }
-                    }
-
-                    if (temperature < lowTemperatureAlarmSetpoint) {
-                        if (!Alarm.CheckAlarming (lowTemperatureAlarmIndex)) {
-                            Alarm.Post (lowTemperatureAlarmIndex);
-                            dataLogger.AddEntry ("low alarm");
-                        }
-                    } else {
-                        if (Alarm.CheckAlarming (lowTemperatureAlarmIndex)) {
-                            Alarm.Clear (lowTemperatureAlarmIndex);
-                        }
-                    }
-
+                if (temperatureProbes.Count > 0) {
                     dataLogger.AddEntry (temperature);
                 } else {
                     dataLogger.AddEntry ("no probes");
+                }
+            }
+
+            public override void OnSensorUpdatedAction (object parm) {
+                var args = parm as SensorUpdatedEvent;
+                if (temperatureProbes.ContainsKey (args.name)) {
+                    if (args.name != args.settings.name) {
+                        var sensorState = temperatureProbes[args.name];
+                        temperatureProbes.Remove (args.name);
+                        temperatureProbes[args.settings.name] = sensorState;
+                    }
+                }
+                UpdateTemperatureGroupSettingsInFile (name);
+            }
+
+            public override void OnSensorRemovedAction (object parm) {
+                var args = parm as SensorRemovedEvent;
+                if (temperatureProbes.ContainsKey (args.name)) {
+                    temperatureProbes.Remove (args.name);
+                    CalculateTemperature ();
+                }
+                UpdateTemperatureGroupSettingsInFile (name);
+            }
+
+            public override void OnValueChangedAction (object parm) {
+                var args = parm as ValueChangedEvent;
+                if (temperatureProbes.ContainsKey (args.name)) {
+                    var temperatureProbe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (args.name);
+                    temperatureProbes[temperatureProbe.name].connected = temperatureProbe.connected;
+                    temperatureProbes[temperatureProbe.name].temperature = temperatureProbe.temperature;
+                    CalculateTemperature ();
+                }
+            }
+
+            protected void CalculateTemperature () {
+                temperature = 0;
+                var connectedTemperatureProbes = 0;
+                foreach (var internalTemperatureProbe in temperatureProbes.Values) {
+                    if (internalTemperatureProbe.connected) {
+                        temperature += internalTemperatureProbe.temperature;
+                        connectedTemperatureProbes++;
+                    }
+                }
+                temperature /= connectedTemperatureProbes;
+
+                if (temperature > highTemperatureAlarmSetpoint) {
+                    if (!Alarm.CheckAlarming (highTemperatureAlarmIndex)) {
+                        Alarm.Post (highTemperatureAlarmIndex);
+                        dataLogger.AddEntry ("high alarm");
+                    }
+                } else {
+                    if (Alarm.CheckAlarming (highTemperatureAlarmIndex)) {
+                        Alarm.Clear (highTemperatureAlarmIndex);
+                    }
+                }
+
+                if (temperature < lowTemperatureAlarmSetpoint) {
+                    if (!Alarm.CheckAlarming (lowTemperatureAlarmIndex)) {
+                        Alarm.Post (lowTemperatureAlarmIndex);
+                        dataLogger.AddEntry ("low alarm");
+                    }
+                } else {
+                    if (Alarm.CheckAlarming (lowTemperatureAlarmIndex)) {
+                        Alarm.Clear (lowTemperatureAlarmIndex);
+                    }
+                }
+            }
+
+            public class InternalTemperatureProbeState
+            {
+                public bool connected;
+                public float temperature;
+
+                public InternalTemperatureProbeState () {
+                    connected = false;
+                    temperature = 0f;
                 }
             }
         }

@@ -25,21 +25,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Sensors;
+using AquaPic.Sensors.TemperatureProbe;
 using AquaPic.DataLogging;
 
-namespace AquaPic.Modules
+namespace AquaPic.Modules.Temperature
 {
     public partial class Temperature
     {
         private static Dictionary<string, Heater> heaters;
-        private static Dictionary<string, TemperatureProbe> probes;
         private static Dictionary<string, TemperatureGroup> temperatureGroups;
         private static string _defaultTemperatureGroup;
 
@@ -56,26 +55,6 @@ namespace AquaPic.Modules
             get {
                 if (heaters.Count > 0) {
                     var first = heaters.First ();
-                    return first.Key;
-                }
-
-                return string.Empty;
-            }
-        }
-
-        /**************************************************************************************************************/
-        /* Temperature Probes                                                                                         */
-        /**************************************************************************************************************/
-        public static int temperatureProbeCount {
-            get {
-                return probes.Count;
-            }
-        }
-
-        public static string defaultTemperatureProbe {
-            get {
-                if (probes.Count > 0) {
-                    var first = probes.First ();
                     return first.Key;
                 }
 
@@ -173,156 +152,48 @@ namespace AquaPic.Modules
             }
         }
 
-        /**************************************************************************************************************/
-        /* Temperature                                                                                                */
-        /**************************************************************************************************************/
+        const string settingsFileName = "temperature";
+        const string groupSettingsArrayName = "temperatureGroups";
+
         static Temperature () { }
 
         public static void Init () {
             Logger.Add ("Initializing Temperature");
 
             heaters = new Dictionary<string, Heater> ();
-            probes = new Dictionary<string, TemperatureProbe> ();
             temperatureGroups = new Dictionary<string, TemperatureGroup> ();
 
-            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = Path.Combine (path, "tempProperties.json");
+            if (SettingsHelper.SettingsFileExists (settingsFileName)) {
+                var groupSettings = SettingsHelper.ReadAllSettingsInArray<TemperatureGroupSettings> (settingsFileName, groupSettingsArrayName);
+                foreach (var setting in groupSettings) {
+                    AddTemperatureGroup (setting, false);
+                }
 
-            if (File.Exists (path)) {
-                using (StreamReader reader = File.OpenText (path)) {
-                    JObject jo = JToken.ReadFrom (new JsonTextReader (reader)) as JObject;
+                /******************************************************************************************************/
+                /* Heaters                                                                                            */
+                /******************************************************************************************************/
+                var jo = SettingsHelper.OpenSettingsFile (settingsFileName) as JObject;
+                var ja = jo["heaters"] as JArray;
+                foreach (var jt in ja) {
+                    JObject obj = jt as JObject;
+                    var name = (string)obj["name"];
+                    var ic = IndividualControl.Empty;
+                    ic.Group = (string)obj["powerStrip"];
+                    try {
+                        ic.Individual = Convert.ToInt32 (obj["outlet"]);
+                    } catch {
+                        continue;
+                    }
+                    var temperatureGroupName = (string)obj["temperatureGroup"];
 
-                    /******************************************************************************************************/
-                    /* Temperature Groups                                                                                 */
-                    /******************************************************************************************************/
-                    var ja = jo["temperatureGroups"] as JArray;
-                    foreach (var jt in ja) {
-                        var obj = jt as JObject;
-                        var name = (string)obj["name"];
-                        var highTempSetpoint = Convert.ToSingle (obj["highTemperatureAlarmSetpoint"]);
-                        var lowTempSetpoint = Convert.ToSingle (obj["lowTemperatureAlarmSetpoint"]);
-                        var tempSetpoint = Convert.ToSingle (obj["temperatureSetpoint"]);
-                        var tempDeadband = Convert.ToSingle (obj["temperatureDeadband"]);
-
-                        AddTemperatureGroup (
-                            name,
-                            highTempSetpoint,
-                            lowTempSetpoint,
-                            tempSetpoint,
-                            tempDeadband);
+                    if (!CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
+                        Logger.AddWarning ("Heater {0} added to nonexistant group {1}", name, temperatureGroupName);
                     }
 
-                    _defaultTemperatureGroup = (string)jo["defaultTemperatureGroup"];
-                    if (!CheckTemperatureGroupKeyNoThrow (_defaultTemperatureGroup)) {
-                        if (temperatureGroups.Count > 0) {
-                            var first = temperatureGroups.First ();
-                            _defaultTemperatureGroup = first.Key;
-                        } else {
-                            _defaultTemperatureGroup = string.Empty;
-                        }
-                    }
-
-                    /******************************************************************************************************/
-                    /* Temperature Probes                                                                                 */
-                    /******************************************************************************************************/
-                    ja = jo["temperatureProbes"] as JArray;
-                    foreach (var jt in ja) {
-                        JObject obj = jt as JObject;
-                        string name = (string)obj["name"];
-
-                        var ic = IndividualControl.Empty;
-                        var text = (string)obj["inputCard"];
-                        if (text.IsNotEmpty ()) {
-                            try {
-                                ic.Group = text;
-                            } catch {
-                                //
-                            }
-                        }
-
-                        if (ic.Group.IsNotEmpty ()) {
-                            text = (string)obj["channel"];
-                            if (text.IsEmpty ()) {
-                                ic = IndividualControl.Empty;
-                            } else {
-                                try {
-                                    ic.Individual = Convert.ToInt32 (text);
-                                } catch {
-                                    ic = IndividualControl.Empty;
-                                }
-                            }
-                        }
-
-                        float zeroActual;
-                        try {
-                            zeroActual = Convert.ToSingle (obj["zeroCalibrationActual"]);
-                        } catch {
-                            zeroActual = 32.0f;
-                        }
-
-                        float zeroValue;
-                        try {
-                            zeroValue = Convert.ToSingle (obj["zeroCalibrationValue"]);
-                        } catch {
-                            zeroValue = 82.0f;
-                        }
-
-                        float fullScaleActual;
-                        try {
-                            fullScaleActual = Convert.ToSingle (obj["fullScaleCalibrationActual"]);
-                        } catch {
-                            fullScaleActual = 100.0f;
-                        }
-
-                        float fullScaleValue;
-                        try {
-                            fullScaleValue = Convert.ToSingle (obj["fullScaleCalibrationValue"]);
-                        } catch {
-                            fullScaleValue = 4095.0f;
-                        }
-
-                        var temperatureGroupName = (string)obj["temperatureGroup"];
-                        if (!CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
-                            Logger.AddWarning ("Temperature probe {0} added to nonexistant group {1}", name, temperatureGroupName);
-                        }
-
-                        AddTemperatureProbe (
-                            name,
-                            ic,
-                            zeroActual,
-                            zeroValue,
-                            fullScaleActual,
-                            fullScaleValue,
-                            temperatureGroupName);
-                    }
-
-                    /******************************************************************************************************/
-                    /* Heaters                                                                                            */
-                    /******************************************************************************************************/
-                    ja = jo["heaters"] as JArray;
-                    foreach (var jt in ja) {
-                        JObject obj = jt as JObject;
-                        var name = (string)obj["name"];
-                        var ic = IndividualControl.Empty;
-                        ic.Group = (string)obj["powerStrip"];
-                        try {
-                            ic.Individual = Convert.ToInt32 (obj["outlet"]);
-                        } catch {
-                            continue;
-                        }
-                        var temperatureGroupName = (string)obj["temperatureGroup"];
-
-                        if (!CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
-                            Logger.AddWarning ("Temperature probe {0} added to nonexistant group {1}", name, temperatureGroupName);
-                        }
-
-                        AddHeater (name, ic, temperatureGroupName);
-                    }
+                    AddHeater (name, ic, temperatureGroupName);
                 }
             } else {
                 Logger.Add ("Temperature settings file did not exist, created new temperature settings");
-                var file = File.Create (path);
-                file.Close ();
 
                 var jo = new JObject ();
                 jo.Add (new JProperty ("temperatureGroups", new JArray ()));
@@ -330,7 +201,7 @@ namespace AquaPic.Modules
                 jo.Add (new JProperty ("temperatureProbes", new JArray ()));
                 jo.Add (new JProperty ("heaters", new JArray ()));
 
-                File.WriteAllText (path, jo.ToString ());
+                SettingsHelper.WriteSettingsFile (settingsFileName, jo);
             }
 
             TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);
@@ -340,39 +211,39 @@ namespace AquaPic.Modules
             foreach (var tempGroup in temperatureGroups.Values) {
                 tempGroup.GroupRun ();
             }
-
-            // Get the value of the all the temperature probes no assigned to a group
-            foreach (var probe in probes.Values) {
-                if (!CheckTemperatureGroupKeyNoThrow (probe.temperatureGroupName)) {
-                    probe.Get ();
-                }
-            }
         }
 
         /**************************************************************************************************************/
         /* Temperature Groups                                                                                         */
         /**************************************************************************************************************/
-        public static void AddTemperatureGroup (
-            string name,
-            float highTemperatureAlarmSetpoint,
-            float lowTemperatureAlarmSetpoint,
-            float temperatureSetpoint,
-            float temperatureDeadband
-        ) {
-            if (!TemperatureGroupNameOk (name)) {
-                throw new Exception (string.Format ("Temperature Group: {0} already exists", name));
+        public static void AddTemperatureGroup (TemperatureGroupSettings settings, bool saveToFile = true) {
+            if (TemperatureGroupNameExists (settings.name)) {
+                throw new Exception (string.Format ("Temperature Group: {0} already exists", settings.name));
             }
 
-            temperatureGroups[name] = new TemperatureGroup (
-                name,
-                highTemperatureAlarmSetpoint,
-                lowTemperatureAlarmSetpoint,
-                temperatureSetpoint,
-                temperatureDeadband);
+            temperatureGroups[settings.name] = new TemperatureGroup (
+                settings.name,
+                settings.highTemperatureAlarmSetpoint,
+                settings.lowTemperatureAlarmSetpoint,
+                settings.temperatureSetpoint,
+                settings.temperatureDeadband,
+                settings.temperatureProbes);
 
             if (_defaultTemperatureGroup.IsEmpty ()) {
-                _defaultTemperatureGroup = name;
+                _defaultTemperatureGroup = settings.name;
             }
+
+            if (saveToFile) {
+                AddTemperatureGroupSettingsToFile (settings.name);
+            }
+        }
+
+        public static void UpdateTemperatureGroup (string name, TemperatureGroupSettings settings) {
+            if (TemperatureGroupNameExists (name)) {
+                RemoveTemperatureGroup (name);
+            }
+
+            AddTemperatureGroup (settings);
         }
 
         public static void RemoveTemperatureGroup (string name) {
@@ -387,6 +258,8 @@ namespace AquaPic.Modules
                     _defaultTemperatureGroup = string.Empty;
                 }
             }
+
+            DeleteTemperatureGroupSettingsFromFile (name);
         }
 
         public static void CheckTemperatureGroupKey (string name) {
@@ -404,19 +277,8 @@ namespace AquaPic.Modules
             }
         }
 
-        public static bool TemperatureGroupNameOk (string name) {
-            return !CheckTemperatureGroupKeyNoThrow (name);
-        }
-
-        public static bool AreTemperatureProbesConnected (string name) {
-            CheckTemperatureGroupKey (name);
-            bool connected = false;
-            foreach (var probe in probes.Values) {
-                if (probe.temperatureGroupName == name) {
-                    connected |= IsTemperatureProbeConnected (probe.name);
-                }
-            }
-            return connected;
+        public static bool TemperatureGroupNameExists (string name) {
+            return CheckTemperatureGroupKeyNoThrow (name);
         }
 
         /***Getters****************************************************************************************************/
@@ -433,6 +295,18 @@ namespace AquaPic.Modules
         public static float GetTemperatureGroupTemperature (string name) {
             CheckTemperatureGroupKey (name);
             return temperatureGroups[name].temperature;
+        }
+
+        /***Probes Connected***/
+        public static bool GetTemperatureGroupTemperatureProbesConnected (string name) {
+            CheckTemperatureGroupKey (name);
+            bool connected = false;
+            foreach (var probeName in temperatureGroups[name].temperatureProbes.Keys) {
+                var probe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (probeName);
+                // Using OR because we really only care that at least one sensor is connected
+                connected |= probe.connected;
+            }
+            return connected;
         }
 
         /***High temperature alarm setpoint***/
@@ -477,219 +351,56 @@ namespace AquaPic.Modules
             return temperatureGroups[name].dataLogger;
         }
 
-        /***Setters****************************************************************************************************/
-        /***High temperature alarm setpoint***/
-        public static void SetTemperatureGroupHighTemperatureAlarmSetpoint (string name, float highTemperatureAlarmSetpoint) {
+        /***Settings***************************************************************************************************/
+        public static TemperatureGroupSettings GetTemperatureGroupSettings (string name) {
             CheckTemperatureGroupKey (name);
-            temperatureGroups[name].highTemperatureAlarmSetpoint = highTemperatureAlarmSetpoint;
+            var settings = new TemperatureGroupSettings ();
+            settings.name = name;
+            settings.highTemperatureAlarmSetpoint = GetTemperatureGroupHighTemperatureAlarmSetpoint (name);
+            settings.lowTemperatureAlarmSetpoint = GetTemperatureGroupLowTemperatureAlarmSetpoint (name);
+            settings.temperatureSetpoint = GetTemperatureGroupTemperatureSetpoint (name);
+            settings.temperatureDeadband = GetTemperatureGroupTemperatureDeadband (name);
+            settings.temperatureProbes = GetAllTemperatureProbesForTemperatureGroup (name);
+            return settings;
         }
 
-        /***Low temperature alarm setpoint***/
-        public static void SetTemperatureGroupLowTemperatureAlarmSetpoint (string name, float lowTemperatureAlarmSetpoint) {
+        protected static void AddTemperatureGroupSettingsToFile (string name) {
             CheckTemperatureGroupKey (name);
-            temperatureGroups[name].lowTemperatureAlarmSetpoint = lowTemperatureAlarmSetpoint;
+            SettingsHelper.AddSettingsToArray (settingsFileName, groupSettingsArrayName, GetTemperatureGroupSettings (name));
         }
 
-        /***Temperature setpoint***/
-        public static void SetTemperatureGroupTemperatureSetpoint (string name, float temperatureSetpoint) {
-            CheckTemperatureGroupKey (name);
-            temperatureGroups[name].temperatureSetpoint = temperatureSetpoint;
+        protected static void UpdateTemperatureGroupSettingsInFile (string name) {
+            SettingsHelper.UpdateSettingsInArray (settingsFileName, groupSettingsArrayName, name, GetTemperatureGroupSettings (name));
         }
 
-        /***Temperature deadband***/
-        public static void SetTemperatureGroupTemperatureDeadband (string name, float temperatureDeadband) {
-            CheckTemperatureGroupKey (name);
-            temperatureGroups[name].temperatureDeadband = temperatureDeadband;
+        protected static void DeleteTemperatureGroupSettingsFromFile (string name) {
+            SettingsHelper.DeleteSettingsFromArray (settingsFileName, groupSettingsArrayName, name);
         }
 
         /**************************************************************************************************************/
-        /* Temperature Probes                                                                                         */
+        /* Temperature Probe                                                                                          */
         /**************************************************************************************************************/
-        public static void AddTemperatureProbe (
-            string name,
-            IndividualControl channel,
-            float zeroActual,
-            float zeroValue,
-            float fullScaleActual,
-            float fullScaleValue,
-            string temperatureGroupName
-        ) {
-            if (!TemperatureProbeNameOk (name)) {
-                throw new Exception (string.Format ("Probe: {0} already exists", name));
-            }
-
-            probes[name] = new TemperatureProbe (
-                name,
-                channel,
-                zeroActual,
-                zeroValue,
-                fullScaleActual,
-                fullScaleValue,
-                temperatureGroupName);
+        public static void AddTemperatureProbeToTemperatureGroup (string groupName, string temperatureProbeName) {
+            CheckTemperatureGroupKey (groupName);
+            temperatureGroups[groupName].temperatureProbes.Add (temperatureProbeName, new TemperatureGroup.InternalTemperatureProbeState ());
+            UpdateTemperatureGroupSettingsInFile (groupName);
         }
 
-        public static void RemoveTemperatureProbe (string probeName) {
-            CheckTemperatureProbeKey (probeName);
-            probes[probeName].Remove ();
-            probes.Remove (probeName);
-        }
-
-        public static void CheckTemperatureProbeKey (string probeName) {
-            if (!probes.ContainsKey (probeName)) {
-                throw new ArgumentException ("probeName");
-            }
-        }
-
-        public static bool CheckTemperatureProbeKeyNoThrow (string probeName) {
-            try {
-                CheckTemperatureProbeKey (probeName);
-                return true;
-            } catch {
-                return false;
-            }
-        }
-
-        public static bool TemperatureProbeNameOk (string probeName) {
-            return !CheckTemperatureProbeKeyNoThrow (probeName);
-        }
-
-        public static bool IsTemperatureProbeConnected (string probeName) {
-            CheckTemperatureProbeKey (probeName);
-            if (probes[probeName].temperature < probes[probeName].zeroActual) {
-                return false;
-            } else {
-                return true;
-            }
+        public static void RemoveTemperatureProbeFromTemperatureGroup (string groupName, string temperatureProbeName) {
+            CheckTemperatureGroupKey (groupName);
+            temperatureGroups[groupName].temperatureProbes.Remove (temperatureProbeName);
+            UpdateTemperatureGroupSettingsInFile (groupName);
         }
 
         /***Getters****************************************************************************************************/
         /***Names***/
-        public static string[] GetAllTemperatureProbeNames () {
+        public static string[] GetAllTemperatureProbesForTemperatureGroup (string groupName) {
+            CheckTemperatureGroupKey (groupName);
             List<string> names = new List<string> ();
-            foreach (var probe in probes.Values) {
-                names.Add (probe.name);
+            foreach (var sensorName in temperatureGroups[groupName].temperatureProbes.Keys) {
+                names.Add (sensorName);
             }
             return names.ToArray ();
-        }
-
-        /***Temperature***/
-        public static float GetTemperatureProbeTemperature (string probeName) {
-            CheckTemperatureProbeKey (probeName);
-            return probes[probeName].temperature;
-        }
-
-        /***Individual Control***/
-        public static IndividualControl GetTemperatureProbeIndividualControl (string probeName) {
-            CheckTemperatureProbeKey (probeName);
-            return probes[probeName].channel;
-        }
-
-        /***Temperature group***/
-        public static string GetTemperatureProbeTemperatureGroupName (string probeName) {
-            CheckTemperatureProbeKey (probeName);
-            return probes[probeName].temperatureGroupName;
-        }
-
-        /***Zero actual***/
-        public static float GetTemperatureProbeZeroActual (string probeName) {
-            CheckTemperatureProbeKey (probeName);
-            return probes[probeName].zeroActual;
-        }
-
-        /***Zero value***/
-        public static float GetTemperatureProbeZeroValue (string probeName) {
-            CheckTemperatureProbeKey (probeName);
-            return probes[probeName].zeroValue;
-        }
-
-        /***Full scale actual***/
-        public static float GetTemperatureProbeFullScaleActual (string probeName) {
-            CheckTemperatureProbeKey (probeName);
-            return probes[probeName].fullScaleActual;
-        }
-
-        /***Full scale value***/
-        public static float GetTemperatureProbeFullScaleValue (string probeName) {
-            CheckTemperatureProbeKey (probeName);
-            return probes[probeName].fullScaleValue;
-        }
-
-        /***Setters****************************************************************************************************/
-        /***Name***/
-        public static void SetTemperatureProbeName (string oldProbeName, string newProbeName) {
-            CheckTemperatureProbeKey (oldProbeName);
-            if (!TemperatureProbeNameOk (newProbeName)) {
-                throw new Exception (string.Format ("Probe: {0} already exists", newProbeName));
-            }
-
-            var probe = probes[oldProbeName];
-
-            probe.SetName (newProbeName);
-
-            probes.Remove (oldProbeName);
-            probes[newProbeName] = probe;
-        }
-
-        /***Individual Control***/
-        public static void SetTemperatureProbeIndividualControl (string probeName, IndividualControl ic) {
-            CheckTemperatureProbeKey (probeName);
-            probes[probeName].Remove ();
-            probes[probeName].Add (ic);
-        }
-
-        /***Temperature group***/
-        public static void SetTemperatureProbeTemperatureGroupName (string probeName, string temperatureGroupName) {
-            CheckTemperatureProbeKey (probeName);
-            probes[probeName].temperatureGroupName = temperatureGroupName;
-        }
-
-        /***Calibration data***/
-        public static bool SetTemperatureProbeCalibrationData (
-            string probeName,
-            float zeroActual,
-            float zeroValue,
-            float fullScaleActual,
-            float fullScaleValue
-        ) {
-            if (fullScaleValue <= zeroValue)
-                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
-
-            if (fullScaleActual < 0.0f)
-                throw new ArgumentException ("Full scale actual can't be less than zero");
-
-            probes[probeName].zeroActual = zeroActual;
-            probes[probeName].zeroValue = zeroValue;
-            probes[probeName].fullScaleActual = fullScaleActual;
-            probes[probeName].fullScaleValue = fullScaleValue;
-
-            var path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = System.IO.Path.Combine (path, "tempProperties.json");
-
-            string json = File.ReadAllText (path);
-            JObject jo = (JObject)JToken.Parse (json);
-            JArray ja = jo["temperatureProbes"] as JArray;
-
-            int arrIdx = -1;
-            for (int i = 0; i < ja.Count; ++i) {
-                string n = (string)ja[i]["name"];
-                if (probeName == n) {
-                    arrIdx = i;
-                    break;
-                }
-            }
-
-            if (arrIdx == -1) {
-                return false;
-            }
-
-            ja[arrIdx]["zeroCalibrationActual"] = probes[probeName].zeroActual.ToString ();
-            ja[arrIdx]["zeroCalibrationValue"] = probes[probeName].zeroValue.ToString ();
-            ja[arrIdx]["fullScaleCalibrationActual"] = probes[probeName].fullScaleActual.ToString ();
-            ja[arrIdx]["fullScaleCalibrationValue"] = probes[probeName].fullScaleValue.ToString ();
-
-            File.WriteAllText (path, jo.ToString ());
-
-            return true;
         }
 
         /**************************************************************************************************************/
