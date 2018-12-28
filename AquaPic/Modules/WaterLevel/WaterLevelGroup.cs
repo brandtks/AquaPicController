@@ -102,12 +102,14 @@ namespace AquaPic.Modules
                 }
             }
 
+            // Using event handler because either float switches or water level sensors can trip a high alarm
             protected void OnHighAlarm (object sender, AlarmEventArgs args) {
                 if (args.type == AlarmEventType.Posted) {
                     dataLogger.AddEntry ("high alarm");
                 }
             }
 
+            // Using event handler because either float switches or water level sensors can trip a low alarm
             protected void OnLowAlarm (object sender, AlarmEventArgs args) {
                 if (args.type == AlarmEventType.Posted) {
                     dataLogger.AddEntry ("low alarm");
