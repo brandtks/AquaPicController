@@ -96,7 +96,7 @@ namespace AquaPic.Modules
                     return false;
                 }
 
-                if (highTempLockout && Alarm.CheckAlarming (Temperature.defaultHighTemperatureAlarmIndex)) {
+                if (highTempLockout && Alarm.CheckAlarming (Temperature.Temperature.defaultHighTemperatureAlarmIndex)) {
                     return false;
                 }
 
