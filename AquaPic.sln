@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserInterface", "UserInterf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{46BD2A7C-CD50-4022-AEE0-34A7AF686EAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{E9FB1676-64A5-411C-AC68-36C49CEC4092}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -43,6 +45,10 @@ Global
 		{D16D7BCC-1475-4F6F-995F-815518E10A49}.Debug|x86.Build.0 = Debug|Any CPU
 		{D16D7BCC-1475-4F6F-995F-815518E10A49}.Release|x86.ActiveCfg = Release|Any CPU
 		{D16D7BCC-1475-4F6F-995F-815518E10A49}.Release|x86.Build.0 = Release|Any CPU
+		{E9FB1676-64A5-411C-AC68-36C49CEC4092}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E9FB1676-64A5-411C-AC68-36C49CEC4092}.Debug|x86.Build.0 = Debug|Any CPU
+		{E9FB1676-64A5-411C-AC68-36C49CEC4092}.Release|x86.ActiveCfg = Release|Any CPU
+		{E9FB1676-64A5-411C-AC68-36C49CEC4092}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

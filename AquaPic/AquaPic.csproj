@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -68,9 +67,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modules\Temperature\TemperatureGroup.cs" />
@@ -133,14 +129,11 @@
     <Compile Include="Domain\Timer\StaticTimer.cs" />
     <Compile Include="Domain\Timer\Timer.cs" />
     <Compile Include="Domain\TimePeriod\TimePeriod.cs" />
-    <Compile Include="Tests\Domain\Timer\StaticTimerTests.cs" />
-    <Compile Include="Tests\Domain\TimePeriod\TimePeriodTests.cs" />
     <Compile Include="Modules\Lights\Lighting.cs" />
     <Compile Include="Modules\Lights\LightingFixture.cs" />
     <Compile Include="Modules\Lights\LightingState.cs" />
     <Compile Include="Modules\Lights\LightingFixtureDimming.cs" />
     <Compile Include="Modules\Lights\LightingFixtureSettings.cs" />
-    <Compile Include="Tests\Runtime\Settings\SettingsHelperTest.cs" />
     <Compile Include="Domain\Sensors\FloatSwitch\FloatSwitch.cs" />
     <Compile Include="Domain\Sensors\FloatSwitch\FloatSwitchSettings.cs" />
     <Compile Include="Domain\Sensors\FloatSwitch\SwitchType.cs" />
@@ -165,7 +158,6 @@
     <Compile Include="Domain\Entity\Mutators\StringMutator.cs" />
     <Compile Include="Domain\Entity\Mutators\UIntMutator.cs" />
     <Compile Include="Driver\GenericDriver\GenericInputCard.cs" />
-    <Compile Include="Tests\Driver\Generic\GenericChannelTests.cs" />
     <Compile Include="Driver\GenericDriver\GenericInputBase.cs" />
     <Compile Include="Driver\GenericDriver\GenericInputChannel.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericSensorSettings.cs" />
@@ -186,7 +178,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Modules\ATO\" />
-    <Folder Include="Tests\" />
     <Folder Include="Driver\pHOrp\" />
     <Folder Include="Modules\GenericModule\" />
     <Folder Include="Domain\" />
@@ -197,11 +188,6 @@
     <Folder Include="Runtime\Settings\" />
     <Folder Include="Domain\Timer\" />
     <Folder Include="Domain\TimePeriod\" />
-    <Folder Include="Tests\Domain\" />
-    <Folder Include="Tests\Domain\Timer\" />
-    <Folder Include="Tests\Domain\TimePeriod\" />
-    <Folder Include="Tests\Runtime\" />
-    <Folder Include="Tests\Runtime\Settings\" />
     <Folder Include="Domain\Sensors\FloatSwitch\" />
     <Folder Include="Domain\Sensors\WaterLevelSensor\" />
     <Folder Include="Domain\Sensors\TemperatureProbe\" />
@@ -209,8 +195,6 @@
     <Folder Include="Domain\Entity\" />
     <Folder Include="Domain\Sensors\GenericSensor\" />
     <Folder Include="Domain\Entity\Mutators\" />
-    <Folder Include="Tests\Driver\" />
-    <Folder Include="Tests\Driver\Generic\" />
     <Folder Include="Runtime\PubSub\" />
     <Folder Include="Domain\Globals\" />
   </ItemGroup>
