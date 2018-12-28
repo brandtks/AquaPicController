@@ -26,84 +26,64 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Runtime;
+using AquaPic.PubSub;
 
-namespace AquaPic.Sensors
+namespace AquaPic.Sensors.TemperatureProbe
 {
-    public class TemperatureProbe : ISensor<float>
+    public class TemperatureProbe : GenericSensor
     {
-        protected IndividualControl _channel;
-        public IndividualControl channel {
+        public float temperature { get; protected set; }
+
+        public float zeroScaleActual { get; set; }
+        public float zeroScaleValue { get; set; }
+        public float fullScaleActual { get; set; }
+        public float fullScaleValue { get; set; }
+        public int probeDisconnectedAlarmIndex { get; private set; }
+        public bool connected {
             get {
-                return _channel;
+                return !Alarm.CheckAlarming (probeDisconnectedAlarmIndex);
             }
         }
-
-        protected string _name;
-        public string name {
-            get {
-                return _name;
-            }
-        }
-
-        protected float _temperature;
-        public float temperature {
-            get {
-                return _temperature;
-            }
-        }
-
-        public string temperatureGroupName;
-
-        public float zeroActual;
-        public float zeroValue;
-        public float fullScaleActual;
-        public float fullScaleValue;
-
-        public int probeDisconnectedAlarmIndex;
 
         public TemperatureProbe (
             string name,
             IndividualControl channel,
-            float zeroActual,
-            float zeroValue,
+            float zeroScaleActual,
+            float zeroScaleValue,
             float fullScaleActual,
-            float fullScaleValue,
-            string temperatureGroupName) {
-            _name = name;
-            _channel = channel;
-            this.zeroActual = zeroActual;
-            this.zeroValue = zeroValue;
+            float fullScaleValue)
+            : base (name, channel)
+        {
+            this.zeroScaleActual = zeroScaleActual;
+            this.zeroScaleValue = zeroScaleValue;
             this.fullScaleActual = fullScaleActual;
             this.fullScaleValue = fullScaleValue;
-            this.temperatureGroupName = temperatureGroupName;
-            _temperature = this.zeroActual;
-            Add (_channel);
+            temperature = this.zeroScaleActual;
+            probeDisconnectedAlarmIndex = -1;
+        }
+
+        public override void OnCreate () {
+            AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Temperature Probe", name));
+            AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
             probeDisconnectedAlarmIndex = Alarm.Subscribe ("Temperature probe disconnected, " + name);
         }
 
-        public void Add (IndividualControl channel) {
-            if (_channel.IsNotEmpty ()) {
-                Remove ();
-            }
-
-            _channel = channel;
-
-            if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.AnalogInput.AddChannel (_channel, string.Format ("{0}, Temperature Probe", name));
-            }
-        }
-
         public void Remove () {
-            if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.AnalogInput.RemoveChannel (_channel);
-            }
+            AquaPicDrivers.AnalogInput.RemoveChannel (channel);
+            AquaPicDrivers.AnalogInput.UnsubscribeConsumer (channel, this);
+            Alarm.Clear (probeDisconnectedAlarmIndex);
         }
 
-        public float Get () {
-            _temperature = AquaPicDrivers.AnalogInput.GetChannelValue (_channel);
-            _temperature = temperature.Map (zeroValue, fullScaleValue, zeroActual, fullScaleActual);
+        public override ValueType GetValue () {
+            return temperature;
+        }
 
-            if (temperature < zeroActual) {
+        public override void OnValueChangedAction (object parm) {
+            var args = parm as ValueChangedEvent;
+            var oldTemperature = temperature;
+            temperature = ScaleRawLevel (Convert.ToSingle (args.newValue));
+
+            if (temperature < zeroScaleActual) {
                 if (!Alarm.CheckAlarming (probeDisconnectedAlarmIndex)) {
                     Alarm.Post (probeDisconnectedAlarmIndex);
                 }
@@ -113,12 +93,12 @@ namespace AquaPic.Sensors
                 }
             }
 
-            return _temperature;
+            NotifyValueChanged (temperature, oldTemperature);
         }
 
-        public void SetName (string name) {
-            _name = name;
-            AquaPicDrivers.AnalogInput.SetChannelName (_channel, string.Format ("{0}, Temperature Probe", name));
+
+        protected float ScaleRawLevel (float rawValue) {
+            return rawValue.Map (zeroScaleValue, fullScaleValue, zeroScaleActual, fullScaleActual);
         }
     }
 }
