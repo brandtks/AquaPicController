@@ -68,7 +68,7 @@ namespace AquaPic.UserInterface
             if (options.Length >= 3) {
                 var requestedGroup = options[2] as string;
                 if (requestedGroup != null) {
-                    if (WaterLevel.WaterLevelGroupNameOk (requestedGroup)) {
+                    if (!WaterLevel.WaterLevelGroupNameOk (requestedGroup)) {
                         groupName = requestedGroup;
                     }
                 }
@@ -381,6 +381,10 @@ namespace AquaPic.UserInterface
                 analogSensorLevelLabel.Visible = false;
             }
 
+            analogSensorCombo.Visible = false;
+            analogSensorCombo.Visible = true;
+
+            analogSensorCombo.QueueDraw ();
             analogSensorLevelTextBox.QueueDraw ();
         }
 
@@ -409,6 +413,10 @@ namespace AquaPic.UserInterface
                 switchStateTextBox.textColor = "white";
             }
 
+            switchCombo.Visible = false;
+            switchCombo.Visible = true;
+
+            switchCombo.QueueDraw ();
             switchTypeLabel.QueueDraw ();
             switchStateTextBox.QueueDraw ();
         }
@@ -460,10 +468,14 @@ namespace AquaPic.UserInterface
                 if (groupName.IsNotEmpty ()) {
                     var groupsWaterLevelSensors = WaterLevel.GetAllWaterLevelSensorsForWaterLevelGroup (groupName);
                     analogSensorCombo.comboList.AddRange (groupsWaterLevelSensors);
-                    analogSensorName = groupsWaterLevelSensors[0];
-                    analogSensorCombo.activeText = analogSensorName;
+                    if (groupsWaterLevelSensors.Length > 0) {
+                        analogSensorName = groupsWaterLevelSensors[0];
+                    } else {
+                        analogSensorName = string.Empty;
+                    }
                 }
                 analogSensorCombo.comboList.Add ("New level sensor...");
+                analogSensorCombo.activeIndex = 0;
                 analogSensorCombo.QueueDraw ();
 
                 switchCombo.comboList.Clear ();
@@ -472,19 +484,18 @@ namespace AquaPic.UserInterface
                     switchCombo.comboList.AddRange (groupsFloatSwitches);
                     if (groupsFloatSwitches.Length > 0) {
                         switchName = groupsFloatSwitches[0];
-                        switchCombo.activeText = switchName;
                     } else {
                         switchName = string.Empty;
                     }
                 }
                 switchCombo.comboList.Add ("New switch...");
+                switchCombo.activeIndex = 0;
                 switchCombo.QueueDraw ();
             }
 
             GetGroupData ();
             GetAnalogSensorData ();
             GetSwitchData ();
-            QueueDraw ();
         }
 
         protected void OnAtoSettingsButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
