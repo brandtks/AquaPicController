@@ -62,7 +62,7 @@ namespace AquaPic.Sensors
         public override void OnCreate () {
             AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name));
             AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
-            sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Analog level probe disconnected, " + name);
+            sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Water level sensor disconnected, " + name);
         }
 
         public override void OnRemove () {
