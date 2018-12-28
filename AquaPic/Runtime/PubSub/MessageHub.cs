@@ -80,12 +80,31 @@ namespace AquaPic.PubSub
         public void Unsubscribe (Guid token) {
             var subscription = subscriptions.FirstOrDefault (subs => subs.Value.Any (s => s.token == token));
             if (subscription.Value != null) {
-                subscriptions.Remove (subscription.Key);
+                Unsubscribe (subscription.Key, token);
+            }
+        }
+
+        public void Unsubscribe (string key, Guid token) {
+            if (!subscriptions.ContainsKey (key)) {
+                return;
+            }
+            var sub = subscriptions[key].Find (s => s.token == token);
+            if (sub != null) {
+                subscriptions[key].Remove (sub);
             }
         }
 
         public bool IsSubscribed (Guid token) {
             return subscriptions.Values.Any (subs => subs.Any (s => s.token == token));
+        }
+
+        public void ChangeKey (string oldKey, string newKey) {
+            if (!subscriptions.ContainsKey (oldKey)) {
+                return;
+            }
+            var subs = subscriptions[oldKey];
+            subscriptions.Remove (oldKey);
+            subscriptions[newKey] = subs;
         }
     }
 }
