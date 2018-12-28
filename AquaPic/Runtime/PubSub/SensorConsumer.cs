@@ -28,26 +28,35 @@ namespace AquaPic.PubSub
 {
     public class SensorConsumer : ValueConsumer
     {
-        public virtual void OnSensorUpdatedEvent (object sender, SensorUpdatedEventArgs args) => throw new NotImplementedException ();
-        public virtual void OnSensorRemovedEvent (object sender, SensorRemovedEventArgs args) => throw new NotImplementedException ();
+        public Guid sensorUpdatedGuid { get; private set; }
+        public Guid sensorRemovedGuid { get; private set; }
+
+        public virtual void OnSensorUpdatedAction (object parm) => throw new NotImplementedException ();
+        public virtual void OnSensorRemovedAction (object parm) => throw new NotImplementedException ();
+
+        public void SetGuids (Guid valueChangedGuid, Guid valueUpdatedGuid, Guid sensorUpdatedGuid, Guid sensorRemovedGuid) {
+            this.sensorUpdatedGuid = sensorUpdatedGuid;
+            this.sensorRemovedGuid = sensorRemovedGuid;
+            SetGuids (valueChangedGuid, valueUpdatedGuid);
+        }
     }
 
-    public class SensorUpdatedEventArgs : EventArgs
+    public class SensorUpdatedEvent
     {
         public string name;
         public GenericSensorSettings settings;
 
-        public SensorUpdatedEventArgs (string name, GenericSensorSettings settings) {
+        public SensorUpdatedEvent (string name, GenericSensorSettings settings) {
             this.name = name;
             this.settings = settings;
         }
     }
 
-    public class SensorRemovedEventArgs : EventArgs
+    public class SensorRemovedEvent
     {
         public string name;
 
-        public SensorRemovedEventArgs (string name) {
+        public SensorRemovedEvent (string name) {
             this.name = name;
         }
     }

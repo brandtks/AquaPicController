@@ -23,61 +23,88 @@
 
 using System;
 using AquaPic.Sensors;
+using AquaPic.Runtime;
 
 namespace AquaPic.PubSub
 {
     public class SensorPublisher : ValueConsumer
     {
-        public event EventHandler<SensorUpdatedEventArgs> SensorUpdatedEvent;
-        public event EventHandler<SensorRemovedEventArgs> SensorRemovedEvent;
-        public event EventHandler<ValueChangedEventArgs> ValueChangedEvent;
-        public event EventHandler<ValueUpdatedEventArgs> ValueUpdatedEvent;
+        string key;
+
+        public SensorPublisher (string key) {
+            this.key = key;
+        }
 
         public void NotifySensorUpdated (string name, GenericSensorSettings settings) {
-            SensorUpdatedEvent?.Invoke (this, new SensorUpdatedEventArgs (name, settings));
+            // If the sensor is renamed, the local key variable is the new name (settings.name)
+            // But the Consumers are subscribed to the MessageHub at the old name
+            if (name != settings.name) {
+                MessageHub.Instance.ChangeKey (name, settings.name);
+            }
+            MessageHub.Instance.Publish (key, new SensorUpdatedEvent (name, settings));
         }
 
         public void NotifySensorRemoved (string name) {
-            SensorRemovedEvent?.Invoke (this, new SensorRemovedEventArgs (name));
+            if (name != key) {
+                Logger.AddError ("Trying to publish remove event on key: {0}, with name {1}", key, name);
+            }
+            MessageHub.Instance.Publish (key, new SensorRemovedEvent (name));
         }
 
         public void NotifyValueChanged (ValueType newValue, ValueType oldValue) {
-            ValueChangedEvent?.Invoke (this, new ValueChangedEventArgs (newValue, oldValue));
+            MessageHub.Instance.Publish (key, new ValueChangedEvent (key, newValue, oldValue));
         }
 
         public void NotifyValueUpdated (ValueType value) {
-            ValueUpdatedEvent?.Invoke (this, new ValueUpdatedEventArgs (value));
+            MessageHub.Instance.Publish (key, new ValueUpdatedEvent (key, value));
         }
 
         public void SubscribeConsumer (SensorConsumer consumer) {
             var consumerType = consumer.GetType ();
+            var messageHub = MessageHub.Instance;
 
-            var methodInfo = consumerType.GetMethod (nameof (consumer.OnValueChangedEvent));
+            Guid valChangedGuid, valUpdatedGuid, sensorUpdatedGuid, sensorRemovedGuid;
+            var methodInfo = consumerType.GetMethod (nameof (consumer.OnValueChangedAction));
             if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                ValueChangedEvent += consumer.OnValueChangedEvent;
+                valChangedGuid = messageHub.Subscribe<ValueChangedEvent> (key, consumer.OnValueChangedAction);
             }
 
-            methodInfo = consumerType.GetMethod (nameof (consumer.OnValueUpdatedEvent));
+            methodInfo = consumerType.GetMethod (nameof (consumer.OnValueUpdatedAction));
             if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                ValueUpdatedEvent += consumer.OnValueUpdatedEvent;
+                valUpdatedGuid = messageHub.Subscribe<ValueUpdatedEvent> (key, consumer.OnValueUpdatedAction);
             }
 
-            methodInfo = consumerType.GetMethod (nameof (consumer.OnSensorUpdatedEvent));
+            methodInfo = consumerType.GetMethod (nameof (consumer.OnSensorUpdatedAction));
             if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                SensorUpdatedEvent += consumer.OnSensorUpdatedEvent;
+                sensorUpdatedGuid = messageHub.Subscribe<SensorUpdatedEvent> (key, consumer.OnSensorUpdatedAction);
             }
 
-            methodInfo = consumerType.GetMethod (nameof (consumer.OnSensorRemovedEvent));
+            methodInfo = consumerType.GetMethod (nameof (consumer.OnSensorRemovedAction));
             if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                SensorRemovedEvent += consumer.OnSensorRemovedEvent;
+                sensorRemovedGuid = messageHub.Subscribe<SensorRemovedEvent> (key, consumer.OnSensorRemovedAction);
             }
+
+            consumer.SetGuids (valChangedGuid, valUpdatedGuid, sensorUpdatedGuid, sensorRemovedGuid);
         }
 
         public void UnsubscribeConsumer (SensorConsumer consumer) {
-            ValueChangedEvent -= consumer.OnValueChangedEvent;
-            ValueUpdatedEvent -= consumer.OnValueUpdatedEvent;
-            SensorUpdatedEvent -= consumer.OnSensorUpdatedEvent;
-            SensorRemovedEvent -= consumer.OnSensorRemovedEvent;
+            var messageHub = MessageHub.Instance;
+
+            if (consumer.valueChangedGuid != Guid.Empty) {
+                messageHub.Unsubscribe (key, consumer.valueChangedGuid);
+            }
+
+            if (consumer.valueUpdatedGuid != Guid.Empty) {
+                messageHub.Unsubscribe (key, consumer.valueUpdatedGuid);
+            }
+
+            if (consumer.sensorUpdatedGuid != Guid.Empty) {
+                messageHub.Unsubscribe (key, consumer.sensorUpdatedGuid);
+            }
+
+            if (consumer.sensorRemovedGuid != Guid.Empty) {
+                messageHub.Unsubscribe (key, consumer.sensorUpdatedGuid);
+            }
         }
     }
 }
