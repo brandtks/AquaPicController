@@ -69,10 +69,14 @@
     <Compile Include="Utilities.Tests\Utilites\RateOfChangeLimiterTest.cs" />
     <Compile Include="Utilities.Tests\Utilites\TimeTest.cs" />
     <Compile Include="Utilities.Tests\Utilites\UtilitiesTest.cs" />
+    <Compile Include="AquaPic.Tests\Domain\Globals\IndividualControlTests.cs" />
+    <Compile Include="AquaPic.Tests\Runtime\PubSub\MessageHubTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AquaPic.Tests\" />
     <Folder Include="Utilities.Tests\" />
+    <Folder Include="AquaPic.Tests\Domain\Globals\" />
+    <Folder Include="AquaPic.Tests\Runtime\PubSub\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
