@@ -22,7 +22,6 @@
 #endregion // License
 
 using System;
-using System.Reflection;
 using AquaPic.Globals;
 using AquaPic.PubSub;
 
@@ -56,25 +55,35 @@ namespace AquaPic.Drivers
 
         public void SubscribeConsumer (int channel, ValueConsumer consumer) {
             CheckChannelRange (channel);
-            var inputChannel = channels[channel] as GenericInputChannel;
+            var key = channels[channel].name;
             var consumerType = consumer.GetType ();
+            var messageHub = MessageHub.Instance;
 
-            var methodInfo = consumerType.GetMethod (nameof (consumer.OnValueChangedEvent));
+            Guid valueChangedGuid, valueUpdatedGuid;
+            var methodInfo = consumerType.GetMethod (nameof (consumer.OnValueChangedAction));
             if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                inputChannel.InputChannelValueChangedEvent += consumer.OnValueChangedEvent;
+                valueChangedGuid = messageHub.Subscribe<ValueChangedEvent> (key, consumer.OnValueChangedAction);
             }
 
-            methodInfo = consumerType.GetMethod (nameof (consumer.OnValueUpdatedEvent));
+            methodInfo = consumerType.GetMethod (nameof (consumer.OnValueUpdatedAction));
             if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                inputChannel.InputChannelValueUpdatedEvent += consumer.OnValueUpdatedEvent;
+                valueUpdatedGuid = messageHub.Subscribe<ValueUpdatedEvent> (key, consumer.OnValueUpdatedAction);
             }
+            consumer.SetGuids (valueChangedGuid, valueUpdatedGuid);
         }
 
         public void UnsubscribeConsumer (int channel, ValueConsumer consumer) {
             CheckChannelRange (channel);
-            var inputChannel = channels[channel] as GenericInputChannel;
-            inputChannel.InputChannelValueChangedEvent -= consumer.OnValueChangedEvent;
-            inputChannel.InputChannelValueUpdatedEvent -= consumer.OnValueUpdatedEvent;
+            var key = channels[channel].name;
+            var messageHub = MessageHub.Instance;
+
+            if (consumer.valueChangedGuid != Guid.Empty) {
+                messageHub.Unsubscribe (key, consumer.valueChangedGuid);
+            }
+
+            if (consumer.valueUpdatedGuid != Guid.Empty) {
+                messageHub.Unsubscribe (key, consumer.valueUpdatedGuid);
+            }
         }
 
         protected virtual void UpdateChannelValue (GenericChannel channel, ValueType value) {

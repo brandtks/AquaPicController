@@ -28,17 +28,14 @@ namespace AquaPic.Drivers
 {
     public class GenericInputChannel : GenericChannel
     {
-        public event EventHandler<ValueChangedEventArgs> InputChannelValueChangedEvent;
-        public event EventHandler<ValueUpdatedEventArgs> InputChannelValueUpdatedEvent;
-
         public GenericInputChannel (string name, Type valueType) : base (name, valueType) { }
 
         public void OnValueChanged (ValueType newValue, ValueType oldValue) {
-            InputChannelValueChangedEvent?.Invoke (this, new ValueChangedEventArgs (newValue, oldValue));
+            MessageHub.Instance.Publish (name, new ValueChangedEvent (name, newValue, oldValue));
         }
 
         public void OnValueUpdated (ValueType newValue) {
-            InputChannelValueUpdatedEvent?.Invoke (this, new ValueUpdatedEventArgs (newValue));
+            MessageHub.Instance.Publish (name, new ValueUpdatedEvent (name, newValue));
         }
     }
 }
