@@ -43,10 +43,10 @@ namespace AquaPic.UserInterface
             var t = new SettingsTextBox ("Name");
             t.textBox.text = waterLevelSensorName.IsNotEmpty () ? waterLevelSensorName : "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
-                if (args.text.IsEmpty ())
+                if (args.text.IsEmpty ()) {
                     args.keepText = false;
-                else if (AquaPicSensors.WaterLevelSensors.SensorNameExists (args.text)) {
-                    MessageBox.Show ("Switch name already exists");
+                } else if (AquaPicSensors.WaterLevelSensors.SensorNameExists (args.text)) {
+                    MessageBox.Show ("Water level sensor name already exists");
                     args.keepText = false;
                 }
             };

@@ -365,13 +365,13 @@ namespace AquaPic.UserInterface
 
         protected void GetAnalogSensorData () {
             if (analogSensorName.IsNotEmpty ()) {
-                float wl = (float)AquaPicSensors.WaterLevelSensors.GetSensorValue (analogSensorName);
-                if (wl < 0.0f) {
+                float level = (float)AquaPicSensors.WaterLevelSensors.GetSensorValue (analogSensorName);
+                if (level < 0f) {
                     analogSensorLevelTextBox.text = "Probe Disconnected";
                     analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
                     analogSensorLevelLabel.Visible = true;
                 } else {
-                    analogSensorLevelTextBox.text = wl.ToString ("F2");
+                    analogSensorLevelTextBox.text = level.ToString ("F2");
                     analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
                     analogSensorLevelLabel.Visible = false;
                 }
