@@ -134,11 +134,11 @@ namespace AquaPic
             AquaPicDrivers.AnalogInput.SetChannelMode ("Salt Reservoir, Water Level Sensor", Mode.Manual);
             AquaPicDrivers.AnalogInput.SetChannelValue ("Salt Reservoir, Water Level Sensor", 2048);
 
-            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump High", Mode.Manual);
-            AquaPicDrivers.DigitalInput.SetChannelValue ("Sump High", true);
-            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump Low", Mode.Manual);
-            AquaPicDrivers.DigitalInput.SetChannelValue ("Sump Low", true);
-            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump ATO", Mode.Manual);
+            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump High, Float Switch", Mode.Manual);
+            AquaPicDrivers.DigitalInput.SetChannelValue ("Sump High, Float Switch", true);
+            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump Low, Float Switch", Mode.Manual);
+            AquaPicDrivers.DigitalInput.SetChannelValue ("Sump Low, Float Switch", true);
+            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump ATO, Float Switch", Mode.Manual);
 #endif
 
             // Run the control
