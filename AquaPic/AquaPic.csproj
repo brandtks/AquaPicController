@@ -170,6 +170,9 @@
     <Compile Include="Domain\Globals\GlobalEnums.cs" />
     <Compile Include="Domain\Globals\IndividualControl.cs" />
     <Compile Include="Runtime\PubSub\Subscription.cs" />
+    <Compile Include="Domain\Sensors\TemperatureProbe\TemperatureProbeCollection.cs" />
+    <Compile Include="Domain\Sensors\TemperatureProbe\TemperatureProbeSettings.cs" />
+    <Compile Include="Modules\Temperature\TemperatureGroupSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
