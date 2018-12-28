@@ -24,10 +24,13 @@
 using System;
 using System.Text.RegularExpressions;
 using Gtk;
+#if RPI_BUILD
 using Cairo;
 using GoodtimeDevelopment.Utilites;
+#endif
 using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Modules;
+using AquaPic.Modules.Temperature;
 
 namespace AquaPic.UserInterface
 {

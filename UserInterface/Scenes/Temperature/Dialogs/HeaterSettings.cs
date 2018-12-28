@@ -27,7 +27,7 @@ using Gtk;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Modules;
+using AquaPic.Modules.Temperature;
 using AquaPic.Globals;
 using AquaPic.Drivers;
 

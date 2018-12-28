@@ -30,6 +30,7 @@ using AquaPic.Runtime;
 using AquaPic.UserInterface;
 using AquaPic.Drivers;
 using AquaPic.Modules;
+using AquaPic.Modules.Temperature;
 using AquaPic.SerialBus;
 using AquaPic.Globals;
 using AquaPic.Sensors;

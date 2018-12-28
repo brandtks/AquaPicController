@@ -25,7 +25,7 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Modules;
+using AquaPic.Modules.Temperature;
 
 namespace AquaPic.UserInterface
 {
@@ -74,7 +74,7 @@ namespace AquaPic.UserInterface
 
         public override void Update () {
             if (group.IsNotEmpty ()) {
-                if (Temperature.AreTemperatureProbesConnected (group)) {
+                if (Temperature.GetTemperatureGroupTemperatureProbesConnected (group)) {
                     currentValue = Temperature.GetTemperatureGroupTemperature (group);
                 } else {
                     textBox.text = "--";
