@@ -592,7 +592,7 @@ namespace AquaPic.UserInterface
                     analogSensorCombo.activeText = analogSensorName;
                 } else {
                     analogSensorName = string.Empty;
-                    analogSensorCombo.activeIndex = -1;
+                    analogSensorCombo.activeIndex = 0;
                 }
             }
 
@@ -672,7 +672,7 @@ namespace AquaPic.UserInterface
                     switchCombo.activeText = switchName;
                 } else {
                     switchName = string.Empty;
-                    switchCombo.activeIndex = -1;
+                    switchCombo.activeIndex = 0;
                 }
             }
 
