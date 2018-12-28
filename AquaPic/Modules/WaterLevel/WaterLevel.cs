@@ -25,9 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
-using AquaPic.Globals;
 using AquaPic.Sensors;
 using AquaPic.DataLogging;
 
