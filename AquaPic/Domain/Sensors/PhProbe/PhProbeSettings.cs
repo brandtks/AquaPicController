@@ -26,66 +26,16 @@ using AquaPic.Globals;
 
 namespace AquaPic.Sensors.PhProbe
 {
-    public class PhProbeSettings : GenericSensorSettings
+    public class PhProbeSettings : GenericAnalogSensorSettings
     {
-        [EntitySetting (typeof (FloatMutatorDefaultPhProbeZeroScaleActual), "zeroScaleCalibrationActual")]
-        public float zeroScaleCalibrationActual { get; set; }
-
-        [EntitySetting (typeof (FloatMutatorDefaultPhProbeZeroScaleValue), "zeroScaleCalibrationValue")]
-        public float zeroScaleCalibrationValue { get; set; }
-
-        [EntitySetting (typeof (FloatMutatorDefaultPhProbeFullScaleActual), "fullScaleCalibrationActual")]
-        public float fullScaleCalibrationActual { get; set; }
-
-        [EntitySetting (typeof (FloatMutatorDefaultPhProbeFullScaleValue), "fullScaleCalibrationValue")]
-        public float fullScaleCalibrationValue { get; set; }
-
-        [EntitySetting (typeof (IntMutatorDefaultPhProbeLowPassFilterFactor), "lowPassFilterFactor")]
-        public int lowPassFilterFactor { get; set; }
-
         public PhProbeSettings () {
             name = string.Empty;
             channel = IndividualControl.Empty;
             zeroScaleCalibrationActual = 0f;
             zeroScaleCalibrationValue = 14f;
             fullScaleCalibrationActual = 0f;
-            fullScaleCalibrationValue = 4095f;
+            fullScaleCalibrationValue = 4096f;
             lowPassFilterFactor = 5;
-        }
-    }
-
-    public class FloatMutatorDefaultPhProbeZeroScaleActual : FloatMutator
-    {
-        public override float Default () {
-            return 0f;
-        }
-    }
-
-    public class FloatMutatorDefaultPhProbeZeroScaleValue : FloatMutator
-    {
-        public override float Default () {
-            return 14f;
-        }
-    }
-
-    public class FloatMutatorDefaultPhProbeFullScaleActual : FloatMutator
-    {
-        public override float Default () {
-            return 0f;
-        }
-    }
-
-    public class FloatMutatorDefaultPhProbeFullScaleValue : FloatMutator
-    {
-        public override float Default () {
-            return 4095f;
-        }
-    }
-
-    public class IntMutatorDefaultPhProbeLowPassFilterFactor : IntMutator
-    {
-        public override int Default () {
-            return 5;
         }
     }
 }

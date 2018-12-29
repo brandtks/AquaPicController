@@ -26,55 +26,16 @@ using AquaPic.Globals;
 
 namespace AquaPic.Sensors
 {
-    public class WaterLevelSensorSettings : GenericSensorSettings
+    public class WaterLevelSensorSettings : GenericAnalogSensorSettings
     {
-        [EntitySetting (typeof (FloatMutatorDefaultWaterLevelSensorZeroScaleValue), "zeroScaleCalibrationValue")]
-        public float zeroScaleCalibrationValue { get; set; }
-
-        [EntitySetting (typeof (FloatMutatorDefaultWaterLevelSensorFullScaleActual), "fullScaleCalibrationActual")]
-        public float fullScaleCalibrationActual { get; set; }
-
-        [EntitySetting (typeof (FloatMutatorDefaultWaterLevelSensorFullScaleValue), "fullScaleCalibrationValue")]
-        public float fullScaleCalibrationValue { get; set; }
-
-        [EntitySetting (typeof (IntMutatorDefaultWaterLevelSensorLowPassFilterFactor), "lowPassFilterFactor")]
-        public int lowPassFilterFactor { get; set; }
-
         public WaterLevelSensorSettings () {
             name = string.Empty;
             channel = IndividualControl.Empty;
+            zeroScaleCalibrationActual = 0f;
             zeroScaleCalibrationValue = 819.2f;
             fullScaleCalibrationActual = 15f;
             fullScaleCalibrationValue = 3003.73f;
             lowPassFilterFactor = 5;
-        }
-    }
-
-    public class FloatMutatorDefaultWaterLevelSensorZeroScaleValue : FloatMutator
-    {
-        public override float Default () {
-            return 819.2f;
-        }
-    }
-
-    public class FloatMutatorDefaultWaterLevelSensorFullScaleActual : FloatMutator
-    {
-        public override float Default () {
-            return 15f;
-        }
-    }
-
-    public class FloatMutatorDefaultWaterLevelSensorFullScaleValue : FloatMutator
-    {
-        public override float Default () {
-            return 3003.73f;
-        }
-    }
-
-    public class IntMutatorDefaultWaterLevelSensorLowPassFilterFactor : IntMutator
-    {
-        public override int Default () {
-            return 5;
         }
     }
 }

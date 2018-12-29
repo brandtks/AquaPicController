@@ -33,29 +33,29 @@ namespace AquaPic.Sensors.TemperatureProbe
         public TemperatureProbe (
             string name,
             IndividualControl channel,
-            float zeroScaleActual,
-            float zeroScaleValue,
-            float fullScaleActual,
-            float fullScaleValue,
+            float zeroScaleCalibrationActual,
+            float zeroScaleCalibrationValue,
+            float fullScaleCalibrationActual,
+            float fullScaleCalibrationValue,
             int lowPassFilterFactor)
         : base (name,
             channel,
-            zeroScaleActual,
-            zeroScaleValue,
-            fullScaleActual,
-            fullScaleValue,
+            zeroScaleCalibrationActual,
+            zeroScaleCalibrationValue,
+            fullScaleCalibrationActual,
+            fullScaleCalibrationValue,
             lowPassFilterFactor) { }
 
         public override void OnCreate () {
             AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Temperature Probe", name), lowPassFilterFactor);
             AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
-            probeDisconnectedAlarmIndex = Alarm.Subscribe ("Temperature probe disconnected, " + name);
+            sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Temperature probe disconnected, " + name);
         }
 
         public override void OnRemove () {
             AquaPicDrivers.AnalogInput.RemoveChannel (channel);
             AquaPicDrivers.AnalogInput.UnsubscribeConsumer (channel, this);
-            Alarm.Clear (probeDisconnectedAlarmIndex);
+            Alarm.Clear (sensorDisconnectedAlarmIndex);
         }
     }
 }

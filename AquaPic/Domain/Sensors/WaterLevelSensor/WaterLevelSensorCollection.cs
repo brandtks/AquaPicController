@@ -32,49 +32,16 @@ namespace AquaPic.Sensors
 
         protected WaterLevelSensorCollection () : base ("waterLevelSensors") { }
 
-        public override void AddAllSensors () {
-            var sensorSettings = SettingsHelper.ReadAllSettingsInArray<WaterLevelSensorSettings> (sensorSettingsFileName, sensorSettingsArrayName);
-            foreach (var setting in sensorSettings) {
-                AddSensor (setting, false);
-            }
-        }
+        protected override GenericAnalogSensor CreateAnalogSensor (GenericAnalogSensorSettings settings) {
+            var sensor = new WaterLevelSensor (
+                settings.name,
+                settings.channel,
+                settings.zeroScaleCalibrationValue,
+                settings.fullScaleCalibrationActual,
+                settings.fullScaleCalibrationValue,
+                settings.lowPassFilterFactor);
 
-        protected override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
-            var sensorSettings = settings as WaterLevelSensorSettings;
-            if (sensorSettings == null) {
-                throw new ArgumentException ("Settings must be WaterLevelSensorSettings");
-            }
-
-            var waterLevelSensor = new WaterLevelSensor (
-                sensorSettings.name,
-                sensorSettings.channel,
-                sensorSettings.zeroScaleCalibrationValue,
-                sensorSettings.fullScaleCalibrationActual,
-                sensorSettings.fullScaleCalibrationValue,
-                sensorSettings.lowPassFilterFactor);
-
-            return waterLevelSensor;
-        }
-
-        protected override GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
-            var levelSensor = sensors[name] as WaterLevelSensor;
-            var sensorSettings = settings as WaterLevelSensorSettings;
-            sensorSettings.zeroScaleCalibrationValue = levelSensor.zeroScaleValue;
-            sensorSettings.fullScaleCalibrationActual = levelSensor.fullScaleActual;
-            sensorSettings.fullScaleCalibrationValue = levelSensor.fullScaleValue;
-            return sensorSettings;
-        }
-
-        public override GenericSensorSettings GetSensorSettings (string name) {
-            CheckSensorKey (name);
-            var levelSensor = sensors[name] as WaterLevelSensor;
-            var settings = new WaterLevelSensorSettings ();
-            settings.name = levelSensor.name;
-            settings.channel = levelSensor.channel;
-            settings.zeroScaleCalibrationValue = levelSensor.zeroScaleValue;
-            settings.fullScaleCalibrationActual = levelSensor.fullScaleActual;
-            settings.fullScaleCalibrationValue = levelSensor.fullScaleValue;
-            return settings;
+            return sensor;
         }
 
         public void SetCalibrationData (string name, float zeroScaleValue, float fullScaleActual, float fullScaleValue) {

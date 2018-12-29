@@ -32,53 +32,17 @@ namespace AquaPic.Sensors.PhProbe
 
         protected PhProbeCollection () : base ("phProbes") { }
 
-        public override void AddAllSensors () {
-            var sensorSettings = SettingsHelper.ReadAllSettingsInArray<PhProbeSettings> (sensorSettingsFileName, sensorSettingsArrayName);
-            foreach (var setting in sensorSettings) {
-                AddSensor (setting, false);
-            }
-        }
+        protected override GenericAnalogSensor CreateAnalogSensor (GenericAnalogSensorSettings settings) {
+            var sensor = new PhProbe (
+                settings.name,
+                settings.channel,
+                settings.zeroScaleCalibrationActual,
+                settings.zeroScaleCalibrationValue,
+                settings.fullScaleCalibrationActual,
+                settings.fullScaleCalibrationValue,
+                settings.lowPassFilterFactor);
 
-        protected override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
-            var sensorSettings = settings as PhProbeSettings;
-            if (sensorSettings == null) {
-                throw new ArgumentException ("Settings must be PhProbeSettings");
-            }
-
-            var phProbe = new PhProbe (
-                sensorSettings.name,
-                sensorSettings.channel,
-                sensorSettings.zeroScaleCalibrationActual,
-                sensorSettings.zeroScaleCalibrationValue,
-                sensorSettings.fullScaleCalibrationActual,
-                sensorSettings.fullScaleCalibrationValue,
-                sensorSettings.lowPassFilterFactor);
-
-            return phProbe;
-        }
-
-        protected override GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
-            var phProbe = sensors[name] as PhProbe;
-            var sensorSettings = settings as PhProbeSettings;
-            sensorSettings.zeroScaleCalibrationValue = phProbe.zeroScaleActual;
-            sensorSettings.zeroScaleCalibrationValue = phProbe.zeroScaleValue;
-            sensorSettings.fullScaleCalibrationActual = phProbe.fullScaleActual;
-            sensorSettings.fullScaleCalibrationValue = phProbe.fullScaleValue;
-            return sensorSettings;
-        }
-
-        public override GenericSensorSettings GetSensorSettings (string name) {
-            CheckSensorKey (name);
-            var phProbe = sensors[name] as PhProbe;
-            var settings = new PhProbeSettings ();
-            settings.name = phProbe.name;
-            settings.channel = phProbe.channel;
-            settings.zeroScaleCalibrationActual = phProbe.zeroScaleActual;
-            settings.zeroScaleCalibrationValue = phProbe.zeroScaleValue;
-            settings.fullScaleCalibrationActual = phProbe.fullScaleActual;
-            settings.fullScaleCalibrationValue = phProbe.fullScaleValue;
-            settings.lowPassFilterFactor = phProbe.lowPassFilterFactor;
-            return settings;
+            return sensor;
         }
     }
 }

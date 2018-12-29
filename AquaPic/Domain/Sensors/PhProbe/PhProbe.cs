@@ -22,40 +22,58 @@
 #endregion // License
 
 using System;
+using GoodtimeDevelopment.Utilites;
+using AquaPic.DataLogging;
 using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Runtime;
+using AquaPic.PubSub;
 
 namespace AquaPic.Sensors.PhProbe
 {
     public class PhProbe : GenericAnalogSensor
     {
+        public IDataLogger dataLogger;
+
         public PhProbe (
             string name,
             IndividualControl channel,
-            float zeroScaleActual,
-            float zeroScaleValue,
-            float fullScaleActual,
-            float fullScaleValue,
+            float zeroScaleCalibrationActual,
+            float zeroScaleCalibrationValue,
+            float fullScaleCalibrationActual,
+            float fullScaleCalibrationValue,
             int lowPassFilterFactor)
         : base (name,
             channel,
-            zeroScaleActual,
-            zeroScaleValue,
-            fullScaleActual,
-            fullScaleValue,
-            lowPassFilterFactor) { }
+            zeroScaleCalibrationActual,
+            zeroScaleCalibrationValue,
+            fullScaleCalibrationActual,
+            fullScaleCalibrationValue,
+            lowPassFilterFactor) 
+        {
+            dataLogger = Factory.GetDataLogger (string.Format ("{0}PhProbe", this.name.RemoveWhitespace ()));
+        }
 
         public override void OnCreate () {
             AquaPicDrivers.PhOrp.AddChannel (channel, string.Format ("{0}, pH Probe", name), lowPassFilterFactor);
             AquaPicDrivers.PhOrp.SubscribeConsumer (channel, this);
-            probeDisconnectedAlarmIndex = Alarm.Subscribe ("pH probe disconnected, " + name);
+            sensorDisconnectedAlarmIndex = Alarm.Subscribe ("pH probe disconnected, " + name);
         }
 
         public override void OnRemove () {
             AquaPicDrivers.PhOrp.RemoveChannel (channel);
             AquaPicDrivers.PhOrp.UnsubscribeConsumer (channel, this);
-            Alarm.Clear (probeDisconnectedAlarmIndex);
+            Alarm.Clear (sensorDisconnectedAlarmIndex);
+        }
+
+        public override void OnValueUpdatedAction (object parm) {
+            var args = parm as ValueChangedEvent;
+            var val = ScaleRawLevel (Convert.ToSingle (args.newValue));
+            if (val < zeroScaleCalibrationActual) {
+                dataLogger.AddEntry (val);
+            } else {
+                dataLogger.AddEntry ("probe disconnected");
+            }
         }
     }
 }

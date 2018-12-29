@@ -27,65 +27,15 @@ using AquaPic.Globals;
 
 namespace AquaPic.Sensors.TemperatureProbe
 {
-    public class TemperatureProbeSettings : GenericSensorSettings
+    public class TemperatureProbeSettings : GenericAnalogSensorSettings
     {
-        [EntitySetting (typeof (FloatMutatorDefaultTemperatureProbeZeroScaleActual), "zeroScaleCalibrationActual")]
-        public float zeroScaleCalibrationActual { get; set; }
-
-        [EntitySetting (typeof (FloatMutatorDefaultTemperatureProbeZeroScaleValue), "zeroScaleCalibrationValue")]
-        public float zeroScaleCalibrationValue { get; set; }
-
-        [EntitySetting (typeof (FloatMutatorDefaultTemperatureProbeFullScaleActual), "fullScaleCalibrationActual")]
-        public float fullScaleCalibrationActual { get; set; }
-
-        [EntitySetting (typeof (FloatMutatorDefaultTemperatureProbeScaleValue), "fullScaleCalibrationValue")]
-        public float fullScaleCalibrationValue { get; set; }
-
-        [EntitySetting (typeof (IntMutatorDefaultTemperatureProbeLowPassFilterFactor), "lowPassFilterFactor")]
-        public int lowPassFilterFactor { get; set; }
-
         public TemperatureProbeSettings () {
             name = string.Empty;
             channel = IndividualControl.Empty;
             zeroScaleCalibrationActual = 32f;
             zeroScaleCalibrationValue = 100f;
             fullScaleCalibrationActual = 82f;
-            fullScaleCalibrationValue = 4095f;
-        }
-    }
-
-    public class FloatMutatorDefaultTemperatureProbeZeroScaleActual : FloatMutator
-    {
-        public override float Default () {
-            return 32f;
-        }
-    }
-
-    public class FloatMutatorDefaultTemperatureProbeZeroScaleValue : FloatMutator
-    {
-        public override float Default () {
-            return 100f;
-        }
-    }
-
-    public class FloatMutatorDefaultTemperatureProbeFullScaleActual : FloatMutator
-    {
-        public override float Default () {
-            return 82f;
-        }
-    }
-
-    public class FloatMutatorDefaultTemperatureProbeScaleValue : FloatMutator
-    {
-        public override float Default () {
-            return 4095f;
-        }
-    }
-
-    public class IntMutatorDefaultTemperatureProbeLowPassFilterFactor : IntMutator
-    {
-        public override int Default () {
-            return 5;
+            fullScaleCalibrationValue = 4096f;
         }
     }
 }

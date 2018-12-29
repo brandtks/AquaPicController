@@ -32,52 +32,17 @@ namespace AquaPic.Sensors.TemperatureProbe
 
         protected TemperatureProbeCollection () : base ("temperatureProbes") { }
 
-        public override void AddAllSensors () {
-            var sensorSettings = SettingsHelper.ReadAllSettingsInArray<TemperatureProbeSettings> (sensorSettingsFileName, sensorSettingsArrayName);
-            foreach (var setting in sensorSettings) {
-                AddSensor (setting, false);
-            }
-        }
+        protected override GenericAnalogSensor CreateAnalogSensor (GenericAnalogSensorSettings settings) {
+            var sensor = new TemperatureProbe (
+                settings.name,
+                settings.channel,
+                settings.zeroScaleCalibrationActual,
+                settings.zeroScaleCalibrationValue,
+                settings.fullScaleCalibrationActual,
+                settings.fullScaleCalibrationValue,
+                settings.lowPassFilterFactor);
 
-        protected override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
-            var sensorSettings = settings as TemperatureProbeSettings;
-            if (sensorSettings == null) {
-                throw new ArgumentException ("Settings must be TemperatureProbeSettings");
-            }
-
-            var temperatureProbe = new TemperatureProbe (
-                sensorSettings.name,
-                sensorSettings.channel,
-                sensorSettings.zeroScaleCalibrationActual,
-                sensorSettings.zeroScaleCalibrationValue,
-                sensorSettings.fullScaleCalibrationActual,
-                sensorSettings.fullScaleCalibrationValue,
-                sensorSettings.lowPassFilterFactor);
-
-            return temperatureProbe;
-        }
-
-        protected override GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
-            var tempProbe = sensors[name] as TemperatureProbe;
-            var sensorSettings = settings as TemperatureProbeSettings;
-            sensorSettings.zeroScaleCalibrationValue = tempProbe.zeroScaleActual;
-            sensorSettings.zeroScaleCalibrationValue = tempProbe.zeroScaleValue;
-            sensorSettings.fullScaleCalibrationActual = tempProbe.fullScaleActual;
-            sensorSettings.fullScaleCalibrationValue = tempProbe.fullScaleValue;
-            return sensorSettings;
-        }
-
-        public override GenericSensorSettings GetSensorSettings (string name) {
-            CheckSensorKey (name);
-            var tempProbe = sensors[name] as TemperatureProbe;
-            var settings = new TemperatureProbeSettings ();
-            settings.name = tempProbe.name;
-            settings.channel = tempProbe.channel;
-            settings.zeroScaleCalibrationActual = tempProbe.zeroScaleActual;
-            settings.zeroScaleCalibrationValue = tempProbe.zeroScaleValue;
-            settings.fullScaleCalibrationActual = tempProbe.fullScaleActual;
-            settings.fullScaleCalibrationValue = tempProbe.fullScaleValue;
-            return settings;
+            return sensor;
         }
     }
 }

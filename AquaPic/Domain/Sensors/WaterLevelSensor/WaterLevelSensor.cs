@@ -33,28 +33,28 @@ namespace AquaPic.Sensors
         public WaterLevelSensor (
             string name,
             IndividualControl channel,
-            float zeroScaleValue,
-            float fullScaleActual,
-            float fullScaleValue,
+            float zeroScaleCalibrationValue,
+            float fullScaleCalibrationActual,
+            float fullScaleCalibrationValue,
             int lowPassFilterFactor)
         : base (name,
             channel,
             0,
-            zeroScaleValue,
-            fullScaleActual,
-            fullScaleValue,
+            zeroScaleCalibrationValue,
+            fullScaleCalibrationActual,
+            fullScaleCalibrationValue,
             lowPassFilterFactor) { }
 
         public override void OnCreate () {
             AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name), lowPassFilterFactor);
             AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
-            probeDisconnectedAlarmIndex = Alarm.Subscribe ("Water level sensor disconnected, " + name);
+            sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Water level sensor disconnected, " + name);
         }
 
         public override void OnRemove () {
             AquaPicDrivers.AnalogInput.RemoveChannel (channel);
             AquaPicDrivers.AnalogInput.UnsubscribeConsumer (channel, this);
-            Alarm.Clear (probeDisconnectedAlarmIndex);
+            Alarm.Clear (sensorDisconnectedAlarmIndex);
         }
     }
 }
