@@ -138,8 +138,6 @@ namespace AquaPic.UserInterface
             /******************************************************************************************************/
             /* Heaters                                                                                            */
             /******************************************************************************************************/
-            heaterName = Temperature.defaultHeater;
-
             label = new TouchLabel ();
             label.text = "Heaters";
             label.textColor = "seca";
@@ -159,32 +157,7 @@ namespace AquaPic.UserInterface
             heaterSetupBtn.text = Convert.ToChar (0x2699).ToString ();
             heaterSetupBtn.SetSizeRequest (30, 30);
             heaterSetupBtn.buttonColor = "pri";
-            heaterSetupBtn.ButtonReleaseEvent += (o, args) => {
-                var parent = Toplevel as Window;
-                var s = new HeaterSettings (heaterName, heaterName.IsNotEmpty (), parent);
-                s.Run ();
-                var newHeaterName = s.newOrUpdatedHeaterName;
-                var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
-
-                if ((outcome == TouchSettingsOutcome.Modified) && (newHeaterName != heaterName)) {
-                    var index = heaterCombo.comboList.IndexOf (heaterName);
-                    heaterCombo.comboList[index] = newHeaterName;
-                    heaterName = newHeaterName;
-                } else if (outcome == TouchSettingsOutcome.Added) {
-                    heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
-                    heaterCombo.activeText = newHeaterName;
-                    heaterName = newHeaterName;
-                } else if (outcome == TouchSettingsOutcome.Deleted) {
-                    heaterCombo.comboList.Remove (heaterName);
-                    heaterName = Temperature.defaultHeater;
-                    heaterCombo.activeText = heaterName;
-                }
-
-                heaterCombo.QueueDraw ();
-                GetHeaterData ();
-            };
+            heaterSetupBtn.ButtonReleaseEvent += OnHeaterSettingsButtonReleaseEvent;
             Put (heaterSetupBtn, 755, 77);
             heaterSetupBtn.Show ();
 
@@ -227,7 +200,16 @@ namespace AquaPic.UserInterface
             Put (probeTempTextbox, 415, 320);
             probeTempTextbox.Show ();
 
-            heaterCombo = new TouchComboBox (Temperature.GetAllHeaterNames ());
+            heaterCombo = new TouchComboBox ();
+            if (groupName.IsNotEmpty ()) {
+                var heaterNames = Temperature.GetAllHeaterNames (groupName);
+                if (heaterNames.Length > 0) {
+                    heaterCombo.comboList.AddRange (heaterNames);
+                    heaterName = heaterNames[0];
+                } else {
+                    heaterName = string.Empty;
+                }
+            }
             heaterCombo.WidthRequest = 200;
             heaterCombo.comboList.Add ("New heater...");
             heaterCombo.ComboChangedEvent += OnHeaterComboChanged;
@@ -242,10 +224,9 @@ namespace AquaPic.UserInterface
             probeCombo = new TouchComboBox ();
             if (groupName.IsNotEmpty ()) {
                 var groupsTemperatureProbes = Temperature.GetAllTemperatureProbesForTemperatureGroup (groupName);
-                probeCombo.comboList.AddRange (groupsTemperatureProbes);
                 if (groupsTemperatureProbes.Length > 0) {
+                    probeCombo.comboList.AddRange (groupsTemperatureProbes);
                     probeName = groupsTemperatureProbes[0];
-                    probeCombo.activeText = probeName;
                 } else {
                     probeName = string.Empty;
                 }
@@ -300,7 +281,7 @@ namespace AquaPic.UserInterface
 
         protected void GetHeaterData () {
             if (heaterName.IsNotEmpty ()) {
-                if (Power.GetOutletState (Temperature.GetHeaterIndividualControl (heaterName)) == MyState.On) {
+                if (Power.GetOutletState (Temperature.GetHeaterIndividualControl (groupName, heaterName)) == MyState.On) {
                     heaterLabel.text = "Heater On";
                     heaterLabel.textColor = "secb";
                 } else {
@@ -352,32 +333,6 @@ namespace AquaPic.UserInterface
             tempDeadband.QueueDraw ();
         }
 
-        protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.activeText == "New heater...") {
-                var heaterCount = Temperature.heaterCount;
-                var parent = Toplevel as Window;
-                var s = new HeaterSettings (string.Empty, false, parent);
-                s.Run ();
-                var newHeaterName = s.newOrUpdatedHeaterName;
-                var outcome = s.outcome;
-                s.Destroy ();
-                s.Dispose ();
-
-                if (outcome == TouchSettingsOutcome.Added) {
-                    heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
-                    heaterCombo.activeText = newHeaterName;
-                    heaterName = newHeaterName;
-                } else {
-                    heaterCombo.activeText = heaterName;
-                }
-            } else {
-                heaterName = e.activeText;
-            }
-
-            heaterCombo.QueueDraw ();
-            GetHeaterData ();
-        }
-
         protected void OnGroupComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New group...") {
                 CallTemperatureGroupSettingsDialog (true);
@@ -397,6 +352,20 @@ namespace AquaPic.UserInterface
                 probeCombo.comboList.Add ("New level sensor...");
                 probeCombo.activeIndex = 0;
                 probeCombo.QueueDraw ();
+
+                heaterCombo.comboList.Clear ();
+                if (groupName.IsNotEmpty ()) {
+                    var heaterNames = Temperature.GetAllHeaterNames (groupName);
+                    if (heaterNames.Length > 0) {
+                        heaterCombo.comboList.AddRange (heaterNames);
+                        heaterName = heaterNames[0];
+                    } else {
+                        heaterName = string.Empty;
+                    }
+                }
+                heaterCombo.comboList.Add ("New heater...");
+                heaterCombo.activeIndex = 0;
+                heaterCombo.QueueDraw ();
             }
 
             groupCombo.QueueDraw ();
@@ -436,6 +405,12 @@ namespace AquaPic.UserInterface
                 probeCombo.QueueDraw ();
                 probeName = string.Empty;
 
+                heaterCombo.comboList.Clear ();
+                heaterCombo.comboList.Add ("New heater...");
+                heaterCombo.activeIndex = 0;
+                heaterCombo.QueueDraw ();
+                heaterName = string.Empty;
+
             } else if (outcome == TouchSettingsOutcome.Deleted) {
                 groupCombo.comboList.Remove (groupName);
                 groupName = Temperature.defaultTemperatureGroup;
@@ -448,8 +423,8 @@ namespace AquaPic.UserInterface
                 probeCombo.comboList.Clear ();
                 if (groupName.IsNotEmpty ()) {
                     var groupsTemperatureProbes = Temperature.GetAllTemperatureProbesForTemperatureGroup (groupName);
-                    probeCombo.comboList.AddRange (groupsTemperatureProbes);
                     if (groupsTemperatureProbes.Length > 0) {
+                        probeCombo.comboList.AddRange (groupsTemperatureProbes);
                         probeName = groupsTemperatureProbes[0];
                     } else {
                         probeName = string.Empty;
@@ -458,11 +433,80 @@ namespace AquaPic.UserInterface
                 probeCombo.comboList.Add ("New level sensor...");
                 probeCombo.activeIndex = 0;
                 probeCombo.QueueDraw ();
+
+                heaterCombo.comboList.Clear ();
+                if (groupName.IsNotEmpty ()) {
+                    var heaterNames = Temperature.GetAllHeaterNames (groupName);
+                    if (heaterNames.Length > 0) {
+                        heaterCombo.comboList.AddRange (heaterNames);
+                        heaterName = heaterNames[0];
+                    } else {
+                        heaterName = string.Empty;
+                    }
+                }
+                heaterCombo.comboList.Add ("New heater...");
+                heaterCombo.activeIndex = 0;
+                heaterCombo.QueueDraw ();
             }
 
             groupCombo.QueueDraw ();
             GetGroupData ();
             GetProbeData ();
+            GetHeaterData ();
+        }
+
+        protected void OnHeaterComboChanged (object sender, ComboBoxChangedEventArgs e) {
+            if (e.activeText == "New heater...") {
+                CallHeaterSettingsDialog (true);
+            } else {
+                heaterName = e.activeText;
+            }
+
+            heaterCombo.QueueDraw ();
+            GetHeaterData ();
+        }
+
+        protected void OnHeaterSettingsButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
+            CallHeaterSettingsDialog ();
+        }
+
+        protected void CallHeaterSettingsDialog (bool forceNew = false) {
+            if (groupName.IsNotEmpty ()) {
+                HeaterSettings settings;
+                if (heaterName.IsNotEmpty () && !forceNew) {
+                    settings = Temperature.GetHeaterSettings (groupName, heaterName);
+                } else {
+                    settings = new HeaterSettings ();
+                }
+                var parent = Toplevel as Window;
+                var s = new HeaterSettingsDialog (groupName, settings, parent);
+                s.Run ();
+                var newHeaterName = s.heaterName;
+                var outcome = s.outcome;
+
+                if ((outcome == TouchSettingsOutcome.Modified) && (newHeaterName != heaterName)) {
+                    var index = heaterCombo.comboList.IndexOf (heaterName);
+                    heaterCombo.comboList[index] = newHeaterName;
+                    heaterName = newHeaterName;
+                } else if (outcome == TouchSettingsOutcome.Added) {
+                    heaterCombo.comboList.Insert (heaterCombo.comboList.Count - 1, newHeaterName);
+                    heaterCombo.activeText = newHeaterName;
+                    heaterName = newHeaterName;
+                } else if (outcome == TouchSettingsOutcome.Deleted) {
+                    heaterCombo.comboList.Remove (heaterName);
+                    var heaterNames = Temperature.GetAllHeaterNames (groupName);
+                    if (heaterNames.Length > 0) {
+                        heaterName = heaterNames[0];
+                        heaterCombo.activeText = heaterName;
+                    } else {
+                        heaterName = string.Empty;
+                        heaterCombo.activeIndex = 0;
+                    }
+                }
+
+                heaterCombo.QueueDraw ();
+                GetHeaterData ();
+            }
         }
 
         protected void OnProbeComboChanged (object sender, ComboBoxChangedEventArgs e) {
