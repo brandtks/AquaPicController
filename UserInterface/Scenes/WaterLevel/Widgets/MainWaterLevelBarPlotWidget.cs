@@ -36,7 +36,7 @@ namespace AquaPic.UserInterface
         public WaterLevelBarPlotWidget (string group, int row, int column) : base ("Water Level", group, row, column) {
             text = "No Water Level";
             unitOfMeasurement = UnitsOfMeasurement.Inches;
-            fullScale = 15.0f;
+            fullScale = 15f;
 
             label = new TouchLabel ();
             label.textColor = "compl";
@@ -52,6 +52,7 @@ namespace AquaPic.UserInterface
                 WidgetReleaseEvent += (o, args) => {
                     AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.group);
                 };
+                fullScale = WaterLevel.GetWaterLevelGroupMaxLevel (this.group);
             } else {
                 this.group = string.Empty;
             }
