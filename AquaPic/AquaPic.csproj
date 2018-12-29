@@ -181,6 +181,7 @@
     <Compile Include="Domain\Sensors\GenericSensor\GenericAnalogSensor.cs" />
     <Compile Include="Domain\Entity\Mutators\IntMutator.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericAnalogSensorCollection.cs" />
+    <Compile Include="Domain\Sensors\GenericSensor\GenericAnalogSensorSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

@@ -22,16 +22,57 @@
 #endregion // License
 
 using System;
-using System.Collections.Generic;
-using AquaPic.Globals;
 using AquaPic.Runtime;
-using AquaPic.PubSub;
 
 namespace AquaPic.Sensors
 {
     public class GenericAnalogSensorCollection : GenericSensorCollection
     {
         public GenericAnalogSensorCollection (string sensorSettingsArrayName) : base (sensorSettingsArrayName) { }
+
+        public override void AddAllSensors () {
+            var sensorSettings = SettingsHelper.ReadAllSettingsInArray<GenericAnalogSensorSettings> (sensorSettingsFileName, sensorSettingsArrayName);
+            foreach (var setting in sensorSettings) {
+                AddSensor (setting, false);
+            }
+        }
+
+        protected override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
+            var sensorSettings = settings as GenericAnalogSensorSettings;
+            if (sensorSettings == null) {
+                throw new ArgumentException ("Settings must be GenericAnalogSensorSettings");
+            }
+
+            var sensor = CreateAnalogSensor (sensorSettings);
+
+            return sensor;
+        }
+
+        protected virtual GenericAnalogSensor CreateAnalogSensor (GenericAnalogSensorSettings settings) => throw new NotImplementedException ();
+
+        protected override GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
+            var phProbe = sensors[name] as GenericAnalogSensor;
+            var sensorSettings = settings as GenericAnalogSensorSettings;
+            sensorSettings.zeroScaleCalibrationValue = phProbe.zeroScaleCalibrationActual;
+            sensorSettings.zeroScaleCalibrationValue = phProbe.zeroScaleCalibrationValue;
+            sensorSettings.fullScaleCalibrationActual = phProbe.fullScaleCalibrationActual;
+            sensorSettings.fullScaleCalibrationValue = phProbe.fullScaleCalibrationValue;
+            return sensorSettings;
+        }
+
+        public override GenericSensorSettings GetSensorSettings (string name) {
+            CheckSensorKey (name);
+            var phProbe = sensors[name] as GenericAnalogSensor;
+            var settings = new GenericAnalogSensorSettings ();
+            settings.name = phProbe.name;
+            settings.channel = phProbe.channel;
+            settings.zeroScaleCalibrationActual = phProbe.zeroScaleCalibrationActual;
+            settings.zeroScaleCalibrationValue = phProbe.zeroScaleCalibrationValue;
+            settings.fullScaleCalibrationActual = phProbe.fullScaleCalibrationActual;
+            settings.fullScaleCalibrationValue = phProbe.fullScaleCalibrationValue;
+            settings.lowPassFilterFactor = phProbe.lowPassFilterFactor;
+            return settings;
+        }
 
         public void SetCalibrationData (string name, float zeroScaleActual, float zeroScaleValue, float fullScaleActual, float fullScaleValue) {
             CheckSensorKey (name);
@@ -44,10 +85,10 @@ namespace AquaPic.Sensors
 
             var phProbe = sensors[name] as GenericAnalogSensor;
 
-            phProbe.zeroScaleActual = zeroScaleActual;
-            phProbe.zeroScaleValue = zeroScaleValue;
-            phProbe.fullScaleActual = fullScaleActual;
-            phProbe.fullScaleValue = fullScaleValue;
+            phProbe.zeroScaleCalibrationActual = zeroScaleActual;
+            phProbe.zeroScaleCalibrationValue = zeroScaleValue;
+            phProbe.fullScaleCalibrationActual = fullScaleActual;
+            phProbe.fullScaleCalibrationValue = fullScaleValue;
 
             UpdateSensorSettingsInFile (name);
         }

@@ -33,37 +33,37 @@ namespace AquaPic.Sensors
     {
         public float value { get; protected set; }
 
-        public float zeroScaleActual { get; set; }
-        public float zeroScaleValue { get; set; }
-        public float fullScaleActual { get; set; }
-        public float fullScaleValue { get; set; }
+        public float zeroScaleCalibrationActual { get; set; }
+        public float zeroScaleCalibrationValue { get; set; }
+        public float fullScaleCalibrationActual { get; set; }
+        public float fullScaleCalibrationValue { get; set; }
 
         public int lowPassFilterFactor { get; set; }
 
-        public int probeDisconnectedAlarmIndex { get; protected set; }
+        public int sensorDisconnectedAlarmIndex { get; protected set; }
         public bool connected {
             get {
-                return !Alarm.CheckAlarming (probeDisconnectedAlarmIndex);
+                return !Alarm.CheckAlarming (sensorDisconnectedAlarmIndex);
             }
         }
 
         public GenericAnalogSensor (
             string name,
             IndividualControl channel,
-            float zeroScaleActual,
-            float zeroScaleValue,
-            float fullScaleActual,
-            float fullScaleValue,
+            float zeroScaleCalibrationActual,
+            float zeroScaleCalibrationValue,
+            float fullScaleCalibrationActual,
+            float fullScaleCalibrationValue,
             int lowPassFilterFactor)
             : base (name, channel) 
         {
-            this.zeroScaleActual = zeroScaleActual;
-            this.zeroScaleValue = zeroScaleValue;
-            this.fullScaleActual = fullScaleActual;
-            this.fullScaleValue = fullScaleValue;
+            this.zeroScaleCalibrationActual = zeroScaleCalibrationActual;
+            this.zeroScaleCalibrationValue = zeroScaleCalibrationValue;
+            this.fullScaleCalibrationActual = fullScaleCalibrationActual;
+            this.fullScaleCalibrationValue = fullScaleCalibrationValue;
             this.lowPassFilterFactor = lowPassFilterFactor;
-            value = this.zeroScaleActual;
-            probeDisconnectedAlarmIndex = -1;
+            value = this.zeroScaleCalibrationActual;
+            sensorDisconnectedAlarmIndex = -1;
         }
 
         public override ValueType GetValue () {
@@ -75,10 +75,10 @@ namespace AquaPic.Sensors
             var oldValue = value;
             value = ScaleRawLevel (Convert.ToSingle (args.newValue));
 
-            if (value < zeroScaleActual) {
-                Alarm.Post (probeDisconnectedAlarmIndex);
+            if (value < zeroScaleCalibrationActual) {
+                Alarm.Post (sensorDisconnectedAlarmIndex);
             } else {
-                Alarm.Clear (probeDisconnectedAlarmIndex);
+                Alarm.Clear (sensorDisconnectedAlarmIndex);
             }
 
             NotifyValueChanged (value, oldValue);
@@ -86,7 +86,7 @@ namespace AquaPic.Sensors
 
 
         protected float ScaleRawLevel (float rawValue) {
-            return rawValue.Map (zeroScaleValue, fullScaleValue, zeroScaleActual, fullScaleActual);
+            return rawValue.Map (zeroScaleCalibrationValue, fullScaleCalibrationValue, zeroScaleCalibrationActual, fullScaleCalibrationActual);
         }
     }
 }
