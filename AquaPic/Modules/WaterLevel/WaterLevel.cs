@@ -159,6 +159,20 @@ namespace AquaPic.Modules
             return waterLevelGroups[name].level;
         }
 
+        /***Max Level***/
+        public static float GetWaterLevelGroupMaxLevel (string name) {
+            CheckWaterLevelGroupKey (name);
+            var maxLevel = 0f;
+            foreach (var sensorName in waterLevelGroups[name].waterLevelSensors.Keys) {
+                var sensor = AquaPicSensors.WaterLevelSensors.GetSensor (sensorName) as WaterLevelSensor;
+                if (sensor.fullScaleCalibrationActual > maxLevel) {
+                    maxLevel = sensor.fullScaleCalibrationActual;
+                }
+            }
+            return maxLevel;
+        }
+
+        /***Float Switch Activated***/
         public static bool GetWaterLevelGroupSwitchesActivated (string name, SwitchFunction function = SwitchFunction.ATO) {
             CheckWaterLevelGroupKey (name);
             bool activated = true;
