@@ -128,7 +128,7 @@ namespace AquaPic.Runtime
             return allEntitySettings.ToArray ();
         }
 
-        public static bool AddSettingsToArray (string fileName, string arrayName, IEntitySettings settings) {
+        public static bool AddSettingsToArray (string fileName, string arrayName, IEntitySettings settings, int index = -1) {
             var successful = false;
             var jo = OpenSettingsFile (fileName) as JObject;
             if (jo != null) {
@@ -147,7 +147,11 @@ namespace AquaPic.Runtime
                             writeMethod.Invoke (mutator, new object[] { reflectedSetting.propertyValue, jobj, entitySettingAttribute.keys });
                         }
                     }
-                    ja.Add (jobj);
+                    if (index == -1) {
+                        ja.Add (jobj);
+                    } else {
+                        ja.Insert (index, jobj);
+                    }
                     WriteSettingsFile (fileName, jo);
                     successful = true;
                 }
@@ -155,27 +159,26 @@ namespace AquaPic.Runtime
             return successful;
         }
 
-        public static bool DeleteSettingsFromArray (string fileName, string arrayName, string entityName) {
-            var successful = false;
+        public static int DeleteSettingsFromArray (string fileName, string arrayName, string entityName) {
+            var arrayIndex = -1;
             var jo = OpenSettingsFile (fileName) as JObject;
             if (jo != null) {
                 var ja = jo[arrayName] as JArray;
                 if (ja != null) {
-                    var arrayIndex = FindSettingsInArray (ja, entityName);
+                    arrayIndex = FindSettingsInArray (ja, entityName);
                     if (arrayIndex != -1) {
                         ja.RemoveAt (arrayIndex);
                         WriteSettingsFile (fileName, jo);
-                        successful = true;
                     }
                 }
             }
-            return successful;
+            return arrayIndex;
         }
 
         public static bool UpdateSettingsInArray (string fileName, string arrayName, string oldEntityName, IEntitySettings settings) {
-            var successful = DeleteSettingsFromArray (fileName, arrayName, oldEntityName);
-            successful &= AddSettingsToArray (fileName, arrayName, settings);
-            return successful;
+            var index = DeleteSettingsFromArray (fileName, arrayName, oldEntityName);
+            var successful = AddSettingsToArray (fileName, arrayName, settings, index);
+            return successful & (index != -1);
         }
 
         public static List<ReflectedSetting> GetReflectedSettings (IEntitySettings settings) {
