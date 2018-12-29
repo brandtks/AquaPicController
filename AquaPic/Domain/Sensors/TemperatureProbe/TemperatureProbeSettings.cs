@@ -44,9 +44,10 @@ namespace AquaPic.Sensors.TemperatureProbe
         public TemperatureProbeSettings () {
             name = string.Empty;
             channel = IndividualControl.Empty;
-            zeroScaleCalibrationValue = 819.2f;
-            fullScaleCalibrationActual = 15f;
-            fullScaleCalibrationValue = 3003.73f;
+            zeroScaleCalibrationActual = 32f;
+            zeroScaleCalibrationValue = 100f;
+            fullScaleCalibrationActual = 82f;
+            fullScaleCalibrationValue = 4095f;
         }
     }
 
