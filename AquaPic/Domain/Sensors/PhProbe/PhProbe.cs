@@ -67,8 +67,8 @@ namespace AquaPic.Sensors.PhProbe
         }
 
         public override void OnValueUpdatedAction (object parm) {
-            var args = parm as ValueChangedEvent;
-            var val = ScaleRawLevel (Convert.ToSingle (args.newValue));
+            var args = parm as ValueUpdatedEvent;
+            var val = ScaleRawLevel (Convert.ToSingle (args.value));
             if (val < zeroScaleCalibrationActual) {
                 dataLogger.AddEntry (val);
             } else {
