@@ -51,7 +51,7 @@ namespace AquaPic.Modules
             }
         }
 
-        const string settingsFile = "lightingProperties";
+        const string settingsFile = "lighting";
         const string settingsArrayName = "lightingFixtures";
 
         static Lighting () { }

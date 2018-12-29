@@ -59,7 +59,7 @@ namespace AquaPic.Modules
             }
         }
 
-        const string settingsFile = "autoTopOffProperties";
+        const string settingsFile = "auto-top-off";
         const string settingsArrayName = "atoGroups";
 
         static AutoTopOff () { }
