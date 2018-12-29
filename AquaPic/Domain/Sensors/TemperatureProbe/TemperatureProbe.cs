@@ -68,7 +68,7 @@ namespace AquaPic.Sensors.TemperatureProbe
             probeDisconnectedAlarmIndex = Alarm.Subscribe ("Temperature probe disconnected, " + name);
         }
 
-        public void Remove () {
+        public override void OnRemove () {
             AquaPicDrivers.AnalogInput.RemoveChannel (channel);
             AquaPicDrivers.AnalogInput.UnsubscribeConsumer (channel, this);
             Alarm.Clear (probeDisconnectedAlarmIndex);
