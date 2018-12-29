@@ -41,6 +41,9 @@ namespace AquaPic.Sensors.TemperatureProbe
         [EntitySetting (typeof (FloatMutatorDefaultTemperatureProbeScaleValue), "fullScaleCalibrationValue")]
         public float fullScaleCalibrationValue { get; set; }
 
+        [EntitySetting (typeof (IntMutatorDefaultTemperatureProbeLowPassFilterFactor), "lowPassFilterFactor")]
+        public int lowPassFilterFactor { get; set; }
+
         public TemperatureProbeSettings () {
             name = string.Empty;
             channel = IndividualControl.Empty;
@@ -77,5 +80,12 @@ namespace AquaPic.Sensors.TemperatureProbe
         public override float Default () {
             return 4095f;
         }
-    }       
+    }
+
+    public class IntMutatorDefaultTemperatureProbeLowPassFilterFactor : IntMutator
+    {
+        public override int Default () {
+            return 5;
+        }
+    }
 }

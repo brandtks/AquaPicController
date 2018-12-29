@@ -26,7 +26,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Sensors.PhProbe
 {
-    public class PhProbeCollection : GenericSensorCollection
+    public class PhProbeCollection : GenericAnalogSensorCollection
     {
         public static PhProbeCollection SharedPhProbeCollectionInstance = new PhProbeCollection ();
 
@@ -51,7 +51,8 @@ namespace AquaPic.Sensors.PhProbe
                 sensorSettings.zeroScaleCalibrationActual,
                 sensorSettings.zeroScaleCalibrationValue,
                 sensorSettings.fullScaleCalibrationActual,
-                sensorSettings.fullScaleCalibrationValue);
+                sensorSettings.fullScaleCalibrationValue,
+                sensorSettings.lowPassFilterFactor);
 
             return phProbe;
         }
@@ -76,26 +77,8 @@ namespace AquaPic.Sensors.PhProbe
             settings.zeroScaleCalibrationValue = phProbe.zeroScaleValue;
             settings.fullScaleCalibrationActual = phProbe.fullScaleActual;
             settings.fullScaleCalibrationValue = phProbe.fullScaleValue;
+            settings.lowPassFilterFactor = phProbe.lowPassFilterFactor;
             return settings;
-        }
-
-        public void SetCalibrationData (string name, float zeroScaleActual, float zeroScaleValue, float fullScaleActual, float fullScaleValue) {
-            CheckSensorKey (name);
-
-            if (fullScaleValue <= zeroScaleValue)
-                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
-
-            if (fullScaleActual < 0.0f)
-                throw new ArgumentException ("Full scale actual can't be less than zero");
-
-            var phProbe = sensors[name] as PhProbe;
-
-            phProbe.zeroScaleActual = zeroScaleActual;
-            phProbe.zeroScaleValue = zeroScaleValue;
-            phProbe.fullScaleActual = fullScaleActual;
-            phProbe.fullScaleValue = fullScaleValue;
-
-            UpdateSensorSettingsInFile (name);
         }
     }
 }

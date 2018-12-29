@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2017 Goodtime Development
+    Copyright (c) 2018 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 #endregion // License
 
 using System;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 
 namespace AquaPic.Sensors
@@ -35,8 +34,11 @@ namespace AquaPic.Sensors
         [EntitySetting (typeof (FloatMutatorDefaultWaterLevelSensorFullScaleActual), "fullScaleCalibrationActual")]
         public float fullScaleCalibrationActual { get; set; }
 
-        [EntitySetting (typeof (FloatMutatorDefaultWaterLevelFullScaleValue), "fullScaleCalibrationValue")]
+        [EntitySetting (typeof (FloatMutatorDefaultWaterLevelSensorFullScaleValue), "fullScaleCalibrationValue")]
         public float fullScaleCalibrationValue { get; set; }
+
+        [EntitySetting (typeof (IntMutatorDefaultWaterLevelSensorLowPassFilterFactor), "lowPassFilterFactor")]
+        public int lowPassFilterFactor { get; set; }
 
         public WaterLevelSensorSettings () {
             name = string.Empty;
@@ -44,6 +46,7 @@ namespace AquaPic.Sensors
             zeroScaleCalibrationValue = 819.2f;
             fullScaleCalibrationActual = 15f;
             fullScaleCalibrationValue = 3003.73f;
+            lowPassFilterFactor = 5;
         }
     }
 
@@ -61,10 +64,17 @@ namespace AquaPic.Sensors
         }
     }
 
-    public class FloatMutatorDefaultWaterLevelFullScaleValue : FloatMutator
+    public class FloatMutatorDefaultWaterLevelSensorFullScaleValue : FloatMutator
     {
         public override float Default () {
             return 3003.73f;
+        }
+    }
+
+    public class IntMutatorDefaultWaterLevelSensorLowPassFilterFactor : IntMutator
+    {
+        public override int Default () {
+            return 5;
         }
     }
 }

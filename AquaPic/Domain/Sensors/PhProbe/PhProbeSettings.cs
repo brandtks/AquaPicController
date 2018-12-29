@@ -37,8 +37,11 @@ namespace AquaPic.Sensors.PhProbe
         [EntitySetting (typeof (FloatMutatorDefaultPhProbeFullScaleActual), "fullScaleCalibrationActual")]
         public float fullScaleCalibrationActual { get; set; }
 
-        [EntitySetting (typeof (FloatMutatorDefaultPhProbeScaleValue), "fullScaleCalibrationValue")]
+        [EntitySetting (typeof (FloatMutatorDefaultPhProbeFullScaleValue), "fullScaleCalibrationValue")]
         public float fullScaleCalibrationValue { get; set; }
+
+        [EntitySetting (typeof (IntMutatorDefaultPhProbeLowPassFilterFactor), "lowPassFilterFactor")]
+        public int lowPassFilterFactor { get; set; }
 
         public PhProbeSettings () {
             name = string.Empty;
@@ -47,6 +50,7 @@ namespace AquaPic.Sensors.PhProbe
             zeroScaleCalibrationValue = 14f;
             fullScaleCalibrationActual = 0f;
             fullScaleCalibrationValue = 4095f;
+            lowPassFilterFactor = 5;
         }
     }
 
@@ -71,10 +75,17 @@ namespace AquaPic.Sensors.PhProbe
         }
     }
 
-    public class FloatMutatorDefaultPhProbeScaleValue : FloatMutator
+    public class FloatMutatorDefaultPhProbeFullScaleValue : FloatMutator
     {
         public override float Default () {
             return 4095f;
+        }
+    }
+
+    public class IntMutatorDefaultPhProbeLowPassFilterFactor : IntMutator
+    {
+        public override int Default () {
+            return 5;
         }
     }
 }

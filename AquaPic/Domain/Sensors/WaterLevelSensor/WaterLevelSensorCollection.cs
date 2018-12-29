@@ -26,7 +26,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Sensors
 {
-    public class WaterLevelSensorCollection : GenericSensorCollection
+    public class WaterLevelSensorCollection : GenericAnalogSensorCollection
     {
         public static WaterLevelSensorCollection SharedWaterLevelSensorCollectionInstance = new WaterLevelSensorCollection ();
 
@@ -50,7 +50,8 @@ namespace AquaPic.Sensors
                 sensorSettings.channel,
                 sensorSettings.zeroScaleCalibrationValue,
                 sensorSettings.fullScaleCalibrationActual,
-                sensorSettings.fullScaleCalibrationValue);
+                sensorSettings.fullScaleCalibrationValue,
+                sensorSettings.lowPassFilterFactor);
 
             return waterLevelSensor;
         }
@@ -77,21 +78,7 @@ namespace AquaPic.Sensors
         }
 
         public void SetCalibrationData (string name, float zeroScaleValue, float fullScaleActual, float fullScaleValue) {
-            CheckSensorKey (name);
-
-            if (fullScaleValue <= zeroScaleValue)
-                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
-
-            if (fullScaleActual < 0.0f)
-                throw new ArgumentException ("Full scale actual can't be less than zero");
-
-            var waterLevelSensor = sensors[name] as WaterLevelSensor;
-
-            waterLevelSensor.zeroScaleValue = zeroScaleValue;
-            waterLevelSensor.fullScaleActual = fullScaleActual;
-            waterLevelSensor.fullScaleValue = fullScaleValue;
-
-            UpdateSensorSettingsInFile (name);
+            SetCalibrationData (name, 0, zeroScaleValue, fullScaleActual, fullScaleValue);
         }
     }
 }

@@ -26,7 +26,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Sensors.TemperatureProbe
 {
-    public class TemperatureProbeCollection : GenericSensorCollection
+    public class TemperatureProbeCollection : GenericAnalogSensorCollection
     {
         public static TemperatureProbeCollection SharedTemperatureProbeCollectionInstance = new TemperatureProbeCollection ();
 
@@ -51,7 +51,8 @@ namespace AquaPic.Sensors.TemperatureProbe
                 sensorSettings.zeroScaleCalibrationActual,
                 sensorSettings.zeroScaleCalibrationValue,
                 sensorSettings.fullScaleCalibrationActual,
-                sensorSettings.fullScaleCalibrationValue);
+                sensorSettings.fullScaleCalibrationValue,
+                sensorSettings.lowPassFilterFactor);
 
             return temperatureProbe;
         }
@@ -77,25 +78,6 @@ namespace AquaPic.Sensors.TemperatureProbe
             settings.fullScaleCalibrationActual = tempProbe.fullScaleActual;
             settings.fullScaleCalibrationValue = tempProbe.fullScaleValue;
             return settings;
-        }
-
-        public void SetCalibrationData (string name, float zeroScaleActual, float zeroScaleValue, float fullScaleActual, float fullScaleValue) {
-            CheckSensorKey (name);
-
-            if (fullScaleValue <= zeroScaleValue)
-                throw new ArgumentException ("Full scale value can't be less than or equal to zero value");
-
-            if (fullScaleActual < 0.0f)
-                throw new ArgumentException ("Full scale actual can't be less than zero");
-
-            var temperatureProbe = sensors[name] as TemperatureProbe;
-
-            temperatureProbe.zeroScaleActual = zeroScaleActual;
-            temperatureProbe.zeroScaleValue = zeroScaleValue;
-            temperatureProbe.fullScaleActual = fullScaleActual;
-            temperatureProbe.fullScaleValue = fullScaleValue;
-
-            UpdateSensorSettingsInFile (name);
         }
     }
 }

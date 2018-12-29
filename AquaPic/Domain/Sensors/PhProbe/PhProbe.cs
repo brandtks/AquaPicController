@@ -30,67 +30,34 @@ using AquaPic.PubSub;
 
 namespace AquaPic.Sensors.PhProbe
 {
-    public class PhProbe : GenericSensor
+    public class PhProbe : GenericAnalogSensor
     {
-        public float level { get; protected set; }
-
-        public float zeroScaleActual;
-        public float zeroScaleValue;
-        public float fullScaleActual;
-        public float fullScaleValue;
-
-        public int probeDisconnectedAlarmIndex;
-
         public PhProbe (
             string name,
             IndividualControl channel,
             float zeroScaleActual,
             float zeroScaleValue,
             float fullScaleActual,
-            float fullScaleValue)
-            : base (name, channel)
-        {
-            this.zeroScaleActual = zeroScaleActual;
-            this.zeroScaleValue = zeroScaleValue;
-            this.fullScaleActual = fullScaleActual;
-            this.fullScaleValue = fullScaleValue;
-            level = this.zeroScaleActual;
-            probeDisconnectedAlarmIndex = -1;
-        }
+            float fullScaleValue,
+            int lowPassFilterFactor)
+        : base (name,
+            channel,
+            zeroScaleActual,
+            zeroScaleValue,
+            fullScaleActual,
+            fullScaleValue,
+            lowPassFilterFactor) { }
 
         public override void OnCreate () {
-            AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, pH Probe", name));
-            AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
+            AquaPicDrivers.PhOrp.AddChannel (channel, string.Format ("{0}, pH Probe", name), lowPassFilterFactor);
+            AquaPicDrivers.PhOrp.SubscribeConsumer (channel, this);
             probeDisconnectedAlarmIndex = Alarm.Subscribe ("pH probe disconnected, " + name);
         }
 
         public override void OnRemove () {
-            AquaPicDrivers.AnalogInput.RemoveChannel (channel);
-            AquaPicDrivers.AnalogInput.UnsubscribeConsumer (channel, this);
+            AquaPicDrivers.PhOrp.RemoveChannel (channel);
+            AquaPicDrivers.PhOrp.UnsubscribeConsumer (channel, this);
             Alarm.Clear (probeDisconnectedAlarmIndex);
-        }
-
-        public override ValueType GetValue () {
-            return level;
-        }
-
-        public override void OnValueChangedAction (object parm) {
-            var args = parm as ValueChangedEvent;
-            var oldLevel = level;
-            level = ScaleRawLevel (Convert.ToSingle (args.newValue));
-
-            if (level < zeroScaleActual) {
-                Alarm.Post (probeDisconnectedAlarmIndex);
-            } else {
-                Alarm.Clear (probeDisconnectedAlarmIndex);
-            }
-
-            NotifyValueChanged (level, oldLevel);
-        }
-
-
-        protected float ScaleRawLevel (float rawValue) {
-            return rawValue.Map (zeroScaleValue, fullScaleValue, zeroScaleActual, fullScaleActual);
         }
     }
 }

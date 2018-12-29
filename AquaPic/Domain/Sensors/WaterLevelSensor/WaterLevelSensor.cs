@@ -30,71 +30,33 @@ using AquaPic.PubSub;
 
 namespace AquaPic.Sensors
 {
-    public class WaterLevelSensor : GenericSensor
+    public class WaterLevelSensor : GenericAnalogSensor
     {
-        public float level { get; protected set; }
-
-        public float zeroScaleValue { get; set; }
-        public float fullScaleActual { get; set; }
-        public float fullScaleValue { get; set; }
-        public int sensorDisconnectedAlarmIndex { get; private set; }
-        public bool connected {
-            get {
-                return !Alarm.CheckAlarming (sensorDisconnectedAlarmIndex);
-            }
-        }
-
         public WaterLevelSensor (
             string name,
             IndividualControl channel,
             float zeroScaleValue,
             float fullScaleActual,
-            float fullScaleValue) 
-            : base (name, channel)
-        {
-            level = 0f;
-            this.zeroScaleValue = zeroScaleValue;
-            this.fullScaleActual = fullScaleActual;
-            this.fullScaleValue = fullScaleValue;
-            sensorDisconnectedAlarmIndex = -1;
-        }
+            float fullScaleValue,
+            int lowPassFilterFactor)
+        : base (name,
+            channel,
+            0,
+            zeroScaleValue,
+            fullScaleActual,
+            fullScaleValue,
+            lowPassFilterFactor) { }
 
         public override void OnCreate () {
             AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name));
             AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
-            sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Water level sensor disconnected, " + name);
+            probeDisconnectedAlarmIndex = Alarm.Subscribe ("Water level sensor disconnected, " + name);
         }
 
         public override void OnRemove () {
             AquaPicDrivers.AnalogInput.RemoveChannel (channel);
             AquaPicDrivers.AnalogInput.UnsubscribeConsumer (channel, this);
-            Alarm.Clear (sensorDisconnectedAlarmIndex);
-        }
-
-        public override ValueType GetValue () {
-            return level;
-        }
-
-        public override void OnValueChangedAction (object parm) {
-            var args = parm as ValueChangedEvent;
-            var oldLevel = level;
-            level = ScaleRawLevel (Convert.ToSingle (args.newValue));
-
-            if (level < 0f) {
-                if (!Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
-                    Alarm.Post (sensorDisconnectedAlarmIndex);
-                }
-            } else {
-                if (Alarm.CheckAlarming (sensorDisconnectedAlarmIndex)) {
-                    Alarm.Clear (sensorDisconnectedAlarmIndex);
-                }
-            }
-
-            NotifyValueChanged (level, oldLevel);
-        }
-
-        protected float ScaleRawLevel (float rawValue) {
-            return rawValue.Map (zeroScaleValue, fullScaleValue, 0, fullScaleActual);
+            Alarm.Clear (probeDisconnectedAlarmIndex);
         }
     }
 }
