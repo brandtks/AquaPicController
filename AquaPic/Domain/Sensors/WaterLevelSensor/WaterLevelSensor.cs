@@ -48,7 +48,7 @@ namespace AquaPic.Sensors
             lowPassFilterFactor) { }
 
         public override void OnCreate () {
-            AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name));
+            AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name), lowPassFilterFactor);
             AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
             probeDisconnectedAlarmIndex = Alarm.Subscribe ("Water level sensor disconnected, " + name);
         }
