@@ -28,7 +28,7 @@ namespace AquaPic.Sensors.PhProbe
 {
     public class PhProbeCollection : GenericSensorCollection
     {
-        public static PhProbeCollection SharedTemperatureProbeCollectionInstance = new PhProbeCollection ();
+        public static PhProbeCollection SharedPhProbeCollectionInstance = new PhProbeCollection ();
 
         protected PhProbeCollection () : base ("phProbes") { }
 

@@ -25,6 +25,7 @@ using System;
 using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
 using AquaPic.Sensors.TemperatureProbe;
+using AquaPic.Sensors.PhProbe;
 
 namespace AquaPic.Sensors
 {
@@ -35,12 +36,14 @@ namespace AquaPic.Sensors
         public static FloatSwitchCollection FloatSwitches = FloatSwitchCollection.SharedFloatSwitchCollectionInstance;
         public static WaterLevelSensorCollection WaterLevelSensors = WaterLevelSensorCollection.SharedWaterLevelSensorCollectionInstance;
         public static TemperatureProbeCollection TemperatureProbes = TemperatureProbeCollection.SharedTemperatureProbeCollectionInstance;
+        public static PhProbeCollection PhProbes = PhProbeCollection.SharedPhProbeCollectionInstance;
 
         public static void AddSensors () {
             if (SettingsHelper.SettingsFileExists (sensorSettingsFileName)) {
                 FloatSwitches.AddAllSensors ();
                 WaterLevelSensors.AddAllSensors ();
                 TemperatureProbes.AddAllSensors ();
+                PhProbes.AddAllSensors ();
             } else {
                 Logger.Add ("Sensors settings file did not exist, created new water level settings");
 
@@ -48,6 +51,7 @@ namespace AquaPic.Sensors
                 jo.Add (new JProperty (FloatSwitches.sensorSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty (WaterLevelSensors.sensorSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty (TemperatureProbes.sensorSettingsArrayName, new JArray ()));
+                jo.Add (new JProperty (PhProbes.sensorSettingsArrayName, new JArray ()));
 
                 SettingsHelper.WriteSettingsFile (sensorSettingsFileName, jo);
             }
