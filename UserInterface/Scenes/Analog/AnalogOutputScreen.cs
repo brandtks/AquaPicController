@@ -52,7 +52,6 @@ namespace AquaPic.UserInterface
                 displays[i].typeLabel.Visible = true;
                 displays[i].ForceButtonReleaseEvent += OnForceRelease;
                 displays[i].ValueChangedEvent += OnValueChanged;
-                displays[i].settingsButton.buttonColor = "grey1";
                 Put (displays[i], 70, 90 + (i * 75));
                 if (card.IsNotEmpty ()) {
                     displays[i].Show ();

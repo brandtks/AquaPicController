@@ -54,7 +54,6 @@ namespace AquaPic.UserInterface
                 displays[i] = new AnalogChannelDisplay ();
                 displays[i].divisionSteps = 4096;
                 displays[i].ForceButtonReleaseEvent += OnForceRelease;
-                displays[i].SettingsButtonReleaseEvent += OnSettingsRelease;
                 displays[i].ValueChangedEvent += OnValueChanged;
                 displays[i].typeLabel.Visible = true;
                 Put (displays[i], 70, 90 + (i * 75));
@@ -195,37 +194,6 @@ namespace AquaPic.UserInterface
                 d.textBox.enableTouch = false;
                 d.forceButton.buttonColor = "grey4";
             }
-
-            d.QueueDraw ();
-        }
-
-        protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
-            var d = sender as AnalogChannelDisplay;
-
-            var ic = IndividualControl.Empty;
-            ic.Group = card;
-            ic.Individual = AquaPicDrivers.AnalogInput.GetChannelIndex (card, d.label.text);
-
-            var parent = Toplevel as Window;
-            var numberInput = new TouchNumberInput (false, parent);
-            numberInput.Title = "LPF";
-
-            numberInput.TextSetEvent += (obj, a) => {
-                if (a.text.IsNotEmpty ()) {
-                    try {
-                        var lpf = Convert.ToInt32 (a.text);
-                        AquaPicDrivers.AnalogInput.SetChannelLowPassFilterFactor (ic, lpf);
-                        d.typeLabel.text = string.Format ("LPF: {0}", lpf);
-                    } catch {
-                        MessageBox.Show ("Invalid number format");
-                    }
-                } else {
-                    MessageBox.Show ("Low pass filter can't be empty");
-                }
-            };
-
-            numberInput.Run ();
-            numberInput.Destroy ();
 
             d.QueueDraw ();
         }

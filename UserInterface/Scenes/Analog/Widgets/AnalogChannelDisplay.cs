@@ -42,7 +42,6 @@ namespace AquaPic.UserInterface
         public TouchProgressBar progressBar;
         public TouchLabel typeLabel;
         public TouchButton forceButton;
-        public TouchButton settingsButton;
 
         public int divisionSteps;
 
@@ -77,7 +76,7 @@ namespace AquaPic.UserInterface
             textBox.Show ();
 
             progressBar = new TouchProgressBar (TouchOrientation.Horizontal);
-            progressBar.WidthRequest = 395;
+            progressBar.WidthRequest = 425;
             progressBar.ProgressChangedEvent += (sender, args) => {
                 currentValue = args.currentProgress * divisionSteps;
                 ValueChanged ();
@@ -96,16 +95,8 @@ namespace AquaPic.UserInterface
             forceButton.buttonColor = "grey4";
             forceButton.text = "Force";
             forceButton.ButtonReleaseEvent += OnForceReleased;
-            Put (forceButton, 590, 20);
+            Put (forceButton, 620, 20);
             forceButton.Show ();
-
-            settingsButton = new TouchButton ();
-            settingsButton.SetSizeRequest (30, 30);
-            settingsButton.buttonColor = "pri";
-            settingsButton.text = Convert.ToChar (0x2699).ToString ();
-            settingsButton.ButtonReleaseEvent += OnSettingsRelease;
-            Put (settingsButton, 680, 20);
-            settingsButton.Show ();
 
             Show ();
         }
