@@ -32,8 +32,8 @@ namespace AquaPic.Sensors.PhProbe
             name = string.Empty;
             channel = IndividualControl.Empty;
             zeroScaleCalibrationActual = 0f;
-            zeroScaleCalibrationValue = 14f;
-            fullScaleCalibrationActual = 0f;
+            zeroScaleCalibrationValue = 0f;
+            fullScaleCalibrationActual = 14f;
             fullScaleCalibrationValue = 4096f;
             lowPassFilterFactor = 5;
         }
