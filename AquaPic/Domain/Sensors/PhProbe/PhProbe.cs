@@ -26,34 +26,16 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Runtime;
+using AquaPic.PubSub;
 
-namespace AquaPic.Sensors
+namespace AquaPic.Sensors.PhProbe
 {
-    public class PhProbe : ISensor<float>
+    public class PhProbe : GenericSensor
     {
-        protected IndividualControl _channel;
-        public IndividualControl channel {
-            get {
-                return _channel;
-            }
-        }
+        public float level { get; protected set; }
 
-        protected string _name;
-        public string name {
-            get {
-                return _name;
-            }
-        }
-
-        protected float _level;
-        public float level {
-            get {
-                return _level;
-            }
-        }
-
-        public float zeroActual;
-        public float zeroValue;
+        public float zeroScaleActual;
+        public float zeroScaleValue;
         public float fullScaleActual;
         public float fullScaleValue;
 
@@ -62,56 +44,53 @@ namespace AquaPic.Sensors
         public PhProbe (
             string name,
             IndividualControl channel,
-            float zeroActual,
-            float zeroValue,
+            float zeroScaleActual,
+            float zeroScaleValue,
             float fullScaleActual,
-            float fullScaleValue
-        ) {
-            _name = name;
-            _channel = channel;
-            this.zeroActual = zeroActual;
-            this.zeroValue = zeroValue;
+            float fullScaleValue)
+            : base (name, channel)
+        {
+            this.zeroScaleActual = zeroScaleActual;
+            this.zeroScaleValue = zeroScaleValue;
             this.fullScaleActual = fullScaleActual;
             this.fullScaleValue = fullScaleValue;
-            _level = this.zeroActual;
-            Add (_channel);
+            level = this.zeroScaleActual;
+            probeDisconnectedAlarmIndex = -1;
+        }
+
+        public override void OnCreate () {
+            AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, pH Probe", name));
+            AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
             probeDisconnectedAlarmIndex = Alarm.Subscribe ("pH probe disconnected, " + name);
         }
 
-        public void Add (IndividualControl channel) {
-            if (_channel.IsNotEmpty ()) {
-                Remove ();
-            }
-
-            _channel = channel;
-
-            if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.PhOrp.AddChannel (_channel, name);
-            }
+        public override void OnRemove () {
+            AquaPicDrivers.AnalogInput.RemoveChannel (channel);
+            AquaPicDrivers.AnalogInput.UnsubscribeConsumer (channel, this);
+            Alarm.Clear (probeDisconnectedAlarmIndex);
         }
 
-        public void Remove () {
-            if (_channel.IsNotEmpty ()) {
-                AquaPicDrivers.PhOrp.RemoveChannel (_channel);
-            }
+        public override ValueType GetValue () {
+            return level;
         }
 
-        public float Get () {
-            _level = AquaPicDrivers.PhOrp.GetChannelValue (_channel);
-            _level = _level.Map (zeroValue, fullScaleValue, zeroActual, fullScaleActual);
+        public override void OnValueChangedAction (object parm) {
+            var args = parm as ValueChangedEvent;
+            var oldLevel = level;
+            level = ScaleRawLevel (Convert.ToSingle (args.newValue));
 
-            if (_level < zeroActual) {
+            if (level < zeroScaleActual) {
                 Alarm.Post (probeDisconnectedAlarmIndex);
             } else {
                 Alarm.Clear (probeDisconnectedAlarmIndex);
             }
 
-            return _level;
+            NotifyValueChanged (level, oldLevel);
         }
 
-        public void SetName (string name) {
-            _name = name;
-            AquaPicDrivers.PhOrp.SetChannelName (_channel, _name);
+
+        protected float ScaleRawLevel (float rawValue) {
+            return rawValue.Map (zeroScaleValue, fullScaleValue, zeroScaleActual, fullScaleActual);
         }
     }
 }

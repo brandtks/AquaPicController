@@ -148,7 +148,6 @@
     <Compile Include="Domain\Sensors\WaterLevelSensor\WaterLevelSensorCollection.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericSensor.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericSensorCollection.cs" />
-    <Compile Include="Domain\Sensors\GenericSensor\ISensor.cs" />
     <Compile Include="Domain\Entity\IEntitySettings.cs" />
     <Compile Include="Domain\Entity\EntitySettingAttribute.cs" />
     <Compile Include="Domain\Entity\Mutators\BoolMutator.cs" />
@@ -174,6 +173,8 @@
     <Compile Include="Domain\Sensors\TemperatureProbe\TemperatureProbeSettings.cs" />
     <Compile Include="Modules\Temperature\TemperatureGroupSettings.cs" />
     <Compile Include="Modules\Temperature\HeaterSettings.cs" />
+    <Compile Include="Domain\Sensors\PhProbe\PhProbeSettings.cs" />
+    <Compile Include="Domain\Sensors\PhProbe\PhProbeCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
