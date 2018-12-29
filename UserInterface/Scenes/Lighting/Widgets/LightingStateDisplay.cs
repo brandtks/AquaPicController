@@ -250,48 +250,6 @@ namespace AquaPic.UserInterface
                                 }
                                 break;
                             }
-                        case LightingStateType.ParabolaRamp: {
-                                delta = Math.Abs (delta);
-                                double interYPos = graphBottom;
-
-                                if (state.startTime.Before (state.endTime)) {
-                                    for (var phase = 1; phase <= period; ++phase) {
-                                        var currentXPos = startXPos + phase;
-                                        var radian = (phase / period).Map (0, 1, 0, Math.PI).Constrain (0, Math.PI);
-                                        interYPos = startYPos - delta * Math.Sin (radian);
-                                        cr.LineTo (currentXPos, interYPos);
-
-                                        if (currentXPos.WithinSetpoint (timeXPos, 1)) {
-                                            timeYPos = interYPos;
-                                        }
-                                    }
-                                } else {
-                                    for (var phase = 1; phase <= rightPart; ++phase) {
-                                        var currentXPos = startXPos + phase;
-                                        var radian = (phase / period).Map (0, 1, 0, Math.PI).Constrain (0, Math.PI);
-                                        interYPos = startYPos - delta * Math.Sin (radian);
-                                        cr.LineTo (currentXPos, interYPos);
-
-                                        if (currentXPos.WithinSetpoint (timeXPos, 1)) {
-                                            timeYPos = interYPos;
-                                        }
-                                    }
-
-                                    cr.MoveTo (graphLeft, interYPos);
-                                    for (var phase = rightPart; phase <= period; ++phase) {
-                                        var currentXPos = interXPos + phase;
-                                        var radian = (phase / period).Map (0, 1, 0, Math.PI).Constrain (0, Math.PI);
-                                        interYPos = startYPos - delta * Math.Sin (radian);
-                                        cr.LineTo (currentXPos, interYPos);
-
-                                        if (currentXPos.WithinSetpoint (timeXPos, 1)) {
-                                            timeYPos = interYPos;
-                                        }
-                                    }
-                                }
-                                endYPos = (float)interYPos;
-                                break;
-                            }
                         case LightingStateType.HalfParabolaRamp: {
                                 delta = Math.Abs (delta);
                                 double mapFrom1, mapFrom2, basePoint;
@@ -470,35 +428,6 @@ namespace AquaPic.UserInterface
                                 cr.LineTo (graphLeft, rightYPos);
                                 cr.LineTo (endXPosSelected, endYPosSelected);
                             }
-                            break;
-                        }
-                    case LightingStateType.ParabolaRamp: {
-                            double interYPos = graphBottom;
-
-                            if (state.startTime.Before (state.endTime)) {
-                                for (var phase = 1; phase <= periodSelected; ++phase) {
-                                    var radian = (phase / periodSelected).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                    interYPos = startYPosSelected - deltaSelected * Math.Sin (radian);
-                                    cr.LineTo (startXPosSelected + phase, interYPos);
-                                }
-                            } else {
-                                for (var phase = 1; phase <= rightPartSelected; ++phase) {
-                                    var radian = (phase / periodSelected).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                    interYPos = startYPosSelected - deltaSelected * Math.Sin (radian);
-                                    cr.LineTo (startXPosSelected + phase, interYPos);
-                                }
-                                cr.LineTo (graphRight, graphBottom);
-                                cr.ClosePath ();
-
-                                cr.MoveTo (graphLeft, graphBottom);
-                                cr.LineTo (graphLeft, interYPos);
-                                for (var phase = rightPartSelected; phase <= periodSelected; ++phase) {
-                                    var radian = (phase / periodSelected).Map (0, 1, 0, 180).Constrain (0, 180).ToRadians ();
-                                    interYPos = startYPosSelected - deltaSelected * Math.Sin (radian);
-                                    cr.LineTo (interXPosSelected + phase, interYPos);
-                                }
-                            }
-                            endYPosSelected = (float)interYPos;
                             break;
                         }
                     case LightingStateType.HalfParabolaRamp: {
@@ -766,7 +695,7 @@ namespace AquaPic.UserInterface
                 } else {
                     #region Linear Ramp Button
 
-                    var buttonX = left + 90;
+                    var buttonX = left + 130;
                     TouchGlobal.DrawRoundedRectangle (cr, buttonX, top + 1, 80, 40, 3);
                     cr.MoveTo (buttonX + 25, top + 35);
                     cr.LineTo (buttonX + 55, top + 5);
@@ -790,23 +719,6 @@ namespace AquaPic.UserInterface
 
                     color = dimmingFixture ? "secb" : "grey1";
                     if (halfParabolaClicked) {
-                        color.ModifyColor (0.75);
-                    }
-                    color.SetSource (cr);
-                    cr.LineWidth = 1;
-                    cr.Stroke ();
-
-                    #endregion
-
-                    #region Full Parabola Ramp Button
-
-                    buttonX += 90;
-                    TouchGlobal.DrawRoundedRectangle (cr, buttonX, top + 1, 80, 40, 3);
-                    cr.MoveTo (buttonX + 10, top + 35);
-                    cr.Arc (buttonX + 40, top + 35, 30, Math.PI, 0);
-
-                    color = dimmingFixture ? "secb" : "grey1";
-                    if (fullParabolaClicked) {
                         color.ModifyColor (0.75);
                     }
                     color.SetSource (cr);
@@ -916,25 +828,20 @@ namespace AquaPic.UserInterface
                 }
             } else {
                 if ((clickY > 0) && (clickY < 40)) {
-                    if ((clickX > 90) && (clickX < 170)) {
+                    if ((clickX > 130) && (clickX < 210)) {
                         if (dimmingFixture) {
                             linearClicked = true;
                             newStateType = LightingStateType.LinearRamp;
                         }
-                    } else if ((clickX > 180) && (clickX < 260)) {
+                    } else if ((clickX > 220) && (clickX < 300)) {
                         if (dimmingFixture) {
                             halfParabolaClicked = true;
                             newStateType = LightingStateType.HalfParabolaRamp;
                         }
-                    } else if ((clickX > 270) && (clickX < 350)) {
-                        if (dimmingFixture) {
-                            fullParabolaClicked = true;
-                            newStateType = LightingStateType.ParabolaRamp;
-                        }
-                    } else if ((clickX > 360) && (clickX < 440)) {
+                    } else if ((clickX > 310) && (clickX < 390)) {
                         onClicked = true;
                         newStateType = LightingStateType.On;
-                    } else if ((clickX > 450) && (clickX < 530)) {
+                    } else if ((clickX > 400) && (clickX < 480)) {
                         offClicked = true;
                         newStateType = LightingStateType.Off;
                     }
@@ -1508,7 +1415,6 @@ namespace AquaPic.UserInterface
             if (dimmingFixture) {
                 switch (newStateType) {
                 case LightingStateType.On:
-                case LightingStateType.ParabolaRamp:
                     if (stateInfo.lightingState.type == LightingStateType.Off) {
                         newState.startingDimmingLevel = stateInfo.next.lightingState.startingDimmingLevel;
                         newState.endingDimmingLevel = stateInfo.next.lightingState.startingDimmingLevel;
@@ -1587,7 +1493,6 @@ namespace AquaPic.UserInterface
             if (dimmingFixture) {
                 switch (newStateType) {
                 case LightingStateType.On:
-                case LightingStateType.ParabolaRamp:
                     if (stateInfo.previous.lightingState.type == LightingStateType.Off) {
                         newState.startingDimmingLevel = stateInfo.lightingState.startingDimmingLevel;
                         newState.endingDimmingLevel = stateInfo.lightingState.startingDimmingLevel;

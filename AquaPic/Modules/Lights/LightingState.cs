@@ -38,8 +38,6 @@ namespace AquaPic.Modules
         LinearRamp = 10,
         [Description ("Half Parabola Ramp")]
         HalfParabolaRamp = 11,
-        [Description ("Parabola Ramp")]
-        ParabolaRamp = 12,
     }
 
     public class LightingState

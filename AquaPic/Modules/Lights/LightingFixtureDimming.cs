@@ -106,13 +106,6 @@ namespace AquaPic.Modules
                             now,
                             lightingStates[currentState].startingDimmingLevel,
                             lightingStates[currentState].endingDimmingLevel);
-                    } else if (lightingStates[currentState].type == LightingStateType.ParabolaRamp) {
-                        autoDimmingLevel = Utils.CalcParabola (
-                            start,
-                            end,
-                            now,
-                            lightingStates[currentState].startingDimmingLevel,
-                            lightingStates[currentState].endingDimmingLevel);
                     } else if (lightingStates[currentState].type == LightingStateType.On) {
                         autoDimmingLevel = lightingStates[currentState].startingDimmingLevel;
                     }
