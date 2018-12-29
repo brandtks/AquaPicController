@@ -83,6 +83,7 @@ namespace AquaPic.UserInterface
                 { "Analog Output", new SceneData ("Analog Output", true, (options) => {return new AnalogOutputWindow (options);}) },
                 { "Analog Input", new SceneData ("Analog Input", true, (options) => {return new AnalogInputWindow (options);}) },
                 { "Digital Input", new SceneData ("Digital Input", true, (options) => {return new DigitalInputWindow (options);}) },
+                { "pH/ORP", new SceneData ("pH/ORP", true, (options) => {return new PhOrpWindow (options);}) },
                 { "Serial Bus", new SceneData ("Serial Bus", true, (options) => {return new SerialBusWindow (options);}) },
                 { "Alarms", new SceneData ("Alarms", true, (options) => {return new AlarmWindow (options);}) },
                 { "Logger", new SceneData ("Logger", true, (options) => {return new LoggerWindow (options);}) },

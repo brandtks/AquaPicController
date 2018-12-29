@@ -33,6 +33,12 @@ namespace AquaPic.UserInterface
     {
         public SensorsWindow (params object[] options) {
             sceneTitle = "Sensors";
+
+            var phWidget = new PhProbeWidget ();
+            Put (phWidget, 100, 100);
+            phWidget.Show ();
+
+            Show ();
         }
     }
 }

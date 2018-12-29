@@ -84,6 +84,9 @@
     <Compile Include="Scenes\Home\Common\NewHomeWidgetSettings.cs" />
     <Compile Include="Scenes\Home\Common\HomeWindowWidgets.cs" />
     <Compile Include="Scenes\Sensors\SensorsScreen.cs" />
+    <Compile Include="Scenes\Sensors\Widgets\PhProbeWidget.cs" />
+    <Compile Include="Scenes\Sensors\Dialogs\PhProbeSettingsDialog.cs" />
+    <Compile Include="Scenes\Analog\PhOrpScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -96,6 +99,8 @@
     <Folder Include="Widgets\" />
     <Folder Include="Scenes\Home\Common\" />
     <Folder Include="Scenes\Sensors\" />
+    <Folder Include="Scenes\Sensors\Widgets\" />
+    <Folder Include="Scenes\Sensors\Dialogs\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AquaPic\AquaPic.csproj">
