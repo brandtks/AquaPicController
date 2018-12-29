@@ -300,7 +300,7 @@ namespace AquaPic.UserInterface
             if (probeName.IsNotEmpty ()) {
                 var probe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (probeName);
                 if (probe.connected) {
-                    probeTempTextbox.text = probe.temperature.ToString ("F2");
+                    probeTempTextbox.text = probe.value.ToString ("F2");
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
                     probeTempLabel.Visible = true;
                 } else {

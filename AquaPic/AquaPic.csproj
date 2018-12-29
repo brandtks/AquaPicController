@@ -175,6 +175,12 @@
     <Compile Include="Modules\Temperature\HeaterSettings.cs" />
     <Compile Include="Domain\Sensors\PhProbe\PhProbeSettings.cs" />
     <Compile Include="Domain\Sensors\PhProbe\PhProbeCollection.cs" />
+    <Compile Include="Driver\GenericDriver\GenericAnalogInputChannel.cs" />
+    <Compile Include="Driver\GenericDriver\GenericAnalogInputCard.cs" />
+    <Compile Include="Driver\GenericDriver\GenericAnalogInputBase.cs" />
+    <Compile Include="Domain\Sensors\GenericSensor\GenericAnalogSensor.cs" />
+    <Compile Include="Domain\Entity\Mutators\IntMutator.cs" />
+    <Compile Include="Domain\Sensors\GenericSensor\GenericAnalogSensorCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

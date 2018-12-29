@@ -122,7 +122,7 @@ namespace AquaPic.Modules.Temperature
                 if (temperatureProbes.ContainsKey (args.name)) {
                     var temperatureProbe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (args.name);
                     temperatureProbes[temperatureProbe.name].connected = temperatureProbe.connected;
-                    temperatureProbes[temperatureProbe.name].temperature = temperatureProbe.temperature;
+                    temperatureProbes[temperatureProbe.name].temperature = temperatureProbe.value;
                     CalculateTemperature ();
                 }
             }
