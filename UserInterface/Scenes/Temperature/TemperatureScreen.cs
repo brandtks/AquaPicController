@@ -582,10 +582,10 @@ namespace AquaPic.UserInterface
                 };
 
                 var probe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (probeName);
-                cal.calArgs.zeroActual = probe.zeroScaleActual;
-                cal.calArgs.zeroValue = probe.zeroScaleValue;
-                cal.calArgs.fullScaleActual = probe.fullScaleActual;
-                cal.calArgs.fullScaleValue = probe.fullScaleValue;
+                cal.calArgs.zeroActual = probe.zeroScaleCalibrationActual;
+                cal.calArgs.zeroValue = probe.zeroScaleCalibrationValue;
+                cal.calArgs.fullScaleActual = probe.fullScaleCalibrationActual;
+                cal.calArgs.fullScaleValue = probe.fullScaleCalibrationValue;
 
                 cal.Run ();
             } else {

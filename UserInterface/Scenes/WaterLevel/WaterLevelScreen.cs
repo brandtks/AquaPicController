@@ -661,9 +661,9 @@ namespace AquaPic.UserInterface
                 };
 
                 var sensor = (WaterLevelSensor)AquaPicSensors.WaterLevelSensors.GetSensor (analogSensorName);
-                cal.calArgs.zeroValue = sensor.zeroScaleValue;
-                cal.calArgs.fullScaleActual = sensor.fullScaleActual;
-                cal.calArgs.fullScaleValue = sensor.fullScaleValue;
+                cal.calArgs.zeroValue = sensor.zeroScaleCalibrationValue;
+                cal.calArgs.fullScaleActual = sensor.fullScaleCalibrationActual;
+                cal.calArgs.fullScaleValue = sensor.fullScaleCalibrationValue;
 
                 cal.Run ();
             } else {
