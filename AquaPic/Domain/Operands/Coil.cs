@@ -37,7 +37,7 @@ namespace AquaPic.Operands
 
         public Coil (StateSetterHandler ConditionSetter) {
             state = false;
-            this.StateSetter = ConditionSetter;
+            StateSetter = ConditionSetter;
         }
 
         public void Execute () {
