@@ -27,7 +27,8 @@ using AquaPic.Runtime;
 
 namespace AquaPic.Modules
 {
-    public class LightingFixtureSettings : IEntitySettings {
+    public class LightingFixtureSettings : IEntitySettings 
+    {
         [EntitySetting (typeof (StringMutator), "name")]
         public string name { get; set; }
 

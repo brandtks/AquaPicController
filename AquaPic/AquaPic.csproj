@@ -173,6 +173,7 @@
     <Compile Include="Domain\Sensors\TemperatureProbe\TemperatureProbeCollection.cs" />
     <Compile Include="Domain\Sensors\TemperatureProbe\TemperatureProbeSettings.cs" />
     <Compile Include="Modules\Temperature\TemperatureGroupSettings.cs" />
+    <Compile Include="Modules\Temperature\HeaterSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
