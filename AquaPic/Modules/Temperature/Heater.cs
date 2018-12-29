@@ -82,6 +82,11 @@ namespace AquaPic.Modules.Temperature
                     }
                 }
             }
+
+            public void Remove () {
+                Power.RemoveOutlet (plug);
+                Power.RemoveHandlerOnStateChange (plug, OnStateChange);
+            }
         }
     }
 }

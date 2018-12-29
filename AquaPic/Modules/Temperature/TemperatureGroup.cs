@@ -49,6 +49,7 @@ namespace AquaPic.Modules.Temperature
             public int lowTemperatureAlarmIndex;
 
             public Dictionary<string, InternalTemperatureProbeState> temperatureProbes;
+            public Dictionary<string, Heater> heaters;
 
             public TemperatureGroup (
                 string name,
@@ -56,7 +57,8 @@ namespace AquaPic.Modules.Temperature
                 float lowTemperatureAlarmSetpoint,
                 float temperatureSetpoint,
                 float temperatureDeadband,
-                IEnumerable<string> temperatureProbes) 
+                IEnumerable<string> temperatureProbes,
+                IEnumerable<HeaterSettings> heaters) 
             {
                 this.name = name;
                 this.highTemperatureAlarmSetpoint = highTemperatureAlarmSetpoint;
@@ -74,6 +76,15 @@ namespace AquaPic.Modules.Temperature
                 foreach (var temperatureProbe in temperatureProbes) {
                     this.temperatureProbes.Add (temperatureProbe, new InternalTemperatureProbeState ());
                     AquaPicSensors.TemperatureProbes.SubscribeConsumer (temperatureProbe, this);
+                }
+
+                this.heaters = new Dictionary<string, Heater> ();
+                foreach (var heater in heaters) {
+                    if (this.heaters.ContainsKey (heater.name)) {
+                        throw new Exception (string.Format ("Heater: {0} already exists", heater.name));
+                    }
+
+                    this.heaters[heater.name] = new Heater (heater.name, heater.plug, this.name);
                 }
             }
 
