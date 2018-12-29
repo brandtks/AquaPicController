@@ -61,8 +61,6 @@ namespace AquaPic.Sensors
         protected virtual GenericSensor OnCreateSensor (GenericSensorSettings settings) => throw new NotImplementedException ();
 
         public void UpdateSensor (string name, GenericSensorSettings settings) {
-            CheckSensorKey (name);
-
             if (SensorNameExists (name)) {
                 settings = OnUpdateSensor (name, settings);
                 RemoveSensor (name, false);
