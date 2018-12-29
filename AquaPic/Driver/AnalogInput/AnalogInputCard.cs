@@ -29,7 +29,7 @@ namespace AquaPic.Drivers
 {
     public partial class AnalogInputBase
     {
-        protected class AnalogInputCard : GenericInputCard
+        protected class AnalogInputCard : GenericAnalogInputCard
         {
             public AnalogInputCard (string name, int address)
                 : base (
@@ -77,34 +77,6 @@ namespace AquaPic.Drivers
                         UpdateChannelValue (channels[i], values[i]);
                     }
                 }
-            }
-
-            public int GetChannelLowPassFilterFactor (int channel) {
-                CheckChannelRange (channel);
-                var analogInputChannel = channels[channel] as AnalogInputChannel;
-                return analogInputChannel.lowPassFilterFactor;
-            }
-
-            public int[] GetAllChannelLowPassFilterFactors () {
-                int[] lowPassFilterFactors = new int[channelCount];
-                for (int i = 0; i < channelCount; ++i) {
-                    var analogInputCard = channels[i] as AnalogInputChannel;
-                    lowPassFilterFactors[i] = analogInputCard.lowPassFilterFactor;
-                }
-                return lowPassFilterFactors;
-            }
-
-            public void SetChannelLowPassFilterFactor (int channel, int lowPassFilterFactor) {
-                CheckChannelRange (channel);
-
-                var analogInputChannel = channels[channel] as AnalogInputChannel;
-                analogInputChannel.lowPassFilterFactor = lowPassFilterFactor;
-
-                var message = new byte[2];
-                message[0] = (byte)channel;
-                message[1] = (byte)lowPassFilterFactor;
-
-                Write (2, message);
             }
         }
     }

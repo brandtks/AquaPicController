@@ -22,11 +22,11 @@
 #endregion // License
 
 using System;
-using GoodtimeDevelopment.Utilites;
+using AquaPic.Globals;
 
 namespace AquaPic.Drivers
 {
-    public partial class PhOrpBase : GenericBase
+    public partial class PhOrpBase : GenericAnalogInputBase
     {
         public static PhOrpBase SharedPhOrpInstance = new PhOrpBase ();
 
@@ -49,6 +49,12 @@ namespace AquaPic.Drivers
 
         public override CardType GetCardType () {
             return CardType.PhOrp;
+        }
+
+        public override void RemoveChannel (IndividualControl channel) {
+            base.RemoveChannel (channel);
+            var inputCard = cards[channel.Group] as GenericAnalogInputCard;
+            inputCard.SetupChannelCommunication (channel.Individual);
         }
     }
 }

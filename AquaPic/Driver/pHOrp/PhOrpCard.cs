@@ -29,7 +29,7 @@ namespace AquaPic.Drivers
 {
     public partial class PhOrpBase
     {
-        protected class PhOrpCard : GenericCard
+        protected class PhOrpCard : GenericAnalogInputCard
         {
             public PhOrpCard (string name, int address)
                 : base (
@@ -76,46 +76,18 @@ namespace AquaPic.Drivers
                 }
             }
 
-            public override void SetChannelValue (int channel, ValueType value) {
-                CheckChannelRange (channel);
-
-                if (channels[channel].mode == Mode.Manual) {
-                    channels[channel].SetValue (value);
-                } else {
-                    throw new Exception ("Can only modify pH/ORP value with channel forced");
-                }
-            }
-
-            public override void SetAllChannelValues (ValueType[] values) {
-                if (values.Length != channels.Length)
-                    throw new ArgumentOutOfRangeException (nameof (values), "values length");
-
-                for (int i = 0; i < channels.Length; ++i) {
-                    if (channels[i].mode == Mode.Manual) {
-                        channels[i].SetValue (values[i]);
-                    }
-                }
-            }
-
-            public void SetupChannel (int channel, bool enabled, int lowPassFilterFactor) {
+            public override void SetupChannelCommunication (int channel) {
                 CheckChannelRange (channel);
 
                 var phOrpChannel = channels[channel] as PhOrpChannel;
-                phOrpChannel.enabled = enabled;
-                phOrpChannel.lowPassFilterFactor = lowPassFilterFactor;
+                phOrpChannel.enabled = phOrpChannel.name != GetDefualtName (channel);
 
                 var message = new byte[3];
                 message[0] = (byte)channel;
-                message[1] = Convert.ToByte (enabled);
-                message[2] = (byte)lowPassFilterFactor;
+                message[1] = Convert.ToByte (phOrpChannel.enabled);
+                message[2] = (byte)phOrpChannel.lowPassFilterFactor;
 
                 Write (2, message);
-            }
-
-            public int GetLowPassFilterFactor (int channel) {
-                CheckChannelRange (channel);
-                var phOrpChannel = channels[channel] as PhOrpChannel;
-                return phOrpChannel.lowPassFilterFactor;
             }
 
             public bool GetChannelEnable (int channel) {

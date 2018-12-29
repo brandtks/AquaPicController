@@ -27,7 +27,7 @@ using GoodtimeDevelopment.Utilites;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogInputBase : GenericInputBase
+    public partial class AnalogInputBase : GenericAnalogInputBase
     {
         public static AnalogInputBase SharedAnalogInputInstance = new AnalogInputBase ();
 
@@ -50,42 +50,6 @@ namespace AquaPic.Drivers
 
         public override CardType GetCardType () {
             return CardType.AnalogInput;
-        }
-
-        public int GetChannelLowPassFilterFactor (string channelName) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
-            return GetChannelLowPassFilterFactor (channel);
-        }
-
-        public int GetChannelLowPassFilterFactor (IndividualControl channel) {
-            return GetChannelLowPassFilterFactor (channel.Group, channel.Individual);
-        }
-
-        public int GetChannelLowPassFilterFactor (string card, int channel) {
-            CheckCardKey (card);
-            var analogInputCard = cards[card] as AnalogInputCard;
-            return analogInputCard.GetChannelLowPassFilterFactor (channel);
-        }
-
-        public int[] GetAllChannelLowPassFilterFactors (string card) {
-            CheckCardKey (card);
-            var analogInputCard = cards[card] as AnalogInputCard;
-            return analogInputCard.GetAllChannelLowPassFilterFactors ();
-        }
-
-        public void SetChannelLowPassFilterFactor (string channelName, int lowPassFilterFactor) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
-            SetChannelLowPassFilterFactor (channel, lowPassFilterFactor);
-        }
-
-        public void SetChannelLowPassFilterFactor (IndividualControl channel, int lowPassFilterFactor) {
-            SetChannelLowPassFilterFactor (channel.Group, channel.Individual, lowPassFilterFactor);
-        }
-
-        public void SetChannelLowPassFilterFactor (string card, int channel, int lowPassFilterFactor) {
-            CheckCardKey (card);
-            var analogInputCard = cards[card] as AnalogInputCard;
-            analogInputCard.SetChannelLowPassFilterFactor (channel, lowPassFilterFactor);
         }
     }
 }
