@@ -73,11 +73,12 @@ namespace AquaPic.UserInterface
 
             ChangeSceneEvent += ScreenChange;
 
-            scenes = new Dictionary<string, SceneData> () {
+            scenes = new Dictionary<string, SceneData> {
                 { "Power", new SceneData ("Power", true, (options) => {return new PowerWindow (options);}) },
                 { "Lighting", new SceneData ("Lighting", true, (options) => {return new LightingWindow (options);}) },
                 { "Temperature", new SceneData ("Temperature", true, (options) => {return new TemperatureWindow (options);}) },
                 { "Water Level", new SceneData ("Water Level", true, (options) => {return new WaterLevelWindow (options);}) },
+                { "Sensors", new SceneData ("Sensors", true, (options) => {return new SensorsWindow (options);}) },
                 { "Chemistry", new SceneData ("Chemistry", true, (options) => {return new ChemistryWindow (options);}) },
                 { "Analog Output", new SceneData ("Analog Output", true, (options) => {return new AnalogOutputWindow (options);}) },
                 { "Analog Input", new SceneData ("Analog Input", true, (options) => {return new AnalogInputWindow (options);}) },

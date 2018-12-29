@@ -83,6 +83,7 @@
     <Compile Include="Scenes\Home\Common\HomeWidgetPlacement.cs" />
     <Compile Include="Scenes\Home\Common\NewHomeWidgetSettings.cs" />
     <Compile Include="Scenes\Home\Common\HomeWindowWidgets.cs" />
+    <Compile Include="Scenes\Sensors\SensorsScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -94,6 +95,7 @@
     <Folder Include="Scenes\" />
     <Folder Include="Widgets\" />
     <Folder Include="Scenes\Home\Common\" />
+    <Folder Include="Scenes\Sensors\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AquaPic\AquaPic.csproj">
