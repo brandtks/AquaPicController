@@ -1290,7 +1290,7 @@ namespace AquaPic.UserInterface
                             break;
                         }
                     } else {
-                        if (generalTime.After (state.endTime) && generalTime.Before (Time.TimeMidnight)) {
+                        if (generalTime.After (state.startTime) && generalTime.Before (Time.TimeMidnight)) {
                             var timeToEnd = Math.Abs (generalTime.totalMinutes - Time.TimeMidnight.totalMinutes) + state.endTime.totalMinutes;
                             var timeToStart = Math.Abs (generalTime.totalMinutes - state.startTime.totalMinutes);
 
@@ -1298,7 +1298,7 @@ namespace AquaPic.UserInterface
                             break;
                         } 
 
-                        if (generalTime.After (Time.TimeZero) && generalTime.Before (state.startTime)) {
+                        if (generalTime.After (Time.TimeZero) && generalTime.Before (state.endTime)) {
                             var timeToEnd = Math.Abs (generalTime.totalMinutes - state.endTime.totalMinutes);
                             var timeToStart = Math.Abs (generalTime.totalMinutes - Time.TimeZero.totalMinutes) + state.startTime.totalMinutes;
 
