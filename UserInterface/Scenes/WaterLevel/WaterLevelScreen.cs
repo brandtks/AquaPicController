@@ -57,7 +57,6 @@ namespace AquaPic.UserInterface
 
         public WaterLevelWindow (params object[] options) {
             sceneTitle = "Water Level";
-
             ExposeEvent += OnExpose;
 
             /******************************************************************************************************/

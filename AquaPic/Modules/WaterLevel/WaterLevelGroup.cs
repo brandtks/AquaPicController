@@ -195,6 +195,10 @@ namespace AquaPic.Modules
                 }
             }
 
+            public WaterLevelGroup Clone () {
+                return (WaterLevelGroup)MemberwiseClone ();
+            }
+
             public class InternalWaterLevelSensorState
             {
                 public bool connected;

@@ -31,16 +31,13 @@ using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class PhProbeSettingsDialog : TouchSettingsDialog
+    public class PhProbeSettingsDialog : SensorSettingsDialog
     {
-        public string probeName { get; private set; }
-
         public PhProbeSettingsDialog (PhProbeSettings settings, Window parent)
-            : base (settings.name, settings.name.IsNotEmpty (), parent) {
-            probeName = settings.name;
-
+            : base (settings, parent) 
+        {
             var t = new SettingsTextBox ("Name");
-            t.textBox.text = probeName.IsNotEmpty () ? probeName : "Enter name";
+            t.textBox.text = sensorName.IsNotEmpty () ? sensorName : "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ()) {
                     args.keepText = false;
@@ -52,7 +49,7 @@ namespace AquaPic.UserInterface
             AddSetting (t);
 
             var c = new SettingsComboBox ("Input Channel");
-            if (probeName.IsNotEmpty ()) {
+            if (sensorName.IsNotEmpty ()) {
                 var ic = settings.channel;
                 c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", ic.Group, ic.Individual));
                 c.combo.activeIndex = 0;
@@ -62,7 +59,7 @@ namespace AquaPic.UserInterface
             AddSetting (c);
 
             t = new SettingsTextBox ("LPF Factor");
-            t.textBox.text = probeName.IsNotEmpty () ? settings.lowPassFilterFactor.ToString () : "5";
+            t.textBox.text = sensorName.IsNotEmpty () ? settings.lowPassFilterFactor.ToString () : "5";
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
                     var factor = Convert.ToInt32 (args.text);
@@ -100,14 +97,14 @@ namespace AquaPic.UserInterface
 
             sensorSettings.lowPassFilterFactor = Convert.ToInt32 (settings["LPF Factor"].setting);
 
-            AquaPicSensors.PhProbes.UpdateSensor (probeName, sensorSettings);
-            probeName = sensorSettings.name;
+            AquaPicSensors.PhProbes.UpdateSensor (sensorName, sensorSettings);
+            sensorName = sensorSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            AquaPicSensors.PhProbes.RemoveSensor (probeName);
+            AquaPicSensors.PhProbes.RemoveSensor (sensorName);
             return true;
         }
     }

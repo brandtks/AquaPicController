@@ -80,8 +80,9 @@ namespace AquaPic.UserInterface
             string name,
             Window parent, 
             GetCalibrationValueHandler GetCalibrationValue,
-            CalibrationState startingState = CalibrationState.ZeroValue
-        ) : base (name + " Calibration", parent, DialogFlags.DestroyWithParent) {
+            CalibrationState startingState = CalibrationState.ZeroValue) 
+            : base (name + " Calibration", parent, DialogFlags.DestroyWithParent) 
+        {
             Name = "AquaPic.Calibration." + name;
             WindowPosition = (WindowPosition)4;
             SetSizeRequest (600, 300);
@@ -200,8 +201,6 @@ namespace AquaPic.UserInterface
             fix.Show ();
 
             timerId = GLib.Timeout.Add (1000, OnUpdateTimer);
-
-            Show ();
         }
 
         public override void Destroy () {
@@ -226,7 +225,7 @@ namespace AquaPic.UserInterface
                         tb.Text = zeroValueInstructions;
                     } else {
                         tb.Text = "Please enter the zero actual value.\n" +
-                            "Once the zero actual value is entered press the button.\n\n";
+                            "Once the zero actual value is entered press the zero button.\n\n";
                     }
 
                     var tag = new TextTag (null);
@@ -241,7 +240,7 @@ namespace AquaPic.UserInterface
                         tb.Text = zeroValueInstructions;
                     else
                         tb.Text = "Place the instrument in its zero state.\n" +
-                            "Once value has settled, press the button.\n\n";
+                            "Once value has settled, press the zero button.\n\n";
 
                     var tag = new TextTag (null);
                     tag.ForegroundGdk = TouchColor.NewGtkColor ("seca");

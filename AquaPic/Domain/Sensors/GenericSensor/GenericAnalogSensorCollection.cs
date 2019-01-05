@@ -37,7 +37,7 @@ namespace AquaPic.Sensors
             }
         }
 
-        protected override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
+        protected override GenericSensor CreateNewSensor (GenericSensorSettings settings) {
             var sensorSettings = settings as GenericAnalogSensorSettings;
             if (sensorSettings == null) {
                 throw new ArgumentException ("Settings must be GenericAnalogSensorSettings");

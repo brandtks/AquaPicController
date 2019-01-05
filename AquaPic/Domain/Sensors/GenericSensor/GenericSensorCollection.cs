@@ -50,7 +50,7 @@ namespace AquaPic.Sensors
             if (SensorNameExists (settings.name)) {
                 throw new Exception (string.Format ("Sensor: {0} already exists", settings.name));
             }
-            var sensor = OnCreateSensor (settings);
+            var sensor = CreateNewSensor (settings);
             sensors[sensor.name] = sensor;
             sensor.OnCreate ();
             if (saveToFile) {
@@ -58,7 +58,7 @@ namespace AquaPic.Sensors
             }
         }
 
-        protected virtual GenericSensor OnCreateSensor (GenericSensorSettings settings) => throw new NotImplementedException ();
+        protected virtual GenericSensor CreateNewSensor (GenericSensorSettings settings) => throw new NotImplementedException ();
 
         public void UpdateSensor (string name, GenericSensorSettings settings) {
             if (SensorNameExists (name)) {
@@ -118,7 +118,6 @@ namespace AquaPic.Sensors
         }
 
         /***Getters****************************************************************************************************/
-        /***Names***/
         public virtual string[] GetAllSensorNames () {
             List<string> names = new List<string> ();
             foreach (var sensor in sensors.Values) {
@@ -127,13 +126,11 @@ namespace AquaPic.Sensors
             return names.ToArray ();
         }
 
-        /***State***/
         public virtual GenericSensor GetSensor (string name) {
             CheckSensorKey (name);
             return sensors[name].Clone ();
         }
 
-        /***State***/
         public virtual ValueType GetSensorValue (string name) {
             CheckSensorKey (name);
             return sensors[name].GetValue ();

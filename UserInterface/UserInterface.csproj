@@ -87,6 +87,8 @@
     <Compile Include="Scenes\Sensors\Widgets\PhProbeWidget.cs" />
     <Compile Include="Scenes\Sensors\Dialogs\PhProbeSettingsDialog.cs" />
     <Compile Include="Scenes\Analog\PhOrpScreen.cs" />
+    <Compile Include="Scenes\Sensors\Widgets\SensorWidget.cs" />
+    <Compile Include="Scenes\Sensors\Dialogs\SensorSettingsDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

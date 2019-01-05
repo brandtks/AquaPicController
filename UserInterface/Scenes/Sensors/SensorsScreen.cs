@@ -33,12 +33,35 @@ namespace AquaPic.UserInterface
     {
         public SensorsWindow (params object[] options) {
             sceneTitle = "Sensors";
+            ExposeEvent += OnExpose;
 
             var phWidget = new PhProbeWidget ();
-            Put (phWidget, 100, 100);
+            Put (phWidget, 37, 77);
             phWidget.Show ();
 
             Show ();
+        }
+
+        protected void OnExpose (object sender, ExposeEventArgs args) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
+                TouchColor.SetSource (cr, "grey3", 0.75);
+                cr.LineWidth = 3;
+
+                cr.MoveTo (402.5, 70);
+                cr.LineTo (402.5, 460);
+                cr.ClosePath ();
+                cr.Stroke ();
+
+                cr.MoveTo (40, 267.5);
+                cr.LineTo (387.5, 267.5);
+                cr.ClosePath ();
+                cr.Stroke ();
+
+                cr.MoveTo (417.5, 267.5);
+                cr.LineTo (780, 267.5);
+                cr.ClosePath ();
+                cr.Stroke ();
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ namespace AquaPic.Sensors
             }
         }
 
-        protected override GenericSensor OnCreateSensor (GenericSensorSettings settings) {
+        protected override GenericSensor CreateNewSensor (GenericSensorSettings settings) {
             var floatSwitchSettings = settings as FloatSwitchSettings;
             if (floatSwitchSettings == null) {
                 throw new ArgumentException ("Settings must be FloatSwitchSettings");

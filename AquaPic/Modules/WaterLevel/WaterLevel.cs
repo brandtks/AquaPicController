@@ -317,7 +317,6 @@ namespace AquaPic.Modules
         }
 
         /***Getters****************************************************************************************************/
-        /***Names***/
         public static string[] GetAllWaterLevelSensorsForWaterLevelGroup (string groupName) {
             CheckWaterLevelGroupKey (groupName);
             List<string> names = new List<string> ();
@@ -343,7 +342,6 @@ namespace AquaPic.Modules
         }
 
         /***Getters****************************************************************************************************/
-        /***Names***/
         public static string[] GetAllFloatSwitchesForWaterLevelGroup (string groupName) {
             CheckWaterLevelGroupKey (groupName);
             List<string> names = new List<string> ();
