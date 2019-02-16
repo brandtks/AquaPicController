@@ -30,7 +30,7 @@ using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class SensorWidget : Fixed
+    public class AnalogSensorWidget : Fixed
     {
         protected string sensorTypeLabel;
         protected string sensorName;
@@ -40,7 +40,7 @@ namespace AquaPic.UserInterface
         protected GenericAnalogSensorCollection sensorCollection;
         protected GenericAnalogInputBase analogInputDriver;
 
-        public SensorWidget (
+        public AnalogSensorWidget (
             string sensorTypeLabel, 
             GenericAnalogSensorCollection sensorCollection,
             GenericAnalogInputBase analogInputDriver) 
@@ -73,7 +73,7 @@ namespace AquaPic.UserInterface
             b.Show ();
 
             sensorLabel = new TouchLabel ();
-            sensorLabel.text = "pH";
+            sensorLabel.text = sensorTypeLabel;
             sensorLabel.textAlignment = TouchAlignment.Center;
             sensorLabel.textColor = "grey3";
             sensorLabel.WidthRequest = 370;
@@ -125,11 +125,17 @@ namespace AquaPic.UserInterface
             CallSensorSettingsDialog ();
         }
 
-        protected virtual SensorSettingsDialog GetSensorSettingsDialog (Window parent, bool forceNew) => throw new NotImplementedException ();
-
         protected void CallSensorSettingsDialog (bool forceNew = false) {
             var parent = Toplevel as Window;
-            var s = GetSensorSettingsDialog (parent, forceNew);
+
+            GenericAnalogSensorSettings settings;
+            if (sensorName.IsNotEmpty () && !forceNew) {
+                settings = (GenericAnalogSensorSettings)sensorCollection.GetSensorSettings (sensorName);
+            } else {
+                settings = new GenericAnalogSensorSettings ();
+            }
+
+            var s = new AnalogSensorSettingsDialog (settings, sensorCollection, analogInputDriver, parent);
             s.Run ();
             var newProbeName = s.sensorName;
             var outcome = s.outcome;

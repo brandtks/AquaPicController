@@ -31,7 +31,7 @@ using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class PhProbeWidget : SensorWidget
+    public class PhProbeWidget : AnalogSensorWidget
     {
         public PhProbeWidget () : base ("pH Probes", AquaPicSensors.PhProbes, AquaPicDrivers.PhOrp) { }
 
@@ -52,16 +52,5 @@ namespace AquaPic.UserInterface
 
             sensorStateTextbox.QueueDraw ();
         }
-
-        protected override SensorSettingsDialog GetSensorSettingsDialog (Window parent, bool forceNew) {
-            PhProbeSettings settings;
-            if (sensorName.IsNotEmpty () && !forceNew) {
-                settings = (PhProbeSettings)AquaPicSensors.PhProbes.GetSensorSettings (sensorName);
-            } else {
-                settings = new PhProbeSettings ();
-            }
-            return new PhProbeSettingsDialog (settings, parent);
-        }
-
     }
 }

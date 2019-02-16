@@ -62,15 +62,15 @@ namespace AquaPic.Sensors
 
         public override GenericSensorSettings GetSensorSettings (string name) {
             CheckSensorKey (name);
-            var phProbe = sensors[name] as GenericAnalogSensor;
+            var genericAnalogSensor = sensors[name] as GenericAnalogSensor;
             var settings = new GenericAnalogSensorSettings ();
-            settings.name = phProbe.name;
-            settings.channel = phProbe.channel;
-            settings.zeroScaleCalibrationActual = phProbe.zeroScaleCalibrationActual;
-            settings.zeroScaleCalibrationValue = phProbe.zeroScaleCalibrationValue;
-            settings.fullScaleCalibrationActual = phProbe.fullScaleCalibrationActual;
-            settings.fullScaleCalibrationValue = phProbe.fullScaleCalibrationValue;
-            settings.lowPassFilterFactor = phProbe.lowPassFilterFactor;
+            settings.name = genericAnalogSensor.name;
+            settings.channel = genericAnalogSensor.channel;
+            settings.zeroScaleCalibrationActual = genericAnalogSensor.zeroScaleCalibrationActual;
+            settings.zeroScaleCalibrationValue = genericAnalogSensor.zeroScaleCalibrationValue;
+            settings.fullScaleCalibrationActual = genericAnalogSensor.fullScaleCalibrationActual;
+            settings.fullScaleCalibrationValue = genericAnalogSensor.fullScaleCalibrationValue;
+            settings.lowPassFilterFactor = genericAnalogSensor.lowPassFilterFactor;
             return settings;
         }
 

@@ -26,39 +26,20 @@ using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Sensors;
-using AquaPic.Sensors.PhProbe;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class PhProbeSettingsDialog : SensorSettingsDialog
+    public class AnalogSensorSettingsDialog : SensorSettingsDialog
     {
-        public PhProbeSettingsDialog (PhProbeSettings settings, Window parent)
-            : base (settings, parent) 
+        public AnalogSensorSettingsDialog (
+            GenericAnalogSensorSettings settings,
+            GenericAnalogSensorCollection sensorCollection,
+            GenericAnalogInputBase analogInputDriver, 
+            Window parent)
+            : base (settings, sensorCollection, analogInputDriver, parent) 
         {
-            var t = new SettingsTextBox ("Name");
-            t.textBox.text = sensorName.IsNotEmpty () ? sensorName : "Enter name";
-            t.textBox.TextChangedEvent += (sender, args) => {
-                if (args.text.IsEmpty ()) {
-                    args.keepText = false;
-                } else if (AquaPicSensors.PhProbes.SensorNameExists (args.text)) {
-                    MessageBox.Show ("Probe name already exists");
-                    args.keepText = false;
-                }
-            };
-            AddSetting (t);
-
-            var c = new SettingsComboBox ("Input Channel");
-            if (sensorName.IsNotEmpty ()) {
-                var ic = settings.channel;
-                c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", ic.Group, ic.Individual));
-                c.combo.activeIndex = 0;
-            }
-            c.combo.nonActiveMessage = "Please select channel";
-            c.combo.comboList.AddRange (AquaPicDrivers.PhOrp.GetAllAvaiableChannels ());
-            AddSetting (c);
-
-            t = new SettingsTextBox ("LPF Factor");
+            var t = new SettingsTextBox ("LPF Factor");
             t.textBox.text = sensorName.IsNotEmpty () ? settings.lowPassFilterFactor.ToString () : "5";
             t.textBox.TextChangedEvent += (sender, args) => {
                 try {
@@ -80,7 +61,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnSave (object sender) {
-            var sensorSettings = new PhProbeSettings ();
+            var sensorSettings = new GenericAnalogSensorSettings ();
 
             sensorSettings.name = (string)settings["Name"].setting;
             if (sensorSettings.name == "Enter name") {
@@ -97,14 +78,14 @@ namespace AquaPic.UserInterface
 
             sensorSettings.lowPassFilterFactor = Convert.ToInt32 (settings["LPF Factor"].setting);
 
-            AquaPicSensors.PhProbes.UpdateSensor (sensorName, sensorSettings);
+            sensorCollection.UpdateSensor (sensorName, sensorSettings);
             sensorName = sensorSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            AquaPicSensors.PhProbes.RemoveSensor (sensorName);
+            sensorCollection.RemoveSensor (sensorName);
             return true;
         }
     }

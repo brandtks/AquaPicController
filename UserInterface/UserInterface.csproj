@@ -85,10 +85,10 @@
     <Compile Include="Scenes\Home\Common\HomeWindowWidgets.cs" />
     <Compile Include="Scenes\Sensors\SensorsScreen.cs" />
     <Compile Include="Scenes\Sensors\Widgets\PhProbeWidget.cs" />
-    <Compile Include="Scenes\Sensors\Dialogs\PhProbeSettingsDialog.cs" />
     <Compile Include="Scenes\Analog\PhOrpScreen.cs" />
-    <Compile Include="Scenes\Sensors\Widgets\SensorWidget.cs" />
+    <Compile Include="Scenes\Sensors\Widgets\AnalogSensorWidget.cs" />
     <Compile Include="Scenes\Sensors\Dialogs\SensorSettingsDialog.cs" />
+    <Compile Include="Scenes\Sensors\Dialogs\AnalogSensorSettingsDialog.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
