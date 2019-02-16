@@ -25,7 +25,6 @@ using System;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.DataLogging;
 using AquaPic.Drivers;
-using AquaPic.Globals;
 using AquaPic.Runtime;
 using AquaPic.PubSub;
 
@@ -35,23 +34,8 @@ namespace AquaPic.Sensors.PhProbe
     {
         public IDataLogger dataLogger;
 
-        public PhProbe (
-            string name,
-            IndividualControl channel,
-            float zeroScaleCalibrationActual,
-            float zeroScaleCalibrationValue,
-            float fullScaleCalibrationActual,
-            float fullScaleCalibrationValue,
-            int lowPassFilterFactor)
-        : base (name,
-            channel,
-            zeroScaleCalibrationActual,
-            zeroScaleCalibrationValue,
-            fullScaleCalibrationActual,
-            fullScaleCalibrationValue,
-            lowPassFilterFactor) 
-        {
-            dataLogger = Factory.GetDataLogger (string.Format ("{0}PhProbe", this.name.RemoveWhitespace ()));
+        public PhProbe (GenericAnalogSensorSettings settings) : base (settings) {
+            dataLogger = Factory.GetDataLogger (string.Format ("{0}PhProbe", name.RemoveWhitespace ()));
         }
 
         public override void OnCreate () {

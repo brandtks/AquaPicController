@@ -32,16 +32,8 @@ namespace AquaPic.Sensors.PhProbe
 
         protected PhProbeCollection () : base ("phProbes") { }
 
-        protected override GenericAnalogSensor CreateAnalogSensor (GenericAnalogSensorSettings settings) {
-            var sensor = new PhProbe (
-                settings.name,
-                settings.channel,
-                settings.zeroScaleCalibrationActual,
-                settings.zeroScaleCalibrationValue,
-                settings.fullScaleCalibrationActual,
-                settings.fullScaleCalibrationValue,
-                settings.lowPassFilterFactor);
-
+        protected override GenericAnalogSensor GetNewAnalogSensorInstance (GenericAnalogSensorSettings settings) {
+            var sensor = new PhProbe (settings);
             return sensor;
         }
     }

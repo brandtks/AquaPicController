@@ -30,21 +30,7 @@ namespace AquaPic.Sensors.TemperatureProbe
 {
     public class TemperatureProbe : GenericAnalogSensor
     {
-        public TemperatureProbe (
-            string name,
-            IndividualControl channel,
-            float zeroScaleCalibrationActual,
-            float zeroScaleCalibrationValue,
-            float fullScaleCalibrationActual,
-            float fullScaleCalibrationValue,
-            int lowPassFilterFactor)
-        : base (name,
-            channel,
-            zeroScaleCalibrationActual,
-            zeroScaleCalibrationValue,
-            fullScaleCalibrationActual,
-            fullScaleCalibrationValue,
-            lowPassFilterFactor) { }
+        public TemperatureProbe (GenericAnalogSensorSettings settings) : base (settings) { }
 
         public override void OnCreate () {
             AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Temperature Probe", name), lowPassFilterFactor);

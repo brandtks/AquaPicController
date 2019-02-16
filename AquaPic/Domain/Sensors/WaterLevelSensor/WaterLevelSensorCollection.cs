@@ -32,15 +32,8 @@ namespace AquaPic.Sensors
 
         protected WaterLevelSensorCollection () : base ("waterLevelSensors") { }
 
-        protected override GenericAnalogSensor CreateAnalogSensor (GenericAnalogSensorSettings settings) {
-            var sensor = new WaterLevelSensor (
-                settings.name,
-                settings.channel,
-                settings.zeroScaleCalibrationValue,
-                settings.fullScaleCalibrationActual,
-                settings.fullScaleCalibrationValue,
-                settings.lowPassFilterFactor);
-
+        protected override GenericAnalogSensor GetNewAnalogSensorInstance (GenericAnalogSensorSettings settings) {
+            var sensor = new WaterLevelSensor (settings);
             return sensor;
         }
 

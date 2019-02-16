@@ -40,10 +40,10 @@ namespace AquaPic.Sensors
 
         public static void AddSensors () {
             if (SettingsHelper.SettingsFileExists (sensorSettingsFileName)) {
-                FloatSwitches.AddAllSensors ();
-                WaterLevelSensors.AddAllSensors ();
-                TemperatureProbes.AddAllSensors ();
-                PhProbes.AddAllSensors ();
+                FloatSwitches.ReadAllSensorsFromFile ();
+                WaterLevelSensors.ReadAllSensorsFromFile ();
+                TemperatureProbes.ReadAllSensorsFromFile ();
+                PhProbes.ReadAllSensorsFromFile ();
             } else {
                 Logger.Add ("Sensors settings file did not exist, created new water level settings");
 

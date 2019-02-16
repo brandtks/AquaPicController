@@ -32,9 +32,9 @@ namespace AquaPic.Sensors
         public string name { get; protected set; }
         public IndividualControl channel { get; protected set; }
 
-        public GenericSensor (string name, IndividualControl channel) : base (name) {
-            this.name = name;
-            this.channel = channel;
+        public GenericSensor (GenericSensorSettings settings) : base (settings.name) {
+            name = settings.name;
+            channel = settings.channel;
         }
 
         public virtual void OnCreate () => throw new NotImplementedException ();

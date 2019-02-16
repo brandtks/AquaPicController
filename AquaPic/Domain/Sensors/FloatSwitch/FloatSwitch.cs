@@ -46,20 +46,12 @@ namespace AquaPic.Sensors
             }
         }
 
-        public FloatSwitch (
-            string name,
-            SwitchType switchType,
-            SwitchFunction switchFuntion,
-            float physicalLevel,
-            IndividualControl channel,
-            uint timeOffset) 
-            : base (name, channel)
-        {
+        public FloatSwitch (FloatSwitchSettings settings) : base (settings) {
             activated = false;
-            this.switchType = switchType;
-            this.switchFuntion = switchFuntion;
-            this.physicalLevel = physicalLevel;
-            delayTimer = new OnDelayTimer (timeOffset);
+            switchType = settings.switchType;
+            switchFuntion = settings.switchFuntion;
+            physicalLevel = settings.physicalLevel;
+            delayTimer = new OnDelayTimer (settings.timeOffset);
             delayTimer.TimerElapsedEvent += OnDelayTimerTimerElapsedEvent;
         }
 

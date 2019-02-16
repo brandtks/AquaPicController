@@ -34,14 +34,14 @@ namespace AquaPic.Sensors
 
         protected FloatSwitchCollection () : base ("floatSwitches") { }
 
-        public override void AddAllSensors () {
+        public override void ReadAllSensorsFromFile () {
             var sensorSettings = SettingsHelper.ReadAllSettingsInArray<FloatSwitchSettings> (sensorSettingsFileName, sensorSettingsArrayName);
             foreach (var setting in sensorSettings) {
-                AddSensor (setting, false);
+                CreateSensor (setting, false);
             }
         }
 
-        protected override GenericSensor CreateNewSensor (GenericSensorSettings settings) {
+        protected override GenericSensor GetNewSensorInstance (GenericSensorSettings settings) {
             var floatSwitchSettings = settings as FloatSwitchSettings;
             if (floatSwitchSettings == null) {
                 throw new ArgumentException ("Settings must be FloatSwitchSettings");
@@ -55,13 +55,7 @@ namespace AquaPic.Sensors
                 Logger.AddWarning ("ATO switch should be normally opened");
             }
 
-            var floatSwitch = new FloatSwitch (
-                floatSwitchSettings.name,
-                floatSwitchSettings.switchType,
-                floatSwitchSettings.switchFuntion,
-                floatSwitchSettings.physicalLevel,
-                floatSwitchSettings.channel,
-                floatSwitchSettings.timeOffset);
+            var floatSwitch = new FloatSwitch (floatSwitchSettings);
 
             return floatSwitch;
         }

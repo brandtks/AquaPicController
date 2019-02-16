@@ -30,25 +30,25 @@ namespace AquaPic.Sensors
     {
         public GenericAnalogSensorCollection (string sensorSettingsArrayName) : base (sensorSettingsArrayName) { }
 
-        public override void AddAllSensors () {
+        public override void ReadAllSensorsFromFile () {
             var sensorSettings = SettingsHelper.ReadAllSettingsInArray<GenericAnalogSensorSettings> (sensorSettingsFileName, sensorSettingsArrayName);
             foreach (var setting in sensorSettings) {
-                AddSensor (setting, false);
+                CreateSensor (setting, false);
             }
         }
 
-        protected override GenericSensor CreateNewSensor (GenericSensorSettings settings) {
+        protected override GenericSensor GetNewSensorInstance (GenericSensorSettings settings) {
             var sensorSettings = settings as GenericAnalogSensorSettings;
             if (sensorSettings == null) {
                 throw new ArgumentException ("Settings must be GenericAnalogSensorSettings");
             }
 
-            var sensor = CreateAnalogSensor (sensorSettings);
+            var sensor = GetNewAnalogSensorInstance (sensorSettings);
 
             return sensor;
         }
 
-        protected virtual GenericAnalogSensor CreateAnalogSensor (GenericAnalogSensorSettings settings) => throw new NotImplementedException ();
+        protected virtual GenericAnalogSensor GetNewAnalogSensorInstance (GenericAnalogSensorSettings settings) => throw new NotImplementedException ();
 
         protected override GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
             var phProbe = sensors[name] as GenericAnalogSensor;

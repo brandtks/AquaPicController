@@ -40,17 +40,15 @@ namespace AquaPic.Sensors
             this.sensorSettingsArrayName = sensorSettingsArrayName;
         }
 
-        public virtual void AddAllSensors () => throw new NotImplementedException ();
-
-        public void AddSensor (GenericSensorSettings settings) {
-            AddSensor (settings, true);
+        public void CreateSensor (GenericSensorSettings settings) {
+            CreateSensor (settings, true);
         }
 
-        protected void AddSensor (GenericSensorSettings settings, bool saveToFile) {
+        protected void CreateSensor (GenericSensorSettings settings, bool saveToFile) {
             if (SensorNameExists (settings.name)) {
                 throw new Exception (string.Format ("Sensor: {0} already exists", settings.name));
             }
-            var sensor = CreateNewSensor (settings);
+            var sensor = GetNewSensorInstance (settings);
             sensors[sensor.name] = sensor;
             sensor.OnCreate ();
             if (saveToFile) {
@@ -58,14 +56,14 @@ namespace AquaPic.Sensors
             }
         }
 
-        protected virtual GenericSensor CreateNewSensor (GenericSensorSettings settings) => throw new NotImplementedException ();
+        protected virtual GenericSensor GetNewSensorInstance (GenericSensorSettings settings) => throw new NotImplementedException ();
 
         public void UpdateSensor (string name, GenericSensorSettings settings) {
             if (SensorNameExists (name)) {
                 settings = OnUpdateSensor (name, settings);
                 RemoveSensor (name, false);
             }
-            AddSensor (settings, true);
+            CreateSensor (settings, true);
             sensors[settings.name].NotifySensorUpdated (name, settings);
         }
 
@@ -144,6 +142,8 @@ namespace AquaPic.Sensors
             settings.channel = sensors[name].channel;
             return settings;
         }
+
+        public virtual void ReadAllSensorsFromFile () => throw new NotImplementedException ();
 
         protected void AddSensorSettingsToFile (IEntitySettings settings) {
             SettingsHelper.AddSettingsToArray (sensorSettingsFileName, sensorSettingsArrayName, settings);

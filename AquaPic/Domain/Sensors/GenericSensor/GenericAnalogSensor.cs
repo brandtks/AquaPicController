@@ -47,22 +47,13 @@ namespace AquaPic.Sensors
             }
         }
 
-        public GenericAnalogSensor (
-            string name,
-            IndividualControl channel,
-            float zeroScaleCalibrationActual,
-            float zeroScaleCalibrationValue,
-            float fullScaleCalibrationActual,
-            float fullScaleCalibrationValue,
-            int lowPassFilterFactor)
-            : base (name, channel) 
-        {
-            this.zeroScaleCalibrationActual = zeroScaleCalibrationActual;
-            this.zeroScaleCalibrationValue = zeroScaleCalibrationValue;
-            this.fullScaleCalibrationActual = fullScaleCalibrationActual;
-            this.fullScaleCalibrationValue = fullScaleCalibrationValue;
-            this.lowPassFilterFactor = lowPassFilterFactor;
-            value = this.zeroScaleCalibrationActual;
+        public GenericAnalogSensor (GenericAnalogSensorSettings settings) : base (settings) {
+            zeroScaleCalibrationActual = settings.zeroScaleCalibrationActual;
+            zeroScaleCalibrationValue = settings.zeroScaleCalibrationValue;
+            fullScaleCalibrationActual = settings.fullScaleCalibrationActual;
+            fullScaleCalibrationValue = settings.fullScaleCalibrationValue;
+            lowPassFilterFactor = settings.lowPassFilterFactor;
+            value = zeroScaleCalibrationActual;
             sensorDisconnectedAlarmIndex = -1;
         }
 

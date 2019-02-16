@@ -30,20 +30,7 @@ namespace AquaPic.Sensors
 {
     public class WaterLevelSensor : GenericAnalogSensor
     {
-        public WaterLevelSensor (
-            string name,
-            IndividualControl channel,
-            float zeroScaleCalibrationValue,
-            float fullScaleCalibrationActual,
-            float fullScaleCalibrationValue,
-            int lowPassFilterFactor)
-        : base (name,
-            channel,
-            0,
-            zeroScaleCalibrationValue,
-            fullScaleCalibrationActual,
-            fullScaleCalibrationValue,
-            lowPassFilterFactor) { }
+        public WaterLevelSensor (GenericAnalogSensorSettings settings) : base (settings) { }
 
         public override void OnCreate () {
             AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name), lowPassFilterFactor);
