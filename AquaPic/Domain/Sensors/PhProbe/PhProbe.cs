@@ -39,15 +39,16 @@ namespace AquaPic.Sensors.PhProbe
         }
 
         public override void OnCreate () {
-            AquaPicDrivers.PhOrp.AddChannel (channel, string.Format ("{0}, pH Probe", name), lowPassFilterFactor);
-            AquaPicDrivers.PhOrp.SubscribeConsumer (channel, this);
+            var channelName = string.Format ("{0}, pH Probe", name);
+            AquaPicDrivers.PhOrp.AddChannel (channel, channelName, lowPassFilterFactor);
             sensorDisconnectedAlarmIndex = Alarm.Subscribe ("pH probe disconnected, " + name);
+            Subscribe (channelName);
         }
 
         public override void OnRemove () {
             AquaPicDrivers.PhOrp.RemoveChannel (channel);
-            AquaPicDrivers.PhOrp.UnsubscribeConsumer (channel, this);
             Alarm.Clear (sensorDisconnectedAlarmIndex);
+            Unsubscribe ();
         }
 
         public override void OnValueUpdatedAction (object parm) {

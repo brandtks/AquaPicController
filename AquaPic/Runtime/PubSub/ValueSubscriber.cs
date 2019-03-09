@@ -26,17 +26,41 @@ using System;
 namespace AquaPic.PubSub
 {
     // This isn't abstract because we don't want to force override the methods
-    public class ValueConsumer
+    public class ValueSubscriber
     {
-        public Guid valueChangedGuid { get; private set; }
-        public Guid valueUpdatedGuid { get; private set; }
+        public string subscriptionKey { get; protected set; }
+        public Guid valueChangedGuid { get; protected set; }
+        public Guid valueUpdatedGuid { get; protected set; }
 
         public virtual void OnValueChangedAction (object parm) => throw new NotImplementedException ();
         public virtual void OnValueUpdatedAction (object parm) => throw new NotImplementedException ();
 
-        public void SetGuids (Guid valueChangedGuid, Guid valueUpdatedGuid) {
-            this.valueChangedGuid = valueChangedGuid;
-            this.valueUpdatedGuid = valueUpdatedGuid;
+        public virtual void Subscribe (string key) {
+            subscriptionKey = key;
+            var consumerType = GetType ();
+            var messageHub = MessageHub.Instance;
+
+            var methodInfo = consumerType.GetMethod (nameof (OnValueChangedAction));
+            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
+                valueChangedGuid = messageHub.Subscribe<ValueChangedEvent> (subscriptionKey, OnValueChangedAction);
+            }
+
+            methodInfo = consumerType.GetMethod (nameof (OnValueUpdatedAction));
+            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
+                valueUpdatedGuid = messageHub.Subscribe<ValueUpdatedEvent> (subscriptionKey, OnValueUpdatedAction);
+            }
+        }
+
+        public virtual void Unsubscribe () {
+            var messageHub = MessageHub.Instance;
+
+            if (valueChangedGuid != Guid.Empty) {
+                messageHub.Unsubscribe (subscriptionKey, valueChangedGuid);
+            }
+
+            if (valueUpdatedGuid != Guid.Empty) {
+                messageHub.Unsubscribe (subscriptionKey, valueUpdatedGuid);
+            }
         }
     }
 

@@ -34,7 +34,7 @@ namespace AquaPic.Modules.Temperature
 {
     public partial class Temperature
     {
-        private class TemperatureGroup : SensorConsumer
+        private class TemperatureGroup : SensorSubscriber
         {
             public string name;
             public float temperature;
@@ -75,7 +75,7 @@ namespace AquaPic.Modules.Temperature
                 this.temperatureProbes = new Dictionary<string, InternalTemperatureProbeState> ();
                 foreach (var temperatureProbe in temperatureProbes) {
                     this.temperatureProbes.Add (temperatureProbe, new InternalTemperatureProbeState ());
-                    AquaPicSensors.TemperatureProbes.SubscribeConsumer (temperatureProbe, this);
+                    Subscribe (temperatureProbe);
                 }
 
                 this.heaters = new Dictionary<string, Heater> ();

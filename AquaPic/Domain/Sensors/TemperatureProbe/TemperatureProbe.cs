@@ -33,15 +33,16 @@ namespace AquaPic.Sensors.TemperatureProbe
         public TemperatureProbe (GenericAnalogSensorSettings settings) : base (settings) { }
 
         public override void OnCreate () {
-            AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Temperature Probe", name), lowPassFilterFactor);
-            AquaPicDrivers.AnalogInput.SubscribeConsumer (channel, this);
+            var channelName = string.Format ("{0}, Temperature Probe", name);
+            AquaPicDrivers.AnalogInput.AddChannel (channel, channelName, lowPassFilterFactor);
             sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Temperature probe disconnected, " + name);
+            Subscribe (channelName);
         }
 
         public override void OnRemove () {
             AquaPicDrivers.AnalogInput.RemoveChannel (channel);
-            AquaPicDrivers.AnalogInput.UnsubscribeConsumer (channel, this);
             Alarm.Clear (sensorDisconnectedAlarmIndex);
+            Unsubscribe ();
         }
     }
 }

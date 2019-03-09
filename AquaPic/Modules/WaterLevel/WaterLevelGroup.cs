@@ -33,7 +33,7 @@ namespace AquaPic.Modules
 {
     public partial class WaterLevel
     {
-        class WaterLevelGroup : SensorConsumer
+        class WaterLevelGroup : SensorSubscriber
         {
             public string name;
             public float highAnalogAlarmSetpoint;
@@ -84,13 +84,13 @@ namespace AquaPic.Modules
 
                 this.floatSwitches = new List<string> (floatSwitches);
                 foreach (var floatSwitch in this.floatSwitches) {
-                    AquaPicSensors.FloatSwitches.SubscribeConsumer (floatSwitch, this);
+                    Subscribe (floatSwitch);
                 }
 
                 this.waterLevelSensors = new Dictionary<string, InternalWaterLevelSensorState> ();
                 foreach (var waterLevelSensor in waterLevelSensors) {
                     this.waterLevelSensors.Add (waterLevelSensor, new InternalWaterLevelSensorState ());
-                    AquaPicSensors.WaterLevelSensors.SubscribeConsumer (waterLevelSensor, this);
+                    Subscribe (waterLevelSensor);
                 }
             }
 

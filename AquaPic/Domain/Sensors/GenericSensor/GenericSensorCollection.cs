@@ -86,16 +86,6 @@ namespace AquaPic.Sensors
             }
         }
 
-        public void SubscribeConsumer (string name, SensorConsumer consumer) {
-            CheckSensorKey (name);
-            sensors[name].SubscribeConsumer (consumer);
-        }
-
-        public void UnsubscribeConsumer (string name, SensorConsumer consumer) {
-            CheckSensorKey (name);
-            sensors[name].UnsubscribeConsumer (consumer);
-        }
-
         public void CheckSensorKey (string name) {
             if (!sensors.ContainsKey (name)) {
                 throw new ArgumentException (name + " isn't a valid sensor name");

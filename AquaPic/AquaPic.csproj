@@ -162,9 +162,9 @@
     <Compile Include="Domain\Sensors\GenericSensor\GenericSensorSettings.cs" />
     <Compile Include="Domain\Entity\Mutators\StringArrayMutator.cs" />
     <Compile Include="Domain\Entity\Mutators\TimerTimeMutator.cs" />
-    <Compile Include="Runtime\PubSub\SensorConsumer.cs" />
+    <Compile Include="Runtime\PubSub\SensorSubscriber.cs" />
     <Compile Include="Runtime\PubSub\SensorPublisher.cs" />
-    <Compile Include="Runtime\PubSub\ValueConsumer.cs" />
+    <Compile Include="Runtime\PubSub\ValueSubscriber.cs" />
     <Compile Include="Runtime\PubSub\MessageHub.cs" />
     <Compile Include="Domain\Globals\GlobalEnums.cs" />
     <Compile Include="Domain\Globals\IndividualControl.cs" />
@@ -182,6 +182,7 @@
     <Compile Include="Domain\Entity\Mutators\IntMutator.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericAnalogSensorCollection.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericAnalogSensorSettings.cs" />
+    <Compile Include="Runtime\PubSub\ValuePublisher.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

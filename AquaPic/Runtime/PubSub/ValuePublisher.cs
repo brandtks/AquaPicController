@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2018 Goodtime Development
+    Copyright (c) 2019 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,13 +22,23 @@
 #endregion // License
 
 using System;
-using AquaPic.Globals;
-using AquaPic.PubSub;
 
-namespace AquaPic.Drivers
+namespace AquaPic.PubSub
 {
-    public class GenericInputBase : GenericBase
+    public class ValuePublisher
     {
-        public GenericInputBase (string name, uint runtime = 1000) : base (name, runtime) { }
+        string key;
+
+        public ValuePublisher (string key) {
+            this.key = key;
+        }
+
+        public void NotifyValueChanged (ValueType newValue, ValueType oldValue) {
+            MessageHub.Instance.Publish (key, new ValueChangedEvent (key, newValue, oldValue));
+        }
+
+        public void NotifyValueUpdated (ValueType newValue) {
+            MessageHub.Instance.Publish (key, new ValueUpdatedEvent (key, newValue));
+        } 
     }
 }

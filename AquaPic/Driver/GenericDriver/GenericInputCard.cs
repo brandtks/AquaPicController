@@ -49,40 +49,9 @@ namespace AquaPic.Drivers
 
             for (int i = 0; i < channels.Length; ++i) {
                 var inputChannel = channels[i] as GenericInputChannel;
-                UpdateChannelValue (inputChannel, values[i]);
-            }
-        }
-
-        public void SubscribeConsumer (int channel, ValueConsumer consumer) {
-            CheckChannelRange (channel);
-            var key = channels[channel].name;
-            var consumerType = consumer.GetType ();
-            var messageHub = MessageHub.Instance;
-
-            Guid valueChangedGuid, valueUpdatedGuid;
-            var methodInfo = consumerType.GetMethod (nameof (consumer.OnValueChangedAction));
-            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                valueChangedGuid = messageHub.Subscribe<ValueChangedEvent> (key, consumer.OnValueChangedAction);
-            }
-
-            methodInfo = consumerType.GetMethod (nameof (consumer.OnValueUpdatedAction));
-            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                valueUpdatedGuid = messageHub.Subscribe<ValueUpdatedEvent> (key, consumer.OnValueUpdatedAction);
-            }
-            consumer.SetGuids (valueChangedGuid, valueUpdatedGuid);
-        }
-
-        public void UnsubscribeConsumer (int channel, ValueConsumer consumer) {
-            CheckChannelRange (channel);
-            var key = channels[channel].name;
-            var messageHub = MessageHub.Instance;
-
-            if (consumer.valueChangedGuid != Guid.Empty) {
-                messageHub.Unsubscribe (key, consumer.valueChangedGuid);
-            }
-
-            if (consumer.valueUpdatedGuid != Guid.Empty) {
-                messageHub.Unsubscribe (key, consumer.valueUpdatedGuid);
+                if (inputChannel.mode == Mode.Manual) {
+                    UpdateChannelValue (inputChannel, values[i]);
+                }
             }
         }
 

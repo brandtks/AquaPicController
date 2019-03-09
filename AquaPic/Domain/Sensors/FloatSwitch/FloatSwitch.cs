@@ -56,13 +56,14 @@ namespace AquaPic.Sensors
         }
 
         public override void OnCreate () {
-            AquaPicDrivers.DigitalInput.AddChannel (channel, string.Format ("{0}, Float Switch", name));
-            AquaPicDrivers.DigitalInput.SubscribeConsumer (channel, this);
+            var channelName = string.Format ("{0}, Float Switch", name);
+            AquaPicDrivers.DigitalInput.AddChannel (channel, channelName);
+            Subscribe (channelName);
         }
 
         public override void OnRemove () {
             AquaPicDrivers.DigitalInput.RemoveChannel (channel);
-            AquaPicDrivers.DigitalInput.UnsubscribeConsumer (channel, this);
+            Unsubscribe ();
         }
 
         public override ValueType GetValue () {
