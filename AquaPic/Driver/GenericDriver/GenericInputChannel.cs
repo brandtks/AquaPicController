@@ -22,7 +22,7 @@
 #endregion // License
 
 using System;
-using AquaPic.PubSub;
+using AquaPic.Globals;
 
 namespace AquaPic.Drivers
 {
@@ -30,12 +30,12 @@ namespace AquaPic.Drivers
     {
         public GenericInputChannel (string name, Type valueType) : base (name, valueType) { }
 
-        public void OnValueChanged (ValueType newValue, ValueType oldValue) {
-            MessageHub.Instance.Publish (name, new ValueChangedEvent (name, newValue, oldValue));
-        }
-
-        public void OnValueUpdated (ValueType newValue) {
-            MessageHub.Instance.Publish (name, new ValueUpdatedEvent (name, newValue));
+        public override void SetValue (object value) {
+            if (mode == Mode.Manual) {
+                base.SetValue (value);
+            } else {
+                throw new Exception ("Can only modify input value with channel forced");
+            }
         }
     }
 }

@@ -27,7 +27,7 @@ namespace AquaPic.PubSub
 {
     public class ValuePublisher
     {
-        string key;
+        public string key { get; protected set; }
 
         public ValuePublisher (string key) {
             this.key = key;

@@ -57,7 +57,7 @@ namespace AquaPic.Drivers
                 byte ch = args.GetDataFromReadBuffer<byte> (0);
                 short value = args.GetDataFromReadBuffer<short> (1);
                 if (channels[ch].mode == Mode.Auto) {
-                    UpdateChannelValue (channels[ch], value);
+                    channels[ch].SetValue (value);
                 }
             }
 
@@ -74,7 +74,7 @@ namespace AquaPic.Drivers
 
                 for (int i = 0; i < channelCount; ++i) {
                     if (channels[i].mode == Mode.Auto) {
-                        UpdateChannelValue (channels[i], values[i]);
+                        channels[i].SetValue (values[i]);
                     }
                 }
             }

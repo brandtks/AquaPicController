@@ -55,7 +55,7 @@ namespace AquaPic.Drivers
                 stateMask = args.GetDataFromReadBuffer<byte> (0);
                 for (int i = 0; i < channelCount; ++i) {
                     if (channels[i].mode == Mode.Auto) {
-                        UpdateChannelValue (channels[i], Utils.MaskToBoolean (stateMask, i));
+                        channels[i].SetValue (Utils.MaskToBoolean (stateMask, i));
                     }
                 }
             }
@@ -68,7 +68,7 @@ namespace AquaPic.Drivers
             protected void GetInputCallback (CallbackArgs args) {
                 var ch = args.GetDataFromReadBuffer<byte> (0);
                 var value = args.GetDataFromReadBuffer<bool> (1);
-                UpdateChannelValue (channels[ch], value);
+                channels[ch].SetValue (value);
             }
         }
     }

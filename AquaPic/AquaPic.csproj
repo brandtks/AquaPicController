@@ -99,7 +99,6 @@
     <Compile Include="Runtime\Logger\Logger.cs" />
     <Compile Include="Runtime\Chemistry\Chemistry.cs" />
     <Compile Include="Runtime\Chemistry\TestProcedure.cs" />
-    <Compile Include="Driver\GenericDriver\GenericChannel.cs" />
     <Compile Include="Driver\GenericDriver\GenericCard.cs" />
     <Compile Include="Driver\GenericDriver\CardTypeEnum.cs" />
     <Compile Include="Driver\GenericDriver\GenericBase.cs" />
@@ -183,6 +182,8 @@
     <Compile Include="Domain\Sensors\GenericSensor\GenericAnalogSensorCollection.cs" />
     <Compile Include="Domain\Sensors\GenericSensor\GenericAnalogSensorSettings.cs" />
     <Compile Include="Runtime\PubSub\ValuePublisher.cs" />
+    <Compile Include="Driver\GenericDriver\GenericOutputChannel.cs" />
+    <Compile Include="Driver\GenericDriver\GenericChannel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

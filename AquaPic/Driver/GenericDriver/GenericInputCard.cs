@@ -22,8 +22,6 @@
 #endregion // License
 
 using System;
-using AquaPic.Globals;
-using AquaPic.PubSub;
 
 namespace AquaPic.Drivers
 {
@@ -31,42 +29,5 @@ namespace AquaPic.Drivers
     {
         public GenericInputCard (string name, int address, int numberChannels)
             : base (name, address, numberChannels) { }
-            
-        public override void SetChannelValue (int channel, ValueType value) {
-            CheckChannelRange (channel);
-
-            if (channels[channel].mode == Mode.Manual) {
-                UpdateChannelValue (channels[channel], value);
-            } else {
-                throw new Exception ("Can only modify input value with channel forced");
-            }
-        }
-
-        public override void SetAllChannelValues (ValueType[] values) {
-            if (values.Length < channels.Length) {
-                throw new ArgumentOutOfRangeException (nameof (values));
-            }
-
-            for (int i = 0; i < channels.Length; ++i) {
-                var inputChannel = channels[i] as GenericInputChannel;
-                if (inputChannel.mode == Mode.Manual) {
-                    UpdateChannelValue (inputChannel, values[i]);
-                }
-            }
-        }
-
-        protected virtual void UpdateChannelValue (GenericChannel channel, ValueType value) {
-            var oldValue = channel.value;
-            channel.SetValue (value);
-            var newValue = channel.value;
-
-            var inputChannel = channel as GenericInputChannel;
-            if (inputChannel != null) {
-                inputChannel.OnValueUpdated (newValue);
-                if (!oldValue.Equals (newValue)) {
-                    inputChannel.OnValueChanged (newValue, oldValue);
-                }
-            }
-        }
     }
 }

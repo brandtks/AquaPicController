@@ -23,7 +23,6 @@
 
 using System;
 using System.Collections.Generic;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.SerialBus;
 
@@ -55,9 +54,7 @@ namespace AquaPic.Drivers
             }
         }
 
-        protected virtual GenericChannel ChannelCreater (int index) {
-            throw new NotImplementedException ();
-        }
+        protected virtual GenericChannel ChannelCreater (int index) => throw new NotImplementedException ();
 
         public virtual void AddChannel (int channel, string channelName) {
             CheckChannelRange (channel);
@@ -104,7 +101,7 @@ namespace AquaPic.Drivers
         protected virtual bool CheckChannelRange (int channel, bool throwException = true) {
             if ((channel < 0) || (channel >= channelCount)) {
                 if (throwException) {
-                    throw new ArgumentOutOfRangeException ("channel");
+                    throw new ArgumentOutOfRangeException (nameof (channel));
                 }
                 return false;
             }
@@ -118,13 +115,9 @@ namespace AquaPic.Drivers
         /**************************************************************************************************************/
         /* Channel Value Getters                                                                                      */
         /**************************************************************************************************************/
-        public virtual void GetValueCommunication (int channel) {
-            throw new NotImplementedException ();
-        }
+        public virtual void GetValueCommunication (int channel) => throw new NotImplementedException ();
 
-        public virtual void GetAllValuesCommunication () {
-            throw new NotImplementedException ();
-        }
+        public virtual void GetAllValuesCommunication () => throw new NotImplementedException ();
 
         public virtual ValueType GetChannelValue (int channel) {
             CheckChannelRange (channel);
@@ -148,13 +141,9 @@ namespace AquaPic.Drivers
         /**************************************************************************************************************/
         /* Channel Value Setters                                                                                      */
         /**************************************************************************************************************/
-        public virtual void SetValueCommunication<CommunicationType> (int channel, CommunicationType value) {
-            throw new NotImplementedException ();
-        }
+        public virtual void SetValueCommunication<CommunicationType> (int channel, CommunicationType value) => throw new NotImplementedException ();
 
-        public virtual void SetAllValuesCommunication<CommunicationType> (CommunicationType[] values) {
-            throw new NotImplementedException ();
-        }
+        public virtual void SetAllValuesCommunication<CommunicationType> (CommunicationType[] values) => throw new NotImplementedException ();
 
         public virtual void SetChannelValue (int channel, ValueType value) {
             CheckChannelRange (channel);
@@ -163,7 +152,7 @@ namespace AquaPic.Drivers
 
         public virtual void SetAllChannelValues (ValueType[] values) {
             if (values.Length < channelCount)
-                throw new ArgumentOutOfRangeException ("values.length");
+                throw new ArgumentOutOfRangeException (nameof (values));
 
             for (int i = 0; i < channelCount; ++i) {
                 channels[i].SetValue (values[i]);
