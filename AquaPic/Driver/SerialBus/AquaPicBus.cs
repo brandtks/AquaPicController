@@ -27,7 +27,6 @@ using System.Diagnostics;           // for Stopwatch
 using System.Collections;           // for Queue
 using System.Collections.Generic;   // for List
 using System.IO.Ports;              // for SerialPort
-using Gtk;                          // for Application.Invoke
 using AquaPic.Runtime;              // for Logger, Alarm
 
 namespace AquaPic.SerialBus

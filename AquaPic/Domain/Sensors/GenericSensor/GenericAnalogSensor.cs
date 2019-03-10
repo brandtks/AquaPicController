@@ -57,6 +57,15 @@ namespace AquaPic.Sensors
             sensorDisconnectedAlarmIndex = -1;
         }
 
+        public override GenericSensorSettings OnUpdate (GenericSensorSettings settings) {
+            var sensorSettings = settings as GenericAnalogSensorSettings;
+            sensorSettings.zeroScaleCalibrationValue = zeroScaleCalibrationActual;
+            sensorSettings.zeroScaleCalibrationValue = zeroScaleCalibrationValue;
+            sensorSettings.fullScaleCalibrationActual = fullScaleCalibrationActual;
+            sensorSettings.fullScaleCalibrationValue = fullScaleCalibrationValue;
+            return sensorSettings;
+        }
+
         public override ValueType GetValue () {
             return value;
         }

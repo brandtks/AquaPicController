@@ -31,7 +31,19 @@ namespace AquaPic.Drivers
         public ValueSubscriber subscriber { get; protected set; }
 
         public GenericOutputChannel (string name, Type valueType) : base (name, valueType) {
+            
+        }
 
+        protected virtual void OnValueChanged (ValueType value) {
+            SetValue (value);
+        }
+
+        protected class OutputChannelValueSubscriber : ValueSubscriber
+        {
+            public override void OnValueChangedAction (object parm) {
+                var args = parm as ValueChangedEvent;
+
+            }
         }
     }
 }

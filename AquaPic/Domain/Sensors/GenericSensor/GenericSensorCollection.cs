@@ -60,15 +60,11 @@ namespace AquaPic.Sensors
 
         public void UpdateSensor (string name, GenericSensorSettings settings) {
             if (SensorNameExists (name)) {
-                settings = OnUpdateSensor (name, settings);
+                settings = sensors[name].OnUpdate (settings);
                 RemoveSensor (name, false);
             }
             CreateSensor (settings, true);
             sensors[settings.name].NotifySensorUpdated (name, settings);
-        }
-
-        protected virtual GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
-            return settings;
         }
 
         public void RemoveSensor (string name) {

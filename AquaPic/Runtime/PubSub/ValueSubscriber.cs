@@ -25,7 +25,6 @@ using System;
 
 namespace AquaPic.PubSub
 {
-    // This isn't abstract because we don't want to force override the methods
     public class ValueSubscriber
     {
         public string subscriptionKey { get; protected set; }

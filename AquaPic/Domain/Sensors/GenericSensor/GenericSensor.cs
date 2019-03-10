@@ -39,6 +39,11 @@ namespace AquaPic.Sensors
 
         public virtual void OnCreate () => throw new NotImplementedException ();
         public virtual void OnRemove () => throw new NotImplementedException ();
+
+        public virtual GenericSensorSettings OnUpdate (GenericSensorSettings settings) {
+            return settings;
+        }
+
         public virtual ValueType GetValue () => throw new NotImplementedException ();
 
         public virtual GenericSensor Clone () {

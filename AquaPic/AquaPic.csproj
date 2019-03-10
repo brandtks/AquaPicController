@@ -100,7 +100,6 @@
     <Compile Include="Runtime\Chemistry\Chemistry.cs" />
     <Compile Include="Runtime\Chemistry\TestProcedure.cs" />
     <Compile Include="Driver\GenericDriver\GenericCard.cs" />
-    <Compile Include="Driver\GenericDriver\CardTypeEnum.cs" />
     <Compile Include="Driver\GenericDriver\GenericBase.cs" />
     <Compile Include="Driver\Driver.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputChannel.cs" />
@@ -184,6 +183,7 @@
     <Compile Include="Runtime\PubSub\ValuePublisher.cs" />
     <Compile Include="Driver\GenericDriver\GenericOutputChannel.cs" />
     <Compile Include="Driver\GenericDriver\GenericChannel.cs" />
+    <Compile Include="Driver\CardTypeEnum.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

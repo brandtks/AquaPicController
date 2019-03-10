@@ -50,16 +50,6 @@ namespace AquaPic.Sensors
 
         protected virtual GenericAnalogSensor GetNewAnalogSensorInstance (GenericAnalogSensorSettings settings) => throw new NotImplementedException ();
 
-        protected override GenericSensorSettings OnUpdateSensor (string name, GenericSensorSettings settings) {
-            var phProbe = sensors[name] as GenericAnalogSensor;
-            var sensorSettings = settings as GenericAnalogSensorSettings;
-            sensorSettings.zeroScaleCalibrationValue = phProbe.zeroScaleCalibrationActual;
-            sensorSettings.zeroScaleCalibrationValue = phProbe.zeroScaleCalibrationValue;
-            sensorSettings.fullScaleCalibrationActual = phProbe.fullScaleCalibrationActual;
-            sensorSettings.fullScaleCalibrationValue = phProbe.fullScaleCalibrationValue;
-            return sensorSettings;
-        }
-
         public override GenericSensorSettings GetSensorSettings (string name) {
             CheckSensorKey (name);
             var genericAnalogSensor = sensors[name] as GenericAnalogSensor;
