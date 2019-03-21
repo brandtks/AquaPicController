@@ -184,6 +184,8 @@
     <Compile Include="Driver\GenericDriver\GenericOutputChannel.cs" />
     <Compile Include="Driver\GenericDriver\GenericChannel.cs" />
     <Compile Include="Driver\CardTypeEnum.cs" />
+    <Compile Include="Driver\GenericDriver\GenericOutputCard.cs" />
+    <Compile Include="Driver\GenericDriver\GenericOutputBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

@@ -22,27 +22,45 @@
 #endregion // License
 
 using System;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.PubSub;
 
 namespace AquaPic.Drivers
 {
     public class GenericOutputChannel : GenericChannel
     {
-        public ValueSubscriber subscriber { get; protected set; }
+        private OutputChannelValueSubscriber _subscriber;
+        public string subscriptionKey {
+            get {
+                return _subscriber.subscriptionKey;
+            }
+        }
 
         public GenericOutputChannel (string name, Type valueType) : base (name, valueType) {
-            
+            _subscriber = new OutputChannelValueSubscriber ();
+            _subscriber.ValueChangedEvent += OnValueChanged;
         }
 
         protected virtual void OnValueChanged (ValueType value) {
             SetValue (value);
         }
 
+        public void Subscribe (string key) {
+            if (_subscriber.subscriptionKey.IsNotEmpty ()) {
+                throw new Exception (string.Format("Output channel {0} is already subscribed to {1}", name, _subscriber.subscriptionKey));
+            }
+            _subscriber.Subscribe (key);
+        }
+
+        protected delegate void OnValueChangedHandler (ValueType value);
+
         protected class OutputChannelValueSubscriber : ValueSubscriber
         {
+            public event OnValueChangedHandler ValueChangedEvent;
+
             public override void OnValueChangedAction (object parm) {
                 var args = parm as ValueChangedEvent;
-
+                ValueChangedEvent?.Invoke (args.newValue);
             }
         }
     }

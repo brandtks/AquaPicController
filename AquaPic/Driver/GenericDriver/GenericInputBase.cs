@@ -22,13 +22,12 @@
 #endregion // License
 
 using System;
-using AquaPic.Globals;
-using AquaPic.PubSub;
 
 namespace AquaPic.Drivers
 {
     public class GenericInputBase : GenericBase
     {
-        public GenericInputBase (string name, uint runtime = 1000) : base (name, runtime) { }
+        public GenericInputBase (string name, uint runtime = 1000) 
+            : base (name, runtime) { }
     }
 }

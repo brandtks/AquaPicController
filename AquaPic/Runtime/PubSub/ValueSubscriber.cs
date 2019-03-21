@@ -52,6 +52,7 @@ namespace AquaPic.PubSub
 
         public virtual void Unsubscribe () {
             var messageHub = MessageHub.Instance;
+            subscriptionKey = string.Empty;
 
             if (valueChangedGuid != Guid.Empty) {
                 messageHub.Unsubscribe (subscriptionKey, valueChangedGuid);

@@ -23,13 +23,13 @@
 
 using System;
 using AquaPic.Globals;
-using AquaPic.PubSub;
 
 namespace AquaPic.Drivers
 {
     public class GenericAnalogInputBase : GenericInputBase
     {
-        public GenericAnalogInputBase (string name, uint runtime = 1000) : base (name, runtime) { }
+        public GenericAnalogInputBase (string name, uint runtime = 1000) 
+            : base (name, runtime) { }
 
         public virtual void AddChannel (IndividualControl channel, string channelName, int lowPassFilterFactor) {
             AddChannel (channel, channelName);
@@ -40,8 +40,8 @@ namespace AquaPic.Drivers
         }
 
         public int GetChannelLowPassFilterFactor (string channelName) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
-            return GetChannelLowPassFilterFactor (channel);
+            var channel = GetChannelIndividualControl (channelName);
+            return GetChannelLowPassFilterFactor (channel.Group, channel.Individual);
         }
 
         public int GetChannelLowPassFilterFactor (IndividualControl channel) {
