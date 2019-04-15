@@ -186,6 +186,8 @@
     <Compile Include="Driver\CardTypeEnum.cs" />
     <Compile Include="Driver\GenericDriver\GenericOutputCard.cs" />
     <Compile Include="Driver\GenericDriver\GenericOutputBase.cs" />
+    <Compile Include="Runtime\PubSub\ChannelPublisher.cs" />
+    <Compile Include="Runtime\PubSub\ChannelSubscriber.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

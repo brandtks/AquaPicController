@@ -69,26 +69,8 @@ namespace AquaPic.PubSub
             if (sensorRemovedGuid != Guid.Empty) {
                 messageHub.Unsubscribe (subscriptionKey, sensorUpdatedGuid);
             }
-        }
-    }
 
-    public class SensorUpdatedEvent
-    {
-        public string name;
-        public GenericSensorSettings settings;
-
-        public SensorUpdatedEvent (string name, GenericSensorSettings settings) {
-            this.name = name;
-            this.settings = settings;
-        }
-    }
-
-    public class SensorRemovedEvent
-    {
-        public string name;
-
-        public SensorRemovedEvent (string name) {
-            this.name = name;
+            subscriptionKey = string.Empty;
         }
     }
 }

@@ -206,7 +206,7 @@ namespace AquaPic.Drivers
 
         public virtual void SetChannelMode (int channel, Mode mode) {
             CheckChannelRange (channel);
-            channels[channel].mode = mode;
+            channels[channel].SetMode (mode);
         }
     }
 }

@@ -22,35 +22,30 @@
 #endregion // License
 
 using System;
+using AquaPic.Globals;
 
 namespace AquaPic.PubSub
 {
-    public class ValueSubscriber
+    public class ChannelSubscriber : ValueSubscriber
     {
-        public string subscriptionKey { get; protected set; }
-        public Guid valueChangedGuid { get; protected set; }
-        public Guid valueUpdatedGuid { get; protected set; }
+        public Guid modeChangeGuid { get; protected set; }
 
-        public virtual void OnValueChangedAction (object parm) => throw new NotImplementedException ();
-        public virtual void OnValueUpdatedAction (object parm) => throw new NotImplementedException ();
+        public virtual void OnModeChangedAction (object parm) => throw new NotImplementedException ();
 
-        public virtual void Subscribe (string key) {
+        public override void Subscribe (string key) {
+            base.Subscribe (key);
+
             subscriptionKey = key;
             var consumerType = GetType ();
             var messageHub = MessageHub.Instance;
 
-            var methodInfo = consumerType.GetMethod (nameof (OnValueChangedAction));
+            var methodInfo = consumerType.GetMethod (nameof (OnModeChangedAction));
             if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                valueChangedGuid = messageHub.Subscribe<ValueChangedEvent> (subscriptionKey, OnValueChangedAction);
-            }
-
-            methodInfo = consumerType.GetMethod (nameof (OnValueUpdatedAction));
-            if (methodInfo.DeclaringType != methodInfo.GetBaseDefinition ().DeclaringType) {
-                valueUpdatedGuid = messageHub.Subscribe<ValueUpdatedEvent> (subscriptionKey, OnValueUpdatedAction);
+                modeChangeGuid = messageHub.Subscribe<ModeChangedEvent> (subscriptionKey, OnModeChangedAction);
             }
         }
 
-        public virtual void Unsubscribe () {
+        public override void Unsubscribe () {
             var messageHub = MessageHub.Instance;
 
             if (valueChangedGuid != Guid.Empty) {
@@ -59,6 +54,10 @@ namespace AquaPic.PubSub
 
             if (valueUpdatedGuid != Guid.Empty) {
                 messageHub.Unsubscribe (subscriptionKey, valueUpdatedGuid);
+            }
+
+            if (modeChangeGuid != Guid.Empty) {
+                messageHub.Unsubscribe (subscriptionKey, modeChangeGuid);
             }
 
             subscriptionKey = string.Empty;

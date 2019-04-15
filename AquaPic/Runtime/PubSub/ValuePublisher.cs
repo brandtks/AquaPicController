@@ -39,6 +39,30 @@ namespace AquaPic.PubSub
 
         public void NotifyValueUpdated (ValueType newValue) {
             MessageHub.Instance.Publish (key, new ValueUpdatedEvent (key, newValue));
-        } 
+        }
+    }
+
+    public class ValueChangedEvent
+    {
+        public string name;
+        public ValueType newValue;
+        public ValueType oldValue;
+
+        public ValueChangedEvent (string name, ValueType newValue, ValueType oldValue) {
+            this.name = name;
+            this.newValue = newValue;
+            this.oldValue = oldValue;
+        }
+    }
+
+    public class ValueUpdatedEvent
+    {
+        public string name;
+        public ValueType value;
+
+        public ValueUpdatedEvent (string name, ValueType value) {
+            this.name = name;
+            this.value = value;
+        }
     }
 }

@@ -27,7 +27,7 @@ using AquaPic.PubSub;
 
 namespace AquaPic.Drivers
 {
-    public class GenericChannel : ValuePublisher
+    public class GenericChannel : ChannelPublisher
     {
         public string name {
             get {
@@ -59,6 +59,11 @@ namespace AquaPic.Drivers
             } catch {
                 this.value = (ValueType)Activator.CreateInstance (valueType);
             }
+        }
+
+        public virtual void SetMode (Mode mode) {
+            this.mode = mode;
+            NotifyModeChanged (this.mode);
         }
     }
 }
