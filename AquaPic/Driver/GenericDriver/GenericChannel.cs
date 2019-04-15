@@ -34,7 +34,9 @@ namespace AquaPic.Drivers
                 return key;
             }
             set {
+                var oldKey = key;
                 key = value;
+                MessageHub.Instance.ChangeKey (oldKey, key);
             }
         }
         public ValueType value;

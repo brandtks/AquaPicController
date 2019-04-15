@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2018 Goodtime Development
+    Copyright (c) 2019 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,17 +22,23 @@
 #endregion // License
 
 using System;
-using AquaPic.Globals;
+using AquaPic.PubSub;
 
-
-namespace AquaPic.Sensors
+namespace AquaPic.Drivers
 {
-    public class GenericSensorSettings : IEntitySettings
-    {
-        [EntitySetting (typeof (StringMutator), "name")]
-        public string name { get; set; }
+    public delegate void OnValueChangedHandler (string name, ValueType value);
 
-        [EntitySetting (typeof (IndividualControlMutator), new string[] { "inputCard", "channel" })]
-        public IndividualControl channel { get; set; }
+    public class OutputChannelValueSubscriber : ValueSubscriber
+    {
+        public event OnValueChangedHandler ValueChangedEvent;
+
+        public OutputChannelValueSubscriber (OnValueChangedHandler valueChangedHandler) {
+            ValueChangedEvent += valueChangedHandler;
+        }
+
+        public override void OnValueChangedAction (object parm) {
+            var args = parm as ValueChangedEvent;
+            ValueChangedEvent?.Invoke (args.name, args.newValue);
+        }
     }
 }

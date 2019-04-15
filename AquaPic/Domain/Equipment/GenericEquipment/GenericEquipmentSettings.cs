@@ -1,9 +1,9 @@
-#region License
+﻿#region License
 
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2017 Goodtime Development
+    Copyright (c) 2018 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,26 +22,17 @@
 #endregion // License
 
 using System;
+using AquaPic.Globals;
 
-namespace AquaPic.Operands
+
+namespace AquaPic.Equipment
 {
-    public delegate float ValueGetterHandler ();
-    public delegate void ValueSetterHandler (float value);
-
-    public class Value : IOperand
+    public class GenericEquipmentSettings : IEntitySettings
     {
-        public ValueGetterHandler ValueGetter;
-        public ValueSetterHandler ValueSetter;
-        public float value;
+        [EntitySetting (typeof (StringMutator), "name")]
+        public string name { get; set; }
 
-        public Value () {
-            value = 0.0f;
-        }
-
-        public void Execute () {
-            value = (float)ValueGetter?.Invoke ();
-            ValueSetter?.Invoke (value);
-        }
+        [EntitySetting (typeof (IndividualControlMutator), new string[] { "outputCard", "channel" })]
+        public IndividualControl channel { get; set; }
     }
 }
-

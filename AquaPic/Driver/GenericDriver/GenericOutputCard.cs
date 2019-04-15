@@ -22,13 +22,31 @@
 #endregion // License
 
 using System;
+using AquaPic.PubSub;
 
 namespace AquaPic.Drivers
 {
     public class GenericOutputCard : GenericCard
     {
+        private OutputChannelValueSubscriber _subscriber;
+
         public GenericOutputCard (string name, int address, int numberChannels)
-            : base (name, address, numberChannels) { }
+            : base (name, address, numberChannels) {
+            _subscriber = new OutputChannelValueSubscriber (OnValueChanged);
+        }
+
+        protected virtual GenericOutputChannel OutputChannelCreater (int index) => throw new NotImplementedException ();
+
+        protected override sealed GenericChannel ChannelCreater (int index) {
+            var outputChannel = OutputChannelCreater (index);
+            _subscriber.Subscribe (outputChannel.key);
+            return outputChannel; 
+        }
+
+        protected virtual void OnValueChanged (string name, ValueType value) {
+            var index = GetChannelIndex (name);
+            SetValueCommunication (index, value);
+        }
 
         public void SubscribeChannel (int channel, string key) {
             CheckChannelRange (channel);

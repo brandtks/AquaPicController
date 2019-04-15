@@ -37,11 +37,10 @@ namespace AquaPic.Drivers
         }
 
         public GenericOutputChannel (string name, Type valueType) : base (name, valueType) {
-            _subscriber = new OutputChannelValueSubscriber ();
-            _subscriber.ValueChangedEvent += OnValueChanged;
+            _subscriber = new OutputChannelValueSubscriber (OnValueChanged);
         }
 
-        protected virtual void OnValueChanged (ValueType value) {
+        protected virtual void OnValueChanged (string name, ValueType value) {
             SetValue (value);
         }
 
@@ -50,18 +49,6 @@ namespace AquaPic.Drivers
                 throw new Exception (string.Format("Output channel {0} is already subscribed to {1}", name, _subscriber.subscriptionKey));
             }
             _subscriber.Subscribe (key);
-        }
-
-        protected delegate void OnValueChangedHandler (ValueType value);
-
-        protected class OutputChannelValueSubscriber : ValueSubscriber
-        {
-            public event OnValueChangedHandler ValueChangedEvent;
-
-            public override void OnValueChangedAction (object parm) {
-                var args = parm as ValueChangedEvent;
-                ValueChangedEvent?.Invoke (args.newValue);
-            }
         }
     }
 }

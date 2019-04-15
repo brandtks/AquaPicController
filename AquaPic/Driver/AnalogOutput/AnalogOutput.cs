@@ -27,34 +27,12 @@ using AquaPic.Operands;
 
 namespace AquaPic.Drivers
 {
-    public partial class AnalogOutputBase : GenericBase
+    public partial class AnalogOutputBase : GenericOutputBase
     {
         public static AnalogOutputBase SharedAnalogOutputInstance = new AnalogOutputBase ();
 
         protected AnalogOutputBase ()
             : base ("Analog Output") { }
-
-        protected override void Run () {
-            foreach (var card in cards.Values) {
-                byte channelId = 0;
-
-                var values = new float[4];
-
-                foreach (var genericChannel in card.channels) {
-                    var channel = genericChannel as AnalogOutputChannel;
-
-                    if (channel.mode == Mode.Auto) {
-                        channel.valueControl.Execute ();
-                    }
-
-                    values[channelId] = (float)channel.value;
-
-                    ++channelId;
-                }
-
-                card.SetAllValuesCommunication (values);
-            }
-        }
 
         protected override GenericCard CardCreater (string cardName, int address) {
             return new AnalogOutputCard (cardName, address);
@@ -102,21 +80,6 @@ namespace AquaPic.Drivers
             CheckCardKey (card);
             var analogOutputCard = cards[card] as AnalogOutputCard;
             analogOutputCard.SetChannelType (channel, type);
-        }
-
-        public Value GetChannelValueControl (string channelName) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
-            return GetChannelValueControl (channel.Group, channel.Individual);
-        }
-
-        public Value GetChannelValueControl (IndividualControl channel) {
-            return GetChannelValueControl (channel.Group, channel.Individual);
-        }
-
-        public Value GetChannelValueControl (string card, int channel) {
-            CheckCardKey (card);
-            var analogOutputCard = cards[card] as AnalogOutputCard;
-            return analogOutputCard.GetChannelValueControl (channel);
         }
     }
 }

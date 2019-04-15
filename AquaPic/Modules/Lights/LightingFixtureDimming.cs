@@ -37,7 +37,7 @@ namespace AquaPic.Modules
             public float requestedDimmingLevel;
             public IndividualControl channel;
             public Mode dimmingMode;
-            public RateOfChangeLimiter rocl;
+            public RateOfChangeLimiter rateOfChangeLimiter;
 
             public LightingFixtureDimming (
                 string name,
@@ -54,7 +54,7 @@ namespace AquaPic.Modules
                 currentDimmingLevel = 0.0f;
                 autoDimmingLevel = 0.0f;
                 requestedDimmingLevel = 0.0f;
-                rocl = new RateOfChangeLimiter (1.0f);
+                rateOfChangeLimiter = new RateOfChangeLimiter (1.0f);
                 this.channel = channel;
                 dimmingMode = Mode.Auto;
                 AquaPicDrivers.AnalogOutput.AddChannel (channel, name);
@@ -117,7 +117,7 @@ namespace AquaPic.Modules
                         requestedDimmingLevel = autoDimmingLevel;
                     }
 
-                    currentDimmingLevel = rocl.RateOfChange (requestedDimmingLevel);
+                    currentDimmingLevel = rateOfChangeLimiter.RateOfChange (requestedDimmingLevel);
                 }
 
                 return currentDimmingLevel;
@@ -134,7 +134,7 @@ namespace AquaPic.Modules
                 if (args.state == MyState.Off) {
                     requestedDimmingLevel = 0.0f;
                     currentDimmingLevel = 0.0f;
-                    rocl.Reset ();
+                    rateOfChangeLimiter.Reset ();
                 }
             }
 

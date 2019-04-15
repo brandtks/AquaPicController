@@ -141,9 +141,9 @@ namespace AquaPic.Drivers
         /**************************************************************************************************************/
         /* Channel Value Setters                                                                                      */
         /**************************************************************************************************************/
-        public virtual void SetValueCommunication<CommunicationType> (int channel, CommunicationType value) => throw new NotImplementedException ();
+        public virtual void SetValueCommunication (int channel, ValueType value) => throw new NotImplementedException ();
 
-        public virtual void SetAllValuesCommunication<CommunicationType> (CommunicationType[] values) => throw new NotImplementedException ();
+        public virtual void SetAllValuesCommunication (ValueType[] values) => throw new NotImplementedException ();
 
         public virtual void SetChannelValue (int channel, ValueType value) {
             CheckChannelRange (channel);

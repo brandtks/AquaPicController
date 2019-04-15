@@ -30,7 +30,7 @@ namespace AquaPic.Drivers
 {
     public partial class AnalogOutputBase
     {
-        protected class AnalogOutputCard : GenericCard
+        protected class AnalogOutputCard : GenericOutputCard
         {
             public AnalogOutputCard (string name, int address)
                 : base (
@@ -38,7 +38,7 @@ namespace AquaPic.Drivers
                     address,
                     4) { }
 
-            protected override GenericChannel ChannelCreater (int index) {
+            protected override GenericOutputChannel OutputChannelCreater (int index) {
                 return new AnalogOutputChannel (GetDefualtName (index));
             }
 
@@ -57,33 +57,6 @@ namespace AquaPic.Drivers
                 channels[ch].SetValue (value);
             }
 
-            public override void SetValueCommunication<CommunicationType> (int channel, CommunicationType value) {
-                CheckChannelRange (channel);
-                channels[channel].SetValue (value);
-                var valueToSend = Convert.ToSingle (value);
-                var buf = new WriteBuffer ();
-                buf.Add ((byte)channel, sizeof (byte));
-                buf.Add (valueToSend, sizeof (float));
-                Write (31, buf);
-            }
-
-            public override void SetAllValuesCommunication<CommunicationType> (CommunicationType[] values) {
-                if (values.Length < channelCount)
-                    throw new ArgumentOutOfRangeException (nameof (values), "values length");
-
-                var valuesToSend = new float[channelCount];
-                for (int i = 0; i < 4; ++i) {
-                    channels[i].SetValue (values[i]);
-                    valuesToSend[i] = Convert.ToSingle (values[i]);
-                }
-
-                var buf = new WriteBuffer ();
-                foreach (var val in valuesToSend) {
-                    buf.Add (val, sizeof (float));
-                }
-                Write (30, buf);
-            }
-
             public override void GetAllValuesCommunication () {
                 Read (20, sizeof (float) * 4, GetAllValuesCommunicationCallback);
             }
@@ -98,6 +71,31 @@ namespace AquaPic.Drivers
                 for (int i = 0; i < channels.Length; ++i) {
                     channels[i].SetValue (values[i]);
                 }
+            }
+
+            public override void SetValueCommunication (int channel, ValueType value) {
+                CheckChannelRange (channel);
+                var valueToSend = Convert.ToSingle (value);
+                var buf = new WriteBuffer ();
+                buf.Add ((byte)channel, sizeof (byte));
+                buf.Add (valueToSend, sizeof (float));
+                Write (31, buf);
+            }
+
+            public override void SetAllValuesCommunication (ValueType[] values) {
+                if (values.Length < channelCount)
+                    throw new ArgumentOutOfRangeException (nameof (values), "values length");
+
+                var valuesToSend = new float[channelCount];
+                for (int i = 0; i < 4; ++i) {
+                    valuesToSend[i] = Convert.ToSingle (values[i]);
+                }
+
+                var buf = new WriteBuffer ();
+                foreach (var val in valuesToSend) {
+                    buf.Add (val, sizeof (float));
+                }
+                Write (30, buf);
             }
 
             public void SetChannelType (int channel, AnalogType type) {
@@ -125,12 +123,6 @@ namespace AquaPic.Drivers
                     types[i] = analogOutputChannel.type;
                 }
                 return types;
-            }
-
-            public Value GetChannelValueControl (int channel) {
-                CheckChannelRange (channel);
-                var analogOutputChannel = channels[channel] as AnalogOutputChannel;
-                return analogOutputChannel.valueControl;
             }
         }
     }

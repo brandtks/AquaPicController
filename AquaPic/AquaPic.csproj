@@ -116,7 +116,6 @@
     <Compile Include="Domain\Equipment\Pump.cs" />
     <Compile Include="Domain\Bit\Bit.cs" />
     <Compile Include="Domain\Bit\BitState.cs" />
-    <Compile Include="Domain\Operands\Value.cs" />
     <Compile Include="Domain\Operands\Coil.cs" />
     <Compile Include="Domain\Operands\IOperand.cs" />
     <Compile Include="Runtime\Settings\SettingsHelper.cs" />
@@ -188,6 +187,9 @@
     <Compile Include="Driver\GenericDriver\GenericOutputBase.cs" />
     <Compile Include="Runtime\PubSub\ChannelPublisher.cs" />
     <Compile Include="Runtime\PubSub\ChannelSubscriber.cs" />
+    <Compile Include="Driver\GenericDriver\GenericOutputChannelSubscriber.cs" />
+    <Compile Include="Domain\Equipment\GenericEquipment\GenericEquipment.cs" />
+    <Compile Include="Domain\Equipment\GenericEquipment\GenericEquipmentSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -215,6 +217,7 @@
     <Folder Include="Domain\Entity\Mutators\" />
     <Folder Include="Runtime\PubSub\" />
     <Folder Include="Domain\Globals\" />
+    <Folder Include="Domain\Equipment\GenericEquipment\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">

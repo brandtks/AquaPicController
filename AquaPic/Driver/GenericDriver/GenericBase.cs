@@ -62,17 +62,11 @@ namespace AquaPic.Drivers
             TaskManager.RemoveCyclicInterrupt (name);
         }
 
-        protected virtual GenericCard CardCreater (string cardName, int address) {
-            throw new NotImplementedException ();
-        }
+        protected virtual GenericCard CardCreater (string cardName, int address) => throw new NotImplementedException ();
 
-        public virtual string GetCardAcyronym () {
-            throw new NotImplementedException ();
-        }
+        public virtual string GetCardAcyronym () => throw new NotImplementedException ();
 
-        public virtual CardType GetCardType () {
-            throw new NotImplementedException ();
-        }
+        public virtual CardType GetCardType () => throw new NotImplementedException ();
 
         /**************************************************************************************************************/
         /* Cards                                                                                                      */

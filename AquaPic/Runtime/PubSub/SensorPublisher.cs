@@ -27,7 +27,7 @@ using AquaPic.Runtime;
 
 namespace AquaPic.PubSub
 {
-    public class SensorPublisher : ValueSubscriber
+    public class SensorPublisher : ChannelSubscriber
     {
         public string key { get; protected set; }
 
@@ -48,6 +48,7 @@ namespace AquaPic.PubSub
             // But the Consumers are subscribed to the MessageHub at the old name
             if (name != settings.name) {
                 MessageHub.Instance.ChangeKey (name, settings.name);
+                key = settings.name;
             }
             MessageHub.Instance.Publish (key, new SensorUpdatedEvent (name, settings));
         }
