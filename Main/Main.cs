@@ -33,7 +33,7 @@ using AquaPic.Modules;
 using AquaPic.Modules.Temperature;
 using AquaPic.SerialBus;
 using AquaPic.Globals;
-using AquaPic.Sensors;
+using AquaPic.Gadgets;
 
 namespace AquaPic
 {
@@ -73,6 +73,8 @@ namespace AquaPic
                 }
             } else {
                 aquaPicEnvironment = Environment.GetEnvironmentVariable ("HOME");
+                aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".config");
+                aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "AquaPic");
                 if (args.Length > 0) {
                     Console.WriteLine ("Arguments {0}", args[0]);
                     if (args[0].Contains ("-empty")) {
@@ -105,7 +107,7 @@ namespace AquaPic
             try {
 #endif
                 Hardware.AddFromJson ();
-                AquaPicSensors.AddSensors ();
+                Sensors.AddSensors ();
                 Temperature.Init ();
                 Lighting.Init ();
                 WaterLevel.Init ();

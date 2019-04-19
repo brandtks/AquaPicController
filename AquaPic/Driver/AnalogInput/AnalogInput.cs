@@ -34,12 +34,6 @@ namespace AquaPic.Drivers
         protected AnalogInputBase ()
             : base ("Analog Input") { }
 
-        protected override void Run () {
-            foreach (var card in cards.Values) {
-                card.GetAllValuesCommunication ();
-            }
-        }
-
         protected override GenericCard CardCreater (string cardName, int address) {
             return new AnalogInputCard (cardName, address);
         }

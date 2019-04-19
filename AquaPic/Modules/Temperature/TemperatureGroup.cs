@@ -27,14 +27,14 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.DataLogging;
 using AquaPic.PubSub;
-using AquaPic.Sensors;
-using AquaPic.Sensors.TemperatureProbe;
+using AquaPic.Gadgets;
+using AquaPic.Gadgets.TemperatureProbe;
 
 namespace AquaPic.Modules.Temperature
 {
     public partial class Temperature
     {
-        private class TemperatureGroup : SensorSubscriber
+        private class TemperatureGroup : GadgetSubscriber
         {
             public string name;
             public float temperature;
@@ -75,7 +75,7 @@ namespace AquaPic.Modules.Temperature
                 this.temperatureProbes = new Dictionary<string, InternalTemperatureProbeState> ();
                 foreach (var temperatureProbe in temperatureProbes) {
                     this.temperatureProbes.Add (temperatureProbe, new InternalTemperatureProbeState ());
-                    Subscribe (temperatureProbe);
+                    Subscribe (Sensors.TemperatureProbes.GetGadgetEventPublisherKey (temperatureProbe));
                 }
 
                 this.heaters = new Dictionary<string, Heater> ();
@@ -96,8 +96,8 @@ namespace AquaPic.Modules.Temperature
                 }
             }
 
-            public override void OnSensorUpdatedAction (object parm) {
-                var args = parm as SensorUpdatedEvent;
+            public override void OnGadgetUpdatedAction (object parm) {
+                var args = parm as GadgetUpdatedEvent;
                 if (temperatureProbes.ContainsKey (args.name)) {
                     if (args.name != args.settings.name) {
                         var sensorState = temperatureProbes[args.name];
@@ -108,8 +108,8 @@ namespace AquaPic.Modules.Temperature
                 UpdateTemperatureGroupSettingsInFile (name);
             }
 
-            public override void OnSensorRemovedAction (object parm) {
-                var args = parm as SensorRemovedEvent;
+            public override void OnGadgetRemovedAction (object parm) {
+                var args = parm as GadgetRemovedEvent;
                 if (temperatureProbes.ContainsKey (args.name)) {
                     temperatureProbes.Remove (args.name);
                     CalculateTemperature ();
@@ -120,7 +120,7 @@ namespace AquaPic.Modules.Temperature
             public override void OnValueChangedAction (object parm) {
                 var args = parm as ValueChangedEvent;
                 if (temperatureProbes.ContainsKey (args.name)) {
-                    var temperatureProbe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (args.name);
+                    var temperatureProbe = (TemperatureProbe)Sensors.TemperatureProbes.GetGadget (args.name);
                     temperatureProbes[temperatureProbe.name].connected = temperatureProbe.connected;
                     temperatureProbes[temperatureProbe.name].temperature = temperatureProbe.value;
                     CalculateTemperature ();

@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
-using AquaPic.Sensors;
+using AquaPic.Gadgets;
 using AquaPic.DataLogging;
 using AquaPic.PubSub;
 
@@ -33,7 +33,7 @@ namespace AquaPic.Modules
 {
     public partial class WaterLevel
     {
-        class WaterLevelGroup : SensorSubscriber
+        class WaterLevelGroup : GadgetSubscriber
         {
             public string name;
             public float highAnalogAlarmSetpoint;
@@ -84,13 +84,13 @@ namespace AquaPic.Modules
 
                 this.floatSwitches = new List<string> (floatSwitches);
                 foreach (var floatSwitch in this.floatSwitches) {
-                    Subscribe (floatSwitch);
+                    Subscribe (Sensors.FloatSwitches.GetGadgetEventPublisherKey(floatSwitch));
                 }
 
                 this.waterLevelSensors = new Dictionary<string, InternalWaterLevelSensorState> ();
                 foreach (var waterLevelSensor in waterLevelSensors) {
                     this.waterLevelSensors.Add (waterLevelSensor, new InternalWaterLevelSensorState ());
-                    Subscribe (waterLevelSensor);
+                    Subscribe (Sensors.WaterLevelSensors.GetGadgetEventPublisherKey (waterLevelSensor));
                 }
             }
 
@@ -116,8 +116,8 @@ namespace AquaPic.Modules
                 }
             }
 
-            public override void OnSensorUpdatedAction (object parm) {
-                var args = parm as SensorUpdatedEvent;
+            public override void OnGadgetUpdatedAction (object parm) {
+                var args = parm as GadgetUpdatedEvent;
                 if (waterLevelSensors.ContainsKey (args.name)) {
                     if (args.name != args.settings.name) {
                         var sensorState = waterLevelSensors[args.name];
@@ -133,8 +133,8 @@ namespace AquaPic.Modules
                 UpdateWaterLevelGroupSettingsInFile (name);
             }
 
-            public override void OnSensorRemovedAction (object parm) {
-                var args = parm as SensorRemovedEvent;
+            public override void OnGadgetRemovedAction (object parm) {
+                var args = parm as GadgetRemovedEvent;
                 if (waterLevelSensors.ContainsKey (args.name)) {
                     waterLevelSensors.Remove (args.name);
                     CalculateWaterLevel ();
@@ -147,13 +147,13 @@ namespace AquaPic.Modules
             public override void OnValueChangedAction (object parm) {
                 var args = parm as ValueChangedEvent;
                 if (waterLevelSensors.ContainsKey (args.name)) {
-                    var waterLevelSensor = (WaterLevelSensor)AquaPicSensors.WaterLevelSensors.GetSensor (args.name);
+                    var waterLevelSensor = (WaterLevelSensor)Sensors.WaterLevelSensors.GetGadget (args.name);
                     waterLevelSensors[waterLevelSensor.name].connected = waterLevelSensor.connected;
                     waterLevelSensors[waterLevelSensor.name].level = waterLevelSensor.value;
                     CalculateWaterLevel ();
                 } else {
                     if (floatSwitches.Contains (args.name)) {
-                        var floatSwitch = (FloatSwitch)AquaPicSensors.FloatSwitches.GetSensor (args.name);
+                        var floatSwitch = (FloatSwitch)Sensors.FloatSwitches.GetGadget (args.name);
                         if (floatSwitch.switchFuntion == SwitchFunction.HighLevel) {
                             if (floatSwitch.activated)
                                 Alarm.Post (highSwitchAlarmIndex);

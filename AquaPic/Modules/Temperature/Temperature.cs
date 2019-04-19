@@ -30,8 +30,8 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Drivers;
 using AquaPic.Globals;
-using AquaPic.Sensors;
-using AquaPic.Sensors.TemperatureProbe;
+using AquaPic.Gadgets;
+using AquaPic.Gadgets.TemperatureProbe;
 using AquaPic.DataLogging;
 
 namespace AquaPic.Modules.Temperature
@@ -255,7 +255,7 @@ namespace AquaPic.Modules.Temperature
             CheckTemperatureGroupKey (name);
             bool connected = false;
             foreach (var probeName in temperatureGroups[name].temperatureProbes.Keys) {
-                var probe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (probeName);
+                var probe = (TemperatureProbe)Sensors.TemperatureProbes.GetGadget (probeName);
                 // Using OR because we really only care that at least one sensor is connected
                 connected |= probe.connected;
             }

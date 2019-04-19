@@ -22,7 +22,6 @@
 #endregion // License
 
 using System;
-using AquaPic.PubSub;
 
 namespace AquaPic.Drivers
 {
@@ -48,20 +47,20 @@ namespace AquaPic.Drivers
             SetValueCommunication (index, value);
         }
 
-        public void SubscribeChannel (int channel, string key) {
+        public void SubscribeChannel (int channel, Guid key) {
             CheckChannelRange (channel);
             var outputChannel = channels[channel] as GenericOutputChannel;
             outputChannel.Subscribe (key);
         }
 
-        public string GetSubscriptionKey (int channel) {
+        public Guid GetSubscriptionKey (int channel) {
             CheckChannelRange (channel);
             var outputChannel = channels[channel] as GenericOutputChannel;
             return outputChannel.subscriptionKey;
         }
 
-        public string[] GetAllSubscriptionKeys () {
-            string[] subscriptionKeys = new string[channelCount];
+        public Guid[] GetAllSubscriptionKeys () {
+            Guid[] subscriptionKeys = new Guid[channelCount];
             for (int i = 0; i < channelCount; ++i) {
                 var outputChannel = channels[i] as GenericOutputChannel;
                 subscriptionKeys[i] = outputChannel.subscriptionKey;

@@ -29,8 +29,8 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules.Temperature;
 using AquaPic.Drivers;
 using AquaPic.Globals;
-using AquaPic.Sensors;
-using AquaPic.Sensors.TemperatureProbe;
+using AquaPic.Gadgets;
+using AquaPic.Gadgets.TemperatureProbe;
 
 namespace AquaPic.UserInterface
 {
@@ -298,7 +298,7 @@ namespace AquaPic.UserInterface
 
         protected void GetProbeData () {
             if (probeName.IsNotEmpty ()) {
-                var probe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (probeName);
+                var probe = (TemperatureProbe)Sensors.TemperatureProbes.GetGadget (probeName);
                 if (probe.connected) {
                     probeTempTextbox.text = probe.value.ToString ("F2");
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
@@ -527,7 +527,7 @@ namespace AquaPic.UserInterface
         protected void CallTemperatureProbeSettingsDialog (bool forceNew = false) {
             TemperatureProbeSettings settings;
             if (probeName.IsNotEmpty () && !forceNew) {
-                settings = (TemperatureProbeSettings)AquaPicSensors.TemperatureProbes.GetSensorSettings (probeName);
+                settings = (TemperatureProbeSettings)Sensors.TemperatureProbes.GetGadgetSettings (probeName);
             } else {
                 settings = new TemperatureProbeSettings ();
             }
@@ -568,12 +568,12 @@ namespace AquaPic.UserInterface
                     "Temperature Probe",
                     parent,
                     () => {
-                        var channel = AquaPicSensors.TemperatureProbes.GetSensor (probeName).channel;
+                        var channel = Sensors.TemperatureProbes.GetGadget (probeName).channel;
                         return AquaPicDrivers.AnalogInput.GetChannelValue (channel);
                     });
 
                 cal.CalibrationCompleteEvent += (a) => {
-                    AquaPicSensors.TemperatureProbes.SetCalibrationData (
+                    Sensors.TemperatureProbes.SetCalibrationData (
                         probeName,
                         (float)a.zeroActual,
                         (float)a.zeroValue,
@@ -581,7 +581,7 @@ namespace AquaPic.UserInterface
                         (float)a.fullScaleValue);
                 };
 
-                var probe = (TemperatureProbe)AquaPicSensors.TemperatureProbes.GetSensor (probeName);
+                var probe = (TemperatureProbe)Sensors.TemperatureProbes.GetGadget (probeName);
                 cal.calArgs.zeroActual = probe.zeroScaleCalibrationActual;
                 cal.calArgs.zeroValue = probe.zeroScaleCalibrationValue;
                 cal.calArgs.fullScaleActual = probe.fullScaleCalibrationActual;

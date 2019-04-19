@@ -208,6 +208,14 @@ namespace AquaPic.Drivers
             CheckChannelRange (channel);
             channels[channel].SetMode (mode);
         }
+
+        /**************************************************************************************************************/
+        /* Channel Event Publisher Key                                                                                */
+        /**************************************************************************************************************/
+        public virtual Guid GetChannelEventPublisherKey (int channel) {
+            CheckChannelRange (channel);
+            return channels[channel].key;
+        }
     }
 }
 

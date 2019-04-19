@@ -58,8 +58,8 @@ namespace AquaPic.Modules
                 this.channel = channel;
                 dimmingMode = Mode.Auto;
                 AquaPicDrivers.AnalogOutput.AddChannel (channel, name);
-                var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (channel);
-                valueControl.ValueGetter = CalculateDimmingLevel;
+                //var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (channel);
+                //valueControl.ValueGetter = CalculateDimmingLevel;
 
                 Power.AddHandlerOnModeChange (
                     plug,

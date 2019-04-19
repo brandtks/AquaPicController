@@ -32,7 +32,7 @@ namespace AquaPic.PubSub
 
         public virtual void OnModeChangedAction (object parm) => throw new NotImplementedException ();
 
-        public override void Subscribe (string key) {
+        public override void Subscribe (Guid key) {
             base.Subscribe (key);
 
             subscriptionKey = key;
@@ -60,7 +60,7 @@ namespace AquaPic.PubSub
                 messageHub.Unsubscribe (subscriptionKey, modeChangeGuid);
             }
 
-            subscriptionKey = string.Empty;
+            subscriptionKey = Guid.Empty;
         }
     }
 }

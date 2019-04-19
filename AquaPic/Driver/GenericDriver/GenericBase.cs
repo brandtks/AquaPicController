@@ -329,7 +329,7 @@ namespace AquaPic.Drivers
         /* Channel Mode Setters                                                                                       */
         /**************************************************************************************************************/
         public virtual void SetChannelMode (string channelName, Mode mode) {
-            IndividualControl channel = GetChannelIndividualControl (channelName);
+            var channel = GetChannelIndividualControl (channelName);
             SetChannelMode (channel.Group, channel.Individual, mode);
         }
 
@@ -340,6 +340,23 @@ namespace AquaPic.Drivers
         public virtual void SetChannelMode (string card, int channel, Mode mode) {
             CheckCardKey (card);
             cards[card].SetChannelMode (channel, mode);
+        }
+
+        /**************************************************************************************************************/
+        /* Channel Event Publisher Key Getters                                                                        */
+        /**************************************************************************************************************/
+        public virtual Guid GetChannelEventPublisherKey (string channelName) {
+            var channel = GetChannelIndividualControl (channelName);
+            return GetChannelEventPublisherKey (channel.Group, channel.Individual);
+        }
+
+        public virtual Guid GetChannelEventPublisherKey (IndividualControl channel) {
+            return GetChannelEventPublisherKey (channel.Group, channel.Individual);
+        }
+
+        public virtual Guid GetChannelEventPublisherKey (string card, int channel) {
+            CheckCardKey (card);
+            return cards[card].GetChannelEventPublisherKey (channel);
         }
     }
 }

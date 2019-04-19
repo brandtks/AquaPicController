@@ -33,12 +33,6 @@ namespace AquaPic.Drivers
         protected PhOrpBase ()
             : base ("pH ORP") { }
 
-        protected override void Run () {
-            foreach (var card in cards.Values) {
-                card.GetAllValuesCommunication ();
-            }
-        }
-
         protected override GenericCard CardCreater (string cardName, int address) {
             return new PhOrpCard (cardName, address);
         }

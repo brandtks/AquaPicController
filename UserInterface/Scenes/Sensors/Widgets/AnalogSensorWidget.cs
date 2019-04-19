@@ -25,7 +25,7 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.Utilites;
 using GoodtimeDevelopment.TouchWidget;
-using AquaPic.Sensors;
+using AquaPic.Gadgets;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
@@ -90,7 +90,7 @@ namespace AquaPic.UserInterface
 
             sensorCombo = new TouchComboBox ();
             sensorCombo.WidthRequest = 200;
-            var allSensors = sensorCollection.GetAllSensorNames ();
+            var allSensors = sensorCollection.GetAllGadgetNames ();
             if (allSensors.Length > 0) {
                 sensorCombo.comboList.AddRange (allSensors);
                 sensorName = allSensors[0];
@@ -130,7 +130,7 @@ namespace AquaPic.UserInterface
 
             GenericAnalogSensorSettings settings;
             if (sensorName.IsNotEmpty () && !forceNew) {
-                settings = (GenericAnalogSensorSettings)sensorCollection.GetSensorSettings (sensorName);
+                settings = sensorCollection.GetGadgetSettings (sensorName) as GenericAnalogSensorSettings;
             } else {
                 settings = new GenericAnalogSensorSettings ();
             }
@@ -150,7 +150,7 @@ namespace AquaPic.UserInterface
                 sensorName = newProbeName;
             } else if (outcome == TouchSettingsOutcome.Deleted) {
                 sensorCombo.comboList.Remove (sensorName);
-                var allSensors = sensorCollection.GetAllSensorNames ();
+                var allSensors = sensorCollection.GetAllGadgetNames ();
                 if (allSensors.Length > 0) {
                     sensorName = allSensors[0];
                     sensorCombo.activeText = sensorName;
@@ -171,7 +171,7 @@ namespace AquaPic.UserInterface
                     sensorTypeLabel + " Calibration",
                     parent,
                     () => {
-                        var channel = sensorCollection.GetSensor (sensorName).channel;
+                        var channel = sensorCollection.GetGadget (sensorName).channel;
                         return analogInputDriver.GetChannelValue (channel);
                     });
 
@@ -184,7 +184,7 @@ namespace AquaPic.UserInterface
                         (float)a.fullScaleValue);
                 };
 
-                var probe = (GenericAnalogSensor)sensorCollection.GetSensor (sensorName);
+                var probe = (GenericAnalogSensor)sensorCollection.GetGadget (sensorName);
                 cal.calArgs.zeroActual = probe.zeroScaleCalibrationActual;
                 cal.calArgs.zeroValue = probe.zeroScaleCalibrationValue;
                 cal.calArgs.fullScaleActual = probe.fullScaleCalibrationActual;

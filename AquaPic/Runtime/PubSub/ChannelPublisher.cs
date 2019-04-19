@@ -28,10 +28,8 @@ namespace AquaPic.PubSub
 {
     public class ChannelPublisher : ValuePublisher
     {
-        public ChannelPublisher (string key) : base (key) { }
-
-        public void NotifyModeChanged (Mode mode) {
-            MessageHub.Instance.Publish (key, new ModeChangedEvent (key, mode));
+        public void NotifyModeChanged (string name, Mode mode) {
+            MessageHub.Instance.Publish (key, new ModeChangedEvent (name, mode));
         }
     }
 

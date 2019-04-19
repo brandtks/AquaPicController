@@ -25,7 +25,7 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Sensors;
+using AquaPic.Gadgets;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
@@ -50,7 +50,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ()) {
                     args.keepText = false;
-                } else if (AquaPicSensors.PhProbes.SensorNameExists (args.text)) {
+                } else if (Sensors.PhProbes.GadgetNameExists (args.text)) {
                     MessageBox.Show ("Probe name already exists");
                     args.keepText = false;
                 }

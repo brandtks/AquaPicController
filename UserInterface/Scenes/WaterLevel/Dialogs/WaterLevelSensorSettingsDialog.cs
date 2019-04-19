@@ -25,7 +25,7 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Sensors;
+using AquaPic.Gadgets;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
@@ -45,7 +45,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ()) {
                     args.keepText = false;
-                } else if (AquaPicSensors.WaterLevelSensors.SensorNameExists (args.text)) {
+                } else if (Sensors.WaterLevelSensors.GadgetNameExists (args.text)) {
                     MessageBox.Show ("Water level sensor name already exists");
                     args.keepText = false;
                 }
@@ -81,14 +81,14 @@ namespace AquaPic.UserInterface
             }
             sensorSettings.channel = ParseIndividualControl (channelString);
 
-            AquaPicSensors.WaterLevelSensors.UpdateSensor (waterLevelSensorName, sensorSettings);
+            Sensors.WaterLevelSensors.UpdateSensor (waterLevelSensorName, sensorSettings);
             waterLevelSensorName = sensorSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            AquaPicSensors.WaterLevelSensors.RemoveSensor (waterLevelSensorName);
+            Sensors.WaterLevelSensors.RemoveSensor (waterLevelSensorName);
             return true;
         }
     }

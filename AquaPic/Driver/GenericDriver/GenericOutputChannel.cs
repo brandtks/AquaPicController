@@ -22,15 +22,13 @@
 #endregion // License
 
 using System;
-using GoodtimeDevelopment.Utilites;
-using AquaPic.PubSub;
 
 namespace AquaPic.Drivers
 {
     public class GenericOutputChannel : GenericChannel
     {
         private OutputChannelValueSubscriber _subscriber;
-        public string subscriptionKey {
+        public Guid subscriptionKey {
             get {
                 return _subscriber.subscriptionKey;
             }
@@ -44,8 +42,8 @@ namespace AquaPic.Drivers
             SetValue (value);
         }
 
-        public void Subscribe (string key) {
-            if (_subscriber.subscriptionKey.IsNotEmpty ()) {
+        public void Subscribe (Guid key) {
+            if (_subscriber.subscriptionKey.Equals (Guid.Empty)) {
                 throw new Exception (string.Format("Output channel {0} is already subscribed to {1}", name, _subscriber.subscriptionKey));
             }
             _subscriber.Subscribe (key);

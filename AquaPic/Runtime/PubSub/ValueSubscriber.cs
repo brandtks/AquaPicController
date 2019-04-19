@@ -27,14 +27,14 @@ namespace AquaPic.PubSub
 {
     public class ValueSubscriber
     {
-        public string subscriptionKey { get; protected set; }
+        public Guid subscriptionKey { get; protected set; }
         public Guid valueChangedGuid { get; protected set; }
         public Guid valueUpdatedGuid { get; protected set; }
 
         public virtual void OnValueChangedAction (object parm) => throw new NotImplementedException ();
         public virtual void OnValueUpdatedAction (object parm) => throw new NotImplementedException ();
 
-        public virtual void Subscribe (string key) {
+        public virtual void Subscribe (Guid key) {
             subscriptionKey = key;
             var consumerType = GetType ();
             var messageHub = MessageHub.Instance;
@@ -61,7 +61,7 @@ namespace AquaPic.PubSub
                 messageHub.Unsubscribe (subscriptionKey, valueUpdatedGuid);
             }
 
-            subscriptionKey = string.Empty;
+            subscriptionKey = Guid.Empty;
         }
     }
 }

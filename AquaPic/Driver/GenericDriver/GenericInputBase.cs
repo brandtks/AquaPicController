@@ -29,5 +29,11 @@ namespace AquaPic.Drivers
     {
         public GenericInputBase (string name, uint runtime = 1000) 
             : base (name, runtime) { }
+
+        protected override void Run () {
+            foreach (var card in cards.Values) {
+                card.GetAllValuesCommunication ();
+            }
+        }
     }
 }

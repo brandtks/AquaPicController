@@ -35,12 +35,6 @@ namespace AquaPic.Drivers
         protected DigitalInputBase ()
             : base ("Digital Input") { }
 
-        protected override void Run () {
-            foreach (var card in cards.Values) {
-                card.GetAllValuesCommunication ();
-            }
-        }
-
         protected override GenericCard CardCreater (string cardName, int address) {
             return new DigitalInputCard (cardName, address);
         }

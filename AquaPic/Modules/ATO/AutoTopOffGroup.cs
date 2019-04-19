@@ -22,11 +22,7 @@
 #endregion // License
 
 using System;
-using AquaPic.Drivers;
 using AquaPic.Runtime;
-using AquaPic.Sensors;
-using AquaPic.Equipment;
-using AquaPic.Operands;
 
 namespace AquaPic.Modules
 {

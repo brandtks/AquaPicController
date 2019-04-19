@@ -25,8 +25,8 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Sensors;
-using AquaPic.Sensors.TemperatureProbe;
+using AquaPic.Gadgets;
+using AquaPic.Gadgets.TemperatureProbe;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
@@ -45,7 +45,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ()) {
                     args.keepText = false;
-                } else if (AquaPicSensors.TemperatureProbes.SensorNameExists (args.text)) {
+                } else if (Sensors.TemperatureProbes.GadgetNameExists (args.text)) {
                     MessageBox.Show ("Probe name already exists");
                     args.keepText = false;
                 }
@@ -81,14 +81,14 @@ namespace AquaPic.UserInterface
             }
             sensorSettings.channel = ParseIndividualControl (channelString);
 
-            AquaPicSensors.TemperatureProbes.UpdateSensor (temperatureProbeName, sensorSettings);
+            Sensors.TemperatureProbes.UpdateSensor (temperatureProbeName, sensorSettings);
             temperatureProbeName = sensorSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            AquaPicSensors.TemperatureProbes.RemoveSensor (temperatureProbeName);
+            Sensors.TemperatureProbes.RemoveSensor (temperatureProbeName);
             return true;
         }
     }

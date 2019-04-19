@@ -29,43 +29,34 @@ namespace AquaPic.Drivers
 {
     public class GenericChannel : ChannelPublisher
     {
-        public string name {
-            get {
-                return key;
-            }
-            set {
-                var oldKey = key;
-                key = value;
-                MessageHub.Instance.ChangeKey (oldKey, key);
-            }
-        }
+        public string name;
         public ValueType value;
         public Type valueType;
         public Mode mode;
 
-        public GenericChannel (string name, Type valueType) : base (name) {
-            key = name;
+        public GenericChannel (string name, Type valueType) {
+            this.name = name;
             this.valueType = valueType;
             value = (ValueType)Activator.CreateInstance (this.valueType);
             mode = Mode.Auto;
         }
 
-        public virtual void SetValue (object value) {
+        public virtual void SetValue (object newValue) {
             try {
-                var oldValue = this.value;
-                this.value = (ValueType)Convert.ChangeType (value, valueType);
-                NotifyValueUpdated (this.value);
-                if (this.value != oldValue) {
-                    NotifyValueChanged (this.value, oldValue);
+                var oldValue = value;
+                value = (ValueType)Convert.ChangeType (newValue, valueType);
+                NotifyValueUpdated (name, value);
+                if (value != oldValue) {
+                    NotifyValueChanged (name, value, oldValue);
                 }
             } catch {
-                this.value = (ValueType)Activator.CreateInstance (valueType);
+                value = (ValueType)Activator.CreateInstance (valueType);
             }
         }
 
-        public virtual void SetMode (Mode mode) {
-            this.mode = mode;
-            NotifyModeChanged (this.mode);
+        public virtual void SetMode (Mode newMode) {
+            mode = newMode;
+            NotifyModeChanged (name, mode);
         }
     }
 }

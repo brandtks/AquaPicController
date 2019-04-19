@@ -30,19 +30,21 @@ namespace AquaPic.PubSub
 {
     public class MessageHub
     {
-        Dictionary<string, List<Subscription>> subscriptions;
+        Dictionary<Guid, List<Subscription>> subscriptions;
+        public Guid globalGuid { get; protected set; }
 
         public static MessageHub Instance { get; } = new MessageHub ();
 
         protected MessageHub () {
-            subscriptions = new Dictionary<string, List<Subscription>> ();
+            subscriptions = new Dictionary<Guid, List<Subscription>> ();
+            globalGuid = new Guid ();
         }
 
         public void Publish<TEvent> (TEvent message) {
-            Publish ("global", message);
+            Publish (globalGuid, message);
         }
 
-        public void Publish<TEvent> (string key, TEvent message) {
+        public void Publish<TEvent> (Guid key, TEvent message) {
             if (!subscriptions.ContainsKey (key)) {
                 return;
             }
@@ -62,10 +64,10 @@ namespace AquaPic.PubSub
         }
 
         public Guid Subscribe<T> (Action<T> action) {
-            return Subscribe ("global", action);
+            return Subscribe (globalGuid, action);
         }
 
-        public Guid Subscribe<T> (string key, Action<T> action) {
+        public Guid Subscribe<T> (Guid key, Action<T> action) {
             var guid = Guid.NewGuid ();
 
             if (!subscriptions.ContainsKey (key)) {
@@ -84,7 +86,7 @@ namespace AquaPic.PubSub
             }
         }
 
-        public void Unsubscribe (string key, Guid token) {
+        public void Unsubscribe (Guid key, Guid token) {
             if (!subscriptions.ContainsKey (key)) {
                 return;
             }
@@ -96,15 +98,6 @@ namespace AquaPic.PubSub
 
         public bool IsSubscribed (Guid token) {
             return subscriptions.Values.Any (subs => subs.Any (s => s.token == token));
-        }
-
-        public void ChangeKey (string oldKey, string newKey) {
-            if (!subscriptions.ContainsKey (oldKey)) {
-                return;
-            }
-            var subs = subscriptions[oldKey];
-            subscriptions.Remove (oldKey);
-            subscriptions[newKey] = subs;
         }
     }
 }

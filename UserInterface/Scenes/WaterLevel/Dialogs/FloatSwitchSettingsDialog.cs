@@ -26,7 +26,7 @@ using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
-using AquaPic.Sensors;
+using AquaPic.Gadgets;
 
 namespace AquaPic.UserInterface
 {
@@ -44,7 +44,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ())
                     args.keepText = false;
-                else if (AquaPicSensors.FloatSwitches.SensorNameExists (args.text)) {
+                else if (Sensors.FloatSwitches.GadgetNameExists (args.text)) {
                     MessageBox.Show ("Switch name already exists");
                     args.keepText = false;
                 }
@@ -138,7 +138,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnSave (object sender) {
-            var switchSettings = new Sensors.FloatSwitchSettings ();
+            var switchSettings = new Gadgets.FloatSwitchSettings ();
 
             switchSettings.name = (string)settings["Name"].setting;
             if (switchSettings.name == "Enter name") {
@@ -182,14 +182,14 @@ namespace AquaPic.UserInterface
             }
             switchSettings.timeOffset = (uint)ParseTime (timeOffsetString);
 
-            AquaPicSensors.FloatSwitches.UpdateSensor (floatSwitchName, switchSettings);
+            Sensors.FloatSwitches.UpdateSensor (floatSwitchName, switchSettings);
             floatSwitchName = switchSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            AquaPicSensors.FloatSwitches.RemoveSensor (floatSwitchName);
+            Sensors.FloatSwitches.RemoveSensor (floatSwitchName);
             return true;
         }
 

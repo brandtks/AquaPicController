@@ -28,7 +28,7 @@ using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules;
 using AquaPic.Drivers;
-using AquaPic.Sensors;
+using AquaPic.Gadgets;
 using AquaPic.Runtime;
 
 namespace AquaPic.UserInterface
@@ -364,7 +364,7 @@ namespace AquaPic.UserInterface
 
         protected void GetAnalogSensorData () {
             if (analogSensorName.IsNotEmpty ()) {
-                float level = (float)AquaPicSensors.WaterLevelSensors.GetSensorValue (analogSensorName);
+                float level = (float)Sensors.WaterLevelSensors.GetSensorValue (analogSensorName);
                 if (level < 0f) {
                     analogSensorLevelTextBox.text = "Probe Disconnected";
                     analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
@@ -389,7 +389,7 @@ namespace AquaPic.UserInterface
 
         protected void GetSwitchData () {
             if (switchName.IsNotEmpty ()) {
-                var floatSwitch = (FloatSwitch)AquaPicSensors.FloatSwitches.GetSensor (switchName);
+                var floatSwitch = (FloatSwitch)Sensors.FloatSwitches.GetGadget (switchName);
                 bool state = floatSwitch.activated;
 
                 if (state) {
@@ -605,7 +605,7 @@ namespace AquaPic.UserInterface
         protected void CallWaterLevelSensorSettingsDialog (bool forceNew = false) {
             WaterLevelSensorSettings settings;
             if (analogSensorName.IsNotEmpty () && !forceNew) {
-                settings = (WaterLevelSensorSettings)AquaPicSensors.WaterLevelSensors.GetSensorSettings (analogSensorName);
+                settings = (WaterLevelSensorSettings)Sensors.WaterLevelSensors.GetGadgetSettings (analogSensorName);
             } else {
                 settings = new WaterLevelSensorSettings ();
             }
@@ -647,19 +647,19 @@ namespace AquaPic.UserInterface
                     "Water Level Sensor",
                     parent,
                     () => {
-                        var channel = AquaPicSensors.WaterLevelSensors.GetSensor (analogSensorName).channel;
+                        var channel = Sensors.WaterLevelSensors.GetGadget (analogSensorName).channel;
                         return AquaPicDrivers.AnalogInput.GetChannelValue (channel);
                     });
 
                 cal.CalibrationCompleteEvent += (aa) => {
-                    AquaPicSensors.WaterLevelSensors.SetCalibrationData (
+                    Sensors.WaterLevelSensors.SetCalibrationData (
                         analogSensorName,
                         (float)aa.zeroValue,
                         (float)aa.fullScaleActual,
                         (float)aa.fullScaleValue);
                 };
 
-                var sensor = (WaterLevelSensor)AquaPicSensors.WaterLevelSensors.GetSensor (analogSensorName);
+                var sensor = (WaterLevelSensor)Sensors.WaterLevelSensors.GetGadget (analogSensorName);
                 cal.calArgs.zeroValue = sensor.zeroScaleCalibrationValue;
                 cal.calArgs.fullScaleActual = sensor.fullScaleCalibrationActual;
                 cal.calArgs.fullScaleValue = sensor.fullScaleCalibrationValue;
@@ -686,7 +686,7 @@ namespace AquaPic.UserInterface
         protected void CallFloatSwitchSettingsDialog (bool forceNew = false) {
             FloatSwitchSettings settings;
             if (switchName.IsNotEmpty () && !forceNew) {
-                settings = (FloatSwitchSettings)AquaPicSensors.FloatSwitches.GetSensorSettings (switchName);
+                settings = (FloatSwitchSettings)Sensors.FloatSwitches.GetGadgetSettings (switchName);
             } else {
                 settings = new FloatSwitchSettings ();
             }

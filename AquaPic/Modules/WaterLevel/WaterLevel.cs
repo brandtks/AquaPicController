@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
-using AquaPic.Sensors;
+using AquaPic.Gadgets;
 using AquaPic.DataLogging;
 
 namespace AquaPic.Modules
@@ -164,7 +164,7 @@ namespace AquaPic.Modules
             CheckWaterLevelGroupKey (name);
             var maxLevel = 0f;
             foreach (var sensorName in waterLevelGroups[name].waterLevelSensors.Keys) {
-                var sensor = AquaPicSensors.WaterLevelSensors.GetSensor (sensorName) as WaterLevelSensor;
+                var sensor = Sensors.WaterLevelSensors.GetGadget (sensorName) as WaterLevelSensor;
                 if (sensor.fullScaleCalibrationActual > maxLevel) {
                     maxLevel = sensor.fullScaleCalibrationActual;
                 }
@@ -177,7 +177,7 @@ namespace AquaPic.Modules
             CheckWaterLevelGroupKey (name);
             bool activated = true;
             foreach (var switchName in waterLevelGroups[name].floatSwitches) {
-                var floatSwitch = AquaPicSensors.FloatSwitches.GetSensor (switchName) as FloatSwitch;
+                var floatSwitch = Sensors.FloatSwitches.GetGadget (switchName) as FloatSwitch;
                 if (floatSwitch.switchFuntion == function) {
                     // Using AND because we want all the switches to be activated
                     activated &= floatSwitch.activated;
@@ -191,7 +191,7 @@ namespace AquaPic.Modules
             CheckWaterLevelGroupKey (name);
             bool connected = false;
             foreach (var sensorName in waterLevelGroups[name].waterLevelSensors.Keys) {
-                var sensor = AquaPicSensors.WaterLevelSensors.GetSensor (sensorName) as WaterLevelSensor;
+                var sensor = Sensors.WaterLevelSensors.GetGadget (sensorName) as WaterLevelSensor;
                 // Using OR because we really only care that at least one sensor is connected
                 connected |= sensor.connected;
             }

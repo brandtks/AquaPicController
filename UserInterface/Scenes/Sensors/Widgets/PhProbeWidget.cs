@@ -25,19 +25,19 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.Utilites;
 using GoodtimeDevelopment.TouchWidget;
-using AquaPic.Sensors;
-using AquaPic.Sensors.PhProbe;
+using AquaPic.Gadgets;
+using AquaPic.Gadgets.PhProbe;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
     public class PhProbeWidget : AnalogSensorWidget
     {
-        public PhProbeWidget () : base ("pH Probes", AquaPicSensors.PhProbes, AquaPicDrivers.PhOrp) { }
+        public PhProbeWidget () : base ("pH Probes", Sensors.PhProbes, AquaPicDrivers.PhOrp) { }
 
         public override void GetSensorData () {
             if (sensorName.IsNotEmpty ()) {
-                var probe = (PhProbe)AquaPicSensors.PhProbes.GetSensor (sensorName);
+                var probe = (PhProbe)Sensors.PhProbes.GetGadget (sensorName);
                 if (probe.connected) {
                     sensorStateTextbox.text = probe.value.ToString ("F2");
                     sensorLabel.Visible = true;

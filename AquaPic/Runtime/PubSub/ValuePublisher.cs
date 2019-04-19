@@ -27,18 +27,18 @@ namespace AquaPic.PubSub
 {
     public class ValuePublisher
     {
-        public string key { get; protected set; }
+        public Guid key { get; protected set; }
 
-        public ValuePublisher (string key) {
-            this.key = key;
+        public ValuePublisher () {
+            key = new Guid ();
         }
 
-        public void NotifyValueChanged (ValueType newValue, ValueType oldValue) {
-            MessageHub.Instance.Publish (key, new ValueChangedEvent (key, newValue, oldValue));
+        public void NotifyValueChanged (string name, ValueType newValue, ValueType oldValue) {
+            MessageHub.Instance.Publish (key, new ValueChangedEvent (name, newValue, oldValue));
         }
 
-        public void NotifyValueUpdated (ValueType newValue) {
-            MessageHub.Instance.Publish (key, new ValueUpdatedEvent (key, newValue));
+        public void NotifyValueUpdated (string name, ValueType newValue) {
+            MessageHub.Instance.Publish (key, new ValueUpdatedEvent (name, newValue));
         }
     }
 

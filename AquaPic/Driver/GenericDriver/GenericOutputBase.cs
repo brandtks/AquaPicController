@@ -31,37 +31,37 @@ namespace AquaPic.Drivers
         public GenericOutputBase (string name, uint runtime = 1000) 
             : base (name, runtime) { }
 
-        public void SubscribeChannel (string channelName, string key) {
+        public void SubscribeChannel (string channelName, Guid key) {
             var channel = GetChannelIndividualControl (channelName);
             SubscribeChannel (channel.Group, channel.Individual, key);
         }
 
-        public void SubscribeChannel (IndividualControl channel, string key) {
+        public void SubscribeChannel (IndividualControl channel, Guid key) {
             SubscribeChannel (channel.Group, channel.Individual, key);
         }
 
-        public void SubscribeChannel (string card, int channel, string key) {
+        public void SubscribeChannel (string card, int channel, Guid key) {
             CheckCardKey (card);
             var outputCard = cards[card] as GenericOutputCard;
             outputCard.SubscribeChannel (channel, key);
         }
 
-        public string GetSubscriptionKey (string channelName) {
+        public Guid GetSubscriptionKey (string channelName) {
             var channel = GetChannelIndividualControl (channelName);
             return GetSubscriptionKey (channel.Group, channel.Individual);
         }
 
-        public string GetSubscriptionKey (IndividualControl channel) {
+        public Guid GetSubscriptionKey (IndividualControl channel) {
             return GetSubscriptionKey (channel.Group, channel.Individual);
         }
 
-        public string GetSubscriptionKey (string card, int channel) {
+        public Guid GetSubscriptionKey (string card, int channel) {
             CheckCardKey (card);
             var outputCard = cards[card] as GenericOutputCard;
             return outputCard.GetSubscriptionKey (channel);
         }
 
-        public string[] GetAllSubscriptionKeys (string card) {
+        public Guid[] GetAllSubscriptionKeys (string card) {
             CheckCardKey (card);
             var outputCard = cards[card] as GenericOutputCard;
             return outputCard.GetAllSubscriptionKeys ();
