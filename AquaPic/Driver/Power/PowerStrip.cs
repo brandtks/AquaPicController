@@ -42,7 +42,7 @@ namespace AquaPic.Drivers
                 powerLossAlarmIndex = Alarm.Subscribe (string.Format ("{0}: Loss of Power", name));
             }
 
-            protected override GenericOutputChannel OutputChannelCreater (int index) {
+            protected override GenericChannel ChannelCreater (int index) {
                 return new PowerOutlet (GetDefualtName (index));
             }
 

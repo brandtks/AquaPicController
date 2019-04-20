@@ -62,7 +62,7 @@ namespace AquaPic.Gadgets
             Unsubscribe ();
         }
 
-        public override ValueType GetValue () {
+        protected override ValueType GetValue () {
             return activated;
         }
 

@@ -30,7 +30,7 @@ namespace AquaPic.PubSub
         public Guid key { get; protected set; }
 
         public ValuePublisher () {
-            key = new Guid ();
+            key = Guid.NewGuid ();
         }
 
         public void NotifyValueChanged (string name, ValueType newValue, ValueType oldValue) {

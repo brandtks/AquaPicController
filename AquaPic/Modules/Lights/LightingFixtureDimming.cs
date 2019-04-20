@@ -50,7 +50,10 @@ namespace AquaPic.Modules
 
                 dimmingChannel = settings.dimmingChannel;
                 dimmingMode = Mode.Auto;
-                dimmingEquipment = new DimmingEquipment (settings, this);
+                var dimmingSettings = new GenericEquipmentSettings ();
+                dimmingSettings.name = name + "dimming output";
+                dimmingSettings.channel = dimmingChannel;
+                dimmingEquipment = new DimmingEquipment (dimmingSettings, this);
                 AquaPicDrivers.AnalogOutput.AddOutputChannel (dimmingChannel, name, dimmingEquipment.key);
             }
 
@@ -138,8 +141,7 @@ namespace AquaPic.Modules
             {
                 protected LightingFixtureDimming fixture;
 
-                public DimmingEquipment (LightingFixtureSettings settings, LightingFixtureDimming fixture) : base (settings) {
-                    channel = settings.dimmingChannel;
+                public DimmingEquipment (GenericEquipmentSettings settings, LightingFixtureDimming fixture) : base (settings) {
                     this.fixture = fixture;
                 }
 

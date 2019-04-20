@@ -28,7 +28,6 @@ using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules.Temperature;
 using AquaPic.Drivers;
-using AquaPic.Globals;
 using AquaPic.Gadgets;
 using AquaPic.Gadgets.TemperatureProbe;
 
@@ -298,7 +297,7 @@ namespace AquaPic.UserInterface
 
         protected void GetProbeData () {
             if (probeName.IsNotEmpty ()) {
-                var probe = (TemperatureProbe)Sensors.TemperatureProbes.GetGadget (probeName);
+                var probe = Sensors.TemperatureProbes.GetGadget (probeName) as TemperatureProbe;
                 if (probe.connected) {
                     probeTempTextbox.text = Convert.ToSingle (probe.value).ToString ("F2");
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;

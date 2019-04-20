@@ -46,8 +46,7 @@ namespace AquaPic.Gadgets
 
         public virtual ValueType GetSensorValue (string name) {
             CheckGadgetKey (name);
-            var sensor = (GenericSensor)gadgets[name];
-            return sensor.GetValue ();
+            return gadgets[name].value;
         }
     }
 }

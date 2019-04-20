@@ -123,7 +123,7 @@ namespace AquaPic.Modules.Temperature
             public override void OnValueChangedAction (object parm) {
                 var args = parm as ValueChangedEvent;
                 if (temperatureProbes.ContainsKey (args.name)) {
-                    var temperatureProbe = (TemperatureProbe)Sensors.TemperatureProbes.GetGadget (args.name);
+                    var temperatureProbe = Sensors.TemperatureProbes.GetGadget (args.name) as TemperatureProbe;
                     temperatureProbes[temperatureProbe.name].connected = temperatureProbe.connected;
                     temperatureProbes[temperatureProbe.name].temperature = Convert.ToSingle (temperatureProbe.value);
                     CalculateTemperature ();

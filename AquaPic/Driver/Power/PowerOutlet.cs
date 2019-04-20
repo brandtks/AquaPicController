@@ -40,7 +40,7 @@ namespace AquaPic.Drivers
             public PowerOutlet (string name) : base (name, typeof(bool)) {
                 this.name = name;
                 fallback = MyState.Off;
-                mode = Mode.Manual;
+                mode = Mode.Auto;
                 amperage = 0.0f;
                 wattPower = 0.0f;
                 powerFactor = 1.0f;

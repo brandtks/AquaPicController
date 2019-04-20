@@ -45,6 +45,13 @@ namespace AquaPic.Drivers
             return CardType.Power;
         }
 
+        protected override void Run () {
+            foreach (var card in cards.Values) {
+                var powerStrip = card as PowerStrip;
+                powerStrip.GetStatusCommunication ();
+            }
+        }
+
         [Obsolete ("Use AddOutlet instead")]
         public sealed override void AddOutputChannel (string card, int channel, string channelName, Guid subscriptionKey) => throw new NotSupportedException ();
         [Obsolete ("Use AddOutlet instead")]
@@ -55,7 +62,7 @@ namespace AquaPic.Drivers
         }
 
         public void AddOutlet (string powerStrip, int outlet, string name, MyState fallback, Guid subscriptionKey) {
-            AddOutputChannel (powerStrip, outlet, name, subscriptionKey);
+            base.AddOutputChannel (powerStrip, outlet, name, subscriptionKey);
             SetOutletFallback (powerStrip, outlet, fallback);
         }
 

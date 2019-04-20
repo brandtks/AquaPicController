@@ -63,14 +63,11 @@ namespace AquaPic.Gadgets
             return sensorSettings;
         }
 
-        public override ValueType GetValue () {
-            return value;
-        }
-
         public override void OnValueChangedAction (object parm) {
             var args = parm as ValueChangedEvent;
             var oldValue = (float)value;
             var newValue = ScaleRawLevel (Convert.ToSingle (args.newValue));
+            value = newValue;
 
             if (newValue < zeroScaleCalibrationActual) {
                 Alarm.Post (sensorDisconnectedAlarmIndex);
@@ -78,8 +75,7 @@ namespace AquaPic.Gadgets
                 Alarm.Clear (sensorDisconnectedAlarmIndex);
             }
 
-            NotifyValueChanged (name, newValue, oldValue);
-            value = newValue;
+            NotifyValueChanged (name, value, oldValue);
         }
 
 

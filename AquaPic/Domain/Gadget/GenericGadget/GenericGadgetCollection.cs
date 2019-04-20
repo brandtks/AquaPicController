@@ -83,7 +83,7 @@ namespace AquaPic.Gadgets
 
         public void CheckGadgetKey (string name) {
             if (!gadgets.ContainsKey (name)) {
-                throw new ArgumentException (name + " isn't a valid equipment name");
+                throw new ArgumentException (name + " isn't a valid gadget");
             }
         }
 

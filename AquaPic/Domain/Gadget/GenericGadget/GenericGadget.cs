@@ -30,7 +30,15 @@ namespace AquaPic.Gadgets
     {
         public string name { get; protected set; }
         public IndividualControl channel { get; protected set; }
-        public ValueType value;
+        protected ValueType _value;
+        public ValueType value {
+            get {
+                return GetValue ();
+            }
+            protected set {
+                _value = value;
+            }
+        }
 
         public GenericGadget (GenericGadgetSettings settings) {
             name = settings.name;
@@ -45,6 +53,10 @@ namespace AquaPic.Gadgets
 
         public virtual GenericGadget Clone () {
             return (GenericGadget)MemberwiseClone ();
+        }
+
+        protected virtual ValueType GetValue () {
+            return _value;
         }
     }
 }

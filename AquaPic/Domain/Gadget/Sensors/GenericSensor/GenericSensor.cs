@@ -28,7 +28,5 @@ namespace AquaPic.Gadgets
     public class GenericSensor : GenericGadget
     {
         public GenericSensor (GenericSensorSettings settings) : base (settings) { }
-
-        public virtual ValueType GetValue () => throw new NotImplementedException ();
     }
 }

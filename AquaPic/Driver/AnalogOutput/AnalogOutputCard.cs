@@ -37,7 +37,7 @@ namespace AquaPic.Drivers
                     address,
                     4) { }
 
-            protected override GenericOutputChannel OutputChannelCreater (int index) {
+            protected override GenericChannel ChannelCreater (int index) {
                 return new AnalogOutputChannel (GetDefualtName (index));
             }
 

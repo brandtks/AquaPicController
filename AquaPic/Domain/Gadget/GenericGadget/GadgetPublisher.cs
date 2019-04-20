@@ -31,7 +31,7 @@ namespace AquaPic.Gadgets
         public Guid key { get; protected set; }
 
         public GadgetPublisher () {
-            key = new Guid ();
+            key = Guid.NewGuid ();
         }
 
         public void NotifyValueChanged (string name, ValueType newValue, ValueType oldValue) {

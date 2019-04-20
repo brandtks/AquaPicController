@@ -45,7 +45,7 @@ namespace AquaPic.Drivers
         }
 
         public void Subscribe (Guid key) {
-            if (_subscriber.subscriptionKey.Equals (Guid.Empty)) {
+            if (!_subscriber.subscriptionKey.Equals (Guid.Empty)) {
                 throw new Exception (string.Format("Output channel {0} is already subscribed to {1}", name, _subscriber.subscriptionKey));
             }
             _subscriber.Subscribe (key);

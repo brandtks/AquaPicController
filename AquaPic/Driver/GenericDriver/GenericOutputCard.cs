@@ -27,19 +27,12 @@ namespace AquaPic.Drivers
 {
     public class GenericOutputCard : GenericCard
     {
-        private OutputChannelValueSubscriber _subscriber;
-
         public GenericOutputCard (string name, int address, int numberChannels)
             : base (name, address, numberChannels) {
-            _subscriber = new OutputChannelValueSubscriber (OnValueChanged);
-        }
-
-        protected virtual GenericOutputChannel OutputChannelCreater (int index) => throw new NotImplementedException ();
-
-        protected override sealed GenericChannel ChannelCreater (int index) {
-            var outputChannel = OutputChannelCreater (index);
-            _subscriber.Subscribe (outputChannel.key);
-            return outputChannel; 
+            foreach (var channel in channels) {
+                var sub = new OutputChannelValueSubscriber (OnValueChanged);
+                sub.Subscribe (channel.key);
+            }
         }
 
         protected virtual void OnValueChanged (string name, ValueType value) {

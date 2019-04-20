@@ -37,7 +37,7 @@ namespace AquaPic.PubSub
 
         protected MessageHub () {
             subscriptions = new Dictionary<Guid, List<Subscription>> ();
-            globalGuid = new Guid ();
+            globalGuid = Guid.NewGuid ();
         }
 
         public void Publish<TEvent> (TEvent message) {
