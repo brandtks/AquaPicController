@@ -205,7 +205,7 @@ namespace AquaPic.Modules
 
             var fixture = fixtures[fixtureName] as LightingFixtureDimming;
             if (fixture != null) {
-                return fixture.channel;
+                return fixture.dimmingChannel;
             }
 
             throw new ArgumentException ("fixtureName");
