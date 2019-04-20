@@ -28,7 +28,7 @@ using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Globals;
-using AquaPic.PubSub;
+using System.Linq;
 
 namespace AquaPic.UserInterface
 {
@@ -171,23 +171,15 @@ namespace AquaPic.UserInterface
 
         protected void GetPowerData () {
             if (powerStripName.IsNotEmpty ()) {
-                var values = power.GetAllChannelValues (powerStripName);
-                var states = new MyState[values.Length];
-                for (var i = 0; i < states.Length; ++i) {
-                    if (values[i]) {
-                        states[i] = MyState.On;
-                    } else {
-                        states[i] = MyState.Off;
-                    }
-                }
-                Mode[] modes = power.GetAllChannelModes (powerStripName);
-                string[] names = power.GetAllChannelNames (powerStripName);
+                var states = power.GetAllChannelValues (powerStripName);
+                var modes = power.GetAllChannelModes (powerStripName);
+                var names = power.GetAllChannelNames (powerStripName);
 
                 for (var i = 0; i < states.Length; ++i) {
                     var s = selectors[i];
                     s.outletName.text = names[i];
 
-                    if (states[i] == MyState.On) {
+                    if (states[i]) {
                         s.statusLabel.text = "On";
                         s.statusLabel.textColor = "secb";
                     } else {
@@ -204,7 +196,7 @@ namespace AquaPic.UserInterface
                             s.ss.currentSelected = 0;
                         }
                     }
-                    ++i;
+                    s.QueueDraw ();
                 }
             }
         }

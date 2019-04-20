@@ -27,7 +27,6 @@ using Cairo;
 using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Globals;
 using AquaPic.Drivers;
-using AquaPic.PubSub;
 
 namespace AquaPic.UserInterface
 {

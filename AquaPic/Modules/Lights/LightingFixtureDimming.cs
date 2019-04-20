@@ -51,7 +51,7 @@ namespace AquaPic.Modules
                 dimmingChannel = settings.dimmingChannel;
                 dimmingMode = Mode.Auto;
                 var dimmingSettings = new GenericEquipmentSettings ();
-                dimmingSettings.name = name + "dimming output";
+                dimmingSettings.name = name + " Dimming Output";
                 dimmingSettings.channel = dimmingChannel;
                 dimmingEquipment = new DimmingEquipment (dimmingSettings, this);
                 AquaPicDrivers.AnalogOutput.AddOutputChannel (dimmingChannel, name, dimmingEquipment.key);

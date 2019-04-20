@@ -37,7 +37,7 @@ namespace AquaPic.Gadgets
             try {
                 var oldValue = value;
                 value = OnRun ();
-                if (value != oldValue) {
+                if (!value.Equals (oldValue)) {
                     NotifyValueChanged (name, value, oldValue);
                 }
             } catch (NotImplementedException) {
