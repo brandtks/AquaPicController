@@ -60,7 +60,7 @@ namespace AquaPic.UserInterface
                 c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Select outlet";
-            c.combo.comboList.AddRange (AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ());
+            c.combo.comboList.AddRange (Driver.AnalogInput.GetAllAvaiableChannels ());
             AddSetting (c);
 
             DrawSettings ();

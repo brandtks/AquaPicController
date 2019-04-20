@@ -59,7 +59,7 @@ namespace AquaPic.UserInterface
                 c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Select outlet";
-            c.combo.comboList.AddRange (AquaPicDrivers.Power.GetAllAvaiableChannels ());
+            c.combo.comboList.AddRange (Driver.Power.GetAllAvaiableChannels ());
             AddSetting (c);
 
             var s = new SettingsSelectorSwitch ("Temp Lockout");
@@ -88,7 +88,7 @@ namespace AquaPic.UserInterface
                 c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Select outlet";
-            c.combo.comboList.AddRange (AquaPicDrivers.AnalogOutput.GetAllAvaiableChannels ());
+            c.combo.comboList.AddRange (Driver.AnalogOutput.GetAllAvaiableChannels ());
             AddOptionalSetting (c);
 
             DrawSettings ();

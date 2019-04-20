@@ -37,13 +37,13 @@ namespace AquaPic.Gadgets.Sensor.PhProbe
         public PhProbe (GenericAnalogSensorSettings settings) : base (settings) {
             dataLogger = Factory.GetDataLogger (string.Format ("{0}PhProbe", name.RemoveWhitespace ()));
             var channelName = string.Format ("{0}, pH Probe", name);
-            AquaPicDrivers.PhOrp.AddChannel (channel, channelName, lowPassFilterFactor);
+            Driver.PhOrp.AddChannel (channel, channelName, lowPassFilterFactor);
             sensorDisconnectedAlarmIndex = Alarm.Subscribe ("pH probe disconnected, " + name);
-            Subscribe (AquaPicDrivers.PhOrp.GetChannelEventPublisherKey (channelName));
+            Subscribe (Driver.PhOrp.GetChannelEventPublisherKey (channelName));
         }
 
         public override void Dispose () {
-            AquaPicDrivers.PhOrp.RemoveChannel (channel);
+            Driver.PhOrp.RemoveChannel (channel);
             Alarm.Clear (sensorDisconnectedAlarmIndex);
             Unsubscribe ();
         }

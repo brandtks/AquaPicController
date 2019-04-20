@@ -54,7 +54,7 @@ namespace AquaPic.Modules
                 dimmingSettings.name = name + " Dimming Output";
                 dimmingSettings.channel = dimmingChannel;
                 dimmingEquipment = new DimmingEquipment (dimmingSettings, this);
-                AquaPicDrivers.AnalogOutput.AddOutputChannel (dimmingChannel, name, dimmingEquipment.key);
+                Driver.AnalogOutput.AddOutputChannel (dimmingChannel, name, dimmingEquipment.key);
             }
 
             public float GetDimmingLevel () {
@@ -134,7 +134,7 @@ namespace AquaPic.Modules
 
             public override void Dispose () {
                 base.Dispose ();
-                AquaPicDrivers.AnalogOutput.RemoveChannel (dimmingChannel);
+                Driver.AnalogOutput.RemoveChannel (dimmingChannel);
             }
 
             protected class DimmingEquipment : GenericDevice

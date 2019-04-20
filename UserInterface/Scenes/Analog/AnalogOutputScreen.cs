@@ -38,7 +38,7 @@ namespace AquaPic.UserInterface
         TouchButton settingsButton;
 
         public AnalogOutputWindow (params object[] options) : base () {
-            card = AquaPicDrivers.AnalogOutput.firstCard;
+            card = Driver.AnalogOutput.firstCard;
             if (card.IsNotEmpty ()) {
                 sceneTitle = "Analog Output Cards";
             } else {
@@ -68,7 +68,7 @@ namespace AquaPic.UserInterface
             Put (settingsButton, 755, 35);
             settingsButton.Show ();
 
-            combo = new TouchComboBox (AquaPicDrivers.AnalogOutput.GetAllCardNames ());
+            combo = new TouchComboBox (Driver.AnalogOutput.GetAllCardNames ());
             combo.comboList.Add ("New card...");
             if (card.IsNotEmpty ()) {
                 combo.activeText = card;
@@ -84,7 +84,7 @@ namespace AquaPic.UserInterface
 
         protected override bool OnUpdateTimer () {
             if (card.IsNotEmpty ()) {
-                var values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (card);
+                var values = Driver.AnalogOutput.GetAllChannelValues (card);
 
                 int i = 0;
                 foreach (var d in displays) {
@@ -108,7 +108,7 @@ namespace AquaPic.UserInterface
                 numberInput.Title = "Address";
 
                 numberInput.TextSetEvent += (o, a) => {
-                    a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, AquaPicDrivers.AnalogOutput);
+                    a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, Driver.AnalogOutput);
 
                     if (a.keepText) {
                         combo.comboList.Insert (combo.comboList.Count - 1, card);
@@ -128,7 +128,7 @@ namespace AquaPic.UserInterface
 
                 // The number input was canceled
                 if (combo.activeText == "New card...") {
-                    card = AquaPicDrivers.AnalogOutput.firstCard;
+                    card = Driver.AnalogOutput.firstCard;
                     combo.activeText = card;
                     GetCardData ();
                 }
@@ -139,16 +139,16 @@ namespace AquaPic.UserInterface
 
         protected void OnGlobalSettingsRelease (object sender, ButtonReleaseEventArgs args) {
             if (card.IsNotEmpty ()) {
-                if (AquaPicDrivers.AnalogOutput.CheckCardEmpty (card)) {
+                if (Driver.AnalogOutput.CheckCardEmpty (card)) {
                     var parent = Toplevel as Window;
                     var ms = new TouchDialog ("Are you sure you with to delete " + card, parent);
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {
-                            var deleted = CardSettingsHelper.OnCardDeleteEvent (card, AquaPicDrivers.AnalogOutput);
+                            var deleted = CardSettingsHelper.OnCardDeleteEvent (card, Driver.AnalogOutput);
                             if (deleted) {
                                 combo.comboList.Remove (card);
-                                if (AquaPicDrivers.AnalogOutput.cardCount == 0) {
+                                if (Driver.AnalogOutput.cardCount == 0) {
                                     card = string.Empty;
                                     sceneTitle = "No Analog Output Cards Added";
                                     foreach (var display in displays) {
@@ -157,7 +157,7 @@ namespace AquaPic.UserInterface
                                     combo.activeIndex = -1;
                                     settingsButton.buttonColor = "grey1";
                                 } else {
-                                    card = AquaPicDrivers.AnalogOutput.firstCard;
+                                    card = Driver.AnalogOutput.firstCard;
                                     combo.activeText = card;
                                     GetCardData ();
                                 }
@@ -177,17 +177,17 @@ namespace AquaPic.UserInterface
 
             var ic = IndividualControl.Empty;
             ic.Group = card;
-            ic.Individual = AquaPicDrivers.AnalogOutput.GetChannelIndex (card, d.label.text);
+            ic.Individual = Driver.AnalogOutput.GetChannelIndex (card, d.label.text);
 
-            var m = AquaPicDrivers.AnalogOutput.GetChannelMode (ic);
+            var m = Driver.AnalogOutput.GetChannelMode (ic);
 
             if (m == Mode.Auto) {
-                AquaPicDrivers.AnalogOutput.SetChannelMode (ic, Mode.Manual);
+                Driver.AnalogOutput.SetChannelMode (ic, Mode.Manual);
                 d.progressBar.enableTouch = true;
                 d.textBox.enableTouch = true;
                 d.forceButton.buttonColor = "pri";
             } else {
-                AquaPicDrivers.AnalogOutput.SetChannelMode (ic, Mode.Auto);
+                Driver.AnalogOutput.SetChannelMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;
                 d.textBox.enableTouch = false;
                 d.forceButton.buttonColor = "grey4";
@@ -201,14 +201,14 @@ namespace AquaPic.UserInterface
 
             var ic = IndividualControl.Empty;
             ic.Group = card;
-            ic.Individual = AquaPicDrivers.AnalogOutput.GetChannelIndex (card, d.label.text);
+            ic.Individual = Driver.AnalogOutput.GetChannelIndex (card, d.label.text);
 
-            var m = AquaPicDrivers.AnalogOutput.GetChannelMode (ic);
+            var m = Driver.AnalogOutput.GetChannelMode (ic);
 
             if (m == Mode.Manual) {
                 // To add more resolution easily the scale steps from 0 to 1000, but the card
                 // needs 0 to 100 so divide by 10
-                AquaPicDrivers.AnalogOutput.SetChannelValue (ic, value / 10f);
+                Driver.AnalogOutput.SetChannelValue (ic, value / 10f);
             }
 
             d.QueueDraw ();
@@ -216,10 +216,10 @@ namespace AquaPic.UserInterface
 
         protected void GetCardData () {
             if (card.IsNotEmpty ()) {
-                var names = AquaPicDrivers.AnalogOutput.GetAllChannelNames (card);
-                var values = AquaPicDrivers.AnalogOutput.GetAllChannelValues (card);
-                var types = AquaPicDrivers.AnalogOutput.GetAllChannelTypes (card);
-                var modes = AquaPicDrivers.AnalogOutput.GetAllChannelModes (card);
+                var names = Driver.AnalogOutput.GetAllChannelNames (card);
+                var values = Driver.AnalogOutput.GetAllChannelValues (card);
+                var types = Driver.AnalogOutput.GetAllChannelTypes (card);
+                var modes = Driver.AnalogOutput.GetAllChannelModes (card);
 
                 int i = 0;
                 foreach (var d in displays) {
@@ -242,7 +242,7 @@ namespace AquaPic.UserInterface
                     ++i;
                 }
 
-                if (AquaPicDrivers.AnalogOutput.CheckCardEmpty (card)) {
+                if (Driver.AnalogOutput.CheckCardEmpty (card)) {
                     settingsButton.buttonColor = "compl";
                 } else {
                     settingsButton.buttonColor = "grey1";

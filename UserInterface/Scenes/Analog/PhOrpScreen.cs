@@ -38,7 +38,7 @@ namespace AquaPic.UserInterface
         TouchButton settingsButton;
 
         public PhOrpWindow (params object[] options) {
-            card = AquaPicDrivers.PhOrp.firstCard;
+            card = Driver.PhOrp.firstCard;
             if (card.IsNotEmpty ()) {
                 sceneTitle = "pH/ORP Cards";
             } else {
@@ -67,7 +67,7 @@ namespace AquaPic.UserInterface
             Put (settingsButton, 755, 35);
             settingsButton.Show ();
 
-            combo = new TouchComboBox (AquaPicDrivers.PhOrp.GetAllCardNames ());
+            combo = new TouchComboBox (Driver.PhOrp.GetAllCardNames ());
             combo.comboList.Add ("New card...");
             if (card.IsNotEmpty ()) {
                 combo.activeText = card;
@@ -83,7 +83,7 @@ namespace AquaPic.UserInterface
 
         protected override bool OnUpdateTimer () {
             if (card.IsNotEmpty ()) {
-                var values = AquaPicDrivers.PhOrp.GetAllChannelValues (card);
+                var values = Driver.PhOrp.GetAllChannelValues (card);
 
                 int i = 0;
                 foreach (var d in displays) {
@@ -106,7 +106,7 @@ namespace AquaPic.UserInterface
                 numberInput.Title = "Address";
 
                 numberInput.TextSetEvent += (o, a) => {
-                    a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, AquaPicDrivers.PhOrp);
+                    a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref card, Driver.PhOrp);
 
                     if (a.keepText) {
                         combo.comboList.Insert (combo.comboList.Count - 1, card);
@@ -126,7 +126,7 @@ namespace AquaPic.UserInterface
 
                 // The number input was canceled
                 if (combo.activeText == "New card...") {
-                    card = AquaPicDrivers.PhOrp.firstCard;
+                    card = Driver.PhOrp.firstCard;
                     combo.activeText = card;
                     GetCardData ();
                 }
@@ -137,16 +137,16 @@ namespace AquaPic.UserInterface
 
         protected void OnGlobalSettingsRelease (object sender, ButtonReleaseEventArgs args) {
             if (card.IsNotEmpty ()) {
-                if (AquaPicDrivers.PhOrp.CheckCardEmpty (card)) {
+                if (Driver.PhOrp.CheckCardEmpty (card)) {
                     var parent = Toplevel as Window;
                     var ms = new TouchDialog ("Are you sure you with to delete " + card, parent);
 
                     ms.Response += (o, a) => {
                         if (a.ResponseId == ResponseType.Yes) {
-                            var deleted = CardSettingsHelper.OnCardDeleteEvent (card, AquaPicDrivers.PhOrp);
+                            var deleted = CardSettingsHelper.OnCardDeleteEvent (card, Driver.PhOrp);
                             if (deleted) {
                                 combo.comboList.Remove (card);
-                                if (AquaPicDrivers.PhOrp.cardCount == 0) {
+                                if (Driver.PhOrp.cardCount == 0) {
                                     card = string.Empty;
                                     sceneTitle = "No pH/ORP Cards Added";
                                     foreach (var display in displays) {
@@ -155,7 +155,7 @@ namespace AquaPic.UserInterface
                                     combo.activeIndex = -1;
                                     settingsButton.buttonColor = "grey1";
                                 } else {
-                                    card = AquaPicDrivers.PhOrp.firstCard;
+                                    card = Driver.PhOrp.firstCard;
                                     combo.activeText = card;
                                     GetCardData ();
                                 }
@@ -175,17 +175,17 @@ namespace AquaPic.UserInterface
 
             var ic = IndividualControl.Empty;
             ic.Group = card;
-            ic.Individual = AquaPicDrivers.PhOrp.GetChannelIndex (card, d.label.text);
+            ic.Individual = Driver.PhOrp.GetChannelIndex (card, d.label.text);
 
-            Mode m = AquaPicDrivers.PhOrp.GetChannelMode (ic);
+            Mode m = Driver.PhOrp.GetChannelMode (ic);
 
             if (m == Mode.Auto) {
-                AquaPicDrivers.PhOrp.SetChannelMode (ic, Mode.Manual);
+                Driver.PhOrp.SetChannelMode (ic, Mode.Manual);
                 d.progressBar.enableTouch = true;
                 d.textBox.enableTouch = true;
                 d.forceButton.buttonColor = "pri";
             } else {
-                AquaPicDrivers.PhOrp.SetChannelMode (ic, Mode.Auto);
+                Driver.PhOrp.SetChannelMode (ic, Mode.Auto);
                 d.progressBar.enableTouch = false;
                 d.textBox.enableTouch = false;
                 d.forceButton.buttonColor = "grey4";
@@ -199,22 +199,22 @@ namespace AquaPic.UserInterface
 
             var ic = IndividualControl.Empty;
             ic.Group = card;
-            ic.Individual = AquaPicDrivers.PhOrp.GetChannelIndex (card, d.label.text);
+            ic.Individual = Driver.PhOrp.GetChannelIndex (card, d.label.text);
 
-            Mode m = AquaPicDrivers.PhOrp.GetChannelMode (ic);
+            Mode m = Driver.PhOrp.GetChannelMode (ic);
 
             if (m == Mode.Manual)
-                AquaPicDrivers.PhOrp.SetChannelValue (ic, value);
+                Driver.PhOrp.SetChannelValue (ic, value);
 
             d.QueueDraw ();
         }
 
         protected void GetCardData () {
             if (card.IsNotEmpty ()) {
-                var names = AquaPicDrivers.PhOrp.GetAllChannelNames (card);
-                var values = AquaPicDrivers.PhOrp.GetAllChannelValues (card);
-                var modes = AquaPicDrivers.PhOrp.GetAllChannelModes (card);
-                var factors = AquaPicDrivers.PhOrp.GetAllChannelLowPassFilterFactors (card);
+                var names = Driver.PhOrp.GetAllChannelNames (card);
+                var values = Driver.PhOrp.GetAllChannelValues (card);
+                var modes = Driver.PhOrp.GetAllChannelModes (card);
+                var factors = Driver.PhOrp.GetAllChannelLowPassFilterFactors (card);
 
                 int i = 0;
                 foreach (var d in displays) {
@@ -237,7 +237,7 @@ namespace AquaPic.UserInterface
                     ++i;
                 }
 
-                if (AquaPicDrivers.PhOrp.CheckCardEmpty (card)) {
+                if (Driver.PhOrp.CheckCardEmpty (card)) {
                     settingsButton.buttonColor = "compl";
                 } else {
                     settingsButton.buttonColor = "grey1";

@@ -31,7 +31,7 @@ namespace AquaPic.UserInterface
 {
     public class PhProbeWidget : AnalogSensorWidget
     {
-        public PhProbeWidget () : base ("pH Probes", Sensors.PhProbes, AquaPicDrivers.PhOrp) { }
+        public PhProbeWidget () : base ("pH Probes", Sensors.PhProbes, Driver.PhOrp) { }
 
         public override void GetSensorData () {
             if (sensorName.IsNotEmpty ()) {

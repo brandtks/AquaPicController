@@ -59,7 +59,7 @@ namespace AquaPic.UserInterface
                 c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Please select channel";
-            c.combo.comboList.AddRange (AquaPicDrivers.DigitalInput.GetAllAvaiableChannels ());
+            c.combo.comboList.AddRange (Driver.DigitalInput.GetAllAvaiableChannels ());
             AddSetting (c);
 
             t = new SettingsTextBox ("Physical Level");

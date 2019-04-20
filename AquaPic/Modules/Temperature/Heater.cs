@@ -38,8 +38,8 @@ namespace AquaPic.Modules.Temperature
 
             public Heater (HeaterSettings settings, string temperatureGroupName) : base (settings) {
                 this.temperatureGroupName = temperatureGroupName;
-                AquaPicDrivers.Power.AddOutlet (channel, name, MyState.On, key);
-                Subscribe (AquaPicDrivers.Power.GetChannelEventPublisherKey (channel));
+                Driver.Power.AddOutlet (channel, name, MyState.On, key);
+                Subscribe (Driver.Power.GetChannelEventPublisherKey (channel));
             }
 
             protected override ValueType OnRun () {
@@ -83,7 +83,7 @@ namespace AquaPic.Modules.Temperature
             }
 
             public override void Dispose () {
-                AquaPicDrivers.Power.RemoveChannel (channel);
+                Driver.Power.RemoveChannel (channel);
                 Unsubscribe ();
             }
         }

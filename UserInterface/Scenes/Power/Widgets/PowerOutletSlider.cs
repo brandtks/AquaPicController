@@ -109,7 +109,7 @@ namespace AquaPic.UserInterface
         }
 
         public void Subscribe (IndividualControl outlet) {
-            outletSubscriber.Subscribe (AquaPicDrivers.Power.GetChannelEventPublisherKey (outlet));
+            outletSubscriber.Subscribe (Driver.Power.GetChannelEventPublisherKey (outlet));
         }
 
         public void Unsubscribe () {

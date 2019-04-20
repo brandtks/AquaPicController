@@ -59,7 +59,7 @@ namespace AquaPic.UserInterface
                 c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Please select channel";
-            c.combo.comboList.AddRange (AquaPicDrivers.AnalogInput.GetAllAvaiableChannels ());
+            c.combo.comboList.AddRange (Driver.AnalogInput.GetAllAvaiableChannels ());
             AddSetting (c);
 
             DrawSettings ();

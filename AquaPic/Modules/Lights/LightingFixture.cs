@@ -44,8 +44,8 @@ namespace AquaPic.Modules
             public LightingFixture (LightingFixtureSettings settings) : base (settings) {
                 highTempLockout = settings.highTempLockout;
                 plugState = MyState.Off;
-                AquaPicDrivers.Power.AddOutlet (channel, name, MyState.Off, key);
-                Subscribe (AquaPicDrivers.Power.GetChannelEventPublisherKey (channel));
+                Driver.Power.AddOutlet (channel, name, MyState.Off, key);
+                Subscribe (Driver.Power.GetChannelEventPublisherKey (channel));
                 UpdateLightingStates (settings.lightingStates, false);
             }
 
@@ -172,7 +172,7 @@ namespace AquaPic.Modules
 
             public override void Dispose () {
                 base.Dispose ();
-                AquaPicDrivers.Power.RemoveChannel (channel);
+                Driver.Power.RemoveChannel (channel);
                 Unsubscribe ();
             }
         }

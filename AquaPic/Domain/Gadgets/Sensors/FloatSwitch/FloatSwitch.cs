@@ -53,12 +53,12 @@ namespace AquaPic.Gadgets.Sensor.FloatSwitch
             delayTimer = new OnDelayTimer (settings.timeOffset);
             delayTimer.TimerElapsedEvent += OnDelayTimerTimerElapsedEvent;
             var channelName = string.Format ("{0}, Float Switch", name);
-            AquaPicDrivers.DigitalInput.AddChannel (channel, channelName);
-            Subscribe (AquaPicDrivers.DigitalInput.GetChannelEventPublisherKey (channelName));
+            Driver.DigitalInput.AddChannel (channel, channelName);
+            Subscribe (Driver.DigitalInput.GetChannelEventPublisherKey (channelName));
         }
 
         public override void Dispose () {
-            AquaPicDrivers.DigitalInput.RemoveChannel (channel);
+            Driver.DigitalInput.RemoveChannel (channel);
             Unsubscribe ();
         }
 

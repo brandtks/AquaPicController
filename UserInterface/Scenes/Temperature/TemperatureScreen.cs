@@ -280,7 +280,7 @@ namespace AquaPic.UserInterface
 
         protected void GetHeaterData () {
             if (heaterName.IsNotEmpty ()) {
-                if (AquaPicDrivers.Power.GetChannelValue (Temperature.GetHeaterIndividualControl (groupName, heaterName))) {
+                if (Driver.Power.GetChannelValue (Temperature.GetHeaterIndividualControl (groupName, heaterName))) {
                     heaterLabel.text = "Heater On";
                     heaterLabel.textColor = "secb";
                 } else {
@@ -568,7 +568,7 @@ namespace AquaPic.UserInterface
                     parent,
                     () => {
                         var channel = Sensors.TemperatureProbes.GetGadget (probeName).channel;
-                        return AquaPicDrivers.AnalogInput.GetChannelValue (channel);
+                        return Driver.AnalogInput.GetChannelValue (channel);
                     });
 
                 cal.CalibrationCompleteEvent += (a) => {

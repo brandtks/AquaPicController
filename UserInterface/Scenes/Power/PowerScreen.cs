@@ -39,7 +39,7 @@ namespace AquaPic.UserInterface
         TouchComboBox combo;
         TouchButton settingsButton;
         PowerWindowGraphics graphics;
-        PowerBase power = AquaPicDrivers.Power;
+        PowerBase power = Driver.Power;
 
         public PowerWindow (params object[] options) : base () {
             powerStripName = power.firstCard;
@@ -160,7 +160,7 @@ namespace AquaPic.UserInterface
                         graphics.Visible = false;
                         combo.activeIndex = -1;
                     } else {
-                        powerStripName = AquaPicDrivers.Power.firstCard;
+                        powerStripName = Driver.Power.firstCard;
                         combo.activeText = powerStripName;
                         GetPowerData ();
                     }

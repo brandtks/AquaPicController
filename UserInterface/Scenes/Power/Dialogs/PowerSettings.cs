@@ -95,9 +95,9 @@ namespace AquaPic.UserInterface
                     return false;
                 }
                 var address = Convert.ToInt32 (addressString.Substring (addressString.IndexOf (",", StringComparison.InvariantCultureIgnoreCase) + 2));
-                powerStripName = string.Format ("PS{0}", AquaPicDrivers.Power.GetLowestCardNameIndex ());
+                powerStripName = string.Format ("PS{0}", Driver.Power.GetLowestCardNameIndex ());
 
-                AquaPicDrivers.Power.AddCard (powerStripName, address);
+                Driver.Power.AddCard (powerStripName, address);
 
                 var jo = new JObject {
                     new JProperty ("type", "power"),
@@ -132,7 +132,7 @@ namespace AquaPic.UserInterface
             }
             ja.RemoveAt (index);
             SettingsHelper.WriteSettingsFile ("equipment", ja);
-            AquaPicDrivers.Power.RemoveCard (powerStripName);
+            Driver.Power.RemoveCard (powerStripName);
             return true;
         }
     }

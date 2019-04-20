@@ -235,9 +235,9 @@ namespace AquaPic.UserInterface
                 dimmingHeader.Visible = true;
                 outletStateLabel.Visible = true;
                 outletSelectorSwitch.Visible = true;
-                outletSubscriber.Subscribe (AquaPicDrivers.Power.GetChannelEventPublisherKey (fixtureName));
-                var state = AquaPicDrivers.Power.GetChannelValue (fixtureName);
-                if (AquaPicDrivers.Power.GetChannelMode (fixtureName) == Mode.Auto) {
+                outletSubscriber.Subscribe (Driver.Power.GetChannelEventPublisherKey (fixtureName));
+                var state = Driver.Power.GetChannelValue (fixtureName);
+                if (Driver.Power.GetChannelMode (fixtureName) == Mode.Auto) {
                     outletSelectorSwitch.currentSelected = 1;
                     outletSelectorSwitch.QueueDraw ();
                 } else {
@@ -388,7 +388,7 @@ namespace AquaPic.UserInterface
             if (args.currentSelectedIndex == 0) {
                 Lighting.SetDimmingMode (fixtureName, Mode.Manual);
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
-                AquaPicDrivers.Power.SetChannelMode (ic, Mode.Manual);
+                Driver.Power.SetChannelMode (ic, Mode.Manual);
                 dimmingProgressBar.enableTouch = true;
                 requestedTextBox.Visible = true;
                 requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureName));
@@ -396,7 +396,7 @@ namespace AquaPic.UserInterface
                 autoLabel.Visible = true;
                 dimmingIsManual = true;
                 autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureName));
-                if (AquaPicDrivers.Power.GetChannelValue (ic)) {
+                if (Driver.Power.GetChannelValue (ic)) {
                     outletSelectorSwitch.currentSelected = 0;
                 } else {
                     outletSelectorSwitch.currentSelected = 2;
@@ -404,7 +404,7 @@ namespace AquaPic.UserInterface
                 outletSelectorSwitch.QueueDraw ();
             } else {
                 Lighting.SetDimmingMode (fixtureName, Mode.Auto);
-                AquaPicDrivers.Power.SetChannelMode (Lighting.GetFixtureOutletIndividualControl (fixtureName), Mode.Auto);
+                Driver.Power.SetChannelMode (Lighting.GetFixtureOutletIndividualControl (fixtureName), Mode.Auto);
                 dimmingProgressBar.enableTouch = false;
                 requestedTextBox.Visible = false;
                 autoTextBox.Visible = false;
@@ -423,13 +423,13 @@ namespace AquaPic.UserInterface
             IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
 
             if (args.currentSelectedIndex == 0) { // Manual Off
-                AquaPicDrivers.Power.SetChannelMode (ic, Mode.Manual);
-                AquaPicDrivers.Power.SetChannelValue (ic, false);
+                Driver.Power.SetChannelMode (ic, Mode.Manual);
+                Driver.Power.SetChannelValue (ic, false);
             } else if (args.currentSelectedIndex == 2) { // Manual On
-                AquaPicDrivers.Power.SetChannelMode (ic, Mode.Manual);
-                AquaPicDrivers.Power.SetChannelValue (ic, true);
+                Driver.Power.SetChannelMode (ic, Mode.Manual);
+                Driver.Power.SetChannelValue (ic, true);
             } else if (args.currentSelectedIndex == 1) {
-                AquaPicDrivers.Power.SetChannelMode (ic, Mode.Auto);
+                Driver.Power.SetChannelMode (ic, Mode.Auto);
             }
 
             GetFixtureData ();

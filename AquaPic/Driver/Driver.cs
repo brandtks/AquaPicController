@@ -31,7 +31,7 @@ using AquaPic.Service;
 
 namespace AquaPic.Drivers
 {
-    public class AquaPicDrivers
+    public class Driver
     {
         public static AnalogInputBase AnalogInput = AnalogInputBase.SharedAnalogInputInstance;
         public static AnalogOutputBase AnalogOutput = AnalogOutputBase.SharedAnalogOutputInstance;

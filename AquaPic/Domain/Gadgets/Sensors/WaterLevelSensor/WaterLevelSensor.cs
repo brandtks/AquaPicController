@@ -31,13 +31,13 @@ namespace AquaPic.Gadgets.Sensor.WaterLevelSensor
     {
         public WaterLevelSensor (GenericAnalogSensorSettings settings) : base (settings) {
             var channelName = string.Format ("{0}, Water Level Sensor", name);
-            AquaPicDrivers.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name), lowPassFilterFactor);
+            Driver.AnalogInput.AddChannel (channel, string.Format ("{0}, Water Level Sensor", name), lowPassFilterFactor);
             sensorDisconnectedAlarmIndex = Alarm.Subscribe ("Water level sensor disconnected, " + name);
-            Subscribe (AquaPicDrivers.AnalogInput.GetChannelEventPublisherKey (channelName));
+            Subscribe (Driver.AnalogInput.GetChannelEventPublisherKey (channelName));
         }
 
         public override void Dispose () {
-            AquaPicDrivers.AnalogInput.RemoveChannel (channel);
+            Driver.AnalogInput.RemoveChannel (channel);
             Alarm.Clear (sensorDisconnectedAlarmIndex);
             Unsubscribe ();
         }

@@ -32,7 +32,7 @@ namespace AquaPic.Gadgets.Device.Pump
         IOutletScript outletScript;
 
         public Pump (PumpSettings settings) : base (settings) {
-            AquaPicDrivers.Power.AddOutlet (channel, name, settings.fallback, key);
+            Driver.Power.AddOutlet (channel, name, settings.fallback, key);
             outletScript = Script.CompileOutletStateGetter (settings.script);
         }
 

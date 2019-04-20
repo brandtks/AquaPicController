@@ -112,7 +112,7 @@ namespace AquaPic
 #if DEBUG
             try {
 #endif
-                AquaPicDrivers.AddFromJson ();
+                Driver.AddFromJson ();
                 Sensors.AddSensors ();
                 Devices.AddDevices ();
                 Temperature.Init ();
@@ -127,27 +127,27 @@ namespace AquaPic
 #endif
 
 #if DEBUG
-            AquaPicDrivers.AnalogInput.SetChannelMode ("Right Overflow, Temperature Probe", Mode.Manual);
-            AquaPicDrivers.AnalogInput.SetChannelValue ("Right Overflow, Temperature Probe", 2796.5);
-            AquaPicDrivers.AnalogInput.SetChannelMode ("Left Overflow, Temperature Probe", Mode.Manual);
-            AquaPicDrivers.AnalogInput.SetChannelValue ("Left Overflow, Temperature Probe", 2796.5);
-            AquaPicDrivers.AnalogInput.SetChannelMode ("Sump, Temperature Probe", Mode.Manual);
-            AquaPicDrivers.AnalogInput.SetChannelValue ("Sump, Temperature Probe", 2796.5);
-            AquaPicDrivers.AnalogInput.SetChannelMode ("Salt Mixing, Temperature Probe", Mode.Manual);
-            AquaPicDrivers.AnalogInput.SetChannelValue ("Salt Mixing, Temperature Probe", 2796.5);
+            Driver.AnalogInput.SetChannelMode ("Right Overflow, Temperature Probe", Mode.Manual);
+            Driver.AnalogInput.SetChannelValue ("Right Overflow, Temperature Probe", 2796.5);
+            Driver.AnalogInput.SetChannelMode ("Left Overflow, Temperature Probe", Mode.Manual);
+            Driver.AnalogInput.SetChannelValue ("Left Overflow, Temperature Probe", 2796.5);
+            Driver.AnalogInput.SetChannelMode ("Sump, Temperature Probe", Mode.Manual);
+            Driver.AnalogInput.SetChannelValue ("Sump, Temperature Probe", 2796.5);
+            Driver.AnalogInput.SetChannelMode ("Salt Mixing, Temperature Probe", Mode.Manual);
+            Driver.AnalogInput.SetChannelValue ("Salt Mixing, Temperature Probe", 2796.5);
 
-            AquaPicDrivers.AnalogInput.SetChannelMode ("Return Chamber, Water Level Sensor", Mode.Manual);
-            AquaPicDrivers.AnalogInput.SetChannelValue ("Return Chamber, Water Level Sensor", 1803);
-            AquaPicDrivers.AnalogInput.SetChannelMode ("ATO Reservoir, Water Level Sensor", Mode.Manual);
-            AquaPicDrivers.AnalogInput.SetChannelValue ("ATO Reservoir, Water Level Sensor", 3878);
-            AquaPicDrivers.AnalogInput.SetChannelMode ("Salt Reservoir, Water Level Sensor", Mode.Manual);
-            AquaPicDrivers.AnalogInput.SetChannelValue ("Salt Reservoir, Water Level Sensor", 2048);
+            Driver.AnalogInput.SetChannelMode ("Return Chamber, Water Level Sensor", Mode.Manual);
+            Driver.AnalogInput.SetChannelValue ("Return Chamber, Water Level Sensor", 1803);
+            Driver.AnalogInput.SetChannelMode ("ATO Reservoir, Water Level Sensor", Mode.Manual);
+            Driver.AnalogInput.SetChannelValue ("ATO Reservoir, Water Level Sensor", 3878);
+            Driver.AnalogInput.SetChannelMode ("Salt Reservoir, Water Level Sensor", Mode.Manual);
+            Driver.AnalogInput.SetChannelValue ("Salt Reservoir, Water Level Sensor", 2048);
 
-            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump High, Float Switch", Mode.Manual);
-            AquaPicDrivers.DigitalInput.SetChannelValue ("Sump High, Float Switch", true);
-            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump Low, Float Switch", Mode.Manual);
-            AquaPicDrivers.DigitalInput.SetChannelValue ("Sump Low, Float Switch", true);
-            AquaPicDrivers.DigitalInput.SetChannelMode ("Sump ATO, Float Switch", Mode.Manual);
+            Driver.DigitalInput.SetChannelMode ("Sump High, Float Switch", Mode.Manual);
+            Driver.DigitalInput.SetChannelValue ("Sump High, Float Switch", true);
+            Driver.DigitalInput.SetChannelMode ("Sump Low, Float Switch", Mode.Manual);
+            Driver.DigitalInput.SetChannelValue ("Sump Low, Float Switch", true);
+            Driver.DigitalInput.SetChannelMode ("Sump ATO, Float Switch", Mode.Manual);
 #endif
 
             // Run the control

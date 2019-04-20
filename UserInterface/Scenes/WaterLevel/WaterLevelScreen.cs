@@ -650,7 +650,7 @@ namespace AquaPic.UserInterface
                     parent,
                     () => {
                         var channel = Sensors.WaterLevelSensors.GetGadget (analogSensorName).channel;
-                        return AquaPicDrivers.AnalogInput.GetChannelValue (channel);
+                        return Driver.AnalogInput.GetChannelValue (channel);
                     });
 
                 cal.CalibrationCompleteEvent += (aa) => {
