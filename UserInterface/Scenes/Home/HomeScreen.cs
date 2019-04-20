@@ -57,8 +57,7 @@ namespace AquaPic.UserInterface
             Put (emptySpaceGraphicalBox, 0, 0);
             emptySpaceGraphicalBox.Show ();
 
-            string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = System.IO.Path.Combine (path, "mainScreen.json");
+            var path = System.IO.Path.Combine (Utils.AquaPicSettings, "mainScreen.json");
 
             if (File.Exists (path)) {
                 using (StreamReader reader = File.OpenText (path)) {

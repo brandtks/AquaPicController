@@ -60,6 +60,20 @@ namespace GoodtimeDevelopment.Utilites
             }
         }
 
+        private static string _aquaPicSettings = string.Empty;
+        public static string AquaPicSettings {
+            get {
+                return _aquaPicSettings;
+            }
+            set {
+                if (_aquaPicSettings != string.Empty) {
+                    throw new Exception ("Settings already set");
+                }
+
+                _aquaPicSettings = value;
+            }
+        }
+
         public static Platform ExecutingOperatingSystem {
             get {
                 switch (Environment.OSVersion.Platform) {

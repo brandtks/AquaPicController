@@ -37,8 +37,7 @@ namespace AquaPic.Runtime
             if (!fileName.EndsWith (".json", StringComparison.InvariantCultureIgnoreCase)) {
                 fileName = string.Format ("{0}.json", fileName);
             }
-            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = Path.Combine (path, fileName);
+            var path = Path.Combine (Utils.AquaPicSettings, fileName);
             return File.Exists (path);
         }
 
@@ -46,8 +45,7 @@ namespace AquaPic.Runtime
             if (!fileName.EndsWith (".json", StringComparison.InvariantCultureIgnoreCase)) {
                 fileName = string.Format ("{0}.json", fileName);
             }
-            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = Path.Combine (path, fileName);
+            var path = Path.Combine (Utils.AquaPicSettings, fileName);
             string json = File.ReadAllText (path);
             return JToken.Parse (json);
         }
@@ -56,8 +54,7 @@ namespace AquaPic.Runtime
             if (!fileName.EndsWith (".json", StringComparison.InvariantCultureIgnoreCase)) {
                 fileName = string.Format ("{0}.json", fileName);
             }
-            var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
-            path = Path.Combine (path, fileName);
+            var path = Path.Combine (Utils.AquaPicSettings, fileName);
 
             if (!File.Exists (path)) {
                 var file = File.Create (path);

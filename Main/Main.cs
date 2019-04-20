@@ -40,7 +40,8 @@ namespace AquaPic
     class MainClass
     {
         public static void Main (string[] args) {
-            string aquaPicEnvironment = string.Empty;
+            var aquaPicEnvironment = string.Empty;
+            var aquaPicSettings = string.Empty;
             // Call the Gtk library hack because Windows sucks at everything
             if (Utils.ExecutingOperatingSystem == Platform.Windows) {
                 CheckWindowsGtk ();
@@ -75,31 +76,35 @@ namespace AquaPic
                 aquaPicEnvironment = Environment.GetEnvironmentVariable ("HOME");
                 aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".config");
                 aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "AquaPic");
-                if (args.Length > 0) {
-                    Console.WriteLine ("Arguments {0}", args[0]);
-                    if (args[0].Contains ("-empty")) {
-                        aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "aquapic.empty");
-                    } else if (args[0].Contains ("-full")) {
-                        aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "aquapic.full");
-                    } else {
-                        aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "aquapic");
-                    }
-                } else {
-                    aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "aquapic");
-                }
-
 
                 if (!Directory.Exists (aquaPicEnvironment)) {
                     Directory.CreateDirectory (aquaPicEnvironment);
-                    Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "Settings"));
                     Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "DataLogging"));
                     Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "Logs"));
                     Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "TestProcedures"));
                 }
             }
 
+            if (args.Length > 0) {
+                Console.WriteLine ("Arguments {0}", args[0]);
+                if (args[0].Contains ("-empty")) {
+                    aquaPicSettings = Path.Combine (aquaPicEnvironment, "Settings.Empty");
+                } else if (args[0].Contains ("-full")) {
+                    aquaPicSettings = Path.Combine (aquaPicEnvironment, "Settings.Full");
+                } else {
+                    aquaPicSettings = Path.Combine (aquaPicEnvironment, "Settings");
+                }
+            } else {
+                aquaPicSettings = Path.Combine (aquaPicEnvironment, "Settings");
+            }
+
+            if (!Directory.Exists (aquaPicSettings)) {
+                Directory.CreateDirectory (aquaPicSettings);
+            }
+
             //Setup
             Utils.AquaPicEnvironment = aquaPicEnvironment;
+            Utils.AquaPicSettings = aquaPicSettings;
             Application.Init ();
             Logger.Add ("Executing operating system is {0}", Utils.GetDescription (Utils.ExecutingOperatingSystem));
 
