@@ -55,40 +55,40 @@ namespace AquaPic.Drivers
         public sealed override void AddOutputChannel (string card, int channel, string channelName, Guid subscriptionKey) => throw new NotSupportedException ();
         public sealed override void AddOutputChannel (IndividualControl channel, string channelName, Guid subscriptionKey) => throw new NotSupportedException ();
 
-        public void AddOutlet (IndividualControl outlet, string name, MyState fallback, Guid subscriptionKey) {
+        public void AddOutlet (IndividualControl outlet, string name, bool fallback, Guid subscriptionKey) {
             AddOutlet (outlet.Group, outlet.Individual, name, fallback, subscriptionKey);
         }
 
-        public void AddOutlet (string powerStrip, int outlet, string name, MyState fallback, Guid subscriptionKey) {
+        public void AddOutlet (string powerStrip, int outlet, string name, bool fallback, Guid subscriptionKey) {
             base.AddOutputChannel (powerStrip, outlet, name, subscriptionKey);
             SetOutletFallback (powerStrip, outlet, fallback);
         }
 
-        public MyState GetOutletFallback (string outletName) {
+        public bool GetOutletFallback (string outletName) {
             var outlet = GetChannelIndividualControl (outletName);
             return GetOutletFallback (outlet.Group, outlet.Individual);
         }
 
-        public MyState GetOutletFallback (IndividualControl outlet) {
+        public bool GetOutletFallback (IndividualControl outlet) {
             return GetOutletFallback (outlet.Group, outlet.Individual);
         }
 
-        public MyState GetOutletFallback (string powerStrip, int outlet) {
+        public bool GetOutletFallback (string powerStrip, int outlet) {
             CheckCardKey (powerStrip);
             var strip = cards[powerStrip] as PowerStrip;
             return strip.GetOutletFallback (outlet);
         }
 
-        public void SetOutletFallback (string outletName, MyState fallback) {
+        public void SetOutletFallback (string outletName, bool fallback) {
             var outlet = GetChannelIndividualControl (outletName);
             SetOutletFallback (outlet.Group, outlet.Individual, fallback);
         }
 
-        public void SetOutletFallback (IndividualControl outlet, MyState fallback) {
+        public void SetOutletFallback (IndividualControl outlet, bool fallback) {
             SetOutletFallback (outlet.Group, outlet.Individual, fallback);
         }
 
-        public void SetOutletFallback (string powerStrip, int outlet, MyState fallback) {
+        public void SetOutletFallback (string powerStrip, int outlet, bool fallback) {
             CheckCardKey (powerStrip);
             var strip = cards[powerStrip] as PowerStrip;
             strip.SetOutletFallback (outlet, fallback);

@@ -190,7 +190,7 @@ namespace AquaPic.UserInterface
                     if (modes[i] == Mode.Auto) {
                         s.ss.currentSelected = 1;
                     } else { // mode is manual
-                        if (states[i] == MyState.On) {
+                        if (states[i]) {
                             s.ss.currentSelected = 2;
                         } else {
                             s.ss.currentSelected = 0;

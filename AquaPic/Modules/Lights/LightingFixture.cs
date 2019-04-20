@@ -34,7 +34,7 @@ namespace AquaPic.Modules
     {
         public class LightingFixture : GenericDevice
         {
-            public MyState plugState;
+            public bool plugState;
             public bool highTempLockout;
             public LightingState[] lightingStates;
             public LightingState[] savedLightingStates;
@@ -42,8 +42,8 @@ namespace AquaPic.Modules
 
             public LightingFixture (LightingFixtureSettings settings) : base (settings) {
                 highTempLockout = settings.highTempLockout;
-                plugState = MyState.Off;
-                Driver.Power.AddOutlet (channel, name, MyState.Off, key);
+                plugState = false;
+                Driver.Power.AddOutlet (channel, name, false, key);
                 Subscribe (Driver.Power.GetChannelEventPublisherKey (channel));
                 UpdateLightingStates (settings.lightingStates, false);
             }
@@ -157,12 +157,7 @@ namespace AquaPic.Modules
 
             public override void OnValueChangedAction (object parm) {
                 var args = parm as ValueChangedEvent;
-                var state = Convert.ToBoolean (args.newValue);
-                if (state) {
-                    plugState = MyState.On;
-                } else {
-                    plugState = MyState.Off;
-                }
+                plugState = Convert.ToBoolean (args.newValue);
             }
 
             public override void Dispose () {

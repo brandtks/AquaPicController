@@ -23,52 +23,41 @@
 
 using System;
 using System.Collections.Generic;
-using AquaPic.Globals;
 
 namespace AquaPic.Service
 {
-    public partial class Bit
+    public class Bit
     {
-        private static Dictionary<string, BitState> states = new Dictionary<string, BitState> ();
+        private static Dictionary<string, bool> states = new Dictionary<string, bool> ();
 
         public static void Set (string name) {
             if (states.ContainsKey (name))
-                states[name].state = MyState.Set;
+                states[name] = true;
             else
-                states.Add (name, new BitState (MyState.Set));
+                states.Add (name, true);
         }
 
         public static void Reset (string name) {
             if (states.ContainsKey (name))
-                states[name].state = MyState.Reset;
+                states[name] = false;
             else
-                states.Add (name, new BitState (MyState.Reset));
+                states.Add (name, false);
         }
 
-        public static bool Toggle (string name) {
+        public static void Toggle (string name) {
             if (states.ContainsKey (name)) {
-                if (states[name].state == MyState.Set)
-                    states[name].state = MyState.Reset;
-                else
-                    states[name].state = MyState.Set;
-            } else
-                states.Add (name, new BitState (MyState.Set)); // technically we started with the state reset
-
-            return states[name].state == MyState.Set;
+                states[name] = !states[name];
+            } else {
+                states.Add (name, true); // technically we started with the state low
+            }
         }
 
         public static bool Check (string name) {
-            if (states.ContainsKey (name))
-                return states[name].state == MyState.Set;
+            if (states.ContainsKey (name)) {
+                return states[name];
+            }
 
             return false;
-        }
-
-        public static MyState Get (string name) {
-            if (states.ContainsKey (name))
-                return states[name].state;
-
-            return MyState.Invalid;
         }
 
         public static void Remove (string name) {

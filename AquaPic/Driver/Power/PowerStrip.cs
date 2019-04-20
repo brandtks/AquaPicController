@@ -50,9 +50,9 @@ namespace AquaPic.Drivers
                 return "p";
             }
 
-            protected void SetupOutletCommunication (int outlet, MyState fallback) {
+            protected void SetupOutletCommunication (int outlet, bool fallback) {
                 byte valueToSend = 0x00;
-                if (fallback == MyState.On) {
+                if (fallback) {
                     valueToSend = 0xFF;
                 }
                 var buf = new WriteBuffer ();
@@ -107,13 +107,13 @@ namespace AquaPic.Drivers
                 Write (30, buf);
             }
 
-            public MyState GetOutletFallback (int outlet) {
+            public bool GetOutletFallback (int outlet) {
                 CheckChannelRange (outlet);
                 var powerOutlet = channels[outlet] as PowerOutlet;
                 return powerOutlet.fallback;
             }
 
-            public void SetOutletFallback (int outlet, MyState fallback) {
+            public void SetOutletFallback (int outlet, bool fallback) {
                 CheckChannelRange (outlet);
                 var powerOutlet = channels[outlet] as PowerOutlet;
                 powerOutlet.fallback = fallback;

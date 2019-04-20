@@ -41,38 +41,10 @@ namespace AquaPic.Globals
         PWM = 255
     }
 
-    public enum MyState : byte
-    {
-        Off = 0,
-        On = 1,
-        Set,
-        Reset,
-        Invalid
-    }
-
     public enum LightingTime : byte
     {
         Daytime = 1,
         Nighttime
-    }
-
-    public static class Globals
-    {
-        public static MyState ToMyState (this bool value) {
-            if (value) {
-                return MyState.On;
-            }
-
-            return MyState.Off;
-        }
-
-        public static bool ToBool (this MyState value) {
-            if (value == MyState.On) {
-                return true;
-            }
-
-            return false;
-        }
     }
 }
 

@@ -35,11 +35,11 @@ namespace AquaPic.Drivers
             public float wattPower;
             public float amperage;
             public float powerFactor;
-            public MyState fallback;
+            public bool fallback;
 
             public PowerOutlet (string name) : base (name, typeof(bool)) {
                 this.name = name;
-                fallback = MyState.Off;
+                fallback = false;
                 mode = Mode.Auto;
                 amperage = 0.0f;
                 wattPower = 0.0f;

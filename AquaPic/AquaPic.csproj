@@ -111,7 +111,6 @@
     <Compile Include="Modules\GenericModule\GenericGroup.cs" />
     <Compile Include="Service\Logger\LogItem.cs" />
     <Compile Include="Domain\Bit\Bit.cs" />
-    <Compile Include="Domain\Bit\BitState.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroupSettings.cs" />
     <Compile Include="Domain\Timer\IntervalTimer.cs" />
     <Compile Include="Domain\Timer\OffDelayTimer.cs" />
@@ -189,7 +188,6 @@
     <Compile Include="Domain\Gadgets\GenericGadget\GadgetSubscriber.cs" />
     <Compile Include="Domain\Gadgets\Devices\Pump\Pump.cs" />
     <Compile Include="Domain\Gadgets\Devices\Pump\PumpSettings.cs" />
-    <Compile Include="Domain\Entity\Mutators\MyStateMutator.cs" />
     <Compile Include="Domain\Gadgets\Devices\Pump\PumpCollection.cs" />
     <Compile Include="Domain\Gadgets\Devices\Devices.cs" />
     <Compile Include="Service\Settings\SettingsHelper.cs" />

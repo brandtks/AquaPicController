@@ -99,7 +99,7 @@ namespace AquaPic.Modules
                 }
 
                 autoDimmingLevel = autoDimmingLevel.Constrain (0, 100);
-                if (plugState == MyState.On) {
+                if (plugState) {
                     if (dimmingMode == Mode.Auto) {
                         requestedDimmingLevel = autoDimmingLevel;
                     }
@@ -121,11 +121,8 @@ namespace AquaPic.Modules
 
             public override void OnValueChangedAction (object parm) {
                 var args = parm as ValueChangedEvent;
-                var state = Convert.ToBoolean (args.newValue);
-                if (state) {
-                    plugState = MyState.On;
-                } else {
-                    plugState = MyState.Off;
+                plugState = Convert.ToBoolean (args.newValue);
+                if (!plugState) {
                     requestedDimmingLevel = 0.0f;
                     currentDimmingLevel = 0.0f;
                     rateOfChangeLimiter.Reset ();

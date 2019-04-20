@@ -37,7 +37,7 @@ namespace AquaPic.Modules.Temperature
 
             public Heater (HeaterSettings settings, string temperatureGroupName) : base (settings) {
                 this.temperatureGroupName = temperatureGroupName;
-                Driver.Power.AddOutlet (channel, name, MyState.On, key);
+                Driver.Power.AddOutlet (channel, name, true, key);
                 Subscribe (Driver.Power.GetChannelEventPublisherKey (channel));
             }
 

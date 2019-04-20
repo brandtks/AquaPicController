@@ -28,8 +28,8 @@ namespace AquaPic.Gadgets.Device.Pump
 {
     public class PumpSettings : GenericDeviceSettings
     {
-        [EntitySetting (typeof (MyStateMutator), "fallback")]
-        public MyState fallback { get; set; }
+        [EntitySetting (typeof (BoolMutator), "fallback")]
+        public bool fallback { get; set; }
 
         [EntitySetting (typeof (StringMutator), "script")]
         public string script { get; set; }
