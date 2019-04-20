@@ -37,7 +37,7 @@ namespace AquaPic.Service
         public static IOutletScript CompileOutletStateGetter (string script) {
             var sb = new StringBuilder ();
             sb.AppendLine ("using GoodtimeDevelopment.Utilites;");
-            sb.AppendLine ("using AquaPic.Runtime;");
+            sb.AppendLine ("using AquaPic.Service;");
             sb.AppendLine ("using AquaPic.Modules;");
             sb.AppendLine ("using AquaPic.Globals;");
             sb.AppendLine ("using AquaPic.Drivers;");

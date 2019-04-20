@@ -24,7 +24,7 @@
 using System;
 using NUnit.Framework;
 
-namespace AquaPic.PubSub.Test
+namespace AquaPic.Service.Test
 {
     [TestFixture]
     public class MessageHubTest

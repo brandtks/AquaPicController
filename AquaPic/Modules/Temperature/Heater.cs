@@ -26,7 +26,6 @@ using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Service;
 using AquaPic.Gadgets.Device;
-using AquaPic.PubSub;
 
 namespace AquaPic.Modules.Temperature
 {

@@ -26,7 +26,6 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.DataLogging;
 using AquaPic.Drivers;
 using AquaPic.Service;
-using AquaPic.PubSub;
 
 namespace AquaPic.Gadgets.Sensor.PhProbe
 {

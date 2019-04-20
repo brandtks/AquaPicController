@@ -30,7 +30,6 @@ using AquaPic.Gadgets.Sensor;
 using AquaPic.Gadgets.Sensor.WaterLevelSensor;
 using AquaPic.Gadgets.Sensor.FloatSwitch;
 using AquaPic.DataLogging;
-using AquaPic.PubSub;
 
 namespace AquaPic.Modules
 {

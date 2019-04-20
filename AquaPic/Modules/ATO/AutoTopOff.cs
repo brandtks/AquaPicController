@@ -83,7 +83,7 @@ namespace AquaPic.Modules
                 SettingsHelper.WriteSettingsFile (settingsFile, jo);
             }
 
-            TaskManager.AddCyclicInterrupt ("Auto Top Off", 1000, Run);
+            TaskManager.Instance.AddCyclicInterrupt ("Auto Top Off", 1000, Run);
         }
 
         public static void Run () {

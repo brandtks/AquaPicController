@@ -24,7 +24,6 @@
 using System;
 using AquaPic.Service;
 using AquaPic.Drivers;
-using AquaPic.PubSub;
 
 namespace AquaPic.Gadgets.Sensor.FloatSwitch
 {

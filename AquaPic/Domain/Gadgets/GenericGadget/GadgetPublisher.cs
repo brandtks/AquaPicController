@@ -22,7 +22,7 @@
 #endregion // License
 
 using System;
-using AquaPic.PubSub;
+using AquaPic.Service;
 
 namespace AquaPic.Gadgets
 {

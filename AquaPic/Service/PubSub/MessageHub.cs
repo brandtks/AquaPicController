@@ -24,9 +24,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AquaPic.Service;
 
-namespace AquaPic.PubSub
+namespace AquaPic.Service
 {
     public class MessageHub
     {

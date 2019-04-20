@@ -54,12 +54,12 @@ namespace AquaPic.Drivers
         public GenericBase (string name, uint runtime = 1000) {
             cards = new Dictionary<string, GenericCard> ();
             this.name = name;
-            TaskManager.AddCyclicInterrupt (name, runtime, Run);
+            TaskManager.Instance.AddCyclicInterrupt (name, runtime, Run);
         }
 
         protected virtual void Run () {
             Logger.AddWarning (name + " does not have an implemented Runtime function");
-            TaskManager.RemoveCyclicInterrupt (name);
+            TaskManager.Instance.RemoveCyclicInterrupt (name);
         }
 
         protected virtual GenericCard CardCreater (string cardName, int address) => throw new NotImplementedException ();

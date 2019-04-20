@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Service;
 using AquaPic.DataLogging;
-using AquaPic.PubSub;
 using AquaPic.Gadgets;
 using AquaPic.Gadgets.Sensor;
 using AquaPic.Gadgets.Sensor.TemperatureProbe;

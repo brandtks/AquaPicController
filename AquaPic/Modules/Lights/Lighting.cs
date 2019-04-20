@@ -27,7 +27,6 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 using AquaPic.Service;
 using AquaPic.Globals;
-using AquaPic.Drivers;
 
 namespace AquaPic.Modules
 {

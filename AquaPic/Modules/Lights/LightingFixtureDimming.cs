@@ -25,7 +25,7 @@ using System;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Globals;
-using AquaPic.PubSub;
+using AquaPic.Service;
 using AquaPic.Gadgets.Device;
 
 namespace AquaPic.Modules

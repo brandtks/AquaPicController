@@ -27,7 +27,6 @@ using AquaPic.Globals;
 using AquaPic.Drivers;
 using AquaPic.Service;
 using AquaPic.Gadgets.Device;
-using AquaPic.PubSub;
 
 namespace AquaPic.Modules
 {
@@ -53,17 +52,13 @@ namespace AquaPic.Modules
                 if (currentState == -1) {
                     return false;
                 }
-
                 if (highTempLockout && Alarm.CheckAlarming (Temperature.Temperature.defaultHighTemperatureAlarmIndex)) {
                     return false;
                 }
-
                 CheckCurrentState ();
-
                 if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
                     return false;
                 }
-
                 // State is anything but off
                 return true;
             }

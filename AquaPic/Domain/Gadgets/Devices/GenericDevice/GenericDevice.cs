@@ -30,7 +30,7 @@ namespace AquaPic.Gadgets.Device
     {
         public GenericDevice (GenericDeviceSettings settings, uint runtime = 1000) 
             : base (settings) {
-            TaskManager.AddCyclicInterrupt (name, runtime, Run);
+            TaskManager.Instance.AddCyclicInterrupt (name, runtime, Run);
         }
 
         protected virtual void Run () {
@@ -42,14 +42,14 @@ namespace AquaPic.Gadgets.Device
                 }
             } catch (NotImplementedException) {
                 Logger.AddWarning (name + " does not have an implemented Runtime function");
-                TaskManager.RemoveCyclicInterrupt (name);
+                TaskManager.Instance.RemoveCyclicInterrupt (name);
             }
         }
 
         protected virtual ValueType OnRun () => throw new NotImplementedException ();
 
         public override void Dispose () {
-            TaskManager.RemoveCyclicInterrupt (name);
+            TaskManager.Instance.RemoveCyclicInterrupt (name);
         }
     }
 }

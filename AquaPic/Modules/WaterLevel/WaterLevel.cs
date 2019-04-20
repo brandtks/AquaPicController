@@ -81,7 +81,7 @@ namespace AquaPic.Modules
                 SettingsHelper.WriteSettingsFile (settingsFileName, jo);
             }
 
-            TaskManager.AddCyclicInterrupt ("Water Level", 1000, Run);
+            TaskManager.Instance.AddCyclicInterrupt ("Water Level", 1000, Run);
         }
 
         public static void Run () {

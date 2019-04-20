@@ -31,10 +31,12 @@ namespace AquaPic.Service
 
     public class TaskManager
     {
-        protected static Dictionary<uint, CyclicTaskLocker> cyclicTasks = new Dictionary<uint, CyclicTaskLocker> ();
-        protected static List<TimeOfDayTask> todTasks = new List<TimeOfDayTask> ();
+        public static TaskManager Instance { get; } = new TaskManager ();
 
-        static TaskManager () {
+        protected Dictionary<uint, CyclicTaskLocker> cyclicTasks = new Dictionary<uint, CyclicTaskLocker> ();
+        protected List<TimeOfDayTask> todTasks = new List<TimeOfDayTask> ();
+
+        protected TaskManager () {
             AddCyclicInterrupt ("TimeOfDayInterrupts", 5000, () => {
                 DateTime now = DateTime.Now;
 
@@ -47,7 +49,7 @@ namespace AquaPic.Service
             });
         }
 
-        public static void AddCyclicInterrupt (string name, uint timeInterval, RunHandler OnRun) {
+        public void AddCyclicInterrupt (string name, uint timeInterval, RunHandler OnRun) {
             if (CyclicInterruptExists (name))
                 throw new Exception ("Task already exists");
 
@@ -61,7 +63,7 @@ namespace AquaPic.Service
             cyclicTasks[timeInterval].tasks.Add (new CyclicTask (name, OnRun));
         }
 
-        public static void RemoveCyclicInterrupt (string name) {
+        public void RemoveCyclicInterrupt (string name) {
             uint runtime;
             try {
                 runtime = GetCyclicRuntime (name);
@@ -78,14 +80,14 @@ namespace AquaPic.Service
             }
         }
 
-        public static void AddTimeOfDayInterrupt (string name, Time time, RunHandler OnRun) {
+        public void AddTimeOfDayInterrupt (string name, Time time, RunHandler OnRun) {
             if (TimeOfDayInterruptExists (name))
                 throw new Exception ("Task already exists");
 
             todTasks.Add (new TimeOfDayTask (name, time, OnRun));
         }
 
-        public static bool CyclicInterruptExists (string name) {
+        public bool CyclicInterruptExists (string name) {
             try {
                 GetCyclicRuntime (name);
                 return true;
@@ -94,7 +96,7 @@ namespace AquaPic.Service
             }
         }
 
-        protected static uint GetCyclicRuntime (string name) {
+        protected uint GetCyclicRuntime (string name) {
             foreach (var runtime in cyclicTasks.Keys) {
                 foreach (var task in cyclicTasks[runtime].tasks) {
                     if (string.Equals (task.name, name, StringComparison.InvariantCultureIgnoreCase))
@@ -105,7 +107,7 @@ namespace AquaPic.Service
             throw new ArgumentException (name + " doesn't exist");
         }
 
-        protected static CyclicTask GetCyclicTask (string name, uint runtime) {
+        protected CyclicTask GetCyclicTask (string name, uint runtime) {
             foreach (var task in cyclicTasks[runtime].tasks) {
                 if (string.Equals (task.name, name, StringComparison.InvariantCultureIgnoreCase)) {
                     return task;
@@ -114,7 +116,7 @@ namespace AquaPic.Service
             return null;
         }
 
-        public static bool TimeOfDayInterruptExists (string name) {
+        public bool TimeOfDayInterruptExists (string name) {
             foreach (var task in todTasks) {
                 if (string.Equals (task.name, name, StringComparison.InvariantCultureIgnoreCase))
                     return true;

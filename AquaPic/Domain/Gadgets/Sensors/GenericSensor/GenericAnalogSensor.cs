@@ -24,7 +24,6 @@
 using System;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Service;
-using AquaPic.PubSub;
 
 namespace AquaPic.Gadgets.Sensor
 {

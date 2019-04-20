@@ -156,7 +156,7 @@ namespace AquaPic.Modules.Temperature
                 SettingsHelper.WriteSettingsFile (settingsFileName, jo);
             }
 
-            TaskManager.AddCyclicInterrupt ("Temperature", 1000, Run);
+            TaskManager.Instance.AddCyclicInterrupt ("Temperature", 1000, Run);
         }
 
         public static void Run () {

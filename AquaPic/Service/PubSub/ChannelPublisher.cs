@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Globals;
 
-namespace AquaPic.PubSub
+namespace AquaPic.Service
 {
     public class ChannelPublisher : ValuePublisher
     {

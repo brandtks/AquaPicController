@@ -23,7 +23,7 @@
 
 using System;
 
-namespace AquaPic.PubSub
+namespace AquaPic.Service
 {
     public class ValueSubscriber
     {
