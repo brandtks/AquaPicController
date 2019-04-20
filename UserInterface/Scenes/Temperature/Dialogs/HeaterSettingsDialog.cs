@@ -59,12 +59,12 @@ namespace AquaPic.UserInterface
 
             var c = new SettingsComboBox ("Outlet");
             if (heaterName.IsNotEmpty ()) {
-                var ic = settings.plug;
+                var ic = settings.channel;
                 c.combo.comboList.Add (string.Format ("Current: {0}.i{1}", ic.Group, ic.Individual));
                 c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Please select outlet";
-            c.combo.comboList.AddRange (Power.GetAllAvailableOutlets ());
+            c.combo.comboList.AddRange (AquaPicDrivers.Power.GetAllAvaiableChannels ());
             AddSetting (c);
 
             DrawSettings ();
@@ -91,7 +91,7 @@ namespace AquaPic.UserInterface
                 MessageBox.Show ("Please select an channel");
                 return false;
             }
-            heaterSettings.plug = ParseIndividualControl (outletString);
+            heaterSettings.channel = ParseIndividualControl (outletString);
 
             Temperature.UpdateHeater (groupName, heaterName, heaterSettings);
             heaterName = heaterSettings.name;

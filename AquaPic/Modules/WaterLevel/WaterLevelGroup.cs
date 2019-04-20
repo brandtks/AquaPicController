@@ -149,7 +149,7 @@ namespace AquaPic.Modules
                 if (waterLevelSensors.ContainsKey (args.name)) {
                     var waterLevelSensor = (WaterLevelSensor)Sensors.WaterLevelSensors.GetGadget (args.name);
                     waterLevelSensors[waterLevelSensor.name].connected = waterLevelSensor.connected;
-                    waterLevelSensors[waterLevelSensor.name].level = waterLevelSensor.value;
+                    waterLevelSensors[waterLevelSensor.name].level = Convert.ToSingle (waterLevelSensor.value);
                     CalculateWaterLevel ();
                 } else {
                     if (floatSwitches.Contains (args.name)) {

@@ -28,6 +28,7 @@ using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Globals;
+using AquaPic.PubSub;
 
 namespace AquaPic.UserInterface
 {
@@ -38,9 +39,10 @@ namespace AquaPic.UserInterface
         TouchComboBox combo;
         TouchButton settingsButton;
         PowerWindowGraphics graphics;
+        PowerBase power = AquaPicDrivers.Power;
 
         public PowerWindow (params object[] options) : base () {
-            powerStripName = Power.firstPowerStrip;
+            powerStripName = power.firstCard;
             if (powerStripName.IsNotEmpty ()) {
                 sceneTitle = "Power Strip";
             } else {
@@ -67,9 +69,12 @@ namespace AquaPic.UserInterface
                         var ic = IndividualControl.Empty;
                         ic.Group = powerStripName;
                         ic.Individual = idx;
-                        selectors[idx].outletName.text = Power.GetOutletName (ic);
-                        Mode mode = Power.GetOutletMode (ic);
-                        MyState state = Power.GetOutletState (ic);
+                        selectors[idx].outletName.text = power.GetChannelName (ic);
+                        Mode mode = power.GetChannelMode (ic);
+                        MyState state = MyState.Off;
+                        if (power.GetChannelValue (ic)) {
+                            state = MyState.On;
+                        }
                         if (mode == Mode.Auto) {
                             selectors[idx].ss.currentSelected = 1;
                         } else { // mode is manual
@@ -98,7 +103,7 @@ namespace AquaPic.UserInterface
                     var ic = IndividualControl.Empty;
                     ic.Group = powerStripName;
                     ic.Individual = i;
-                    Power.AddHandlerOnStateChange (ic, PlugStateChange);
+                    selectors[i].Subscribe (ic);
                 } else {
                     selectors[i].Visible = false;
                 }
@@ -112,7 +117,7 @@ namespace AquaPic.UserInterface
             Put (settingsButton, 755, 35);
             settingsButton.Show ();
 
-            combo = new TouchComboBox (Power.GetAllPowerStripNames ());
+            combo = new TouchComboBox (power.GetAllCardNames ());
             combo.comboList.Add ("New power strip...");
             combo.activeText = powerStripName;
             combo.WidthRequest = 200;
@@ -127,20 +132,18 @@ namespace AquaPic.UserInterface
 
         protected void OnComboChanged (object sender, ComboBoxChangedEventArgs args) {
             if (args.activeText != "New power strip...") {
-                var ic = IndividualControl.Empty;
-                ic.Group = powerStripName;
                 for (int i = 0; i < selectors.Length; ++i) {
-                    ic.Individual = i;
-                    Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
+                    selectors[i].Unsubscribe ();
                 }
 
                 powerStripName = args.activeText;
                 GetPowerData ();
 
+                var ic = IndividualControl.Empty;
                 ic.Group = powerStripName;
                 for (int i = 0; i < selectors.Length; ++i) {
                     ic.Individual = i;
-                    Power.AddHandlerOnStateChange (ic, PlugStateChange);
+                    selectors[i].Subscribe (ic);
                 }
             } else {
                 var parent = Toplevel as Window;
@@ -169,12 +172,12 @@ namespace AquaPic.UserInterface
         protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
             if (powerStripName.IsNotEmpty ()) {
                 var parent = Toplevel as Window;
-                var s = new PowerSettings (powerStripName, Power.CheckPowerStipEmpty (powerStripName), parent);
+                var s = new PowerSettings (powerStripName, power.CheckCardEmpty (powerStripName), parent);
                 s.Run ();
 
                 if (s.outcome == TouchSettingsOutcome.Deleted) {
                     combo.comboList.Remove (powerStripName);
-                    if (Power.powerStripCount == 0) {
+                    if (power.cardCount == 0) {
                         powerStripName = string.Empty;
                         sceneTitle = "No Power Strips Added";
                         foreach (var sel in selectors) {
@@ -183,7 +186,7 @@ namespace AquaPic.UserInterface
                         graphics.Visible = false;
                         combo.activeIndex = -1;
                     } else {
-                        powerStripName = Power.firstPowerStrip;
+                        powerStripName = AquaPicDrivers.Power.firstCard;
                         combo.activeText = powerStripName;
                         GetPowerData ();
                     }
@@ -194,12 +197,20 @@ namespace AquaPic.UserInterface
 
         protected void GetPowerData () {
             if (powerStripName.IsNotEmpty ()) {
-                MyState[] states = Power.GetAllStates (powerStripName);
-                Mode[] modes = Power.GetAllModes (powerStripName);
-                string[] names = Power.GetAllOutletNames (powerStripName);
+                var values = power.GetAllChannelValues (powerStripName);
+                var states = new MyState[values.Length];
+                for (var i = 0; i < states.Length; ++i) {
+                    if (values[i]) {
+                        states[i] = MyState.On;
+                    } else {
+                        states[i] = MyState.Off;
+                    }
+                }
+                Mode[] modes = power.GetAllChannelModes (powerStripName);
+                string[] names = power.GetAllChannelNames (powerStripName);
 
-                int i = 0;
-                foreach (var s in selectors) {
+                for (var i = 0; i < states.Length; ++i) {
+                    var s = selectors[i];
                     s.outletName.text = names[i];
 
                     if (states[i] == MyState.On) {
@@ -231,27 +242,13 @@ namespace AquaPic.UserInterface
             ic.Individual = ss.id;
 
             if (ss.currentSelected == 1) { // auto
-                Power.SetOutletMode (ic, Mode.Auto);
+                power.SetChannelMode (ic, Mode.Auto);
             } else if (ss.currentSelected == 0) { // manual and state off
-                Power.SetOutletMode (ic, Mode.Manual);
-                Power.SetOutletManualState (ic, MyState.Off);
+                power.SetChannelMode (ic, Mode.Manual);
+                power.SetChannelValue (ic, false);
             } else if (ss.currentSelected == 2) {// manual and state on
-                Power.SetOutletMode (ic, Mode.Manual);
-                Power.SetOutletManualState (ic, MyState.On);
-            }
-        }
-
-        protected void PlugStateChange (object sender, StateChangeEventArgs args) {
-            if (args.powerStripName == powerStripName) {
-                if (args.state == MyState.On) {
-                    selectors[args.outletId].statusLabel.text = "On";
-                    selectors[args.outletId].statusLabel.textColor = "secb";
-                } else {
-                    selectors[args.outletId].statusLabel.text = "Off";
-                    selectors[args.outletId].statusLabel.textColor = "grey4";
-                }
-
-                selectors[args.outletId].QueueDraw ();
+                power.SetChannelMode (ic, Mode.Manual);
+                power.SetChannelValue (ic, true);
             }
         }
 
@@ -284,11 +281,8 @@ namespace AquaPic.UserInterface
 
         public override void Dispose () {
             if (powerStripName.IsNotEmpty ()) {
-                var ic = IndividualControl.Empty;
-                ic.Group = powerStripName;
                 for (int i = 0; i < selectors.Length; ++i) {
-                    ic.Individual = i;
-                    Power.RemoveHandlerOnStateChange (ic, PlugStateChange);
+                    selectors[i].Unsubscribe ();
                 }
             }
 

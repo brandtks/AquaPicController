@@ -97,13 +97,13 @@ namespace AquaPic.UserInterface
 
             var t = new SettingsTextBox ("Name");
             if (includeDelete)
-                t.textBox.text = Power.GetOutletName (ic);
+                t.textBox.text = PowerBase.GetOutletName (ic);
             else
                 t.textBox.text = "Enter name";
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text))
                     args.keepText = false;
-                else if (!Power.OutletNameOk (args.text)) {
+                else if (!PowerBase.OutletNameOk (args.text)) {
                     MessageBox.Show ("Heater name already exists");
                     args.keepText = false;
                 }
@@ -112,7 +112,7 @@ namespace AquaPic.UserInterface
 
             var s = new SettingsSelectorSwitch ("Fallback", "On", "Off");
             if (includeDelete) {
-                if (Power.GetOutletFallback (ic) == MyState.On)
+                if (PowerBase.GetOutletFallback (ic) == MyState.On)
                     s.selectorSwitch.currentSelected = 0;
                 else
                     s.selectorSwitch.currentSelected = 1;
@@ -153,15 +153,15 @@ namespace AquaPic.UserInterface
             JArray ja = (JArray)JToken.Parse (jstring);
 
             if (includeDelete) {
-                string oldName = Power.GetOutletName (ic);
+                string oldName = PowerBase.GetOutletName (ic);
                 if (oldName != name)
-                    Power.SetOutletName (ic, name);
+                    PowerBase.SetOutletName (ic, name);
 
-                MyState oldFallback = Power.GetOutletFallback (ic);
+                MyState oldFallback = PowerBase.GetOutletFallback (ic);
                 if (oldFallback != fallback)
-                    Power.SetOutletFallback (ic, fallback);
+                    PowerBase.SetOutletFallback (ic, fallback);
 
-                Power.SetOutletCoilStateGetter (ic, script);
+                PowerBase.SetOutletCoilStateGetter (ic, script);
 
                 int arrIdx = -1;
                 string psName = ic.Group;
@@ -191,7 +191,7 @@ namespace AquaPic.UserInterface
                     return false;
                 }
 
-                var c = Power.AddOutlet (ic, name, fallback);
+                var c = PowerBase.AddOutlet (ic, name, fallback);
                 c.StateGetter = () => {
                     return script.OutletCoilStateGetter ();
                 };
@@ -211,7 +211,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnDelete (object sender) {
-            Power.RemoveOutlet (ic);
+            PowerBase.RemoveOutlet (ic);
 
             string path = System.IO.Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = System.IO.Path.Combine (path, "powerProperties.json");

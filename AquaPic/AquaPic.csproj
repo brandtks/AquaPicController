@@ -78,8 +78,7 @@
     <Compile Include="Driver\SerialBus\AquaPicBusMessage.cs" />
     <Compile Include="Driver\SerialBus\AquaPicBusSlave.cs" />
     <Compile Include="Driver\SerialBus\AquaPicDefines.cs" />
-    <Compile Include="Driver\Power\Power.cs" />
-    <Compile Include="Driver\Power\PowerDefines.cs" />
+    <Compile Include="Driver\Power\PowerBase.cs" />
     <Compile Include="Driver\AnalogInput\AnalogInput.cs" />
     <Compile Include="Driver\AnalogOutput\AnalogOutput.cs" />
     <Compile Include="Driver\AnalogOutput\AnalogOutputCard.cs" />
@@ -114,8 +113,6 @@
     <Compile Include="Runtime\Logger\LogItem.cs" />
     <Compile Include="Domain\Bit\Bit.cs" />
     <Compile Include="Domain\Bit\BitState.cs" />
-    <Compile Include="Domain\Operands\Coil.cs" />
-    <Compile Include="Domain\Operands\IOperand.cs" />
     <Compile Include="Runtime\Settings\SettingsHelper.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroupSettings.cs" />
     <Compile Include="Domain\Timer\IntervalTimer.cs" />
@@ -169,8 +166,6 @@
     <Compile Include="Domain\Gadget\Equipment\GenericEquipment\GenericEquipment.cs" />
     <Compile Include="Domain\Gadget\Equipment\GenericEquipment\GenericEquipmentCollection.cs" />
     <Compile Include="Domain\Gadget\Equipment\GenericEquipment\GenericEquipmentSettings.cs" />
-    <Compile Include="Domain\Gadget\Equipment\IEquipment.cs" />
-    <Compile Include="Domain\Gadget\Equipment\Pump.cs" />
     <Compile Include="Domain\Gadget\Sensors\FloatSwitch\FloatSwitch.cs" />
     <Compile Include="Domain\Gadget\Sensors\FloatSwitch\FloatSwitchCollection.cs" />
     <Compile Include="Domain\Gadget\Sensors\FloatSwitch\FloatSwitchSettings.cs" />
@@ -206,7 +201,6 @@
     <Folder Include="Modules\GenericModule\" />
     <Folder Include="Domain\" />
     <Folder Include="Domain\Bit\" />
-    <Folder Include="Domain\Operands\" />
     <Folder Include="Runtime\Settings\" />
     <Folder Include="Domain\Timer\" />
     <Folder Include="Domain\TimePeriod\" />
@@ -218,6 +212,7 @@
     <Folder Include="Domain\Gadget\GenericGadget\" />
     <Folder Include="Domain\Gadget\Equipment\" />
     <Folder Include="Domain\Gadget\Sensors\" />
+    <Folder Include="Domain\Gadget\Equipment\LightingFixture\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">

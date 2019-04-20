@@ -78,14 +78,14 @@ namespace AquaPic
                 if (args.Length > 0) {
                     Console.WriteLine ("Arguments {0}", args[0]);
                     if (args[0].Contains ("-empty")) {
-                        aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.empty");
+                        aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "aquapic.empty");
                     } else if (args[0].Contains ("-full")) {
-                        aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic.full");
+                        aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "aquapic.full");
                     } else {
-                        aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic");
+                        aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "aquapic");
                     }
                 } else {
-                    aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".aquapic");
+                    aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "aquapic");
                 }
 
 
@@ -112,7 +112,6 @@ namespace AquaPic
                 Lighting.Init ();
                 WaterLevel.Init ();
                 AutoTopOff.Init ();
-                Power.Init ();
 #if DEBUG
             } catch (Exception ex) {
                 Logger.AddError (ex.ToString ());

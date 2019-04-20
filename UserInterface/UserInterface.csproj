@@ -53,7 +53,6 @@
     <Compile Include="Scenes\Lighting\Widgets\MainLightingCurvedBarPlotWidgets.cs" />
     <Compile Include="Scenes\Logger\LoggerScreen.cs" />
     <Compile Include="Scenes\Menu\MenuScreen.cs" />
-    <Compile Include="Scenes\Power\Dialogs\OutletSettings.cs" />
     <Compile Include="Scenes\Power\Dialogs\PowerSettings.cs" />
     <Compile Include="Scenes\Power\PowerScreen.cs" />
     <Compile Include="Scenes\Power\Widgets\PowerOutletSlider.cs" />
@@ -94,6 +93,7 @@
     <None Include="packages.config" />
     <None Include="Scenes\Plugin.Disable\EditPluginScreen.cs" />
     <None Include="Scenes\Plugin.Disable\PluginScreen.cs" />
+    <None Include="Scenes\Power\Dialogs\OutletSettings.cs.disable" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Dialogs\" />

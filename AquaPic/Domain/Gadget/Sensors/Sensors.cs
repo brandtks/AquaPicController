@@ -31,15 +31,13 @@ namespace AquaPic.Gadgets
 {
     public class Sensors
     {
-        public static readonly string sensorSettingsFileName = "sensors";
-
         public static FloatSwitchCollection FloatSwitches = FloatSwitchCollection.SharedFloatSwitchCollectionInstance;
         public static WaterLevelSensorCollection WaterLevelSensors = WaterLevelSensorCollection.SharedWaterLevelSensorCollectionInstance;
         public static TemperatureProbeCollection TemperatureProbes = TemperatureProbeCollection.SharedTemperatureProbeCollectionInstance;
         public static PhProbeCollection PhProbes = PhProbeCollection.SharedPhProbeCollectionInstance;
 
         public static void AddSensors () {
-            if (SettingsHelper.SettingsFileExists (sensorSettingsFileName)) {
+            if (SettingsHelper.SettingsFileExists (GenericSensorCollection.sensorSettingsFileName)) {
                 FloatSwitches.ReadAllGadgetsFromFile ();
                 WaterLevelSensors.ReadAllGadgetsFromFile ();
                 TemperatureProbes.ReadAllGadgetsFromFile ();
@@ -53,7 +51,7 @@ namespace AquaPic.Gadgets
                 jo.Add (new JProperty (TemperatureProbes.gadgetSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty (PhProbes.gadgetSettingsArrayName, new JArray ()));
 
-                SettingsHelper.WriteSettingsFile (sensorSettingsFileName, jo);
+                SettingsHelper.WriteSettingsFile (GenericSensorCollection.sensorSettingsFileName, jo);
             }
         }
     }

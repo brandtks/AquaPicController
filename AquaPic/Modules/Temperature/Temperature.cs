@@ -367,7 +367,7 @@ namespace AquaPic.Modules.Temperature
                 throw new Exception (string.Format ("Heater: {0} already exists", settings.name));
             }
 
-            temperatureGroups[groupName].heaters[settings.name] = new Heater (settings.name, settings.plug, groupName);
+            temperatureGroups[groupName].heaters[settings.name] = new Heater (settings, groupName);
 
             if (saveToFile) {
                 UpdateTemperatureGroupSettingsInFile (groupName);
@@ -384,7 +384,7 @@ namespace AquaPic.Modules.Temperature
 
         public static void RemoveHeater (string groupName, string heaterName) {
             CheckHeaterKey (groupName, heaterName);
-            temperatureGroups[groupName].heaters[heaterName].Remove ();
+            temperatureGroups[groupName].heaters[heaterName].Dispose ();
             temperatureGroups[groupName].heaters.Remove (heaterName);
             UpdateTemperatureGroupSettingsInFile (groupName);
         }
@@ -423,7 +423,7 @@ namespace AquaPic.Modules.Temperature
         /***Individual Control***/
         public static IndividualControl GetHeaterIndividualControl (string groupName, string heaterName) {
             CheckHeaterKey (groupName, heaterName);
-            return temperatureGroups[groupName].heaters[heaterName].plug;
+            return temperatureGroups[groupName].heaters[heaterName].channel;
         }
 
         /***Settings***************************************************************************************************/
@@ -431,7 +431,7 @@ namespace AquaPic.Modules.Temperature
             CheckHeaterKey (groupName, heaterName);
             var settings = new HeaterSettings ();
             settings.name = heaterName;
-            settings.plug = GetHeaterIndividualControl (groupName, heaterName);
+            settings.channel = GetHeaterIndividualControl (groupName, heaterName);
             return settings;
         }
 
@@ -441,7 +441,7 @@ namespace AquaPic.Modules.Temperature
             foreach (var heater in temperatureGroups[groupName].heaters.Values) {
                 var settings = new HeaterSettings ();
                 settings.name = heater.name;
-                settings.plug = heater.plug;
+                settings.channel = heater.channel;
                 heaterSettings.Add (settings);
             }
             return heaterSettings;

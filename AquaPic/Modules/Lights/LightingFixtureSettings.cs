@@ -23,22 +23,16 @@
 
 using System;
 using AquaPic.Globals;
-using AquaPic.Runtime;
+using AquaPic.Gadgets;
 
 namespace AquaPic.Modules
 {
-    public class LightingFixtureSettings : IEntitySettings 
+    public class LightingFixtureSettings : GenericEquipmentSettings 
     {
-        [EntitySetting (typeof (StringMutator), "name")]
-        public string name { get; set; }
-
-        [EntitySetting (typeof (IndividualControlMutator), new string[] { "powerStrip", "outlet" })]
-        public IndividualControl powerOutlet { get; set; }
-
         [EntitySetting (typeof (BoolMutatorDefaultTrue), "highTempLockout")]
         public bool highTempLockout { get; set; }
 
-        [EntitySetting (typeof (IndividualControlMutator), new string[] { "dimmingCard", "channel" }, true)]
+        [EntitySetting (typeof (IndividualControlMutator), new string[] { "dimmingCard", "dimmingChannel" }, true)]
         public IndividualControl dimmingChannel { get; set; }
 
         [EntitySetting (typeof (LightingStatesMutator))]
@@ -46,7 +40,7 @@ namespace AquaPic.Modules
 
         public LightingFixtureSettings () {
             name = string.Empty;
-            powerOutlet = IndividualControl.Empty;
+            channel = IndividualControl.Empty;
             highTempLockout = true;
             dimmingChannel = IndividualControl.Empty;
             lightingStates = new LightingState[0];

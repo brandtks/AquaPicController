@@ -39,7 +39,7 @@ namespace AquaPic.UserInterface
             if (sensorName.IsNotEmpty ()) {
                 var probe = (PhProbe)Sensors.PhProbes.GetGadget (sensorName);
                 if (probe.connected) {
-                    sensorStateTextbox.text = probe.value.ToString ("F2");
+                    sensorStateTextbox.text = Convert.ToSingle (probe.value).ToString ("F2");
                     sensorLabel.Visible = true;
                 } else {
                     sensorStateTextbox.text = "Probe disconnected";

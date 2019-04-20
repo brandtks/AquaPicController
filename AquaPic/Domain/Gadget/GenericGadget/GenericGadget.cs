@@ -30,6 +30,7 @@ namespace AquaPic.Gadgets
     {
         public string name { get; protected set; }
         public IndividualControl channel { get; protected set; }
+        public ValueType value;
 
         public GenericGadget (GenericGadgetSettings settings) {
             name = settings.name;

@@ -22,7 +22,6 @@
 #endregion // License
 
 using System;
-using AquaPic.Globals;
 using AquaPic.Runtime;
 
 namespace AquaPic.Gadgets
@@ -36,7 +35,11 @@ namespace AquaPic.Gadgets
 
         protected virtual void Run () {
             try {
-
+                var oldValue = value;
+                value = OnRun ();
+                if (value != oldValue) {
+                    NotifyValueChanged (name, value, oldValue);
+                }
             } catch (NotImplementedException) {
                 Logger.AddWarning (name + " does not have an implemented Runtime function");
                 TaskManager.RemoveCyclicInterrupt (name);

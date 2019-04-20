@@ -39,7 +39,9 @@ namespace AquaPic.Drivers
         }
 
         protected virtual void OnValueChanged (string name, ValueType value) {
-            SetValue (value);
+            if (mode == Globals.Mode.Auto) {
+                SetValue (value);
+            }
         }
 
         public void Subscribe (Guid key) {
@@ -47,6 +49,10 @@ namespace AquaPic.Drivers
                 throw new Exception (string.Format("Output channel {0} is already subscribed to {1}", name, _subscriber.subscriptionKey));
             }
             _subscriber.Subscribe (key);
+        }
+
+        public void Unsubscribe () {
+            _subscriber.Unsubscribe ();
         }
     }
 }

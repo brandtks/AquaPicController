@@ -25,27 +25,24 @@ using System;
 using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Runtime;
+using AquaPic.Gadgets;
+using AquaPic.PubSub;
 
 namespace AquaPic.Modules.Temperature
 {
     public partial class Temperature
     {
-        private class Heater
+        private class Heater : GenericEquipment
         {
-            public string name;
-            public IndividualControl plug;
             public string temperatureGroupName;
 
-            public Heater (string name, IndividualControl plug, string temperatureGroupName) {
-                this.name = name;
-                this.plug = plug;
+            public Heater (HeaterSettings settings, string temperatureGroupName) : base (settings) {
                 this.temperatureGroupName = temperatureGroupName;
-                var plugControl = Power.AddOutlet (plug, name, MyState.On, "Temperature");
-                plugControl.StateGetter = OnPlugControl;
-                Power.AddHandlerOnStateChange (plug, OnStateChange);
+                AquaPicDrivers.Power.AddOutlet (channel, name, MyState.On, key);
+                Subscribe (AquaPicDrivers.Power.GetChannelEventPublisherKey (channel));
             }
 
-            public bool OnPlugControl () {
+            protected override ValueType OnRun () {
                 if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
                     bool cond = true;
                     cond &= !Alarm.CheckAlarming (temperatureGroups[temperatureGroupName].highTemperatureAlarmIndex);
@@ -71,8 +68,10 @@ namespace AquaPic.Modules.Temperature
                 return false;
             }
 
-            public void OnStateChange (object obj, StateChangeEventArgs args) {
-                if (args.state == MyState.On) {
+            public override void OnValueChangedAction (object parm) {
+                var args = parm as ValueChangedEvent;
+                var state = Convert.ToBoolean (args.newValue);
+                if (state) {
                     if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
                         GetTemperatureGroupDataLogger (temperatureGroupName).AddEntry ("heater on");
                     }
@@ -83,9 +82,9 @@ namespace AquaPic.Modules.Temperature
                 }
             }
 
-            public void Remove () {
-                Power.RemoveOutlet (plug);
-                Power.RemoveHandlerOnStateChange (plug, OnStateChange);
+            public override void Dispose () {
+                AquaPicDrivers.Power.RemoveChannel (channel);
+                Unsubscribe ();
             }
         }
     }

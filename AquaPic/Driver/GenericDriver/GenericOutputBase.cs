@@ -31,6 +31,20 @@ namespace AquaPic.Drivers
         public GenericOutputBase (string name, uint runtime = 1000) 
             : base (name, runtime) { }
 
+        [Obsolete ("Use AddOutputChannel instead")]
+        public sealed override void AddChannel (string card, int channel, string channelName) => throw new NotSupportedException ();
+        [Obsolete ("Use AddOutputChannel instead")]
+        public sealed override void AddChannel (IndividualControl channel, string channelName) => throw new NotSupportedException ();
+
+        public virtual void AddOutputChannel (IndividualControl channel, string channelName, Guid subscriptionKey) {
+            AddOutputChannel (channel.Group, channel.Individual, channelName, subscriptionKey);
+        }
+
+        public virtual void AddOutputChannel (string card, int channel, string channelName, Guid subscriptionKey) {
+            base.AddChannel (card, channel, channelName);
+            SubscribeChannel (card, channel, subscriptionKey);
+        }
+
         public void SubscribeChannel (string channelName, Guid key) {
             var channel = GetChannelIndividualControl (channelName);
             SubscribeChannel (channel.Group, channel.Individual, key);
@@ -44,6 +58,21 @@ namespace AquaPic.Drivers
             CheckCardKey (card);
             var outputCard = cards[card] as GenericOutputCard;
             outputCard.SubscribeChannel (channel, key);
+        }
+
+        public void UnsubscribeChannel (string channelName) {
+            var channel = GetChannelIndividualControl (channelName);
+            UnsubscribeChannel (channel.Group, channel.Individual);
+        }
+
+        public void UnsubscribeChannel (IndividualControl channel) {
+            UnsubscribeChannel (channel.Group, channel.Individual);
+        }
+
+        public void UnsubscribeChannel (string card, int channel) {
+            CheckCardKey (card);
+            var outputCard = cards[card] as GenericOutputCard;
+            outputCard.UnsubscribeChannel (channel);
         }
 
         public Guid GetSubscriptionKey (string channelName) {

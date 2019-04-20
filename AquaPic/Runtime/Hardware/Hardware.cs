@@ -49,34 +49,23 @@ namespace AquaPic.Runtime
                         switch (type) {
                         case "power":
                             Logger.Add ("Adding power strip");
-                            Power.AddPowerStrip (
-                                name,
-                                address,
-                                Convert.ToBoolean (jo["options"][0]));
+                            AquaPicDrivers.Power.AddCard (name, address);
                             break;
                         case "analogInput":
                             Logger.Add ("Adding analog input card");
-                            AquaPicDrivers.AnalogInput.AddCard (
-                                name,
-                                address);
+                            AquaPicDrivers.AnalogInput.AddCard (name, address);
                             break;
                         case "analogOutput":
                             Logger.Add ("Adding analog output card");
-                            AquaPicDrivers.AnalogOutput.AddCard (
-                                name,
-                                address);
+                            AquaPicDrivers.AnalogOutput.AddCard (name, address);
                             break;
                         case "digitalInput":
                             Logger.Add ("Adding digital input card");
-                            AquaPicDrivers.DigitalInput.AddCard (
-                                name,
-                                address);
+                            AquaPicDrivers.DigitalInput.AddCard (name, address);
                             break;
                         case "phOrp":
                             Logger.Add ("Adding pH/ORP card");
-                            AquaPicDrivers.PhOrp.AddCard (
-                                name,
-                                address);
+                            AquaPicDrivers.PhOrp.AddCard (name, address);
                             break;
                         default:
                             Console.WriteLine ("Unknow equipment type: {0}", type);

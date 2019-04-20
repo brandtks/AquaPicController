@@ -88,14 +88,14 @@ namespace AquaPic.Modules
             if (settings.dimmingChannel.IsNotEmpty ()) {
                 AddDimmingLight (
                     settings.name,
-                    settings.powerOutlet,
+                    settings.channel,
                     settings.dimmingChannel,
                     settings.lightingStates,
                     settings.highTempLockout);
             } else {
                 AddLight (
                     settings.name,
-                    settings.powerOutlet,
+                    settings.channel,
                     settings.lightingStates,
                     settings.highTempLockout);
             }
@@ -111,26 +111,30 @@ namespace AquaPic.Modules
             LightingState[] lightingStates,
             bool highTempLockout) 
         {
-            fixtures[name] = new LightingFixture (
-                name,
-                powerOutlet,
-                lightingStates,
-                highTempLockout);
+            var fixtureSettings = new LightingFixtureSettings ();
+            fixtureSettings.name = name;
+            fixtureSettings.channel = powerOutlet;
+            fixtureSettings.lightingStates = lightingStates;
+            fixtureSettings.highTempLockout = highTempLockout;
+
+            fixtures[name] = new LightingFixture (fixtureSettings);
         }
 
         protected static void AddDimmingLight (
             string name,
             IndividualControl powerOutlet,
-            IndividualControl dimmingOutlet,
+            IndividualControl dimmingChannel,
             LightingState[] lightingStates,
             bool highTempLockout) 
         {
-            fixtures[name] = new LightingFixtureDimming (
-                name,
-                powerOutlet,
-                dimmingOutlet,
-                lightingStates,
-                highTempLockout);
+            var fixtureSettings = new LightingFixtureSettings ();
+            fixtureSettings.name = name;
+            fixtureSettings.channel = powerOutlet;
+            fixtureSettings.dimmingChannel = dimmingChannel;
+            fixtureSettings.lightingStates = lightingStates;
+            fixtureSettings.highTempLockout = highTempLockout;
+
+            fixtures[name] = new LightingFixtureDimming (fixtureSettings);
         }
 
         public static void UpdateLight (string fixtureName, LightingFixtureSettings settings) {
@@ -143,7 +147,7 @@ namespace AquaPic.Modules
 
         public static void RemoveLight (string fixtureName) {
             CheckFixtureKey (fixtureName);
-            fixtures[fixtureName].Remove ();
+            fixtures[fixtureName].Dispose ();
             fixtures.Remove (fixtureName);
             DeleteFixtureSettingsFromFile (fixtureName);
         }
@@ -193,7 +197,7 @@ namespace AquaPic.Modules
         /**************************************************************************************************************/
         public static IndividualControl GetFixtureOutletIndividualControl (string fixtureName) {
             CheckFixtureKey (fixtureName);
-            return fixtures[fixtureName].powerOutlet;
+            return fixtures[fixtureName].channel;
         }
 
         public static IndividualControl GetDimmingChannelIndividualControl (string fixtureName) {
@@ -321,7 +325,7 @@ namespace AquaPic.Modules
             CheckFixtureKey (fixtureName);
             var settings = new LightingFixtureSettings ();
             settings.name = fixtureName;
-            settings.powerOutlet = GetFixtureOutletIndividualControl (fixtureName);
+            settings.channel = GetFixtureOutletIndividualControl (fixtureName);
             settings.highTempLockout = GetFixtureTemperatureLockout (fixtureName);
             settings.lightingStates = GetLightingFixtureLightingStates (fixtureName);
             if (IsDimmingFixture (fixtureName)) {

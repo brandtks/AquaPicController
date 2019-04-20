@@ -80,16 +80,6 @@ namespace AquaPic.UserInterface
                 Title = string.Format ("{0} Settings", powerStripName);
             }
 
-            var s = new SettingsSelectorSwitch ("Power Loss Alarm", "Yes", "No");
-            if (powerStripName.IsNotEmpty ()) {
-                if (Power.GetPowerStripAlarmOnPowerLoss (powerStripName)) {
-                    s.selectorSwitch.currentSelected = 0;
-                } else {
-                    s.selectorSwitch.currentSelected = 1;
-                }
-            }
-            AddSetting (s);
-
             DrawSettings ();
         }
 
@@ -105,9 +95,9 @@ namespace AquaPic.UserInterface
                     return false;
                 }
                 var address = Convert.ToInt32 (addressString.Substring (addressString.IndexOf (",", StringComparison.InvariantCultureIgnoreCase) + 2));
-                powerStripName = string.Format ("PS{0}", Power.GetLowestPowerStripNameIndex ());
+                powerStripName = string.Format ("PS{0}", AquaPicDrivers.Power.GetLowestCardNameIndex ());
 
-                Power.AddPowerStrip (powerStripName, address, alarmOnPowerLoss);
+                AquaPicDrivers.Power.AddCard (powerStripName, address);
 
                 var jo = new JObject {
                     new JProperty ("type", "power"),
@@ -120,7 +110,6 @@ namespace AquaPic.UserInterface
 
                 ja.Add (jo);
             } else {
-                Power.SetPowerStripAlarmOnPowerLoss (powerStripName, alarmOnPowerLoss);
                 var index = SettingsHelper.FindSettingsInArray (ja, powerStripName);
                 if (index == -1) {
                     MessageBox.Show ("Something went wrong");
@@ -143,7 +132,7 @@ namespace AquaPic.UserInterface
             }
             ja.RemoveAt (index);
             SettingsHelper.WriteSettingsFile ("equipment", ja);
-            Power.RemovePowerStrip (powerStripName);
+            AquaPicDrivers.Power.RemoveCard (powerStripName);
             return true;
         }
     }

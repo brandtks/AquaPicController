@@ -54,12 +54,12 @@ namespace AquaPic.UserInterface
 
             var c = new SettingsComboBox ("Outlet");
             if (fixtureName.IsNotEmpty ()) {
-                var ic = settings.powerOutlet;
+                var ic = settings.channel;
                 c.combo.comboList.Add (string.Format ("Current: {0}.p{1}", ic.Group, ic.Individual));
                 c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Select outlet";
-            c.combo.comboList.AddRange (Power.GetAllAvailableOutlets ());
+            c.combo.comboList.AddRange (AquaPicDrivers.Power.GetAllAvaiableChannels ());
             AddSetting (c);
 
             var s = new SettingsSelectorSwitch ("Temp Lockout");
@@ -108,7 +108,7 @@ namespace AquaPic.UserInterface
                 MessageBox.Show ("Please select a power outlet");
                 return false;
             }
-            fixtureSettings.powerOutlet = ParseIndividualControl (outletString);
+            fixtureSettings.channel = ParseIndividualControl (outletString);
 
             fixtureSettings.highTempLockout = (int)settings["Temp Lockout"].setting == 0;
             bool dimmingFixture = (int)settings["Dimming Fixture"].setting == 0;

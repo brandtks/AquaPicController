@@ -147,7 +147,9 @@ namespace AquaPic.Drivers
 
         public virtual void SetChannelValue (int channel, ValueType value) {
             CheckChannelRange (channel);
-            channels[channel].SetValue (value);
+            if (channels[channel].mode == Mode.Manual) {
+                channels[channel].SetValue (value);
+            }
         }
 
         public virtual void SetAllChannelValues (ValueType[] values) {
@@ -155,7 +157,9 @@ namespace AquaPic.Drivers
                 throw new ArgumentOutOfRangeException (nameof (values));
 
             for (int i = 0; i < channelCount; ++i) {
-                channels[i].SetValue (values[i]);
+                if (channels[i].mode == Mode.Manual) {
+                    channels[i].SetValue (values[i]);
+                }
             }
         }
 

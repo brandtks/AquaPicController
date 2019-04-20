@@ -26,38 +26,46 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
+using AquaPic.Gadgets;
 using AquaPic.PubSub;
 
 namespace AquaPic.Modules
 {
     public partial class Lighting
     {
-        public class LightingFixture
+        public class LightingFixture : GenericEquipment
         {
-            public string name;
             public MyState plugState;
             public bool highTempLockout;
-            public IndividualControl powerOutlet;
             public LightingState[] lightingStates;
             public LightingState[] savedLightingStates;
             public int currentState;
 
-            public LightingFixture (
-                string name,
-                IndividualControl powerOutlet,
-                LightingState[] lightingStates,
-                bool highTempLockout)
-            {
-                this.name = name;
-                this.powerOutlet = powerOutlet;
-                this.highTempLockout = highTempLockout;
-
+            public LightingFixture (LightingFixtureSettings settings) : base (settings) {
+                highTempLockout = settings.highTempLockout;
                 plugState = MyState.Off;
-                var plugControl = Power.AddOutlet (this.powerOutlet, this.name, MyState.Off, "Lighting");
-                plugControl.StateGetter = OnPlugStateGetter;
-                Power.AddHandlerOnStateChange (this.powerOutlet, OnLightingPlugStateChange);
+                AquaPicDrivers.Power.AddOutlet (channel, name, MyState.Off, key);
+                Subscribe (AquaPicDrivers.Power.GetChannelEventPublisherKey (channel));
+                UpdateLightingStates (settings.lightingStates, false);
+            }
 
-                UpdateLightingStates (lightingStates, false);
+            protected override ValueType OnRun () {
+                if (currentState == -1) {
+                    return false;
+                }
+
+                if (highTempLockout && Alarm.CheckAlarming (Temperature.Temperature.defaultHighTemperatureAlarmIndex)) {
+                    return false;
+                }
+
+                CheckCurrentState ();
+
+                if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
+                    return false;
+                }
+
+                // State is anything but off
+                return true;
             }
 
             public void UpdateLightingStates (LightingState[] lightingStates, bool temporaryChange) {
@@ -90,29 +98,6 @@ namespace AquaPic.Modules
                     }
                     lightingStates[0] = lastState;
                 }
-            }
-
-            public bool OnPlugStateGetter () {
-                if (currentState == -1) {
-                    return false;
-                }
-
-                if (highTempLockout && Alarm.CheckAlarming (Temperature.Temperature.defaultHighTemperatureAlarmIndex)) {
-                    return false;
-                }
-
-                CheckCurrentState ();
-
-                if (lightingStates[currentState].type == LightingStateType.Off) { // State is off
-                    return false;
-                }
-
-                // State is anything but off
-                return true;
-            }
-
-            public void OnLightingPlugStateChange (object sender, StateChangeEventArgs args) {
-                plugState = args.state;
             }
 
             public void CheckCurrentState () {
@@ -175,9 +160,20 @@ namespace AquaPic.Modules
                 return -1;
             }
 
-            public virtual void Remove () {
-                Power.RemoveOutlet (powerOutlet);
-                Power.RemoveHandlerOnStateChange (powerOutlet, OnLightingPlugStateChange);
+            public override void OnValueChangedAction (object parm) {
+                var args = parm as ValueChangedEvent;
+                var state = Convert.ToBoolean (args.newValue);
+                if (state) {
+                    plugState = MyState.On;
+                } else {
+                    plugState = MyState.Off;
+                }
+            }
+
+            public override void Dispose () {
+                base.Dispose ();
+                AquaPicDrivers.Power.RemoveChannel (channel);
+                Unsubscribe ();
             }
         }
     }

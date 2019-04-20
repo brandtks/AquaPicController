@@ -27,8 +27,10 @@ namespace AquaPic.Gadgets
 {
     public class GenericSensorCollection : GenericGadgetCollection
     {
+        public static readonly string sensorSettingsFileName = "sensors";
+
         public GenericSensorCollection (string sensorSettingsArrayName) 
-            : base (Sensors.sensorSettingsFileName, sensorSettingsArrayName) { }
+            : base (sensorSettingsFileName, sensorSettingsArrayName) { }
 
         public void CreateSensor (GenericSensorSettings settings) {
             CreateGadget (settings, true);

@@ -166,7 +166,7 @@ namespace AquaPic.Drivers
 
         public virtual void RemoveChannel (string channelName) {
             IndividualControl channel = GetChannelIndividualControl (channelName);
-            RemoveChannel (channel);
+            RemoveChannel (channel.Group, channel.Individual);
         }
 
         public virtual void RemoveChannel (IndividualControl channel) {

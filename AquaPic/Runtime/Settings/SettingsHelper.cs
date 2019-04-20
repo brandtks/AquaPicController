@@ -48,8 +48,9 @@ namespace AquaPic.Runtime
             }
             var path = Path.Combine (Utils.AquaPicEnvironment, "Settings");
             path = Path.Combine (path, fileName);
-
+            Console.WriteLine (path);
             string json = File.ReadAllText (path);
+            Console.WriteLine (json);
             return JToken.Parse (json);
         }
 
@@ -85,6 +86,7 @@ namespace AquaPic.Runtime
             var allEntitySettings = new List<EntitySettings> ();
 
             // Open the settings file and read in the JSON object
+            Console.WriteLine (fileName);
             var jo = OpenSettingsFile (fileName) as JObject;
             // If the JSON object exists
             if (jo != null) {

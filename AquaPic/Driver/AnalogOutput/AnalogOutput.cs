@@ -23,7 +23,6 @@
 
 using System;
 using AquaPic.Globals;
-using AquaPic.Operands;
 
 namespace AquaPic.Drivers
 {

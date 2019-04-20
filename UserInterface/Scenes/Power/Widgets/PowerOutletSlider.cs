@@ -27,6 +27,7 @@ using Cairo;
 using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Globals;
 using AquaPic.Drivers;
+using AquaPic.PubSub;
 
 namespace AquaPic.UserInterface
 {
@@ -41,7 +42,7 @@ namespace AquaPic.UserInterface
         public TouchSelectorSwitch ss;
         public TouchCurvedProgressBar ampBar;
         public TouchLabel ampText;
-        public EventBox settingsButton;
+        OutputChannelValueSubscriber outletSubscriber;
 
         public float amps {
             set {
@@ -107,34 +108,30 @@ namespace AquaPic.UserInterface
             Put (statusLabel, 0, 37);
             statusLabel.Show ();
 
-            settingsButton = new EventBox ();
-            settingsButton.VisibleWindow = false;
-            settingsButton.SetSizeRequest (180, 140);
-            settingsButton.ButtonReleaseEvent += OnSettingButtonRelease;
-            Put (settingsButton, 0, 0);
-            settingsButton.Show ();
+            outletSubscriber = new OutputChannelValueSubscriber (OnValueChanged);
 
             ShowAll ();
         }
 
-        protected void OnSettingButtonRelease (object sender, ButtonReleaseEventArgs args) {
-            IndividualControl ic = Power.GetOutletIndividualControl (outletName.text);
-            string owner = Power.GetOutletOwner (ic);
-            if (owner == "Power") {
-                string n = string.Format ("{0}.p{1}", ic.Group, ic.Individual);
-                OutletSettings os;
-                var parent = Toplevel as Window;
-                if (n == outletName.text)
-                    os = new OutletSettings (outletName.text, false, ic, parent);
-                else
-                    os = new OutletSettings (outletName.text, true, ic, parent);
+        public void Subscribe (IndividualControl outlet) {
+            outletSubscriber.Subscribe (AquaPicDrivers.Power.GetChannelEventPublisherKey (outlet));
+        }
 
-                os.Run ();
+        public void Unsubscribe () {
+            outletSubscriber.Unsubscribe ();
+        }
 
-                UpdateScreen?.Invoke ();
+        protected void OnValueChanged (string name, ValueType value) {
+            var state = Convert.ToBoolean (value);
+            if (state) {
+                statusLabel.text = "On";
+                statusLabel.textColor = "secb";
             } else {
-                MessageBox.Show ("Can't edit outlet,\nOwned by " + owner);
+                statusLabel.text = "Off";
+                statusLabel.textColor = "grey4";
             }
+
+            QueueDraw ();
         }
     }
 }

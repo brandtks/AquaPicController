@@ -22,7 +22,6 @@
 #endregion // License
 
 using System;
-using AquaPic.Operands;
 using AquaPic.Globals;
 using AquaPic.SerialBus;
 
@@ -75,10 +74,9 @@ namespace AquaPic.Drivers
 
             public override void SetValueCommunication (int channel, ValueType value) {
                 CheckChannelRange (channel);
-                var valueToSend = Convert.ToSingle (value);
                 var buf = new WriteBuffer ();
                 buf.Add ((byte)channel, sizeof (byte));
-                buf.Add (valueToSend, sizeof (float));
+                buf.Add (Convert.ToSingle (value), sizeof (float));
                 Write (31, buf);
             }
 

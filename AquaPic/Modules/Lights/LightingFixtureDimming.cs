@@ -25,6 +25,8 @@ using System;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Globals;
+using AquaPic.PubSub;
+using AquaPic.Gadgets;
 
 namespace AquaPic.Modules
 {
@@ -35,42 +37,24 @@ namespace AquaPic.Modules
             public float currentDimmingLevel;
             public float autoDimmingLevel;
             public float requestedDimmingLevel;
-            public IndividualControl channel;
+            public IndividualControl dimmingChannel;
             public Mode dimmingMode;
             public RateOfChangeLimiter rateOfChangeLimiter;
+            protected DimmingEquipment dimmingEquipment;
 
-            public LightingFixtureDimming (
-                string name,
-                IndividualControl plug,
-                IndividualControl channel,
-                LightingState[] lightingStates,
-                bool highTempLockout)
-            : base (
-                name,
-                plug,
-                lightingStates,
-                highTempLockout) 
-            {
+            public LightingFixtureDimming (LightingFixtureSettings settings) : base (settings) {
                 currentDimmingLevel = 0.0f;
                 autoDimmingLevel = 0.0f;
                 requestedDimmingLevel = 0.0f;
                 rateOfChangeLimiter = new RateOfChangeLimiter (1.0f);
-                this.channel = channel;
-                dimmingMode = Mode.Auto;
-                AquaPicDrivers.AnalogOutput.AddChannel (channel, name);
-                //var valueControl = AquaPicDrivers.AnalogOutput.GetChannelValueControl (channel);
-                //valueControl.ValueGetter = CalculateDimmingLevel;
 
-                Power.AddHandlerOnModeChange (
-                    plug,
-                    OnLightingPlugModeChange);
-                
-                Power.AddHandlerOnStateChange (
-                    plug,
-                    OnDimmingLightPlugStateChange);
+                dimmingChannel = settings.dimmingChannel;
+                dimmingMode = Mode.Auto;
+                dimmingEquipment = new DimmingEquipment (settings, this);
+                AquaPicDrivers.AnalogOutput.AddOutputChannel (dimmingChannel, name, dimmingEquipment.key);
             }
 
-            public float CalculateDimmingLevel () {
+            public float GetDimmingLevel () {
                 if (currentState == -1) {
                     autoDimmingLevel = 0;
                 } else {
@@ -123,25 +107,45 @@ namespace AquaPic.Modules
                 return currentDimmingLevel;
             }
 
-            public void OnLightingPlugModeChange (object sender, ModeChangeEventArgs args) {
-                if (args.mode == Mode.Auto)
+            public override void OnModeChangedAction (object parm) {
+                var args = parm as ModeChangedEvent;
+                if (args.mode == Mode.Auto) {
                     dimmingMode = Mode.Auto;
-                else
+                } else {
                     dimmingMode = Mode.Manual;
+                }
             }
 
-            public void OnDimmingLightPlugStateChange (object sender, StateChangeEventArgs args) {
-                if (args.state == MyState.Off) {
+            public override void OnValueChangedAction (object parm) {
+                var args = parm as ValueChangedEvent;
+                var state = Convert.ToBoolean (args.newValue);
+                if (state) {
+                    plugState = MyState.On;
+                } else {
+                    plugState = MyState.Off;
                     requestedDimmingLevel = 0.0f;
                     currentDimmingLevel = 0.0f;
                     rateOfChangeLimiter.Reset ();
                 }
             }
 
-            public override void Remove () {
-                base.Remove ();
-                Power.RemoveHandlerOnModeChange (powerOutlet, OnLightingPlugModeChange);
-                AquaPicDrivers.AnalogOutput.RemoveChannel (channel);
+            public override void Dispose () {
+                base.Dispose ();
+                AquaPicDrivers.AnalogOutput.RemoveChannel (dimmingChannel);
+            }
+
+            protected class DimmingEquipment : GenericEquipment
+            {
+                protected LightingFixtureDimming fixture;
+
+                public DimmingEquipment (LightingFixtureSettings settings, LightingFixtureDimming fixture) : base (settings) {
+                    channel = settings.dimmingChannel;
+                    this.fixture = fixture;
+                }
+
+                protected override ValueType OnRun () {
+                    return fixture.GetDimmingLevel ();
+                }
             }
         }
     }

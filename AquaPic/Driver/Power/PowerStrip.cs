@@ -29,135 +29,95 @@ using AquaPic.Globals;
 
 namespace AquaPic.Drivers
 {
-    public partial class Power
+    public partial class PowerBase
     {
-        class PowerStrip : AquaPicBus.Slave
+        class PowerStrip : GenericOutputCard
         {
             public int powerLossAlarmIndex;
-            public bool AcPowerAvailable;
-            public string name;
-            public OutletData[] outlets;
+            public bool acPowerAvailable;
 
-            public bool AquaPicBusCommunicationOk {
-                get {
-                    return ((status == AquaPicBusStatus.CommunicationStart) || (status == AquaPicBusStatus.CommunicationSuccess));
+            public PowerStrip (string name, int address)
+                : base (name, address, 8) {
+                acPowerAvailable = false;
+                powerLossAlarmIndex = Alarm.Subscribe (string.Format ("{0}: Loss of Power", name));
+            }
+
+            protected override GenericOutputChannel OutputChannelCreater (int index) {
+                return new PowerOutlet (GetDefualtName (index));
+            }
+
+            public override string GetChannelPrefix () {
+                return "p";
+            }
+
+            protected void SetupOutletCommunication (int outlet, MyState fallback) {
+                byte valueToSend = 0x00;
+                if (fallback == MyState.On) {
+                    valueToSend = 0xFF;
                 }
+                var buf = new WriteBuffer ();
+                buf.Add ((byte)outlet, sizeof (byte));
+                buf.Add (valueToSend, sizeof (byte));
+                Write (2, buf, true);
             }
 
-            public PowerStrip (string name, byte address, int powerLossAlarmIndex)
-                : base (address, name) {
-                this.name = name;
-                AcPowerAvailable = false;
-                this.powerLossAlarmIndex = powerLossAlarmIndex;
-
-                outlets = new OutletData[8];
-                for (int i = 0; i < 8; ++i) {
-                    int plugID = i;
-                    string plugName = this.name + "." + "p" + plugID.ToString ();
-
-                    outlets[plugID] = new OutletData (
-                        plugName,
-                        (state) => {
-                            if (state) {
-                                if (outlets[plugID].currentState != MyState.On)
-                                    SetOutletState ((byte)plugID, MyState.On);
-                            } else {
-                                if (outlets[plugID].currentState != MyState.Off)
-                                    SetOutletState ((byte)plugID, MyState.Off);
-                            }
-                        });
-                }
-            }
-
-            public void SetupOutlet (int outletId, MyState fallback) {
-                const int messageLength = 2;
-                byte[] message = new byte[messageLength];
-
-                message[0] = (byte)outletId;
-
-                if (fallback == MyState.On)
-                    message[1] = 0xFF;
-                else
-                    message[1] = 0x00;
-
-                Write (2, message, true);
-            }
-
-            public void GetStatus () {
+            public void GetStatusCommunication () {
                 Read (20, 3, GetStatusCallback);
             }
 
             protected void GetStatusCallback (CallbackArgs callArgs) {
-                if (status != AquaPicBusStatus.CommunicationSuccess)
-                    return;
+                acPowerAvailable = callArgs.GetDataFromReadBuffer<bool> (0);
 
-                AcPowerAvailable = callArgs.GetDataFromReadBuffer<bool> (0);
-
-                if (!AcPowerAvailable)
+                if (!acPowerAvailable) {
                     Alarm.Post (powerLossAlarmIndex);
+                } else {
+                    Alarm.Clear (powerLossAlarmIndex);
+                }
 
                 byte stateMask = callArgs.GetDataFromReadBuffer<byte> (1);
-                for (int i = 0; i < outlets.Length; ++i) {
-                    if (Utils.MaskToBoolean (stateMask, i)) {
-                        outlets[i].currentState = MyState.On;
-                    } else {
-                        outlets[i].currentState = MyState.Off;
-                    }
+                for (var i = 0; i < channels.Length; ++i) {
+                    channels[i].SetValue (Utils.MaskToBoolean (stateMask, i));
                 }
 
 #if INCLUDE_POWER_STRIP_CURRENT
-                byte currentMask = callArgs.GetDataFromReadBuffer<byte> (2);
-                for (int i = 0; i < outlets.Length; ++i) {
+                var currentMask = callArgs.GetDataFromReadBuffer<byte> (2);
+                for (var i = 0; i < channels.Length; ++i) {
                     if (Utils.MaskToBoolean (currentMask, i))
-                        ReadOutletCurrent ((byte)i);
+                        ReadOutletCurrentCommunication (i);
                 }
 #endif
             }
 
-            public void ReadOutletCurrent (byte outletId) {
-                ReadWrite (10, outletId, 5, ReadOutletCurrentCallback);
+            public void ReadOutletCurrentCommunication (int outlet) {
+                CheckChannelRange (outlet);
+                ReadWrite (10, (byte)outlet, 5, ReadOutletCurrentCallback);
             }
 
             protected void ReadOutletCurrentCallback (CallbackArgs callArgs) {
-                if (status != AquaPicBusStatus.CommunicationSuccess)
-                    return;
-
-                int outletId = callArgs.GetDataFromReadBuffer<byte> (0);
-                outlets[outletId].SetAmperage (callArgs.GetDataFromReadBuffer<float> (1));
+                var outletIndex = callArgs.GetDataFromReadBuffer<byte> (0);
+                var outlet = channels[outletIndex] as PowerOutlet;
+                outlet.SetAmperage (callArgs.GetDataFromReadBuffer<float> (1));
             }
 
-            public void SetOutletState (byte outletId, MyState state) {
-                const int messageLength = 2;
-
-                outlets[outletId].manualState = state;
-
-                byte[] message = new byte[messageLength];
-                message[0] = outletId;
-
-                if (state == MyState.On)
-                    message[1] = 0xFF;
-                else
-                    message[1] = 0x00;
-
-                ReadWrite (
-                    30,
-                    message,
-                    0, // this just returns the default response so there is no data, ie 0
-                    (args) => {
-                        outlets[outletId].currentState = state;
-                        OnStateChange (outlets[outletId], new StateChangeEventArgs (outletId, name, state));
-                    });
-
-
-#if !RPI_BUILD
-                outlets[outletId].currentState = state;
-                OnStateChange (outlets[outletId], new StateChangeEventArgs (outletId, name, state));
-#endif
+            public override void SetValueCommunication (int channel, ValueType value) {
+                CheckChannelRange (channel);
+                var buf = new WriteBuffer ();
+                buf.Add ((byte)channel, sizeof (byte));
+                buf.Add (Convert.ToBoolean (value), sizeof (bool));
+                Write (30, buf);
             }
 
-            public void SetPlugMode (byte outletId, Mode mode) {
-                outlets[outletId].mode = mode;
-                OnModeChange (outlets[outletId], new ModeChangeEventArgs (outletId, name, outlets[outletId].mode));
+            public MyState GetOutletFallback (int outlet) {
+                CheckChannelRange (outlet);
+                var powerOutlet = channels[outlet] as PowerOutlet;
+                return powerOutlet.fallback;
+            }
+
+            public void SetOutletFallback (int outlet, MyState fallback) {
+                CheckChannelRange (outlet);
+                var powerOutlet = channels[outlet] as PowerOutlet;
+                powerOutlet.fallback = fallback;
+                SetupOutletCommunication (outlet, fallback);
             }
         }
     }

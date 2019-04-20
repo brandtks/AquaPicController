@@ -53,6 +53,12 @@ namespace AquaPic.Drivers
             outputChannel.Subscribe (key);
         }
 
+        public void UnsubscribeChannel (int channel) {
+            CheckChannelRange (channel);
+            var outputChannel = channels[channel] as GenericOutputChannel;
+            outputChannel.Unsubscribe ();
+        }
+
         public Guid GetSubscriptionKey (int channel) {
             CheckChannelRange (channel);
             var outputChannel = channels[channel] as GenericOutputChannel;

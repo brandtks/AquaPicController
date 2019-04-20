@@ -23,47 +23,32 @@
 
 using System;
 using AquaPic.Globals;
-using AquaPic.Operands;
 
 namespace AquaPic.Drivers
 {
-    public partial class Power
+    public partial class PowerBase
     {
-        private class OutletData
+        protected class PowerOutlet : GenericOutputChannel
         {
             public static float Voltage = 115;
 
             public float wattPower;
-            public float ampCurrent;
-            public Mode mode;
+            public float amperage;
             public float powerFactor;
-            public string name;
-            public MyState currentState;
-            public MyState manualState;
-            //public MyState autoState;
             public MyState fallback;
-            public Coil OutletControl;
-            public string owner;
 
-            public OutletData (string name, StateSetterHandler outletSetter) {
+            public PowerOutlet (string name) : base (name, typeof(bool)) {
                 this.name = name;
-                currentState = MyState.Off;
-                manualState = MyState.Off;
                 fallback = MyState.Off;
                 mode = Mode.Manual;
-                ampCurrent = 0.0f;
+                amperage = 0.0f;
                 wattPower = 0.0f;
                 powerFactor = 1.0f;
-                owner = "Power";
-                OutletControl = new Coil (outletSetter);
-                OutletControl.StateGetter = () => {
-                    return false;
-                };
             }
 
             public void SetAmperage (float c) {
-                ampCurrent = c;
-                wattPower = ampCurrent * Voltage * powerFactor;
+                amperage = c;
+                wattPower = amperage * Voltage * powerFactor;
             }
         }
     }

@@ -51,6 +51,7 @@ namespace AquaPic.UserInterface
         bool isDimmingFixture;
         bool dimmingIsManual;
         LightingStateWidget lightingStateWidget;
+        OutputChannelValueSubscriber outletSubscriber;
 
         public LightingWindow (params object[] options) : base (false) {
             sceneTitle = "Lighting";
@@ -215,6 +216,8 @@ namespace AquaPic.UserInterface
                 combo.activeIndex = 0;
             }
 
+            outletSubscriber = new OutputChannelValueSubscriber (OnValueChanged);
+
             GetFixtureData ();
             lightingStateWidget.SetStates (fixtureName);
             Show ();
@@ -222,7 +225,7 @@ namespace AquaPic.UserInterface
 
         public override void Dispose () {
             if (fixtureName.IsNotEmpty ()) {
-                Power.RemoveHandlerOnStateChange (Lighting.GetFixtureOutletIndividualControl (fixtureName), OnOutletStateChange);
+                outletSubscriber.Unsubscribe ();
             }
             base.Dispose ();
         }
@@ -232,22 +235,20 @@ namespace AquaPic.UserInterface
                 dimmingHeader.Visible = true;
                 outletStateLabel.Visible = true;
                 outletSelectorSwitch.Visible = true;
-
-                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
-                Power.AddHandlerOnStateChange (ic, OnOutletStateChange);
-
-                if (Power.GetOutletMode (ic) == Mode.Auto) {
+                outletSubscriber.Subscribe (AquaPicDrivers.Power.GetChannelEventPublisherKey (fixtureName));
+                var state = AquaPicDrivers.Power.GetChannelValue (fixtureName);
+                if (AquaPicDrivers.Power.GetChannelMode (fixtureName) == Mode.Auto) {
                     outletSelectorSwitch.currentSelected = 1;
                     outletSelectorSwitch.QueueDraw ();
                 } else {
-                    if (Power.GetOutletManualState (ic) == MyState.Off) {
+                    if (state) {
                         outletSelectorSwitch.currentSelected = 0;
                     } else {
                         outletSelectorSwitch.currentSelected = 2;
                     }
                 }
 
-                if (Power.GetOutletState (ic) == MyState.Off) {
+                if (!state) {
                     outletStateLabel.text = "Light Off";
                     outletStateLabel.textColor = "grey4";
                 } else {
@@ -387,8 +388,7 @@ namespace AquaPic.UserInterface
             if (args.currentSelectedIndex == 0) {
                 Lighting.SetDimmingMode (fixtureName, Mode.Manual);
                 IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
-                Power.SetOutletManualState (ic, Power.GetOutletState (ic));
-                Power.SetOutletMode (ic, Mode.Manual);
+                AquaPicDrivers.Power.SetChannelMode (ic, Mode.Manual);
                 dimmingProgressBar.enableTouch = true;
                 requestedTextBox.Visible = true;
                 requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureName));
@@ -396,7 +396,7 @@ namespace AquaPic.UserInterface
                 autoLabel.Visible = true;
                 dimmingIsManual = true;
                 autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureName));
-                if (Power.GetOutletState (ic) == MyState.Off) {
+                if (AquaPicDrivers.Power.GetChannelValue (ic)) {
                     outletSelectorSwitch.currentSelected = 0;
                 } else {
                     outletSelectorSwitch.currentSelected = 2;
@@ -404,7 +404,7 @@ namespace AquaPic.UserInterface
                 outletSelectorSwitch.QueueDraw ();
             } else {
                 Lighting.SetDimmingMode (fixtureName, Mode.Auto);
-                Power.SetOutletMode (Lighting.GetFixtureOutletIndividualControl (fixtureName), Mode.Auto);
+                AquaPicDrivers.Power.SetChannelMode (Lighting.GetFixtureOutletIndividualControl (fixtureName), Mode.Auto);
                 dimmingProgressBar.enableTouch = false;
                 requestedTextBox.Visible = false;
                 autoTextBox.Visible = false;
@@ -423,13 +423,13 @@ namespace AquaPic.UserInterface
             IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
 
             if (args.currentSelectedIndex == 0) { // Manual Off
-                Power.SetOutletMode (ic, Mode.Manual);
-                Power.SetOutletManualState (ic, MyState.Off);
+                AquaPicDrivers.Power.SetChannelMode (ic, Mode.Manual);
+                AquaPicDrivers.Power.SetChannelValue (ic, false);
             } else if (args.currentSelectedIndex == 2) { // Manual On
-                Power.SetOutletMode (ic, Mode.Manual);
-                Power.SetOutletManualState (ic, MyState.On);
+                AquaPicDrivers.Power.SetChannelMode (ic, Mode.Manual);
+                AquaPicDrivers.Power.SetChannelValue (ic, true);
             } else if (args.currentSelectedIndex == 1) {
-                Power.SetOutletMode (ic, Mode.Auto);
+                AquaPicDrivers.Power.SetChannelMode (ic, Mode.Auto);
             }
 
             GetFixtureData ();
@@ -474,15 +474,17 @@ namespace AquaPic.UserInterface
             requestedTextBox.QueueDraw ();
         }
 
-        protected void OnOutletStateChange (object sender, StateChangeEventArgs args) {
-            if (args.state == MyState.Off) {
+        protected void OnValueChanged (string name, ValueType value) {
+            var state = Convert.ToBoolean (value);
+            if (state) {
                 outletStateLabel.text = "Light Off";
                 outletStateLabel.textColor = "grey4";
             } else {
                 outletStateLabel.text = "Light On";
                 outletStateLabel.textColor = "secb";
             }
-            outletStateLabel.QueueDraw ();
+
+            QueueDraw ();
         }
     }
 }

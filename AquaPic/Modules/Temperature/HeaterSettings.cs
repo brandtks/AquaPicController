@@ -25,17 +25,13 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using AquaPic.Globals;
-using AquaPic.Runtime;
+using AquaPic.Gadgets;
 
 namespace AquaPic.Modules.Temperature
 {
-    public class HeaterSettings : IEntitySettings
+    public class HeaterSettings : GenericEquipmentSettings
     {
-        [EntitySetting (typeof (StringMutator), "name")]
-        public string name { get; set; }
 
-        [EntitySetting (typeof (IndividualControlMutator), new string[] { "powerStrip", "outlet" })]
-        public IndividualControl plug { get; set; }
     }
 
     public class HeaterMutator : ISettingMutator<IEnumerable<HeaterSettings>>
@@ -49,14 +45,14 @@ namespace AquaPic.Modules.Temperature
                 var settings = new HeaterSettings ();
                 settings.name = (string)jo["name"];
                 var plug = IndividualControl.Empty;
-                plug.Group = (string)jo["powerStrip"];
-                var text = (string)jo["outlet"];
+                plug.Group = (string)jo["card"];
+                var text = (string)jo["channel"];
                 try {
                     plug.Individual = Convert.ToInt32 (text);
                 } catch {
                     plug = IndividualControl.Empty;
                 }
-                settings.plug = plug;
+                settings.channel = plug;
                 heaters.Add (settings);
             }
 
@@ -68,8 +64,8 @@ namespace AquaPic.Modules.Temperature
             foreach (var heater in value) {
                 JObject jo = new JObject ();
                 jo.Add (new JProperty ("name", heater.name));
-                jo.Add (new JProperty ("powerStrip", heater.plug.Group));
-                jo.Add (new JProperty ("outlet", heater.plug.Individual.ToString ()));
+                jo.Add (new JProperty ("card", heater.channel.Group));
+                jo.Add (new JProperty ("channel", heater.channel.Individual.ToString ()));
                 ja.Add (jo);
             }
             jobj["heaters"] = ja;

@@ -30,15 +30,15 @@ namespace AquaPic.Drivers
 
     public class OutputChannelValueSubscriber : ValueSubscriber
     {
-        public event OnValueChangedHandler ValueChangedEvent;
+        public OnValueChangedHandler ValueChanged;
 
         public OutputChannelValueSubscriber (OnValueChangedHandler valueChangedHandler) {
-            ValueChangedEvent += valueChangedHandler;
+            ValueChanged = valueChangedHandler;
         }
 
         public override void OnValueChangedAction (object parm) {
             var args = parm as ValueChangedEvent;
-            ValueChangedEvent?.Invoke (args.name, args.newValue);
+            ValueChanged (args.name, args.newValue);
         }
     }
 }

@@ -281,7 +281,7 @@ namespace AquaPic.UserInterface
 
         protected void GetHeaterData () {
             if (heaterName.IsNotEmpty ()) {
-                if (Power.GetOutletState (Temperature.GetHeaterIndividualControl (groupName, heaterName)) == MyState.On) {
+                if (AquaPicDrivers.Power.GetChannelValue (Temperature.GetHeaterIndividualControl (groupName, heaterName))) {
                     heaterLabel.text = "Heater On";
                     heaterLabel.textColor = "secb";
                 } else {
@@ -300,7 +300,7 @@ namespace AquaPic.UserInterface
             if (probeName.IsNotEmpty ()) {
                 var probe = (TemperatureProbe)Sensors.TemperatureProbes.GetGadget (probeName);
                 if (probe.connected) {
-                    probeTempTextbox.text = probe.value.ToString ("F2");
+                    probeTempTextbox.text = Convert.ToSingle (probe.value).ToString ("F2");
                     probeTempTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
                     probeTempLabel.Visible = true;
                 } else {

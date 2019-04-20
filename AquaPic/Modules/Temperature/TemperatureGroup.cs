@@ -84,7 +84,10 @@ namespace AquaPic.Modules.Temperature
                         throw new Exception (string.Format ("Heater: {0} already exists", heater.name));
                     }
 
-                    this.heaters[heater.name] = new Heater (heater.name, heater.plug, this.name);
+                    var heaterSettings = new HeaterSettings ();
+                    heaterSettings.name = heater.name;
+                    heaterSettings.channel = heater.channel;
+                    this.heaters[heater.name] = new Heater (heaterSettings, this.name);
                 }
             }
 
@@ -122,7 +125,7 @@ namespace AquaPic.Modules.Temperature
                 if (temperatureProbes.ContainsKey (args.name)) {
                     var temperatureProbe = (TemperatureProbe)Sensors.TemperatureProbes.GetGadget (args.name);
                     temperatureProbes[temperatureProbe.name].connected = temperatureProbe.connected;
-                    temperatureProbes[temperatureProbe.name].temperature = temperatureProbe.value;
+                    temperatureProbes[temperatureProbe.name].temperature = Convert.ToSingle (temperatureProbe.value);
                     CalculateTemperature ();
                 }
             }
