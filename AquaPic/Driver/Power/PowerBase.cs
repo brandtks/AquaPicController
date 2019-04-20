@@ -52,9 +52,7 @@ namespace AquaPic.Drivers
             }
         }
 
-        [Obsolete ("Use AddOutlet instead")]
         public sealed override void AddOutputChannel (string card, int channel, string channelName, Guid subscriptionKey) => throw new NotSupportedException ();
-        [Obsolete ("Use AddOutlet instead")]
         public sealed override void AddOutputChannel (IndividualControl channel, string channelName, Guid subscriptionKey) => throw new NotSupportedException ();
 
         public void AddOutlet (IndividualControl outlet, string name, MyState fallback, Guid subscriptionKey) {

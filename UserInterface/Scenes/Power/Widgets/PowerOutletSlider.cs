@@ -31,12 +31,8 @@ using AquaPic.PubSub;
 
 namespace AquaPic.UserInterface
 {
-    public delegate void UpdateScreenHandler ();
-
     public class PowerOutletSlider : Fixed
     {
-        public UpdateScreenHandler UpdateScreen;
-
         public TouchLabel outletName;
         public TouchLabel statusLabel;
         public TouchSelectorSwitch ss;

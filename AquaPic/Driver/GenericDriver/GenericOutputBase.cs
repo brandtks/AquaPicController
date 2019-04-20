@@ -31,9 +31,7 @@ namespace AquaPic.Drivers
         public GenericOutputBase (string name, uint runtime = 1000) 
             : base (name, runtime) { }
 
-        [Obsolete ("Use AddOutputChannel instead")]
         public sealed override void AddChannel (string card, int channel, string channelName) => throw new NotSupportedException ();
-        [Obsolete ("Use AddOutputChannel instead")]
         public sealed override void AddChannel (IndividualControl channel, string channelName) => throw new NotSupportedException ();
 
         public virtual void AddOutputChannel (IndividualControl channel, string channelName, Guid subscriptionKey) {
