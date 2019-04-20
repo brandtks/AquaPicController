@@ -24,7 +24,7 @@
 using System;
 using GoodtimeDevelopment.Utilites;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Service
 {
     public class TimePeriod
     {

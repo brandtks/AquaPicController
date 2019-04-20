@@ -22,15 +22,27 @@
 #endregion // License
 
 using System;
-using System.Collections.Generic;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Service
 {
-    public class Chemistry
+    public enum AlarmEventType
     {
-        static Chemistry () {
+        Posted,
+        Acknowledged,
+        Cleared
+    }
 
+    public class AlarmEventArgs : EventArgs
+    {
+        public AlarmEventType type;
+        public string name;
+
+        public AlarmEventArgs (AlarmEventType type, string name) {
+            this.type = type;
+            this.name = name;
         }
     }
+
+    public delegate void AlarmEventHandler (object sender, AlarmEventArgs args);
 }
 

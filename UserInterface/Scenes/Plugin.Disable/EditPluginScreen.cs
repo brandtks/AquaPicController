@@ -26,7 +26,7 @@ using System.Text;
 using Gtk;
 using Cairo;
 using MyWidgetLibrary;
-using AquaPic.Runtime;
+using AquaPic.Service;
 
 namespace AquaPic.UserInterface
 {

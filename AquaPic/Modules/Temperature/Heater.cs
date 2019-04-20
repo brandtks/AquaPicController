@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Drivers;
 using AquaPic.Globals;
-using AquaPic.Runtime;
+using AquaPic.Service;
 using AquaPic.Gadgets.Device;
 using AquaPic.PubSub;
 
@@ -53,7 +53,7 @@ namespace AquaPic.Modules.Temperature
                 return false;
             }
 
-            public bool CheckTemperature () {
+            protected bool CheckTemperature () {
                 if (CheckTemperatureGroupKeyNoThrow (temperatureGroupName)) {
                     var deadband = temperatureGroups[temperatureGroupName].temperatureDeadband / 2;
                     var temp = temperatureGroups[temperatureGroupName].temperatureSetpoint + deadband;

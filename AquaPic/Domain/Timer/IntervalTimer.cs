@@ -24,7 +24,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Service
 {
     public delegate void TimerHandler (object sender);
 

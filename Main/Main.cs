@@ -26,7 +26,7 @@ using System.IO;
 using Gtk;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.DataLogging;
-using AquaPic.Runtime;
+using AquaPic.Service;
 using AquaPic.UserInterface;
 using AquaPic.Drivers;
 using AquaPic.Modules;
@@ -112,7 +112,7 @@ namespace AquaPic
 #if DEBUG
             try {
 #endif
-                Hardware.AddFromJson ();
+                AquaPicDrivers.AddFromJson ();
                 Sensors.AddSensors ();
                 Devices.AddDevices ();
                 Temperature.Init ();

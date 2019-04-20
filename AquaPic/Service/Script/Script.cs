@@ -25,7 +25,7 @@ using System;
 using System.Text;
 using CSScriptLibrary;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Service
 {
     public interface IOutletScript
     {

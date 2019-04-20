@@ -87,17 +87,16 @@
     <Compile Include="Modules\Temperature\Temperature.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInput.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputCard.cs" />
-    <Compile Include="Runtime\TaskManager\TaskManager.cs" />
-    <Compile Include="Runtime\Alarm\Alarm.cs" />
-    <Compile Include="Runtime\Alarm\AlarmEvents.cs" />
-    <Compile Include="Runtime\Alarm\AlarmType.cs" />
+    <Compile Include="Service\TaskManager\TaskManager.cs" />
+    <Compile Include="Service\Alarm\Alarm.cs" />
+    <Compile Include="Service\Alarm\AlarmEvents.cs" />
+    <Compile Include="Service\Alarm\AlarmType.cs" />
     <Compile Include="Driver\Power\PowerOutlet.cs" />
-    <Compile Include="Runtime\Hardware\Hardware.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevel.cs" />
-    <Compile Include="Runtime\Script\Script.cs" />
-    <Compile Include="Runtime\Logger\Logger.cs" />
-    <Compile Include="Runtime\Chemistry\Chemistry.cs" />
-    <Compile Include="Runtime\Chemistry\TestProcedure.cs" />
+    <Compile Include="Service\Script\Script.cs" />
+    <Compile Include="Service\Logger\Logger.cs" />
+    <Compile Include="Service\Chemistry\Chemistry.cs" />
+    <Compile Include="Service\Chemistry\TestProcedure.cs" />
     <Compile Include="Driver\GenericDriver\GenericCard.cs" />
     <Compile Include="Driver\GenericDriver\GenericBase.cs" />
     <Compile Include="Driver\Driver.cs" />
@@ -110,10 +109,9 @@
     <Compile Include="Modules\ATO\AutoTopOff.cs" />
     <Compile Include="Modules\GenericModule\GenericModule.cs" />
     <Compile Include="Modules\GenericModule\GenericGroup.cs" />
-    <Compile Include="Runtime\Logger\LogItem.cs" />
+    <Compile Include="Service\Logger\LogItem.cs" />
     <Compile Include="Domain\Bit\Bit.cs" />
     <Compile Include="Domain\Bit\BitState.cs" />
-    <Compile Include="Runtime\Settings\SettingsHelper.cs" />
     <Compile Include="Modules\WaterLevel\WaterLevelGroupSettings.cs" />
     <Compile Include="Domain\Timer\IntervalTimer.cs" />
     <Compile Include="Domain\Timer\OffDelayTimer.cs" />
@@ -140,25 +138,25 @@
     <Compile Include="Driver\GenericDriver\GenericInputChannel.cs" />
     <Compile Include="Domain\Entity\Mutators\StringArrayMutator.cs" />
     <Compile Include="Domain\Entity\Mutators\TimerTimeMutator.cs" />
-    <Compile Include="Runtime\PubSub\ValueSubscriber.cs" />
-    <Compile Include="Runtime\PubSub\MessageHub.cs" />
+    <Compile Include="Service\PubSub\ValueSubscriber.cs" />
+    <Compile Include="Service\PubSub\MessageHub.cs" />
     <Compile Include="Domain\Globals\GlobalEnums.cs" />
     <Compile Include="Domain\Globals\IndividualControl.cs" />
-    <Compile Include="Runtime\PubSub\Subscription.cs" />
+    <Compile Include="Service\PubSub\Subscription.cs" />
     <Compile Include="Modules\Temperature\TemperatureGroupSettings.cs" />
     <Compile Include="Modules\Temperature\HeaterSettings.cs" />
     <Compile Include="Driver\GenericDriver\GenericAnalogInputChannel.cs" />
     <Compile Include="Driver\GenericDriver\GenericAnalogInputCard.cs" />
     <Compile Include="Driver\GenericDriver\GenericAnalogInputBase.cs" />
     <Compile Include="Domain\Entity\Mutators\IntMutator.cs" />
-    <Compile Include="Runtime\PubSub\ValuePublisher.cs" />
+    <Compile Include="Service\PubSub\ValuePublisher.cs" />
     <Compile Include="Driver\GenericDriver\GenericOutputChannel.cs" />
     <Compile Include="Driver\GenericDriver\GenericChannel.cs" />
     <Compile Include="Driver\CardTypeEnum.cs" />
     <Compile Include="Driver\GenericDriver\GenericOutputCard.cs" />
     <Compile Include="Driver\GenericDriver\GenericOutputBase.cs" />
-    <Compile Include="Runtime\PubSub\ChannelPublisher.cs" />
-    <Compile Include="Runtime\PubSub\ChannelSubscriber.cs" />
+    <Compile Include="Service\PubSub\ChannelPublisher.cs" />
+    <Compile Include="Service\PubSub\ChannelSubscriber.cs" />
     <Compile Include="Driver\GenericDriver\GenericOutputChannelSubscriber.cs" />
     <Compile Include="Domain\Gadgets\GenericGadget\GenericGadget.cs" />
     <Compile Include="Domain\Gadgets\GenericGadget\GenericGadgetCollection.cs" />
@@ -194,6 +192,7 @@
     <Compile Include="Domain\Entity\Mutators\MyStateMutator.cs" />
     <Compile Include="Domain\Gadgets\Devices\Pump\PumpCollection.cs" />
     <Compile Include="Domain\Gadgets\Devices\Devices.cs" />
+    <Compile Include="Service\Settings\SettingsHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -206,12 +205,11 @@
     <Folder Include="Modules\GenericModule\" />
     <Folder Include="Domain\" />
     <Folder Include="Domain\Bit\" />
-    <Folder Include="Runtime\Settings\" />
     <Folder Include="Domain\Timer\" />
     <Folder Include="Domain\TimePeriod\" />
     <Folder Include="Domain\Entity\" />
     <Folder Include="Domain\Entity\Mutators\" />
-    <Folder Include="Runtime\PubSub\" />
+    <Folder Include="Service\PubSub\" />
     <Folder Include="Domain\Globals\" />
     <Folder Include="Domain\Gadgets\" />
     <Folder Include="Domain\Gadgets\GenericGadget\" />
@@ -219,6 +217,7 @@
     <Folder Include="Domain\Gadgets\Sensors\" />
     <Folder Include="Domain\Gadgets\Devices\LightingFixture\" />
     <Folder Include="Domain\Gadgets\Devices\Pump\" />
+    <Folder Include="Service\Settings\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">

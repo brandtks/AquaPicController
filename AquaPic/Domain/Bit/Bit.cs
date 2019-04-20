@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 using AquaPic.Globals;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Service
 {
     public partial class Bit
     {

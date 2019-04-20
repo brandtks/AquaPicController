@@ -26,7 +26,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GoodtimeDevelopment.Utilites;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Service
 {
     public partial class Timer
     {

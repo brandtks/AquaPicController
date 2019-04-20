@@ -23,7 +23,7 @@
 
 using System;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Service
 {
     public delegate void TimerElapsedHandler (object sender, TimerElapsedEventArgs args);
 

@@ -29,7 +29,7 @@ using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 
-namespace AquaPic.Runtime
+namespace AquaPic.Service
 {
     public class SettingsHelper
     {

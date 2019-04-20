@@ -25,7 +25,7 @@ using System;
 using NUnit.Framework;
 using GoodtimeDevelopment.Utilites;
 
-namespace AquaPic.Runtime.Test
+namespace AquaPic.Service.Test
 {
     [TestFixture]
     public class TimePeriodTests

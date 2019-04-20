@@ -22,7 +22,7 @@
 #endregion // License
 
 using System;
-using AquaPic.Runtime;
+using AquaPic.Service;
 
 namespace AquaPic.Gadgets.Device.Pump
 {

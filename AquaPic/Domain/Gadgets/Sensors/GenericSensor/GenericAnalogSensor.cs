@@ -23,7 +23,7 @@
 
 using System;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Runtime;
+using AquaPic.Service;
 using AquaPic.PubSub;
 
 namespace AquaPic.Gadgets.Sensor

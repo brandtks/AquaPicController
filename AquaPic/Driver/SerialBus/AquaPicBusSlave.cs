@@ -23,7 +23,7 @@
 
 using System;
 using Gtk; // for Application.Invoke
-using AquaPic.Runtime;
+using AquaPic.Service;
 
 namespace AquaPic.SerialBus
 {

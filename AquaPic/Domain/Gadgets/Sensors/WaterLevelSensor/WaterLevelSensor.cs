@@ -23,7 +23,7 @@
 
 using System;
 using AquaPic.Drivers;
-using AquaPic.Runtime;
+using AquaPic.Service;
 
 namespace AquaPic.Gadgets.Sensor.WaterLevelSensor
 {
