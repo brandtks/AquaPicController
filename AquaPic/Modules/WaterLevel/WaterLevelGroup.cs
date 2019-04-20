@@ -26,6 +26,9 @@ using System.Collections.Generic;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.Gadgets;
+using AquaPic.Gadgets.Sensor;
+using AquaPic.Gadgets.Sensor.WaterLevelSensor;
+using AquaPic.Gadgets.Sensor.FloatSwitch;
 using AquaPic.DataLogging;
 using AquaPic.PubSub;
 

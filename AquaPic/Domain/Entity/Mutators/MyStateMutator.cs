@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2017 Goodtime Development
+    Copyright (c) 2019 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,50 +24,41 @@
 using System;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Globals;
 
-namespace AquaPic.Gadgets.Sensor.FloatSwitch
+namespace AquaPic.Globals
 {
-    public enum SwitchFunction
+    public class MyStateMutator : ISettingMutator<MyState>
     {
-        LowLevel,
-        HighLevel,
-        ATO,
-        Other
-    }
-
-    public class SwitchFunctionMutator : ISettingMutator<SwitchFunction>
-    {
-        public SwitchFunction Read (JObject jobj, string[] keys) {
+        public MyState Read (JObject jobj, string[] keys) {
             if (keys.Length < 1) {
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
 
-            var type = Default ();
+            var state = Default ();
             var text = (string)jobj[keys[0]];
             if (text.IsNotEmpty ()) {
                 try {
-                    type = (SwitchFunction)Enum.Parse (typeof (SwitchFunction), text);
+                    state = (MyState)Enum.Parse (typeof (MyState), text);
                 } catch {
                     //
                 }
             }
-            return type;
+            return state;
         }
 
-        public void Write (SwitchFunction value, JObject jobj, string[] keys) {
+        public void Write (MyState value, JObject jobj, string[] keys) {
             if (keys.Length < 1) {
                 throw new ArgumentException ("keys can not be empty", nameof (keys));
             }
             jobj[keys[0]] = value.ToString ();
         }
 
-        public bool Valid (SwitchFunction type) {
-            return true;
+        public bool Valid (MyState value) {
+            return value != MyState.Invalid;
         }
 
-        public SwitchFunction Default () {
-            return SwitchFunction.Other;
+        public MyState Default () {
+            return MyState.Off;
         }
     }
 }

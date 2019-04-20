@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Globals;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Sensor
 {
     public class GenericAnalogSensorSettings : GenericSensorSettings
     {

@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2018 Goodtime Development
+    Copyright (c) 2019 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,10 +23,13 @@
 
 using System;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Device
 {
-    public class GenericEquipmentSettings : GenericGadgetSettings
+    public class GenericDeviceCollection : GenericGadgetCollection
     {
+        public static readonly string equipmentSettingsFileName = "equipment";
 
+        public GenericDeviceCollection (string sensorSettingsArrayName)
+            : base (equipmentSettingsFileName, sensorSettingsArrayName) { }
     }
 }

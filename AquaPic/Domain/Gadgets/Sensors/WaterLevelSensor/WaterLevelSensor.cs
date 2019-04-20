@@ -24,9 +24,8 @@
 using System;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
-using AquaPic.Globals;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Sensor.WaterLevelSensor
 {
     public class WaterLevelSensor : GenericAnalogSensor
     {

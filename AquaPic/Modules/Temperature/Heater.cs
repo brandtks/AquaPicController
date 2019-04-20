@@ -25,14 +25,14 @@ using System;
 using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.Runtime;
-using AquaPic.Gadgets;
+using AquaPic.Gadgets.Device;
 using AquaPic.PubSub;
 
 namespace AquaPic.Modules.Temperature
 {
     public partial class Temperature
     {
-        private class Heater : GenericEquipment
+        private class Heater : GenericDevice
         {
             public string temperatureGroupName;
 

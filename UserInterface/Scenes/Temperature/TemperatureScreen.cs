@@ -28,8 +28,8 @@ using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules.Temperature;
 using AquaPic.Drivers;
-using AquaPic.Gadgets;
-using AquaPic.Gadgets.TemperatureProbe;
+using AquaPic.Gadgets.Sensor;
+using AquaPic.Gadgets.Sensor.TemperatureProbe;
 
 namespace AquaPic.UserInterface
 {

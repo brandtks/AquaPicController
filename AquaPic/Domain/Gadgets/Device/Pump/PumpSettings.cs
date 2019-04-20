@@ -22,13 +22,16 @@
 #endregion // License
 
 using System;
+using AquaPic.Globals;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Device.Pump
 {
-    public class GenericEquipmentCollection : GenericGadgetCollection
+    public class PumpSettings : GenericDeviceSettings
     {
-        public GenericEquipmentCollection (string equipmentSettingsArrayName) 
-            : base ("equipment", equipmentSettingsArrayName) {
-        }
+        [EntitySetting (typeof (MyStateMutator), "fallback")]
+        public MyState fallback { get; set; }
+
+        [EntitySetting (typeof (StringMutator), "script")]
+        public string script { get; set; }
     }
 }

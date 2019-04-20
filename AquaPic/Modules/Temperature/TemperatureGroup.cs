@@ -28,7 +28,8 @@ using AquaPic.Runtime;
 using AquaPic.DataLogging;
 using AquaPic.PubSub;
 using AquaPic.Gadgets;
-using AquaPic.Gadgets.TemperatureProbe;
+using AquaPic.Gadgets.Sensor;
+using AquaPic.Gadgets.Sensor.TemperatureProbe;
 
 namespace AquaPic.Modules.Temperature
 {

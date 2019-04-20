@@ -26,14 +26,14 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.Drivers;
 using AquaPic.Runtime;
-using AquaPic.Gadgets;
+using AquaPic.Gadgets.Device;
 using AquaPic.PubSub;
 
 namespace AquaPic.Modules
 {
     public partial class Lighting
     {
-        public class LightingFixture : GenericEquipment
+        public class LightingFixture : GenericDevice
         {
             public MyState plugState;
             public bool highTempLockout;

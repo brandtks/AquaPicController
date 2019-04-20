@@ -22,11 +22,9 @@
 #endregion // License
 
 using System;
-using Gtk;
 using GoodtimeDevelopment.Utilites;
-using GoodtimeDevelopment.TouchWidget;
-using AquaPic.Gadgets;
-using AquaPic.Gadgets.PhProbe;
+using AquaPic.Gadgets.Sensor;
+using AquaPic.Gadgets.Sensor.PhProbe;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface

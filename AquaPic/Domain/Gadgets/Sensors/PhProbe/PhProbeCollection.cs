@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Runtime;
 
-namespace AquaPic.Gadgets.PhProbe
+namespace AquaPic.Gadgets.Sensor.PhProbe
 {
     public class PhProbeCollection : GenericAnalogSensorCollection
     {

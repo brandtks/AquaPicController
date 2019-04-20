@@ -24,32 +24,28 @@
 using System;
 using AquaPic.Runtime;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Device.Pump
 {
-    public class GenericEquipment : GenericGadget
+    public class PumpCollection : GenericDeviceCollection
     {
-        public GenericEquipment (GenericEquipmentSettings settings, uint runtime = 1000) 
-            : base (settings) {
-            TaskManager.AddCyclicInterrupt (name, runtime, Run);
-        }
+        public static PumpCollection SharedPumpCollectionInstance = new PumpCollection ();
 
-        protected virtual void Run () {
-            try {
-                var oldValue = value;
-                value = OnRun ();
-                if (!value.Equals (oldValue)) {
-                    NotifyValueChanged (name, value, oldValue);
-                }
-            } catch (NotImplementedException) {
-                Logger.AddWarning (name + " does not have an implemented Runtime function");
-                TaskManager.RemoveCyclicInterrupt (name);
+        protected PumpCollection () : base ("pumps") { }
+
+        public override void ReadAllGadgetsFromFile () {
+            var equipmentSettings = SettingsHelper.ReadAllSettingsInArray<PumpSettings> (gadgetSettingsFileName, gadgetSettingsArrayName);
+            foreach (var setting in equipmentSettings) {
+                CreateGadget (setting, false);
             }
         }
 
-        protected virtual ValueType OnRun () => throw new NotImplementedException ();
-
-        public override void Dispose () {
-            TaskManager.RemoveCyclicInterrupt (name);
+        protected override GenericGadget GadgetCreater (GenericGadgetSettings settings) {
+            var pumpSettings = settings as PumpSettings;
+            if (pumpSettings == null) {
+                throw new ArgumentException ("Settings must be PumpSettings");
+            }
+            var pump = new Pump (pumpSettings);
+            return pump;
         }
     }
 }

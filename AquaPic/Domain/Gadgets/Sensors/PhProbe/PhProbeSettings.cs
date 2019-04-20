@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Globals;
 
-namespace AquaPic.Gadgets.PhProbe
+namespace AquaPic.Gadgets.Sensor.PhProbe
 {
     public class PhProbeSettings : GenericAnalogSensorSettings
     {

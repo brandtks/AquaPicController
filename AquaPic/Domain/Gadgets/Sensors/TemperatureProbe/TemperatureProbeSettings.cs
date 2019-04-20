@@ -25,7 +25,7 @@ using System;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 
-namespace AquaPic.Gadgets.TemperatureProbe
+namespace AquaPic.Gadgets.Sensor.TemperatureProbe
 {
     public class TemperatureProbeSettings : GenericAnalogSensorSettings
     {

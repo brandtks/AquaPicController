@@ -26,7 +26,8 @@ using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
-using AquaPic.Gadgets;
+using AquaPic.Gadgets.Sensor;
+using AquaPic.Gadgets.Sensor.FloatSwitch;
 
 namespace AquaPic.UserInterface
 {
@@ -138,7 +139,7 @@ namespace AquaPic.UserInterface
         }
 
         protected override bool OnSave (object sender) {
-            var switchSettings = new Gadgets.FloatSwitchSettings ();
+            var switchSettings = new FloatSwitchSettings ();
 
             switchSettings.name = (string)settings["Name"].setting;
             if (switchSettings.name == "Enter name") {

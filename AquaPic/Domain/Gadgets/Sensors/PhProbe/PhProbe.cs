@@ -28,7 +28,7 @@ using AquaPic.Drivers;
 using AquaPic.Runtime;
 using AquaPic.PubSub;
 
-namespace AquaPic.Gadgets.PhProbe
+namespace AquaPic.Gadgets.Sensor.PhProbe
 {
     public class PhProbe : GenericAnalogSensor
     {

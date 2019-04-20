@@ -26,7 +26,7 @@ using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Sensor.FloatSwitch
 {
     public enum SwitchType
     {

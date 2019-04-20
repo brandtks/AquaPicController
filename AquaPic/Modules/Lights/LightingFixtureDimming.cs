@@ -26,7 +26,7 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Globals;
 using AquaPic.PubSub;
-using AquaPic.Gadgets;
+using AquaPic.Gadgets.Device;
 
 namespace AquaPic.Modules
 {
@@ -50,7 +50,7 @@ namespace AquaPic.Modules
 
                 dimmingChannel = settings.dimmingChannel;
                 dimmingMode = Mode.Auto;
-                var dimmingSettings = new GenericEquipmentSettings ();
+                var dimmingSettings = new GenericDeviceSettings ();
                 dimmingSettings.name = name + " Dimming Output";
                 dimmingSettings.channel = dimmingChannel;
                 dimmingEquipment = new DimmingEquipment (dimmingSettings, this);
@@ -137,11 +137,11 @@ namespace AquaPic.Modules
                 AquaPicDrivers.AnalogOutput.RemoveChannel (dimmingChannel);
             }
 
-            protected class DimmingEquipment : GenericEquipment
+            protected class DimmingEquipment : GenericDevice
             {
                 protected LightingFixtureDimming fixture;
 
-                public DimmingEquipment (GenericEquipmentSettings settings, LightingFixtureDimming fixture) : base (settings) {
+                public DimmingEquipment (GenericDeviceSettings settings, LightingFixtureDimming fixture) : base (settings) {
                     this.fixture = fixture;
                 }
 

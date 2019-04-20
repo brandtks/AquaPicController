@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2018 Goodtime Development
+    Copyright (c) 2019 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,22 +23,21 @@
 
 using System;
 using AquaPic.Runtime;
+using AquaPic.Drivers;
 
-namespace AquaPic.Gadgets.Sensor.WaterLevelSensor
+namespace AquaPic.Gadgets.Device.Pump
 {
-    public class WaterLevelSensorCollection : GenericAnalogSensorCollection
+    public class Pump : GenericDevice
     {
-        public static WaterLevelSensorCollection SharedWaterLevelSensorCollectionInstance = new WaterLevelSensorCollection ();
+        IOutletScript outletScript;
 
-        protected WaterLevelSensorCollection () : base ("waterLevelSensors") { }
-
-        protected override GenericAnalogSensor AnalogSensorCreater (GenericAnalogSensorSettings settings) {
-            var sensor = new WaterLevelSensor (settings);
-            return sensor;
+        public Pump (PumpSettings settings) : base (settings) {
+            AquaPicDrivers.Power.AddOutlet (channel, name, settings.fallback, key);
+            outletScript = Script.CompileOutletStateGetter (settings.script);
         }
 
-        public void SetCalibrationData (string name, float zeroScaleValue, float fullScaleActual, float fullScaleValue) {
-            SetCalibrationData (name, 0, zeroScaleValue, fullScaleActual, fullScaleValue);
+        protected override ValueType OnRun () {
+            return outletScript.GetOutletState ();
         }
     }
 }

@@ -25,7 +25,7 @@ using System;
 using AquaPic.Globals;
 
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Sensor.FloatSwitch
 {
     public class FloatSwitchSettings : GenericSensorSettings
     {

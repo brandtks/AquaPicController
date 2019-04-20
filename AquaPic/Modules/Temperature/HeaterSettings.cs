@@ -25,14 +25,11 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using AquaPic.Globals;
-using AquaPic.Gadgets;
+using AquaPic.Gadgets.Device;
 
 namespace AquaPic.Modules.Temperature
 {
-    public class HeaterSettings : GenericEquipmentSettings
-    {
-
-    }
+    public class HeaterSettings : GenericDeviceSettings { }
 
     public class HeaterMutator : ISettingMutator<IEnumerable<HeaterSettings>>
     {

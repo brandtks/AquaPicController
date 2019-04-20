@@ -23,11 +23,11 @@
 
 using System;
 using AquaPic.Globals;
-using AquaPic.Gadgets;
+using AquaPic.Gadgets.Device;
 
 namespace AquaPic.Modules
 {
-    public class LightingFixtureSettings : GenericEquipmentSettings 
+    public class LightingFixtureSettings : GenericDeviceSettings 
     {
         [EntitySetting (typeof (BoolMutatorDefaultTrue), "highTempLockout")]
         public bool highTempLockout { get; set; }

@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Runtime;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Sensor.FloatSwitch
 {
     public class FloatSwitchCollection : GenericSensorCollection
     {

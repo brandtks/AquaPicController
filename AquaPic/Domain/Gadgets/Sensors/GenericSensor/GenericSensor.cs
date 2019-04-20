@@ -23,7 +23,7 @@
 
 using System;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Sensor
 {
     public class GenericSensor : GenericGadget
     {

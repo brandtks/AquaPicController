@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2018 Goodtime Development
+    Copyright (c) 2019 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,10 +24,12 @@
 using System;
 using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
-using AquaPic.Gadgets.TemperatureProbe;
-using AquaPic.Gadgets.PhProbe;
+using AquaPic.Gadgets.Sensor.PhProbe;
+using AquaPic.Gadgets.Sensor.FloatSwitch;
+using AquaPic.Gadgets.Sensor.TemperatureProbe;
+using AquaPic.Gadgets.Sensor.WaterLevelSensor;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Sensor
 {
     public class Sensors
     {

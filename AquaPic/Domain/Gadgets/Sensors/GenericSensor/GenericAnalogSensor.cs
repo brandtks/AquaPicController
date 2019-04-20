@@ -26,7 +26,7 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Runtime;
 using AquaPic.PubSub;
 
-namespace AquaPic.Gadgets
+namespace AquaPic.Gadgets.Sensor
 {
     public class GenericAnalogSensor : GenericSensor
     {

@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Runtime;
 
-namespace AquaPic.Gadgets.TemperatureProbe
+namespace AquaPic.Gadgets.Sensor.TemperatureProbe
 {
     public class TemperatureProbeCollection : GenericAnalogSensorCollection
     {

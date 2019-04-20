@@ -163,9 +163,9 @@
     <Compile Include="Domain\Gadgets\GenericGadget\GenericGadget.cs" />
     <Compile Include="Domain\Gadgets\GenericGadget\GenericGadgetCollection.cs" />
     <Compile Include="Domain\Gadgets\GenericGadget\GenericGadgetSettings.cs" />
-    <Compile Include="Domain\Gadgets\Equipment\GenericEquipment\GenericEquipment.cs" />
-    <Compile Include="Domain\Gadgets\Equipment\GenericEquipment\GenericEquipmentCollection.cs" />
-    <Compile Include="Domain\Gadgets\Equipment\GenericEquipment\GenericEquipmentSettings.cs" />
+    <Compile Include="Domain\Gadgets\Device\GenericDevice\GenericDevice.cs" />
+    <Compile Include="Domain\Gadgets\Device\GenericDevice\GenericDeviceCollection.cs" />
+    <Compile Include="Domain\Gadgets\Device\GenericDevice\GenericDeviceSettings.cs" />
     <Compile Include="Domain\Gadgets\Sensors\FloatSwitch\FloatSwitch.cs" />
     <Compile Include="Domain\Gadgets\Sensors\FloatSwitch\FloatSwitchCollection.cs" />
     <Compile Include="Domain\Gadgets\Sensors\FloatSwitch\FloatSwitchSettings.cs" />
@@ -189,6 +189,11 @@
     <Compile Include="Domain\Gadgets\Sensors\WaterLevelSensor\WaterLevelSensorSettings.cs" />
     <Compile Include="Domain\Gadgets\GenericGadget\GadgetPublisher.cs" />
     <Compile Include="Domain\Gadgets\GenericGadget\GadgetSubscriber.cs" />
+    <Compile Include="Domain\Gadgets\Device\Pump\Pump.cs" />
+    <Compile Include="Domain\Gadgets\Device\Pump\PumpSettings.cs" />
+    <Compile Include="Domain\Entity\Mutators\MyStateMutator.cs" />
+    <Compile Include="Domain\Gadgets\Device\Pump\PumpCollection.cs" />
+    <Compile Include="Domain\Gadgets\Device\Devices.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -210,9 +215,10 @@
     <Folder Include="Domain\Globals\" />
     <Folder Include="Domain\Gadgets\" />
     <Folder Include="Domain\Gadgets\GenericGadget\" />
-    <Folder Include="Domain\Gadgets\Equipment\" />
+    <Folder Include="Domain\Gadgets\Device\" />
     <Folder Include="Domain\Gadgets\Sensors\" />
-    <Folder Include="Domain\Gadgets\Equipment\LightingFixture\" />
+    <Folder Include="Domain\Gadgets\Device\LightingFixture\" />
+    <Folder Include="Domain\Gadgets\Device\Pump\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">

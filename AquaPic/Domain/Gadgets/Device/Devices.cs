@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2018 Goodtime Development
+    Copyright (c) 2019 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,23 +22,27 @@
 #endregion // License
 
 using System;
+using Newtonsoft.Json.Linq;
 using AquaPic.Runtime;
+using AquaPic.Gadgets.Device.Pump;
 
-namespace AquaPic.Gadgets.Sensor.WaterLevelSensor
+namespace AquaPic.Gadgets.Device
 {
-    public class WaterLevelSensorCollection : GenericAnalogSensorCollection
+    public class Devices
     {
-        public static WaterLevelSensorCollection SharedWaterLevelSensorCollectionInstance = new WaterLevelSensorCollection ();
+        public static PumpCollection Pumps = PumpCollection.SharedPumpCollectionInstance;
 
-        protected WaterLevelSensorCollection () : base ("waterLevelSensors") { }
+        public static void AddDevices () {
+            if (SettingsHelper.SettingsFileExists (GenericDeviceCollection.equipmentSettingsFileName)) {
+                Pumps.ReadAllGadgetsFromFile ();
+            } else {
+                Logger.Add ("Sensors settings file did not exist, created new water level settings");
 
-        protected override GenericAnalogSensor AnalogSensorCreater (GenericAnalogSensorSettings settings) {
-            var sensor = new WaterLevelSensor (settings);
-            return sensor;
-        }
+                var jo = new JObject ();
+                jo.Add (new JProperty (Pumps.gadgetSettingsArrayName, new JArray ()));
 
-        public void SetCalibrationData (string name, float zeroScaleValue, float fullScaleActual, float fullScaleValue) {
-            SetCalibrationData (name, 0, zeroScaleValue, fullScaleActual, fullScaleValue);
+                SettingsHelper.WriteSettingsFile (GenericDeviceCollection.equipmentSettingsFileName, jo);
+            }
         }
     }
 }
