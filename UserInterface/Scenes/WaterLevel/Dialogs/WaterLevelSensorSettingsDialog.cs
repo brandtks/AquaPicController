@@ -35,7 +35,7 @@ namespace AquaPic.UserInterface
     {
         public string waterLevelSensorName { get; private set; }
 
-        public WaterLevelSensorSettingsDialog (WaterLevelSensorSettings settings, Window parent)
+        public WaterLevelSensorSettingsDialog (GenericAnalogSensorSettings settings, Window parent)
             : base (settings.name, settings.name.IsNotEmpty (), parent) 
         {
             waterLevelSensorName = settings.name;

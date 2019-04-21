@@ -526,9 +526,9 @@ namespace AquaPic.UserInterface
         }
 
         protected void CallTemperatureProbeSettingsDialog (bool forceNew = false) {
-            TemperatureProbeSettings settings;
+            GenericAnalogSensorSettings settings;
             if (probeName.IsNotEmpty () && !forceNew) {
-                settings = (TemperatureProbeSettings)Sensors.TemperatureProbes.GetGadgetSettings (probeName);
+                settings = Sensors.TemperatureProbes.GetGadgetSettings (probeName) as GenericAnalogSensorSettings;
             } else {
                 settings = new TemperatureProbeSettings ();
             }

@@ -605,9 +605,9 @@ namespace AquaPic.UserInterface
         }
 
         protected void CallWaterLevelSensorSettingsDialog (bool forceNew = false) {
-            WaterLevelSensorSettings settings;
+            GenericAnalogSensorSettings settings;
             if (analogSensorName.IsNotEmpty () && !forceNew) {
-                settings = (WaterLevelSensorSettings)Sensors.WaterLevelSensors.GetGadgetSettings (analogSensorName);
+                settings = Sensors.WaterLevelSensors.GetGadgetSettings (analogSensorName) as GenericAnalogSensorSettings;
             } else {
                 settings = new WaterLevelSensorSettings ();
             }

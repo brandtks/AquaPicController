@@ -35,7 +35,7 @@ namespace AquaPic.UserInterface
     {
         public string temperatureProbeName { get; private set; }
 
-        public TemperatureProbeSettingsDialog (TemperatureProbeSettings settings, Window parent)
+        public TemperatureProbeSettingsDialog (GenericAnalogSensorSettings settings, Window parent)
             : base (settings.name, settings.name.IsNotEmpty (), parent) 
         {
             temperatureProbeName = settings.name;
