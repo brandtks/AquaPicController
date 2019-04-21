@@ -50,7 +50,7 @@ namespace AquaPic.Gadgets.Sensor.PhProbe
         public override void OnValueUpdatedAction (object parm) {
             var args = parm as ValueUpdatedEvent;
             var val = ScaleRawLevel (Convert.ToSingle (args.value));
-            if (val < zeroScaleCalibrationActual) {
+            if (val > zeroScaleCalibrationActual) {
                 dataLogger.AddEntry (val);
             } else {
                 dataLogger.AddEntry ("probe disconnected");

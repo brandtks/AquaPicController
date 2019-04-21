@@ -233,7 +233,7 @@ namespace AquaPic.UserInterface
                     cr.Fill ();
 
                     var topEdge = (height / 2) - 30 + top;
-                    TouchGlobal.DrawRoundedRectangle (cr, left - 50, topEdge, 80, 60, 22);
+                    TouchGlobal.DrawRoundedRectangle (cr, left - 30, topEdge, 55, 60, 25);
 
                     var color = new TouchColor ("grey3");
                     var outlineColor = new TouchColor (color);

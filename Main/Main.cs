@@ -147,6 +147,9 @@ namespace AquaPic
             Driver.DigitalInput.SetChannelMode ("Sump Low, Float Switch", Mode.Manual);
             Driver.DigitalInput.SetChannelValue ("Sump Low, Float Switch", true);
             Driver.DigitalInput.SetChannelMode ("Sump ATO, Float Switch", Mode.Manual);
+
+            Driver.PhOrp.SetChannelMode ("Sump, pH Probe", Mode.Manual);
+            Driver.PhOrp.SetChannelValue ("Sump, pH Probe", 2282);
 #endif
 
             // Run the control
@@ -172,6 +175,13 @@ namespace AquaPic
             groups = WaterLevel.GetAllWaterLevelGroupNames ();
             foreach (var group in groups) {
                 var dataLogger = (DataLoggerIoImplementation)WaterLevel.GetWaterLevelGroupDataLogger (group);
+                if (dataLogger != null) {
+                    dataLogger.DeleteAllLogFiles ();
+                }
+            }
+            var phProbes = Sensors.PhProbes.GetAllGadgetNames ();
+            foreach (var probe in phProbes) {
+                var dataLogger = (DataLoggerIoImplementation)Sensors.PhProbes.GetPhProbeDataLogger (probe);
                 if (dataLogger != null) {
                     dataLogger.DeleteAllLogFiles ();
                 }
