@@ -24,6 +24,7 @@
 using System;
 using System.Text;
 using CSScriptLibrary;
+using csscript;
 
 namespace AquaPic.Service
 {
@@ -49,7 +50,13 @@ namespace AquaPic.Service
             sb.AppendLine ("}");
             sb.AppendLine ("}");
             var code = sb.ToString ();
-            var outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
+
+            IOutletScript outletScript;
+            try {
+                outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
+            } catch (CompilerException) {
+                outletScript = null;
+            }
             return outletScript;
         }
     }

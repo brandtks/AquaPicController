@@ -58,5 +58,9 @@ namespace AquaPic.Gadgets
         protected virtual ValueType GetValue () {
             return _value;
         }
+
+        public virtual bool Valid () {
+            return !channel.Equals (IndividualControl.Empty);
+        }
     }
 }

@@ -32,12 +32,27 @@ namespace AquaPic.Gadgets.Device.Pump
         IOutletScript outletScript;
 
         public Pump (PumpSettings settings) : base (settings) {
-            Driver.Power.AddOutlet (channel, name, settings.fallback, key);
             outletScript = Script.CompileOutletStateGetter (settings.script);
+            if (outletScript != null) {
+                Driver.Power.AddOutlet (channel, name, settings.fallback, key);
+            } else {
+                Logger.AddError ("Failed to compile script for pump {0}", name);
+            }
         }
 
         protected override ValueType OnRun () {
             return outletScript.GetOutletState ();
+        }
+
+        public override void Dispose () {
+            base.Dispose ();
+            Driver.Power.RemoveChannel (channel);
+        }
+
+        public override bool Valid () {
+            var valid = base.Valid ();
+            valid &= outletScript != null;
+            return valid;
         }
     }
 }

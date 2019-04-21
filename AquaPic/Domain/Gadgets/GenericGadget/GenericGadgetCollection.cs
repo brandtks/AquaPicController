@@ -49,9 +49,13 @@ namespace AquaPic.Gadgets
                 throw new Exception (string.Format ("gadget: {0} already exists", settings.name));
             }
             var equip = GadgetCreater (settings);
-            gadgets[equip.name] = equip;
-            if (saveToFile) {
-                AddGadgetSettingsToFile (settings);
+            if (equip.Valid ()) {
+                gadgets[equip.name] = equip;
+                if (saveToFile) {
+                    AddGadgetSettingsToFile (settings);
+                }
+            } else {
+                equip.Dispose ();
             }
         }
 
