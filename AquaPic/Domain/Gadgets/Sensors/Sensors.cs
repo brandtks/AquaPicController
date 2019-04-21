@@ -32,8 +32,7 @@ using AquaPic.Gadgets.Sensor.Switch;
 
 namespace AquaPic.Gadgets.Sensor
 {
-    public class Sensors
-    {
+    public class Sensors {
         public static FloatSwitchCollection FloatSwitches = FloatSwitchCollection.SharedFloatSwitchCollectionInstance;
         public static WaterLevelSensorCollection WaterLevelSensors = WaterLevelSensorCollection.SharedWaterLevelSensorCollectionInstance;
         public static TemperatureProbeCollection TemperatureProbes = TemperatureProbeCollection.SharedTemperatureProbeCollectionInstance;
