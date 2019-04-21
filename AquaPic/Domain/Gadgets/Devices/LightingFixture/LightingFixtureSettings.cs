@@ -23,14 +23,16 @@
 
 using System;
 using AquaPic.Globals;
-using AquaPic.Gadgets.Device;
 
-namespace AquaPic.Modules
+namespace AquaPic.Gadgets.Device.Lighting
 {
     public class LightingFixtureSettings : GenericDeviceSettings 
     {
         [EntitySetting (typeof (BoolMutatorDefaultTrue), "highTempLockout")]
         public bool highTempLockout { get; set; }
+
+        [EntitySetting (typeof (StringMutator), "tempLockoutTemperatureGroup", true)]
+        public string tempLockoutTemperatureGroup { get; set; }
 
         [EntitySetting (typeof (IndividualControlMutator), new string[] { "dimmingCard", "dimmingChannel" }, true)]
         public IndividualControl dimmingChannel { get; set; }

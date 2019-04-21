@@ -22,12 +22,13 @@
 #endregion // License
 
 using System;
-using AquaPic.Drivers;
-using AquaPic.Globals;
-using AquaPic.Modules;
+using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using Gtk;
+using AquaPic.Drivers;
+using AquaPic.Globals;
+using AquaPic.Gadgets.Device;
+using AquaPic.Gadgets.Device.Lighting;
 
 namespace AquaPic.UserInterface
 {
@@ -56,7 +57,7 @@ namespace AquaPic.UserInterface
         public LightingWindow (params object[] options) : base (false) {
             sceneTitle = "Lighting";
 
-            fixtureName = Lighting.defaultFixture;
+            fixtureName = Devices.Lighting.defaultGadget;
             if (fixtureName.IsNotEmpty ()) {
                 dimmingIsManual = false;
             }
@@ -64,7 +65,7 @@ namespace AquaPic.UserInterface
             if (options.Length >= 3) {
                 string requestedFixture = options[2] as string;
                 if (requestedFixture != null) {
-                    if (Lighting.CheckFixtureKeyNoThrow (requestedFixture)) {
+                    if (Devices.Lighting.CheckGadgetKeyNoThrow (requestedFixture)) {
                         fixtureName = requestedFixture;
                     }
                 }
@@ -148,7 +149,7 @@ namespace AquaPic.UserInterface
                         newLevel = 0.0f;
                     if (newLevel > 100.0f)
                         newLevel = 100.0f;
-                    Lighting.SetDimmingLevel (fixtureName, newLevel);
+                    Devices.Lighting.SetDimmingLevel (fixtureName, newLevel);
                 } catch (Exception ex) {
                     MessageBox.Show (ex.Message);
                     args.keepText = false;
@@ -202,7 +203,7 @@ namespace AquaPic.UserInterface
             Put (lightingStateWidget, 55, 77);
             lightingStateWidget.Show ();
 
-            combo = new TouchComboBox (Lighting.GetAllFixtureNames ());
+            combo = new TouchComboBox (Devices.Lighting.GetAllGadgetNames ());
             combo.comboList.Add ("New fixture...");
             combo.activeIndex = 0;
             combo.WidthRequest = 250;
@@ -256,7 +257,7 @@ namespace AquaPic.UserInterface
                     outletStateLabel.textColor = "secb";
                 }
 
-                isDimmingFixture = Lighting.IsDimmingFixture (fixtureName);
+                isDimmingFixture = Devices.Lighting.IsDimmingFixture (fixtureName);
 
                 if (isDimmingFixture) {
                     dimmingHeader.Visible = true;
@@ -267,7 +268,7 @@ namespace AquaPic.UserInterface
                     requestedLabel.Visible = true;
                     requestedTextLabel.Visible = true;
 
-                    Mode m = Lighting.GetDimmingMode (fixtureName);
+                    Mode m = Devices.Lighting.GetDimmingMode (fixtureName);
                     dimmingIsManual = m == Mode.Manual;
                     if (!dimmingIsManual) {
                         modeSelector.currentSelected = 1;
@@ -279,17 +280,17 @@ namespace AquaPic.UserInterface
                         modeSelector.currentSelected = 0;
                         dimmingProgressBar.enableTouch = true;
                         requestedTextBox.Visible = true;
-                        requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureName));
+                        requestedTextBox.text = string.Format ("{0:N2}", Devices.Lighting.GetRequestedDimmingLevel (fixtureName));
                         autoTextBox.Visible = true;
                         autoLabel.Visible = true;
-                        autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureName));
+                        autoTextBox.text = string.Format ("{0:N2}", Devices.Lighting.GetAutoDimmingLevel (fixtureName));
                     }
 
-                    float level = Lighting.GetCurrentDimmingLevel (fixtureName);
+                    float level = Devices.Lighting.GetCurrentDimmingLevel (fixtureName);
                     dimmingProgressBar.currentProgressSecondary = level / 100.0f;
                     actualTextBox.text = string.Format ("{0:N2}", level);
 
-                    level = Lighting.GetRequestedDimmingLevel (fixtureName);
+                    level = Devices.Lighting.GetRequestedDimmingLevel (fixtureName);
                     dimmingProgressBar.currentProgress = level / 100.0f;
                     requestedLabel.text = string.Format ("{0:N2}", level);
 
@@ -359,11 +360,11 @@ namespace AquaPic.UserInterface
         protected override bool OnUpdateTimer () {
             if (fixtureName.IsNotEmpty ()) {
                 if (isDimmingFixture) {
-                    float level = Lighting.GetCurrentDimmingLevel (fixtureName);
+                    float level = Devices.Lighting.GetCurrentDimmingLevel (fixtureName);
                     dimmingProgressBar.currentProgressSecondary = level / 100.0f;
                     actualTextBox.text = string.Format ("{0:N2}", level);
 
-                    level = Lighting.GetRequestedDimmingLevel (fixtureName);
+                    level = Devices.Lighting.GetRequestedDimmingLevel (fixtureName);
                     dimmingProgressBar.currentProgress = level / 100.0f;
                     requestedLabel.text = string.Format ("{0:N2}", level);
                     requestedTextBox.text = string.Format ("{0:N2}", level);
@@ -373,7 +374,7 @@ namespace AquaPic.UserInterface
                     dimmingProgressBar.QueueDraw ();
 
                     if (dimmingIsManual) {
-                        autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureName));
+                        autoTextBox.text = string.Format ("{0:N2}", Devices.Lighting.GetAutoDimmingLevel (fixtureName));
                         autoTextBox.QueueDraw ();
                     }
                 }
@@ -386,16 +387,16 @@ namespace AquaPic.UserInterface
 
         protected void OnDimmingModeSelectorChanged (object sender, SelectorChangedEventArgs args) {
             if (args.currentSelectedIndex == 0) {
-                Lighting.SetDimmingMode (fixtureName, Mode.Manual);
-                IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
+                Devices.Lighting.SetDimmingMode (fixtureName, Mode.Manual);
+                var ic = Devices.Lighting.GetChannel (fixtureName);
                 Driver.Power.SetChannelMode (ic, Mode.Manual);
                 dimmingProgressBar.enableTouch = true;
                 requestedTextBox.Visible = true;
-                requestedTextBox.text = string.Format ("{0:N2}", Lighting.GetRequestedDimmingLevel (fixtureName));
+                requestedTextBox.text = string.Format ("{0:N2}", Devices.Lighting.GetRequestedDimmingLevel (fixtureName));
                 autoTextBox.Visible = true;
                 autoLabel.Visible = true;
                 dimmingIsManual = true;
-                autoTextBox.text = string.Format ("{0:N2}", Lighting.GetAutoDimmingLevel (fixtureName));
+                autoTextBox.text = string.Format ("{0:N2}", Devices.Lighting.GetAutoDimmingLevel (fixtureName));
                 if (Driver.Power.GetChannelValue (ic)) {
                     outletSelectorSwitch.currentSelected = 0;
                 } else {
@@ -403,8 +404,8 @@ namespace AquaPic.UserInterface
                 }
                 outletSelectorSwitch.QueueDraw ();
             } else {
-                Lighting.SetDimmingMode (fixtureName, Mode.Auto);
-                Driver.Power.SetChannelMode (Lighting.GetFixtureOutletIndividualControl (fixtureName), Mode.Auto);
+                Devices.Lighting.SetDimmingMode (fixtureName, Mode.Auto);
+                Driver.Power.SetChannelMode (Devices.Lighting.GetChannel (fixtureName), Mode.Auto);
                 dimmingProgressBar.enableTouch = false;
                 requestedTextBox.Visible = false;
                 autoTextBox.Visible = false;
@@ -420,7 +421,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnOutletControlSelectorChanged (object sender, SelectorChangedEventArgs args) {
-            IndividualControl ic = Lighting.GetFixtureOutletIndividualControl (fixtureName);
+            var ic = Devices.Lighting.GetChannel (fixtureName);
 
             if (args.currentSelectedIndex == 0) { // Manual Off
                 Driver.Power.SetChannelMode (ic, Mode.Manual);
@@ -437,7 +438,7 @@ namespace AquaPic.UserInterface
 
         protected void OnFixtureSettingsButtonReleased (object sender, ButtonReleaseEventArgs args) {
             var parent = Toplevel as Window;
-            var s = new FixtureSettings (Lighting.GetLightingFixtureSettings (fixtureName), parent);
+            var s = new FixtureSettings (Devices.Lighting.GetGadgetSettings (fixtureName) as LightingFixtureSettings, parent);
             s.Run ();
             var newFixtureName = s.fixtureName;
             var outcome = s.outcome;
@@ -452,7 +453,7 @@ namespace AquaPic.UserInterface
                 fixtureName = newFixtureName;
             } else if (outcome == TouchSettingsOutcome.Deleted) {
                 combo.comboList.Remove (fixtureName);
-                fixtureName = Lighting.defaultFixture;
+                fixtureName = Devices.Lighting.defaultGadget;
                 combo.activeText = fixtureName;
             }
 
@@ -463,8 +464,8 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnProgressChanged (object sender, ProgressChangeEventArgs args) {
-            Lighting.SetDimmingLevel (fixtureName, args.currentProgress * 100.0f);
-            float level = Lighting.GetCurrentDimmingLevel (fixtureName);
+            Devices.Lighting.SetDimmingLevel (fixtureName, args.currentProgress * 100.0f);
+            var level = Devices.Lighting.GetCurrentDimmingLevel (fixtureName);
             actualTextBox.text = string.Format ("{0:N2}", level);
             actualTextBox.QueueDraw ();
         }

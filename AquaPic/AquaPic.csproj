@@ -118,11 +118,6 @@
     <Compile Include="Domain\Timer\StaticTimer.cs" />
     <Compile Include="Domain\Timer\Timer.cs" />
     <Compile Include="Domain\TimePeriod\TimePeriod.cs" />
-    <Compile Include="Modules\Lights\Lighting.cs" />
-    <Compile Include="Modules\Lights\LightingFixture.cs" />
-    <Compile Include="Modules\Lights\LightingState.cs" />
-    <Compile Include="Modules\Lights\LightingFixtureDimming.cs" />
-    <Compile Include="Modules\Lights\LightingFixtureSettings.cs" />
     <Compile Include="Modules\ATO\AutoTopOffGroupSettings.cs" />
     <Compile Include="Domain\Entity\IEntitySettings.cs" />
     <Compile Include="Domain\Entity\EntitySettingAttribute.cs" />
@@ -194,6 +189,11 @@
     <Compile Include="Domain\Gadgets\Sensors\Switch\SwitchSettings.cs" />
     <Compile Include="Domain\Gadgets\Sensors\Switch\Switch.cs" />
     <Compile Include="Domain\Gadgets\Sensors\Switch\SwitchCollection.cs" />
+    <Compile Include="Domain\Gadgets\Devices\LightingFixture\LightingCollection.cs" />
+    <Compile Include="Domain\Gadgets\Devices\LightingFixture\LightingFixture.cs" />
+    <Compile Include="Domain\Gadgets\Devices\LightingFixture\LightingFixtureDimming.cs" />
+    <Compile Include="Domain\Gadgets\Devices\LightingFixture\LightingFixtureSettings.cs" />
+    <Compile Include="Domain\Gadgets\Devices\LightingFixture\LightingState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

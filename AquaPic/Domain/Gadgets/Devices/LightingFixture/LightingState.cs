@@ -28,7 +28,7 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 using AquaPic.Service;
 
-namespace AquaPic.Modules
+namespace AquaPic.Gadgets.Device.Lighting
 {
     public enum LightingStateType
     {

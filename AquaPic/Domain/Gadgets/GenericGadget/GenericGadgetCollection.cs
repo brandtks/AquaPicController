@@ -23,6 +23,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AquaPic.Globals;
 using AquaPic.Service;
 
@@ -33,6 +34,22 @@ namespace AquaPic.Gadgets
         protected Dictionary<string, GenericGadget> gadgets;
         protected readonly string gadgetSettingsFileName;
         public string gadgetSettingsArrayName { get; protected set; }
+
+        public int gadgetCount {
+            get {
+                return gadgets.Count;
+            }
+        }
+
+        public string defaultGadget {
+            get {
+                if (gadgets.Count > 0) {
+                    var first = gadgets.First ();
+                    return first.Key;
+                }
+                return string.Empty;
+            }
+        }
 
         public GenericGadgetCollection (string gadgetSettingsFileName, string gadgetSettingsArrayName) {
             gadgets = new Dictionary<string, GenericGadget> ();
@@ -116,6 +133,11 @@ namespace AquaPic.Gadgets
         public virtual GenericGadget GetGadget (string name) {
             CheckGadgetKey (name);
             return gadgets[name].Clone ();
+        }
+
+        public virtual IndividualControl GetChannel (string name) {
+            CheckGadgetKey (name);
+            return gadgets[name].channel;
         }
 
         public virtual Guid GetGadgetEventPublisherKey (string name) {

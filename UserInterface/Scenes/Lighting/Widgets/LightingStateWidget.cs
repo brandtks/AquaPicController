@@ -24,7 +24,7 @@
 using System;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
-using AquaPic.Modules;
+using AquaPic.Gadgets.Device;
 
 namespace AquaPic.UserInterface
 {
@@ -99,7 +99,7 @@ namespace AquaPic.UserInterface
                         if (a.ResponseId != ResponseType.Cancel) {
                             var makeChangePermanant = a.ResponseId == ResponseType.Yes;
 
-                            Lighting.SetLightingFixtureLightingStates (
+                            Devices.Lighting.SetLightingFixtureLightingStates (
                                 fixtureName,
                                 lightingStateDisplay.lightingStates,
                                 !makeChangePermanant);
@@ -154,8 +154,8 @@ namespace AquaPic.UserInterface
         public void SetStates (string fixtureName) {
             this.fixtureName = fixtureName;
             lightingStateDisplay.SetStates (
-                Lighting.GetLightingFixtureLightingStates (fixtureName),
-                Lighting.IsDimmingFixture (fixtureName));
+                Devices.Lighting.GetLightingFixtureLightingStates (fixtureName),
+                Devices.Lighting.IsDimmingFixture (fixtureName));
         }
     }
 }

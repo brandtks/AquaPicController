@@ -116,7 +116,6 @@ namespace AquaPic
                 Sensors.AddSensors ();
                 Devices.AddDevices ();
                 Temperature.Init ();
-                Lighting.Init ();
                 WaterLevel.Init ();
                 AutoTopOff.Init ();
 #if DEBUG

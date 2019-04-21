@@ -31,6 +31,7 @@ using GoodtimeDevelopment.Utilites;
 using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Modules;
 using AquaPic.Modules.Temperature;
+using AquaPic.Gadgets.Device;
 
 namespace AquaPic.UserInterface
 {
@@ -207,7 +208,7 @@ namespace AquaPic.UserInterface
                 } else if (args.activeText == "Lighting") {
                     groupComboBox.Visible = true;
                     groupComboBox.combo.comboList.Clear ();
-                    groupComboBox.combo.comboList.AddRange (Lighting.GetAllDimmingFixtureNames ());
+                    groupComboBox.combo.comboList.AddRange (Devices.Lighting.GetAllDimmingFixtureNames ());
                     groupComboBox.combo.activeIndex = -1;
                 } else {
                     groupComboBox.Visible = false;

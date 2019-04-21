@@ -22,10 +22,9 @@
 #endregion // License
 
 using System;
-using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Modules;
+using AquaPic.Gadgets.Device;
 
 namespace AquaPic.UserInterface
 {
@@ -36,8 +35,8 @@ namespace AquaPic.UserInterface
             unitOfMeasurement = UnitsOfMeasurement.Percentage;
 
             this.group = group;
-            if (Lighting.CheckFixtureKeyNoThrow (this.group)) {
-                if (Lighting.IsDimmingFixture (this.group)) {
+            if (Devices.Lighting.CheckGadgetKeyNoThrow (this.group)) {
+                if (Devices.Lighting.IsDimmingFixture (this.group)) {
                     text = this.group;
                     WidgetReleaseEvent += (o, args) => {
                         AquaPicGui.AquaPicUserInterface.ChangeScreens ("Lighting", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.group);
@@ -52,7 +51,7 @@ namespace AquaPic.UserInterface
 
         public override void Update () {
             if (group.IsNotEmpty ()) {
-                currentValue = Lighting.GetCurrentDimmingLevel (group);
+                currentValue = Devices.Lighting.GetCurrentDimmingLevel (group);
             }
         }
     }

@@ -25,7 +25,8 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Modules;
+using AquaPic.Gadgets.Device;
+using AquaPic.Gadgets.Device.Lighting;
 using AquaPic.Globals;
 using AquaPic.Drivers;
 
@@ -45,7 +46,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (args.text.IsEmpty ()) {
                     args.keepText = false;
-                } else if (!Lighting.FixtureNameOk (args.text)) {
+                } else if (Devices.Lighting.GadgetNameExists (args.text)) {
                     MessageBox.Show ("Heater name already exists");
                     args.keepText = false;
                 }
@@ -125,14 +126,14 @@ namespace AquaPic.UserInterface
 
             fixtureSettings.lightingStates = new LightingState[0];
 
-            Lighting.UpdateLight (fixtureName, fixtureSettings);
+            Devices.Lighting.UpdateGadget (fixtureName, fixtureSettings);
             fixtureName = fixtureSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            Lighting.RemoveLight (fixtureName);
+            Devices.Lighting.RemoveGadget (fixtureName);
             return true;
         }
     }

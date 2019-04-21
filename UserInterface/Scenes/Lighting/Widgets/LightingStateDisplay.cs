@@ -27,7 +27,7 @@ using Gtk;
 using Cairo;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Modules;
+using AquaPic.Gadgets.Device.Lighting;
 
 namespace AquaPic.UserInterface
 {

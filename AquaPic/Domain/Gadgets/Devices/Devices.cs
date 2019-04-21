@@ -25,21 +25,25 @@ using System;
 using Newtonsoft.Json.Linq;
 using AquaPic.Service;
 using AquaPic.Gadgets.Device.Pump;
+using AquaPic.Gadgets.Device.Lighting;
 
 namespace AquaPic.Gadgets.Device
 {
     public class Devices
     {
         public static PumpCollection Pumps = PumpCollection.SharedPumpCollectionInstance;
+        public static LightingCollection Lighting = LightingCollection.SharedLightingCollectionInstance;
 
         public static void AddDevices () {
             if (SettingsHelper.SettingsFileExists (GenericDeviceCollection.equipmentSettingsFileName)) {
                 Pumps.ReadAllGadgetsFromFile ();
+                Lighting.ReadAllGadgetsFromFile ();
             } else {
-                Logger.Add ("Sensors settings file did not exist, created new water level settings");
+                Logger.Add ("Device settings file did not exist, created new device settings");
 
                 var jo = new JObject ();
                 jo.Add (new JProperty (Pumps.gadgetSettingsArrayName, new JArray ()));
+                jo.Add (new JProperty (Lighting.gadgetSettingsArrayName, new JArray ()));
 
                 SettingsHelper.WriteSettingsFile (GenericDeviceCollection.equipmentSettingsFileName, jo);
             }
