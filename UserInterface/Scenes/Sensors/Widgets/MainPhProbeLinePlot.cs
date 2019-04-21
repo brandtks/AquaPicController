@@ -1,3 +1,4 @@
+﻿// #region License
 #region License
 
 /*
@@ -23,18 +24,18 @@
 
 using System;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Modules;
+using AquaPic.Gadgets.Sensor;
 using GoodtimeDevelopment.TouchWidget;
 
 namespace AquaPic.UserInterface
 {
-    public class WaterLevelLinePlot : LinePlotWidget
+    public class PhProbeLinePlot : LinePlotWidget
     {
         TouchLabel label;
 
-        public WaterLevelLinePlot (string group, int row, int column) : base ("Water Level", group, row, column) {
-            text = "No Water Level";
-            unitOfMeasurement = UnitsOfMeasurement.Inches;
+        public PhProbeLinePlot (string group, int row, int column) : base ("pH Probe", group, row, column) {
+            text = "No pH Probe";
+            unitOfMeasurement = UnitsOfMeasurement.None;
 
             label = new TouchLabel ();
             label.SetSizeRequest (152, 16);
@@ -44,18 +45,18 @@ namespace AquaPic.UserInterface
             Put (label, 155, 63);
 
             this.group = group;
-            if (WaterLevel.CheckWaterLevelGroupKeyNoThrow (this.group)) {
-                var dataLogger = WaterLevel.GetWaterLevelGroupDataLogger (this.group);
+            if (Sensors.PhProbes.CheckGadgetKeyNoThrow (this.group)) {
+                var dataLogger = Sensors.PhProbes.GetPhProbeDataLogger (this.group);
                 linePlot.LinkDataLogger (dataLogger);
 
                 Destroyed += (obj, args) => {
                     linePlot.UnLinkDataLogger (dataLogger);
                 };
 
-                text = string.Format ("{0} Water Level", this.group);
+                text = string.Format ("{0} pH", this.group);
 
                 WidgetReleaseEvent += (o, args) => {
-                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Water Level", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.group);
+                    AquaPicGui.AquaPicUserInterface.ChangeScreens ("Sensors", Toplevel, AquaPicGui.AquaPicUserInterface.currentScene, this.group);
                 };
             } else {
                 this.group = string.Empty;
@@ -63,25 +64,20 @@ namespace AquaPic.UserInterface
 
             linePlot.rangeMargin = 1;
             linePlot.eventColors.Add ("probe disconnected", new TouchColor ("secb", 0.25));
-            linePlot.eventColors.Add ("ato started", new TouchColor ("seca", 0.5));
-            linePlot.eventColors.Add ("ato stopped", new TouchColor ("secc", 0.5));
-            linePlot.eventColors.Add ("low alarm", new TouchColor ("compl", 0.25));
-            linePlot.eventColors.Add ("high alarm", new TouchColor ("compl", 0.25));
             linePlot.eventColors.Add ("disconnected alarm", new TouchColor ("compl", 0.25));
         }
 
         public override void Update () {
             if (group.IsNotEmpty ()) {
-                if (!WaterLevel.GetWaterLevelGroupAnalogSensorConnected (group)) {
+                if (!Sensors.PhProbes.GetAnalogSensorConnected (group)) {
                     textBox.text = "--";
                     label.Visible = true;
                     label.text = "Disconnected";
                 } else {
-                    currentValue = WaterLevel.GetWaterLevelGroupLevel (group); ;
+                    currentValue = (float)Sensors.PhProbes.GetGadgeValue (group);
                     label.Visible = false;
                 }
             }
         }
     }
 }
-

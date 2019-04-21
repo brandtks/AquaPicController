@@ -32,6 +32,7 @@ using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Modules;
 using AquaPic.Modules.Temperature;
 using AquaPic.Gadgets.Device;
+using AquaPic.Gadgets.Sensor;
 
 namespace AquaPic.UserInterface
 {
@@ -209,6 +210,11 @@ namespace AquaPic.UserInterface
                     groupComboBox.Visible = true;
                     groupComboBox.combo.comboList.Clear ();
                     groupComboBox.combo.comboList.AddRange (Devices.Lighting.GetAllDimmingFixtureNames ());
+                    groupComboBox.combo.activeIndex = -1;
+                } else if (args.activeText == "pH Probe") {
+                    groupComboBox.Visible = true;
+                    groupComboBox.combo.comboList.Clear ();
+                    groupComboBox.combo.comboList.AddRange (Sensors.PhProbes.GetAllGadgetNames ());
                     groupComboBox.combo.activeIndex = -1;
                 } else {
                     groupComboBox.Visible = false;

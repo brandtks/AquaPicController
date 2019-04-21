@@ -366,7 +366,7 @@ namespace AquaPic.UserInterface
 
         protected void GetAnalogSensorData () {
             if (analogSensorName.IsNotEmpty ()) {
-                float level = (float)Sensors.WaterLevelSensors.GetSensorValue (analogSensorName);
+                float level = (float)Sensors.WaterLevelSensors.GetGadgeValue (analogSensorName);
                 if (level < 0f) {
                     analogSensorLevelTextBox.text = "Probe Disconnected";
                     analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;

@@ -43,10 +43,5 @@ namespace AquaPic.Gadgets.Sensor
         public void RemoveSensor (string name) {
             RemoveGadget (name, true);
         }
-
-        public virtual ValueType GetSensorValue (string name) {
-            CheckGadgetKey (name);
-            return gadgets[name].value;
-        }
     }
 }

@@ -82,5 +82,11 @@ namespace AquaPic.Gadgets.Sensor
 
             UpdateGadgetSettingsInFile (name);
         }
+
+        public bool GetAnalogSensorConnected (string name) {
+            CheckGadgetKey (name);
+            var analogSensor = gadgets[name] as GenericAnalogSensor;
+            return analogSensor.connected;
+        }
     }
 }

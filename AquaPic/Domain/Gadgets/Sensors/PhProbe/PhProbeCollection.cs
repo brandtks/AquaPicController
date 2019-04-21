@@ -22,7 +22,7 @@
 #endregion // License
 
 using System;
-using AquaPic.Service;
+using AquaPic.DataLogging;
 
 namespace AquaPic.Gadgets.Sensor.PhProbe
 {
@@ -35,6 +35,12 @@ namespace AquaPic.Gadgets.Sensor.PhProbe
         protected override GenericAnalogSensor AnalogSensorCreater (GenericAnalogSensorSettings settings) {
             var sensor = new PhProbe (settings);
             return sensor;
+        }
+
+        public IDataLogger GetPhProbeDataLogger (string name) {
+            CheckGadgetKey (name);
+            var phProbe = gadgets[name] as PhProbe;
+            return phProbe.dataLogger;
         }
     }
 }

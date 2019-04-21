@@ -36,7 +36,8 @@ namespace AquaPic.UserInterface
         static HomeWindowWidgets () {
             linePlots = new Dictionary<string, LinePlotData> {
                 { "Temperature", new LinePlotData ((group, row, column) => {return new TemperatureLinePlot (group, row, column);}) },
-                { "Water Level", new LinePlotData ((group, row, column) => {return new WaterLevelLinePlot (group, row, column);}) }
+                { "Water Level", new LinePlotData ((group, row, column) => {return new WaterLevelLinePlot (group, row, column);}) },
+                { "pH Probe", new LinePlotData ((group, row, column) => {return new PhProbeLinePlot (group, row, column);}) }
             };
 
             barPlots = new Dictionary<string, BarPlotData> {
