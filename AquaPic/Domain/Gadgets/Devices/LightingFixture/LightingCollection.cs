@@ -156,7 +156,7 @@ namespace AquaPic.Gadgets.Device.Lighting
         // Lighting States
         public LightingState[] GetLightingFixtureLightingStates (string fixtureName) {
             CheckGadgetKey (fixtureName);
-            var fixture = gadgets[fixtureName] as LightingFixtureDimming;
+            var fixture = gadgets[fixtureName] as LightingFixture;
             var lightingStates = new List<LightingState> ();
             foreach (var state in fixture.lightingStates) {
                 lightingStates.Add (new LightingState (state));

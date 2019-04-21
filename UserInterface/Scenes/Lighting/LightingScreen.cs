@@ -233,7 +233,6 @@ namespace AquaPic.UserInterface
 
         protected void GetFixtureData () {
             if (fixtureName.IsNotEmpty ()) {
-                dimmingHeader.Visible = true;
                 outletStateLabel.Visible = true;
                 outletSelectorSwitch.Visible = true;
                 outletSubscriber.Subscribe (Driver.Power.GetChannelEventPublisherKey (fixtureName));
