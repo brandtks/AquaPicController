@@ -25,21 +25,21 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
-using AquaPic.Modules.Temperature;
+using AquaPic.Gadgets.Device;
+using AquaPic.Gadgets.Device.Heater;
 using AquaPic.Drivers;
+using AquaPic.Modules.Temperature;
 
 namespace AquaPic.UserInterface
 {
     public class HeaterSettingsDialog : TouchSettingsDialog
     {
         public string heaterName { get; private set; }
-        string groupName;
 
-        public HeaterSettingsDialog (string groupName, HeaterSettings settings, Window parent)
+        public HeaterSettingsDialog (HeaterSettings settings, Window parent)
             : base (settings.name, settings.name.IsNotEmpty (), parent) 
         {
             heaterName = settings.name;
-            this.groupName = groupName;
 
             var t = new SettingsTextBox ("Name");
             if (heaterName.IsNotEmpty ()) {
@@ -50,7 +50,7 @@ namespace AquaPic.UserInterface
             t.textBox.TextChangedEvent += (sender, args) => {
                 if (string.IsNullOrWhiteSpace (args.text)) {
                     args.keepText = false;
-                }  else if (Temperature.HeaterNameExists (groupName, args.text)) {
+                }  else if (Devices.Heater.GadgetNameExists (args.text)) {
                     MessageBox.Show ("Heater name already exists");
                     args.keepText = false;
                 }
@@ -65,6 +65,15 @@ namespace AquaPic.UserInterface
             }
             c.combo.nonActiveMessage = "Please select outlet";
             c.combo.comboList.AddRange (Driver.Power.GetAllAvaiableChannels ());
+            AddSetting (c);
+
+            c = new SettingsComboBox ("Temperature Group");
+            if (heaterName.IsNotEmpty ()) {
+                c.combo.comboList.Add ("Current: " + settings.temperatureGroup);
+                c.combo.activeIndex = 0;
+            }
+            c.combo.nonActiveMessage = "Please select group";
+            c.combo.comboList.AddRange (Temperature.GetAllTemperatureGroupNames ());
             AddSetting (c);
 
             DrawSettings ();
@@ -93,14 +102,20 @@ namespace AquaPic.UserInterface
             }
             heaterSettings.channel = ParseIndividualControl (outletString);
 
-            Temperature.UpdateHeater (groupName, heaterName, heaterSettings);
+            heaterSettings.temperatureGroup = (string)settings["Temperature Group"].setting;
+            if (heaterSettings.temperatureGroup.IsEmpty ()) {
+                MessageBox.Show ("Please select a temperature Group");
+                return false;
+            }
+
+            Devices.Heater.UpdateGadget (heaterName, heaterSettings);
             heaterName = heaterSettings.name;
 
             return true;
         }
 
         protected override bool OnDelete (object sender) {
-            Temperature.RemoveHeater (groupName, heaterName);
+            Devices.Heater.RemoveGadget (heaterName);
             return true;
         }
     }

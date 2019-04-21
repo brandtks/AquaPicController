@@ -44,8 +44,18 @@ namespace AquaPic.Gadgets.Device.Pump
             if (pumpSettings == null) {
                 throw new ArgumentException ("Settings must be PumpSettings");
             }
-            var pump = new Pump (pumpSettings);
-            return pump;
+            return new Pump (pumpSettings);
+        }
+
+        public override GenericGadgetSettings GetGadgetSettings (string name) {
+            CheckGadgetKey (name);
+            var settings = new PumpSettings ();
+            var pump = gadgets[name] as Pump;
+            settings.name = pump.name;
+            settings.channel = pump.channel;
+            settings.fallback = pump.fallback;
+            settings.script = pump.script;
+            return settings;
         }
     }
 }

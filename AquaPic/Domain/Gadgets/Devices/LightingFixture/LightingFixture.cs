@@ -33,6 +33,7 @@ namespace AquaPic.Gadgets.Device.Lighting
     {
         public bool plugState;
         public bool highTempLockout;
+        public string highTempLockoutTemperatureGroup;
         public int temperatureAlarmIndex;
         public LightingState[] lightingStates;
         public LightingState[] savedLightingStates;
@@ -40,8 +41,9 @@ namespace AquaPic.Gadgets.Device.Lighting
 
         public LightingFixture (LightingFixtureSettings settings) : base (settings) {
             highTempLockout = settings.highTempLockout;
-            if (settings.tempLockoutTemperatureGroup.IsNotEmpty ()) {
-                temperatureAlarmIndex = Temperature.GetTemperatureGroupHighTemperatureAlarmIndex (settings.tempLockoutTemperatureGroup);
+            highTempLockoutTemperatureGroup = settings.highTempLockoutTemperatureGroup;
+            if (highTempLockoutTemperatureGroup.IsNotEmpty ()) {
+                temperatureAlarmIndex = Temperature.GetTemperatureGroupHighTemperatureAlarmIndex (highTempLockoutTemperatureGroup);
             } else {
                 temperatureAlarmIndex = Temperature.defaultHighTemperatureAlarmIndex;
             }

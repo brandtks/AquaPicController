@@ -46,8 +46,5 @@ namespace AquaPic.Modules.Temperature
 
         [EntitySetting (typeof (StringArrayMutator), "temperatureProbes")]
         public IEnumerable<string> temperatureProbes { get; set; }
-
-        [EntitySetting (typeof (HeaterMutator), "heaters")]
-        public IEnumerable<HeaterSettings> heaters { get; set; }
     }
 }

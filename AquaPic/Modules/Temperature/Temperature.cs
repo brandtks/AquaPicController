@@ -23,13 +23,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Service;
-using AquaPic.Drivers;
-using AquaPic.Globals;
 using AquaPic.Gadgets.Sensor;
 using AquaPic.Gadgets.Sensor.TemperatureProbe;
 using AquaPic.DataLogging;
@@ -125,9 +122,8 @@ namespace AquaPic.Modules.Temperature
             get {
                 if (!string.IsNullOrWhiteSpace (_defaultTemperatureGroup)) {
                     return temperatureGroups[_defaultTemperatureGroup].lowTemperatureAlarmIndex;
-                } else {
-                    return -1;
                 }
+                return -1;
             }
         }
 
@@ -179,8 +175,7 @@ namespace AquaPic.Modules.Temperature
                 settings.lowTemperatureAlarmSetpoint,
                 settings.temperatureSetpoint,
                 settings.temperatureDeadband,
-                settings.temperatureProbes,
-                settings.heaters);
+                settings.temperatureProbes);
 
             if (_defaultTemperatureGroup.IsEmpty ()) {
                 _defaultTemperatureGroup = settings.name;
@@ -314,7 +309,6 @@ namespace AquaPic.Modules.Temperature
             settings.temperatureSetpoint = GetTemperatureGroupTemperatureSetpoint (name);
             settings.temperatureDeadband = GetTemperatureGroupTemperatureDeadband (name);
             settings.temperatureProbes = GetAllTemperatureProbesForTemperatureGroup (name);
-            settings.heaters = GetAllHeaterSettings (name);
             return settings;
         }
 
@@ -355,96 +349,6 @@ namespace AquaPic.Modules.Temperature
                 names.Add (sensorName);
             }
             return names.ToArray ();
-        }
-
-        /**************************************************************************************************************/
-        /* Heaters                                                                                                    */
-        /**************************************************************************************************************/
-        public static void AddHeater (string groupName, HeaterSettings settings, bool saveToFile = true) {
-            CheckTemperatureGroupKey (groupName);
-
-            if (HeaterNameExists (groupName, settings.name)) {
-                throw new Exception (string.Format ("Heater: {0} already exists", settings.name));
-            }
-
-            temperatureGroups[groupName].heaters[settings.name] = new Heater (settings, groupName);
-
-            if (saveToFile) {
-                UpdateTemperatureGroupSettingsInFile (groupName);
-            }
-        }
-
-        public static void UpdateHeater (string groupName, string heaterName, HeaterSettings settings) {
-            CheckTemperatureGroupKey (groupName);
-            if (HeaterNameExists (groupName, heaterName)) {
-                RemoveHeater (groupName, heaterName);
-            }
-            AddHeater (groupName, settings);
-        }
-
-        public static void RemoveHeater (string groupName, string heaterName) {
-            CheckHeaterKey (groupName, heaterName);
-            temperatureGroups[groupName].heaters[heaterName].Dispose ();
-            temperatureGroups[groupName].heaters.Remove (heaterName);
-            UpdateTemperatureGroupSettingsInFile (groupName);
-        }
-
-        public static void CheckHeaterKey (string groupName, string heaterName) {
-            CheckTemperatureGroupKey (groupName);
-            if (!temperatureGroups[groupName].heaters.ContainsKey (heaterName)) {
-                throw new ArgumentException ("heaterName");
-            }
-        }
-
-        public static bool CheckHeaterKeyNoThrow (string groupName, string heaterName) {
-            try {
-                CheckHeaterKey (groupName, heaterName);
-                return true;
-            } catch {
-                return false;
-            }
-        }
-
-        public static bool HeaterNameExists (string groupName, string heaterName) {
-            return CheckHeaterKeyNoThrow (groupName, heaterName);
-        }
-
-        /***Getters****************************************************************************************************/
-        /***Names***/
-        public static string[] GetAllHeaterNames (string groupName) {
-            CheckTemperatureGroupKey (groupName);
-            List<string> names = new List<string> ();
-            foreach (var heater in temperatureGroups[groupName].heaters.Values) {
-                names.Add (heater.name);
-            }
-            return names.ToArray ();
-        }
-
-        /***Individual Control***/
-        public static IndividualControl GetHeaterIndividualControl (string groupName, string heaterName) {
-            CheckHeaterKey (groupName, heaterName);
-            return temperatureGroups[groupName].heaters[heaterName].channel;
-        }
-
-        /***Settings***************************************************************************************************/
-        public static HeaterSettings GetHeaterSettings (string groupName, string heaterName) {
-            CheckHeaterKey (groupName, heaterName);
-            var settings = new HeaterSettings ();
-            settings.name = heaterName;
-            settings.channel = GetHeaterIndividualControl (groupName, heaterName);
-            return settings;
-        }
-
-        public static IEnumerable<HeaterSettings> GetAllHeaterSettings (string groupName) {
-            CheckTemperatureGroupKey (groupName);
-            List<HeaterSettings> heaterSettings = new List<HeaterSettings> ();
-            foreach (var heater in temperatureGroups[groupName].heaters.Values) {
-                var settings = new HeaterSettings ();
-                settings.name = heater.name;
-                settings.channel = heater.channel;
-                heaterSettings.Add (settings);
-            }
-            return heaterSettings;
         }
     }
 }

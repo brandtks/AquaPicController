@@ -30,6 +30,8 @@ using AquaPic.Modules.Temperature;
 using AquaPic.Drivers;
 using AquaPic.Gadgets.Sensor;
 using AquaPic.Gadgets.Sensor.TemperatureProbe;
+using AquaPic.Gadgets.Device;
+using AquaPic.Gadgets.Device.Heater;
 
 namespace AquaPic.UserInterface
 {
@@ -201,7 +203,7 @@ namespace AquaPic.UserInterface
 
             heaterCombo = new TouchComboBox ();
             if (groupName.IsNotEmpty ()) {
-                var heaterNames = Temperature.GetAllHeaterNames (groupName);
+                var heaterNames = Devices.Heater.GetAllHeatersForTemperatureGroup (groupName);
                 if (heaterNames.Length > 0) {
                     heaterCombo.comboList.AddRange (heaterNames);
                     heaterName = heaterNames[0];
@@ -280,7 +282,7 @@ namespace AquaPic.UserInterface
 
         protected void GetHeaterData () {
             if (heaterName.IsNotEmpty ()) {
-                if (Driver.Power.GetChannelValue (Temperature.GetHeaterIndividualControl (groupName, heaterName))) {
+                if (Driver.Power.GetChannelValue (Devices.Heater.GetChannel (heaterName))) {
                     heaterLabel.text = "Heater On";
                     heaterLabel.textColor = "secb";
                 } else {
@@ -354,7 +356,7 @@ namespace AquaPic.UserInterface
 
                 heaterCombo.comboList.Clear ();
                 if (groupName.IsNotEmpty ()) {
-                    var heaterNames = Temperature.GetAllHeaterNames (groupName);
+                    var heaterNames = Devices.Heater.GetAllHeatersForTemperatureGroup (groupName);
                     if (heaterNames.Length > 0) {
                         heaterCombo.comboList.AddRange (heaterNames);
                         heaterName = heaterNames[0];
@@ -435,7 +437,7 @@ namespace AquaPic.UserInterface
 
                 heaterCombo.comboList.Clear ();
                 if (groupName.IsNotEmpty ()) {
-                    var heaterNames = Temperature.GetAllHeaterNames (groupName);
+                    var heaterNames = Devices.Heater.GetAllHeatersForTemperatureGroup (groupName);
                     if (heaterNames.Length > 0) {
                         heaterCombo.comboList.AddRange (heaterNames);
                         heaterName = heaterNames[0];
@@ -473,12 +475,12 @@ namespace AquaPic.UserInterface
             if (groupName.IsNotEmpty ()) {
                 HeaterSettings settings;
                 if (heaterName.IsNotEmpty () && !forceNew) {
-                    settings = Temperature.GetHeaterSettings (groupName, heaterName);
+                    settings = Devices.Heater.GetGadgetSettings (heaterName) as HeaterSettings;
                 } else {
                     settings = new HeaterSettings ();
                 }
                 var parent = Toplevel as Window;
-                var s = new HeaterSettingsDialog (groupName, settings, parent);
+                var s = new HeaterSettingsDialog (settings, parent);
                 s.Run ();
                 var newHeaterName = s.heaterName;
                 var outcome = s.outcome;
@@ -493,7 +495,7 @@ namespace AquaPic.UserInterface
                     heaterName = newHeaterName;
                 } else if (outcome == TouchSettingsOutcome.Deleted) {
                     heaterCombo.comboList.Remove (heaterName);
-                    var heaterNames = Temperature.GetAllHeaterNames (groupName);
+                    var heaterNames = Devices.Heater.GetAllHeatersForTemperatureGroup (groupName);
                     if (heaterNames.Length > 0) {
                         heaterName = heaterNames[0];
                         heaterCombo.activeText = heaterName;

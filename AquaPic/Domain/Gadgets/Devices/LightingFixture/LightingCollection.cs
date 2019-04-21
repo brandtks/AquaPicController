@@ -57,6 +57,22 @@ namespace AquaPic.Gadgets.Device.Lighting
             return fixture;
         }
 
+        public override GenericGadgetSettings GetGadgetSettings (string name) {
+            CheckGadgetKey (name);
+            var settings = new LightingFixtureSettings ();
+            var fixture = gadgets[name] as LightingFixture;
+            settings.name = fixture.name;
+            settings.channel = fixture.channel;
+            settings.highTempLockout = fixture.highTempLockout;
+            settings.highTempLockoutTemperatureGroup = fixture.highTempLockoutTemperatureGroup;
+            settings.lightingStates = GetLightingFixtureLightingStates (name);
+            var dimmingFixture = fixture as LightingFixtureDimming;
+            if (dimmingFixture != null) {
+                settings.dimmingChannel = dimmingFixture.dimmingChannel;
+            }
+            return settings;
+        }
+
         // Names
         public string[] GetAllDimmingFixtureNames () {
             List<string> names = new List<string> ();
@@ -166,7 +182,7 @@ namespace AquaPic.Gadgets.Device.Lighting
 
         public void SetLightingFixtureLightingStates (string fixtureName, LightingState[] lightingStates, bool temporaryChange = true) {
             CheckGadgetKey (fixtureName);
-            var fixture = gadgets[fixtureName] as LightingFixtureDimming;
+            var fixture = gadgets[fixtureName] as LightingFixture;
             fixture.UpdateLightingStates (lightingStates, temporaryChange);
             if (!temporaryChange) {
                 UpdateGadgetSettingsInFile (fixtureName);

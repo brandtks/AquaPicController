@@ -83,7 +83,6 @@
     <Compile Include="Driver\AnalogOutput\AnalogOutput.cs" />
     <Compile Include="Driver\AnalogOutput\AnalogOutputCard.cs" />
     <Compile Include="Driver\AnalogOutput\AnalogOutputChannel.cs" />
-    <Compile Include="Modules\Temperature\Heater.cs" />
     <Compile Include="Modules\Temperature\Temperature.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInput.cs" />
     <Compile Include="Driver\DigitalInput\DigitalInputCard.cs" />
@@ -138,7 +137,6 @@
     <Compile Include="Domain\Globals\IndividualControl.cs" />
     <Compile Include="Service\PubSub\Subscription.cs" />
     <Compile Include="Modules\Temperature\TemperatureGroupSettings.cs" />
-    <Compile Include="Modules\Temperature\HeaterSettings.cs" />
     <Compile Include="Driver\GenericDriver\GenericAnalogInputChannel.cs" />
     <Compile Include="Driver\GenericDriver\GenericAnalogInputCard.cs" />
     <Compile Include="Driver\GenericDriver\GenericAnalogInputBase.cs" />
@@ -194,6 +192,9 @@
     <Compile Include="Domain\Gadgets\Devices\LightingFixture\LightingFixtureDimming.cs" />
     <Compile Include="Domain\Gadgets\Devices\LightingFixture\LightingFixtureSettings.cs" />
     <Compile Include="Domain\Gadgets\Devices\LightingFixture\LightingState.cs" />
+    <Compile Include="Domain\Gadgets\Devices\Heater\HeaterCollection.cs" />
+    <Compile Include="Domain\Gadgets\Devices\Heater\Heater.cs" />
+    <Compile Include="Domain\Gadgets\Devices\Heater\HeaterSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -220,6 +221,7 @@
     <Folder Include="Domain\Gadgets\Devices\Pump\" />
     <Folder Include="Service\Settings\" />
     <Folder Include="Domain\Gadgets\Sensors\Switch\" />
+    <Folder Include="Domain\Gadgets\Devices\Heater\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">

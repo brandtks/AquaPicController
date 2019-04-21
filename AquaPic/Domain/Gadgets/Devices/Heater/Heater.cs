@@ -1,9 +1,9 @@
-﻿#region License
+#region License
 
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2019 Goodtime Development
+    Copyright (c) 2017 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,41 +22,30 @@
 #endregion // License
 
 using System;
-using AquaPic.Service;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
+using AquaPic.Service;
 
-namespace AquaPic.Gadgets.Device.Pump
+namespace AquaPic.Gadgets.Device.Heater
 {
-    public class Pump : GenericDevice
+    public class Heater : GenericDevice
     {
-        IOutletScript outletScript;
-        public bool fallback;
-        public string script;
+        public string temperatureGroup;
+        public string bitName;
 
-        public Pump (PumpSettings settings) : base (settings) {
-            fallback = settings.fallback;
-            script = settings.script;
-            outletScript = Script.CompileOutletStateGetter (script);
-            if (outletScript != null) {
-                Driver.Power.AddOutlet (channel, name, fallback, key);
-            } else {
-                Logger.AddError ("Failed to compile script for pump {0}", name);
-            }
+        public Heater (HeaterSettings settings) : base (settings) {
+            temperatureGroup = settings.temperatureGroup;
+            bitName = temperatureGroup.RemoveWhitespace () + "HeaterRequest";
+            Driver.Power.AddOutlet (channel, name, true, key);
         }
 
         protected override ValueType OnRun () {
-            return outletScript.GetOutletState ();
+            return Bit.Instance.Check (bitName);
         }
 
         public override void Dispose () {
-            base.Dispose ();
             Driver.Power.RemoveChannel (channel);
-        }
-
-        public override bool Valid () {
-            var valid = base.Valid ();
-            valid &= outletScript != null;
-            return valid;
         }
     }
 }
+

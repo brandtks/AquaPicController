@@ -37,6 +37,7 @@ namespace AquaPic.Modules.Temperature
         private class TemperatureGroup : GadgetSubscriber
         {
             public string name;
+            public string bitName;
             public float temperature;
             public IDataLogger dataLogger;
 
@@ -49,7 +50,6 @@ namespace AquaPic.Modules.Temperature
             public int lowTemperatureAlarmIndex;
 
             public Dictionary<string, InternalTemperatureProbeState> temperatureProbes;
-            public Dictionary<string, Heater> heaters;
 
             public TemperatureGroup (
                 string name,
@@ -57,10 +57,11 @@ namespace AquaPic.Modules.Temperature
                 float lowTemperatureAlarmSetpoint,
                 float temperatureSetpoint,
                 float temperatureDeadband,
-                IEnumerable<string> temperatureProbes,
-                IEnumerable<HeaterSettings> heaters) 
+                IEnumerable<string> temperatureProbes) 
             {
                 this.name = name;
+                bitName = name.RemoveWhitespace () + "HeaterRequest";
+                Bit.Instance.Set (bitName, true);
                 this.highTemperatureAlarmSetpoint = highTemperatureAlarmSetpoint;
                 this.lowTemperatureAlarmSetpoint = lowTemperatureAlarmSetpoint;
                 this.temperatureSetpoint = temperatureSetpoint;
@@ -77,25 +78,29 @@ namespace AquaPic.Modules.Temperature
                     this.temperatureProbes.Add (temperatureProbe, new InternalTemperatureProbeState ());
                     Subscribe (Sensors.TemperatureProbes.GetGadgetEventPublisherKey (temperatureProbe));
                 }
-
-                this.heaters = new Dictionary<string, Heater> ();
-                foreach (var heater in heaters) {
-                    if (this.heaters.ContainsKey (heater.name)) {
-                        throw new Exception (string.Format ("Heater: {0} already exists", heater.name));
-                    }
-
-                    var heaterSettings = new HeaterSettings ();
-                    heaterSettings.name = heater.name;
-                    heaterSettings.channel = heater.channel;
-                    this.heaters[heater.name] = new Heater (heaterSettings, this.name);
-                }
             }
 
             public void GroupRun () {
                 if (temperatureProbes.Count > 0) {
                     dataLogger.AddEntry (temperature);
+
+                    var deadband = temperatureDeadband / 2;
+                    if (Bit.Instance.Check (bitName)) { // the heater request is high
+                        var offTemperature = temperatureSetpoint + deadband;
+                        if (temperature > offTemperature) {
+                            Bit.Instance.Reset (bitName);
+                            dataLogger.AddEntry ("heater off");
+                        }
+                    } else {
+                        var onTemperature = temperatureSetpoint + deadband;
+                        if (temperature < onTemperature) {
+                            Bit.Instance.Set (bitName);
+                            dataLogger.AddEntry ("heater on");
+                        }
+                    }
                 } else {
                     dataLogger.AddEntry ("no probes");
+                    Bit.Instance.Set (bitName);
                 }
             }
 

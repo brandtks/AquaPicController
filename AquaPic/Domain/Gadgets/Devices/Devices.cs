@@ -26,6 +26,7 @@ using Newtonsoft.Json.Linq;
 using AquaPic.Service;
 using AquaPic.Gadgets.Device.Pump;
 using AquaPic.Gadgets.Device.Lighting;
+using AquaPic.Gadgets.Device.Heater;
 
 namespace AquaPic.Gadgets.Device
 {
@@ -33,17 +34,20 @@ namespace AquaPic.Gadgets.Device
     {
         public static PumpCollection Pumps = PumpCollection.SharedPumpCollectionInstance;
         public static LightingCollection Lighting = LightingCollection.SharedLightingCollectionInstance;
+        public static HeaterCollection Heater = HeaterCollection.SharedHeaterCollectionInstance;
 
         public static void AddDevices () {
             if (SettingsHelper.SettingsFileExists (GenericDeviceCollection.equipmentSettingsFileName)) {
                 Pumps.ReadAllGadgetsFromFile ();
                 Lighting.ReadAllGadgetsFromFile ();
+                Heater.ReadAllGadgetsFromFile ();
             } else {
                 Logger.Add ("Device settings file did not exist, created new device settings");
 
                 var jo = new JObject ();
                 jo.Add (new JProperty (Pumps.gadgetSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty (Lighting.gadgetSettingsArrayName, new JArray ()));
+                jo.Add (new JProperty (Heater.gadgetSettingsArrayName, new JArray ()));
 
                 SettingsHelper.WriteSettingsFile (GenericDeviceCollection.equipmentSettingsFileName, jo);
             }
