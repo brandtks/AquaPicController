@@ -135,7 +135,7 @@ namespace AquaPic.Gadgets
             return gadgets[name].Clone ();
         }
 
-        public virtual IndividualControl GetChannel (string name) {
+        public virtual IndividualControl GetGadgetChannel (string name) {
             CheckGadgetKey (name);
             return gadgets[name].channel;
         }

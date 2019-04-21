@@ -387,7 +387,7 @@ namespace AquaPic.UserInterface
         protected void OnDimmingModeSelectorChanged (object sender, SelectorChangedEventArgs args) {
             if (args.currentSelectedIndex == 0) {
                 Devices.Lighting.SetDimmingMode (fixtureName, Mode.Manual);
-                var ic = Devices.Lighting.GetChannel (fixtureName);
+                var ic = Devices.Lighting.GetGadgetChannel (fixtureName);
                 Driver.Power.SetChannelMode (ic, Mode.Manual);
                 dimmingProgressBar.enableTouch = true;
                 requestedTextBox.Visible = true;
@@ -404,7 +404,7 @@ namespace AquaPic.UserInterface
                 outletSelectorSwitch.QueueDraw ();
             } else {
                 Devices.Lighting.SetDimmingMode (fixtureName, Mode.Auto);
-                Driver.Power.SetChannelMode (Devices.Lighting.GetChannel (fixtureName), Mode.Auto);
+                Driver.Power.SetChannelMode (Devices.Lighting.GetGadgetChannel (fixtureName), Mode.Auto);
                 dimmingProgressBar.enableTouch = false;
                 requestedTextBox.Visible = false;
                 autoTextBox.Visible = false;
@@ -420,7 +420,7 @@ namespace AquaPic.UserInterface
         }
 
         protected void OnOutletControlSelectorChanged (object sender, SelectorChangedEventArgs args) {
-            var ic = Devices.Lighting.GetChannel (fixtureName);
+            var ic = Devices.Lighting.GetGadgetChannel (fixtureName);
 
             if (args.currentSelectedIndex == 0) { // Manual Off
                 Driver.Power.SetChannelMode (ic, Mode.Manual);

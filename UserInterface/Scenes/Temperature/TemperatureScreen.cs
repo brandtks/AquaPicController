@@ -282,7 +282,7 @@ namespace AquaPic.UserInterface
 
         protected void GetHeaterData () {
             if (heaterName.IsNotEmpty ()) {
-                if (Driver.Power.GetChannelValue (Devices.Heater.GetChannel (heaterName))) {
+                if (Driver.Power.GetChannelValue (Devices.Heater.GetGadgetChannel (heaterName))) {
                     heaterLabel.text = "Heater On";
                     heaterLabel.textColor = "secb";
                 } else {
