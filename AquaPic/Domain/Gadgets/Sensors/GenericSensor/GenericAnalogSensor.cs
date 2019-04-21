@@ -29,6 +29,7 @@ namespace AquaPic.Gadgets.Sensor
 {
     public class GenericAnalogSensor : GenericSensor
     {
+        public float analogValue { get; set; }
         public float zeroScaleCalibrationActual { get; set; }
         public float zeroScaleCalibrationValue { get; set; }
         public float fullScaleCalibrationActual { get; set; }
@@ -64,19 +65,21 @@ namespace AquaPic.Gadgets.Sensor
 
         public override void OnValueChangedAction (object parm) {
             var args = parm as ValueChangedEvent;
-            var oldValue = (float)value;
-            var newValue = ScaleRawLevel (Convert.ToSingle (args.newValue));
-            value = newValue;
+            var oldValue = analogValue;
+            analogValue = ScaleRawLevel (Convert.ToSingle (args.newValue));
 
-            if (newValue < zeroScaleCalibrationActual) {
+            if (analogValue < zeroScaleCalibrationActual) {
                 Alarm.Post (sensorDisconnectedAlarmIndex);
             } else {
                 Alarm.Clear (sensorDisconnectedAlarmIndex);
             }
 
-            NotifyValueChanged (name, value, oldValue);
+            NotifyValueChanged (name, analogValue, oldValue);
         }
 
+        protected override ValueType GetValue () {
+            return analogValue; 
+        }
 
         protected float ScaleRawLevel (float rawValue) {
             return rawValue.Map (zeroScaleCalibrationValue, fullScaleCalibrationValue, zeroScaleCalibrationActual, fullScaleCalibrationActual);

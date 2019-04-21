@@ -36,7 +36,7 @@ namespace AquaPic.UserInterface
             button = new TouchButton ();
             button.SetSizeRequest (100, 82);
             button.text = name;
-            button.buttonColor = Bit.Check (button.text) ? "pri" : "seca";
+            button.buttonColor = Bit.Instance.Check (button.text) ? "pri" : "seca";
             button.ButtonReleaseEvent += OnButtonRelease;
             Put (button, 0, 0);
             button.Show ();
@@ -45,18 +45,18 @@ namespace AquaPic.UserInterface
         public virtual void OnButtonRelease (object sender, ButtonReleaseEventArgs args) {
             var b = sender as TouchButton;
             var stateText = b.text;
-            if (Bit.Check (stateText)) {
-                Bit.Reset (stateText);
+            if (Bit.Instance.Check (stateText)) {
+                Bit.Instance.Reset (stateText);
                 b.buttonColor = "seca";
             } else {
-                Bit.Set (stateText);
+                Bit.Instance.Set (stateText);
                 b.buttonColor = "pri";
             }
             b.QueueDraw ();
         }
 
         public void Update () {
-            button.buttonColor = Bit.Check (button.text) ? "pri" : "seca";
+            button.buttonColor = Bit.Instance.Check (button.text) ? "pri" : "seca";
         }
     }
 }

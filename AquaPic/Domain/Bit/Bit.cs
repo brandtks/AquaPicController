@@ -28,23 +28,39 @@ namespace AquaPic.Service
 {
     public class Bit
     {
-        private static Dictionary<string, bool> states = new Dictionary<string, bool> ();
+        public static Bit Instance { get; } = new Bit ();
 
-        public static void Set (string name) {
-            if (states.ContainsKey (name))
+        private Dictionary<string, bool> states;
+
+        protected Bit () {
+            states = new Dictionary<string, bool> ();
+        }
+
+        public void Set (string name, bool value) {
+            if (states.ContainsKey (name)) {
+                states[name] = value;
+            } else {
+                states.Add (name, value);
+            }
+        }
+
+        public void Set (string name) {
+            if (states.ContainsKey (name)) {
                 states[name] = true;
-            else
+            } else {
                 states.Add (name, true);
+            }
         }
 
-        public static void Reset (string name) {
-            if (states.ContainsKey (name))
+        public void Reset (string name) {
+            if (states.ContainsKey (name)) {
                 states[name] = false;
-            else
+            } else {
                 states.Add (name, false);
+            }
         }
 
-        public static void Toggle (string name) {
+        public void Toggle (string name) {
             if (states.ContainsKey (name)) {
                 states[name] = !states[name];
             } else {
@@ -52,7 +68,7 @@ namespace AquaPic.Service
             }
         }
 
-        public static bool Check (string name) {
+        public bool Check (string name) {
             if (states.ContainsKey (name)) {
                 return states[name];
             }
@@ -60,7 +76,7 @@ namespace AquaPic.Service
             return false;
         }
 
-        public static void Remove (string name) {
+        public void Remove (string name) {
             if (states.ContainsKey (name)) {
                 states.Remove (name);
             }

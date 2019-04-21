@@ -88,7 +88,7 @@ namespace AquaPic.Modules
                     state = AutoTopOffState.Off;
                 }
 
-                Bit.Reset (this.requestBitName);
+                Bit.Instance.Set (this.requestBitName, false);
 
                 timer = IntervalTimer.GetTimer (name);
                 timer.TimerElapsedEvent += OnTimerElapsed;
@@ -118,7 +118,7 @@ namespace AquaPic.Modules
                             pumpOnRequest &= WaterLevel.GetWaterLevelGroupSwitchesActivated (waterLevelGroupName);
                         }
 
-                        pumpOnRequest |= Bit.Check (requestBitName);
+                        pumpOnRequest |= Bit.Instance.Check (requestBitName);
 
                         if (pumpOnRequest) {
                             state = AutoTopOffState.Filling;
@@ -145,7 +145,7 @@ namespace AquaPic.Modules
                             pumpOffRequest &= !WaterLevel.GetWaterLevelGroupSwitchesActivated (waterLevelGroupName);
                         }
 
-                        pumpOffRequest |= !Bit.Check (requestBitName);
+                        pumpOffRequest |= !Bit.Instance.Check (requestBitName);
                         pumpOffRequest |= WaterLevel.GetWaterLevelGroupHighAlarming (waterLevelGroupName);
 
                         pumpOnRequest = !pumpOffRequest;
@@ -166,19 +166,19 @@ namespace AquaPic.Modules
                     }
 
                     if (pumpOnRequest) {
-                        Bit.Set (requestBitName);
+                        Bit.Instance.Set (requestBitName);
                     } else {
-                        Bit.Reset (requestBitName);
+                        Bit.Instance.Reset (requestBitName);
                     }
                 } else {
                     state = AutoTopOffState.Off;
-                    Bit.Reset (requestBitName);
+                    Bit.Instance.Reset (requestBitName);
                 }
             }
 
             protected void OnTimerElapsed (object sender, TimerElapsedEventArgs args) {
                 if (state == AutoTopOffState.Filling) {
-                    Bit.Reset (requestBitName);
+                    Bit.Instance.Reset (requestBitName);
                     state = AutoTopOffState.Error;
                     Alarm.Post (failAlarmIndex);
                 } else if (state == AutoTopOffState.Cooldown) {

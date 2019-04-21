@@ -22,22 +22,11 @@
 #endregion // License
 
 using System;
-using AquaPic.Globals;
 
-namespace AquaPic.Gadgets.Sensor.FloatSwitch
+namespace AquaPic.Gadgets.Sensor.Switch
 {
-    public class FloatSwitchSettings : GenericSensorSettings
+    public class SwitchSettings : GenericSensorSettings
     {
-        [EntitySetting (typeof (FloatMutator), "physicalLevel")]
-        public float physicalLevel { get; set; }
 
-        [EntitySetting (typeof (SwitchTypeMutator), "switchType")]
-        public SwitchType switchType { get; set; }
-
-        [EntitySetting (typeof (SwitchFunctionMutator), "switchFuntion")]
-        public SwitchFunction switchFuntion { get; set; }
-
-        [EntitySetting (typeof (TimerTimeMutator), "timeOffset")]
-        public uint timeOffset { get; set; }
     }
 }

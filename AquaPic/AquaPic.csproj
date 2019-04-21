@@ -191,6 +191,9 @@
     <Compile Include="Domain\Gadgets\Devices\Pump\PumpCollection.cs" />
     <Compile Include="Domain\Gadgets\Devices\Devices.cs" />
     <Compile Include="Service\Settings\SettingsHelper.cs" />
+    <Compile Include="Domain\Gadgets\Sensors\Switch\SwitchSettings.cs" />
+    <Compile Include="Domain\Gadgets\Sensors\Switch\Switch.cs" />
+    <Compile Include="Domain\Gadgets\Sensors\Switch\SwitchCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -216,6 +219,7 @@
     <Folder Include="Domain\Gadgets\Devices\LightingFixture\" />
     <Folder Include="Domain\Gadgets\Devices\Pump\" />
     <Folder Include="Service\Settings\" />
+    <Folder Include="Domain\Gadgets\Sensors\Switch\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">
