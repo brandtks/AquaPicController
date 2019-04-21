@@ -28,7 +28,8 @@ namespace AquaPic.Drivers
     public class GenericOutputCard : GenericCard
     {
         public GenericOutputCard (string name, int address, int numberChannels)
-            : base (name, address, numberChannels) {
+            : base (name, address, numberChannels)
+        {
             foreach (var channel in channels) {
                 var sub = new OutputChannelValueSubscriber (OnValueChanged);
                 sub.Subscribe (channel.key);

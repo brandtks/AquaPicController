@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using GoodtimeDevelopment.Utilites;
 using AquaPic.Service;
 
 namespace AquaPic.Gadgets.Device
@@ -30,7 +31,7 @@ namespace AquaPic.Gadgets.Device
     {
         public GenericDevice (GenericDeviceSettings settings, uint runtime = 1000) 
             : base (settings) {
-            TaskManager.Instance.AddCyclicInterrupt (name, runtime, Run);
+            TaskManager.Instance.AddCyclicInterrupt (name.RemoveWhitespace () + "CyclicRuntime", runtime, Run);
         }
 
         protected virtual void Run () {
@@ -42,14 +43,14 @@ namespace AquaPic.Gadgets.Device
                 }
             } catch (NotImplementedException) {
                 Logger.AddWarning (name + " does not have an implemented Runtime function");
-                TaskManager.Instance.RemoveCyclicInterrupt (name);
+                TaskManager.Instance.RemoveCyclicInterrupt (name.RemoveWhitespace () + "CyclicRuntime");
             }
         }
 
         protected virtual ValueType OnRun () => throw new NotImplementedException ();
 
         public override void Dispose () {
-            TaskManager.Instance.RemoveCyclicInterrupt (name);
+            TaskManager.Instance.RemoveCyclicInterrupt (name.RemoveWhitespace () + "CyclicRuntime");
         }
     }
 }

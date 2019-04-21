@@ -173,11 +173,7 @@ namespace AquaPic.Gadgets.Device.Lighting
         public LightingState[] GetLightingFixtureLightingStates (string fixtureName) {
             CheckGadgetKey (fixtureName);
             var fixture = gadgets[fixtureName] as LightingFixture;
-            var lightingStates = new List<LightingState> ();
-            foreach (var state in fixture.lightingStates) {
-                lightingStates.Add (new LightingState (state));
-            }
-            return lightingStates.ToArray ();
+            return fixture.GetLightingStates ();
         }
 
         public void SetLightingFixtureLightingStates (string fixtureName, LightingState[] lightingStates, bool temporaryChange = true) {

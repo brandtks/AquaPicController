@@ -22,6 +22,7 @@
 #endregion // License
 
 using System;
+using System.Collections.Generic;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules.Temperature;
 using AquaPic.Drivers;
@@ -66,6 +67,12 @@ namespace AquaPic.Gadgets.Device.Lighting
             }
             // State is anything but off
             return true;
+        }
+
+        public override GenericGadgetSettings OnUpdate (GenericGadgetSettings settings) {
+            var fixtureSettings = settings as LightingFixtureSettings;
+            fixtureSettings.lightingStates = GetLightingStates ();
+            return fixtureSettings;
         }
 
         public void UpdateLightingStates (LightingState[] lightingStates, bool temporaryChange) {
@@ -158,6 +165,14 @@ namespace AquaPic.Gadgets.Device.Lighting
             }
 
             return -1;
+        }
+
+        public LightingState[] GetLightingStates () {
+            var states = new List<LightingState> ();
+            foreach (var state in lightingStates) {
+                states.Add (new LightingState (state));
+            }
+            return states.ToArray ();
         }
 
         public override void OnValueChangedAction (object parm) {

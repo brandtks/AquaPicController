@@ -129,6 +129,7 @@ namespace AquaPic.Gadgets.Device.Lighting
         public override void Dispose () {
             base.Dispose ();
             Driver.AnalogOutput.RemoveChannel (dimmingChannel);
+            dimmingEquipment.Dispose ();
         }
 
         protected class DimmingEquipment : GenericDevice
