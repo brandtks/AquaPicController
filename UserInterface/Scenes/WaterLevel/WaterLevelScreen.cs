@@ -46,16 +46,13 @@ namespace AquaPic.UserInterface
         TouchButton atoClearFailBtn;
         TouchComboBox atoGroupCombo;
 
-        string analogSensorName;
-        TouchLabel analogSensorLevelTextBox;
-        TouchLabel analogSensorLevelLabel;
-        TouchComboBox analogSensorCombo;
-
         string switchName;
         TouchLabel switchStateTextBox;
         TouchLabel switchTypeLabel;
         TouchLabel switchStateLabel;
         TouchComboBox switchCombo;
+
+        AnalogSensorWidget analogSensorWidget;
 
         public WaterLevelWindow (params object[] options) {
             sceneTitle = "Water Level";
@@ -155,41 +152,23 @@ namespace AquaPic.UserInterface
             /**************************************************************************************************************/
             /* Analog water sensor                                                                                        */
             /**************************************************************************************************************/
-            label = new TouchLabel ();
-            label.text = "Analog Sensor";
-            label.textColor = "seca";
-            label.textSize = 12;
-            Put (label, 415, 80);
-            label.Show ();
+            analogSensorWidget = new WaterLevelSensorWidget ();
+            Put (analogSensorWidget, 415, 77);
+            analogSensorWidget.Show ();
 
-            analogSensorLevelLabel = new TouchLabel ();
-            analogSensorLevelLabel.WidthRequest = 370;
-            analogSensorLevelLabel.text = "Water Level";
-            analogSensorLevelLabel.textColor = "grey3";
-            analogSensorLevelLabel.textAlignment = TouchAlignment.Center;
-            Put (analogSensorLevelLabel, 415, 155);
-            analogSensorLevelLabel.Show ();
-
-            analogSensorLevelTextBox = new TouchLabel ();
-            analogSensorLevelTextBox.WidthRequest = 370;
-            analogSensorLevelTextBox.textSize = 20;
-            analogSensorLevelTextBox.textAlignment = TouchAlignment.Center;
-            Put (analogSensorLevelTextBox, 415, 120);
-
-            var settingsBtn = new TouchButton ();
-            settingsBtn.text = "\u2699";
-            settingsBtn.SetSizeRequest (30, 30);
-            settingsBtn.buttonColor = "pri";
-            settingsBtn.ButtonReleaseEvent += OnWaterLevelSensorSettingsButtonReleaseEvent;
-            Put (settingsBtn, 755, 77);
-            settingsBtn.Show ();
-
-            var calibrationButton = new TouchButton ();
-            calibrationButton.text = "Calibrate";
-            calibrationButton.SetSizeRequest (100, 60);
-            calibrationButton.ButtonReleaseEvent += OnWaterLevelSensorCalibrationButtonReleaseEvent;
-            Put (calibrationButton, 415, 195);
-            calibrationButton.Show ();
+            analogSensorWidget.sensorCombo.comboList.Clear ();
+            if (groupName.IsNotEmpty ()) {
+                var groupsWaterLevelSensors = WaterLevel.GetAllWaterLevelSensorsForWaterLevelGroup (groupName);
+                analogSensorWidget.sensorCombo.comboList.AddRange (groupsWaterLevelSensors);
+                if (groupsWaterLevelSensors.Length > 0) {
+                    analogSensorWidget.sensorName = groupsWaterLevelSensors[0];
+                } else {
+                    analogSensorWidget.sensorName = string.Empty;
+                }
+            }
+            analogSensorWidget.sensorCombo.comboList.Add ("New level sensor...");
+            analogSensorWidget.sensorCombo.activeIndex = 0;
+            analogSensorWidget.sensorCombo.QueueDraw ();
 
             /**************************************************************************************************************/
             /* Float Switches                                                                                             */
@@ -255,23 +234,6 @@ namespace AquaPic.UserInterface
             Put (atoGroupCombo, 153, 277);
             atoGroupCombo.Show ();
 
-            analogSensorCombo = new TouchComboBox ();
-            analogSensorCombo.WidthRequest = 200;
-            if (groupName.IsNotEmpty ()) {
-                var groupsWaterLevelSensors = WaterLevel.GetAllWaterLevelSensorsForWaterLevelGroup (groupName);
-                analogSensorCombo.comboList.AddRange (groupsWaterLevelSensors);
-                if (groupsWaterLevelSensors.Length > 0) {
-                    analogSensorName = groupsWaterLevelSensors[0];
-                } else {
-                    analogSensorName = string.Empty;
-                }
-            }
-            analogSensorCombo.comboList.Add ("New level sensor...");
-            analogSensorCombo.activeIndex = 0;
-            analogSensorCombo.ComboChangedEvent += OnAnalogSensorComboChanged;
-            Put (analogSensorCombo, 550, 77);
-            analogSensorCombo.Show ();
-
             switchCombo = new TouchComboBox ();
             switchCombo.WidthRequest = 200;
             if (groupName.IsNotEmpty ()) {
@@ -291,7 +253,7 @@ namespace AquaPic.UserInterface
 
             GetGroupData ();
             GetAtoGroupData ();
-            GetAnalogSensorData ();
+            analogSensorWidget.GetSensorData ();
             GetSwitchData ();
 
             Show ();
@@ -322,7 +284,7 @@ namespace AquaPic.UserInterface
         protected override bool OnUpdateTimer () {
             GetGroupData ();
             GetAtoGroupData ();
-            GetAnalogSensorData ();
+            analogSensorWidget.GetSensorData ();
             GetSwitchData ();
             return true;
         }
@@ -362,31 +324,6 @@ namespace AquaPic.UserInterface
             }
 
             atoStateTextBox.QueueDraw ();
-        }
-
-        protected void GetAnalogSensorData () {
-            if (analogSensorName.IsNotEmpty ()) {
-                float level = (float)Sensors.WaterLevelSensors.GetGadgeValue (analogSensorName);
-                if (level < 0f) {
-                    analogSensorLevelTextBox.text = "Probe Disconnected";
-                    analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-                    analogSensorLevelLabel.Visible = true;
-                } else {
-                    analogSensorLevelTextBox.text = level.ToString ("F2");
-                    analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
-                    analogSensorLevelLabel.Visible = false;
-                }
-            } else {
-                analogSensorLevelTextBox.text = "Probe not available";
-                analogSensorLevelTextBox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-                analogSensorLevelLabel.Visible = false;
-            }
-
-            analogSensorCombo.Visible = false;
-            analogSensorCombo.Visible = true;
-
-            analogSensorCombo.QueueDraw ();
-            analogSensorLevelTextBox.QueueDraw ();
         }
 
         protected void GetSwitchData () {
@@ -432,19 +369,19 @@ namespace AquaPic.UserInterface
             } else {
                 groupName = e.activeText;
 
-                analogSensorCombo.comboList.Clear ();
+                analogSensorWidget.sensorCombo.comboList.Clear ();
                 if (groupName.IsNotEmpty ()) {
                     var groupsWaterLevelSensors = WaterLevel.GetAllWaterLevelSensorsForWaterLevelGroup (groupName);
-                    analogSensorCombo.comboList.AddRange (groupsWaterLevelSensors);
+                    analogSensorWidget.sensorCombo.comboList.AddRange (groupsWaterLevelSensors);
                     if (groupsWaterLevelSensors.Length > 0) {
-                        analogSensorName = groupsWaterLevelSensors[0];
+                        analogSensorWidget.sensorName = groupsWaterLevelSensors[0];
                     } else {
-                        analogSensorName = string.Empty;
+                        analogSensorWidget.sensorName = string.Empty;
                     }
                 }
-                analogSensorCombo.comboList.Add ("New level sensor...");
-                analogSensorCombo.activeIndex = 0;
-                analogSensorCombo.QueueDraw ();
+                analogSensorWidget.sensorCombo.comboList.Add ("New level sensor...");
+                analogSensorWidget.sensorCombo.activeIndex = 0;
+                analogSensorWidget.sensorCombo.QueueDraw ();
 
                 switchCombo.comboList.Clear ();
                 if (groupName.IsNotEmpty ()) {
@@ -462,7 +399,7 @@ namespace AquaPic.UserInterface
             }
 
             GetGroupData ();
-            GetAnalogSensorData ();
+            analogSensorWidget.GetSensorData ();
             GetSwitchData ();
         }
 
@@ -489,11 +426,11 @@ namespace AquaPic.UserInterface
                 groupCombo.comboList.Insert (groupCombo.comboList.Count - 1, groupName);
                 groupCombo.activeText = groupName;
 
-                analogSensorCombo.comboList.Clear ();
-                analogSensorCombo.comboList.Add ("New level sensor...");
-                analogSensorCombo.activeIndex = 0;
-                analogSensorCombo.QueueDraw ();
-                analogSensorName = string.Empty;
+                analogSensorWidget.sensorCombo.comboList.Clear ();
+                analogSensorWidget.sensorCombo.comboList.Add ("New level sensor...");
+                analogSensorWidget.sensorCombo.activeIndex = 0;
+                analogSensorWidget.sensorCombo.QueueDraw ();
+                analogSensorWidget.sensorName = string.Empty;
 
                 switchCombo.comboList.Clear ();
                 switchCombo.comboList.Add ("New switch...");
@@ -505,19 +442,19 @@ namespace AquaPic.UserInterface
                 groupName = WaterLevel.firstWaterLevelGroup;
                 groupCombo.activeText = groupName;
 
-                analogSensorCombo.comboList.Clear ();
+                analogSensorWidget.sensorCombo.comboList.Clear ();
                 if (groupName.IsNotEmpty ()) {
                     var groupsWaterLevelSensors = WaterLevel.GetAllWaterLevelSensorsForWaterLevelGroup (groupName);
-                    analogSensorCombo.comboList.AddRange (groupsWaterLevelSensors);
+                    analogSensorWidget.sensorCombo.comboList.AddRange (groupsWaterLevelSensors);
                     if (groupsWaterLevelSensors.Length > 0) {
-                        analogSensorName = groupsWaterLevelSensors[0];
+                        analogSensorWidget.sensorName = groupsWaterLevelSensors[0];
                     } else {
-                        analogSensorName = string.Empty;
+                        analogSensorWidget.sensorName = string.Empty;
                     }
                 }
-                analogSensorCombo.comboList.Add ("New level sensor...");
-                analogSensorCombo.activeIndex = 0;
-                analogSensorCombo.QueueDraw ();
+                analogSensorWidget.sensorCombo.comboList.Add ("New level sensor...");
+                analogSensorWidget.sensorCombo.activeIndex = 0;
+                analogSensorWidget.sensorCombo.QueueDraw ();
 
                 switchCombo.comboList.Clear ();
                 if (groupName.IsNotEmpty ()) {
@@ -536,7 +473,7 @@ namespace AquaPic.UserInterface
 
             groupCombo.QueueDraw ();
             GetGroupData ();
-            GetAnalogSensorData ();
+            analogSensorWidget.GetSensorData ();
             GetSwitchData ();
         }
 
@@ -588,88 +525,6 @@ namespace AquaPic.UserInterface
                 atoGroupName = e.activeText;
             }
             GetAtoGroupData ();
-        }
-
-        protected void OnWaterLevelSensorSettingsButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
-            CallWaterLevelSensorSettingsDialog ();
-        }
-
-        protected void OnAnalogSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.activeText == "New level sensor...") {
-                CallWaterLevelSensorSettingsDialog (true);
-            } else {
-                analogSensorName = e.activeText;
-            }
-
-            GetAnalogSensorData ();
-        }
-
-        protected void CallWaterLevelSensorSettingsDialog (bool forceNew = false) {
-            GenericAnalogSensorSettings settings;
-            if (analogSensorName.IsNotEmpty () && !forceNew) {
-                settings = Sensors.WaterLevelSensors.GetGadgetSettings (analogSensorName) as GenericAnalogSensorSettings;
-            } else {
-                settings = new WaterLevelSensorSettings ();
-            }
-            var parent = Toplevel as Window;
-            var s = new WaterLevelSensorSettingsDialog (settings, parent);
-            s.Run ();
-            var newAnalogSensorName = s.waterLevelSensorName;
-            var outcome = s.outcome;
-
-            if ((outcome == TouchSettingsOutcome.Modified) && (newAnalogSensorName != analogSensorName)) {
-                var index = analogSensorCombo.comboList.IndexOf (analogSensorName);
-                analogSensorCombo.comboList[index] = newAnalogSensorName;
-                analogSensorName = newAnalogSensorName;
-            } else if (outcome == TouchSettingsOutcome.Added) {
-                analogSensorCombo.comboList.Insert (analogSensorCombo.comboList.Count - 1, newAnalogSensorName);
-                analogSensorCombo.activeText = newAnalogSensorName;
-                analogSensorName = newAnalogSensorName;
-                WaterLevel.AddWaterLevelSensorToWaterLevelGroup (groupName, analogSensorName);
-            } else if (outcome == TouchSettingsOutcome.Deleted) {
-                analogSensorCombo.comboList.Remove (analogSensorName);
-                var groupsWaterLevelSensors = WaterLevel.GetAllWaterLevelSensorsForWaterLevelGroup (groupName);
-                if (groupsWaterLevelSensors.Length > 0) {
-                    analogSensorName = groupsWaterLevelSensors[0];
-                    analogSensorCombo.activeText = analogSensorName;
-                } else {
-                    analogSensorName = string.Empty;
-                    analogSensorCombo.activeIndex = 0;
-                }
-            }
-
-            analogSensorCombo.QueueDraw ();
-            GetAnalogSensorData ();
-        }
-
-        protected void OnWaterLevelSensorCalibrationButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
-            if (analogSensorName.IsNotEmpty ()) {
-                var parent = Toplevel as Window;
-                var cal = new CalibrationDialog (
-                    "Water Level Sensor",
-                    parent,
-                    () => {
-                        var channel = Sensors.WaterLevelSensors.GetGadget (analogSensorName).channel;
-                        return Driver.AnalogInput.GetChannelValue (channel);
-                    });
-
-                cal.CalibrationCompleteEvent += (aa) => {
-                    Sensors.WaterLevelSensors.SetCalibrationData (
-                        analogSensorName,
-                        (float)aa.zeroValue,
-                        (float)aa.fullScaleActual,
-                        (float)aa.fullScaleValue);
-                };
-
-                var sensor = (WaterLevelSensor)Sensors.WaterLevelSensors.GetGadget (analogSensorName);
-                cal.calArgs.zeroValue = sensor.zeroScaleCalibrationValue;
-                cal.calArgs.fullScaleActual = sensor.fullScaleCalibrationActual;
-                cal.calArgs.fullScaleValue = sensor.fullScaleCalibrationValue;
-
-                cal.Run ();
-            } else {
-                MessageBox.Show ("Can't calibrate a none existent sensor");
-            }
         }
 
         protected void OnFloatSwitchSettingsButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {

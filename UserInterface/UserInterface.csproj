@@ -65,7 +65,6 @@
     <Compile Include="Scenes\Temperature\Dialogs\TemperatureGroupSettingsDialog.cs" />
     <Compile Include="Scenes\Temperature\TemperatureScreen.cs" />
     <Compile Include="Scenes\Temperature\Widgets\MainTemperatureLinePlotWidgets.cs" />
-    <Compile Include="Scenes\WaterLevel\Dialogs\WaterLevelSensorSettingsDialog.cs" />
     <Compile Include="Scenes\WaterLevel\Dialogs\AtoSettings.cs" />
     <Compile Include="Scenes\WaterLevel\Dialogs\FloatSwitchSettingsDialog.cs" />
     <Compile Include="Scenes\WaterLevel\Dialogs\WaterGroupSettings.cs" />
@@ -89,6 +88,7 @@
     <Compile Include="Scenes\Sensors\Dialogs\AnalogSensorSettingsDialog.cs" />
     <Compile Include="Scenes\Sensors\Widgets\MainPhProbeLinePlot.cs" />
     <Compile Include="Scenes\Sensors\Widgets\TemperatureProbeWidget.cs" />
+    <Compile Include="Scenes\Sensors\Widgets\WaterLevelSensorWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
