@@ -3,7 +3,7 @@
 /*
  AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
- Copyright (c) 2018 Goodtime Development
+ Copyright (c) 2019 Goodtime Development
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -24,29 +24,33 @@
 using System;
 using Gtk;
 using GoodtimeDevelopment.Utilites;
+using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Gadgets.Sensor;
-using AquaPic.Gadgets.Sensor.PhProbe;
+using AquaPic.Gadgets.Sensor.TemperatureProbe;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class PhProbeWidget : AnalogSensorWidget
+    public class TemperatureProbeWidget : AnalogSensorWidget
     {
-        public PhProbeWidget ()
-         : base ("pH Probes", Sensors.PhProbes, Driver.PhOrp, typeof (PhProbeSettings)) { }
+        public TemperatureProbeWidget () 
+            : base ("Probes", Sensors.TemperatureProbes, Driver.AnalogInput, typeof (TemperatureProbeSettings)) { }
 
         public override void GetSensorData () {
             if (sensorName.IsNotEmpty ()) {
-                var probe = (PhProbe)Sensors.PhProbes.GetGadget (sensorName);
+                var probe = Sensors.TemperatureProbes.GetGadget (sensorName) as TemperatureProbe;
                 if (probe.connected) {
                     sensorStateTextbox.text = Convert.ToSingle (probe.value).ToString ("F2");
+                    sensorStateTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Degrees;
                     sensorLabel.Visible = true;
                 } else {
                     sensorStateTextbox.text = "Probe disconnected";
+                    sensorStateTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
                     sensorLabel.Visible = false;
                 }
             } else {
                 sensorStateTextbox.text = "Probe not available";
+                sensorStateTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
                 sensorLabel.Visible = false;
             }
 

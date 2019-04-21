@@ -62,7 +62,6 @@
     <Compile Include="Scenes\SerialBus\Widgets\SerialBusSlaveWidget.cs" />
     <Compile Include="Scenes\Settings\SettingsScreen.cs" />
     <Compile Include="Scenes\Temperature\Dialogs\HeaterSettingsDialog.cs" />
-    <Compile Include="Scenes\Temperature\Dialogs\TemperatureProbeSettingsDialog.cs" />
     <Compile Include="Scenes\Temperature\Dialogs\TemperatureGroupSettingsDialog.cs" />
     <Compile Include="Scenes\Temperature\TemperatureScreen.cs" />
     <Compile Include="Scenes\Temperature\Widgets\MainTemperatureLinePlotWidgets.cs" />
@@ -89,6 +88,7 @@
     <Compile Include="Scenes\Sensors\Dialogs\SensorSettingsDialog.cs" />
     <Compile Include="Scenes\Sensors\Dialogs\AnalogSensorSettingsDialog.cs" />
     <Compile Include="Scenes\Sensors\Widgets\MainPhProbeLinePlot.cs" />
+    <Compile Include="Scenes\Sensors\Widgets\TemperatureProbeWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

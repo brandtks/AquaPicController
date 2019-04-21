@@ -22,7 +22,6 @@
 #endregion // License
 
 using System;
-using GoodtimeDevelopment.Utilites;
 using AquaPic.Globals;
 
 namespace AquaPic.Gadgets.Sensor.TemperatureProbe

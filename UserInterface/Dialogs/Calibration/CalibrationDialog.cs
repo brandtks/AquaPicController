@@ -86,7 +86,6 @@ namespace AquaPic.UserInterface
             Name = "AquaPic.Calibration." + name;
             WindowPosition = (WindowPosition)4;
             SetSizeRequest (600, 300);
-
 #if RPI_BUILD
             Decorated = false;
 
@@ -249,7 +248,6 @@ namespace AquaPic.UserInterface
                     var ti = tb.EndIter;
                     tb.InsertWithTags (ref ti, string.Format ("Previous zero value: {0:F2}", calArgs.zeroValue), tag);
                 }
-
                 tv.QueueDraw ();
                 init = true;
             }

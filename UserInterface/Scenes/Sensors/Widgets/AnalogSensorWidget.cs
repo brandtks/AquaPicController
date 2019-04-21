@@ -32,21 +32,27 @@ namespace AquaPic.UserInterface
 {
     public class AnalogSensorWidget : Fixed
     {
-        protected string sensorTypeLabel;
-        protected string sensorName;
-        protected TouchComboBox sensorCombo;
-        protected TouchLabel sensorStateTextbox;
-        protected TouchLabel sensorLabel;
-        protected GenericAnalogSensorCollection sensorCollection;
-        protected GenericAnalogInputBase analogInputDriver;
+        public string sensorTypeLabel { get; protected set; }
+        public string sensorName { get; set; }
+        public TouchComboBox sensorCombo { get; protected set; }
+        public TouchLabel sensorStateTextbox { get; protected set; }
+        public TouchLabel sensorLabel { get; protected set; }
+        public GenericAnalogSensorCollection sensorCollection { get; protected set; }
+        public GenericAnalogInputBase analogInputDriver { get; protected set; }
+        public Type settingsType { get; protected set; }
 
         public AnalogSensorWidget (
             string sensorTypeLabel, 
             GenericAnalogSensorCollection sensorCollection,
-            GenericAnalogInputBase analogInputDriver) 
-        {
+            GenericAnalogInputBase analogInputDriver,
+            Type settingsType
+        ) {
             this.sensorCollection = sensorCollection;
             this.analogInputDriver = analogInputDriver;
+            if (!settingsType.TypeIs (typeof (GenericAnalogSensorSettings))) {
+                throw new ArgumentException ("The settings type must derive GenericAnalogSensorSettings", nameof (settingsType));
+            }
+            this.settingsType = settingsType;
 
             SetSizeRequest (370, 188);
 
@@ -62,7 +68,7 @@ namespace AquaPic.UserInterface
             sensorSettingsButton.SetSizeRequest (30, 30);
             sensorSettingsButton.buttonColor = "pri";
             sensorSettingsButton.ButtonReleaseEvent += OnSensorSettingsButtonReleaseEvent;
-            Put (sensorSettingsButton, 321, 0);
+            Put (sensorSettingsButton, 340, 0);
             sensorSettingsButton.Show ();
 
             var b = new TouchButton ();
@@ -100,7 +106,7 @@ namespace AquaPic.UserInterface
             sensorCombo.comboList.Add ("New sensor...");
             sensorCombo.activeIndex = 0;
             sensorCombo.ComboChangedEvent += OnSensorComboChanged;
-            Put (sensorCombo, 116, 0);
+            Put (sensorCombo, 135, 0);
             sensorCombo.Show ();
 
             GetSensorData ();
@@ -126,16 +132,14 @@ namespace AquaPic.UserInterface
         }
 
         protected void CallSensorSettingsDialog (bool forceNew = false) {
-            var parent = Toplevel as Window;
-
             GenericAnalogSensorSettings settings;
             if (sensorName.IsNotEmpty () && !forceNew) {
                 settings = sensorCollection.GetGadgetSettings (sensorName) as GenericAnalogSensorSettings;
             } else {
-                settings = new GenericAnalogSensorSettings ();
+                settings = Activator.CreateInstance (settingsType) as GenericAnalogSensorSettings;
             }
 
-            var s = new AnalogSensorSettingsDialog (settings, sensorCollection, analogInputDriver, parent);
+            var s = new AnalogSensorSettingsDialog (settings, sensorCollection, analogInputDriver, Toplevel as Window);
             s.Run ();
             var newProbeName = s.sensorName;
             var outcome = s.outcome;

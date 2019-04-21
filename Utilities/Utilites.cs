@@ -285,11 +285,14 @@ namespace GoodtimeDevelopment.Utilites
             }
 
             for (var baseType = type; baseType != null; baseType = baseType.BaseType) {
+                if (baseType == compareBaseType) {
+                    return true;
+                }
+
                 var interfaces = baseType.GetInterfaces ();
 
                 for (var i = interfaces.Length - 1; i >= 0; --i) {
                     var compare = i < 0 ? baseType : interfaces[i];
-
                     if (compare == compareBaseType || (compare.IsGenericType && compare.GetGenericTypeDefinition () == compareBaseType)) {
                         return true;
                     }

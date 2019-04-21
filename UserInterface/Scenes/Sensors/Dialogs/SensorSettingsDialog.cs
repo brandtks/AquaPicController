@@ -39,9 +39,8 @@ namespace AquaPic.UserInterface
             GenericSensorSettings settings,
             GenericSensorCollection sensorCollection,
             GenericInputBase inputDriver, 
-            Window parent)
-            : base (settings.name, settings.name.IsNotEmpty (), parent) 
-        {
+            Window parent
+        ) : base (settings.name, settings.name.IsNotEmpty (), parent) {
             sensorName = settings.name;
             this.sensorCollection = sensorCollection;
 
