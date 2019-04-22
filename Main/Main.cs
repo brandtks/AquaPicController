@@ -21,6 +21,8 @@
 
 #endregion // License
 
+#define DELETE_DATA_FILES
+
 using System;
 using System.IO;
 using Gtk;
@@ -163,7 +165,7 @@ namespace AquaPic
                 AquaPicBus.Close ();
             }
 
-#if DEBUG
+#if DELETE_DATA_FILES
             // For some reason this doesn't like to be in the destroyed event
             var groups = Temperature.GetAllTemperatureGroupNames ();
             foreach (var group in groups) {

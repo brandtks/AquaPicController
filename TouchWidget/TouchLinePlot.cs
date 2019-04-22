@@ -89,7 +89,7 @@ namespace GoodtimeDevelopment.TouchWidget
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 int top = Allocation.Top;
                 int left = Allocation.Left;
                 int height = Allocation.Height;
@@ -101,47 +101,57 @@ namespace GoodtimeDevelopment.TouchWidget
                 TouchColor.SetSource (cr, "grey3", 0.15f);
                 cr.Fill ();
 
+                var timeToPoints = PointTimeDifferenceToSeconds ();
+
                 //Value points
                 if (dataPoints.count > 0) {
-                    var valueBuffer = dataPoints.ToArray ();
+                    var fullBuffer = dataPoints.ToArray ();
+                    Array.Reverse (fullBuffer);
+
+                    int maxIndex = fullBuffer.Length - 1;
+                    for (var i = 0; i < fullBuffer.Length; ++i) {
+                        var maxX = now.Subtract (fullBuffer[i].dateTime).TotalSeconds / timeToPoints * (double)_pointSpacing;
+                        if (maxX > graphWidth) {
+                            maxIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (maxIndex == 0) {
+                        maxIndex = 1;
+                    }
+
+                    var valueBuffer = fullBuffer.SubArray (0, maxIndex);
 
                     var min = valueBuffer.Min (entry => entry.value);
                     var max = valueBuffer.Max (entry => entry.value);
 
                     if ((max - min) < rangeMargin) {
-                        max += (rangeMargin / 2);
                         min -= (rangeMargin / 2);
+                        max += (rangeMargin / 2);
                     }
-
-                    Array.Reverse (valueBuffer);
-
-                    TouchColor.SetSource (cr, "pri");
 
                     var y = valueBuffer[0].value.Map (min, max, bottom - 4, top + 4);
                     double x = left + 8;
                     cr.MoveTo (x, y);
-                    var pointDifference = now.Subtract (valueBuffer[0].dateTime).TotalSeconds / PointTimeDifferenceToSeconds ();
-                    if (pointDifference > 2) {
-                        x += pointDifference * (double)_pointSpacing;
+                    var pointDifference = now.Subtract (valueBuffer[0].dateTime).TotalSeconds / timeToPoints;
+                    x += pointDifference * (double)_pointSpacing;
+                    if (x > (left + width)) {
+                        x = left + width;
                     }
                     cr.LineTo (x, y);
 
-                    for (int i = 1; i < valueBuffer.Length; ++i) {
+                    for (var i = 1; i < valueBuffer.Length; ++i) {
                         y = valueBuffer[i].value.Map (min, max, bottom - 4, top + 4);
                         x = left + 8;
 
-                        pointDifference = now.Subtract (valueBuffer[i].dateTime).TotalSeconds / PointTimeDifferenceToSeconds ();
+                        pointDifference = now.Subtract (valueBuffer[i].dateTime).TotalSeconds / timeToPoints;
                         x += pointDifference * (double)_pointSpacing;
-
-                        if (x > (left + width)) {
-                            x = left + width;
-                            cr.LineTo (x, y);
-                            break;
-                        } 
 
                         cr.LineTo (x, y);
                     }
 
+                    TouchColor.SetSource (cr, "pri");
                     cr.Stroke ();
 
                     var textRender = new TouchText ();
@@ -149,18 +159,18 @@ namespace GoodtimeDevelopment.TouchWidget
                     textRender.font.color = "white";
 
                     if (rangeMargin > 1) {
-                        textRender.text = Math.Ceiling (max).ToString ();
-                    } else {
-                        textRender.text = max.ToString ("F1");
-                    }
-                    textRender.Render (this, left - 9, top - 2, 16);
-
-                    if (rangeMargin > 1) {
                         textRender.text = Math.Floor (min).ToString ();
                     } else {
                         textRender.text = min.ToString ("F1");
                     }
                     textRender.Render (this, left - 9, bottom - 16, 16);
+
+                    if (rangeMargin > 1) {
+                        textRender.text = Math.Ceiling (max).ToString ();
+                    } else {
+                        textRender.text = max.ToString ("F1");
+                    }
+                    textRender.Render (this, left - 9, top - 2, 16);
                 }
 
                 //Event points
@@ -169,12 +179,12 @@ namespace GoodtimeDevelopment.TouchWidget
                     Array.Reverse (eventBuffer);
                     for (int i = 0; i < eventBuffer.Length; i++) {
                         double x = left + 8;
-                        x += (now.Subtract (eventBuffer[i].dateTime).TotalSeconds / PointTimeDifferenceToSeconds ()) * (double)_pointSpacing;
+                        x += now.Subtract (eventBuffer[i].dateTime).TotalSeconds / timeToPoints * (double)_pointSpacing;
                         if (x > (left + width)) {
                             break;
                         }
 
-                        cr.Rectangle (x, top, (int)_pointSpacing, height);
+                        cr.Rectangle (x - (int)_pointSpacing, top, (int)_pointSpacing * 2, height);
 
                         if (eventColors.ContainsKey (eventBuffer[i].eventType)) {
                             eventColors[eventBuffer[i].eventType].SetSource (cr);
