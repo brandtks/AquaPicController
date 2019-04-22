@@ -36,6 +36,7 @@ namespace AquaPic.UserInterface
         public PhProbeLinePlot (string group, int row, int column) : base ("pH Probe", group, row, column) {
             text = "No pH Probe";
             unitOfMeasurement = UnitsOfMeasurement.None;
+            linePlot.rangeMargin = 0.2;
 
             label = new TouchLabel ();
             label.SetSizeRequest (152, 16);

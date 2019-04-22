@@ -80,14 +80,6 @@ namespace AquaPic.Modules
 
                 SettingsHelper.WriteSettingsFile (settingsFileName, jo);
             }
-
-            TaskManager.Instance.AddCyclicInterrupt ("Water Level", 1000, Run);
-        }
-
-        public static void Run () {
-            foreach (var waterLevelGroup in waterLevelGroups.Values) {
-                waterLevelGroup.GroupRun ();
-            }
         }
 
         /**************************************************************************************************************/
