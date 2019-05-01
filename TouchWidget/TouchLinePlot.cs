@@ -36,19 +36,8 @@ namespace GoodtimeDevelopment.TouchWidget
         uint timerId;
         const int graphWidth = 240;
 
-        private CircularBuffer<LogEntry> _dataPoints;
-        public CircularBuffer<LogEntry> dataPoints {
-            get {
-                return _dataPoints;
-            }
-        }
-
-        private CircularBuffer<LogEntry> _eventPoints;
-        public CircularBuffer<LogEntry> eventPoints {
-            get {
-                return _eventPoints;
-            }
-        }
+        public CircularBuffer<LogEntry> dataPoints { get; protected set; }
+        public CircularBuffer<LogEntry> eventPoints { get; protected set; }
 
         public Dictionary<string, TouchColor> eventColors;
 
@@ -60,8 +49,8 @@ namespace GoodtimeDevelopment.TouchWidget
             set {
                 _pointSpacing = value;
 
-                _dataPoints.maxSize = maxDataPoints;
-                _eventPoints.maxSize = maxDataPoints;
+                dataPoints.maxSize = maxDataPoints;
+                eventPoints.maxSize = maxDataPoints;
             }
         }
 
@@ -81,11 +70,11 @@ namespace GoodtimeDevelopment.TouchWidget
             SetSizeRequest (graphWidth + 8, 60);
 
             _pointSpacing = TouchLinePlotPointPixelDifference.One;
-            _dataPoints = new CircularBuffer<LogEntry> (maxDataPoints);
-            _eventPoints = new CircularBuffer<LogEntry> (maxDataPoints);
+            dataPoints = new CircularBuffer<LogEntry> (maxDataPoints);
+            eventPoints = new CircularBuffer<LogEntry> (maxDataPoints);
             eventColors = new Dictionary<string, TouchColor> ();
 
-            rangeMargin = 3;
+            rangeMargin = 2;
             timeSpan = TouchLinePlotPointTimeDifference.Seconds1;
             startingPoint = new TouchLinePlotStartingPoint ();
 
@@ -100,7 +89,7 @@ namespace GoodtimeDevelopment.TouchWidget
         }
 
         protected void OnExpose (object sender, ExposeEventArgs args) {
-            using (Context cr = Gdk.CairoHelper.Create (this.GdkWindow)) {
+            using (Context cr = Gdk.CairoHelper.Create (GdkWindow)) {
                 int top = Allocation.Top;
                 int left = Allocation.Left;
                 int height = Allocation.Height;
@@ -112,83 +101,90 @@ namespace GoodtimeDevelopment.TouchWidget
                 TouchColor.SetSource (cr, "grey3", 0.15f);
                 cr.Fill ();
 
+                var timeToPoints = PointTimeDifferenceToSeconds ();
+
                 //Value points
-                if (_dataPoints.count > 0) {
-                    var valueBuffer = _dataPoints.ToArray ();
+                if (dataPoints.count > 0) {
+                    var fullBuffer = dataPoints.ToArray ();
+                    Array.Reverse (fullBuffer);
+
+                    int maxIndex = fullBuffer.Length - 1;
+                    for (var i = 0; i < fullBuffer.Length; ++i) {
+                        var maxX = now.Subtract (fullBuffer[i].dateTime).TotalSeconds / timeToPoints * (double)_pointSpacing;
+                        if (maxX > graphWidth) {
+                            maxIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (maxIndex == 0) {
+                        maxIndex = 1;
+                    }
+
+                    var valueBuffer = fullBuffer.SubArray (0, maxIndex);
 
                     var min = valueBuffer.Min (entry => entry.value);
                     var max = valueBuffer.Max (entry => entry.value);
 
                     if ((max - min) < rangeMargin) {
-                        max += (rangeMargin / 2);
                         min -= (rangeMargin / 2);
+                        max += (rangeMargin / 2);
                     }
-
-                    Array.Reverse (valueBuffer);
-
-                    TouchColor.SetSource (cr, "pri");
 
                     var y = valueBuffer[0].value.Map (min, max, bottom - 4, top + 4);
                     double x = left + 8;
-                    var pointDifference = now.Subtract (valueBuffer[0].dateTime).TotalSeconds / (double)PointTimeDifferenceToSeconds ();
-                    if (pointDifference > 2) {
-                        x += pointDifference * (double)_pointSpacing;
-                    }
                     cr.MoveTo (x, y);
+                    var pointDifference = now.Subtract (valueBuffer[0].dateTime).TotalSeconds / timeToPoints;
+                    x += pointDifference * (double)_pointSpacing;
+                    if (x > (left + width)) {
+                        x = left + width;
+                    }
+                    cr.LineTo (x, y);
 
-                    for (int i = 1; i < valueBuffer.Length; ++i) {
+                    for (var i = 1; i < valueBuffer.Length; ++i) {
                         y = valueBuffer[i].value.Map (min, max, bottom - 4, top + 4);
                         x = left + 8;
 
-                        pointDifference = now.Subtract (valueBuffer[i].dateTime).TotalSeconds / (double)PointTimeDifferenceToSeconds ();
+                        pointDifference = now.Subtract (valueBuffer[i].dateTime).TotalSeconds / timeToPoints;
                         x += pointDifference * (double)_pointSpacing;
 
-                        var previousDifference = valueBuffer[i - 1].dateTime.Subtract (valueBuffer[i].dateTime).TotalSeconds / (double)PointTimeDifferenceToSeconds ();
-                        if (previousDifference > 2) {
-                            cr.Stroke ();
-
-                            if (x > (left + width)) {
-                                break;
-                            } else {
-                                cr.MoveTo (x, y);
-                            }
-                        } else {
-                            if (x > (left + width)) {
-                                x = left + width;
-                                cr.LineTo (x, y);
-                                break;
-                            } else {
-                                cr.LineTo (x, y);
-                            }
-                        }
+                        cr.LineTo (x, y);
                     }
 
+                    TouchColor.SetSource (cr, "pri");
                     cr.Stroke ();
 
                     var textRender = new TouchText ();
-                    textRender.textWrap = TouchTextWrap.Shrink;
                     textRender.alignment = TouchAlignment.Right;
                     textRender.font.color = "white";
 
-                    textRender.text = Math.Ceiling (max).ToString ();
-                    textRender.Render (this, left - 9, top - 2, 16);
-
-                    textRender.text = Math.Floor (min).ToString ();
+                    if (rangeMargin > 1) {
+                        textRender.text = Math.Floor (min).ToString ();
+                    } else {
+                        textRender.text = min.ToString ("F1");
+                    }
                     textRender.Render (this, left - 9, bottom - 16, 16);
+
+                    if (rangeMargin > 1) {
+                        textRender.text = Math.Ceiling (max).ToString ();
+                    } else {
+                        textRender.text = max.ToString ("F1");
+                    }
+                    textRender.Render (this, left - 9, top - 2, 16);
                 }
 
                 //Event points
-                if (_eventPoints.count > 0) {
-                    var eventBuffer = _eventPoints.ToArray ();
+                if (eventPoints.count > 0) {
+                    var eventBuffer = eventPoints.ToArray ();
                     Array.Reverse (eventBuffer);
                     for (int i = 0; i < eventBuffer.Length; i++) {
                         double x = left + 8;
-                        x += (now.Subtract (eventBuffer[i].dateTime).TotalSeconds / (double)PointTimeDifferenceToSeconds ()) * (double)_pointSpacing;
+                        x += now.Subtract (eventBuffer[i].dateTime).TotalSeconds / timeToPoints * (double)_pointSpacing;
                         if (x > (left + width)) {
                             break;
                         }
 
-                        cr.Rectangle (x, top, (int)_pointSpacing, height);
+                        cr.Rectangle (x - (int)_pointSpacing, top, (int)_pointSpacing * 2, height);
 
                         if (eventColors.ContainsKey (eventBuffer[i].eventType)) {
                             eventColors[eventBuffer[i].eventType].SetSource (cr);
@@ -207,11 +203,11 @@ namespace GoodtimeDevelopment.TouchWidget
 
             logger.ValueLogEntryAddedEvent += OnValueLogEntryAdded;
             var valueEntries = logger.GetValueEntries (maxDataPoints, PointTimeDifferenceToSeconds (), endSearchTime);
-            _dataPoints.AddRange (valueEntries);
+            dataPoints.AddRange (valueEntries);
 
             logger.EventLogEntryAddedEvent += OnEventLogEntryAdded;
             var eventEntries = logger.GetEventEntries (maxDataPoints, endSearchTime);
-            _eventPoints.AddRange (eventEntries);
+            eventPoints.AddRange (eventEntries);
         }
 
         public void UnLinkDataLogger (IDataLogger logger) {
@@ -220,20 +216,20 @@ namespace GoodtimeDevelopment.TouchWidget
         }
 
         public void OnValueLogEntryAdded (object sender, DataLogEntryAddedEventArgs args) {
-            if (_dataPoints.count > 0) {
-                var previous = _dataPoints[_dataPoints.count - 1].dateTime;
+            if (dataPoints.count > 0) {
+                var previous = dataPoints[dataPoints.count - 1].dateTime;
                 var totalSeconds = args.entry.dateTime.Subtract (previous).TotalSeconds.ToInt ();
                 var secondTimeSpan = PointTimeDifferenceToSeconds ();
                 if (totalSeconds >= secondTimeSpan) {
-                    _dataPoints.Add (new LogEntry (args.entry));
+                    dataPoints.Add (new LogEntry (args.entry));
                 }
             } else {
-                _dataPoints.Add (new LogEntry (args.entry));
+                dataPoints.Add (new LogEntry (args.entry));
             }
         }
 
         public void OnEventLogEntryAdded (object sender, DataLogEntryAddedEventArgs args) {
-            _eventPoints.Add (new LogEntry (args.entry));
+            eventPoints.Add (new LogEntry (args.entry));
         }
 
         public int PointTimeDifferenceToSeconds () {

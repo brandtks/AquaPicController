@@ -121,23 +121,34 @@ namespace AquaPic.UserInterface
                 }
             } else {
                 var parent = Toplevel as Window;
-                var s = new PowerSettings (string.Empty, false, parent);
-                s.Run ();
+                var numberInput = new TouchNumberInput (false, parent);
+                numberInput.Title = "Address";
 
-                if (s.outcome == TouchSettingsOutcome.Added) {
-                    powerStripName = s.newPowerStripName;
-                    combo.comboList.Insert (combo.comboList.Count - 1, powerStripName);
-                    foreach (var sel in selectors) {
-                        sel.Visible = true;
+                numberInput.TextSetEvent += (o, a) => {
+                    a.keepText = CardSettingsHelper.OnAddressSetEvent (a.text, ref powerStripName, Driver.Power);
+
+                    if (a.keepText) {
+                        combo.comboList.Insert (combo.comboList.Count - 1, powerStripName);
+                        foreach (var sel in selectors) {
+                            sel.Visible = true;
+                        }
+                        graphics.Visible = true;
+                        combo.Visible = false;
+                        combo.Visible = true;
+                        sceneTitle = "Power Strip";
+                        GetPowerData ();
                     }
-                    graphics.Visible = true;
-                    combo.Visible = false;
-                    combo.Visible = true;
-                    sceneTitle = "Power Strip";
+                };
+
+                numberInput.Run ();
+                numberInput.Destroy ();
+
+                // The number input was canceled
+                if (combo.activeText == "New power strip...") {
+                    powerStripName = Driver.Power.firstCard;
+                    combo.activeText = powerStripName;
                     GetPowerData ();
                 }
-
-                combo.activeText = powerStripName;
             }
 
             QueueDraw ();
@@ -145,26 +156,35 @@ namespace AquaPic.UserInterface
 
         protected void OnSettingsRelease (object sender, ButtonReleaseEventArgs args) {
             if (powerStripName.IsNotEmpty ()) {
-                var parent = Toplevel as Window;
-                var s = new PowerSettings (powerStripName, power.CheckCardEmpty (powerStripName), parent);
-                s.Run ();
+                if (Driver.Power.CheckCardEmpty (powerStripName)) {
+                    var parent = Toplevel as Window;
+                    var ms = new TouchDialog ("Are you sure you with to delete " + powerStripName, parent);
 
-                if (s.outcome == TouchSettingsOutcome.Deleted) {
-                    combo.comboList.Remove (powerStripName);
-                    if (power.cardCount == 0) {
-                        powerStripName = string.Empty;
-                        sceneTitle = "No Power Strips Added";
-                        foreach (var sel in selectors) {
-                            sel.Visible = false;
+                    ms.Response += (o, a) => {
+                        if (a.ResponseId == ResponseType.Yes) {
+                            var deleted = CardSettingsHelper.OnCardDeleteEvent (powerStripName, Driver.Power);
+                            if (deleted) {
+                                combo.comboList.Remove (powerStripName);
+                                if (power.cardCount == 0) {
+                                    powerStripName = string.Empty;
+                                    sceneTitle = "No Power Strips Added";
+                                    foreach (var sel in selectors) {
+                                        sel.Visible = false;
+                                    }
+                                    graphics.Visible = false;
+                                    combo.activeIndex = -1;
+                                } else {
+                                    powerStripName = Driver.Power.firstCard;
+                                    combo.activeText = powerStripName;
+                                    GetPowerData ();
+                                }
+                                QueueDraw ();
+                            }
                         }
-                        graphics.Visible = false;
-                        combo.activeIndex = -1;
-                    } else {
-                        powerStripName = Driver.Power.firstCard;
-                        combo.activeText = powerStripName;
-                        GetPowerData ();
-                    }
-                    QueueDraw ();
+                    };
+
+                    ms.Run ();
+                    ms.Destroy ();
                 }
             }
         }
@@ -198,6 +218,14 @@ namespace AquaPic.UserInterface
                     }
                     s.QueueDraw ();
                 }
+
+                if (Driver.Power.CheckCardEmpty (powerStripName)) {
+                    settingsButton.buttonColor = "compl";
+                } else {
+                    settingsButton.buttonColor = "grey1";
+                }
+            } else {
+                settingsButton.buttonColor = "grey1";
             }
         }
 

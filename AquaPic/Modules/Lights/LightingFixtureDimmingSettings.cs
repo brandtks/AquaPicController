@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2019 Goodtime Development
+    Copyright (c) 2017 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,18 +24,10 @@
 using System;
 using AquaPic.Globals;
 
-namespace AquaPic.Gadgets.Sensor.PhProbe
+namespace AquaPic.Modules
 {
-    public class PhProbeSettings : GenericAnalogSensorSettings
+    public class LightingFixtureDimmingSettings
     {
-        public PhProbeSettings () {
-            name = string.Empty;
-            channel = IndividualControl.Empty;
-            zeroScaleCalibrationActual = 0f;
-            zeroScaleCalibrationValue = 0f;
-            fullScaleCalibrationActual = 14f;
-            fullScaleCalibrationValue = 4096f;
-            lowPassFilterFactor = 5;
-        }
+
     }
 }

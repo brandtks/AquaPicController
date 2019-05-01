@@ -96,14 +96,6 @@ namespace AquaPic.Modules
                 }
             }
 
-            public void GroupRun () {
-                if (waterLevelSensors.Count > 0) {
-                    dataLogger.AddEntry (level);
-                } else {
-                    dataLogger.AddEntry ("probe disconnected");
-                }
-            }
-
             // Using event handler because either float switches or water level sensors can trip a high alarm
             protected void OnHighAlarm (object sender, AlarmEventArgs args) {
                 if (args.type == AlarmEventType.Posted) {
@@ -183,6 +175,12 @@ namespace AquaPic.Modules
                     }
                 }
                 level /= connectedWaterLevelSensors;
+
+                if (connectedWaterLevelSensors > 0) {
+                    dataLogger.AddEntry (level);
+                } else {
+                    dataLogger.AddEntry ("probe disconnected");
+                }
 
                 if (enableHighAnalogAlarm && (level > highAnalogAlarmSetpoint)) {
                     Alarm.Post (highAnalogAlarmIndex);

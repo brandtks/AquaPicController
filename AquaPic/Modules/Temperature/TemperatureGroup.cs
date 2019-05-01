@@ -82,8 +82,6 @@ namespace AquaPic.Modules.Temperature
 
             public void GroupRun () {
                 if (temperatureProbes.Count > 0) {
-                    dataLogger.AddEntry (temperature);
-
                     var deadband = temperatureDeadband / 2;
                     if (Bit.Instance.Check (bitName)) { // the heater request is high
                         var offTemperature = temperatureSetpoint + deadband;
@@ -99,7 +97,6 @@ namespace AquaPic.Modules.Temperature
                         }
                     }
                 } else {
-                    dataLogger.AddEntry ("no probes");
                     Bit.Instance.Set (bitName);
                 }
             }
@@ -145,6 +142,12 @@ namespace AquaPic.Modules.Temperature
                     }
                 }
                 temperature /= connectedTemperatureProbes;
+
+                if (connectedTemperatureProbes > 0) {
+                    dataLogger.AddEntry (temperature);
+                } else {
+                    dataLogger.AddEntry ("no probes");
+                }
 
                 if (temperature > highTemperatureAlarmSetpoint) {
                     if (!Alarm.CheckAlarming (highTemperatureAlarmIndex)) {

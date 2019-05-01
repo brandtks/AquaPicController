@@ -24,17 +24,20 @@
 using System;
 using AquaPic.Globals;
 
-namespace AquaPic.Gadgets.Sensor.PhProbe
-{
-    public class PhProbeSettings : GenericAnalogSensorSettings
+namespace AquaPic.Gadgets.Sensor.SpecificGravity
+{ 
+    public class SpecificGravitySettings : WaterLevelSensor.WaterLevelSensorSettings
     {
-        public PhProbeSettings () {
+        [EntitySetting (typeof (StringMutator), "secondWaterLevelSensor")]
+        public string secondWaterLevelSensor { get; set; }
+
+        public SpecificGravitySettings () {
             name = string.Empty;
             channel = IndividualControl.Empty;
             zeroScaleCalibrationActual = 0f;
-            zeroScaleCalibrationValue = 0f;
-            fullScaleCalibrationActual = 14f;
-            fullScaleCalibrationValue = 4096f;
+            zeroScaleCalibrationValue = 819.2f;
+            fullScaleCalibrationActual = 15f;
+            fullScaleCalibrationValue = 3003.73f;
             lowPassFilterFactor = 5;
         }
     }

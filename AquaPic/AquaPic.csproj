@@ -65,7 +65,7 @@
       <HintPath>..\packages\CS-Script.lib.3.28.7\lib\CSScriptLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +195,8 @@
     <Compile Include="Domain\Gadgets\Devices\Heater\HeaterCollection.cs" />
     <Compile Include="Domain\Gadgets\Devices\Heater\Heater.cs" />
     <Compile Include="Domain\Gadgets\Devices\Heater\HeaterSettings.cs" />
+    <Compile Include="Domain\Gadgets\Sensors\SpecificGravity\SpecificGravity.cs" />
+    <Compile Include="Domain\Gadgets\Sensors\SpecificGravity\SpecificGravitySettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -222,6 +224,7 @@
     <Folder Include="Service\Settings\" />
     <Folder Include="Domain\Gadgets\Sensors\Switch\" />
     <Folder Include="Domain\Gadgets\Devices\Heater\" />
+    <Folder Include="Domain\Gadgets\Sensors\SpecificGravity\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">

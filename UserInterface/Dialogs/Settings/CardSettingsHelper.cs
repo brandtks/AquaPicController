@@ -50,7 +50,7 @@ namespace AquaPic.UserInterface
                     if (!AquaPicBus.SlaveAddressOk (address)) {
                         MessageBox.Show ("Address already exists");
                     } else {
-                        var ja = SettingsHelper.OpenSettingsFile ("equipment") as JArray;
+                        var ja = SettingsHelper.OpenSettingsFile ("hardware") as JArray;
 
                         card = string.Format (
                             "{0}{1}",
@@ -68,11 +68,12 @@ namespace AquaPic.UserInterface
                                     new JProperty ("options", string.Empty)
                                 };
                         ja.Add (jo);
-                        SettingsHelper.WriteSettingsFile ("equipment", ja);
+                        SettingsHelper.WriteSettingsFile ("hardware", ja);
                         keepText = true;
                     }
-                } catch {
+                } catch (Exception ex) {
                     MessageBox.Show ("Improper address");
+                    Console.WriteLine (ex);
                 }
             }
 
@@ -80,7 +81,7 @@ namespace AquaPic.UserInterface
         }
 
         public static bool OnCardDeleteEvent (string card, GenericBase cardDriver) {
-            var ja = SettingsHelper.OpenSettingsFile ("equipment") as JArray;
+            var ja = SettingsHelper.OpenSettingsFile ("hardware") as JArray;
             var index = SettingsHelper.FindSettingsInArray (ja, card);
             if (index == -1) {
                 MessageBox.Show ("Something went wrong");
@@ -88,7 +89,7 @@ namespace AquaPic.UserInterface
             }
 
             ja.RemoveAt (index);
-            SettingsHelper.WriteSettingsFile ("equipment", ja);
+            SettingsHelper.WriteSettingsFile ("hardware", ja);
             cardDriver.RemoveCard (card);
             return true;
         }

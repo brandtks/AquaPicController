@@ -53,7 +53,6 @@
     <Compile Include="Scenes\Lighting\Widgets\MainLightingCurvedBarPlotWidgets.cs" />
     <Compile Include="Scenes\Logger\LoggerScreen.cs" />
     <Compile Include="Scenes\Menu\MenuScreen.cs" />
-    <Compile Include="Scenes\Power\Dialogs\PowerSettings.cs" />
     <Compile Include="Scenes\Power\PowerScreen.cs" />
     <Compile Include="Scenes\Power\Widgets\PowerOutletSlider.cs" />
     <Compile Include="Scenes\SceneBase.cs" />
@@ -153,7 +152,7 @@
       <HintPath>..\packages\CS-Script.lib.3.28.7\lib\CSScriptLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

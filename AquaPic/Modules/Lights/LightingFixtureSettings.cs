@@ -3,7 +3,7 @@
 /*
     AquaPic Main Control - Handles all functionality for the AquaPic aquarium controller.
 
-    Copyright (c) 2019 Goodtime Development
+    Copyright (c) 2017 Goodtime Development
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,19 +23,27 @@
 
 using System;
 using AquaPic.Globals;
+using AquaPic.Gadgets.Device;
 
-namespace AquaPic.Gadgets.Sensor.PhProbe
+namespace AquaPic.Modules
 {
-    public class PhProbeSettings : GenericAnalogSensorSettings
+    public class LightingFixtureSettings : GenericDeviceSettings 
     {
-        public PhProbeSettings () {
+        [EntitySetting (typeof (BoolMutatorDefaultTrue), "highTempLockout")]
+        public bool highTempLockout { get; set; }
+
+        [EntitySetting (typeof (IndividualControlMutator), new string[] { "dimmingCard", "dimmingChannel" }, true)]
+        public IndividualControl dimmingChannel { get; set; }
+
+        [EntitySetting (typeof (LightingStatesMutator))]
+        public LightingState[] lightingStates { get; set; }
+
+        public LightingFixtureSettings () {
             name = string.Empty;
             channel = IndividualControl.Empty;
-            zeroScaleCalibrationActual = 0f;
-            zeroScaleCalibrationValue = 0f;
-            fullScaleCalibrationActual = 14f;
-            fullScaleCalibrationValue = 4096f;
-            lowPassFilterFactor = 5;
+            highTempLockout = true;
+            dimmingChannel = IndividualControl.Empty;
+            lightingStates = new LightingState[0];
         }
     }
 }
