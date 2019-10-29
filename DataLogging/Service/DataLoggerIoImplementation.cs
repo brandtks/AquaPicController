@@ -164,7 +164,6 @@ namespace AquaPic.DataLogging
             return returnArray;
         }
 
-#if DEBUG
         public void DeleteAllLogFiles () {
             var files = Directory.GetFiles (_currentFilePath);
             foreach (var file in files) {
@@ -172,7 +171,6 @@ namespace AquaPic.DataLogging
                 File.Delete (file);
             }
         }
-#endif
     }
 }
 
