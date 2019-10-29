@@ -28,7 +28,6 @@ using Newtonsoft.Json.Linq;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Service;
 using AquaPic.Gadgets.Sensor;
-using AquaPic.Gadgets.Sensor.TemperatureProbe;
 using AquaPic.DataLogging;
 
 namespace AquaPic.Modules.Temperature

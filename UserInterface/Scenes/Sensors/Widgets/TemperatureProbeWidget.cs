@@ -26,7 +26,6 @@ using Gtk;
 using GoodtimeDevelopment.Utilites;
 using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Gadgets.Sensor;
-using AquaPic.Gadgets.Sensor.TemperatureProbe;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface

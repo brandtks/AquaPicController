@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Service;
 
-namespace AquaPic.Gadgets.Sensor.WaterLevelSensor
+namespace AquaPic.Gadgets.Sensor
 {
     public class WaterLevelSensorCollection : GenericAnalogSensorCollection
     {

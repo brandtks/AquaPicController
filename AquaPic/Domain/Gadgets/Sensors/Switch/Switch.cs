@@ -25,7 +25,7 @@ using System;
 using AquaPic.Drivers;
 using AquaPic.Service;
 
-namespace AquaPic.Gadgets.Sensor.Switch
+namespace AquaPic.Gadgets.Sensor
 {
     public class Switch : GenericSensor
     {

@@ -183,7 +183,7 @@ namespace AquaPic
             }
             var phProbes = Sensors.PhProbes.GetAllGadgetNames ();
             foreach (var probe in phProbes) {
-                var dataLogger = (DataLoggerIoImplementation)Sensors.PhProbes.GetPhProbeDataLogger (probe);
+                var dataLogger = (DataLoggerIoImplementation)Sensors.PhProbes.GetDataLogger (probe);
                 if (dataLogger != null) {
                     dataLogger.DeleteAllLogFiles ();
                 }

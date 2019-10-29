@@ -27,7 +27,6 @@ using GoodtimeDevelopment.TouchWidget;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Drivers;
 using AquaPic.Gadgets.Sensor;
-using AquaPic.Gadgets.Sensor.FloatSwitch;
 
 namespace AquaPic.UserInterface
 {

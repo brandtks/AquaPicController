@@ -26,7 +26,6 @@ using Gtk;
 using GoodtimeDevelopment.Utilites;
 using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Gadgets.Sensor;
-using AquaPic.Gadgets.Sensor.WaterLevelSensor;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface

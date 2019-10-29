@@ -24,11 +24,6 @@
 using System;
 using Newtonsoft.Json.Linq;
 using AquaPic.Service;
-using AquaPic.Gadgets.Sensor.PhProbe;
-using AquaPic.Gadgets.Sensor.FloatSwitch;
-using AquaPic.Gadgets.Sensor.TemperatureProbe;
-using AquaPic.Gadgets.Sensor.WaterLevelSensor;
-using AquaPic.Gadgets.Sensor.Switch;
 
 namespace AquaPic.Gadgets.Sensor
 {
@@ -38,6 +33,7 @@ namespace AquaPic.Gadgets.Sensor
         public static TemperatureProbeCollection TemperatureProbes = TemperatureProbeCollection.SharedTemperatureProbeCollectionInstance;
         public static PhProbeCollection PhProbes = PhProbeCollection.SharedPhProbeCollectionInstance;
         public static SwitchCollection Switches = SwitchCollection.SharedSwitchCollectionInstance;
+        public static SpecificGravityCollection SpecificGravitySensors = SpecificGravityCollection.SharedSpecificGravityCollection;
 
         public static void AddSensors () {
             if (SettingsHelper.SettingsFileExists (GenericSensorCollection.sensorSettingsFileName)) {
@@ -46,6 +42,7 @@ namespace AquaPic.Gadgets.Sensor
                 TemperatureProbes.ReadAllGadgetsFromFile ();
                 PhProbes.ReadAllGadgetsFromFile ();
                 Switches.ReadAllGadgetsFromFile ();
+                SpecificGravitySensors.ReadAllGadgetsFromFile ();
             } else {
                 Logger.Add ("Sensors settings file did not exist, created new water level settings");
 
@@ -54,6 +51,7 @@ namespace AquaPic.Gadgets.Sensor
                 jo.Add (new JProperty (WaterLevelSensors.gadgetSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty (TemperatureProbes.gadgetSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty (PhProbes.gadgetSettingsArrayName, new JArray ()));
+                jo.Add (new JProperty (Switches.gadgetSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty (Switches.gadgetSettingsArrayName, new JArray ()));
 
                 SettingsHelper.WriteSettingsFile (GenericSensorCollection.sensorSettingsFileName, jo);

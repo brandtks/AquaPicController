@@ -24,7 +24,7 @@
 using System;
 using AquaPic.Globals;
 
-namespace AquaPic.Gadgets.Sensor.TemperatureProbe
+namespace AquaPic.Gadgets.Sensor
 {
     public class TemperatureProbeSettings : GenericAnalogSensorSettings
     {

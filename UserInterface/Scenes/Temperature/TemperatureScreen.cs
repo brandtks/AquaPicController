@@ -29,7 +29,6 @@ using GoodtimeDevelopment.Utilites;
 using AquaPic.Modules.Temperature;
 using AquaPic.Drivers;
 using AquaPic.Gadgets.Sensor;
-using AquaPic.Gadgets.Sensor.TemperatureProbe;
 using AquaPic.Gadgets.Device;
 using AquaPic.Gadgets.Device.Heater;
 

@@ -23,7 +23,7 @@
 
 using System;
 
-namespace AquaPic.Gadgets.Sensor.Switch
+namespace AquaPic.Gadgets.Sensor
 {
     public class SwitchSettings : GenericSensorSettings
     {

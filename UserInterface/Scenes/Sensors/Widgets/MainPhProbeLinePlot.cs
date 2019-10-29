@@ -47,7 +47,7 @@ namespace AquaPic.UserInterface
 
             this.group = group;
             if (Sensors.PhProbes.CheckGadgetKeyNoThrow (this.group)) {
-                var dataLogger = Sensors.PhProbes.GetPhProbeDataLogger (this.group);
+                var dataLogger = Sensors.PhProbes.GetDataLogger (this.group);
                 linePlot.LinkDataLogger (dataLogger);
 
                 Destroyed += (obj, args) => {

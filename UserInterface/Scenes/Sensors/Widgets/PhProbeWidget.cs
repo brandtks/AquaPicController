@@ -25,7 +25,6 @@ using System;
 using Gtk;
 using GoodtimeDevelopment.Utilites;
 using AquaPic.Gadgets.Sensor;
-using AquaPic.Gadgets.Sensor.PhProbe;
 using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface

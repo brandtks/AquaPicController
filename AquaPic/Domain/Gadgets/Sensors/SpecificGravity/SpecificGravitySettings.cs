@@ -24,21 +24,49 @@
 using System;
 using AquaPic.Globals;
 
-namespace AquaPic.Gadgets.Sensor.SpecificGravity
+namespace AquaPic.Gadgets.Sensor
 { 
-    public class SpecificGravitySettings : WaterLevelSensor.WaterLevelSensorSettings
+    public class SpecificGravitySettings : WaterLevelSensorSettings
     {
-        [EntitySetting (typeof (StringMutator), "secondWaterLevelSensor")]
-        public string secondWaterLevelSensor { get; set; }
+        [EntitySetting (typeof (IndividualControlMutator), new string[] { "secondCard", "secondChannel" })]
+        public IndividualControl secondChannel { get; set; }
+
+        [EntitySetting (typeof (FloatMutatorDefaultZeroScaleActual), "secondZeroScaleCalibrationActual")]
+        public float secondZeroScaleCalibrationActual { get; set; }
+
+        [EntitySetting (typeof (FloatMutatorDefaultZeroScaleValue), "secondZeroScaleCalibrationValue")]
+        public float secondZeroScaleCalibrationValue { get; set; }
+
+        [EntitySetting (typeof (FloatMutatorDefaultFullScaleActual), "secondFullScaleCalibrationActual")]
+        public float secondFullScaleCalibrationActual { get; set; }
+
+        [EntitySetting (typeof (IntMutatorDefaultLowPassFilterFactor), "lowPassFilterFactor")]
+        public int secondLowPassFilterFactor { get; set; }
+
+        [EntitySetting (typeof (FloatMutatorDefaultFullScaleValue), "secondFullScaleCalibrationValue")]
+        public float secondFullScaleCalibrationValue { get; set; }
+
+        [EntitySetting (typeof (FloatMutator), "levelDifference")]
+        public float levelDifference { get; set; }
+
+        [EntitySetting (typeof (FloatMutator), "calibratedSpecificGravity")]
+        public float calibratedSpecificGravity { get; set; }
 
         public SpecificGravitySettings () {
             name = string.Empty;
             channel = IndividualControl.Empty;
+            secondChannel = IndividualControl.Empty;
             zeroScaleCalibrationActual = 0f;
             zeroScaleCalibrationValue = 819.2f;
             fullScaleCalibrationActual = 15f;
             fullScaleCalibrationValue = 3003.73f;
+            secondZeroScaleCalibrationActual = 0f;
+            secondZeroScaleCalibrationValue = 819.2f;
+            secondFullScaleCalibrationActual = 15f;
+            secondFullScaleCalibrationValue = 3003.73f;
             lowPassFilterFactor = 5;
+            levelDifference = 3f;
+            calibratedSpecificGravity = 1.025f;
         }
     }
 }

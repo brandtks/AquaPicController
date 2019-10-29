@@ -26,21 +26,28 @@ using AquaPic.DataLogging;
 
 namespace AquaPic.Gadgets.Sensor
 {
-    public class PhProbeCollection : GenericAnalogSensorCollection
-    {
-        public static PhProbeCollection SharedPhProbeCollectionInstance = new PhProbeCollection ();
 
-        protected PhProbeCollection () : base ("phProbes") { }
+
+    public class SpecificGravityCollection : GenericAnalogSensorCollection
+    {
+        public static SpecificGravityCollection SharedSpecificGravityCollection = new SpecificGravityCollection ();
+
+        protected SpecificGravityCollection () : base ("SpecificGravity") { }
 
         protected override GenericAnalogSensor AnalogSensorCreater (GenericAnalogSensorSettings settings) {
-            var sensor = new PhProbe (settings);
+            var specificGravity = settings as SpecificGravitySettings;
+            if (specificGravity == null) {
+                throw new ArgumentException ("Settings must be SpecificGravitySettings");
+            }
+
+            var sensor = new SpecificGravity (specificGravity);
             return sensor;
         }
 
         public IDataLogger GetDataLogger (string name) {
             CheckGadgetKey (name);
-            var phProbe = gadgets[name] as PhProbe;
-            return phProbe.dataLogger;
+            var sg = gadgets[name] as SpecificGravity;
+            return sg.dataLogger;
         }
     }
 }

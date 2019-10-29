@@ -197,6 +197,7 @@
     <Compile Include="Domain\Gadgets\Devices\Heater\HeaterSettings.cs" />
     <Compile Include="Domain\Gadgets\Sensors\SpecificGravity\SpecificGravity.cs" />
     <Compile Include="Domain\Gadgets\Sensors\SpecificGravity\SpecificGravitySettings.cs" />
+    <Compile Include="Domain\Gadgets\Sensors\SpecificGravity\SpecificGravityCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
