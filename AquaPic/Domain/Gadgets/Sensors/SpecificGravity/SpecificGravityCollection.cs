@@ -32,7 +32,7 @@ namespace AquaPic.Gadgets.Sensor
     {
         public static SpecificGravityCollection SharedSpecificGravityCollection = new SpecificGravityCollection ();
 
-        protected SpecificGravityCollection () : base ("SpecificGravity") { }
+        protected SpecificGravityCollection () : base ("specificGravitySensors") { }
 
         protected override GenericAnalogSensor AnalogSensorCreater (GenericAnalogSensorSettings settings) {
             var specificGravity = settings as SpecificGravitySettings;

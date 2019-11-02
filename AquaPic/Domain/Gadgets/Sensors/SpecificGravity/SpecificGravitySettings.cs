@@ -40,9 +40,6 @@ namespace AquaPic.Gadgets.Sensor
         [EntitySetting (typeof (FloatMutatorDefaultFullScaleActual), "secondFullScaleCalibrationActual")]
         public float secondFullScaleCalibrationActual { get; set; }
 
-        [EntitySetting (typeof (IntMutatorDefaultLowPassFilterFactor), "lowPassFilterFactor")]
-        public int secondLowPassFilterFactor { get; set; }
-
         [EntitySetting (typeof (FloatMutatorDefaultFullScaleValue), "secondFullScaleCalibrationValue")]
         public float secondFullScaleCalibrationValue { get; set; }
 

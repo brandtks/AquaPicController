@@ -42,6 +42,7 @@ namespace AquaPic.Gadgets.Sensor
             dataLogger = Factory.GetDataLogger (string.Format ("{0}PhProbe", name.RemoveWhitespace ()));
 
             var secondSettings = new WaterLevelSensorSettings ();
+            secondSettings.name = string.Format("{0}, Specific Gravity", settings.name);
             secondSettings.channel = settings.secondChannel;
             secondSettings.zeroScaleCalibrationValue = settings.secondZeroScaleCalibrationValue;
             secondSettings.zeroScaleCalibrationActual = settings.zeroScaleCalibrationActual;
