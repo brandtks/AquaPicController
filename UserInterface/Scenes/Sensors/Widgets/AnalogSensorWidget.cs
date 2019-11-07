@@ -118,7 +118,7 @@ namespace AquaPic.UserInterface
 
         protected void OnSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
             if (e.activeText == "New sensor...") {
-                CallSensorSettingsDialog ();
+                CallSensorSettingsDialog (true);
             } else {
                 sensorName = e.activeText;
             }

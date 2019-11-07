@@ -54,6 +54,11 @@ namespace AquaPic.Gadgets.Sensor
             // ie 1.025, but pascals equation uses 1000 times that number for bla bla bla reasons
             fullScalePressureDelta = 249.08891 * calibratedSpecificGravity * levelDifference;
 
+            // Set this instance's top water level sensor name to the settings value
+            topWaterLevelSensor = settings.topWaterLevelSensor;
+            // Set this instance's top water level sensor name to the settings value
+            bottomWaterLevelSensor = settings.bottomWaterLevelSensor;
+
             // Make sure the top water level sensor is valid
             sensorsValid = Sensors.WaterLevelSensors.GadgetNameExists (topWaterLevelSensor);
             // Make sure the bottom water level sensor is valid
@@ -111,9 +116,9 @@ namespace AquaPic.Gadgets.Sensor
 
             if (sensorsValid) {
                 // Find the delta between the calibrated level and the current level difference
-                var topLevel = (double)Sensors.WaterLevelSensors.GetGadgeValue (topWaterLevelSensor);
-                var bottomLevel = (double)Sensors.WaterLevelSensors.GetGadgeValue (bottomWaterLevelSensor);
-                var delta = Math.Abs (topLevel - bottomLevel);
+                var topLevel = (float)Sensors.WaterLevelSensors.GetGadgeValue (topWaterLevelSensor);
+                var bottomLevel = (float)Sensors.WaterLevelSensors.GetGadgeValue (bottomWaterLevelSensor);
+                var delta = (double)Math.Abs (topLevel - bottomLevel);
 
                 // Convert the measured level difference to a difference in pressure
                 var pressureDelta = delta.Map (0, levelDifference, 0, fullScalePressureDelta);
