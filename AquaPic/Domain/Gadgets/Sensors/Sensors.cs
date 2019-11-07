@@ -33,7 +33,7 @@ namespace AquaPic.Gadgets.Sensor
         public static TemperatureProbeCollection TemperatureProbes = TemperatureProbeCollection.SharedTemperatureProbeCollectionInstance;
         public static PhProbeCollection PhProbes = PhProbeCollection.SharedPhProbeCollectionInstance;
         public static SwitchCollection Switches = SwitchCollection.SharedSwitchCollectionInstance;
-        public static SpecificGravityCollection SpecificGravitySensors = SpecificGravityCollection.SharedSpecificGravityCollection;
+        public static SpecificGravitySensorCollection SpecificGravitySensors = SpecificGravitySensorCollection.SharedSpecificGravityCollection;
 
         public static void AddSensors () {
             if (SettingsHelper.SettingsFileExists (GenericSensorCollection.sensorSettingsFileName)) {
@@ -52,7 +52,7 @@ namespace AquaPic.Gadgets.Sensor
                 jo.Add (new JProperty (TemperatureProbes.gadgetSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty (PhProbes.gadgetSettingsArrayName, new JArray ()));
                 jo.Add (new JProperty (Switches.gadgetSettingsArrayName, new JArray ()));
-                jo.Add (new JProperty (Switches.gadgetSettingsArrayName, new JArray ()));
+                jo.Add (new JProperty (SpecificGravitySensors.gadgetSettingsArrayName, new JArray ()));
 
                 SettingsHelper.WriteSettingsFile (GenericSensorCollection.sensorSettingsFileName, jo);
             }

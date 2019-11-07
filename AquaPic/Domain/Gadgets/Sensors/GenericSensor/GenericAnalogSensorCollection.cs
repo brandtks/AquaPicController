@@ -37,19 +37,6 @@ namespace AquaPic.Gadgets.Sensor
             }
         }
 
-        protected override sealed GenericGadget GadgetCreater (GenericGadgetSettings settings) {
-            var sensorSettings = settings as GenericAnalogSensorSettings;
-            if (sensorSettings == null) {
-                throw new ArgumentException ("Settings must be GenericAnalogSensorSettings");
-            }
-
-            var sensor = AnalogSensorCreater (sensorSettings);
-
-            return sensor;
-        }
-
-        protected virtual GenericAnalogSensor AnalogSensorCreater (GenericAnalogSensorSettings settings) => throw new NotImplementedException ();
-
         public override GenericGadgetSettings GetGadgetSettings (string name) {
             CheckGadgetKey (name);
             var genericAnalogSensor = gadgets[name] as GenericAnalogSensor;

@@ -32,8 +32,13 @@ namespace AquaPic.Gadgets.Sensor
 
         protected PhProbeCollection () : base ("phProbes") { }
 
-        protected override GenericAnalogSensor AnalogSensorCreater (GenericAnalogSensorSettings settings) {
-            var sensor = new PhProbe (settings);
+        protected override GenericGadget GadgetCreater (GenericGadgetSettings settings) {
+            var sensorSettings = settings as GenericAnalogSensorSettings;
+            if (sensorSettings == null) {
+                throw new ArgumentException ("Settings must be GenericAnalogSensorSettings");
+            }
+            var sensor = new PhProbe (sensorSettings);
+
             return sensor;
         }
 

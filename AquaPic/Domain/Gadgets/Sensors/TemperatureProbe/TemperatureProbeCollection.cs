@@ -32,8 +32,13 @@ namespace AquaPic.Gadgets.Sensor
 
         protected TemperatureProbeCollection () : base ("temperatureProbes") { }
 
-        protected override GenericAnalogSensor AnalogSensorCreater (GenericAnalogSensorSettings settings) {
-            var sensor = new TemperatureProbe (settings);
+        protected override GenericGadget GadgetCreater (GenericGadgetSettings settings) {
+            var sensorSettings = settings as GenericAnalogSensorSettings;
+            if (sensorSettings == null) {
+                throw new ArgumentException ("Settings must be GenericAnalogSensorSettings");
+            }
+            var sensor = new TemperatureProbe (sensorSettings);
+
             return sensor;
         }
     }

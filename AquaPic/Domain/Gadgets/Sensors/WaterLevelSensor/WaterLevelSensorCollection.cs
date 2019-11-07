@@ -32,8 +32,13 @@ namespace AquaPic.Gadgets.Sensor
 
         protected WaterLevelSensorCollection () : base ("waterLevelSensors") { }
 
-        protected override GenericAnalogSensor AnalogSensorCreater (GenericAnalogSensorSettings settings) {
-            var sensor = new WaterLevelSensor (settings);
+        protected override GenericGadget GadgetCreater (GenericGadgetSettings settings) {
+            var sensorSettings = settings as GenericAnalogSensorSettings;
+            if (sensorSettings == null) {
+                throw new ArgumentException ("Settings must be GenericAnalogSensorSettings");
+            }
+            var sensor = new WaterLevelSensor (sensorSettings);
+
             return sensor;
         }
 
