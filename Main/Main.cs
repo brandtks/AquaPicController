@@ -138,13 +138,13 @@ namespace AquaPic
             Driver.AnalogInput.SetChannelValue ("Salt Mixing, Temperature Probe", 2796.5);
 
             Driver.AnalogInput.SetChannelMode ("Return Chamber, Water Level Sensor", Mode.Manual);
-            Driver.AnalogInput.SetChannelValue ("Return Chamber, Water Level Sensor", 1803);
+            Driver.AnalogInput.SetChannelValue ("Return Chamber, Water Level Sensor", 1802);
             Driver.AnalogInput.SetChannelMode ("ATO Reservoir, Water Level Sensor", Mode.Manual);
             Driver.AnalogInput.SetChannelValue ("ATO Reservoir, Water Level Sensor", 3878);
             Driver.AnalogInput.SetChannelMode ("Salt Reservoir, Water Level Sensor", Mode.Manual);
             Driver.AnalogInput.SetChannelValue ("Salt Reservoir, Water Level Sensor", 2048);
             Driver.AnalogInput.SetChannelMode ("Return Chamber Lower, Water Level Sensor", Mode.Manual);
-            Driver.AnalogInput.SetChannelValue ("Return Chamber Lower, Water Level Sensor", 1583);
+            Driver.AnalogInput.SetChannelValue ("Return Chamber Lower, Water Level Sensor", 1146);
 
             Driver.DigitalInput.SetChannelMode ("Sump High, Float Switch", Mode.Manual);
             Driver.DigitalInput.SetChannelValue ("Sump High, Float Switch", true);
