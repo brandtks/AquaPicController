@@ -45,12 +45,14 @@ namespace AquaPic
         public static void Main (string[] args) {
             var aquaPicEnvironment = string.Empty;
             var aquaPicSettings = string.Empty;
-            // Call the Gtk library hack because Windows sucks at everything
-            if (Utils.ExecutingOperatingSystem == Platform.Windows) {
-                CheckWindowsGtk ();
 
-                //Get the AquaPic directory environment
+            if (Utils.ExecutingOperatingSystem == Platform.Windows) {
+                // Call the Gtk library hack because Windows sucks at everything
+                CheckWindowsGtk ();
+                
+                // Get the AquaPic directory environment variable
                 aquaPicEnvironment = Environment.GetEnvironmentVariable ("AquaPic");
+                
                 if (aquaPicEnvironment.IsEmpty ()) {
                     var path = Path.GetDirectoryName (System.Reflection.Assembly.GetEntryAssembly ().Location);
                     path = Path.Combine (path, "AquaPicEnvironment.txt");
@@ -60,32 +62,24 @@ namespace AquaPic
                     }
                 }
 
-                if (aquaPicEnvironment.IsNotEmpty ()) {
-                    var path = aquaPicEnvironment;
-                    if (!Directory.Exists (path)) {
-                        Console.WriteLine ("Path to AquaPic directory environment is incorrect");
-                        Console.WriteLine ("Incorrect path was {0}", path);
-                        aquaPicEnvironment = string.Empty;
-                    }
-                }
-
+                // If the environment variable isn't specified, use the home directory
                 if (aquaPicEnvironment.IsEmpty ()) {
-                    Console.WriteLine ("Please edit the AquaPicEnvironment.txt file to point to the path of the AquaPicRuntime directory.");
-                    Console.WriteLine ("For example if the AquaPicRuntime directory is located at /home/user/AquaPicRuntimeProject/,");
-                    Console.WriteLine ("then add \"/home/user/AquaPicRuntimeProject/\" to the first line of the file.");
-                    return;
+                    aquaPicEnvironment = Environment.GetFolderPath (Environment.SpecialFolder.Personal);
+                    aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "AquaPic");
                 }
+            // For Linux just use the home directory under the .config directory
             } else {
                 aquaPicEnvironment = Environment.GetEnvironmentVariable ("HOME");
                 aquaPicEnvironment = Path.Combine (aquaPicEnvironment, ".config");
                 aquaPicEnvironment = Path.Combine (aquaPicEnvironment, "AquaPic");
+            }
 
-                if (!Directory.Exists (aquaPicEnvironment)) {
-                    Directory.CreateDirectory (aquaPicEnvironment);
-                    Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "DataLogging"));
-                    Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "Logs"));
-                    Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "TestProcedures"));
-                }
+            // Create the AquaPic directory if it doesn't exist 
+            if (!Directory.Exists (aquaPicEnvironment)) {
+                Directory.CreateDirectory (aquaPicEnvironment);
+                Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "DataLogging"));
+                Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "Logs"));
+                Directory.CreateDirectory (Path.Combine (aquaPicEnvironment, "TestProcedures"));
             }
 
             if (args.Length > 0) {

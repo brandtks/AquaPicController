@@ -53,10 +53,12 @@ namespace AquaPic.Service
 
             IOutletScript outletScript;
             try {
-                outletScript = CSScript.Evaluator.LoadCode<IOutletScript> (code);
-            } catch (CompilerException) {
+                outletScript = (IOutletScript)CSScript.LoadCode (code).CreateObject ("*");
+            } catch (CompilerException ex) {
+                Logger.AddError (ex.ToString ());
                 outletScript = null;
-            }
+            } 
+
             return outletScript;
         }
     }
