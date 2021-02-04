@@ -98,9 +98,9 @@ namespace AquaPic.UserInterface
             case "pH Probe":
                 widget = new PhProbeWidget ();
                 break;
-            case "SG Sensor":
-                widget = new SpecificGravitySensorWidget ();
-                break;
+            //case "SG Sensor":
+            //    widget = new SpecificGravitySensorWidget ();
+            //    break;
             }
 
             return widget;
