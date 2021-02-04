@@ -30,15 +30,13 @@ using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class SensorSettingsDialog : TouchSettingsDialog
-    {
+    public class SensorSettingsDialog : TouchSettingsDialog {
         public string sensorName { get; protected set; }
         protected GenericSensorCollection sensorCollection;
 
         public SensorSettingsDialog (
             GenericSensorSettings settings,
             GenericSensorCollection sensorCollection,
-            GenericInputBase inputDriver, 
             Window parent
         ) : base (settings.name, settings.name.IsNotEmpty (), parent) {
             sensorName = settings.name;
@@ -63,11 +61,13 @@ namespace AquaPic.UserInterface
                 c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Please select channel";
-            c.combo.comboList.AddRange (inputDriver.GetAllAvaiableChannels ());
+            c.combo.comboList.AddRange (GetAvailableChannels ());
             AddSetting (c);
 
             DrawSettings ();
         }
+
+        protected virtual string[] GetAvailableChannels () => throw new NotImplementedException ();
 
         protected override bool OnSave (object sender) {
             var sensorSettings = new GenericSensorSettings ();

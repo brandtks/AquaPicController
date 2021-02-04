@@ -35,7 +35,7 @@ namespace AquaPic.UserInterface
         TouchComboBox topCombo;
         TouchComboBox bottomCombo;
 
-        readonly string[] analogSensorNames = { "Water Level Sensor", "Temperature Probe", "pH Probe" };
+        readonly string[] analogSensorNames = { "Water Level Sensor", "Temperature Probe", "pH Probe", "SG Sensor" };
 
         public SensorsWindow (params object[] options) {
             sceneTitle = "Sensors";
@@ -97,6 +97,9 @@ namespace AquaPic.UserInterface
                 break;
             case "pH Probe":
                 widget = new PhProbeWidget ();
+                break;
+            case "SG Sensor":
+                widget = new SpecificGravitySensorWidget ();
                 break;
             }
 

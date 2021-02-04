@@ -26,18 +26,17 @@ using Gtk;
 using GoodtimeDevelopment.Utilites;
 using GoodtimeDevelopment.TouchWidget;
 using AquaPic.Gadgets.Sensor;
-using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class WaterLevelSensorWidget : AnalogSensorWidget
+    public class SpecificGravitySensorWidget : SensorWidget
     {
-        public WaterLevelSensorWidget ()
-            : base ("Water Level Sensors", Sensors.WaterLevelSensors, Driver.AnalogInput, typeof (WaterLevelSensorSettings)) { }
+        public SpecificGravitySensorWidget ()
+            : base ("Specific Gravity Sensors", Sensors.SpecificGravitySensors, typeof (SpecificGravitySensorSettings)) { }
 
         public override void GetSensorData () {
             if (sensorName.IsNotEmpty ()) {
-                var probe = Sensors.WaterLevelSensors.GetGadget (sensorName) as WaterLevelSensor;
+                var probe = Sensors.SpecificGravitySensors.GetGadget (sensorName) as SpecificGravitySensor;
                 if (probe.connected) {
                     sensorStateTextbox.text = Convert.ToSingle (probe.value).ToString ("F2");
                     sensorStateTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;

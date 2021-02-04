@@ -88,6 +88,9 @@
     <Compile Include="Scenes\Sensors\Widgets\MainPhProbeLinePlot.cs" />
     <Compile Include="Scenes\Sensors\Widgets\TemperatureProbeWidget.cs" />
     <Compile Include="Scenes\Sensors\Widgets\WaterLevelSensorWidget.cs" />
+    <Compile Include="Scenes\Sensors\Widgets\MainSpecificGravitySensorLinePlot.cs" />
+    <Compile Include="Scenes\Sensors\Widgets\SpecificGravitySensorWidget.cs" />
+    <Compile Include="Scenes\Sensors\Widgets\SensorWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -149,7 +152,7 @@
       <HintPath>..\packages\CS-Script.lib.3.28.7\lib\CSScriptLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

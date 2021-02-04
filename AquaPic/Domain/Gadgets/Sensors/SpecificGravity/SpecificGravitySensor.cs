@@ -38,7 +38,19 @@ namespace AquaPic.Gadgets.Sensor
         public double fullScalePressureDelta { get; protected set; }
         public string topWaterLevelSensor { get; protected set; }
         public string bottomWaterLevelSensor { get; protected set; }
-        protected bool sensorsValid;
+        public bool sensorsValid { get; protected set; }
+        public bool connected {
+            get {
+                if (sensorsValid) {
+                    var sensor = Sensors.WaterLevelSensors.GetGadget (topWaterLevelSensor) as WaterLevelSensor;
+                    var localConnected = sensor.connected;
+                    sensor = Sensors.WaterLevelSensors.GetGadget (bottomWaterLevelSensor) as WaterLevelSensor;
+                    localConnected &= sensor.connected;
+                    return localConnected;
+                }
+                return false;
+            }
+        }
 
         public SpecificGravitySensor (SpecificGravitySensorSettings settings) : base (settings) {
             dataLogger = Factory.GetDataLogger (string.Format ("{0}SgProbe", name.RemoveWhitespace ()));

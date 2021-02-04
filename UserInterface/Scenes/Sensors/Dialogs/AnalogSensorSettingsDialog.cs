@@ -32,13 +32,17 @@ namespace AquaPic.UserInterface
 {
     public class AnalogSensorSettingsDialog : SensorSettingsDialog
     {
+        public GenericAnalogInputBase analogInputDriver { get; protected set; }
+
         public AnalogSensorSettingsDialog (
             GenericAnalogSensorSettings settings,
             GenericAnalogSensorCollection sensorCollection,
             GenericAnalogInputBase analogInputDriver, 
             Window parent)
-            : base (settings, sensorCollection, analogInputDriver, parent) 
+            : base (settings, sensorCollection, parent) 
         {
+            this.analogInputDriver = analogInputDriver;
+
             var t = new SettingsTextBox ("LPF Factor");
             t.textBox.text = sensorName.IsNotEmpty () ? settings.lowPassFilterFactor.ToString () : "5";
             t.textBox.TextChangedEvent += (sender, args) => {
@@ -87,6 +91,10 @@ namespace AquaPic.UserInterface
         protected override bool OnDelete (object sender) {
             sensorCollection.RemoveSensor (sensorName);
             return true;
+        }
+
+        protected override string[] GetAvailableChannels () {
+            return analogInputDriver.GetAllAvaiableChannels ();
         }
     }
 }

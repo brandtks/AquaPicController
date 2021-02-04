@@ -62,10 +62,11 @@
       <HintPath>..\packages\CS-Script.lib.3.28.7\lib\CSScriptLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\Gadgets\GenericGadget\IGadget.cs" />
     <Compile Include="Modules\Temperature\TemperatureGroup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Driver\Power\PowerStrip.cs" />
@@ -201,29 +202,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\ATO\" />
-    <Folder Include="Driver\pHOrp\" />
-    <Folder Include="Modules\GenericModule\" />
-    <Folder Include="Domain\" />
-    <Folder Include="Domain\Bit\" />
-    <Folder Include="Domain\Timer\" />
-    <Folder Include="Domain\TimePeriod\" />
-    <Folder Include="Domain\Entity\" />
-    <Folder Include="Domain\Entity\Mutators\" />
-    <Folder Include="Service\PubSub\" />
-    <Folder Include="Domain\Globals\" />
-    <Folder Include="Domain\Gadgets\" />
-    <Folder Include="Domain\Gadgets\GenericGadget\" />
-    <Folder Include="Domain\Gadgets\Devices\" />
-    <Folder Include="Domain\Gadgets\Sensors\" />
-    <Folder Include="Domain\Gadgets\Devices\LightingFixture\" />
-    <Folder Include="Domain\Gadgets\Devices\Pump\" />
-    <Folder Include="Service\Settings\" />
-    <Folder Include="Domain\Gadgets\Sensors\Switch\" />
-    <Folder Include="Domain\Gadgets\Devices\Heater\" />
-    <Folder Include="Domain\Gadgets\Sensors\SpecificGravity\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\TouchWidget\TouchWidget.csproj">
       <Project>{9F122E71-B510-4481-BC19-550C14250481}</Project>
