@@ -30,8 +30,8 @@ namespace AquaPic.UserInterface
 {
     public class SensorsWindow : SceneBase
     {
-        AnalogSensorWidget topWidget;
-        AnalogSensorWidget bottomWidget;
+        SensorWidget topWidget;
+        SensorWidget bottomWidget;
         TouchComboBox topCombo;
         TouchComboBox bottomCombo;
 
@@ -72,21 +72,21 @@ namespace AquaPic.UserInterface
         protected void OnComboChange (object sender, ComboBoxChangedEventArgs args) {
             if (topCombo.Equals (sender)) {
                 topWidget.Destroy ();
-                topWidget = AnalogSensorWidgetCreater (args.activeText);
+                topWidget = SensorWidgetCreater (args.activeText);
                 Put (topWidget, 415, 77);
                 topWidget.Show ();
                 topWidget.GetSensorData ();
             } else {
                 bottomWidget.Destroy ();
-                bottomWidget = AnalogSensorWidgetCreater (args.activeText);
+                bottomWidget = SensorWidgetCreater (args.activeText);
                 Put (bottomWidget, 415, 277);
                 bottomWidget.Show ();
                 bottomWidget.GetSensorData ();
             }
         }
 
-        protected AnalogSensorWidget AnalogSensorWidgetCreater (string name) {
-            AnalogSensorWidget widget = null;
+        protected SensorWidget SensorWidgetCreater (string name) {
+            SensorWidget widget = null;
 
             switch (name) {
             case "Water Level Sensor":
@@ -98,9 +98,9 @@ namespace AquaPic.UserInterface
             case "pH Probe":
                 widget = new PhProbeWidget ();
                 break;
-            //case "SG Sensor":
-            //    widget = new SpecificGravitySensorWidget ();
-            //    break;
+            case "SG Sensor":
+                widget = new SpecificGravitySensorWidget ();
+                break;
             }
 
             return widget;

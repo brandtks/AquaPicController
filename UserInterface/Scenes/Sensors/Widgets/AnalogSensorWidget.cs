@@ -30,108 +30,34 @@ using AquaPic.Drivers;
 
 namespace AquaPic.UserInterface
 {
-    public class AnalogSensorWidget : Fixed
+    public class AnalogSensorWidget : SensorWidget
     {
-        public string sensorTypeLabel { get; protected set; }
-        public string sensorName { get; set; }
-        public TouchComboBox sensorCombo { get; protected set; }
-        public TouchLabel sensorStateTextbox { get; protected set; }
-        public TouchLabel sensorLabel { get; protected set; }
-        public GenericAnalogSensorCollection sensorCollection { get; protected set; }
         public GenericAnalogInputBase analogInputDriver { get; protected set; }
-        public Type settingsType { get; protected set; }
 
         public AnalogSensorWidget (
             string sensorTypeLabel, 
             GenericAnalogSensorCollection sensorCollection,
             GenericAnalogInputBase analogInputDriver,
             Type settingsType
-        ) {
-            this.sensorCollection = sensorCollection;
+        ) : base (sensorTypeLabel, sensorCollection, settingsType) {
             this.analogInputDriver = analogInputDriver;
             if (!settingsType.TypeIs (typeof (GenericAnalogSensorSettings))) {
                 throw new ArgumentException ("The settings type must derive GenericAnalogSensorSettings", nameof (settingsType));
             }
-            this.settingsType = settingsType;
-
-            SetSizeRequest (370, 188);
-
-            var label = new TouchLabel ();
-            label.text = sensorTypeLabel;
-            label.textColor = "seca";
-            label.textSize = 12;
-            Put (label, 0, 3);
-            label.Show ();
-
-            var sensorSettingsButton = new TouchButton ();
-            sensorSettingsButton.text = "\u2699";
-            sensorSettingsButton.SetSizeRequest (30, 30);
-            sensorSettingsButton.buttonColor = "pri";
-            sensorSettingsButton.ButtonReleaseEvent += OnSensorSettingsButtonReleaseEvent;
-            Put (sensorSettingsButton, 340, 0);
-            sensorSettingsButton.Show ();
 
             var b = new TouchButton ();
             b.text = "Calibrate";
             b.SetSizeRequest (100, 60);
             b.ButtonReleaseEvent += OnCalibrationButtonReleaseEvent;
             Put (b, 0, 118);
-            b.Show ();
-
-            sensorLabel = new TouchLabel ();
-            sensorLabel.text = sensorTypeLabel;
-            sensorLabel.textAlignment = TouchAlignment.Center;
-            sensorLabel.textColor = "grey3";
-            sensorLabel.WidthRequest = 370;
-            Put (sensorLabel, 0, 78);
-            sensorLabel.Show ();
-
-            sensorStateTextbox = new TouchLabel ();
-            sensorStateTextbox.WidthRequest = 370;
-            sensorStateTextbox.textSize = 20;
-            sensorStateTextbox.textAlignment = TouchAlignment.Center;
-            sensorStateTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
-            Put (sensorStateTextbox, 0, 43);
-            sensorStateTextbox.Show ();
-
-            sensorCombo = new TouchComboBox ();
-            sensorCombo.WidthRequest = 200;
-            var allSensors = sensorCollection.GetAllGadgetNames ();
-            if (allSensors.Length > 0) {
-                sensorCombo.comboList.AddRange (allSensors);
-                sensorName = allSensors[0];
-            } else {
-                sensorName = string.Empty;
-            }
-            sensorCombo.comboList.Add ("New sensor...");
-            sensorCombo.activeIndex = 0;
-            sensorCombo.ComboChangedEvent += OnSensorComboChanged;
-            Put (sensorCombo, 135, 0);
-            sensorCombo.Show ();
+            b.Show (); 
 
             GetSensorData ();
 
             Show ();
         }
 
-        public virtual void GetSensorData () => throw new NotImplementedException ();
-
-        protected void OnSensorComboChanged (object sender, ComboBoxChangedEventArgs e) {
-            if (e.activeText == "New sensor...") {
-                CallSensorSettingsDialog (true);
-            } else {
-                sensorName = e.activeText;
-            }
-
-            sensorCombo.QueueDraw ();
-            GetSensorData ();
-        }
-
-        protected void OnSensorSettingsButtonReleaseEvent (object sender, ButtonReleaseEventArgs args) {
-            CallSensorSettingsDialog ();
-        }
-
-        protected void CallSensorSettingsDialog (bool forceNew = false) {
+        protected override void CallSensorSettingsDialog (bool forceNew = false) {
             GenericAnalogSensorSettings settings;
             if (sensorName.IsNotEmpty () && !forceNew) {
                 settings = sensorCollection.GetGadgetSettings (sensorName) as GenericAnalogSensorSettings;
@@ -139,7 +65,8 @@ namespace AquaPic.UserInterface
                 settings = Activator.CreateInstance (settingsType) as GenericAnalogSensorSettings;
             }
 
-            var s = new AnalogSensorSettingsDialog (settings, sensorCollection, analogInputDriver, Toplevel as Window);
+            var analogSensorCollection = (GenericAnalogSensorCollection)sensorCollection;
+            var s = new AnalogSensorSettingsDialog (settings, analogSensorCollection, analogInputDriver, Toplevel as Window);
             s.Run ();
             var newProbeName = s.sensorName;
             var outcome = s.outcome;
@@ -179,8 +106,9 @@ namespace AquaPic.UserInterface
                         return analogInputDriver.GetChannelValue (channel);
                     });
 
+                var analogSensorCollection = (GenericAnalogSensorCollection)sensorCollection;
                 cal.CalibrationCompleteEvent += (a) => {
-                    sensorCollection.SetCalibrationData (
+                    analogSensorCollection.SetCalibrationData (
                         sensorName,
                         (float)a.zeroActual,
                         (float)a.zeroValue,

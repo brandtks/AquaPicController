@@ -121,7 +121,7 @@ namespace AquaPic.UserInterface
             CallSensorSettingsDialog ();
         }
 
-        protected void CallSensorSettingsDialog (bool forceNew = false) {
+        protected virtual void CallSensorSettingsDialog (bool forceNew = false) {
             GenericAnalogSensorSettings settings;
             if (sensorName.IsNotEmpty () && !forceNew) {
                 settings = sensorCollection.GetGadgetSettings (sensorName) as GenericAnalogSensorSettings;
