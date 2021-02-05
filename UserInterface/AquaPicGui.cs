@@ -92,7 +92,7 @@ namespace AquaPic.UserInterface
                 { "Home", new SceneData ("Home", true, (options) => {return new HomeWindow (options);}) }
             };
 
-            currentScene = "Home";
+            currentScene = "Sensors";
 
             f = new Fixed ();
             f.SetSizeRequest (800, 480);

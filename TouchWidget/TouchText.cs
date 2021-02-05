@@ -157,8 +157,10 @@ namespace GoodtimeDevelopment.TouchWidget
             color = "white";
             size = 11;
             if (Utilites.Utils.ExecutingOperatingSystem == Utilites.Platform.Mac) {
+                size = 11;
                 fontName = "Liberation Sans";
             } else {
+                size = 10;
                 fontName = "Sans";
             }
         }
