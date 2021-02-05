@@ -61,13 +61,17 @@ namespace AquaPic.UserInterface
                 c.combo.activeIndex = 0;
             }
             c.combo.nonActiveMessage = "Please select channel";
-            c.combo.comboList.AddRange (GetAvailableChannels ());
             AddSetting (c);
 
             DrawSettings ();
         }
 
         protected virtual string[] GetAvailableChannels () => throw new NotImplementedException ();
+
+        protected virtual void UpdateAvailableChannels () {
+            var comboSetting = settings["Input Channel"] as SettingsComboBox;
+            comboSetting.combo.comboList.AddRange (GetAvailableChannels ());
+        }
 
         protected override bool OnSave (object sender) {
             var sensorSettings = new GenericSensorSettings ();

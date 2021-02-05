@@ -221,13 +221,8 @@ namespace AquaPic.UserInterface
             settings.Add (w.label.text, w);
         }
 
-        protected virtual bool OnSave (object sender) {
-            throw new NotImplementedException ();
-        }
-
-        protected virtual bool OnDelete (object sender) {
-            throw new NotImplementedException ();
-        }
+        protected virtual bool OnSave (object sender) => throw new NotImplementedException ();
+        protected virtual bool OnDelete (object sender) => throw new NotImplementedException ();
 
         public IndividualControl ParseIndividualControl (string individualControlString) {
             var ic = IndividualControl.Empty;

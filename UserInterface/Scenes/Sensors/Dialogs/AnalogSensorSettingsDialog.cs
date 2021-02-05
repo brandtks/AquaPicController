@@ -38,10 +38,10 @@ namespace AquaPic.UserInterface
             GenericAnalogSensorSettings settings,
             GenericAnalogSensorCollection sensorCollection,
             GenericAnalogInputBase analogInputDriver, 
-            Window parent)
-            : base (settings, sensorCollection, parent) 
-        {
+            Window parent
+        ) : base (settings, sensorCollection, parent) {
             this.analogInputDriver = analogInputDriver;
+            UpdateAvailableChannels ();
 
             var t = new SettingsTextBox ("LPF Factor");
             t.textBox.text = sensorName.IsNotEmpty () ? settings.lowPassFilterFactor.ToString () : "5";
