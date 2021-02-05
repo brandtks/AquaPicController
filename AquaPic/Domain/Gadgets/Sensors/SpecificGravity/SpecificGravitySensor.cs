@@ -30,7 +30,7 @@ using AquaPic.Service;
 
 namespace AquaPic.Gadgets.Sensor
 {
-    public class SpecificGravitySensor : GenericSensor
+    public class SpecificGravitySensor : GenericGadget
     {
         public IDataLogger dataLogger { get; protected set; }
         public float levelDifference { get; protected set; }
