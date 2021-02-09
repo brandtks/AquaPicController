@@ -32,23 +32,22 @@ namespace AquaPic.UserInterface
     public class SpecificGravitySensorWidget : SensorWidget
     {
         public SpecificGravitySensorWidget ()
-            : base ("Specific Gravity Sensors", Sensors.SpecificGravitySensors, typeof (SpecificGravitySensorSettings)) { }
+            : base ("Specific Gravity Sensors", Sensors.SpecificGravitySensors, typeof (SpecificGravitySensorSettings)) {
+            sensorStateTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
+        }
 
         public override void GetSensorData () {
             if (sensorName.IsNotEmpty ()) {
                 var probe = Sensors.SpecificGravitySensors.GetGadget (sensorName) as SpecificGravitySensor;
                 if (probe.connected) {
-                    sensorStateTextbox.text = Convert.ToSingle (probe.value).ToString ("F2");
-                    sensorStateTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.Inches;
+                    sensorStateTextbox.text = Convert.ToSingle (probe.value).ToString ("F5");
                     sensorLabel.Visible = true;
                 } else {
                     sensorStateTextbox.text = "Probe disconnected";
-                    sensorStateTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
                     sensorLabel.Visible = false;
                 }
             } else {
                 sensorStateTextbox.text = "Probe not available";
-                sensorStateTextbox.textRender.unitOfMeasurement = UnitsOfMeasurement.None;
                 sensorLabel.Visible = false;
             }
 
